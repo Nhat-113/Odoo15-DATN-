@@ -30,3 +30,15 @@ For a standard installation please follow the <a href="https://www.odoo.com/docu
 from the documentation.
 
 To learn the software, we recommend the <a href="https://www.odoo.com/slides">Odoo eLearning</a>, or <a href="https://www.odoo.com/page/scale-up-business-game">Scale-up</a>, the <a href="https://www.odoo.com/page/scale-up-business-game">business game</a>. Developers can start with <a href="https://www.odoo.com/documentation/15.0/developer/howtos.html">the developer tutorials</a>
+
+### Branch Strategy
+
+- `develop`
+  - Default branch for development
+  - Specification written in this branch's latest commit should work at development environment
+  - Do not commit to `develop` directly
+    - If you want to add/change documents, send pull request to this branch
+- `master`
+  - Specification written in this branch's latest commit should work at production environment
+  - Do not commit to `master` directly
+    - If you want to add/change documents in this branch, send pull request to this branch
