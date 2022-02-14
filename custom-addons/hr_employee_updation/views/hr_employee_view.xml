@@ -31,6 +31,8 @@
                 <xpath expr="//page[@name='personal_information']/group/group[1]" position="after">
                     <group name="identification_id" string="Identification ID">
                         <field name="identification_id"/>
+                        <field name="identification_place" groups="hr.group_hr_user" attrs="{'invisible': [('identification_id', 'in', [None,False])]}"/>
+                        <field name="id_start_date" groups="hr.group_hr_user" attrs="{'invisible': [('identification_id', 'in', [None,False])]}"/>
                         <field name="id_expiry_date"  groups="hr.group_hr_user" attrs="{'invisible': [('identification_id', 'in', [None,False])]}"/>
                         <field name="id_attachment_id" groups="hr.group_hr_user" widget="many2many_binary" class="oe_inline" attrs="{'invisible': [('identification_id', 'in', [None,False])]}"/>
                     </group>

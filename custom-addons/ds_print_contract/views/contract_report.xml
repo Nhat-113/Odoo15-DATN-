@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="contract_qweb_report" name="contract_qweb_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="e">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <link rel='stylesheet' href='/ds_print_contract/static/src/css/report.css'/>
+                        <div class="container contract-report">
+                            <div class="row">
+                                <div class="col-4 text-center">
+                                    <tr>
+                                        <th>
+                                            <b>
+                                                <t t-if='e.company_id.display_name'>
+                                                    <span t-field="e.company_id.display_name"/>
+                                                </t>
+                                                <t t-if="not e.company_id.display_name">CÔNG TY CỔ PHẦN D-SOFT
+                                            </t>
+                                            </b>
+                                        </th>
+                                    </tr>
+                                    <br/>
+                                    <tr>
+                                        <th>
+                                            <b>
+                                                <span>Số: ...../HĐLĐ
+                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                                </span>
+                                            </b>
+                                        </th>
+                                    </tr>
+                                </div>
+                                <div class="col-8 text-center">
+                                    <div class="text-center">
+                                        <tr>
+                                            <th>
+                                                <b>
+                                                    <span>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</span>
+                                                </b>
+                                            </th>
+                                        </tr>
+                                        <br/>
+                                        <tr>
+                                            <th>
+                                                <em>Độc lập - Tự do - Hạnh phúc</em>
+                                            </th>
+                                        </tr>
+                                        <br/>
+                                        <tr>
+                                            <th>----o0o----</th>
+                                        </tr>
+                                    </div>
+                                    <br/>
+                                    <div class="text-right">
+                                        <tr>
+                                            <th>
+                                                <em>Đà Nẵng, ngày
+                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+                                                    tháng
+                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+                                                    năm
+                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                                </em>
+                                            </th>
+                                        </tr>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 contract-hdld">
+                                    <b>
+                                        <span>HỢP ĐỒNG LAO ĐỘNG</span>
+                                    </b>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <table style="width:100%">
+                                        <tr>
+                                            <th>Chúng tôi, một bên là</th>
+                                            <td>
+                                                <span>:  </span>
+                                                <b>
+                                                    <t t-if='e.company_id.display_name'>
+                                                        <span t-field="e.company_id.display_name"/>
+                                                    </t>
+                                                    <t t-if="not e.company_id.display_name">Công ty CỔ PHẦN D-SOFT
+                                            </t>
+                                                </b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Địa chỉ</th>
+                                            <td>
+                                                <span>:  </span>
+                                                <span>
+                                                    <t t-if='e.company_id.street'>
+                                                        <span t-field="e.company_id.street"/>
+                                                    </t>
+                                                    <t t-if="not e.company_id.street">Số 10 Hải Phòng - P.Thạch Thang - Q.Hải Châu - TP.Đà Nẵng</t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Số điện thoại</th>
+                                            <td>
+                                                <span>:  </span>
+                                                <t t-if='e.company_id.phone'>
+                                                    <span t-field="e.company_id.phone"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Người đại diện</th>
+                                            <td>
+                                                <span>:  </span>Ông
+                                                <b>NGUYỄN HỒNG TÂN</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Chức vụ</th>
+                                            <td>
+                                                <span>:  </span>
+                                                Phó giám đốc
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2">Sau đây gọi tắt là “Công ty”</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Và một bên là Ông</th>
+                                            <td>
+                                                <span>:  </span>Ông
+                                                <b>
+                                                    <span style="text-transform: uppercase;">
+                                                        <t t-if='e.employee_id.name'>
+                                                            <span t-field="e.employee_id.name"/>
+                                                        </t>
+                                                    </span>
+                                                </b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Sinh ngày</th>
+                                            <td style="border: none; border-bottom: none;">
+                                                <span>:  </span>
+                                                <span>
+                                                    <t t-if='e.employee_id.birthday'>
+                                                        <span t-esc="e.employee_id.birthday.strftime('%d/%m/%Y')"/>
+                                                    </t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Địa chỉ thường trú</th>
+                                            <td style="border: none; border-top: none;">
+                                                <span>:  </span>
+                                                <span>
+                                                    <t t-if='e.employee_id.address_home_id.display_name'>
+                                                        <span t-field="e.employee_id.address_home_id.display_name"/>
+                                                    </t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2">CMND số :
+                                                <span>
+                                                    <t t-if='e.employee_id.identification_id'>
+                                                        <span t-field="e.employee_id.identification_id"/>
+                                                    </t>
+                                                    <t t-if="not e.employee_id.identification_id">....................................</t>
+                                                </span> cấp ngày:
+                                                <span>
+                                                    <t t-if='e.employee_id.id_start_date'>
+                                                        <span t-esc="e.employee_id.id_start_date.strftime('%d/%m/%Y')"/>
+                                                    </t>
+                                                    <t t-if="not e.employee_id.id_start_date">....................................</t>
+                                                </span> tại:
+                                                <span>
+                                                    <t t-if='e.employee_id.identification_place'>
+                                                        <span t-field="e.employee_id.identification_place"/>
+                                                    </t>
+                                                    <t t-if="not e.employee_id.identification_place">......................................................</t>
+                                                </span>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2">Sau đây gọi tắt là “Người lao động”</th>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <p class="font-weight-bold">Thoả thuận ký kết hợp đồng lao động và cam kết làm đúng những điều khoản sau đây:</p>
+                                    <p class="font-weight-bold">Điều I.	 Thời hạn và công việc</p>
+                                    <div class="ml-4">
+                                        <p class="font-weight-bold">Chức danh công việc:
+                                            <span class="font-weight-normal">
+                                                <t t-if='e.employee_id.job_title'>
+                                                    <span t-field="e.employee_id.job_title"/>
+                                                </t>
+                                            </span>
+                                        </p>
+                                        <p class="ml-2">Chức danh công việc có thể thay đổi trong quá trình làm việc theo quyết định của công ty</p>
+                                        <p class="font-weight-bold">Chức vụ
+                                            <span class="font-weight-normal">(nếu có): </span>
+                                        </p>
+                                        <span></span>
+                                        <p class="font-weight-bold">Công việc phải làm:
+                                            <span class="font-weight-normal">Thực hiện công việc theo bản mô tả công việc, các hướng dẫn công việc có liên quan, và các công việc khác theo sự phân công của cán bộ quản lý trực tiếp</span>
+                                        </p>
+                                        <p class="font-weight-bold">Địa điểm làm việc:
+                                            <span class="font-weight-normal">Tại trụ sở của Công ty.</span>
+                                        </p>
+                                        <p class="ml-2">Ngoài các địa điểm làm việc nêu trên, Công ty có thể có các địa điểm làm việc khác theo nhu cầu kinh doanh, hoặc theo yêu cầu của Cơ quan nhà nước có thẩm quyền hoặc theo yêu cầu của pháp luật.</p>
+                                        <p class="font-weight-bold">Loại hợp đồng và thời hạn hợp đồng:</p>
+                                        <p class="ml-2">Loại hợp đồng lao động:
+                                            <span>
+                                                <t t-if='e.contract_type_id.name'>
+                                                    <span t-field="e.contract_type_id.name"/>
+                                                </t>
+                                            </span>
+                                        </p>
+                                        <p class="ml-2">Bắt đầu từ ngày :
+                                            <span>
+                                                <t t-if='e.date_start'>
+                                                    <span t-esc="e.date_start.strftime('%d/%m/%Y')"/>
+                                                </t>
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <br/>
+                                    <p class="font-weight-bold">Điều II. Chế độ làm việc</p>
+                                    <div class="ml-4">
+                                        <p>1.   Thời giờ làm việc: Theo quy định chung của công ty.</p>
+                                        <p>2.   Trong một số trường hợp đặc biệt, do tính chất công việc, nhu cầu kinh doanh hay nhu cầu của tổ chức/bộ phận. Công ty có thể áp dụng thời gian linh hoạt. Trường hợp Người lao động được áp dụng thời gian làm việc linh hoạt. Người lao động có thể không tuân thủ lịch làm việc cố định bình thường mà làm theo ca kíp nhưng vẫn phải đảm bảo đủ số giờ làm việc theo quy định của Công ty.</p>
+                                        <p>3.   Được cấp phát đồ dùng văn phòng phẩm và sử dụng các thiết bị văn phòng cần thiết vào mục đích công việc.</p>
+                                        <p>4.   Điều kiện an toàn và vệ sinh lao động tại nơi làm việc theo quy định hiện hành của nhà nước.</p>
+                                    </div>
+                                    <br/>
+                                    <p class="font-weight-bold">Điều III. Quyền lợi và Nghĩa vụ của người lao động</p>
+                                    <div class="ml-4">
+                                        <p class="font-weight-bold">A- Quyền lợi: </p>
+                                        <p>Phương tiện đi lại làm việc: Do Người lao động tự túc</p>
+                                        <p class="font-weight-bold">1.   Mức lương chính hoặc tiền công</p>
+                                        <p class="font-weight-bold">Mức lương:
+                                            <span class="font-weight-normal">Mức lương này là căn cứ đóng bảo hiểm bắt buộc theo quy định của pháp luật lao động là cơ sở để giải quyết các chế độ bảo hiểm xã hội (ốm đau, thai sản, tai nạn lao động, bệnh nghề nghiệp, hưu trí, tử tuất) theo quy định của Luật Bảo hiểm xã hội, và các chế độ khác liên qua đến hợp đồng lao động.</span>
+                                        </p>
+                                        <p class="font-weight-bold">2.   Hình thức trả lương</p>
+                                        <p class="ml-2">Theo tháng bằng chuyển khoản, trả một lần vào ngày 02 hàng tháng. Nếu trùng vào ngày nghỉ thì được trả vào ngày làm việc đầu tiên tiếp theo. Người lao động đồng ý mở tài khoản cá nhân tại ngân hàng do Công ty chỉ định để trả tiền lương ngay sau khi ký Hợp đồng lao động với Công ty.</p>
+                                        <p class="font-weight-bold">3.   Chế độ phúc lợi:
+                                            <span class="font-weight-normal">Theo quy định của công ty</span>
+                                        </p>
+                                        <p class="font-weight-bold">4.   Tiền thưởng và lương tháng 13:
+                                            <span class="font-weight-normal">Theo quy định của công ty</span>
+                                        </p>
+                                        <p class="font-weight-bold">5.   Chế độ nâng lương:
+                                            <span class="font-weight-normal">Theo quy định của công ty được quy định tại Thoả ước lao động tập thể.</span>
+                                        </p>
+                                        <p class="font-weight-bold">6.   Chế độ nghỉ ngơi:
+                                            <span class="font-weight-normal">Được hưởng các ngày nghỉ theo quy định hiện hành của nhà nước và quy định của công ty.</span>
+                                        </p>
+                                        <p class="font-weight-bold">7.   Bảo hiểm xã hội, Bảo hiểm y tế và Bảo hiểm thất nghiệp:
+                                            <span class="font-weight-normal">Công ty và người lao động chịu trách nhiệm đóng theo quy định của nhà nước.</span>
+                                        </p>
+                                        <p class="font-weight-bold">8.   Chế độ đào tạo:
+                                            <span class="font-weight-normal">Được bồi dưỡng chuyên môn nghiệp vụ qua thực hiện công việc và được đào tạo theo chương trình chung của Công ty hàng năm theo quy định của công ty.</span>
+                                        </p>
+                                        <p class="font-weight-bold">B- Nghĩa vụ: </p>
+                                        <div class="ml-2">
+                                            <p>1.   Hoàn thành những công việc được giao, chấp hành sự phân công công việc của Công ty.</p>
+                                            <p>2.   Thực hiện nội quy, quy định của công ty.</p>
+                                            <p>3.   Trường hợp người lao động có hành vi gây thiệt hại đến sản xuất, kinh doanh, làm hư hỏng hoặc mất tài sản trang thiết bị làm việc hoặc có hành vi khác gây thiệt hại về tài sản, uy tín, hình ảnh công ty thì ngoài việc bị xử lý kỷ luật, người lao động còn có trách nhiệm bổi thưởng thiệt hại.</p>
+                                            <p>4.   Trường hợp người lao động thôi việc phải bàn giao lại thiết bị máy móc đang sử dụng theo biên bản bàn giao và có nghĩa vụ thanh toán phí Bảo hiểm còn lại (nếu có).</p>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <p class="font-weight-bold">Điều IV. Nghĩa vụ và quyền hạn của người sử dụng lao động</p>
+                                    <div class="ml-4">
+                                        <p class="font-weight-bold">A- Nghĩa vụ: </p>
+                                        <div class="ml-2">
+                                            <p>1.   Thực hiện đầy đủ những điều kiện cần thiết đã cam kết trong hợp đồng lao động để người lao động làm việc đạt hiệu quả. Bảo đảm việc làm cho người lao động theo hợp đồng đã ký.</p>
+                                            <p>2.   Thanh toán đầy đủ, dứt điểm, đúng hạn các chế độ và quyền lợi của người lao động đã cam kết trong hợp đồng lao động.</p>
+                                        </div>
+                                        <p class="font-weight-bold">B- Quyền hạn: </p>
+                                        <div class="ml-2">
+                                            <p>1.   Quản lý người lao động hoàn thành công việc theo hợp đồng (bố trí và phân công công việc theo đúng chức danh và chuyên môn).</p>
+                                            <p>2.   Có quyền thay đổi, tạm hoãn, chấm dứt hợp đồng lao động và áp dụng các biện pháp kỷ luật theo quy định của pháp luật hiện hành, Thoả ước Lao động Tập thể và Nội quy Lao động của Công ty.</p>
+                                            <p>3.   Có quyền đòi bồi thường khiếu nại tới các cơ quan liên đới để bảo vệ quyền lợi của mình nếu Người lao động vi phạm Pháp luật nhà nước hay các điều khoản của hợp đồng này.</p>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <p class="font-weight-bold">Điều V. Điều khoản thi hành</p>
+                                    <div class="ml-4">
+                                        <p>1.   Những vấn đề về lao động không được ghi trong hợp đồng này thì áp dụng quy định tại Nội quy Lao động, Thoả ước lao động tập thể và quy định của pháp luật lao động để giải quyết.</p>
+                                        <p>2.   Khi hai bên ký kết phụ lục hợp đồng thì nội dung của phụ lục cũng có giá trị như các nội dung của bản hợp đồng này.</p>
+                                        <p>3.   Hợp đồng lao động này làm thành hai (02) bản có giá trị như nhau, mỗi bên giữ một bản, và có hiệu lực từ ngày ký.</p>
+                                        <p>4.   Người lao động đọc kỹ, hiểu rõ và cam kết thực hiện các điều khoản và quy định ghi tại hợp đồng lao động.</p>
+                                        <p>5.   Hợp đồng lao động làm tại Công ty Cổ phần D-Soft ngày
+                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+                                    tháng
+                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+                                    năm
+                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row contract-signature">
+                                <div class="col-6 text-center">
+                                    <p class="font-weight-bold">Người lao động</p>
+                                    <p class="font-italic">(Ký, ghi rõ họ tên)</p>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <p class="font-weight-bold">Đại diện công ty CP D-Soft</p>
+                                    <p class="font-italic">Phó giám đốc</p>
+                                </div>
+                            </div>
+                            <!-- PHỤ LỤC HỢP ĐỒNG SỐ 1 -->
+                            <p style="page-break-before:always;"></p>
+                            <div class="row">
+                                <div class="col-4 text-center">
+                                    <tr>
+                                        <th>
+                                            <b>
+                                                <span>CÔNG TY CỔ PHẦN D-SOFT</span>
+                                            </b>
+                                        </th>
+                                    </tr>
+                                </div>
+                                <div class="col-8 text-center">
+                                    <div class="text-center">
+                                        <tr>
+                                            <th>
+                                                <b>
+                                                    <span>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</span>
+                                                </b>
+                                            </th>
+                                        </tr>
+                                        <br/>
+                                        <tr>
+                                            <th>
+                                                <em>Độc lập - Tự do - Hạnh phúc</em>
+                                            </th>
+                                        </tr>
+                                        <br/>
+                                        <tr>
+                                            <th>----o0o----</th>
+                                        </tr>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 contract-plhd">
+                                    <b>
+                                        <span>PHỤ LỤC HỢP ĐỒNG SỐ 1</span>
+                                    </b>
+                                    <p class="font-italic" style="font-size: 16px;">
+                        (Kèm theo hợp đồng số ……/HĐLĐ
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                        )
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p>Hôm nay, ngày
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+                        tháng
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+                        năm
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                    </p>
+                                </div>
+                            </div>
+                            <table style="width:100%">
+                                <tr>
+                                    <th>Chúng tôi, một bên là</th>
+                                    <td>
+                                        <span>:  </span>
+                                        <b>
+                                            <t t-if='e.company_id.display_name'>
+                                                <span t-field="e.company_id.display_name"/>
+                                            </t>
+                                            <t t-if="not e.company_id.display_name">Công ty CỔ PHẦN D-SOFT
+                                            </t>
+                                        </b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Địa chỉ</th>
+                                    <td>
+                                        <span>:  </span>
+                                        <span>
+                                            <t t-if='e.company_id.street'>
+                                                <span t-field="e.company_id.street"/>
+                                            </t>
+                                            <t t-if="not e.company_id.street">Số 10 Hải Phòng - P.Thạch Thang - Q.Hải Châu - TP.Đà Nẵng</t>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Số điện thoại</th>
+                                    <td>
+                                        <span>:  </span>
+                                        <t t-if='e.company_id.phone'>
+                                            <span t-field="e.company_id.phone"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Người đại diện</th>
+                                    <td>
+                                        <span>:  </span>Ông
+                                        <b>NGUYỄN HỒNG TÂN</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Chức vụ</th>
+                                    <td>
+                                        <span>:  </span>
+                                                Phó giám đốc
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Và một bên là Ông</th>
+                                    <td>
+                                        <span>:  </span>Ông
+                                        <b>
+                                            <span style="text-transform: uppercase;">
+                                                <t t-if='e.employee_id.name'>
+                                                    <span t-field="e.employee_id.name"/>
+                                                </t>
+                                            </span>
+                                        </b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Sinh ngày</th>
+                                    <td style="border: none; border-bottom: none;">
+                                        <span>:  </span>
+                                        <span>
+                                            <t t-if='e.employee_id.birthday'>
+                                                <span t-esc="e.employee_id.birthday.strftime('%d/%m/%Y')"/>
+                                            </t>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Địa chỉ thường trú</th>
+                                    <td style="border: none; border-top: none;">
+                                        <span>:  </span>
+                                        <span>
+                                            <t t-if='e.employee_id.address_home_id.display_name'>
+                                                <span t-field="e.employee_id.address_home_id.display_name"/>
+                                            </t>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2">CMND số :
+                                        <span>
+                                            <t t-if='e.employee_id.identification_id'>
+                                                <span t-field="e.employee_id.identification_id"/>
+                                            </t>
+                                            <t t-if="not e.employee_id.identification_id">....................................</t>
+                                        </span> cấp ngày:
+                                        <span>
+                                            <t t-if='e.employee_id.id_start_date'>
+                                                <span t-esc="e.employee_id.id_start_date.strftime('%d/%m/%Y')"/>
+                                            </t>
+                                            <t t-if="not e.employee_id.id_start_date">....................................</t>
+                                        </span> tại:
+                                        <span>
+                                            <t t-if='e.employee_id.identification_place'>
+                                                <span t-field="e.employee_id.identification_place"/>
+                                            </t>
+                                            <t t-if="not e.employee_id.identification_place">......................................................</t>
+                                        </span>
+                                    </th>
+                                </tr>
+                            </table>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <p>Hai bên thoả thuận ký kết phụ lục hợp đồng lao động và cam kết làm đúng những điều khoản sau đây:</p>
+                                    <p class="font-weight-bold">Điều 1: Nội dung</p>
+                                    <div class="ml-4">
+                                        <p>Thu nhập thực nhận:
+                                            <span class="font-weight-normal">
+                                                <t t-if='e.wage'>
+                                                    <span t-field="e.wage"/>
+                                                </t>
+                                                <t t-if="not e.wage">....................................</t>/tháng. Trong đó:
+                                            </span>
+                                        </p>
+                                        <p>Lương cơ bản:
+                                            <span class="font-weight-normal">
+                                                <t t-if='e.wage'>
+                                                    <span t-field="e.wage"/>
+                                                </t>
+                                                <t t-if="not e.wage">....................................</t>/tháng
+                                            </span>
+                                        </p>
+                                        <p>Các khoản chế độ phúc lợi:
+                                            <span class="font-weight-normal">
+                                                <t t-if='e.other_allowance'>
+                                                    <span t-field="e.other_allowance"/>
+                                                </t>
+                                                <t t-if="not e.other_allowance">....................................</t>/tháng
+                                            </span>
+                                        </p>
+                                        <p>Thời gian tăng ca sẽ được tính khi có yêu cầu từ trưởng bộ phận hoặc khách hàng. Tiền công tăng ca hoặc ngày nghỉ được tính theo quy định của công ty.</p>
+                                    </div>
+                                    <p class="font-weight-bold">Điều 2: Thời hạn</p>
+                                    <div class="ml-4">
+                                        <p>Phụ lục này có hiệu lực từ ngày
+                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+ tháng
+                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+ năm
+                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                        </p>
+                                        <p>Và là bộ phận của hợp đồng số …………/HĐLĐ
+                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+ được lập thành 02 (hai) bản có giá trị như nhau, mỗi bên giữ 01 (một) bản
+                                        </p>
+                                        <p>Phụ lục hợp đồng được lập tại:
+                                            <span>CÔNG TY CỔ PHẦN D-SOFT</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row contract-signature">
+                                <div class="col-6 text-center">
+                                    <p class="font-weight-bold">NGƯỜI LAO ĐỘNG</p>
+                                    <p class="font-italic">(Ký, ghi rõ họ tên)</p>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <p class="font-weight-bold">ĐẠI DIỆN CÔNG TY CỔ PHẦN D-SOFT</p>
+                                    <p class="font-italic">(Phó giám đốc)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="footer"></div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

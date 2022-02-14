@@ -92,6 +92,12 @@ class HrEmployee(models.Model):
         string='Joining Date',
         help="Employee joining date computed from the contract start date",
         compute='_compute_joining_date', store=True)
+    identification_place = fields.Char(
+        string='Identification Place', store=True,
+        help="Employee identification cards are created in this location")
+    id_start_date = fields.Date(
+        string='Start Date',
+        help='Start date of Identification ID')
     id_expiry_date = fields.Date(
         string='Expiry Date',
         help='Expiry date of Identification ID')
