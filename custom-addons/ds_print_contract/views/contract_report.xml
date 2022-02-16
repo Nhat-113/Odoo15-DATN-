@@ -489,26 +489,31 @@
                                     <div class="ml-4">
                                         <p>Thu nhập thực nhận:
                                             <span class="font-weight-normal">
-                                                <t t-if='e.wage'>
-                                                    <span t-field="e.wage"/>
+                                                <t t-if="e.wage">
+                                                    <span t-esc="'{:,}'.format(int(e.wage + e.other_allowance))"/>
                                                 </t>
-                                                <t t-if="not e.wage">....................................</t>/tháng. Trong đó:
+                                                <t t-if="not e.wage">
+                                                    <t t-if="e.other_allowance">
+                                                        <span t-esc="'{:,}'.format(int(e.other_allowance))"/>
+                                                    </t>
+                                                    <t t-if="not e.other_allowance"> 0 </t>
+                                                </t>VNĐ/tháng. Trong đó:
                                             </span>
                                         </p>
                                         <p>Lương cơ bản:
                                             <span class="font-weight-normal">
-                                                <t t-if='e.wage'>
-                                                    <span t-field="e.wage"/>
+                                                <t t-if="e.wage">
+                                                    <span t-esc="'{:,}'.format(int(e.wage))"/>
                                                 </t>
-                                                <t t-if="not e.wage">....................................</t>/tháng
+                                                <t t-if="not e.wage"> 0 </t>VNĐ/tháng
                                             </span>
                                         </p>
                                         <p>Các khoản chế độ phúc lợi:
                                             <span class="font-weight-normal">
-                                                <t t-if='e.other_allowance'>
-                                                    <span t-field="e.other_allowance"/>
+                                                <t t-if="e.other_allowance">
+                                                    <span t-esc="'{:,}'.format(int(e.other_allowance))"/>
                                                 </t>
-                                                <t t-if="not e.other_allowance">....................................</t>/tháng
+                                                <t t-if="not e.other_allowance"> 0 </t>VNĐ/tháng
                                             </span>
                                         </p>
                                         <p>Thời gian tăng ca sẽ được tính khi có yêu cầu từ trưởng bộ phận hoặc khách hàng. Tiền công tăng ca hoặc ngày nghỉ được tính theo quy định của công ty.</p>

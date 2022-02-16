@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="information_security_commit_qweb_report" name="information_security_commit_qweb_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="e">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <link rel='stylesheet' href='/ds_print_contract/static/src/css/report.css'/>
+                        <div class="container contract-report">
+                            <div class="row">
+                                <div class="col-4 text-center">
+                                    <tr>
+                                        <th>
+                                            <img src="/ds_print_contract/static/description/img/d-soft.jpg" style="width:100%;"/>
+                                        </th>
+                                    </tr>
+                                </div>
+                                <div class="col-8 text-center">
+                                    <div class="text-center">
+                                        <tr>
+                                            <th>
+                                                <b>
+                                                    <span>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</span>
+                                                </b>
+                                            </th>
+                                        </tr>
+                                        <br/>
+                                        <tr>
+                                            <th>
+                                                <em>Độc lập - Tự do - Hạnh phúc</em>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <span style="margin-top: -10px; display: block;">________________________</span>
+                                            </th>
+                                        </tr>
+                                    </div>
+                                    <br/>
+                                    <div class="text-right">
+                                        <tr>
+                                            <th>
+                                                <em>Đà Nẵng, ngày
+                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+                                                    tháng
+                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+                                                    năm
+                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                                </em>
+                                            </th>
+                                        </tr>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12 contract-hdld">
+                                    <b>
+                                        <span>CAM KẾT BẢO MẬT THÔNG TIN</span>
+                                    </b>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p>Bản cam kết này nhằm được đảm bảo các thông tin cần được bảo mật thuộc quyền sở hữu của công ty Cổ phần D-SOFT Đà Nẵng, được bảo mật, không bị thất thoát, tiết lộ cho một bên thứ 3 nào.
+                                    </p>
+                                    <table style="width:100%">
+                                        <tr>
+                                            <th>Tên tôi là</th>
+                                            <td>
+                                                <span>:  </span>
+                                                <b>
+                                                    <span style="text-transform: uppercase;">
+                                                        <t t-if='e.employee_id.name'>
+                                                            <span t-field="e.employee_id.name"/>
+                                                        </t>
+                                                    </span>
+                                                </b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Quốc tịch</th>
+                                            <td>
+                                                <span>: Việt Nam</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Sinh ngày</th>
+                                            <td>
+                                                <span>:  </span>
+                                                <span>
+                                                    <t t-if='e.employee_id.birthday'>
+                                                        <span t-esc="e.employee_id.birthday.strftime('%d/%m/%Y')"/>
+                                                    </t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Giới tính</th>
+                                            <td>
+                                                <span>:  </span>
+                                                <span>
+                                                    <t t-if='e.employee_id.gender'>
+                                                        <t t-if="e.employee_id.gender == 'male'">
+                                                            <span>Nam</span>
+                                                        </t>
+                                                        <t t-if="e.employee_id.gender == 'female'">
+                                                            <span>Nữ</span>
+                                                        </t>
+                                                        <t t-if="e.employee_id.gender == 'other'">
+                                                            <span>Other</span>
+                                                        </t>
+                                                    </t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Địa chỉ thường trú tại</th>
+                                            <td style="border: none; border-top: none;">
+                                                <span>:  </span>
+                                                <span>
+                                                    <t t-if='e.employee_id.address_home_id.display_name'>
+                                                        <span t-field="e.employee_id.address_home_id.display_name"/>
+                                                    </t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2">CMND số :
+                                                <span>
+                                                    <t t-if='e.employee_id.identification_id'>
+                                                        <span style="padding-right: 20px;" t-field="e.employee_id.identification_id"/>
+                                                    </t>
+                                                    <t t-if="not e.employee_id.identification_id">....................................</t>
+                                                </span>    Cấp ngày:
+                                                <span>
+                                                    <t t-if='e.employee_id.id_start_date'>
+                                                        <span style="padding-right: 20px;" t-esc="e.employee_id.id_start_date.strftime('%d/%m/%Y')"/>
+                                                    </t>
+                                                    <t t-if="not e.employee_id.id_start_date">....................................</t>
+                                                </span>    Nơi cấp:
+                                                <span>
+                                                    <t t-if='e.employee_id.identification_place'>
+                                                        <span t-field="e.employee_id.identification_place"/>
+                                                    </t>
+                                                    <t t-if="not e.employee_id.identification_place">......................................................</t>
+                                                </span>
+                                            </th>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <p class="font-weight-bold">I.	 Các khái niệm</p>
+                                    <p class="font-weight-bold ml-2">Thông tin được bảo mật:
+                                        <span class="font-weight-normal"> Là những thông tin liên quan đến sản phẩm sở hữu trí tuệ và bí mật kinh doanh của Công ty.</span>
+                                    </p>
+                                    <div class="ml-4">
+                                        <ul>
+                                            <li>Các sản phẩm phần mềm của công ty và của khách hàng/đối tác bao gồm:</li>
+                                            <div class="ml-2 mt-2">
+                                                <p>-	Tài liệu khảo sát, phân tích, thiết kế bước đầu.</p>
+                                                <p>-	Tài liệu thiết kế, module sản phẩm.</p>
+                                                <p>-	Cơ sở dữ liệu, các chương trình máy tính bao gồm mã nguồn, mã đối tượng.</p>
+                                                <p>-    Các phương tiện xây dựng phần mềm như cơ sở dữ liệu, ngôn ngữ lập trình, chương trình dịch, chương trình bổ trợ…</p>
+                                                <p>-	Sản phẩm phần mềm trọn gói, hướng dẫn sử dụng</p>
+                                                <p>-	Nguyên bản các giao diện sản phẩm phần mềm, bao gồm cả trang web của công ty và của công ty thiết kế cho khách hàng/đối tác</p>
+                                            </div>
+                                            <li>Các thiết kế/giải pháp, các quy trình cài đặt triển khai cho từng dòng sản phẩm công nghệ thông tin hoặc cho từng khách hàng/đối tác và các tài liệu liên quan.</li>
+                                            <li>Các giải pháp tích hợp hệ thống thông tin, giải pháp công nghệ triển khai cho công ty, khách hàng, đối tác.</li>
+                                            <li>Các tài liệu báo cáo hoặc tổng kết về giải pháp/thiết kế do công ty nghiên cứu phát triển.</li>
+                                            <li>Các thông tin bí mật về thị trường, khách hàng, tài chính đã được công ty khai thác và phát triển mang tính đặc thù.</li>
+                                            <li>Các quy trình sản xuất bao gồm tất cả các tài liệu cấu thành mô tả quá trình, mô tả sản phẩm, biểu mẫu…</li>
+                                            <li>Các thông tin, được thể hiện bằng văn bản giấy tờ hoặc văn bản điện tử được đánh dấu “ Tài liệu mật”, “Sử dụng nội bộ” hoặc một hình thức tương đương.</li>
+                                        </ul>
+                                    </div>
+                                    <p class="font-weight-bold ml-2">Đối tác của công ty:
+                                        <span class="font-weight-normal"> Là những cá nhân tập thể tổ chức có hoạt động sản xuất kinh doanh các sản phẩm/dịch vụ giống hoặc tương tự sản phẩm Công ty cùng hướng tới đối tượng khách hàng và chia sẻ lợi ích với Công ty.</span>
+                                    </p>
+                                    <p class="font-weight-bold ml-2">Khách hàng của Công ty:
+                                        <span class="font-weight-normal"> Là những cá nhân, tổ chức, tập thể mua sản phẩm/dịch vụ của Công ty.</span>
+                                    </p>
+                                    <p class="font-weight-bold ml-2">Bên thứ ba:
+                                        <span class="font-weight-normal"> Là bất kỳ cá nhân, tập thể, tổ chức nào ngoài Công ty và bản thân cá nhân nhân viên nắm giữ thông tin cần được Bảo mật.</span>
+                                    </p>
+                                    <br/>
+                                    <p class="font-weight-bold">II.   Cam kết bảo mật thông tin</p>
+                                    <p class="ml-2">Tuyệt đối tuân thủ quy định về Bảo mật thông tin của Công ty.</p>
+                                    <p class="ml-2">Sử dụng thông tin: Chỉ sử dụng thông tin cần được bảo mật cho mục đích công việc liên quan đến hoạt động kinh doanh của Công ty.</p>
+                                    <p class="ml-2">Không được:</p>
+                                    <div class="ml-4">
+                                        <p>-    Tiết lộ cho bất kỳ bên thứ ba nào những thông tin cần được bảo mật hoặc bất kỳ thông tin nào của Công ty/Khách hàng/Đối tác của công ty được đánh dấu “ Tài liệu mật”, “ Sử dụng nội bộ” hoặc bằng hình thức tương tự mà không có sự đồng ý của Lãnh đạo công ty.</p>
+                                        <p>-	Sử dụng thông tin cần được bảo mật cho mục đích cá nhân (lập hồ sơ xin việc, chia sẻ thông tin bạn bè, người thân…).</p>
+                                        <p>-	Sao chép các thông tin cần được bảo mật vì bất cứ lý do gì khi chưa có sự chấp thuận bằng văn bản của của Công ty.</p>
+                                        <p>-    Lưu trữ thông tin bảo mật liên quan đến các dự án của công ty dưới mọi hình thức trên các thiết bị điện tử cá nhân và trên internet.</p>
+                                        <p>-	Sau khi kết thúc thời gian làm việc, thực tập tại công ty phải xóa hết toàn bộ thông tin liên quan đến dự án trên các thiết bị cá nhân và bàn giao toàn bộ công cụ làm việc cho Công ty.</p>
+                                    </div>
+                                    <br/>
+                                    <p class="font-weight-bold">III.    Hiệu lực của bản Cam kết</p>
+                                    <div class="ml-2">
+                                        <p>Trong thời gian cam kết này có hiệu lực, nếu tôi vi phạm bất kỳ điều nào của bản cam kết, tôi xin chịu hoàn toàn trách nhiệm và phải bồi thường thiệt hại cho công ty theo mức độ thiệt hại gây ra. Ngoài ra, Công ty có quyền khởi kiện tôi ra toà để giải quyết theo quy định của pháp luật.</p>
+                                        <p>Cam kết này có hiệu lực kể từ ngày ký và trong trường hợp kết thúc hợp đồng lao động thì cam kết này vẫn có hiệu lực.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row contract-signature">
+                                <div class="col-6"></div>
+                                <div class="col-6 text-center">
+                                    <p>
+                                        Đà Nẵng, ngày
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+                                                    tháng
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+                                                    năm
+                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                    </p>
+                                    <p class="font-italic">Người cam kết</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="footer"></div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
