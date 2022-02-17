@@ -119,11 +119,17 @@ class HrEmployee(models.Model):
         'hr.employee.family', 'employee_id',
         string='Family', help='Family Information')
 
+    def _first_contract(self):
+        hr_contract = self.env['hr.contract'].sudo()
+        return hr_contract.search([('employee_id', '=', self.id)],
+                                  order='date_start asc', limit=1)
+
     @api.depends('contract_id')
     def _compute_joining_date(self):
         for rec in self:
-            rec.joining_date = min(rec.contract_id.mapped('date_start'))\
-                if rec.contract_id else False
+            first_contract = rec._first_contract()
+            rec.joining_date = min(first_contract.mapped('date_start'))\
+                if first_contract else False
 
     @api.onchange('spouse_complete_name', 'spouse_birthdate')
     def onchange_spouse(self):
@@ -134,7 +140,6 @@ class HrEmployee(models.Model):
                 'relation_id': relation.id,
                 'birth_date': self.spouse_birthdate,
             })]
-
 
 class EmployeeRelationInfo(models.Model):
     """Table for keep employee family information"""

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="hr_employee_kanban_birthday_status_inherit">
+            <field name="name">hr.employee.kanban.birthday.status</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.hr_kanban_view_employees"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_kanban_details')]" position="after">
+                    <field name="birthday" invisible="1"/>
+                    <div t-if="moment(record.birthday.raw_value).format('MMM')==moment(Date()).format('MMM')">
+                        <img src='/ds_employee_birthday_reminder/static/src/img/cake.png' style="width:40px;height:30px"/>
+                    </div>
+                </xpath>
+                <xpath expr="//div[hasclass('oe_kanban_details')]" position="inside">
+
+                    <div t-if="moment(record.birthday.raw_value).format('MMM')==moment(Date()).format('MMM')">
+                        <span t-esc="moment(record.birthday.raw_value).format('DD-MMM-YYYY')" style="color:green; font-size: 0.94791667rem;" />
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Display the Date of Birth in the Tree view -->
+        <record model="ir.ui.view" id="view_employee_tree_inherit_day_of_birth">
+            <field name="name">hr.employee.tree.birthday</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='work_email']" position="after">
+                    <field name="birthday" optional="hide" string="Date of Birth"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Add Employee Age to display in the employee Form -->
+        <record id="view_hr_employee_form_inherit_age" model="ir.ui.view">
+            <field name="name">hr.employee.form.inherit.age</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='birthday']" position="after">
+                    <field name="employee_age" readonly="1" force_save="1"/>
+                </xpath>
+            </field>
+        </record>
+
+         <!-- Add This Month Filter Date of Birth in Employees -->
+        <record id="view_employee_birthday_filter" model="ir.ui.view">
+            <field name="name">ds_employee_birthday_reminder.view_employee_birthday_filter</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='message_needaction']" position="after">
+                    <separator/>
+                    <filter string="This Month's Birthdays" name="thismonth" domain="[('birthday_month', '=' , context_today().strftime('%m'))]"/>
+                    <separator/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
