@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Display the Employee Seniority in the Kaban view -->
+    <record model="ir.ui.view" id="hr_employee_kanban_seniority_inherit">
+        <field name="name">hr.employee.kanban.seniority</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.hr_kanban_view_employees"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_kanban_details')]" position="inside">
+                <i class="fa fa-clock-o" role="img" aria-label="Seniority" title="Seniority"></i>
+                <span style="font-size: 0.94791667rem;">
+                    <field name="seniority"/>
+                </span>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Display the Employee Seniority, Gender, Address, Certificate in the Tree view -->
+    <record model="ir.ui.view" id="view_employee_tree_inherit_seniority">
+        <field name="name">hr.employee.tree.seniority</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='birthday']" position="after">
+                <field name="gender" string="Gender"/>
+                <field name="address_home_id" optional="hide" string="Address"/>
+                <field name="certificate" optional="hide" string="Certificate"/>
+                <field name="seniority" optional="hide" string="Seniority"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
