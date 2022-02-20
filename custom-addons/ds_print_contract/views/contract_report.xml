@@ -129,9 +129,17 @@
                                             <th colspan="2">Sau đây gọi tắt là “Công ty”</th>
                                         </tr>
                                         <tr>
-                                            <th>Và một bên là Ông</th>
+                                            <th>Và một bên là </th>
                                             <td>
-                                                <span>:  </span>Ông
+                                                <span>:  </span>
+                                                <t1 t-if='e.employee_id.gender'>
+                                                    <t t-if="e.employee_id.gender == 'male'">
+                                                        <span>Ông</span>
+                                                    </t>
+                                                    <t t-if="e.employee_id.gender == 'female'">
+                                                        <span>Bà</span>
+                                                    </t>
+                                                </t1>
                                                 <b>
                                                     <span style="text-transform: uppercase;">
                                                         <t t-if='e.employee_id.name'>
@@ -227,6 +235,13 @@
                                             <span>
                                                 <t t-if='e.date_start'>
                                                     <span t-esc="e.date_start.strftime('%d/%m/%Y')"/>
+                                                </t>
+                                            </span>
+                                        </p>
+                                        <p class="ml-2">Ngày kết thúc :
+                                            <span>
+                                                <t t-if='e.date_end'>
+                                                    <span t-esc="e.date_end.strftime('%d/%m/%Y')"/>
                                                 </t>
                                             </span>
                                         </p>
@@ -425,9 +440,17 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>Và một bên là Ông</th>
+                                    <th>Và một bên là </th>
                                     <td>
-                                        <span>:  </span>Ông
+                                        <span>:  </span>
+                                        <t1 t-if='e.employee_id.gender'>
+                                            <t t-if="e.employee_id.gender == 'male'">
+                                                <span>Ông</span>
+                                            </t>
+                                            <t t-if="e.employee_id.gender == 'female'">
+                                                <span>Bà</span>
+                                            </t>
+                                        </t1>
                                         <b>
                                             <span style="text-transform: uppercase;">
                                                 <t t-if='e.employee_id.name'>
@@ -521,11 +544,11 @@
                                     <p class="font-weight-bold">Điều 2: Thời hạn</p>
                                     <div class="ml-4">
                                         <p>Phụ lục này có hiệu lực từ ngày
-                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+                                            <span t-esc="e.date_start.strftime('%d')"/>
  tháng
-                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+                                            <span t-esc="e.date_start.strftime('%m')"/>
  năm
-                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                            <span t-esc="e.date_start.strftime('%Y')"/>
                                         </p>
                                         <p>Và là bộ phận của hợp đồng số …………/HĐLĐ
                                             <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
