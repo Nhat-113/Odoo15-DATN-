@@ -9,6 +9,7 @@
     "depends": ["hr", "hr_contract", "hr_employee_updation"],
     "data": ["views/contract_report.xml",
              "views/probationary_contract_report.xml",
+             "views/internship_contract_report.xml",
              "views/duration_contract_view.xml",
              "views/information_security_commit_report.xml",
              "report/contract_qweb_report.xml",
