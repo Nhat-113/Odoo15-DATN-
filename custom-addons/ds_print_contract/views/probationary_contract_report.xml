@@ -119,9 +119,17 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>Và một bên là Ông</th>
+                                            <th>Và một bên là </th>
                                             <td>
-                                                <span>:  </span>Ông
+                                                <span>:  </span>
+                                                <t1 t-if='e.employee_id.gender'>
+                                                    <t t-if="e.employee_id.gender == 'male'">
+                                                        <span>Ông</span>
+                                                    </t>
+                                                    <t t-if="e.employee_id.gender == 'female'">
+                                                        <span>Bà</span>
+                                                    </t>
+                                                </t1>
                                                 <b>
                                                     <span style="text-transform: uppercase;">
                                                         <t t-if='e.employee_id.name'>
