@@ -61,7 +61,7 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='salary']" position="after">
                 <group string="Monthly Advantages in Cash" name='allowances'>
-                    <label for="hra"/>
+                    <!-- <label for="hra"/>
                     <div class="o_row">
                         <field name="hra" nolabel="1"/>
                         <span>/ month</span>
@@ -70,7 +70,7 @@
                     <div class="o_row">
                         <field name="da" nolabel="1"/>
                         <span>/ month</span>
-                    </div>
+                    </div> -->
                     <label for="travel_allowance"/>
                     <div class="o_row">
 
@@ -87,6 +87,18 @@
                     <div class="o_row">
 
                         <field name="medical_allowance" nolabel="1"/>
+                        <span>/ month</span>
+                    </div>
+                    <label for="non_taxable_allowance"/>
+                    <div class="o_row">
+
+                        <field name="non_taxable_allowance" nolabel="1"/>
+                        <span>/ month</span>
+                    </div>
+                    <label for="taxable_allowance"/>
+                    <div class="o_row">
+
+                        <field name="taxable_allowance" nolabel="1"/>
                         <span>/ month</span>
                     </div>
                     <label for="other_allowance"/>
