@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+ds_send_email_payslips_message_wizard,Email Payslip Message Wizard,ds_send_email_payslips.model_ds_send_email_payslips_message_wizard,,1,1,1,1

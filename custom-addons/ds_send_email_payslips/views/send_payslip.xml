@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="employee_payslip_send_mail_form_view">
+            <field name="name">hr.payslip.form</field>
+            <field name="model">hr.payslip</field>
+            <field name="inherit_id" ref="hr_payroll_community.view_hr_payslip_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header/button[@name='action_payslip_cancel']" position="before">
+                    <button name="send_payslip" string="Send By Email" type="object" class="oe_highlight"/>
+                </xpath>
+            </field>
+        </record>
+        
+        <!-- Send Email Payslips Button in action menu -->
+        <record id="action_send_payslips" model="ir.actions.server">
+            <field name="name">Send Email Payslips</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="model_hr_payslip"/>
+            <field name="binding_model_id" ref="model_hr_payslip"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">action = records._send_multi_payslips()</field>
+        </record>
+
+        <!-- Send Email Payslips Button in Batches action menu -->
+        <record model="ir.ui.view" id="employee_payslip_batches_send_mail_form_view">
+            <field name="name">hr.payslip.batches.form</field>
+            <field name="model">hr.payslip.run</field>
+            <field name="inherit_id" ref="hr_payroll_community.hr_payslip_run_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header/button[@name='draft_payslip_run']" position="after">
+                    <button name="send_multi_payslips" type="object"
+                        class="oe_highlight"
+                        string="Send Email Payslips"
+                        confirm="Are you sure that you want to send the Email Payslips to all Employess in this Payslips Batches? This action can't be undone."
+                    />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
