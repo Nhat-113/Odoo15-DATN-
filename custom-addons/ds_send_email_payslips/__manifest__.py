@@ -1,0 +1,21 @@
+{
+    'name': "DS Send Email Payslips",
+    'version': '15.0.1.0.0',
+    'summary': """Send Payslip by Email""",
+    'description': """This module allow send payslip by mail""",
+    'author': "nhannv",
+    'company': "D-Soft",
+    'website': "http://d-soft.com.vn",
+    'category': 'Human Resources',
+    'depends': ['base', 'hr', 'hr_payroll_community'],
+    'data': [
+        'views/send_payslip.xml',
+        'wizard/message_wizard_views.xml',
+        'security/ir.model.access.csv',
+        'data/payslip_mail_template.xml',
+    ],
+    'images': ['static/description/banner.jpg'],
+    'license': 'AGPL-3',
+    'installable': True,
+    'auto_install': False,
+}
