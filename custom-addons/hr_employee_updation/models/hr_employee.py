@@ -44,7 +44,7 @@ class HrEmployeeFamilyInfo(models.Model):
     member_contact = fields.Char(string='Contact No')
     birth_date = fields.Date(string="DOB", tracking=True)
 
-
+    
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
@@ -118,6 +118,8 @@ class HrEmployee(models.Model):
     fam_ids = fields.One2many(
         'hr.employee.family', 'employee_id',
         string='Family', help='Family Information')
+    insurance_id = fields.Char(string='Insurance ID', groups="hr.group_hr_user",  tracking=True)
+    personal_income_tax_code = fields.Char(string="Personal Income Tax Code", groups="hr.group_hr_user", tracking=True)
 
     def _first_contract(self):
         hr_contract = self.env['hr.contract'].sudo()
@@ -140,7 +142,7 @@ class HrEmployee(models.Model):
                 'relation_id': relation.id,
                 'birth_date': self.spouse_birthdate,
             })]
-
+    
 class EmployeeRelationInfo(models.Model):
     """Table for keep employee family information"""
 
