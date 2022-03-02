@@ -28,6 +28,7 @@ class HrContract(models.Model):
     da = fields.Monetary(string="DA", help="Dearness allowance")
     meal_allowance = fields.Monetary(string="Meal Allowance", help="Meal allowance")
     medical_allowance = fields.Monetary(string="Medical Allowance", help="Medical allowance")
+    union_fee = fields.Monetary(string="Union Fee", help="Union fee")
     other_allowance = fields.Monetary(compute='_other_allowance_total', string="Other Allowance", readonly=True, help="Other allowances = Non-Taxable Allowances + Taxable Allowances")
     non_taxable_allowance = fields.Monetary(string="Non-Taxable Allowance", help="Non-Taxable Allowances")
     taxable_allowance = fields.Monetary(string="Taxable Allowance", help="Taxable Allowances")
