@@ -21,7 +21,7 @@
 
         <!-- Salary Rules -->
 
-        <record id="hr_salary_rule_houserentallowance1" model="hr.salary.rule">
+        <!-- <record id="hr_salary_rule_houserentallowance1" model="hr.salary.rule">
             <field name="amount_select">percentage</field>
             <field eval="40.0" name="amount_percentage"/>
             <field name="amount_percentage_base">contract.wage</field>
@@ -89,11 +89,11 @@
             <field name="name">Get 1% of sales</field>
             <field name="sequence" eval="17"/>
             <field name="amount_python_compute">result = ((inputs.SALEURO and inputs.SALEURO.amount) + (inputs.SALASIA and inputs.SALASIA.amount)) * 0.01</field>
-         </record>
+         </record> -->
 
         <!-- Rule Inputs -->
 
-        <record id="hr_rule_input_sale_a" model="hr.rule.input">
+        <!-- <record id="hr_rule_input_sale_a" model="hr.rule.input">
             <field name="code">SALEURO</field>
             <field name="name">Sales to Europe</field>
             <field name="input_id" ref="hr_salary_rule_sales_commission"/>
@@ -103,11 +103,11 @@
             <field name="code">SALASIA</field>
             <field name="name">Sales to Asia</field>
             <field name="input_id" ref="hr_salary_rule_sales_commission"/>
-        </record>
+        </record> -->
 
         <!-- Salary Structure -->
 
-         <record id="structure_001" model="hr.payroll.structure">
+         <!-- <record id="structure_001" model="hr.payroll.structure">
             <field name="code">ME</field>
             <field name="name">Marketing Executive</field>
             <field eval="[(6, 0, [ref('hr_salary_rule_houserentallowance1'), ref('hr_salary_rule_convanceallowance1'),ref('hr_salary_rule_professionaltax1'),ref('hr_salary_rule_providentfund1')])]" name="rule_ids"/>
@@ -121,7 +121,7 @@
             <field eval="[(6, 0, [ref('hr_salary_rule_ca_gravie'), ref('hr_salary_rule_meal_voucher')])]" name="rule_ids"/>
             <field name="company_id" ref="base.main_company"/>
             <field name="parent_id" ref="structure_001"/>
-        </record>
+        </record> -->
 
         <!--Employeee Work Location-->
         <record id="work_data" model="hr.work.location">
