@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Send Email Contract Button in Contract Form view -->
+        <record model="ir.ui.view" id="employee_contract_send_mail_form_view">
+            <field name="name">hr.contract.send.button</field>
+            <field name="model">hr.contract</field>
+            <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="send_email_contract" type="object" class="oe_highlight" string="Send Email Contract" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
