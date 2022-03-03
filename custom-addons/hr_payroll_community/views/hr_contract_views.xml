@@ -71,7 +71,7 @@
                         <field name="da" nolabel="1"/>
                         <span>/ month</span>
                     </div> -->
-                    <label for="travel_allowance"/>
+                    <!-- <label for="travel_allowance"/>
                     <div class="o_row">
 
                         <field name="travel_allowance" nolabel="1"/>
@@ -87,6 +87,12 @@
                     <div class="o_row">
 
                         <field name="medical_allowance" nolabel="1"/>
+                        <span>/ month</span>
+                    </div> -->
+                    <label for="union_fee"/>
+                    <div class="o_row">
+
+                        <field name="union_fee" nolabel="1"/>
                         <span>/ month</span>
                     </div>
                     <label for="non_taxable_allowance"/>
