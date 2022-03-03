@@ -21,7 +21,7 @@
                     .....
                     </p>
                     <br/>
-                    <p>Please find attached <i>Offical_Labor_Contract_<t t-out="object.employee_id.name"/></i></p>
+                    <p>Please find attached <i>Offical_Labor_Contract_<t t-out="object.employee_id.name"/></i> and then please contact HR within <strong>3</strong> business days after getting this email.</p>
                     <p>If you have any questions, do not hesitate to contact HR.</p>
                     <br/>
                     <p>Thank you!</p>
