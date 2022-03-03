@@ -18,12 +18,12 @@
 
     <!-- Hợp đồng chính thức -->
     <record id="action_report_contract" model="ir.actions.report">
-        <field name="name">Employee Contract</field>
+        <field name="name">Employee Offical Labor Contract</field>
         <field name="model">hr.contract</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">ds_print_contract.contract_qweb_report</field>
         <field name="report_file">ds_print_contract.contract_qweb_report</field>
-        <field name="print_report_name">'Contract - %s' % (object.name)</field>
+        <field name="print_report_name">'Offical Labor Contract - %s' % (object.name)</field>
         <field name="binding_model_id" ref="model_hr_contract"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="ds_print_contract.contract_paperformat_qweb" />

@@ -9,7 +9,8 @@ class ContractType(models.Model):
     _order = 'sequence, id'
 
     name = fields.Char(string='Contract Type', required=True, help="Name")
-    sequence = fields.Integer(help="Gives the sequence when displaying a list of Contract.", default=10)
+    sequence = fields.Integer(
+        help="Gives the sequence when displaying a list of Contract.", default=10)
 
 
 class ContractInherit(models.Model):
@@ -18,3 +19,8 @@ class ContractInherit(models.Model):
     type_id = fields.Many2one('hr.contract.type', string="Employee Category",
                               required=True, help="Employee category",
                               default=lambda self: self.env['hr.contract.type'].search([], limit=1))
+    contract_document_type = fields.Selection([
+        ('offical_labor', 'Offical Labor Contract'),
+        ('probationary', 'Probationary Contract'),
+        ('internship', 'Internship Contract')
+    ], 'Contract Document Type', default='offical_labor', index=True, required=True)
