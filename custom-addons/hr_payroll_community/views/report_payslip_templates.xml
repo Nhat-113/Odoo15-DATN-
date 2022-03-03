@@ -75,13 +75,13 @@
                             </tr>
                         </table>
 
-                        <table class="table table-sm table-bordered" style="font-family: 'Times New Roman'; font-size: 18px;">
+                        <table class="table table-sm table-bordered" style="font-family: 'Times New Roman'; font-size: 16px;">
                             <thead class="text-center">
                                 <tr>
                                     <th style="width: 10%">No.</th>
-                                    <th style="width: 60%">Danh mục/Details</th>
+                                    <th style="width: 70%">Danh mục/Details</th>
                                     <!-- <th>Quantity/rate</th> -->
-                                    <th style="width: 30%">Amount</th>
+                                    <th style="width: 20%">Amount</th>
                                     <!-- <th>Total</th> -->
                                 </tr>
                             </thead>
