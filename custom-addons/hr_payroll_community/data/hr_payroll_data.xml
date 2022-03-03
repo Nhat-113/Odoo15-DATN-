@@ -520,13 +520,13 @@
          <record id="structure_base" model="hr.payroll.structure">
             <field name="code">BASE</field>
             <field name="name">Base for new structures</field>
-            <field eval="[(6, 0, [ref('hr_rule_Basic'), ref('hr_rule_nctt'),ref('hr_rule_bqnc'), 
-                ref('hr_rule_nnkl'),ref('hr_rule_nctte'), ref('hr_rule_tl'),ref('hr_rule_tot1'),
-                ref('hr_rule_tot2'),ref('hr_rule_tot3'), ref('hr_rule_lot'),ref('hr_rule_ltu'),
-                ref('hr_rule_pcd'),ref('hr_rule_bh'), ref('hr_rule_gtgc'),ref('hr_rule_tnc'),
-                ref('hr_rule_tncn1'),ref('hr_rule_tncn2'), ref('hr_rule_tncn3'),ref('hr_rule_tncn4'),
-                ref('hr_rule_tncn5'),ref('hr_rule_tncn6'), ref('hr_rule_tncn7'),ref('hr_rule_tncn8'),
-                ref('hr_rule_ltl')])]" name="rule_ids"/>
+            <field eval="[(6, 0, [ref('hr_rule_wage'), ref('hr_rule_other_all'),ref('hr_rule_Basic'), 
+                ref('hr_rule_nctt'),ref('hr_rule_bqnc'), ref('hr_rule_nnkl'),ref('hr_rule_nctte'), 
+                ref('hr_rule_tl'),ref('hr_rule_tot1'), ref('hr_rule_tot2'),ref('hr_rule_tot3'),
+                ref('hr_rule_lot'),ref('hr_rule_ltu'), ref('hr_rule_pcd'),ref('hr_rule_bh'), 
+                ref('hr_rule_gtgc'),ref('hr_rule_tnc'), ref('hr_rule_tncn1'),ref('hr_rule_tncn2'), 
+                ref('hr_rule_tncn3'),ref('hr_rule_tncn4'), ref('hr_rule_tncn5'),ref('hr_rule_tncn6'), 
+                ref('hr_rule_tncn7'),ref('hr_rule_tncn8'),ref('hr_rule_ltl')])]" name="rule_ids"/>
             <field name="company_id" ref="base.main_company"/>
         </record>
 
