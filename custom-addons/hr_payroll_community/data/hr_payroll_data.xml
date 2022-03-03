@@ -11,10 +11,10 @@
             <field name="code">BASIC</field>
         </record>
 
-        <record id="ALW" model="hr.salary.rule.category">
+        <!-- <record id="ALW" model="hr.salary.rule.category">
             <field name="name">Allowance</field>
             <field name="code">ALW</field>
-        </record>
+        </record> -->
 
         <record id="GROSS" model="hr.salary.rule.category">
             <field name="name">Gross</field>
@@ -31,12 +31,12 @@
             <field name="code">NET</field>
         </record>
 
-        <record id="COMP" model="hr.salary.rule.category">
+        <!-- <record id="COMP" model="hr.salary.rule.category">
             <field name="name">Company Contribution</field>
             <field name="code">COMP</field>
-        </record>
+        </record> -->
 
-        <record id="HRA" model="hr.salary.rule.category">
+        <!-- <record id="HRA" model="hr.salary.rule.category">
             <field name="name">House Rent Allowance</field>
             <field name="code">HRA</field>
         </record>
@@ -74,17 +74,17 @@
         <record id="TLL" model="hr.salary.rule.category">
             <field name="name">Tổng lương</field>
             <field name="code">TLL</field>
-        </record>
+        </record> -->
 
         <record id="GT" model="hr.salary.rule.category">
             <field name="name">Deduction of family</field>
             <field name="code">GT</field>
         </record>
 
-        <record id="OVT" model="hr.salary.rule.category">
+        <!-- <record id="OVT" model="hr.salary.rule.category">
             <field name="name">Over Time</field>
             <field name="code">OVT</field>
-        </record>
+        </record> -->
 
         <record id="BS" model="hr.salary.rule.category">
             <field name="name">Bonus</field>
@@ -108,7 +108,7 @@
 <!--            <field name="parent_id" eval="False"/>-->
 <!--        </record>-->
 
-        <record id="hr_rule_basic" model="hr.salary.rule">
+        <!-- <record id="hr_rule_basic" model="hr.salary.rule">
             <field name="name">Basic Salary</field>
             <field name="sequence" eval="1"/>
             <field name="code">BASIC</field>
@@ -116,9 +116,9 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = contract.wage</field>
-        </record>
+        </record> -->
 
-        <record id="hr_rule_taxable" model="hr.salary.rule">
+        <!-- <record id="hr_rule_taxable" model="hr.salary.rule">
             <field name="name">Gross</field>
             <field name="sequence" eval="100"/>
             <field name="code">GROSS</field>
@@ -126,9 +126,9 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = categories.BASIC + categories.ALW</field>
-        </record>
+        </record> -->
 
-        <record id="hr_rule_net" model="hr.salary.rule">
+        <!-- <record id="hr_rule_net" model="hr.salary.rule">
             <field name="name">Net Salary</field>
             <field name="sequence" eval="200"/>
             <field name="code">NET</field>
@@ -137,9 +137,9 @@
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = categories.BASIC + categories.ALW + categories.DED</field>
             <field name="register_id" ref="contrib_register_employees"/>
-        </record>
+        </record> -->
 
-        <record id="hr_rule_hra" model="hr.salary.rule">
+        <!-- <record id="hr_rule_hra" model="hr.salary.rule">
             <field name="name">House Rent Allowance</field>
             <field name="sequence" eval="1"/>
             <field name="code">HRA</field>
@@ -147,9 +147,9 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = contract.hra</field>
-        </record>
+        </record> -->
 
-        <record id="hr_rule_da" model="hr.salary.rule">
+        <!-- <record id="hr_rule_da" model="hr.salary.rule">
             <field name="name">Dearness Allowance</field>
             <field name="sequence" eval="1"/>
             <field name="code">DA</field>
@@ -157,9 +157,9 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = contract.da</field>
-        </record>
+        </record> -->
 
-        <record id="hr_rule_travel" model="hr.salary.rule">
+        <!-- <record id="hr_rule_travel" model="hr.salary.rule">
             <field name="name">Travel Allowance</field>
             <field name="sequence" eval="1"/>
             <field name="code">Travel</field>
@@ -167,9 +167,9 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = contract.travel_allowance</field>
-        </record>
+        </record> -->
 
-        <record id="hr_rule_meal" model="hr.salary.rule">
+        <!-- <record id="hr_rule_meal" model="hr.salary.rule">
             <field name="name">Meal Allowance</field>
             <field name="sequence" eval="1"/>
             <field name="code">Meal</field>
@@ -177,9 +177,9 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = contract.meal_allowance</field>
-        </record>
+        </record> -->
 
-        <record id="hr_rule_medical" model="hr.salary.rule">
+        <!-- <record id="hr_rule_medical" model="hr.salary.rule">
             <field name="name">Medical Allowance</field>
             <field name="sequence" eval="1"/>
             <field name="code">Medical</field>
@@ -187,9 +187,9 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = contract.medical_allowance</field>
-        </record>
+        </record> -->
 
-        <record id="hr_rule_other" model="hr.salary.rule">
+        <!-- <record id="hr_rule_other" model="hr.salary.rule">
             <field name="name">Other Allowance</field>
             <field name="sequence" eval="1"/>
             <field name="code">Other</field>
@@ -197,7 +197,7 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = contract.other_allowance</field>
-        </record>
+        </record> -->
 
         <record id="hr_rule_wage" model="hr.salary.rule">
             <field name="name">Lương cơ bản(VND)</field>
