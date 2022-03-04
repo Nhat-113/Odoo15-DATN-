@@ -115,6 +115,15 @@
                     </div>
                 </group>
             </xpath>
+            <xpath expr="//group[@name='salary']" position="after">
+                <group name="salary">
+                    <label for="number_of_dependents"/>
+                    <div class="o_row" name="number_of_dependents">
+                        <field name="number_of_dependents" nolabel="1"/>
+                        <span> person</span>
+                    </div>
+                </group>
+            </xpath>
         </field>
     </record>
 
