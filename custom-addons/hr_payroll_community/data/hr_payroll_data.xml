@@ -101,12 +101,6 @@
             <field name="code">Other</field>
         </record>
 
-        <record id="NPT" model="hr.salary.rule.category">
-            <field name="name">Dependent people</field>
-            <field name="code">DP</field>
-        </record>
-
-
 <!--        <record id="DEDUCTION" model="hr.salary.rule.category">-->
 <!--            <field name="name">Deduction</field>-->
 <!--            <field name="code">DED</field>-->
