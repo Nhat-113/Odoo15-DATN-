@@ -91,6 +91,13 @@ class HrPayslip(models.Model):
         if any(self.filtered(lambda payslip: payslip.date_from > payslip.date_to)):
             raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
 
+    @api.constrains('name')
+    def _check_payslips(self):
+        payslip_names = [payslip.name for payslip in self.employee_id.slip_ids][:-1]
+
+        if any(self.filtered(lambda payslip: payslip.name in payslip_names)):
+            raise ValidationError(_("Do not create multiple payslips for an employee in the same month"))
+
     def action_payslip_draft(self):
 
         return self.write({'state': 'draft'})
