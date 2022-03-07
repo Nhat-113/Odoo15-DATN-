@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="internship_contract_qweb_report" name="internship_contract_qweb_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="e">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <link rel='stylesheet' href='/ds_print_contract/static/src/css/report.css'/>
+                        <div class="container contract-report">
+                            <div class="row">
+                                <div class="col-4 text-center">
+                                    <tr>
+                                        <th>
+                                            <img src="/ds_print_contract/static/description/img/d-soft.jpg" style="width:100%;"/>
+                                        </th>
+                                    </tr>
+                                </div>
+                                <div class="col-8 text-center">
+                                    <div class="text-center">
+                                        <tr>
+                                            <th>
+                                                <b>
+                                                    <span>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</span>
+                                                </b>
+                                            </th>
+                                        </tr>
+                                        <br/>
+                                        <tr>
+                                            <th>
+                                                <em>Độc lập - Tự do - Hạnh phúc</em>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <span style="margin-top: -10px; display: block;">________________________</span>
+                                            </th>
+                                        </tr>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12 contract-hdld">
+                                    <b>
+                                        <span>THOẢ THUẬN THỰC TẬP</span>
+                                    </b>
+                                    <p class="font-weight-bold"  style="font-size: 16px;">Số:......./TTTT</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p>Hôm nay, ngày
+                                        <span t-esc="e.date_start.strftime('%d')"/>
+                        tháng
+                                        <span t-esc="e.date_start.strftime('%m')"/>
+                        năm
+                                        <span t-esc="e.date_start.strftime('%Y')"/> tại Văn phòng Công ty D-Soft.
+                                    </p>
+                                    <table style="width:100%">
+                                        <tr>
+                                            <th>Chúng tôi, một bên là</th>
+                                            <td>
+                                                <span>:  </span>
+                                                <b>
+                                                    <t t-if='e.company_id.display_name'>
+                                                        <span t-field="e.company_id.display_name"/>
+                                                    </t>
+                                                    <t t-if="not e.company_id.display_name">Công ty CỔ PHẦN D-SOFT
+                                            </t>
+                                                </b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Đại diện ông</th>
+                                            <td>
+                                                <span>:  </span>
+                                                <b>NGUYỄN HỒNG TÂN</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Chức vụ</th>
+                                            <td>
+                                                <span>:  </span>
+                                                Phó giám đốc
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Địa chỉ</th>
+                                            <td>
+                                                <span>:  </span>
+                                                <span>
+                                                    <t t-if='e.company_id.street'>
+                                                        <span t-field="e.company_id.street"/>
+                                                    </t>
+                                                    <t t-if="not e.company_id.street">Số 10 Hải Phòng - P.Thạch Thang - Q.Hải Châu - TP.Đà Nẵng</t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Mã số thuế</th>
+                                            <td>
+                                                <span>:  </span>
+                                                <span>
+                                                    <t t-if='e.company_id.vat'>
+                                                        <span t-field="e.company_id.vat"/>
+                                                    </t>1
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Số điện thoại</th>
+                                            <td>
+                                                <span>:  </span>
+                                                <t t-if='e.company_id.phone'>
+                                                    <span t-field="e.company_id.phone"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <b>Và một bên là
+                                                    <span>
+                                                        <t1 t-if='e.employee_id.gender'>
+                                                            <t t-if="e.employee_id.gender == 'male'">
+                                                                <span>Ông</span>
+                                                            </t>
+                                                            <t t-if="e.employee_id.gender == 'female'">
+                                                                <span>Bà</span>
+                                                            </t>
+                                                        </t1>
+                                                    </span>
+                                                </b>
+                                            </th>
+                                            <td>
+                                                <span>:  </span>
+                                                <b>
+                                                    <span style="text-transform: uppercase;">
+                                                        <t t-if='e.employee_id.name'>
+                                                            <span t-field="e.employee_id.name"/>
+                                                        </t>
+                                                    </span>
+                                                </b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Sinh ngày</th>
+                                            <td style="border: none; border-bottom: none;">
+                                                <span>:  </span>
+                                                <span>
+                                                    <t t-if='e.employee_id.birthday'>
+                                                        <span t-esc="e.employee_id.birthday.strftime('%d/%m/%Y')"/>
+                                                    </t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Địa chỉ thường trú</th>
+                                            <td style="border: none; border-top: none;">
+                                                <span>:  </span>
+                                                <span>
+                                                    <t t-if='e.employee_id.address_home_id.display_name'>
+                                                        <span t-field="e.employee_id.address_home_id.display_name"/>
+                                                    </t>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2">CMND số :
+                                                <span>
+                                                    <t t-if='e.employee_id.identification_id'>
+                                                        <span style="padding-right: 20px;" t-field="e.employee_id.identification_id"/>
+                                                    </t>
+                                                    <t t-if="not e.employee_id.identification_id">....................................</t>
+                                                </span>    Cấp ngày:
+                                                <span>
+                                                    <t t-if='e.employee_id.id_start_date'>
+                                                        <span style="padding-right: 20px;" t-esc="e.employee_id.id_start_date.strftime('%d/%m/%Y')"/>
+                                                    </t>
+                                                    <t t-if="not e.employee_id.id_start_date">....................................</t>
+                                                </span>    Nơi cấp:
+                                                <span>
+                                                    <t t-if='e.employee_id.identification_place'>
+                                                        <span t-field="e.employee_id.identification_place"/>
+                                                    </t>
+                                                    <t t-if="not e.employee_id.identification_place">......................................................</t>
+                                                </span>
+                                            </th>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <p>Hai bên đã thỏa thuận và thống nhất các điều khoản sau đây:</p>
+                                    <p class="font-weight-bold">Điều 1. Thời gian và công cụ làm việc</p>
+                                    <div class="ml-4">
+                                        <p>-	Công ty tạo điều kiện cho Thực tập sinh được thực tập từ ngày
+                                            <t t-if='e.date_start'>
+                                                <span t-esc="e.date_start.strftime('%d/%m/%Y')"/>
+                                            </t>
+                                            <t t-if='not e.date_start'>
+                                                .........................
+                                            </t> đến khi thực tập sinh hoàn thành chương trình thực tập theo kế hoạch của nhà trường.
+                                        </p>
+                                        <p>-	Thời gian thực tập là: 05 ngày/tuần (từ thứ 2 đến thứ 6).</p>
+                                        <div class="ml-4">
+                                            <p>+	Sáng từ: 8h30 đến 12h00.</p>
+                                            <p>+	Chiều từ: 13h00 đến 17h30.</p>
+                                        </div>
+                                        <p>-	Thời gian nghỉ trưa từ: 12h00 đến 13h00.</p>
+                                        <p>-    Công cụ làm việc (máy tính): do thực tập sinh tự túc</p>
+                                    </div>
+                                    <br/>
+                                    <p class="font-weight-bold">Điều 2. Chi phí trợ cấp, phương thức thanh toán</p>
+                                    <div class="ml-2">
+                                        <p class="font-weight-bold">2.1 Chi phí trợ cấp:</p>
+                                        <p class="ml-4">-   Thực tập sinh được trả trợ cấp trong quá trình thực tập là:
+                                            <t t-if="e.wage">
+                                                <span t-esc="'{:,}'.format(int(e.wage))"/> VNĐ/tháng
+                                            </t>
+                                            <t t-if="not e.wage">
+                                                2,000,000 VNĐ/tháng (Hai triệu đồng/tháng)
+                                            </t> đối với trường hợp thực tập toàn thời gian. Theo thời gian làm việc của công ty quy định ở Điều 1.
+                                        </p>
+                                    </div>
+                                    <div class="ml-2">
+                                        <p class="font-weight-bold">2.2 Phương thức thanh toán:</p>
+                                        <p class="ml-4">-   Bằng tiền mặt hoặc chuyển khoản vào ngày 2 hàng tháng.</p>
+                                    </div>
+                                    <br/>
+                                    <p class="font-weight-bold">Điều 3. Quyền và nghĩa vụ của thực tập sinh</p>
+                                    <div class="ml-2">
+                                        <p class="font-weight-bold">3.1 Quyền lợi:</p>
+                                        <div class="ml-4">
+                                            <p>-   Được Công ty hướng dẫn và phân công công việc trong thời gian thực tập.</p>
+                                            <p>-   Được quyền tham gia các khóa học ngoại khóa phục vụ cho quá trình thực tập do Công ty tổ chức.</p>
+                                            <p>-   Được Công ty đóng dấu và ký xác nhận thực tập sau khi kết thúc thời gian thực tập.</p>
+                                            <p>-   Được quyền đề xuất, đóng góp ý kiến nhằm đảm bảo quyền và lợi ích của mình trong quá trình học việc và xây dựng công ty ngày càng phát triển.</p>
+                                            <p>-   Được quyền nghỉ những ngày lễ, tết theo các quy định của pháp luật.</p>
+                                            <p>-   Sau khi kết thúc thời gian thực tập, nếu Thực tập sinh hoàn thành tốt các nhiệm vụ được giao và có mong muốn làm việc lâu dài tại Công ty thì sẽ được Công ty xem xét, cân nhắc và ký hợp đồng lao động chính thức với Thực tập sinh theo quy chế của Công ty.</p>
+                                        </div>
+                                    </div>
+                                    <div class="ml-2">
+                                        <p class="font-weight-bold">3.2 Nghĩa vụ:</p>
+                                        <div class="ml-4">
+                                            <p>-   Chấp hành nghiêm chỉnh các nghĩa vụ, nội quy, quy chế của Công ty và quy định của Pháp luật.</p>
+                                            <p>-   Thực hiện đầy đủ, đúng thời hạn các công việc được phân công và báo cáo kết quả công việc được giao cho người quản lý trực tiếp.</p>
+                                            <p>-   Tham gia đầy đủ các khóa học nâng cao kỹ năng, chuyên môn mà công ty tổ chức.</p>
+                                            <p>-   Bồi thường thiệt hại khi Thực tập sinh gây ra thiệt hại theo nội quy, quy chế của Công ty và quy định của Bộ luật lao động hiện hành.</p>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <p class="font-weight-bold">Điều 4. Quyền và nghĩa vụ của công ty</p>
+                                    <div class="ml-2">
+                                        <p class="font-weight-bold">4.1 Quyền hạn:</p>
+                                        <div class="ml-4">
+                                            <p>-   Yêu cầu Thực tập sinh thực hiện đầy đủ và đúng thời hạn các công việc mà Công ty giao cho Thực tập sinh thực hiện.</p>
+                                            <p>-   Công ty có quyền xem xét và xử lý kỷ luật hoặc chấm dứt thực tập trong trường hợp Thực tập sinh vi phạm nội quy, quy chế Công ty và theo quy định của pháp luật.</p>
+                                            <p>-   Yêu cầu Thực tập sinh bồi thường thiệt hại khi Thực tập sinh gây ra thiệt hại theo nội quy, quy chế của Công ty và quy định của Bộ luật lao động hiện hành.</p>
+                                        </div>
+                                    </div>
+                                    <div class="ml-2">
+                                        <p class="font-weight-bold">4.2 Nghĩa vụ</p>
+                                        <div class="ml-4">
+                                            <p>-   Công ty tạo điều kiện thuận lợi cho Thực tập sinh được học tập và làm việc.</p>
+                                            <p>-   Đóng dấu và ký xác nhận thực tập cho Thực tập sinh sau kết thúc thời gian thực tập.</p>
+                                            <p>-   Thanh toán trợ cấp thực tập cho Thực tập sinh đầy đủ và đúng thời hạn được quy định tại Điều 2 của thoả thuận này.</p>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <p class="font-weight-bold">Điều 5. Điều khoản thi hành</p>
+                                    <div class="ml-2">
+                                        <div class="ml-4">
+                                            <p>-   Thoả thuận này có hiệu lực kể từ ngày ký và được lập thành (02) hai bản gốc có giá trị pháp lý ngang nhau. Mỗi bên giữ (01) một bản gốc.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row contract-signature">
+                                <div class="col-6 text-center">
+                                    <p class="font-weight-bold">BÊN B</p>
+                                    <p class="font-italic">(Ký và ghi rõ họ tên)</p>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <p class="font-weight-bold">BÊN A</p>
+                                    <p class="font-italic">(Ký, đóng dấu và ghi rõ họ tên)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="footer"></div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

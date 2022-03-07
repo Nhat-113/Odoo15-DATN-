@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="contract_paperformat_qweb" model="report.paperformat">
+        <field name="name">Contract Paper Format</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">18</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">45</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Hợp đồng chính thức -->
+    <record id="action_report_contract" model="ir.actions.report">
+        <field name="name">Employee Offical Labor Contract</field>
+        <field name="model">hr.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ds_print_contract.contract_qweb_report</field>
+        <field name="report_file">ds_print_contract.contract_qweb_report</field>
+        <field name="print_report_name">'Offical Labor Contract - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_hr_contract"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="ds_print_contract.contract_paperformat_qweb" />
+    </record>
+
+    <!-- Hợp đồng thử việc -->
+    <record id="action_report_probationary_contract" model="ir.actions.report">
+        <field name="name">Employee Probationary Contract</field>
+        <field name="model">hr.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ds_print_contract.probationary_contract_qweb_report</field>
+        <field name="report_file">ds_print_contract.probationary_contract_qweb_report</field>
+        <field name="print_report_name">'Probationary Contract - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_hr_contract"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="ds_print_contract.contract_paperformat_qweb" />
+    </record>
+
+    <!-- Hợp đồng thực tập -->
+    <record id="action_report_internship_contract" model="ir.actions.report">
+        <field name="name">Employee Internship Contract</field>
+        <field name="model">hr.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ds_print_contract.internship_contract_qweb_report</field>
+        <field name="report_file">ds_print_contract.internship_contract_qweb_report</field>
+        <field name="print_report_name">'Internship Contract - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_hr_contract"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="ds_print_contract.contract_paperformat_qweb" />
+    </record>
+</odoo>
