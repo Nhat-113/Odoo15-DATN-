@@ -221,7 +221,17 @@ class HrPayslip(models.Model):
                 'contract_id': contract.id,
             }
 
+            unpaid = {
+                'name': _("Ngày nghỉ không lương"),
+                'sequence': 5,
+                'code': 'NNKL',
+                'number_of_days': 0,
+                'number_of_hours': 0,
+                'contract_id': contract.id,
+            }
+
             res.append(attendances)
+            res.append(unpaid)
             res.extend(leaves.values())
         return res
 
