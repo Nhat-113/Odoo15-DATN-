@@ -26,15 +26,5 @@ class Contract(models.Model):
         res = super(Contract, self).write(vals)
         if vals.get('state') == 'open' or 'draft':
             self._assign_open_contract()
-        if vals.get('state') == 'close':
-            for contract in self.filtered(lambda c: not c.date_end):
-                contract.date_end = max(date.today(), contract.date_start)
-
-        calendar = vals.get('resource_calendar_id')
-        if calendar:
-            self.filtered(lambda c: c.state == 'open' or (c.state == 'draft' and c.kanban_state == 'done')).mapped('employee_id').write({'resource_calendar_id': calendar})
-
-        if 'state' in vals and 'kanban_state' not in vals:
-            self.write({'kanban_state': 'normal'})
-
+        
         return res
