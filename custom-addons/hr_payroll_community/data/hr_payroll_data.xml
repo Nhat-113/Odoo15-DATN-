@@ -539,7 +539,7 @@
         </record>
 
         <record id="hr_rule_ltl" model="hr.salary.rule">
-            <field name="name">Lương thực lĩnh (VND) = (8) + (12) + (14) - (13) - (15)</field>
+            <field name="name">Lương thực lĩnh (VND) = (8) + (13) + (15) - (14) - (16)</field>
             <field name="sequence" eval="28"/>
             <field name="code">NET</field>
             <field name="category_id" ref="hr_payroll_community.NET"/>
