@@ -4,35 +4,6 @@ import { Dialog } from "../../core/dialog/dialog";
 import { browser } from "../../core/browser/browser";
 import { registry } from "../../core/registry";
 import { _lt } from "../../core/l10n/translation";
-import { session } from "@web/session";
-
-function documentationItem(env) {
-    const documentationURL = "https://www.odoo.com/documentation/15.0";
-    return {
-        type: "item",
-        id: "documentation",
-        description: env._t("Documentation"),
-        href: documentationURL,
-        callback: () => {
-            browser.open(documentationURL, "_blank");
-        },
-        sequence: 10,
-    };
-}
-
-function supportItem(env) {
-    const url = session.support_url;
-    return {
-        type: "item",
-        id: "support",
-        description: env._t("Support"),
-        href: url,
-        callback: () => {
-            browser.open(url, "_blank");
-        },
-        sequence: 20,
-    };
-}
 
 class ShortCutsDialog extends Dialog {}
 ShortCutsDialog.bodyTemplate = "web.UserMenu.shortcutsTable";
@@ -51,12 +22,6 @@ function shortCutsItem(env) {
     };
 }
 
-function separator() {
-    return {
-        type: "separator",
-        sequence: 40,
-    };
-}
 
 export function preferencesItem(env) {
     return {
@@ -69,25 +34,6 @@ export function preferencesItem(env) {
             env.services.action.doAction(actionDescription);
         },
         sequence: 50,
-    };
-}
-
-function odooAccountItem(env) {
-    return {
-        type: "item",
-        id: "account",
-        description: env._t("My Odoo.com.account"),
-        callback: () => {
-            env.services
-                .rpc("/web/session/account")
-                .then((url) => {
-                    browser.location.href = url;
-                })
-                .catch(() => {
-                    browser.location.href = "https://accounts.odoo.com/account";
-                });
-        },
-        sequence: 60,
     };
 }
 
@@ -107,10 +53,6 @@ function logOutItem(env) {
 
 registry
     .category("user_menuitems")
-    .add("documentation", documentationItem)
-    .add("support", supportItem)
     .add("shortcuts", shortCutsItem)
-    .add("separator", separator)
     .add("profile", preferencesItem)
-    .add("odoo_account", odooAccountItem)
     .add("log_out", logOutItem);

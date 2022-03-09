@@ -16,7 +16,7 @@
                                                     <span t-field="e.company_id.display_name"/>
                                                 </t>
                                                 <t t-if="not e.company_id.display_name">CÔNG TY CỔ PHẦN D-SOFT
-                                            </t>
+                                                </t>
                                             </b>
                                         </th>
                                     </tr>
@@ -56,11 +56,11 @@
                                         <tr>
                                             <th>
                                                 <em>Đà Nẵng, ngày
-                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+                                                    <span t-esc="e.date_start.strftime('%d')"/>
                                                     tháng
-                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+                                                    <span t-esc="e.date_start.strftime('%m')"/>
                                                     năm
-                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                                    <span t-esc="e.date_start.strftime('%Y')"/>
                                                 </em>
                                             </th>
                                         </tr>
@@ -86,7 +86,7 @@
                                                         <span t-field="e.company_id.display_name"/>
                                                     </t>
                                                     <t t-if="not e.company_id.display_name">Công ty CỔ PHẦN D-SOFT
-                                            </t>
+                                                    </t>
                                                 </b>
                                             </td>
                                         </tr>
@@ -314,11 +314,11 @@
                                         <p>3.   Hợp đồng lao động này làm thành hai (02) bản có giá trị như nhau, mỗi bên giữ một bản, và có hiệu lực từ ngày ký.</p>
                                         <p>4.   Người lao động đọc kỹ, hiểu rõ và cam kết thực hiện các điều khoản và quy định ghi tại hợp đồng lao động.</p>
                                         <p>5.   Hợp đồng lao động làm tại Công ty Cổ phần D-Soft ngày
-                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+                                            <span t-esc="e.date_start.strftime('%d')"/>
                                     tháng
-                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+                                            <span t-esc="e.date_start.strftime('%m')"/>
                                     năm
-                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                            <span t-esc="e.date_start.strftime('%Y')"/>
                                         </p>
                                     </div>
                                 </div>
@@ -382,11 +382,11 @@
                             <div class="row">
                                 <div class="col-12">
                                     <p>Hôm nay, ngày
-                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+                                        <span t-esc="e.date_start.strftime('%d')"/>
                         tháng
-                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+                                        <span t-esc="e.date_start.strftime('%m')"/>
                         năm
-                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                        <span t-esc="e.date_start.strftime('%Y')"/>
                                     </p>
                                 </div>
                             </div>

@@ -63,11 +63,11 @@
                             <div class="row">
                                 <div class="col-12">
                                     <p>Hôm nay, ngày
-                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+                                        <span t-esc="e.date_start.strftime('%d')"/>
                         tháng
-                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+                                        <span t-esc="e.date_start.strftime('%m')"/>
                         năm
-                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/> tại Văn phòng Công ty.
+                                        <span t-esc="e.date_start.strftime('%Y')"/> tại Văn phòng Công ty.
                                     </p>
                                     <table style="width:100%">
                                         <tr>

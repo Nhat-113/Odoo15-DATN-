@@ -91,6 +91,13 @@ class HrPayslip(models.Model):
         if any(self.filtered(lambda payslip: payslip.date_from > payslip.date_to)):
             raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
 
+    @api.constrains('name')
+    def _check_payslips(self):
+        payslip_names = [payslip.name for payslip in self.employee_id.slip_ids][:-1]
+
+        if any(self.filtered(lambda payslip: payslip.name in payslip_names)):
+            raise ValidationError(_("Do not create multiple payslips for an employee in the same month"))
+
     def action_payslip_draft(self):
 
         return self.write({'state': 'draft'})
@@ -221,7 +228,17 @@ class HrPayslip(models.Model):
                 'contract_id': contract.id,
             }
 
+            unpaid = {
+                'name': _("Ngày nghỉ không lương"),
+                'sequence': 5,
+                'code': 'NNKL',
+                'number_of_days': 0,
+                'number_of_hours': 0,
+                'contract_id': contract.id,
+            }
+
             res.append(attendances)
+            res.append(unpaid)
             res.extend(leaves.values())
         return res
 
