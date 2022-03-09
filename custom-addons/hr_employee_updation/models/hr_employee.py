@@ -148,7 +148,7 @@ class HrEmployee(models.Model):
     def _check_work_email(self):
         for employee in self:
             if (employee.work_email in [employee.work_email for employee in self.env['hr.employee'].search([])][:-1]):
-                raise ValidationError(_("This work email already exists."))
+                raise ValidationError(_("Work email is already in use."))
 
 
 class EmployeeRelationInfo(models.Model):
