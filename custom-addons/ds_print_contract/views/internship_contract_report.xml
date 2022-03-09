@@ -43,7 +43,7 @@
                                     <b>
                                         <span>THOẢ THUẬN THỰC TẬP</span>
                                     </b>
-                                    <p class="font-weight-bold"  style="font-size: 16px;">Số:......./TTTT</p>
+                                    <p class="font-weight-bold" style="font-size: 16px;">Số:......./TTTT</p>
                                 </div>
                             </div>
                             <div class="row">
@@ -53,7 +53,8 @@
                         tháng
                                         <span t-esc="e.date_start.strftime('%m')"/>
                         năm
-                                        <span t-esc="e.date_start.strftime('%Y')"/> tại Văn phòng Công ty D-Soft.
+                                        <span t-esc="e.date_start.strftime('%Y')"/>
+ tại Văn phòng Công ty D-Soft.
                                     </p>
                                     <table style="width:100%">
                                         <tr>
@@ -65,7 +66,7 @@
                                                         <span t-field="e.company_id.display_name"/>
                                                     </t>
                                                     <t t-if="not e.company_id.display_name">Công ty CỔ PHẦN D-SOFT
-                                            </t>
+                                                    </t>
                                                 </b>
                                             </td>
                                         </tr>
@@ -102,7 +103,7 @@
                                                 <span>
                                                     <t t-if='e.company_id.vat'>
                                                         <span t-field="e.company_id.vat"/>
-                                                    </t>1
+                                                    </t>
                                                 </span>
                                             </td>
                                         </tr>
@@ -118,20 +119,20 @@
                                         <tr>
                                             <th>
                                                 <b>Và một bên là
-                                                    <span>
-                                                        <t1 t-if='e.employee_id.gender'>
-                                                            <t t-if="e.employee_id.gender == 'male'">
-                                                                <span>Ông</span>
-                                                            </t>
-                                                            <t t-if="e.employee_id.gender == 'female'">
-                                                                <span>Bà</span>
-                                                            </t>
-                                                        </t1>
-                                                    </span>
                                                 </b>
                                             </th>
                                             <td>
                                                 <span>:  </span>
+                                                <span>
+                                                    <t1 t-if='e.employee_id.gender'>
+                                                        <t t-if="e.employee_id.gender == 'male'">
+                                                            <span>Ông</span>
+                                                        </t>
+                                                        <t t-if="e.employee_id.gender == 'female'">
+                                                            <span>Bà</span>
+                                                        </t>
+                                                    </t1>
+                                                </span>
                                                 <b>
                                                     <span style="text-transform: uppercase;">
                                                         <t t-if='e.employee_id.name'>
@@ -215,7 +216,8 @@
                                         <p class="font-weight-bold">2.1 Chi phí trợ cấp:</p>
                                         <p class="ml-4">-   Thực tập sinh được trả trợ cấp trong quá trình thực tập là:
                                             <t t-if="e.wage">
-                                                <span t-esc="'{:,}'.format(int(e.wage))"/> VNĐ/tháng
+                                                <span t-esc="'{:,}'.format(int(e.wage))"/>
+ VNĐ/tháng
                                             </t>
                                             <t t-if="not e.wage">
                                                 2,000,000 VNĐ/tháng (Hai triệu đồng/tháng)
