@@ -20,7 +20,7 @@
       >
         <t t-slot="toggler" />
       </button>
-      <div t-if="state.open" class="o-dropdown--menu dropdown-menu d-block" t-att-class="props.menuClass" t-ref="menuRef">
+      <div t-if="state.open" class="o-dropdown--menu dropdown-menu d-block" t-att-class="props.menuClass" t-ref="menuRef" style="right: 0px;">
         <t t-slot="default" />
       </div>
     </div>
