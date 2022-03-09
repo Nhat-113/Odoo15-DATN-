@@ -9,7 +9,7 @@
             <field name="email_to">{{(object.employee_id.work_email or '')}}</field>
             <field name="model_id" ref="model_hr_contract"/>
             <field name="auto_delete" eval="False"/>
-            <field name="report_template" ref="ds_print_contract.action_report_probationary_contract"/>
+            <field name="report_template" ref="ds_print_contract.action_report_internship_contract"/>
             <field name="report_name">Internship_Contract_{{object.employee_id.name}}</field>
             <field name="lang">{{(object.employee_id.user_id.lang or user.lang)}}</field>
             <field name="body_html"><![CDATA[
