@@ -23,6 +23,7 @@
 
 from datetime import timedelta
 from odoo import models, fields, _, api
+from odoo.exceptions import ValidationError
 
 GENDER_SELECTION = [('male', 'Male'),
                     ('female', 'Female'),
@@ -142,7 +143,14 @@ class HrEmployee(models.Model):
                 'relation_id': relation.id,
                 'birth_date': self.spouse_birthdate,
             })]
-    
+
+    @api.constrains('work_email')
+    def _check_work_email(self):
+        for employee in self:
+            if (employee.work_email in [employee.work_email for employee in self.env['hr.employee'].search([])][:-1]):
+                raise ValidationError(_("Work email is already in use."))
+
+
 class EmployeeRelationInfo(models.Model):
     """Table for keep employee family information"""
 
