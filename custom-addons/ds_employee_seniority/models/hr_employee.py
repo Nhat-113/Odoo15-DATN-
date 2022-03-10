@@ -1,10 +1,11 @@
 from odoo import api, fields, models, _
-from datetime import datetime
+from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
+    seniority_by_days = fields.Integer(compute='_compute_seniority_by_days', string='Employee Seniority By Days', store=True)
     seniority = fields.Char(compute='_compute_seniority', string='Employee Seniority')
 
     def _compute_seniority(self):
@@ -21,6 +22,13 @@ class HrEmployee(models.Model):
             else:
                 employee.seniority = '{} days'.format(days)
 
+    def _compute_seniority_by_days(self):
+        for employee in self:
+            if isinstance(employee['joining_date'], (date)):
+                diff = datetime.now().date() - employee['joining_date']
+                employee.seniority_by_days = diff.days
+            else:
+                employee.seniority_by_days = 0
 class HrContract(models.Model):
     _inherit = 'hr.contract'
 
