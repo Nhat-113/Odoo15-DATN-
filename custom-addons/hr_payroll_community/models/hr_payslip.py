@@ -98,6 +98,11 @@ class HrPayslip(models.Model):
         if any(self.filtered(lambda payslip: payslip.name in payslip_names)):
             raise ValidationError(_("Do not create multiple payslips for an employee in the same month"))
 
+    @api.constrains('contract_id')
+    def _check_contract_id(self):
+            if (self.employee_id.contract_id != self.employee_id.slip_ids.contract_id):            
+                raise UserError('Cannot choose the wrong contract with the employee')
+
     def action_payslip_draft(self):
 
         return self.write({'state': 'draft'})
