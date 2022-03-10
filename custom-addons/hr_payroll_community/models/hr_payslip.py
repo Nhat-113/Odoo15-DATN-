@@ -118,7 +118,7 @@ class HrPayslip(models.Model):
 
             copied_payslip = payslip.copy({'credit_note': True, 'name': _('Refund: ') + payslip.name})
             copied_payslip.compute_sheet()
-            copied_payslip.action_payslip_done()
+            copied_payslip.action_payslip_draft()
         formview_ref = self.env.ref('hr_payroll_community.view_hr_payslip_form', False)
         treeview_ref = self.env.ref('hr_payroll_community.view_hr_payslip_tree', False)
         return {
@@ -176,7 +176,7 @@ class HrPayslip(models.Model):
                            self.get_contract(payslip.employee_id, payslip.date_from, payslip.date_to)
             lines = [(0, 0, line) for line in self._get_payslip_lines(contract_ids, payslip.id)]
             payslip.write({'line_ids': lines, 'number': number})
-        return True
+        return self.write({'state': 'verify'})
 
     @api.model
     def get_worked_day_lines(self, contracts, date_from, date_to):
