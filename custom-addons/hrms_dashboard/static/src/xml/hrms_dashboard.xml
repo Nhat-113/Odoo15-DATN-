@@ -415,8 +415,7 @@
 
     <t t-name="EmployeeWarning">
         <div>
-            <p>Error : Could not find employee linked to user</p>
-            <p>Please contact system admin for the setup</p>
+            <h6 style="margin-top: 10%; text-align: center;">You are not an employee so cannot access the Dashboard!</h6>
         </div>
     </t>
 
