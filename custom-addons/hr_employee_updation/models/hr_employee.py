@@ -146,8 +146,10 @@ class HrEmployee(models.Model):
 
     @api.constrains('work_email')
     def _check_work_email(self):
+        work_emails = [employee.work_email for employee in self.env['hr.employee'].search([])]
+        work_emails.pop(-2)
         for employee in self:
-            if (employee.work_email in [employee.work_email for employee in self.env['hr.employee'].search([])][:-1]):
+            if (employee.work_email in work_emails):
                 raise ValidationError(_("Work email is already in use."))
 
 
