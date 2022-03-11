@@ -409,7 +409,7 @@
         </record>
 
         <record id="hr_rule_bh" model="hr.salary.rule">
-            <field name="name">BHYT, BHXH, BHTN (VND)</field>
+            <field name="name">BHYT, BHXH, BHTN (VND) = (1) * 30.5%</field>
             <field name="sequence" eval="17"/>
             <field name="code">BH</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
