@@ -169,7 +169,7 @@
                                 <field name="name"/>
                                 <field name="code"/>
                                 <field name="number_of_days"/>
-                                <field name="number_of_hours"/>
+                                <!-- <field name="number_of_hours"/> -->
                                 <field name="contract_id"/>
                                 <field name="sequence" invisible="True"/>
                             </tree>
@@ -179,7 +179,7 @@
                                     <field name="code"/>
                                     <field name="sequence"/>
                                     <field name="number_of_days"/>
-                                    <field name="number_of_hours"/>
+                                    <!-- <field name="number_of_hours"/> -->
                                     <field name="contract_id"/>
                                 </group>
                             </form>
