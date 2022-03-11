@@ -25,6 +25,7 @@
                 <field name="gender" string="Gender"/>
                 <field name="address_home_id" optional="hide" string="Address"/>
                 <field name="certificate" optional="hide" string="Certificate"/>
+                <field name="seniority_by_days" optional="hide" string="Seniority By Days"/>
                 <field name="seniority" optional="hide" string="Seniority"/>
             </xpath>
         </field>
