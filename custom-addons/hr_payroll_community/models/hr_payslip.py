@@ -226,7 +226,7 @@ class HrPayslip(models.Model):
             work_data = contract.employee_id.get_work_days_data(day_from, day_to,
                                                                 calendar=contract.resource_calendar_id)
             attendances = {
-                'name': _("Normal Working Days paid at 100%"),
+                'name': _("Ngày làm việc bình thường được trả 100%"),
                 'sequence': 1,
                 'code': 'WORK100',
                 'number_of_days': work_data['days'],
