@@ -23,7 +23,7 @@
 
 from datetime import timedelta
 from odoo import models, fields, _, api
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 GENDER_SELECTION = [('male', 'Male'),
                     ('female', 'Female'),
@@ -146,11 +146,13 @@ class HrEmployee(models.Model):
 
     @api.constrains('work_email')
     def _check_work_email(self):
-        work_emails = [employee.work_email for employee in self.env['hr.employee'].search([])]
-        work_emails.pop(-2)
+        work_emails = [employee.work_email for employee in self.env['hr.employee'].search([('id', '!=', self.id)])]
         for employee in self:
-            if (employee.work_email in work_emails):
-                raise ValidationError(_("Work email is already in use."))
+            if employee.work_email == False:
+               raise UserError('Work email cannot be left blank')
+            else:
+                if (employee.work_email in work_emails):
+                    raise ValidationError(_("Work email is already in use."))
 
 
 class EmployeeRelationInfo(models.Model):

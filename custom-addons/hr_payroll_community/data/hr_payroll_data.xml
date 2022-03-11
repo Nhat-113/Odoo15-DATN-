@@ -259,13 +259,13 @@
         </record>
 
         <record id="hr_rule_nctte" model="hr.salary.rule">
-            <field name="name">Ngày công tính lương (Ngày)</field>
+            <field name="name">Ngày công tính lương (Ngày) = (4) - (6)</field>
             <field name="sequence" eval="7"/>
             <field name="code">NCTTE</field>
             <field name="category_id" ref="hr_payroll_community.WD"/>
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = worked_days.WORK100.number_of_days - (worked_days.GLOBAL and worked_days.GLOBAL.number_of_days or 0) - (worked_days.NCL and worked_days.NCL.number_of_days or 0) - (worked_days.NNKL and worked_days.NNKL.number_of_days or 0)</field>
+            <field name="amount_python_compute">result = NCTT - (worked_days.NNKL and worked_days.NNKL.number_of_days or 0)</field>
         </record>
 
         <record id="hr_rule_tl" model="hr.salary.rule">
@@ -275,7 +275,7 @@
             <field name="category_id" ref="hr_payroll_community.GROSS"/>
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = (worked_days.WORK100.number_of_days + (worked_days.GLOBAL and worked_days.GLOBAL.number_of_days or 0) + (worked_days.NCL and worked_days.NCL.number_of_days or 0) - (worked_days.NNKL and worked_days.NNKL.number_of_days or 0)) * BQNC</field>
+            <field name="amount_python_compute">result = NCTTE * BQNC</field>
         </record>
         
 

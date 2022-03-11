@@ -52,16 +52,16 @@ class HrPayslip(models.Model):
                 \n* If the payslip is confirmed then status is set to \'Done\'.
                 \n* When user cancel payslip the status is \'Rejected\'.""")
     line_ids = fields.One2many('hr.payslip.line', 'slip_id', string='Payslip Lines', readonly=True,
-                               states={'draft': [('readonly', False)]})
+                               states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     company_id = fields.Many2one('res.company', string='Company', readonly=True, copy=False, help="Company",
                                  default=lambda self: self.env['res.company']._company_default_get(),
                                  states={'draft': [('readonly', False)]})
     worked_days_line_ids = fields.One2many('hr.payslip.worked_days', 'payslip_id',
                                            string='Payslip Worked Days', copy=True, readonly=True,
                                            help="Payslip worked days",
-                                           states={'draft': [('readonly', False)]})
+                                           states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     input_line_ids = fields.One2many('hr.payslip.input', 'payslip_id', string='Payslip Inputs',
-                                     readonly=True, states={'draft': [('readonly', False)]})
+                                     readonly=True, states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     paid = fields.Boolean(string='Made Payment Order ? ', readonly=True, copy=False,
                           states={'draft': [('readonly', False)]})
     note = fields.Text(string='Internal Note', readonly=True, states={'draft': [('readonly', False)]})
@@ -76,6 +76,7 @@ class HrPayslip(models.Model):
     payslip_run_id = fields.Many2one('hr.payslip.run', string='Payslip Batches', readonly=True,
                                      copy=False, states={'draft': [('readonly', False)]})
     payslip_count = fields.Integer(compute='_compute_payslip_count', string="Payslip Computation Details")
+
 
     def _compute_details_by_salary_rule_category(self):
         for payslip in self:
