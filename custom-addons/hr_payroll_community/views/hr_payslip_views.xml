@@ -272,6 +272,8 @@
                 <field name="date_from"/>
                 <filter string="Draft" name="draft" domain="[('state','=','draft')]" help="Draft Slip"/>
                 <filter string="Done" name="done" domain="[('state','=','done')]" help="Done Slip"/>
+                <filter string="Waiting" name="waiting" domain="[('state','=','verify')]" help="Waiting Slip"/>
+                <filter string="Rejected" name="rejected" domain="[('state','=','cancel')]" help="Rejected Slip"/>
                 <field name="employee_id"/>
                 <field name="payslip_run_id"/>
                 <group expand="0" string="Group By">
