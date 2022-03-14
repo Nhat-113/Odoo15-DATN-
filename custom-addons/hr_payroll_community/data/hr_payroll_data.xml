@@ -429,7 +429,7 @@
         </record>
 
         <record id="hr_rule_tnc" model="hr.salary.rule">
-            <field name="name">Thu nhập chịu (VND)</field>
+            <field name="name">Thu nhập chịu thuế (VND)</field>
             <field name="sequence" eval="19"/>
             <field name="code">TNC</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
