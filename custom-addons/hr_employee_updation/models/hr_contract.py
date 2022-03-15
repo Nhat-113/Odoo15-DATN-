@@ -15,6 +15,13 @@ class Contract(models.Model):
                     contract=contract.name, start=contract.date_start, end=contract.date_end, today=date.today()
                 ))
 
+    @api.constrains('employee_id')
+    def _check_employee(self):
+        if not self.employee_id:
+            raise ValidationError(_(
+                    'Please choose an employee for the contract.'
+                ))
+
     def _assign_open_contract(self):
         for contract in self:
             if contract.date_end >= date.today():
