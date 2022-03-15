@@ -409,13 +409,13 @@
         </record>
 
         <record id="hr_rule_bh" model="hr.salary.rule">
-            <field name="name">BHYT, BHXH, BHTN (VND) = (1) * 30.5%</field>
+            <field name="name">BHYT, BHXH, BHTN (VND) = (1) * 32%</field>
             <field name="sequence" eval="17"/>
             <field name="code">BH</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.wage * 0.305</field>
+            <field name="amount_python_compute">result = contract.wage * 0.32</field>
         </record>
 
         <record id="hr_rule_gtgc" model="hr.salary.rule">
@@ -428,14 +428,26 @@
             <field name="amount_python_compute">result = 11000000 + (contract.number_of_dependents * 4400000)</field>
         </record>
 
-        <record id="hr_rule_tnc" model="hr.salary.rule">
+        <record id="hr_rule_tnc1" model="hr.salary.rule">
             <field name="name">Thu nhập chịu thuế (VND)</field>
             <field name="sequence" eval="19"/>
             <field name="code">TNC</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
-            <field name="condition_select">none</field> 
+            <field name="condition_select">python</field> 
+            <field name="condition_python">result = ((categories.GROSS + categories.BS - categories.DED) + PCD - categories.GT -  contract.non_taxable_allowance - OT) &gt; 0</field> 
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = (categories.GROSS + categories.BS - categories.DED) + PCD - categories.GT -  contract.non_taxable_allowance - OT</field>
+        </record>
+
+        <record id="hr_rule_tnc2" model="hr.salary.rule">
+            <field name="name">Thu nhập chịu thuế (VND)</field>
+            <field name="sequence" eval="19"/>
+            <field name="code">TNC</field>
+            <field name="category_id" ref="hr_payroll_community.OTH"/>
+            <field name="condition_select">python</field> 
+            <field name="condition_python">result = ((categories.GROSS + categories.BS - categories.DED) + PCD - categories.GT -  contract.non_taxable_allowance - OT) &lt;= 0</field> 
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = 0</field>
         </record>
 
         <record id="hr_rule_tncn1" model="hr.salary.rule">
@@ -559,10 +571,10 @@
                 ref('hr_rule_nctt'),ref('hr_rule_bqnc'), ref('hr_rule_nnkl'),ref('hr_rule_nctte'), 
                 ref('hr_rule_tl'),ref('hr_rule_tot1'), ref('hr_rule_tot2'),ref('hr_rule_tot3'),
                 ref('hr_rule_lot'),ref('hr_rule_ltu'), ref('hr_rule_pcd'),ref('hr_rule_bh'), 
-                ref('hr_rule_gtgc'),ref('hr_rule_tnc'), ref('hr_rule_tncn1'),ref('hr_rule_tncn2'), 
+                ref('hr_rule_gtgc'),ref('hr_rule_tnc1'), ref('hr_rule_tncn1'),ref('hr_rule_tncn2'), 
                 ref('hr_rule_tncn3'),ref('hr_rule_tncn4'), ref('hr_rule_tncn5'),ref('hr_rule_tncn6'), 
                 ref('hr_rule_tncn7'),ref('hr_rule_tncn8'),ref('hr_rule_ltl'),ref('hr_rule_kbs'),
-                ref('hr_rule_tot4')])]" name="rule_ids"/>
+                ref('hr_rule_tot4'),ref('hr_rule_tnc2')])]" name="rule_ids"/>
             <field name="company_id" ref="base.main_company"/>
         </record>
 

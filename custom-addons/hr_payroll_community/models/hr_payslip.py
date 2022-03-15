@@ -101,8 +101,9 @@ class HrPayslip(models.Model):
 
     @api.constrains('contract_id')
     def _check_contract_id(self):
-            if (self.employee_id.contract_id != self.employee_id.slip_ids.contract_id):            
-                raise UserError('Cannot choose the wrong contract with the employee')
+
+        if self.employee_id.contract_id != self.contract_id:            
+            raise ValidationError(_('Cannot choose the wrong contract with the employee'))
 
     def action_payslip_draft(self):
 
@@ -171,7 +172,7 @@ class HrPayslip(models.Model):
         return self.env['hr.contract'].search(clause_final).ids
 
     def compute_sheet(self):
-
+        
         for payslip in self:
             number = payslip.number or self.env['ir.sequence'].next_by_code('salary.slip')
             # delete old payslip lines
@@ -179,11 +180,12 @@ class HrPayslip(models.Model):
             # set the list of contract for which the rules have to be applied
             # if we don't give the contract, then the rules to apply should be for all current contracts of the employee
             contract_ids = payslip.contract_id.ids or \
-                           self.get_contract(payslip.employee_id, payslip.date_from, payslip.date_to)
+                        self.get_contract(payslip.employee_id, payslip.date_from, payslip.date_to)
             lines = [(0, 0, line) for line in self._get_payslip_lines(contract_ids, payslip.id)]
-            payslip.write({'line_ids': lines, 'number': number})
+            payslip.write({'line_ids': lines, 'number': number}) 
+        self._check_contract_id() 
         return self.write({'state': 'verify'})
-
+       
     @api.model
     def get_worked_day_lines(self, contracts, date_from, date_to):
 

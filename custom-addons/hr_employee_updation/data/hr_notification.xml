@@ -23,7 +23,7 @@
             <field name="code">model.mail_contract_reminder()</field>
             <field
                 name="nextcall"
-                eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 07:00:00')"
+                eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 00:30:00')"
             />
         </record>
     </data>
