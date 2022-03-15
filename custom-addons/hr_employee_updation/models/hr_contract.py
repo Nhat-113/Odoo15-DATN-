@@ -19,7 +19,7 @@ class Contract(models.Model):
     def _check_employee(self):
         if not self.employee_id:
             raise ValidationError(_(
-                    'Contracts cannot be saved when there are no employees'
+                    'Please choose an employee for the contract.'
                 ))
 
     def _assign_open_contract(self):
