@@ -409,13 +409,13 @@
         </record>
 
         <record id="hr_rule_bh" model="hr.salary.rule">
-            <field name="name">BHYT, BHXH, BHTN (VND) = (1) * 30.5%</field>
+            <field name="name">BHYT, BHXH, BHTN (VND) = (1) * 32%</field>
             <field name="sequence" eval="17"/>
             <field name="code">BH</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.wage * 0.305</field>
+            <field name="amount_python_compute">result = contract.wage * 0.32</field>
         </record>
 
         <record id="hr_rule_gtgc" model="hr.salary.rule">
