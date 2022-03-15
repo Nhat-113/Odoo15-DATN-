@@ -511,7 +511,7 @@
                                     <div class="ml-4">
                                         <table style="width:100%">
                                             <tr>
-                                                <th>Thu nhập thực nhận</th>
+                                                <th style="width:24%">Thu nhập thực nhận</th>
                                                 <td>
                                                     <span>:  </span>
                                                     <span class="font-weight-normal">
