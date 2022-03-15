@@ -24,7 +24,7 @@
                     <p class="text-light"><t t-esc="widget.login_employee['job_id'][1]"/></p>
                 </t>
                     <t t-if="!widget.login_employee['job_id']">
-                        <p class="text-light" style="color:#b6b6b6 !important">Add job title</p>
+                        <p class="text-light" style="color:#b6b6b6 !important">Add job Position</p>
                     </t>
                 </div>
                 <div class="employee-details">
