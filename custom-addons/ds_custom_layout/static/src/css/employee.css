@@ -1,0 +1,4 @@
+
+.o_main_navbar .o_menu_sections a[title=Directory] {
+    display: none;
+}
