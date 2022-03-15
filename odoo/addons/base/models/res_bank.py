@@ -108,7 +108,13 @@ class ResPartnerBank(models.Model):
     def name_get(self):
         return [(acc.id, '{} - {}'.format(acc.acc_number, acc.bank_id.name) if acc.bank_id else acc.acc_number)
                 for acc in self]
-
+    @api.model
+    def get_import_templates(self):
+        return [{
+            'label': _('Import Template for Bank account'),
+            'template': '/base/static/xls/import_bank_account.xls'
+        }]
+    
     @api.model
     def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
         pos = 0

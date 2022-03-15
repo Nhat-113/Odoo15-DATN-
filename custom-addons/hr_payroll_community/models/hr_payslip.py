@@ -52,16 +52,16 @@ class HrPayslip(models.Model):
                 \n* If the payslip is confirmed then status is set to \'Done\'.
                 \n* When user cancel payslip the status is \'Rejected\'.""")
     line_ids = fields.One2many('hr.payslip.line', 'slip_id', string='Payslip Lines', readonly=True,
-                               states={'draft': [('readonly', False)]})
+                               states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     company_id = fields.Many2one('res.company', string='Company', readonly=True, copy=False, help="Company",
                                  default=lambda self: self.env['res.company']._company_default_get(),
                                  states={'draft': [('readonly', False)]})
     worked_days_line_ids = fields.One2many('hr.payslip.worked_days', 'payslip_id',
                                            string='Payslip Worked Days', copy=True, readonly=True,
                                            help="Payslip worked days",
-                                           states={'draft': [('readonly', False)]})
+                                           states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     input_line_ids = fields.One2many('hr.payslip.input', 'payslip_id', string='Payslip Inputs',
-                                     readonly=True, states={'draft': [('readonly', False)]})
+                                     readonly=True, states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     paid = fields.Boolean(string='Made Payment Order ? ', readonly=True, copy=False,
                           states={'draft': [('readonly', False)]})
     note = fields.Text(string='Internal Note', readonly=True, states={'draft': [('readonly', False)]})
@@ -77,6 +77,7 @@ class HrPayslip(models.Model):
                                      copy=False, states={'draft': [('readonly', False)]})
     payslip_count = fields.Integer(compute='_compute_payslip_count', string="Payslip Computation Details")
 
+
     def _compute_details_by_salary_rule_category(self):
         for payslip in self:
             payslip.details_by_salary_rule_category = payslip.mapped('line_ids').filtered(lambda line: line.category_id)
@@ -91,6 +92,18 @@ class HrPayslip(models.Model):
         if any(self.filtered(lambda payslip: payslip.date_from > payslip.date_to)):
             raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
 
+    @api.constrains('name')
+    def _check_payslips(self):
+        payslip_names = [payslip.name for payslip in self.employee_id.slip_ids][:-1]
+
+        if any(self.filtered(lambda payslip: payslip.name in payslip_names)):
+            raise ValidationError(_("Do not create multiple payslips for an employee in the same month"))
+
+    @api.constrains('contract_id')
+    def _check_contract_id(self):
+            if (self.employee_id.contract_id != self.employee_id.slip_ids.contract_id):            
+                raise UserError('Cannot choose the wrong contract with the employee')
+
     def action_payslip_draft(self):
 
         return self.write({'state': 'draft'})
@@ -102,8 +115,8 @@ class HrPayslip(models.Model):
 
     def action_payslip_cancel(self):
 
-        if self.filtered(lambda slip: slip.state == 'done'):
-            raise UserError(_("Cannot cancel a payslip that is done."))
+        # if self.filtered(lambda slip: slip.state == 'done'):
+        #     raise UserError(_("Cannot cancel a payslip that is done."))
         return self.write({'state': 'cancel'})
 
     def refund_sheet(self):
@@ -111,7 +124,7 @@ class HrPayslip(models.Model):
 
             copied_payslip = payslip.copy({'credit_note': True, 'name': _('Refund: ') + payslip.name})
             copied_payslip.compute_sheet()
-            copied_payslip.action_payslip_done()
+            copied_payslip.action_payslip_draft()
         formview_ref = self.env.ref('hr_payroll_community.view_hr_payslip_form', False)
         treeview_ref = self.env.ref('hr_payroll_community.view_hr_payslip_tree', False)
         return {
@@ -169,7 +182,7 @@ class HrPayslip(models.Model):
                            self.get_contract(payslip.employee_id, payslip.date_from, payslip.date_to)
             lines = [(0, 0, line) for line in self._get_payslip_lines(contract_ids, payslip.id)]
             payslip.write({'line_ids': lines, 'number': number})
-        return True
+        return self.write({'state': 'verify'})
 
     @api.model
     def get_worked_day_lines(self, contracts, date_from, date_to):
@@ -213,11 +226,11 @@ class HrPayslip(models.Model):
             work_data = contract.employee_id.get_work_days_data(day_from, day_to,
                                                                 calendar=contract.resource_calendar_id)
             attendances = {
-                'name': _("Normal Working Days paid at 100%"),
+                'name': _("Ngày làm việc bình thường được trả 100%"),
                 'sequence': 1,
                 'code': 'WORK100',
                 'number_of_days': work_data['days'],
-                'number_of_hours': work_data['hours'],
+                # 'number_of_hours': work_data['hours'],
                 'contract_id': contract.id,
             }
 
@@ -226,7 +239,7 @@ class HrPayslip(models.Model):
                 'sequence': 5,
                 'code': 'NNKL',
                 'number_of_days': 0,
-                'number_of_hours': 0,
+                # 'number_of_hours': 0,
                 'contract_id': contract.id,
             }
 

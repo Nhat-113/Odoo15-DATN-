@@ -11,5 +11,20 @@
             <field name="state">code</field>
             <field name="code">model.mail_reminder()</field>
         </record>
+
+        <record model="ir.cron" id="employee_contract_reminder">
+            <field name="name">HR Employee Contract Expiration</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="model_id" ref="model_hr_contract"/>
+            <field name="state">code</field>
+            <field name="code">model.mail_contract_reminder()</field>
+            <field
+                name="nextcall"
+                eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 07:00:00')"
+            />
+        </record>
     </data>
 </odoo>
