@@ -105,6 +105,13 @@ class HrPayslip(models.Model):
         if self.employee_id.contract_id != self.contract_id:            
             raise ValidationError(_('Cannot choose the wrong contract with the employee'))
 
+    @api.constrains('date_from', 'date_to')
+    def _check_contract_date(self):
+        if self.contract_id.date_end:
+            if self.contract_id.date_start < self.date_from or self.contract_id.date_end > self.date_to:
+                raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
+                name=self.employee_id.name))
+
     def action_payslip_draft(self):
 
         return self.write({'state': 'draft'})
