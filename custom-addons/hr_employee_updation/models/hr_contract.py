@@ -29,7 +29,7 @@ class Contract(models.Model):
                 if contract.date_end >= date.today():
                     contract.employee_id.sudo().write({'contract_id': contract.id})
                 else:
-                    raise ValidationError(_('Contract has expired on day(%(date_end)s)', date_end=contract.date_end))
+                    raise ValidationError(_('Contract has expired on day (%(date_end)s)', date_end=contract.date_end))
 
     def write(self, vals):
         res = super(Contract, self).write(vals)
