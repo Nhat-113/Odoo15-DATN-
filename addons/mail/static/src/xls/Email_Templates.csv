@@ -1,0 +1,2066 @@
+"id","name","model_id","subject","email_from","email_to","partner_to","report_name","attachment_ids","auto_delete","body_html","email_cc","use_default_to","null_value","id","model_object_field","lang","report_template","mail_server_id","copyvalue","reply_to","scheduled_date","sub_model_object_field"
+"hr_recruitment.email_template_data_applicant_congratulations","Applicant: Acknowledgement","Applicant","Your Job Application: {{ object.job_id.name }}","","{{ (not object.partner_id and object.email_from or '') }}","{{ object.partner_id.id or '' }}","","","True","<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""background-color: white; border-collapse: collapse; margin-left: 20px;"">
+    <tr>
+        <td valign=""top"" style=""padding: 0px 10px;"">
+            <div style=""font-size: 13px; margin: 0px; padding: 0px;"">
+                Hello,
+                <br/><br/>
+                We confirm we successfully received your application for the job
+                ""<a t-att-href=""hasattr(object.job_id, 'website_url') and object.job_id.website_url or ''"" style=""color:#9A6C8E;""><strong t-out=""object.job_id.name or ''"">Experienced Developer</strong></a>"" at <strong t-out=""object.company_id.name or ''"">YourCompany</strong>.
+                <br/><br/>
+                We will come back to you shortly.
+
+                <div t-if=""'website_url' in object.job_id and object.job_id.website_url"" style=""padding: 16px 8px 16px 8px;"">
+                    <a t-att-href=""object.job_id.website_url"" style=""background-color: #875a7b; text-decoration: none; color: #fff; padding: 8px 16px 8px 16px; border-radius: 5px;"">Job Description</a>
+                </div>
+
+                <hr width=""97%"" style=""background-color: rgb(204,204,204); border: medium none; clear: both; display: block; font-size: 0px; min-height: 1px; line-height: 0; margin: 16px 0px 16px 0px;""/>
+                <t t-if=""object.user_id"">
+                    <h3 style=""color:#9A6C8E;""><strong>Your Contact:</strong></h3>
+                    <table>
+                        <tr>
+                            <td width=""75"">
+                                <img t-attf-src=""/web/image/res.users/{{ object.user_id.id }}/avatar_128"" alt=""Avatar"" style=""vertical-align:baseline; width: 64px; height: 64px; object-fit: cover;""/>
+                            </td>
+                            <td>
+                                <strong t-out=""object.user_id.name or ''"">Mitchell Admin</strong><br/>
+                                <span>Email: <t t-out=""object.user_id.email or ''"">admin@yourcompany.example.com</t></span><br/>
+                                <span>Phone: <t t-out=""object.user_id.phone or ''"">+1 650-123-4567</t></span>
+                            </td>
+                        </tr>
+                    </table>
+                    <hr width=""97%"" style=""background-color: rgb(204,204,204); border: medium none; clear: both; display: block; font-size: 0px; min-height: 1px; line-height: 0; margin: 16px 0px 16px 0px;""/>
+                </t>
+
+                <h3 style=""color:#9A6C8E;""><strong>What is the next step?</strong></h3>
+                We usually <strong>answer applications within a few days.</strong><br/><br/>
+                Feel free to <strong>contact us if you want a faster
+                feedback</strong> or if you don't get news from us
+                quickly enough (just reply to this email).
+
+                <hr width=""97%"" style=""background-color: rgb(204,204,204); border: medium none; clear: both; display: block; font-size: 0px; min-height: 1px; line-height: 0; margin: 17px 0px 16px 0px;""/>
+                <t t-set=""location"" t-value=""''""/>
+                <t t-if=""object.job_id.address_id.name"">
+                    <strong t-out=""object.job_id.address_id.name or ''"">Teksa SpA</strong><br/>
+                </t>
+                <t t-if=""object.job_id.address_id.street"">
+                    <t t-out=""object.job_id.address_id.street or ''"">Puerto Madero 9710</t><br/>
+                    <t t-set=""location"" t-value=""object.job_id.address_id.street""/>
+                </t>
+                <t t-if=""object.job_id.address_id.street2"">
+                    <t t-out=""object.job_id.address_id.street2 or ''"">Of A15, Santiago (RM)</t><br/>
+                    <t t-set=""location"" t-value=""'%s, %s' % (location, object.job_id.address_id.street2)""/>
+                </t>
+                <t t-if=""object.job_id.address_id.city"">
+                    <t t-out=""object.job_id.address_id.city or ''"">Pudahuel</t>,
+                    <t t-set=""location"" t-value=""'%s, %s' % (location, object.job_id.address_id.city)""/>
+                </t>
+                <t t-if=""object.job_id.address_id.state_id.name"">
+                    <t t-out=""object.job_id.address_id.state_id.name or ''"">C1</t>,
+                    <t t-set=""location"" t-value=""'%s, %s' % (location, object.job_id.address_id.state_id.name)""/>
+                </t>
+                <t t-if=""object.job_id.address_id.zip"">
+                    <t t-out=""object.job_id.address_id.zip or ''"">98450</t>
+                    <t t-set=""location"" t-value=""'%s, %s' % (location, object.job_id.address_id.zip)""/>
+                </t>
+                <br/>
+                <t t-if=""object.job_id.address_id.country_id.name"">
+                    <t t-out=""object.job_id.address_id.country_id.name or ''"">Argentina</t><br/>
+                    <t t-set=""location"" t-value=""'%s, %s' % (location, object.job_id.address_id.country_id.name)""/>
+                </t>
+                <br/>
+            </div>
+        </td>
+    </tr>
+</table>","","","","hr_recruitment.email_template_data_applicant_congratulations","","{{ object.partner_id.lang or '' }}","","","","","",""
+"hr_recruitment.email_template_data_applicant_interest","Applicant: Interest","Applicant","Your Job Application: {{ object.job_id.name }}","","{{ (not object.partner_id and object.email_from or '') }}","{{ object.partner_id.id or '' }}","","","True","<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""background-color: white; border-collapse: collapse; margin-left: 20px;"">
+    <tr>
+        <td valign=""top"" style=""padding: 0px 10px;"">
+            <div style=""text-align: center"">
+                <h2>Congratulations!</h2>
+                <div style=""color:grey;"">Your resume has been positively reviewed.</div>
+                <img src=""/hr_recruitment/static/src/img/congratulations.png"" alt=""Congratulations!"" style=""width:175px;margin:20px 0;""/>
+            </div>
+            <div style=""font-size: 13px; margin: 0px; padding: 0px;"">
+                We just reviewed your resume, and it caught our
+                attention. As we think you might be great for the
+                position, your application has been short listed for a
+                call or an interview.
+                <br/><br/>
+                <div t-if=""'website_url' in object.job_id and object.job_id.website_url"" style=""padding: 16px 8px 16px 8px;"">
+                    <a t-att-href=""object.job_id.website_url"" style=""background-color: #875a7b; text-decoration: none; color: #fff; padding: 8px 16px 8px 16px; border-radius: 5px;"">Job Description</a>
+                </div>
+
+                <t t-if=""object.user_id"">
+                    You will soon be contacted by:
+                    <table>
+                        <tr>
+                            <td width=""75"">
+                                <img t-attf-src=""/web/image/res.users/{{ object.user_id.id }}/avatar_128"" alt=""Avatar"" style=""vertical-align:baseline; width: 64px; height: 64px; object-fit: cover;""/>
+                            </td>
+                            <td>
+                                <strong t-out=""object.user_id.name or ''"">Mitchell Admin</strong><br/>
+                                <span>Email: <t t-out=""object.user_id.email or ''"">admin@yourcompany.example.com</t></span><br/>
+                                <span>Phone: <t t-out=""object.user_id.phone or ''"">+1 650-123-4567</t></span>
+                            </td>
+                        </tr>
+                    </table>
+                    <br/><br/>
+                </t>
+                See you soon,
+                <div style=""font-size: 11px; color: grey;"">
+                    -- <br/>
+                    The HR Team
+                    <t t-if=""'website_url' in object.job_id and hasattr(object.job_id, 'website_url') and object.job_id.website_url"">
+                        Discover <a href=""/jobs"" style=""text-decoration:none;color:#717188;"">all our jobs</a>.<br/>
+                    </t>
+                </div>
+
+                <hr width=""97%"" style=""background-color: rgb(204,204,204); border: medium none; clear: both; display: block; font-size: 0px; min-height: 1px; line-height: 0; margin: 16px 0px 16px 0px;""/>
+                <h3 style=""color:#9A6C8E;""><strong>What is the next step?</strong></h3>
+                We usually <strong>answer applications within a few days</strong>.
+                <br/><br/>
+                The next step is either a call or a meeting in our offices.
+                <br/>
+                Feel free to <strong>contact us if you want a faster
+                feedback</strong> or if you don't get news from us
+                quickly enough (just reply to this email).
+                <br/>
+
+                <hr width=""97%"" style=""background-color: rgb(204,204,204); border: medium none; clear: both; display: block; font-size: 0px; min-height: 1px; line-height: 0; margin: 17px 0px 16px 0px;""/>
+                <t t-set=""location"" t-value=""''""/>
+                <t t-if=""object.job_id.address_id.name"">
+                    <strong t-out=""object.job_id.address_id.name or ''"">Teksa SpA</strong><br/>
+                </t>
+                <t t-if=""object.job_id.address_id.street"">
+                    <t t-out=""object.job_id.address_id.street or ''"">Puerto Madero 9710</t><br/>
+                    <t t-set=""location"" t-value=""object.job_id.address_id.street""/>
+                </t>
+                <t t-if=""object.job_id.address_id.street2"">
+                    <t t-out=""object.job_id.address_id.street2 or ''"">Of A15, Santiago (RM)</t><br/>
+                    <t t-set=""location"" t-value=""'%s, %s' % (location, object.job_id.address_id.street2)""/>
+                </t>
+                <t t-if=""object.job_id.address_id.city"">
+                    <t t-out=""object.job_id.address_id.city or ''"">Pudahuel</t>,
+                    <t t-set=""location"" t-value=""'%s, %s' % (location, object.job_id.address_id.city)""/>
+                </t>
+                <t t-if=""object.job_id.address_id.state_id.name"">
+                    <t t-out=""object.job_id.address_id.state_id.name or ''"">C1</t>,
+                    <t t-set=""location"" t-value=""'%s, %s' % (location, object.job_id.address_id.state_id.name)""/>
+                </t>
+                <t t-if=""object.job_id.address_id.zip"">
+                    <t t-out=""object.job_id.address_id.zip or ''"">98450</t>
+                    <t t-set=""location"" t-value=""'%s, %s' % (location, object.job_id.address_id.zip)""/>
+                </t>
+                <br/>
+                <t t-if=""object.job_id.address_id.country_id.name"">
+                    <t t-out=""object.job_id.address_id.country_id.name or ''"">Argentina</t><br/>
+                    <t t-set=""location"" t-value=""'%s, %s' % (location, object.job_id.address_id.country_id.name)""/>
+                </t>
+                <br/>
+            </div>
+        </td>
+    </tr>
+</table>","","","","hr_recruitment.email_template_data_applicant_interest","","{{ object.partner_id.lang or '' }}","","","","","",""
+"hr_recruitment.email_template_data_applicant_not_interested","Applicant: Not interested anymore","Applicant","Your Job Application: {{ object.job_id.name }}","","{{ (not object.partner_id and object.email_from or '') }}","{{ object.partner_id.id or '' }}","","","True","<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+    <tr>
+        <td valign=""top"">
+            <div style=""font-size: 13px; margin: 0px; padding: 0px;"">
+                Dear,<br/><br/>
+                We would like to thank you for your interest and your time.<br/>
+                We wish you all the best in your future endeavors.
+                <br/><br/>
+                Best<br/>
+                <div style=""font-size: 11px; color: grey;"">
+                    <t t-if=""object.user_id"">
+                        -- <br/>
+                        <strong t-out=""object.user_id.name or ''"">Marc Demo</strong><br/>
+                        Email: <t t-out=""object.user_id.email or ''"">mark.brown23@example.com</t><br/>
+                        Phone: <t t-out=""object.user_id.phone or ''"">+1 650-123-4567</t>
+                    </t>
+                    <t t-else="""">
+                        -- <br/>
+                        <t t-out=""object.company_id.name or ''"">YourCompany</t><br/>
+                        The HR Team<br/>
+                    </t>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+        ","","","","hr_recruitment.email_template_data_applicant_not_interested","","{{ object.partner_id.lang or '' }}","","","","","",""
+"hr_recruitment.email_template_data_applicant_refuse","Applicant: Refuse","Applicant","Your Job Application: {{ object.job_id.name }}","","{{ (not object.partner_id and object.email_from or '') }}","{{ object.partner_id.id or '' }}","","","True","<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+    <tr>
+        <td valign=""top"">
+            <div style=""font-size: 13px; margin: 0px; padding: 0px;"">
+                Hello,<br/><br/>
+                Thank you for your interest in joining the
+                <b><t t-out=""object.company_id.name or ''"">YourCompany</t></b> team.  We
+                wanted to let you know that, although your resume is
+                competitive, our hiring team reviewed your application
+                and <b>did not select it for further consideration</b>.
+                <br/><br/>
+                Please note that recruiting is hard, and we can make
+                mistakes. Do not hesitate to reply to this email if you
+                think we made a mistake, or if you want more information
+                about our decision.
+                <br/><br/>
+                We will, however, keep your resume on record and get in
+                touch with you about future opportunities that may be a
+                better fit for your skills and experience.
+                <br/><br/>
+                We wish you all the best in your job search and hope we
+                will have the chance to consider you for another role
+                in the future.
+                <br/><br/>
+                Thank you,
+                <div style=""font-size: 11px; color: grey;"">
+                    <t t-if=""object.user_id"">
+                        -- <br/>
+                        <strong t-out=""object.user_id.name or ''"">Mitchell Admin</strong><br/>
+                        Email: <t t-out=""object.user_id.email or ''"">admin@yourcompany.example.com</t><br/>
+                        Phone: <t t-out=""object.user_id.phone or ''"">+1 650-123-4567</t>
+                    </t>
+                    <t t-else="""">
+                        -- <br/>
+                        <t t-out=""object.company_id.name or ''"">YourCompany</t><br/>
+                        The HR Team
+                    </t>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+        ","","","","hr_recruitment.email_template_data_applicant_refuse","","{{ object.partner_id.lang or '' }}","","","","","",""
+"auth_signup.mail_template_user_signup_account_created","Auth Signup: Odoo Account Created","Users","Welcome to {{ object.company_id.name }}!","""{{ object.company_id.name }}"" <{{ (object.company_id.email or user.email) }}>","{{ object.email_formatted }}","","","","True","<table border=""0"" cellpadding=""0"" cellspacing=""0"" style=""box-sizing:border-box;padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"" width=""1067px""><tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td align=""center"" style=""box-sizing:border-box;"">
+<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;padding: 16px; background-color: white; color: #454748; border-collapse:separate;"">
+<tbody style=""box-sizing:border-box;"">
+    <!-- HEADER -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""middle"" style=""box-sizing:border-box;"">
+                    <span style=""box-sizing:border-box;font-size: 10px;"">Your Account</span><br style=""box-sizing:border-box;"">
+                    <span style=""box-sizing:border-box;font-size: 20px; font-weight: bold;"">
+                        <t t-out=""object.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">Marc Demo</t>
+                    </span>
+                </td><td valign=""middle"" align=""right"" style=""box-sizing:border-box;"">
+                    <img t-attf-src=""/logo.png?company={{ object.company_id.id }}"" style=""border-style:none;box-sizing:border-box;vertical-align:middle;padding: 0px; margin: 0px; height: 0px; width: 80px;"" t-att-alt=""object.company_id.name"" width=""80px"" height=""0"">
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td colspan=""2"" style=""box-sizing:border-box;text-align:center;"">
+                  <hr width=""100%"" style=""border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"">
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <!-- CONTENT -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""top"" style=""box-sizing:border-box;font-size: 13px;"">
+                    <div style=""box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;"">
+                        Dear <t t-out=""object.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">Marc Demo</t>,<br style=""box-sizing:border-box;""><br style=""box-sizing:border-box;"">
+                        Your account has been successfully created!<br style=""box-sizing:border-box;"">
+                        Your login is <strong style=""box-sizing:border-box;font-weight:bolder;""><t t-out=""object.email or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">mark.brown23@example.com</t></strong><br style=""box-sizing:border-box;"">
+                        To gain access to your account, you can use the following link:
+                        <div style=""box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;margin: 16px 0px 16px 0px;"">
+                            <a t-attf-href=""/web/login?auth_login={{object.email}}"" style=""box-sizing:border-box;background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"">
+                                Go to My Account
+                            </a>
+                        </div>
+                        Thanks,<br style=""box-sizing:border-box;"">
+                        <t t-if=""user.signature"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"" data-oe-t-group=""0"" data-oe-t-inline=""true"">
+                            <br style=""box-sizing:border-box;"">
+                            <t t-out=""user.signature or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">--<br style=""box-sizing:border-box;"">Mitchell Admin</t>
+                        </t>
+                    </div>
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td style=""box-sizing:border-box;text-align:center;"">
+                  <hr width=""100%"" style=""border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"">
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <!-- FOOTER -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""middle"" align=""left"" style=""box-sizing:border-box;"">
+                    <t t-out=""object.company_id.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">YourCompany</t>
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td valign=""middle"" align=""left"" style=""box-sizing:border-box;opacity: 0.7;"">
+                    <t t-out=""object.company_id.phone or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">+1 650-123-4567</t>
+                    <t t-if=""object.company_id.email"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"" data-oe-t-group=""1"" data-oe-t-inline=""true"">
+                        | <a t-attf-href=""'mailto:%s' % {{ object.company_id.email }}"" style=""box-sizing:border-box;background-color:transparent;text-decoration:none; color: #454748;""><t t-out=""object.company_id.email or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">info@yourcompany.com</t></a>
+                    </t>
+                    <t t-if=""object.company_id.website"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"" data-oe-t-group=""2"" data-oe-t-inline=""true"">
+                        | <a t-attf-href=""'%s' % {{ object.company_id.website }}"" style=""box-sizing:border-box;background-color:transparent;text-decoration:none; color: #454748;"">
+                            <t t-out=""object.company_id.website or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">http://www.example.com</t>
+                        </a>
+                    </t>
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- POWERED BY -->
+<tr style=""box-sizing:border-box;""><td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+    <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"">
+      <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td style=""box-sizing:border-box;text-align: center; font-size: 13px;"">
+        Powered by <a target=""_blank"" href=""https://d-soft.com.vn/"" style=""text-decoration:none;box-sizing:border-box;background-color:transparent;color: #875A7B;"">D-Soft</a></td></tr>
+    </tbody></table>
+</td></tr>
+</tbody></table>","","","","auth_signup.mail_template_user_signup_account_created","","{{ object.lang }}","","","","","",""
+"auth_signup.set_password_email","Auth Signup: Odoo Connection","Users","{{ object.create_uid.name }} from {{ object.company_id.name }} invites you to connect to Dsoft","""{{ object.company_id.name }}"" <{{ (object.company_id.email or user.email) }}>","{{ object.email_formatted }}","","","","True","<table border=""0"" cellpadding=""0"" cellspacing=""0"" style=""box-sizing:border-box;padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"" width=""1067.2px""><tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td align=""center"" style=""box-sizing:border-box;"">
+<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;padding: 16px; background-color: white; color: #454748; border-collapse:separate;"">
+<tbody style=""box-sizing:border-box;"">
+    <!-- HEADER -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""middle"" style=""box-sizing:border-box;"">
+                    <span style=""box-sizing:border-box;font-size: 10px;"">Welcome to Dsoft</span><br style=""box-sizing:border-box;"">
+                    <span style=""box-sizing:border-box;font-size: 20px; font-weight: bold;"">
+                        <t t-out=""object.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">Marc Demo</t>
+                    </span>
+                </td><td valign=""middle"" align=""right"" style=""box-sizing:border-box;"">
+                    <img t-attf-src=""/logo.png?company={{ object.company_id.id }}"" style=""border-style:none;box-sizing:border-box;vertical-align:middle;padding: 0px; margin: 0px; height: 0px; width: 80px;"" t-att-alt=""object.company_id.name"" width=""80px"" height=""0"">
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td colspan=""2"" style=""box-sizing:border-box;text-align:center;"">
+                  <hr width=""100%"" style=""border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"">
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <!-- CONTENT -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""top"" style=""box-sizing:border-box;font-size: 13px;"">
+                    <div style=""box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;"">
+                        Dear <t t-out=""object.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">Marc Demo</t>,<br style=""box-sizing:border-box;""><br style=""box-sizing:border-box;"">
+                        You have been invited by <t t-out=""object.create_uid.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">OdooBot</t> of <t t-out=""object.company_id.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">YourCompany</t> to connect on D-SOFT.
+                        <div style=""box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;margin: 16px 0px 16px 0px;"">
+                            <a t-att-href=""object.signup_url"" style=""box-sizing:border-box;background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"">
+                                Accept invitation
+                            </a>
+                        </div>
+                        <t t-set=""website_url"" t-value=""object.get_base_url()"" data-oe-t-inline=""true"" style=""box-sizing:border-box;""></t>
+                        Your D-soft domain is: <b style=""box-sizing:border-box;font-weight:bolder;""><a t-att-href=""website_url"" t-out=""website_url or ''"" style=""text-decoration:none;box-sizing:border-box;background-color:transparent;color:inherit;"">http://yourcompany.odoo.com</a></b><br style=""box-sizing:border-box;"">
+                        Your sign in email is: <b style=""box-sizing:border-box;font-weight:bolder;""><a t-attf-href=""/web/login?login={{ object.email }}"" target=""_blank"" t-out=""object.email or ''"" style=""text-decoration:none;box-sizing:border-box;background-color:transparent;color:inherit;"">mark.brown23@example.com</a></b><br style=""box-sizing:border-box;""><br style=""box-sizing:border-box;"">
+                        --<br style=""box-sizing:border-box;"">The <t t-out=""object.company_id.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">YourCompany</t> Team
+                    </div>
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td style=""box-sizing:border-box;text-align:center;"">
+                  <hr width=""100%"" style=""border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"">
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <!-- FOOTER -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""middle"" align=""left"" style=""box-sizing:border-box;"">
+                    <t t-out=""object.company_id.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">YourCompany</t>
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td valign=""middle"" align=""left"" style=""box-sizing:border-box;opacity: 0.7;"">
+                    <t t-out=""object.company_id.phone or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">+1 650-123-4567</t>
+                    <t t-if=""object.company_id.email"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"">
+                        | <a t-att-href=""'mailto:%s' % object.company_id.email"" style=""box-sizing:border-box;background-color:transparent;text-decoration:none; color: #454748;"" t-out=""object.company_id.email or ''"">info@yourcompany.com</a>
+                    </t>
+                    <t t-if=""object.company_id.website"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"">
+                        | <a t-att-href=""'%s' % object.company_id.website"" style=""box-sizing:border-box;background-color:transparent;text-decoration:none; color: #454748;"" t-out=""object.company_id.website or ''"">http://www.example.com</a>
+                    </t>
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- POWERED BY -->
+<tr style=""box-sizing:border-box;""><td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+    <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"">
+      <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td style=""box-sizing:border-box;text-align: center; font-size: 13px;"">
+        Powered by&nbsp;<a target=""_blank"" href=""https://d-soft.com.vn/"" style=""text-decoration:none;box-sizing:border-box;background-color:transparent;color:#66598f;"">D-soft</a></td></tr>
+    </tbody></table>
+</td></tr>
+</tbody></table>","","","","auth_signup.set_password_email","","{{ object.lang }}","","","","","",""
+"auth_signup.reset_password_email","Auth Signup: Reset Password","Users","Password reset","""{{ object.company_id.name }}"" <{{ (object.company_id.email or user.email) }}>","{{ object.email_formatted }}","","","","True","<table border=""0"" cellpadding=""0"" cellspacing=""0"" style=""box-sizing:border-box;padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"" width=""1067px""><tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td align=""center"" style=""box-sizing:border-box;"">
+<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;padding: 16px; background-color: white; color: #454748; border-collapse:separate;"">
+<tbody style=""box-sizing:border-box;"">
+    <!-- HEADER -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""middle"" style=""box-sizing:border-box;"">
+                    <span style=""box-sizing:border-box;font-size: 10px;"">Your Account</span><br style=""box-sizing:border-box;"">
+                    <span style=""box-sizing:border-box;font-size: 20px; font-weight: bold;"">
+                        <t t-out=""object.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">Marc Demo</t>
+                    </span>
+                </td><td valign=""middle"" align=""right"" style=""box-sizing:border-box;"">
+                    <img t-attf-src=""/logo.png?company={{ object.company_id.id }}"" style=""border-style:none;box-sizing:border-box;vertical-align:middle;padding: 0px; margin: 0px; height: 0px; width: 80px;"" t-att-alt=""object.company_id.name"" width=""80px"" height=""0"">
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td colspan=""2"" style=""box-sizing:border-box;text-align:center;"">
+                  <hr width=""100%"" style=""border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"">
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <!-- CONTENT -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""top"" style=""box-sizing:border-box;font-size: 13px;"">
+                    <div style=""box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;"">
+                        Dear <t t-out=""object.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">Marc Demo</t>,<br style=""box-sizing:border-box;""><br style=""box-sizing:border-box;"">
+                        A password reset was requested for the D-Soft&nbsp;<a href=""https://d-soft.com.vn/"" style=""text-decoration:none;box-sizing:border-box;background-color:transparent;color:#66598f;""></a>account linked to this email.
+                        You may change your password by following this link which will remain valid during 24 hours:<br style=""box-sizing:border-box;"">
+                        <div style=""box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;margin: 16px 0px 16px 0px;"">
+                            <a t-att-href=""object.signup_url"" style=""box-sizing:border-box;background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"">
+                                Change password
+                            </a>
+                        </div>
+                        If you do not expect this, you can safely ignore this email.<br style=""box-sizing:border-box;""><br style=""box-sizing:border-box;"">
+                        Thanks,
+                        <t t-if=""user.signature"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"">
+                            <br style=""box-sizing:border-box;"">
+                            <t t-out=""user.signature or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">--<br style=""box-sizing:border-box;"">Mitchell Admin</t>
+                        </t>
+                    </div>
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td style=""box-sizing:border-box;text-align:center;"">
+                  <hr width=""100%"" style=""border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"">
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <!-- FOOTER -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""middle"" align=""left"" style=""box-sizing:border-box;"">
+                    <t t-out=""object.company_id.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">YourCompany</t>
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td valign=""middle"" align=""left"" style=""box-sizing:border-box;opacity: 0.7;"">
+                    <t t-out=""object.company_id.phone or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">+1 650-123-4567</t>
+
+                    <t t-if=""object.company_id.email"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"">
+                        | <a t-att-href=""'mailto:%s' % object.company_id.email"" style=""box-sizing:border-box;background-color:transparent;text-decoration:none; color: #454748;"" t-out=""object.company_id.email or ''"">info@yourcompany.com</a>
+                    </t>
+                    <t t-if=""object.company_id.website"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"">
+                        | <a t-att-href=""'%s' % object.company_id.website"" style=""box-sizing:border-box;background-color:transparent;text-decoration:none; color: #454748;"" t-out=""object.company_id.website or ''"">http://www.example.com</a>
+                    </t>
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- POWERED BY -->
+<tr style=""box-sizing:border-box;""><td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+    <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"">
+      <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td style=""box-sizing:border-box;text-align: center; font-size: 13px;"">
+        Powered by <a target=""_blank"" href=""https://d-soft.com.vn/"" style=""text-decoration:none;box-sizing:border-box;background-color:transparent;color: #875A7B;"">D-Soft</a>
+      </td></tr>
+    </tbody></table>
+</td></tr>
+</tbody></table>
+            ","","","","auth_signup.reset_password_email","","","","","","","",""
+"auth_signup.mail_template_data_unregistered_users","Auth Signup: Unregistered Users","Users","Reminder for unregistered users","{{ object.company_id.partner_id.email_formatted }}","{{ object.email_formatted }}","","","","True","<table border=""0"" cellpadding=""0"" cellspacing=""0"" style=""background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;""><tr><td align=""center"">
+<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""padding: 16px; background-color: white; color: #454748; border-collapse:separate;"">
+<tbody>
+    <!-- CONTENT -->
+    <tr>
+        <td align=""center"" style=""min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <t t-set=""invited_users"" t-value=""ctx.get('invited_users', [])""/>
+                <td style=""text-align : left"">
+                    <span style=""font-size: 20px; font-weight: bold;"">
+                        Pending Invitations
+                    </span><br/><br/>
+                </td>
+                <tr><td valign=""top"" style=""font-size: 13px;"">
+                    <div>
+                        Dear <t t-out=""object.name or ''"">Mitchell Admin</t>,<br/> <br/>
+                        You added the following user(s) to your database but they haven't registered yet:
+                        <ul>
+                            <t t-foreach=""invited_users"" t-as=""invited_user"">
+                                <li t-out=""invited_user or ''"">demo@example.com</li>
+                            </t>
+                        </ul>
+                        Follow up with them so they can access your database and start working with you.
+                        <br/><br/>
+                        Have a nice day!<br/>
+                        --<br/>The <t t-out=""object.company_id.name or ''"">YourCompany</t> Team
+                    </div>
+                </td></tr>
+                <tr><td style=""text-align:center;"">
+                  <hr width=""100%"" style=""background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;""/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+</table>
+            ","","","","auth_signup.mail_template_data_unregistered_users","","{{ object.partner_id.lang }}","","","","","",""
+"calendar.calendar_template_meeting_changedate","Calendar: Date updated","Calendar Attendee Information","{{ object.event_id.name }}: Date updated","{{ (object.event_id.user_id.email_formatted or user.email_formatted or '') }}","{{ ('' if object.partner_id.email and object.partner_id.email == object.email else object.email) }}","{{ object.partner_id.id if object.partner_id.email and object.partner_id.email == object.email else False }}","","","True","<div>
+
+    <t t-set=""colors"" t-value=""{'needsAction': 'grey', 'accepted': 'green', 'tentative': '#FFFF00', 'declined': 'red'}""/>
+    <t t-set=""is_online"" t-value=""'appointment_type_id' in object.event_id and object.event_id.appointment_type_id""/>
+    <t t-set=""customer"" t-value=""object.event_id.find_partner_customer()""/>
+    <t t-set=""target_responsible"" t-value=""object.partner_id == object.event_id.partner_id""/>
+    <t t-set=""target_customer"" t-value=""object.partner_id == customer""/>
+     <t t-set=""recurrent"" t-value=""object.recurrence_id and not ctx.get('calendar_template_ignore_recurrence')""/>
+
+    <p>
+        Hello <t t-out=""object.common_name or ''"">Ready Mat</t>,<br/><br/>
+        <t t-if=""is_online and target_responsible"">
+            <t t-if=""customer"">
+                The date of your appointment with <t t-out=""customer.name or ''"">Jesse Brown</t> has been updated.
+            </t>
+            <t t-else="""">
+                Your appointment has been updated.
+            </t>
+            The appointment <strong t-out=""object.event_id.appointment_type_id.name or ''"">Schedule a Demo</strong> is now scheduled for
+            <t t-out=""object.event_id.get_display_time_tz(tz=object.partner_id.tz) or ''"">05/04/2021 at (11:00:00 To 11:30:00) (Europe/Brussels)</t>
+        </t>
+        <t t-elif=""is_online and target_customer"">
+            The date of your appointment with <t t-out=""object.event_id.user_id.partner_id.name or ''"">Colleen Diaz</t> has been updated.
+            The appointment <strong t-out=""object.event_id.appointment_type_id.name or ''""/> is now scheduled for
+            <t t-out=""object.event_id.get_display_time_tz(tz=object.partner_id.tz) or ''"">05/04/2021 at (11:00:00 To 11:30:00) (Europe/Brussels)</t>.
+        </t>
+        <t t-else="""">
+            The date of the meeting has been updated.
+            The meeting <strong t-out=""object.event_id.name or ''"">Follow-up for Project proposal</strong> created by <t t-out=""object.event_id.user_id.partner_id.name or ''"">Colleen Diaz</t> is now scheduled for
+            <t t-out=""object.event_id.get_display_time_tz(tz=object.partner_id.tz) or ''"">05/04/2021 at (11:00:00 To 11:30:00) (Europe/Brussels)</t>.
+        </t>
+    </p>
+    <div style=""text-align: center; padding: 16px 0px 16px 0px;"">
+        <a t-attf-href=""/calendar/meeting/accept?token={{ object.access_token }}&amp;id={{ object.event_id.id }}"" style=""padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px"">
+            Accept</a>
+        <a t-attf-href=""/calendar/meeting/decline?token={{ object.access_token }}&amp;id={{ object.event_id.id }}"" style=""padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px"">
+            Decline</a>
+        <a t-attf-href=""/calendar/meeting/view?token={{ object.access_token }}&amp;id={{ object.event_id.id }}"" style=""padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px"">
+            View</a>
+    </div>
+    <table border=""0"" cellpadding=""0"" cellspacing=""0""><tr>
+        <td width=""130px;"">
+            <div style=""border-top-left-radius: 3px; border-top-right-radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; font-weight: bold; color: #ffffff; min-height: 18px; background-color: #875A7B; border: 1px solid #875A7B;"">
+                <t t-out=""format_datetime(dt=object.event_id.start, tz=object.mail_tz if not object.event_id.allday else None, dt_format=&quot;EEEE&quot;, lang_code=object.env.lang) or &quot;&quot;"">Tuesday</t>
+            </div>
+            <div style=""font-size: 48px; min-height: auto; font-weight: bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: 1px solid #875A7B;"">
+                <t t-out=""str(object.event_id.start.day) or ''"">4</t>
+            </div>
+            <div style=""font-size: 12px; text-align: center; font-weight: bold; color: #ffffff; background-color: #875A7B;"">
+                <t t-out=""format_datetime(dt=object.event_id.start, tz=object.mail_tz if not object.event_id.allday else None, dt_format=&quot;MMMM y&quot;, lang_code=object.env.lang) or &quot;&quot;"">May 2021</t>
+            </div>
+            <div style=""border-collapse: separate; color: #5F5F5F; text-align: center; font-size: 12px; border-bottom-right-radius: 3px; font-weight: bold; border: 1px solid #875A7B; border-bottom-left-radius: 3px;"">
+                 <t t-if=""not object.event_id.allday"">
+                    <div>
+                        <t t-out=""format_time(time=object.event_id.start, tz=object.mail_tz, time_format=&quot;short&quot;, lang_code=object.env.lang) or &quot;&quot;"">11:00 AM</t>
+                    </div>
+                    <t t-if=""object.mail_tz"">
+                        <div style=""font-size: 10px; font-weight: normal"">
+                            (<t t-out=""object.mail_tz or ''"">Europe/Brussels</t>)
+                        </div>
+                    </t>
+                </t>
+            </div>
+        </td>
+        <td width=""20px;""/>
+        <td style=""padding-top: 5px;"">
+            <p><strong>Details of the event</strong></p>
+            <ul>
+                <t t-if=""object.event_id.location"">
+                    <li>Location: <t t-out=""object.event_id.location or ''"">Bruxelles</t>
+                        (<a target=""_blank"" t-attf-href=""http://maps.google.com/maps?oi=map&amp;q={{ object.event_id.location }}"">View Map</a>)
+                    </li>
+                </t>
+                <t t-if=""recurrent"">
+                    <li>When: <t t-out=""object.recurrence_id.name or ''"">Every 1 Weeks, for 3 events</t></li>
+                </t>
+                <t t-if=""not object.event_id.allday and object.event_id.duration"">
+                    <li>Duration: <t t-out=""('%dH%02d' % (object.event_id.duration,round(object.event_id.duration*60)%60)) or ''"">0H30</t></li>
+                </t>
+                <li>Attendees
+                <ul>
+                    <li t-foreach=""object.event_id.attendee_ids"" t-as=""attendee"">
+                        <div t-attf-style=""display: inline-block; border-radius: 50%; width: 10px; height: 10px; background: {{ colors.get(attendee.state) or 'white' }};""> </div>
+                        <t t-if=""attendee.common_name != object.common_name"">
+                            <span style=""margin-left:5px"" t-out=""attendee.common_name or ''"">Mitchell Admin</span>
+                        </t>
+                        <t t-else="""">
+                            <span style=""margin-left:5px"">You</span>
+                        </t>
+                    </li>
+                </ul></li>
+                <t t-if=""object.event_id.videocall_location"">
+                    <li>Meeting URL: <a t-att-href=""object.event_id.videocall_location"" target=""_blank"" t-out=""object.event_id.videocall_location or ''"">https://meet.jit.si/odoo-xyz</a></li>
+                </t>
+                <t t-if=""not is_html_empty(object.event_id.description)"">
+                    <li>Description of the event:
+                    <t t-out=""object.event_id.description"">Internal meeting for discussion for new pricing for product and services.</t></li>
+                </t>
+            </ul>
+        </td>
+    </tr></table>
+    <br/>
+    Thank you,
+    <t t-if=""object.event_id.user_id.signature"">
+        <br/>
+        <t t-out=""object.event_id.user_id.signature or ''"">--<br/>Mitchell Admin</t>
+    </t>
+</div>
+            ","","","","calendar.calendar_template_meeting_changedate","","{{ object.partner_id.lang }}","","","","","",""
+"calendar.calendar_template_meeting_update","Calendar: Event Update","Calendar Event","{{object.name}}: Event update","{{ (object.user_id.email_formatted or user.email_formatted or '') }}","{{ object._get_attendee_emails() }}","","","","True","<div>
+    <t t-set=""colors"" t-value=""{'needsAction': 'grey', 'accepted': 'green', 'tentative': '#FFFF00', 'declined': 'red'}""/>
+    <t t-set=""is_online = 'appointment_type_id' in object and object.appointment_type_id""/>
+    <t t-set=""target_responsible = object.partner_id == object.partner_id""/>
+    <t t-set=""target_customer = object.partner_id == customer""/>
+    <t t-set=""recurrent = object.recurrence_id and not ctx.get('calendar_template_ignore_recurrence'""/>
+    <t t-set=""mail_tz = ctx.get('mail_tz')""/>
+    <div>
+        <table border=""0"" cellpadding=""0"" cellspacing=""0"">
+            <tr>
+                <td width=""130px;"">
+                    <div style=""border-top-left-radius: 3px; border-top-right-radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; font-weight: bold; color: #ffffff; min-height: 18px; background-color: #875A7B; border: 1px solid #875A7B;"">
+                        <t t-out=""format_datetime(dt=object.start, tz=mail_tz if not object.allday else None, dt_format='EEEE', lang_code=object.env.lang) ""/>
+                    </div>
+                    <div style=""font-size: 48px; min-height: auto; font-weight: bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: 1px solid #875A7B;"">
+                        <t t-out=""format_datetime(dt=object.start, tz=mail_tz if not object.allday else None, dt_format='d', lang_code=object.env.lang)""/>
+                    </div>
+                    <div style=""font-size: 12px; text-align: center; font-weight: bold; color: #ffffff; background-color: #875A7B;"">
+                        <t t-out=""format_datetime(dt=object.start, tz=mail_tz if not object.allday else None, dt_format='MMMM y', lang_code=object.env.lang)""/>
+                    </div>
+                    <div style=""border-collapse: separate; color: #5F5F5F; text-align: center; font-size: 12px; border-bottom-right-radius: 3px; font-weight: bold; border: 1px solid #875A7B; border-bottom-left-radius: 3px;"">
+                        <t t-if=""not object.allday"">
+                            <div>
+                                <t t-out=""format_time(time=object.start, tz=mail_tz, time_format='short', lang_code=object.env.lang)""/>
+                            </div>
+                            <t t-if=""mail_tz"">
+                                <div style=""font-size: 10px; font-weight: normal"">
+                                    (<t t-out=""mail_tz""/>)
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                </td>
+                <td width=""20px;""/>
+                <td style=""padding-top: 5px;"">
+                    <p>
+                        <strong>Details of the event</strong>
+                    </p>
+                    <ul>
+                        <t t-if=""not is_online and object.display_description"">
+                            <li>Description: <t t-out=""object.description or ''""/></li>
+                        </t>
+                        <t t-elif=""is_online and object.description"">
+                            <t t-set=""splitted_description"" t-value=""object.description_to_html_lines()""/>
+                            <li>Description:
+                                <ul>
+                                    <t t-foreach=""splitted_description"" t-as=""description_line"">
+                                        <li t-out=""description_line or ''""/>
+                                    </t>
+                                </ul>
+                            </li>
+                        </t>
+                        <t t-if=""object.videocall_location"">
+                            <li>Meeting URL:
+                                <a t-att-href=""object.videocall_location"" target=""_blank"">
+                                    <t t-out=""object.videocall_location or ''""/>
+                                </a>
+                            </li>
+                        </t>
+                        <t t-if=""object.location"">
+                            <li>Location: <t t-out=""object.location or ''""/>
+                                (<a target=""_blank"" t-attf-href=""http://maps.google.com/maps?oi=map&amp;q={{object.location}}"">View Map</a>)
+                            </li>
+                        </t>
+                        <t t-if=""recurrent"">
+                            <li>When: <t t-out=""object.recurrence_id.name or ''""/></li>
+                        </t>
+                        <t t-if=""not object.allday and object.duration"">
+                            <li>Duration:
+                                <t t-out=""('%dH%02d' % (object.duration,round(object.duration*60)%60))""/>
+                            </li>
+                        </t>
+                    </ul>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class=""user_input"">
+        <hr/>
+        <p placeholder=""Enter your message here""><br/></p>
+
+    </div>
+</div>
+            ","","","","calendar.calendar_template_meeting_update","","{{ object.partner_id.lang }}","","","","","",""
+"calendar.calendar_template_meeting_invitation","Calendar: Meeting Invitation","Calendar Attendee Information","Invitation to {{ object.event_id.name }}","{{ (object.event_id.user_id.email_formatted or user.email_formatted or '') }}","{{ ('' if object.partner_id.email and object.partner_id.email == object.email else object.email) }}","{{ object.partner_id.id if object.partner_id.email and object.partner_id.email == object.email else False }}","","","True","<div>
+    <t t-set=""colors"" t-value=""{'needsAction': 'grey', 'accepted': 'green', 'tentative': '#FFFF00', 'declined': 'red'}""/>
+    <t t-set=""is_online"" t-value=""'appointment_type_id' in object.event_id and object.event_id.appointment_type_id""/>
+    <t t-set=""customer"" t-value="" object.event_id.find_partner_customer()""/>
+    <t t-set=""target_responsible"" t-value=""object.partner_id == object.event_id.partner_id""/>
+    <t t-set=""target_customer"" t-value=""object.partner_id == customer""/>
+    <t t-set=""recurrent"" t-value=""object.recurrence_id and not ctx.get('calendar_template_ignore_recurrence')""/>
+
+    <p>
+        Hello <t t-out=""object.common_name or ''"">Wood Corner</t>,<br/><br/>
+
+        <t t-if=""is_online and target_customer"">
+            Your appointment <strong t-out=""object.event_id.appointment_type_id.name or ''"">Schedule a Demo</strong> with <t t-out=""object.event_id.user_id.name or ''"">Ready Mat</t> has been booked.
+        </t>
+        <t t-elif=""is_online and target_responsible"">
+            <t t-if=""customer"">
+                <t t-out=""customer.name or ''""/> scheduled the following appointment <strong t-out=""object.event_id.appointment_type_id.name or ''"">Schedule a Demo</strong> with you.
+            </t>
+            <t t-else="""">
+                Your appointment <strong t-out=""object.event_id.appointment_type_id.name or ''"">Schedule a Demo</strong> has been booked.
+            </t>
+        </t>
+        <t t-elif=""not target_responsible"">
+            <t t-out=""object.event_id.user_id.partner_id.name or ''"">Colleen Diaz</t> invited you for the <strong t-out=""object.event_id.name or ''"">Follow-up for Project proposal</strong> meeting.
+        </t>
+        <t t-else="""">
+            Your meeting <strong t-out=""object.event_id.name or ''"">Follow-up for Project proposal</strong> has been booked.
+        </t>
+
+    </p>
+    <div style=""text-align: center; padding: 16px 0px 16px 0px;"">
+        <t t-if=""not is_online or object.state != 'accepted'"">
+            <a t-attf-href=""/calendar/meeting/accept?token={{object.access_token}}&amp;id={{object.event_id.id}}"" style=""padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px"">
+                Accept</a>
+            <a t-attf-href=""/calendar/meeting/decline?token={{object.access_token}}&amp;id={{object.event_id.id}}"" style=""padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px"">
+                Decline</a>
+        </t>
+        <a t-attf-href=""/calendar/meeting/view?token={{object.access_token}}&amp;id={{object.event_id.id}}"" style=""padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px""><t t-out=""'Reschedule' if is_online and target_customer else 'View'"">View</t></a>
+    </div>
+    <table border=""0"" cellpadding=""0"" cellspacing=""0""><tr>
+        <td width=""130px;"">
+            <div style=""border-top-left-radius: 3px; border-top-right-radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; font-weight: bold; color: #ffffff; min-height: 18px; background-color: #875A7B; border: 1px solid #875A7B;"">
+                <t t-out=""format_datetime(dt=object.event_id.start, tz=object.mail_tz if not object.event_id.allday else None, dt_format='EEEE', lang_code=object.env.lang) or ''"">Tuesday</t>
+            </div>
+            <div style=""font-size: 48px; min-height: auto; font-weight: bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: 1px solid #875A7B;"">
+                <t t-out=""str(object.event_id.start.day) or ''"">4</t>
+            </div>
+            <div style=""font-size: 12px; text-align: center; font-weight: bold; color: #ffffff; background-color: #875A7B;"">
+                <t t-out=""format_datetime(dt=object.event_id.start, tz=object.mail_tz if not object.event_id.allday else None, dt_format='MMMM y', lang_code=object.env.lang) or ''"">May 2021</t>
+            </div>
+            <div style=""border-collapse: separate; color: #5F5F5F; text-align: center; font-size: 12px; border-bottom-right-radius: 3px; font-weight: bold ; border: 1px solid #875A7B; border-bottom-left-radius: 3px;"">
+                <t t-if=""not object.event_id.allday"">
+                    <div>
+                        <t t-out=""format_time(time=object.event_id.start, tz=object.mail_tz, time_format='short', lang_code=object.env.lang) or ''"">11:00 AM</t>
+                    </div>
+                    <t t-if=""object.mail_tz"">
+                        <div style=""font-size: 10px; font-weight: normal"">
+                            (<t t-out=""object.mail_tz or ''"">Europe/Brussels</t>)
+                        </div>
+                    </t>
+                </t>
+            </div>
+        </td>
+        <td width=""20px;""/>
+        <td style=""padding-top: 5px;"">
+            <p><strong>Details of the event</strong></p>
+            <ul>
+                <t t-if=""is_online"">
+                    <li>Appointment Type: <t t-out=""object.event_id.appointment_type_id.name or ''"">Schedule a Demo</t></li>
+                </t>
+                <t t-if=""object.event_id.location"">
+                    <li>Location: <t t-out=""object.event_id.location or ''"">Bruxelles</t>
+                        (<a target=""_blank"" t-attf-href=""http://maps.google.com/maps?oi=map&amp;q={{object.event_id.location}}"">View Map</a>)
+                    </li>
+                </t>
+                <t t-if=""recurrent"">
+                    <li>When: <t t-out=""object.recurrence_id.name or ''"">Every 1 Weeks, for 3 events</t></li>
+                </t>
+                <t t-if=""not object.event_id.allday and object.event_id.duration"">
+                    <li>Duration: <t t-out=""('%dH%02d' % (object.event_id.duration,round(object.event_id.duration*60)%60)) or ''"">0H30</t></li>
+                </t>
+                <li>Attendees
+                <ul>
+                    <li t-foreach=""object.event_id.attendee_ids"" t-as=""attendee"">
+                        <div t-attf-style=""display: inline-block; border-radius: 50%; width: 10px; height: 10px; background:{{ colors.get(attendee.state) or 'white' }};""> </div>
+                        <t t-if=""attendee.common_name != object.common_name"">
+                            <span style=""margin-left:5px"" t-out=""attendee.common_name or ''"">Mitchell Admin</span>
+                        </t>
+                        <t t-else="""">
+                            <span style=""margin-left:5px"">You</span>
+                        </t>
+                    </li>
+                </ul></li>
+                <t t-if=""object.event_id.videocall_location"">
+                    <li>Meeting URL: <a t-att-href=""object.event_id.videocall_location"" target=""_blank"" t-out=""object.event_id.videocall_location or ''"">https://meet.jit.si/odoo-xyz</a></li>
+                </t>
+                <t t-if=""not is_html_empty(object.event_id.description)"">
+                    <li>Description of the event:
+                    <t t-out=""object.event_id.description"">Internal meeting for discussion for new pricing for product and services.</t></li>
+                </t>
+            </ul>
+        </td>
+    </tr></table>
+    <br/>
+    Thank you,
+    <t t-if=""object.event_id.user_id.signature"">
+        <br/>
+        <t t-out=""object.event_id.user_id.signature or ''"">--<br/>Mitchell Admin</t>
+    </t>
+</div>
+            ","","","","calendar.calendar_template_meeting_invitation","","{{ object.partner_id.lang }}","","","","","",""
+"calendar.calendar_template_meeting_reminder","Calendar: Reminder","Calendar Attendee Information","{{ object.event_id.name }} - Reminder","{{ (object.event_id.user_id.email_formatted or user.email_formatted or '') }}","{{ ('' if object.partner_id.email and object.partner_id.email == object.email else object.email) }}","{{ object.partner_id.id if object.partner_id.email and object.partner_id.email == object.email else False }}","","","True","<div>
+    <t t-set=""colors"" t-value=""{'needsAction': 'grey', 'accepted': 'green', 'tentative': '#FFFF00', 'declined': 'red'}""/>
+    <t t-set=""is_online"" t-value=""'appointment_type_id' in object.event_id and object.event_id.appointment_type_id""/>
+    <t t-set=""recurrent"" t-value=""object.recurrence_id and not ctx.get('calendar_template_ignore_recurrence')""/>
+    <p>
+        Hello <t t-out=""object.common_name or ''"">Gemini Furniture</t>,<br/><br/>
+        This is a reminder for the below event :
+    </p>
+    <div style=""text-align: center; padding: 16px 0px 16px 0px;"">
+        <a t-attf-href=""/calendar/{{ 'recurrence' if recurrent else 'meeting' }}/accept?token={{ object.access_token }}&amp;id={{ object.event_id.id }}"" style=""padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px"">
+            Accept</a>
+        <a t-attf-href=""/calendar/{{ 'recurrence' if recurrent else 'meeting' }}/decline?token={{ object.access_token }}&amp;id={{ object.event_id.id }}"" style=""padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px"">
+            Decline</a>
+        <a t-attf-href=""/calendar/meeting/view?token={{ object.access_token }}&amp;id={{ object.event_id.id }}"" style=""padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px"">
+            View</a>
+    </div>
+    <table border=""0"" cellpadding=""0"" cellspacing=""0""><tr>
+        <td width=""130px;"">
+            <div style=""border-top-left-radius: 3px; border-top-right-radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; font-weight: bold; color: #ffffff; min-height: 18px; background-color: #875A7B; border: 1px solid #875A7B;"">
+                <t t-out=""format_datetime(dt=object.event_id.start, tz=object.mail_tz if not object.event_id.allday else None, dt_format=&quot;EEEE&quot;, lang_code=object.env.lang) or &quot;&quot;"">Tuesday</t>
+            </div>
+            <div style=""font-size: 48px; min-height: auto; font-weight: bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: 1px solid #875A7B;"">
+                <t t-out=""str(object.event_id.start.day) or ''"">4</t>
+            </div>
+            <div style=""font-size: 12px; text-align: center; font-weight: bold; color: #ffffff; background-color: #875A7B;"">
+                <t t-out=""format_datetime(dt=object.event_id.start, tz=object.mail_tz if not object.event_id.allday else None, dt_format=&quot;MMMM y&quot;, lang_code=object.env.lang) or &quot;&quot;"">May 2021</t>
+            </div>
+            <div style=""border-collapse: separate; color: #5F5F5F; text-align: center; font-size: 12px; border-bottom-right-radius: 3px; font-weight: bold; border: 1px solid #875A7B; border-bottom-left-radius: 3px;"">
+                <t t-if=""not object.event_id.allday"">
+                    <div>
+                        <t t-out=""format_time(time=object.event_id.start, tz=object.mail_tz, time_format=&quot;short&quot;, lang_code=object.env.lang) or &quot;&quot;"">11:00 AM</t>
+                    </div>
+                    <t t-if=""object.mail_tz"">
+                        <div style=""font-size: 10px; font-weight: normal"">
+                            (<t t-out=""object.mail_tz or ''"">Europe/Brussels</t>)
+                        </div>
+                    </t>
+                </t>
+            </div>
+        </td>
+        <td width=""20px;""/>
+        <td style=""padding-top: 5px;"">
+            <p><strong>Details of the event</strong></p>
+            <ul>
+                <t t-if=""object.event_id.location"">
+                    <li>Location: <t t-out=""object.event_id.location or ''"">Bruxelles</t>
+                        (<a target=""_blank"" t-attf-href=""http://maps.google.com/maps?oi=map&amp;q={{ object.event_id.location }}"">View Map</a>)
+                    </li>
+                </t>
+                <t t-if=""recurrent"">
+                    <li>When: <t t-out=""object.recurrence_id.name or ''"">Every 1 Weeks, for 3 events</t></li>
+                </t>
+                <t t-if=""not object.event_id.allday and object.event_id.duration"">
+                    <li>Duration: <t t-out=""('%dH%02d' % (object.event_id.duration,round(object.event_id.duration*60)%60)) or ''"">0H30</t></li>
+                </t>
+                <li>Attendees
+                <ul>
+                    <li t-foreach=""object.event_id.attendee_ids"" t-as=""attendee"">
+                        <div t-attf-style=""display: inline-block; border-radius: 50%; width: 10px; height: 10px; background:{{ colors.get(attendee.state) or 'white' }};""> </div>
+                        <t t-if=""attendee.common_name != object.common_name"">
+                            <span style=""margin-left:5px"" t-out=""attendee.common_name or ''"">Mitchell Admin</span>
+                        </t>
+                        <t t-else="""">
+                            <span style=""margin-left:5px"">You</span>
+                        </t>
+                    </li>
+                </ul></li>
+                <t t-if=""object.event_id.videocall_location"">
+                    <li>Meeting URL: <a t-attf-href=""{{ object.event_id.videocall_location }}"" target=""_blank"" t-out=""object.event_id.videocall_location or ''"">https://meet.jit.si/odoo-xyz</a></li>
+                </t>
+                <t t-if=""not is_html_empty(object.event_id.description)"">
+                    <li>Description of the event:
+                    <t t-out=""object.event_id.description"">Internal meeting for discussion for new pricing for product and services.</t></li>
+                </t>
+            </ul>
+        </td>
+    </tr></table>
+    <br/>
+    Thank you,
+    <t t-if=""object.event_id.user_id.signature"">
+        <br/>
+        <t t-out=""object.event_id.user_id.signature or ''"">--<br/>Mitchell Admin</t>
+    </t>
+</div>
+            ","","","","calendar.calendar_template_meeting_reminder","","{{ object.partner_id.lang }}","","","","","",""
+"account.email_template_edi_credit_note","Credit note: Send by email","Journal Entry","{{ object.company_id.name }} Credit Note (Ref {{ object.name or 'n/a' }})","{{ (object.invoice_user_id.email_formatted or user.email_formatted) }}","","{{ object.partner_id.id }}","Credit_note_{{ (object.name or '').replace('/','_') }}{{ object.state == 'draft' and '_draft' or '' }}","","True","<div style=""margin: 0px; padding: 0px;"">
+    <p style=""margin: 0px; padding: 0px; font-size: 13px;"">
+        Dear
+        <t t-if=""object.partner_id.parent_id"">
+            <t t-out=""object.partner_id.name or ''"">Brandon Freeman</t> (<t t-out=""object.partner_id.parent_id.name or ''"">Azure Interior</t>),
+        </t>
+        <t t-else="""">
+            <t t-out=""object.partner_id.name or ''"">Brandon Freeman</t>,
+        </t>
+        <br/><br/>
+        Here is your
+        <t t-if=""object.name"">
+            credit note <strong t-out=""object.name or ''"">RINV/2021/05/0001</strong>
+        </t>
+        <t t-else="""">
+            credit note
+        </t>
+        <t t-if=""object.invoice_origin"">
+            (with reference: <t t-out=""object.invoice_origin or ''"">SUB003</t>)
+        </t>
+        amounting in <strong t-out=""format_amount(object.amount_total, object.currency_id) or ''"">$ 143,750.00</strong>
+        from <t t-out=""object.company_id.name or ''"">YourCompany</t>.
+        <br/><br/>
+        Do not hesitate to contact us if you have any questions.
+        <t t-if=""object.invoice_user_id.signature"">
+            <br/>
+            <t t-out=""object.invoice_user_id.signature or ''"">--<br/>Mitchell Admin</t>
+        </t>
+    </p>
+</div>
+            ","","","","account.email_template_edi_credit_note","","{{ object.partner_id.lang }}","Invoices","","","","",""
+"ds_employee_birthday_reminder.email_birthday_reminder_template","Employee Birthday Reminder Template","Users","Reminder For Upcoming Birthday","","","${object.partner_id.id|safe}","","","True","
+                <p>Hello Manager,</p>
+                % set birthday_info = object.get_employee_birthday_info()
+                <p>This is a notification of upcoming birthday of below employees on <b>${birthday_info.get('date')}</b>
+                    .
+                </p>
+                <ul>
+                    % for employee in birthday_info.get('employees'):
+                    <li>
+                        ${employee.name}
+                    </li>
+                    % endfor
+                </ul>
+                <br/>
+                <p>Thank You</p>
+                
+            ","","","","ds_employee_birthday_reminder.email_birthday_reminder_template","","","","","","","",""
+"ds_employee_birthday_reminder.email_birthday_wishes_employee_template","Employee Birthday Wish Template","Employee","Happy Birthday ${object.name} 🎂","${user.email|safe}","${object.work_email|safe}","","","","True","
+                <p>Dear <b>${object.name}</b> 🥳,</p>
+                <p>On behalf of the entire <b>${user.company_id.name}</b>, We wish you a very happy birthday 🎂 and
+                    sending you our best wishes for much happiness in your life 🎉.</p>
+                <p>Have a best one!</p>
+                
+            ","","","","ds_employee_birthday_reminder.email_birthday_wishes_employee_template","","","","","","","",""
+"event.event_subscription","Event: Registration","Event Registration","Your registration at {{ object.event_id.name }}","{{ (object.event_id.organizer_id.email_formatted or object.event_id.user_id.email_formatted or '') }}","{{ (object.email and '""%s"" <%s>' % (object.name, object.email) or object.partner_id.email_formatted or '') }}","","Full Page Ticket - {{ (object.event_id.name or 'Event').replace('/','') }}","","True","<table border=""0"" cellpadding=""0"" cellspacing=""0"" style=""padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;""><tr><td align=""center"">
+<t t-set=""date_begin"" t-value=""format_datetime(object.event_id.date_begin, tz='UTC', dt_format=&quot;yyyyMMdd'T'HHmmss'Z'&quot;)""/>
+<t t-set=""date_end"" t-value=""format_datetime(object.event_id.date_end, tz='UTC', dt_format=&quot;yyyyMMdd'T'HHmmss'Z'&quot;)""/>
+<t t-set=""is_online"" t-value=""'is_published' in object.event_id and object.event_id.is_published""/>
+<t t-set=""event_organizer"" t-value=""object.event_id.organizer_id""/>
+<t t-set=""event_address"" t-value=""object.event_id.address_id""/>
+<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""padding: 16px; background-color: white; color: #454748; border-collapse:separate;"">
+<tbody>
+    <!-- HEADER -->
+    <tr>
+        <td align=""center"" style=""min-width: 590px;"">
+            <table width=""590"" border=""0"" cellpadding=""0"" cellspacing=""0"" style=""min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tr><td valign=""middle"">
+                    <span style=""font-size: 10px;"">Your registration</span><br/>
+                    <span style=""font-size: 20px; font-weight: bold;"">
+                        <t t-out=""object.name or ''"">Oscar Morgan</t>
+                    </span>
+                </td><td valign=""middle"" align=""right"">
+                    <t t-if=""is_online"">
+                        <a t-att-href=""object.event_id.website_url"" style=""padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: none !important; font-weight: 400; background-color: #875A7B; border: 0px solid #875A7B; border-radius:3px"">
+                            View Event
+                        </a>
+                    </t>
+                    <t t-else="""">
+                        <img t-att-src=""'/logo.png?company=%s' % object.company_id.id"" style=""padding: 0px; margin: 0px; height: auto; width: 80px;"" t-att-alt=""'%s' % object.company_id.name""/>
+                    </t>
+                </td></tr>
+                <tr><td colspan=""2"" style=""text-align:center;"">
+                  <hr width=""100%"" style=""background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;""/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+    <!-- EVENT DESCRIPTION -->
+    <tr>
+        <td align=""center"" style=""min-width: 590px;"">
+            <table width=""590"" border=""0"" cellpadding=""0"" cellspacing=""0"" style=""min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tr><td valign=""top"" style=""font-size: 14px;"">
+                    <div>
+                        Hello <t t-out=""object.name or ''"">Oscar Morgan</t>,<br/>
+                        We are happy to confirm your registration to the event
+                        <t t-if=""is_online"">
+                            <a t-att-href=""object.event_id.website_url"" style=""color:#875A7B;text-decoration:none;"" t-out=""object.event_id.name or ''"">OpenWood Collection Online Reveal</a>
+                        </t>
+                        <t t-else="""">
+                            <strong t-out=""object.event_id.name or ''"">OpenWood Collection Online Reveal</strong>
+                        </t>
+                        for attendee <t t-out=""object.name or ''"">Oscar Morgan</t>.
+                    </div>
+                    <div>
+                        <br/>
+                        <strong>Add this event to your calendar</strong>
+                        <a t-attf-href=""https://www.google.com/calendar/render?action=TEMPLATE&amp;text={{ object.event_id.name }}&amp;dates={{ date_begin }}/{{ date_end }}&amp;location={{ location }}"" style=""padding:3px 5px;border:1px solid #875A7B;color:#875A7B;text-decoration:none;border-radius:3px;"" target=""new""><img src=""/web_editor/font_to_img/61525/rgb(135,90,123)/16"" style=""vertical-align:middle;"" height=""16"" alt=""""/> Google</a>
+                        <a t-attf-href=""/event/{{ slug(object.event_id) }}/ics"" style=""padding:3px 5px;border:1px solid #875A7B;color:#875A7B;text-decoration:none;border-radius:3px;""><img src=""/web_editor/font_to_img/61525/rgb(135,90,123)/16"" style=""vertical-align:middle;"" height=""16"" alt=""""/> iCal/Outlook</a>
+                        <a t-attf-href=""https://calendar.yahoo.com/?v=60&amp;view=d&amp;type=20&amp;title={{ object.event_id.name }}&amp;in_loc={{ location }}&amp;st={{ format_datetime(object.event_id.date_begin, tz='UTC', dt_format='yyyyMMdd\'T\'HHmmss') }}&amp;et={{ format_datetime(object.event_id.date_end, tz='UTC', dt_format='yyyyMMdd\'T\'HHmmss') }}"" style=""padding:3px 5px;border:1px solid #875A7B;color:#875A7B;text-decoration:none;border-radius:3px;"" target=""new"">
+                            <img src=""/web_editor/font_to_img/61525/rgb(135,90,123)/16"" style=""vertical-align:middle;"" height=""16"" alt=""""/> Yahoo
+                        </a>
+                        <br/><br/>
+                    </div>
+                    <div>
+                        See you soon,<br/>
+                        <span style=""color: #454748;"">
+                        -- <br/>
+                        <t t-if=""event_organizer"">
+                            <t t-out=""event_organizer.name or ''"">YourCompany</t>
+                        </t>
+                        <t t-else="""">
+                            The <t t-out=""object.event_id.name or ''"">OpenWood Collection Online Reveal</t> Team
+                        </t>
+                        </span>
+                    </div>
+                </td></tr>
+                <tr><td style=""text-align:center;"">
+                  <hr width=""100%"" style=""background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;""/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+    <!-- DETAILS -->
+    <tr>
+        <td align=""center"" style=""min-width: 590px;"">
+            <table width=""590"" border=""0"" cellpadding=""0"" cellspacing=""0"" style=""min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tr><td valign=""top"" style=""font-size: 14px;"">
+                    <table style=""width:100%;"">
+                        <tr>
+                            <td style=""vertical-align:top;"">
+                                <img src=""/web_editor/font_to_img/61555/rgb(81,81,102)/34"" style=""padding:4px;max-width:inherit;"" height=""34"" alt=""""/>
+                            </td>
+                            <td style=""padding: 0px 10px 0px 10px;width:50%;line-height:20px;vertical-align:top;"">
+                                <div><strong>From</strong> <t t-out=""object.event_id.date_begin_located or ''"">May 4, 2021, 7:00:00 AM</t></div>
+                                <div><strong>To</strong> <t t-out=""object.event_id.date_end_located or ''"">May 6, 2021, 5:00:00 PM</t></div>
+                                <div style=""font-size:12px;color:#9e9e9e""><i><strong>TZ</strong> <t t-out=""object.event_id.date_tz or ''"">Europe/Brussels</t></i></div>
+                            </td>
+                            <td style=""vertical-align:top;"">
+                                <t t-if=""event_address"">
+                                    <img src=""/web_editor/font_to_img/61505/rgb(81,81,102)/34"" style=""padding:4px;max-width:inherit;"" height=""34"" alt=""""/>
+                                </t>
+                            </td>
+                            <td style=""padding: 0px 10px 0px 10px;width:50%;vertical-align:top;"">
+                                <t t-if=""event_address"">
+                                    <t t-set=""location"" t-value=""''""/>
+                                    <t t-if=""object.event_id.address_id.name"">
+                                        <div t-out=""object.event_id.address_id.name or ''"">Teksa SpA</div>
+                                    </t>
+                                    <t t-if=""object.event_id.address_id.street"">
+                                        <div t-out=""object.event_id.address_id.street or ''"">Puerto Madero 9710</div>
+                                        <t t-set=""location"" t-value=""object.event_id.address_id.street""/>
+                                    </t>
+                                    <t t-if=""object.event_id.address_id.street2"">
+                                        <div t-out=""object.event_id.address_id.street2 or ''"">Of A15, Santiago (RM)</div>
+                                        <t t-set=""location"" t-value=""'%s, %s' % (location, object.event_id.address_id.street2)""/>
+                                    </t>
+                                    <div>
+                                    <t t-if=""object.event_id.address_id.city"">
+                                        <t t-out=""object.event_id.address_id.city or ''"">Pudahuel</t>,
+                                        <t t-set=""location"" t-value=""'%s, %s' % (location, object.event_id.address_id.city)""/>
+                                    </t>
+                                    <t t-if=""object.event_id.address_id.state_id.name"">
+                                        <t t-out=""object.event_id.address_id.state_id.name or ''"">C1</t>,
+                                        <t t-set=""location"" t-value=""'%s, %s' % (location, object.event_id.address_id.state_id.name)""/>
+                                    </t>
+                                    <t t-if=""object.event_id.address_id.zip"">
+                                        <t t-out=""object.event_id.address_id.zip or ''"">98450</t>
+                                        <t t-set=""location"" t-value=""'%s, %s' % (location, object.event_id.address_id.zip)""/>
+                                    </t>
+                                    </div>
+                                    <t t-if=""object.event_id.address_id.country_id.name"">
+                                        <div t-out=""object.event_id.address_id.country_id.name or ''"">Argentina</div>
+                                        <t t-set=""location"" t-value=""'%s, %s' % (location, object.event_id.address_id.country_id.name)""/>
+                                    </t>
+                                </t>
+                            </td>
+                        </tr>
+                    </table>
+                </td></tr>
+                <tr><td style=""text-align:center;"">
+                    <t t-if=""event_organizer"">
+                        <hr width=""100%"" style=""background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;""/>
+                    </t>
+                </td></tr>
+
+                <tr><td valign=""top"" style=""font-size: 14px;"">
+                    <!-- CONTACT ORGANIZER -->
+                    <t t-if=""event_organizer"">
+                        <div>
+                            <span style=""font-weight:300;margin:10px 0px"">Questions about this event?</span>
+                            <div>Please contact the organizer:</div>
+                            <ul>
+                                <li><t t-out=""event_organizer.name or ''"">YourCompany</t></li>
+                                <t t-if=""event_organizer.email"">
+                                    <li>Mail: <a t-attf-href=""mailto:{{ event_organizer.email }}"" style=""text-decoration:none;color:#875A7B;"" t-out=""event_organizer.email or ''"">info@yourcompany.com</a></li>
+                                </t>
+                                <t t-if=""event_organizer.phone"">
+                                    <li>Phone: <t t-out=""event_organizer.phone or ''"">+1 650-123-4567</t></li>
+                                </t>
+                            </ul>
+                        </div>
+                    </t>
+                </td></tr>
+                <tr><td style=""text-align:center;"">
+                    <!-- CONTACT ORGANIZER SEPARATION -->
+                    <t t-if=""is_online or event_address"">
+                        <hr width=""100%"" style=""background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;""/>
+                    </t>
+                </td></tr>
+
+                <tr><td valign=""top"" style=""font-size: 14px;"">
+                    <!-- PWA MARKGETING -->
+                    <t t-if=""is_online"">
+                        <div>
+                            <strong>Get the best mobile experience.</strong>
+                            <a href=""/event"">Install our mobile app</a>
+                        </div>
+                    </t>
+                </td></tr>
+                <tr><td style=""text-align:center;"">
+                    <!-- PWA MARKGETING SEPARATION-->
+                    <t t-if=""is_online and event_address"">
+                        <hr width=""100%"" style=""background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;""/>
+                    </t>
+                </td></tr>
+
+                <tr><td valign=""top"" style=""font-size: 14px;"">
+                    <!-- GOOGLE MAPS LINK -->
+                    <t t-if=""event_address"">
+                        <table style=""width:100%;""><tr><td>
+                            <div>
+                                <a t-attf-href=""https://maps.google.com/maps?q={{ location }}"" target=""new"">
+                                    <img t-attf-src=""http://maps.googleapis.com/maps/api/staticmap?autoscale=1&amp;size=598x200&amp;maptype=roadmap&amp;format=png&amp;visual_refresh=true&amp;markers=size:mid%7Ccolor:0xa5117d%7Clabel:%7C{{ location }}"" style=""vertical-align:bottom; width: 100%;"" alt=""Google Maps""/>
+                                </a>
+                            </div>
+                        </td></tr></table>
+                    </t>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- FOOTER BY -->
+<tr><td align=""center"" style=""min-width: 590px;"">
+    <t t-if=""object.company_id"">
+        <table width=""590"" border=""0"" cellpadding=""0"" cellspacing=""0"" style=""min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"">
+        <tr><td style=""text-align: center; font-size: 14px;"">
+            Sent by <a target=""_blank"" t-attf-href=""{{ object.company_id.website }}"" style=""color: #875A7B;"" t-out=""object.company_id.name or ''"">YourCompany</a>
+            <t t-if=""is_online"">
+                <br/>
+                Discover <a href=""/event"" style=""color:#875A7B;"">all our events</a>.
+            </t>
+        </td></tr>
+        </table>
+    </t>
+</td></tr>
+</table>
+            ","","","","event.event_subscription","","{{ object.partner_id.lang }}","Full Page Ticket","","","","",""
+"event.event_registration_mail_template_badge","Event: Registration Badge","Event Registration","Your badge for {{ object.event_id.name }}","{{ (object.event_id.organizer_id.email_formatted or object.event_id.user_id.email_formatted or '') }}","{{ (object.email and '""%s"" <%s>' % (object.name, object.email) or object.partner_id.email_formatted or '') }}","","Foldable Badge - {{ (object.event_id.name or 'Event').replace('/','_') }}","","True","<div>
+    Dear <t t-out=""object.name or ''"">Oscar Morgan</t>,<br/>
+    Thank you for your inquiry.<br/>
+    Here is your badge for the event <t t-out=""object.event_id.name or ''"">OpenWood Collection Online Reveal</t>.<br/>
+    If you have any questions, please let us know.
+    <br/><br/>
+    Thank you,
+    <t t-if=""object.event_id.user_id.signature"">
+        <br/>
+        <t t-out=""object.event_id.user_id.signature or ''"">--<br/>Mitchell Admin</t>
+    </t>
+</div>","","","","event.event_registration_mail_template_badge","","{{ object.partner_id.lang }}","Foldable Badge","","","","",""
+"event.event_reminder","Event: Reminder","Event Registration","{{ object.event_id.name }}: {{ object.get_date_range_str() }}","{{ (object.event_id.organizer_id.email_formatted or object.event_id.user_id.email_formatted or '') }}","{{ (object.email and '""%s"" <%s>' % (object.name, object.email) or object.partner_id.email_formatted or '') }}","","","","True","<table border=""0"" cellpadding=""0"" cellspacing=""0"" style=""padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;""><tr><td align=""center"">
+<t t-set=""date_begin"" t-value=""format_datetime(object.event_id.date_begin, tz='UTC', dt_format=&quot;yyyyMMdd'T'HHmmss'Z'&quot;)""/>
+<t t-set=""date_end"" t-value=""format_datetime(object.event_id.date_end, tz='UTC', dt_format=&quot;yyyyMMdd'T'HHmmss'Z'&quot;)""/>
+<t t-set=""is_online"" t-value=""'is_published' in object.event_id and object.event_id.is_published""/>
+<t t-set=""event_organizer"" t-value=""object.event_id.organizer_id""/>
+<t t-set=""event_address"" t-value=""object.event_id.address_id""/>
+<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""padding: 16px; background-color: white; color: #454748; border-collapse:separate;"">
+<tbody>
+    <!-- HEADER -->
+    <tr>
+        <td align=""center"" style=""min-width: 590px;"">
+            <table width=""590"" border=""0"" cellpadding=""0"" cellspacing=""0"" style=""min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tr><td valign=""middle"">
+                    <span style=""font-size: 10px;"">Your registration</span><br/>
+                    <span style=""font-size: 20px; font-weight: bold;"" t-out=""object.name or ''"">Oscar Morgan</span>
+                </td><td valign=""middle"" align=""right"">
+                    <t t-if=""is_online"">
+                        <a t-attf-href=""{{ object.event_id.website_url }}"" style=""padding: 8px 12px; font-size: 12px; color: #FFFFFF; text-decoration: none !important; font-weight: 400; background-color: #875A7B; border: 0px solid #875A7B; border-radius:3px"">
+                            View Event
+                        </a>
+                    </t>
+                    <t t-else="""">
+                        <img t-att-src=""'/logo.png?company=%s' % object.company_id.id"" style=""padding: 0px; margin: 0px; height: auto; width: 80px;"" t-att-alt=""'%s' % object.company_id.name""/>
+                    </t>
+                </td></tr>
+                <tr><td colspan=""2"" style=""text-align:center;"">
+                  <hr width=""100%"" style=""background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;""/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+    <!-- EVENT DESCRIPTION -->
+    <tr>
+        <td align=""center"" style=""min-width: 590px;"">
+            <table width=""590"" border=""0"" cellpadding=""0"" cellspacing=""0"" style=""min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tr><td valign=""top"" style=""font-size: 14px;"">
+                    <div>
+                        Hello <t t-out=""object.name or ''"">Oscar Morgan</t>,<br/>
+                        We are excited to remind you that the event
+                        <t t-if=""is_online"">
+                            <a t-att-href=""object.event_id.website_url"" style=""color:#875A7B;text-decoration:none;"" t-out=""object.event_id.name or ''"">OpenWood Collection Online Reveal</a>
+                        </t>
+                        <t t-else="""">
+                            <strong t-out=""object.event_id.name or ''"">OpenWood Collection Online Reveal</strong>
+                        </t>
+                        is starting <strong t-out=""object.get_date_range_str() or ''"">today</strong>.
+                    </div>
+                    <div>
+                        <br/>
+                        <strong>Add this event to your calendar</strong>
+                        <a t-attf-href=""https://www.google.com/calendar/render?action=TEMPLATE&amp;text={{ object.event_id.name }}&amp;dates={{ date_begin }}/{{ date_end }}&amp;location={{ location }}"" style=""padding:3px 5px;border:1px solid #875A7B;color:#875A7B;text-decoration:none;border-radius:3px;"" target=""new""><img src=""/web_editor/font_to_img/61525/rgb(135,90,123)/16"" style=""vertical-align:middle;"" height=""16"" alt=""""/> Google</a>
+                        <a t-attf-href=""/event/{{ slug(object.event_id) }}/ics"" style=""padding:3px 5px;border:1px solid #875A7B;color:#875A7B;text-decoration:none;border-radius:3px;""><img src=""/web_editor/font_to_img/61525/rgb(135,90,123)/16"" style=""vertical-align:middle;"" height=""16"" alt=""""/> iCal/Outlook</a>
+                        <a t-attf-href=""https://calendar.yahoo.com/?v=60&amp;view=d&amp;type=20&amp;title={{ object.event_id.name }}&amp;in_loc={{ location }}&amp;st={{ format_datetime(object.event_id.date_begin, tz='UTC', dt_format='yyyyMMdd\'T\'HHmmss') }}&amp;et={{ format_datetime(object.event_id.date_end, tz='UTC', dt_format='yyyyMMdd\'T\'HHmmss') }}"" style=""padding:3px 5px;border:1px solid #875A7B;color:#875A7B;text-decoration:none;border-radius:3px;"" target=""new"">
+                            <img src=""/web_editor/font_to_img/61525/rgb(135,90,123)/16"" style=""vertical-align:middle;"" height=""16"" alt=""""/> Yahoo
+                        </a>
+                        <br/><br/>
+                    </div>
+                    <div>
+                        We confirm your registration and hope to meet you there,<br/>
+                        <span style=""color: #454748;"">
+                        -- <br/>
+                        <t t-if=""event_organizer"">
+                            <t t-out=""event_organizer.name or ''"">YourCompany</t>
+                        </t>
+                        <t t-else="""">
+                            The <t t-out=""object.event_id.name or ''"">OpenWood Collection Online Reveal</t> Team
+                        </t>
+                        </span>
+                    </div>
+                </td></tr>
+                <tr><td style=""text-align:center;"">
+                  <hr width=""100%"" style=""background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;""/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+    <!-- DETAILS -->
+    <tr>
+        <td align=""center"" style=""min-width: 590px;"">
+            <table width=""590"" border=""0"" cellpadding=""0"" cellspacing=""0"" style=""min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tr><td valign=""top"" style=""font-size: 14px;"">
+                    <table style=""width:100%;"">
+                        <tr>
+                            <td style=""vertical-align:top;"">
+                                <img src=""/web_editor/font_to_img/61555/rgb(81,81,102)/34"" style=""padding:4px;max-width:inherit;"" height=""34"" alt=""""/>
+                            </td>
+                            <td style=""padding: 0px 10px 0px 10px;width:50%;line-height:20px;vertical-align:top;"">
+                                <div><strong>From</strong> <t t-out=""object.event_id.date_begin_located or ''"">May 4, 2021, 7:00:00 AM</t></div>
+                                <div><strong>To</strong> <t t-out=""object.event_id.date_end_located or ''"">May 6, 2021, 5:00:00 PM</t></div>
+                                <div style=""font-size:12px;color:#9e9e9e""><i><strong>TZ</strong> <t t-out=""object.event_id.date_tz or ''"">Europe/Brussels</t></i></div>
+                            </td>
+                            <td style=""vertical-align:top;"">
+                                <t t-if=""event_address"">
+                                    <img src=""/web_editor/font_to_img/61505/rgb(81,81,102)/34"" style=""padding:4px;max-width:inherit;"" height=""34"" alt=""""/>
+                                </t>
+                            </td>
+                            <td style=""padding: 0px 10px 0px 10px;width:50%;vertical-align:top;"">
+                                <t t-if=""event_address"">
+                                    <t t-set=""location"" t-value=""''""/>
+                                    <t t-if=""object.event_id.address_id.name"">
+                                        <div t-out=""object.event_id.address_id.name or ''"">Teksa SpA</div>
+                                    </t>
+                                    <t t-if=""object.event_id.address_id.street"">
+                                        <div t-out=""object.event_id.address_id.street or ''"">Puerto Madero 9710</div>
+                                        <t t-set=""location"" t-value=""object.event_id.address_id.street""/>
+                                    </t>
+                                    <t t-if=""object.event_id.address_id.street2"">
+                                        <div t-out=""object.event_id.address_id.street2 or ''"">Of A15, Santiago (RM)</div>
+                                        <t t-set=""location"" t-value=""'%s, %s' % (location, object.event_id.address_id.street2)""/>
+                                    </t>
+                                    <div>
+                                    <t t-if=""object.event_id.address_id.city"">
+                                        <t t-out=""object.event_id.address_id.city or ''"">Pudahuel</t>,
+                                        <t t-set=""location"" t-value=""'%s, %s' % (location, object.event_id.address_id.city)""/>
+                                    </t>
+                                    <t t-if=""object.event_id.address_id.state_id.name"">
+                                        <t t-out=""object.event_id.address_id.state_id.name or ''"">C1</t>,
+                                        <t t-set=""location"" t-value=""'%s, %s' % (location, object.event_id.address_id.state_id.name)""/>
+                                    </t>
+                                    <t t-if=""object.event_id.address_id.zip"">
+                                        <t t-out=""object.event_id.address_id.zip or ''"">98450</t>
+                                        <t t-set=""location"" t-value=""'%s, %s' % (location, object.event_id.address_id.zip)""/>
+                                    </t>
+                                    </div>
+                                    <t t-if=""object.event_id.address_id.country_id.name"">
+                                        <div t-out=""object.event_id.address_id.country_id.name or ''"">Argentina</div>
+                                        <t t-set=""location"" t-value=""'%s, %s' % (location, object.event_id.address_id.country_id.name)""/>
+                                    </t>
+                                </t>
+                            </td>
+                        </tr>
+                    </table>
+                </td></tr>
+                <tr><td style=""text-align:center;"">
+                    <t t-if=""event_organizer"">
+                        <hr width=""100%"" style=""background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;""/>
+                    </t>
+                </td></tr>
+
+                <tr><td valign=""top"" style=""font-size: 14px;"">
+                    <!-- CONTACT ORGANIZER -->
+                    <t t-if=""event_organizer"">
+                        <div>
+                            <span style=""font-weight:300;margin:10px 0px"">Questions about this event?</span>
+                            <div>Please contact the organizer:</div>
+                            <ul>
+                                <li t-out=""event_organizer.name or ''"">YourCompany</li>
+                                <t t-if=""event_organizer.email"">
+                                    <li>Mail: <a t-attf-href=""mailto:{{ event_organizer.email }}"" style=""text-decoration:none;color:#875A7B;"" t-out=""event_organizer.email or ''""/></li>
+                                </t>
+                                <t t-if=""event_organizer.phone"">
+                                    <li>Phone: <t t-out=""event_organizer.phone or ''""/></li>
+                                </t>
+                            </ul>
+                        </div>
+                    </t>
+                </td></tr>
+                <tr><td style=""text-align:center;"">
+                    <!-- CONTACT ORGANIZER SEPARATION -->
+                    <hr t-if=""is_online or event_address"" width=""100%"" style=""background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;""/>
+                </td></tr>
+
+                <tr><td valign=""top"" style=""font-size: 14px;"">
+                    <!-- PWA MARKGETING -->
+                    <div t-if=""is_online"">
+                        <strong>Get the best mobile experience.</strong>
+                        <a href=""/event"">Install our mobile app</a>
+                    </div>
+                </td></tr>
+                <tr><td style=""text-align:center;"">
+                    <!-- PWA MARKGETING SEPARATION-->
+                    <hr t-if=""is_online and event_address"" width=""100%"" style=""background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;""/>
+                </td></tr>
+
+                <tr><td valign=""top"" style=""font-size: 14px;"">
+                    <!-- GOOGLE MAPS LINK -->
+                    <table t-if=""event_address"" style=""width:100%;""><tr><td>
+                        <div>
+                            <a t-attf-href=""https://maps.google.com/maps?q={{ location }}"" target=""new"">
+                                <img t-attf-src=""http://maps.googleapis.com/maps/api/staticmap?autoscale=1&amp;size=598x200&amp;maptype=roadmap&amp;format=png&amp;visual_refresh=true&amp;markers=size:mid%7Ccolor:0xa5117d%7Clabel:%7C{{ location }}"" style=""vertical-align:bottom; width: 100%;"" alt=""Google Maps""/>
+                            </a>
+                        </div>
+                    </td></tr></table>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- FOOTER BY -->
+<tr><td align=""center"" style=""min-width: 590px;"">
+    <table t-if=""object.company_id"" width=""590"" border=""0"" cellpadding=""0"" cellspacing=""0"" style=""min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"">
+      <tr><td style=""text-align: center; font-size: 14px;"">
+        Sent by <a target=""_blank"" t-attf-href=""{{ object.company_id.website }}"" style=""color: #875A7B;"" t-out=""object.company_id.name or ''"">YourCompany</a>
+        <t t-if=""'website_url' in object.event_id and object.event_id.website_url"">
+            <br/>
+            Discover <a href=""/event"" style=""color:#875A7B;"">all our events</a>.
+        </t>
+      </td></tr>
+    </table>
+</td></tr>
+</table>
+            ","","","","event.event_reminder","","{{ object.partner_id.lang }}","","","","","",""
+"gamification.email_template_goal_reminder","Goal: Reminder for Goal Update","Gamification Goal","","","","{{ object.user_id.partner_id.id }}","","","True","<div>
+    <strong>Reminder <t t-out=""object.name or ''""/></strong><br/>
+    You have not updated your progress for the goal <t t-out=""object.definition_id.name or ''""/> (currently reached at <t t-out=""object.completeness or ''""/>%) for at least <t t-out=""object.remind_update_delay or ''""/> days. Do not forget to do it.
+    <br/><br/>
+    Thank you,
+    <t t-if=""object.challenge_id.manager_id.signature"">
+        <br/>
+        <t t-out=""object.challenge_id.manager_id.signature or ''""/>
+    </t>
+</div>","","","","gamification.email_template_goal_reminder","","{{ object.user_id.lang }}","","","","","",""
+"crm_iap_mine.lead_generation_no_credits","IAP Lead Generation Notification","IAP Account","IAP Lead Generation Notification","iap@odoo.com","iap@odoo.com","","","","True","<div style=""box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;margin: 0px; padding: 0px;"">
+    <p style=""margin:0px;box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;"">Dear,</p>
+    <p style=""margin:0px;box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;"">There are no more credits on your IAP Lead Generation account.<br style=""box-sizing:border-box;"">
+    You can charge your IAP Lead Generation account in the settings of the CRM app.<br style=""box-sizing:border-box;""></p>
+    <p style=""margin:0px;box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;"">Best regards,</p>
+    <p style=""margin:0px;box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;"">D-Soft S.A.</p>
+</div>","","","","crm_iap_mine.lead_generation_no_credits","","","","","","","",""
+"ds_print_contract.internship_contract_mail_template","Internship Contract - Send by Email","Employee Contract","{{object.company_id.name}} - Internship Contract (Ref {{object.name or 'n/a' }})","""{{object.company_id.name}}""<{{object.company_id.email}}>","{{(object.employee_id.work_email or '')}}","","Internship_Contract_{{object.employee_id.name}}","","","
+                <div style=""font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; "">
+
+                    <p>Dear <t t-out=""object.employee_id.name""/>,</p>
+
+                    <p>We are pleased to inform you that we at <strong><t t-out=""object.company_id.name"" contenteditable=""false"" data-oe-t-inline=""true""></t></strong> have accepted you as our employee. <br>
+                    .....
+                    </p>
+                    <br/>
+                    <p>Please find attached <i>Internship_Contract_<t t-out=""object.employee_id.name""/></i> and then please contact HR within <strong>3</strong> business days after getting this email.</p>
+                    <p>If you have any questions, do not hesitate to contact HR.</p>
+                    <br/>
+                    <p>Thank you!</p>
+                </div>
+                
+            ","","","","ds_print_contract.internship_contract_mail_template","","{{(object.employee_id.user_id.lang or user.lang)}}","Employee Internship Contract","","","","",""
+"account.email_template_edi_invoice","Invoice: Send by email","Journal Entry","{{ object.company_id.name }} Invoice (Ref {{ object.name or 'n/a' }})","{{ (object.invoice_user_id.email_formatted or user.email_formatted) }}","","{{ object.partner_id.id }}","Invoice_{{ (object.name or '').replace('/','_') }}{{ object.state == 'draft' and '_draft' or '' }}","","True","<div style=""margin: 0px; padding: 0px;"">
+    <p style=""margin: 0px; padding: 0px; font-size: 13px;"">
+        Dear
+        <t t-if=""object.partner_id.parent_id"">
+            <t t-out=""object.partner_id.name or ''"">Brandon Freeman</t> (<t t-out=""object.partner_id.parent_id.name or ''"">Azure Interior</t>),
+        </t>
+        <t t-else="""">
+            <t t-out=""object.partner_id.name or ''"">Brandon Freeman</t>,
+        </t>
+        <br/><br/>
+        Here is your
+        <t t-if=""object.name"">
+            invoice <strong t-out=""object.name or ''"">INV/2021/05/0005</strong>
+        </t>
+        <t t-else="""">
+            invoice
+        </t>
+        <t t-if=""object.invoice_origin"">
+            (with reference: <t t-out=""object.invoice_origin or ''"">SUB003</t>)
+        </t>
+        amounting in <strong t-out=""format_amount(object.amount_total, object.currency_id) or ''"">$ 143,750.00</strong>
+        from <t t-out=""object.company_id.name or ''"">YourCompany</t>.
+        <t t-if=""object.payment_state in ('paid', 'in_payment')"">
+            This invoice is already paid.
+        </t>
+        <t t-else="""">
+            Please remit payment at your earliest convenience.
+            <t t-if=""object.payment_reference"">
+                <br/><br/>
+                Please use the following communication for your payment: <strong t-out=""object.payment_reference or ''"">INV/2021/05/0005</strong>.
+            </t>
+        </t>
+        <br/><br/>
+        Do not hesitate to contact us if you have any questions.
+        <t t-if=""object.invoice_user_id.signature"">
+            <br/>
+            <t t-out=""object.invoice_user_id.signature or ''"">--<br/>Mitchell Admin</t>
+        </t>
+    </p>
+</div>
+            ","","","","account.email_template_edi_invoice","","{{ object.partner_id.lang }}","Invoices","","","","",""
+"ds_print_contract.offical_labor_contract_mail_template","Offical Labor Contract - Send by Email","Employee Contract","{{object.company_id.name}} - Offical Labor Contract (Ref {{object.name or 'n/a' }})","""{{object.company_id.name}}""<{{object.company_id.email}}>","{{(object.employee_id.work_email or '')}}","","Offical_Labor_Contract_{{object.employee_id.name}}","","","
+                <div style=""font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; "">
+
+                    <p>Dear <t t-out=""object.employee_id.name""/>,</p>
+
+                    <p>We are pleased to inform you that we at <strong><t t-out=""object.company_id.name"" contenteditable=""false"" data-oe-t-inline=""true""></t></strong> have accepted you as our employee. <br>
+                    .....
+                    </p>
+                    <br/>
+                    <p>Please find attached <i>Offical_Labor_Contract_<t t-out=""object.employee_id.name""/></i> and then please contact HR within <strong>3</strong> business days after getting this email.</p>
+                    <p>If you have any questions, do not hesitate to contact HR.</p>
+                    <br/>
+                    <p>Thank you!</p>
+                </div>
+                
+            ","","","","ds_print_contract.offical_labor_contract_mail_template","","{{(object.employee_id.user_id.lang or user.lang)}}","Employee Offical Labor Contract","","","","",""
+"account.mail_template_data_payment_receipt","Payment Receipt: Send by email","Payments","{{ object.company_id.name }} Payment Receipt (Ref {{ object.name or 'n/a' }})","","","{{ object.partner_id.id }}","{{ (object.name or '').replace('/','-') }}","","True","<div style=""margin: 0px; padding: 0px;"">
+    <p style=""margin: 0px; padding: 0px; font-size: 13px;"">
+        Dear <t t-out=""object.partner_id.name or ''"">Azure Interior</t><br/><br/>
+        Thank you for your payment.
+        Here is your payment receipt <strong t-out=""(object.name or '').replace('/','-') or ''"">BNK1-2021-05-0002</strong> amounting
+        to <strong t-out=""format_amount(object.amount, object.currency_id) or ''"">$ 10.00</strong> from <t t-out=""object.company_id.name or ''"">YourCompany</t>.
+        <br/><br/>
+        Do not hesitate to contact us if you have any questions.
+        <br/><br/>
+        Best regards,
+        <t t-if=""user.signature"">
+            <br/>
+            <t t-out=""user.signature or ''"">--<br/>Mitchell Admin</t>
+        </t>
+    </p>
+</div>
+","","","","account.mail_template_data_payment_receipt","","{{ object.partner_id.lang }}","Payment Receipt","","","","",""
+"ds_send_email_payslips.email_template_hr_payslip","Payslip - Send by Email","Pay Slip","{{object.company_id.name}} Payslip (Ref {{object.name or 'n/a' }})","""{{object.company_id.name}}""<{{object.company_id.email}}>","{{(object.employee_id.work_email or '')}}","","{{(object.name or '').replace('/','_')}}","","True","
+                <div style=""font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; "">
+
+                    <p>Hello <t t-out=""object.employee_id.name""/>,</p>
+
+                    <p>Here is your payslip from <t t-out=""object.company_id.name"" contenteditable=""false"" data-oe-t-inline=""true""></t>: <strong><t t-out=""object.name"" contenteditable=""false"" data-oe-t-inline=""true""></t></strong><br>
+                    </p>
+                    <br/>
+                    <p>Please find attached <i><t t-out=""object.name""/></i></p>
+                    <p>If you have any question, do not hesitate to contact HR.</p>
+                    <br/>
+                    <p>Thank you!</p>
+                </div>
+                
+            ","","","","ds_send_email_payslips.email_template_hr_payslip","","{{(object.employee_id.user_id.lang or user.lang)}}","Payslip","","","","",""
+"portal.mail_template_data_portal_welcome","Portal: User Invite","Portal User Config","Your account at {{ object.user_id.company_id.name }}","","{{ object.user_id.email_formatted }}","","","","True","<table border=""0"" cellpadding=""0"" cellspacing=""0"" style=""box-sizing:border-box;padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"" width=""1067.2px""><tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td align=""center"" style=""box-sizing:border-box;"">
+<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;padding: 16px; background-color: white; color: #454748; border-collapse:separate;"">
+<tbody style=""box-sizing:border-box;"">
+    <!-- HEADER -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""middle"" style=""box-sizing:border-box;"">
+                    <span style=""box-sizing:border-box;font-size: 10px;"">Your Account</span><br style=""box-sizing:border-box;"">
+                    <span style=""box-sizing:border-box;font-size: 20px; font-weight: bold;"" t-out=""object.user_id.name or ''"" contenteditable=""false"">Marc Demo</span>
+                </td><td valign=""middle"" align=""right"" style=""box-sizing:border-box;"">
+                    <img t-attf-src=""/logo.png?company={{ object.user_id.company_id.id }}"" style=""border-style:none;box-sizing:border-box;vertical-align:middle;padding: 0px; margin: 0px; height: 0px; width: 80px;"" t-att-alt=""object.user_id.company_id.name"" width=""80px"" height=""0"">
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td colspan=""2"" style=""box-sizing:border-box;text-align:center;"">
+                  <hr width=""100%"" style=""border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;"">
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <!-- CONTENT -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""top"" style=""box-sizing:border-box;font-size: 13px;"">
+                    <div style=""box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;"">
+                        Dear <t t-out=""object.user_id.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">Marc Demo</t>,<br style=""box-sizing:border-box;""> <br style=""box-sizing:border-box;"">
+                        Welcome to <t t-out=""object.user_id.company_id.name"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">YourCompany</t>'s Portal!<br style=""box-sizing:border-box;""><br style=""box-sizing:border-box;"">
+                        An account has been created for you with the following login: <t t-out=""object.user_id.login"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">demo</t><br style=""box-sizing:border-box;""><br style=""box-sizing:border-box;"">
+                        Click on the button below to pick a password and activate your account.
+                        <div style=""box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;margin: 16px 0px 16px 0px; text-align: center;"">
+                            <a t-att-href=""object.user_id.signup_url"" style=""box-sizing:border-box;display: inline-block; padding: 10px; text-decoration: none; font-size: 12px; background-color: #875A7B; color: #fff; border-radius: 5px;"">
+                                <strong style=""box-sizing:border-box;font-weight:bolder;"">Activate Account</strong>
+                            </a>
+                            <a href=""/web/login"" style=""box-sizing:border-box;background-color:transparent;color:#66598f;display: inline-block; padding: 10px; text-decoration: none; font-size: 12px;"">
+                                <strong style=""box-sizing:border-box;font-weight:bolder;"">Log in</strong>
+                            </a>
+                        </div>
+                        <t t-out=""object.wizard_id.welcome_message or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">Welcome to our company's portal.</t>
+                    </div>
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td style=""box-sizing:border-box;text-align:center;"">
+                  <hr width=""100%"" style=""border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"">
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <!-- FOOTER -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""middle"" align=""left"" style=""box-sizing:border-box;"">
+                    <t t-out=""object.user_id.company_id.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">YourCompany</t>
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td valign=""middle"" align=""left"" style=""box-sizing:border-box;opacity: 0.7;"">
+                    <t t-out=""object.user_id.company_id.phone or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"" contenteditable=""false"">+1 650-123-4567</t>
+                    <t t-if=""object.user_id.company_id.email"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"" data-oe-t-group=""0"" data-oe-t-inline=""true"">
+                        | <a t-attf-href=""'mailto:%s' % {{ object.user_id.company_id.email }}"" style=""box-sizing:border-box;background-color:transparent;text-decoration:none; color: #454748;"" t-out=""object.user_id.company_id.email or ''"" contenteditable=""false"">info@yourcompany.com</a>
+                    </t>
+                    <t t-if=""object.user_id.company_id.website"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"" data-oe-t-group=""1"" data-oe-t-inline=""true"">
+                        | <a t-attf-href=""'%s' % {{ object.user_id.company_id.website }}"" style=""box-sizing:border-box;background-color:transparent;text-decoration:none; color: #454748;"" t-out=""object.user_id.company_id.website or ''"" contenteditable=""false"">http://www.example.com</a>
+                    </t>
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- POWERED BY -->
+<tr style=""box-sizing:border-box;""><td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+    <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""box-sizing:border-box;min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"">
+      <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td style=""box-sizing:border-box;text-align: center; font-size: 13px;"">
+        Powered by&nbsp;<a target=""_blank"" href=""https://d-soft.com.vn/"" style=""text-decoration:none;box-sizing:border-box;background-color:transparent;color: #875A7B;"">D-Soft</a></td></tr>
+    </tbody></table>
+</td></tr>
+</tbody></table>
+            ","","","","portal.mail_template_data_portal_welcome","","{{ object.partner_id.lang }}","","","","","",""
+"ds_print_contract.probationary_contract_mail_template","Probationary Contract - Send by Email","Employee Contract","{{object.company_id.name}} - Probationary Contract (Ref {{object.name or 'n/a' }})","""{{object.company_id.name}}""<{{object.company_id.email}}>","{{(object.employee_id.work_email or '')}}","","Probationary_Contract_{{object.employee_id.name}}","","","
+                <div style=""font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; "">
+
+                    <p>Dear <t t-out=""object.employee_id.name""/>,</p>
+
+                    <p>We are pleased to inform you that we at <strong><t t-out=""object.company_id.name"" contenteditable=""false"" data-oe-t-inline=""true""></t></strong> have accepted you as our employee. <br>
+                    .....
+                    </p>
+                    <br/>
+                    <p>Please find attached <i>Probationary_Contract_<t t-out=""object.employee_id.name""/></i> and then please contact HR within <strong>3</strong> business days after getting this email.</p>
+                    <p>If you have any questions, do not hesitate to contact HR.</p>
+                    <br/>
+                    <p>Thank you!</p>
+                </div>
+                
+            ","","","","ds_print_contract.probationary_contract_mail_template","","{{(object.employee_id.user_id.lang or user.lang)}}","Employee Probationary Contract","","","","",""
+"gamification.email_template_badge_received","Received Badge","Gamification User Badge","New badge {{ object.badge_id.name }} granted","","","{{ object.user_id.partner_id.id }}","","","True","<table border=""0"" cellpadding=""0"" style=""box-sizing:border-box;padding-top: 16px; background-color: #F1F1F1; color: #454748; width: 100%; border-collapse:separate;"" width=""1067px""><tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td align=""center"" style=""box-sizing:border-box;"">
+<table border=""0"" width=""590"" cellpadding=""0"" style=""box-sizing:border-box;padding: 16px; background-color: white; color: #454748; border-collapse:separate;"" summary=""o_mail_notification"">
+<tbody style=""box-sizing:border-box;"">
+    <!-- HEADER -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table width=""590"" border=""0"" cellpadding=""0"" style=""box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""middle"" style=""box-sizing:border-box;"">
+                    <span style=""box-sizing:border-box;font-size: 10px;"">Your Badge</span><br style=""box-sizing:border-box;"">
+                    <span style=""box-sizing:border-box;font-size: 20px; font-weight: bold;"" t-out=""object.badge_id.name or ''""></span>
+                </td><td valign=""middle"" align=""right"" style=""box-sizing:border-box;"">
+                    <img t-attf-src=""/logo.png?company={{ object.user_id.company_id.id }}"" style=""border-style:none;box-sizing:border-box;vertical-align:middle;padding: 0px; margin: 0px; height: 0px; width: 80px;"" t-att-alt=""object.user_id.company_id.name"" width=""80px"" height=""0"">
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td colspan=""2"" style=""box-sizing:border-box;text-align:center;"">
+                  <hr width=""100%"" style=""border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"">
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <!-- CONTENT -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table width=""590"" border=""0"" cellpadding=""0"" style=""box-sizing:border-box;min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""top"" style=""box-sizing:border-box;font-size: 14px;"">
+                    <div style=""box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;"">
+                        Congratulations <t t-out=""object.user_id.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;""></t> !<br style=""box-sizing:border-box;"">
+                        You just received badge <strong t-out=""object.badge_id.name or ''"" style=""box-sizing:border-box;font-weight:bolder;""></strong> !<br style=""box-sizing:border-box;"">
+                        <table t-if=""is_html_empty(object.badge_id.description)"" cellspacing=""0"" cellpadding=""0"" border=""0"" style=""box-sizing:border-box;border-collapse:collapse;width: 560px; margin-top: 5px;"" data-oe-t-group-active=""true"" width=""560px"">
+                            <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;"">
+                                <td valign=""center"" style=""box-sizing:border-box;"">
+                                    <img t-attf-src=""/web/image/gamification.badge/{{ object.badge_id.id }}/image_128/80x80"" style=""border-style:none;box-sizing:border-box;vertical-align:middle;padding: 0px; margin: 0px; height: 0px; width: 80px;"" t-att-alt=""user.company_id.name"" width=""80px"" height=""0"">
+                                </td>
+                                <td valign=""center"" style=""box-sizing:border-box;"">
+                                    <cite t-out=""object.badge_id.description or ''"" style=""box-sizing:border-box;""></cite>
+                                </td>
+                            </tr></tbody>
+                        </table>
+                        <br style=""box-sizing:border-box;"">
+                        <t t-if=""object.sender_id"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"">
+                            This badge was granted by <strong t-out=""object.sender_id.name or ''"" style=""box-sizing:border-box;font-weight:bolder;""></strong>.
+                        </t>
+                        <br style=""box-sizing:border-box;"">
+                        <t t-if=""object.comment"" t-out=""object.comment or ''"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;""></t>
+                        <br style=""box-sizing:border-box;""><br style=""box-sizing:border-box;"">
+                        Thank you,
+                        <t t-if=""object.sender_id.signature"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"">
+                            <br style=""box-sizing:border-box;"">
+                            <t t-out=""object.sender_id.signature or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;""></t>
+                        </t>
+                    </div>
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td style=""box-sizing:border-box;text-align:center;"">
+                  <hr width=""100%"" style=""border-style:none;border-top-width:medium;border-left-width:medium;border-bottom-width:medium;border-right-width:medium;overflow-y:visible;overflow-x:visible;height:0px;box-sizing:content-box;background-color:#cccccc;border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"">
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <!-- FOOTER -->
+    <tr style=""box-sizing:border-box;"">
+        <td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+            <table width=""590"" border=""0"" cellpadding=""0"" style=""box-sizing:border-box;min-width: 590px; background-color: white; font-size: 12px; padding: 0px 8px 0px 8px; border-collapse:separate;"">
+                <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td valign=""middle"" align=""left"" style=""box-sizing:border-box;"">
+                    <t t-out=""object.user_id.company_id.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">YourCompany</t>
+                </td></tr>
+                <tr style=""box-sizing:border-box;""><td valign=""middle"" align=""left"" style=""box-sizing:border-box;opacity: 0.7;"">
+                    <t t-out=""object.user_id.company_id.phone or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;"">+1 650-123-4567</t>
+                    <t t-if=""object.user_id.company_id.email"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"">
+                        | <a t-attf-href=""'mailto:%s' % {{ object.user_id.company_id.email }}"" style=""box-sizing:border-box;background-color:transparent;text-decoration:none; color: #454748;"" t-out=""object.user_id.company_id.email or ''"">info@yourcompany.com</a>
+                    </t>
+                    <t t-if=""object.user_id.company_id.website"" data-oe-t-group-active=""true"" style=""box-sizing:border-box;"">
+                        | <a t-attf-href=""'%s' % {{ object.user_id.company_id.website }}"" style=""box-sizing:border-box;background-color:transparent;text-decoration:none; color: #454748;"" t-out=""object.user_id.company_id.website or ''"">http://www.example.com</a>
+                    </t>
+                </td></tr>
+            </tbody></table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- POWERED BY -->
+<tr style=""box-sizing:border-box;""><td align=""center"" style=""box-sizing:border-box;min-width: 590px;"">
+    <table width=""590"" border=""0"" cellpadding=""0"" style=""box-sizing:border-box;min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;"">
+      <tbody style=""box-sizing:border-box;""><tr style=""box-sizing:border-box;""><td style=""box-sizing:border-box;text-align: center; font-size: 14px;"">
+        Powered by&nbsp;<a target=""_blank"" href=""https://d-soft.com.vn/"" style=""text-decoration:none;box-sizing:border-box;background-color:transparent;color: #875A7B;"">D-Soft</a></td></tr>
+    </tbody></table>
+</td></tr>
+</tbody></table>","","","","gamification.email_template_badge_received","","{{ object.user_id.lang }}","","","","","",""
+"sale.mail_template_sale_confirmation","Sales Order: Confirmation Email","Sales Order","{{ object.company_id.name }} {{ (object.get_portal_last_transaction().state == 'pending') and 'Pending Order' or 'Order' }} (Ref {{ object.name or 'n/a' }})","{{ (object.user_id.email_formatted or user.email_formatted) }}","","{{ object.partner_id.id }}","{{ (object.name or '').replace('/','_') }}","","True","<div style=""margin: 0px; padding: 0px;"">
+    <p style=""margin: 0px; padding: 0px; font-size: 12px;"">
+        Hello,
+        <br/><br/>
+        <t t-set=""transaction"" t-value=""object.get_portal_last_transaction()""/>
+        Your order <strong t-out=""object.name or ''"">S00049</strong> amounting in <strong t-out=""format_amount(object.amount_total, object.currency_id) or ''"">$ 10.00</strong>
+        <t t-if=""object.state == 'sale' or (transaction and transaction.state in ('done', 'authorized'))"">
+            has been confirmed.<br/>
+            Thank you for your trust!
+        </t>
+        <t t-elif=""transaction and transaction.state == 'pending'"">
+            is pending. It will be confirmed when the payment is received.
+            <t t-if=""object.reference"">
+                Your payment reference is <strong t-out=""object.reference or ''""/>.
+            </t>
+        </t>
+        <br/><br/>
+        Do not hesitate to contact us if you have any questions.
+        <br/><br/>
+    </p>
+<t t-if=""hasattr(object, 'website_id') and object.website_id"">
+    <div style=""margin: 0px; padding: 0px;"">
+        <table width=""100%"" style=""color: #454748; font-size: 12px; border-collapse: collapse;"">
+            <tr style=""border-bottom: 2px solid #dee2e6;"">
+                <td style=""width: 150px;""><strong>Products</strong></td>
+                <td/>
+                <td width=""15%"" align=""center""><strong>Quantity</strong></td>
+                <td width=""20%"" align=""right""><strong>
+                <t t-if=""object.user_id.has_group('account.group_show_line_subtotals_tax_excluded')"">
+                    VAT Excl.
+                </t>
+                <t t-else="""">
+                    VAT Incl.
+                </t>
+                </strong></td>
+            </tr>
+        </table>
+        <t t-foreach=""object.order_line"" t-as=""line"">
+            <t t-if=""(not hasattr(line, 'is_delivery') or not line.is_delivery) and line.display_type in ['line_section', 'line_note']"">
+                <table width=""100%"" style=""color: #454748; font-size: 12px; border-collapse: collapse;"">
+                    <t t-set=""loop_cycle_number"" t-value=""0""/>
+                    <tr t-att-style=""'background-color: #f2f2f2' if loop_cycle_number % 2 == 0 else 'background-color: #ffffff'"">
+                        <t t-set=""loop_cycle_number"" t-value=""loop_cycle_number + 1""/>
+                        <td colspan=""4"">
+                            <t t-if=""line.display_type == 'line_section'"">
+                                <strong t-out=""line.name or ''"">Taking care of Trees Course</strong>
+                            </t>
+                            <t t-elif=""line.display_type == 'line_note'"">
+                                <i t-out=""line.name or ''"">Taking care of Trees Course</i>
+                            </t>
+                        </td>
+                    </tr>
+                </table>
+            </t>
+            <t t-elif=""(not hasattr(line, 'is_delivery') or not line.is_delivery)"">
+                <table width=""100%"" style=""color: #454748; font-size: 12px; border-collapse: collapse;"">
+                    <t t-set=""loop_cycle_number"" t-value=""0""/>
+                    <tr t-att-style=""'background-color: #f2f2f2' if loop_cycle_number % 2 == 0 else 'background-color: #ffffff'"">
+                        <t t-set=""loop_cycle_number"" t-value=""loop_cycle_number + 1""/>
+                        <td style=""width: 150px;"">
+                            <img t-attf-src=""/web/image/product.product/{{ line.product_id.id }}/image_128"" style=""width: 64px; height: 64px; object-fit: contain;"" alt=""Product image""/>
+                        </td>
+                        <td align=""left"" t-out=""line.product_id.name or ''"">	Taking care of Trees Course</td>
+                        <td width=""15%"" align=""center"" t-out=""line.product_uom_qty or ''"">1</td>
+                        <td width=""20%"" align=""right""><strong>
+                        <t t-if=""object.user_id.has_group('account.group_show_line_subtotals_tax_excluded')"">
+                            <t t-out=""format_amount(line.price_reduce_taxexcl, object.currency_id) or ''"">$ 10.00</t>
+                        </t>
+                        <t t-else="""">
+                            <t t-out=""format_amount(line.price_reduce_taxinc, object.currency_id) or ''"">$ 10.00</t>
+                        </t>
+                        </strong></td>
+                    </tr>
+                </table>
+            </t>
+        </t>
+    </div>
+    <div style=""margin: 0px; padding: 0px;"" t-if=""hasattr(object, 'carrier_id') and object.carrier_id"">
+        <table width=""100%"" style=""color: #454748; font-size: 12px; border-spacing: 0px 4px;"" align=""right"">
+            <tr>
+                <td style=""width: 60%""/>
+                <td style=""width: 30%; border-top: 1px solid #dee2e6;"" align=""right""><strong>Delivery:</strong></td>
+                <td style=""width: 10%; border-top: 1px solid #dee2e6;"" align=""right"" t-out=""format_amount(object.amount_delivery, object.currency_id) or ''"">$ 0.00</td>
+            </tr>
+            <tr>
+                <td style=""width: 60%""/>
+                <td style=""width: 30%;"" align=""right""><strong>SubTotal:</strong></td>
+                <td style=""width: 10%;"" align=""right"" t-out=""format_amount(object.amount_untaxed, object.currency_id) or ''"">$ 10.00</td>
+            </tr>
+        </table>
+    </div>
+    <div style=""margin: 0px; padding: 0px;"" t-else="""">
+        <table width=""100%"" style=""color: #454748; font-size: 12px; border-spacing: 0px 4px;"" align=""right"">
+            <tr>
+                <td style=""width: 60%""/>
+                <td style=""width: 30%; border-top: 1px solid #dee2e6;"" align=""right""><strong>SubTotal:</strong></td>
+                <td style=""width: 10%; border-top: 1px solid #dee2e6;"" align=""right"" t-out=""format_amount(object.amount_untaxed, object.currency_id) or ''"">$ 10.00</td>
+            </tr>
+        </table>
+    </div>
+    <div style=""margin: 0px; padding: 0px;"">
+        <table width=""100%"" style=""color: #454748; font-size: 12px; border-spacing: 0px 4px;"" align=""right"">
+            <tr>
+                <td style=""width: 60%""/>
+                <td style=""width: 30%;"" align=""right""><strong>Taxes:</strong></td>
+                <td style=""width: 10%;"" align=""right"" t-out=""format_amount(object.amount_tax, object.currency_id) or ''"">$ 0.00</td>
+            </tr>
+            <tr>
+                <td style=""width: 60%""/>
+                <td style=""width: 30%; border-top: 1px solid #dee2e6;"" align=""right""><strong>Total:</strong></td>
+                <td style=""width: 10%; border-top: 1px solid #dee2e6;"" align=""right"" t-out=""format_amount(object.amount_total, object.currency_id) or ''"">$ 10.00</td>
+            </tr>
+        </table>
+    </div>
+    <div t-if=""object.partner_invoice_id"" style=""margin: 0px; padding: 0px;"">
+        <table width=""100%"" style=""color: #454748; font-size: 12px;"">
+            <tr>
+                <td style=""padding-top: 10px;"">
+                    <strong>Bill to:</strong>
+                    <t t-out=""object.partner_invoice_id.street or ''"">1201 S Figueroa St</t>
+                    <t t-out=""object.partner_invoice_id.city or ''"">Los Angeles</t>
+                    <t t-out=""object.partner_invoice_id.state_id.name or ''"">California</t>
+                    <t t-out=""object.partner_invoice_id.zip or ''"">90015</t>
+                    <t t-out=""object.partner_invoice_id.country_id.name or ''"">United States</t>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>Payment Method:</strong>
+                    <t t-if=""transaction.token_id"">
+                        <t t-out=""transaction.token_id.name or ''""/>
+                    </t>
+                    <t t-else="""">
+                        <t t-out=""transaction.acquirer_id.sudo().name or ''""/>
+                    </t>
+                    (<t t-out=""format_amount(transaction.amount, object.currency_id) or ''"">$ 10.00</t>)
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div t-if=""object.partner_shipping_id and not object.only_services"" style=""margin: 0px; padding: 0px;"">
+        <table width=""100%"" style=""color: #454748; font-size: 12px;"">
+            <tr>
+                <td>
+                    <br/>
+                    <strong>Ship to:</strong>
+                    <t t-out=""object.partner_shipping_id.street or ''"">1201 S Figueroa St</t>
+                    <t t-out=""object.partner_shipping_id.city or ''"">Los Angeles</t>
+                    <t t-out=""object.partner_shipping_id.state_id.name or ''"">California</t>
+                    <t t-out=""object.partner_shipping_id.zip or ''"">90015</t>
+                    <t t-out=""object.partner_shipping_id.country_id.name or ''"">United States</t>
+                </td>
+            </tr>
+        </table>
+        <table t-if=""hasattr(object, 'carrier_id') and object.carrier_id"" width=""100%"" style=""color: #454748; font-size: 12px;"">
+            <tr>
+                <td>
+                    <strong>Shipping Method:</strong>
+                    <t t-out=""object.carrier_id.name or ''""/>
+                    <t t-if=""object.carrier_id.fixed_price == 0.0"">
+                        (Free)
+                    </t>
+                    <t t-else="""">
+                        (<t t-out=""format_amount(object.carrier_id.fixed_price, object.currency_id) or ''"">$ 10.00</t>)
+                    </t>
+                </td>
+            </tr>
+        </table>
+    </div>
+</t>
+</div>","","","","sale.mail_template_sale_confirmation","","{{ object.partner_id.lang }}","Quotation / Order","","","","",""
+"sale.email_template_edi_sale","Sales Order: Send by email","Sales Order","{{ object.company_id.name }} {{ object.state in ('draft', 'sent') and (ctx.get('proforma') and 'Proforma' or 'Quotation') or 'Order' }} (Ref {{ object.name or 'n/a' }})","{{ (object.user_id.email_formatted or user.email_formatted) }}","","{{ object.partner_id.id }}","{{ (object.name or '').replace('/','_') }}","","True","<div style=""margin: 0px; padding: 0px;"">
+    <p style=""margin: 0px; padding: 0px; font-size: 13px;"">
+        <t t-set=""doc_name"" t-value=""'quotation' if object.state in ('draft', 'sent') else 'order'""/>
+        Hello,
+        <br/><br/>
+        Your
+        <t t-if=""ctx.get('proforma')"">
+            Pro forma invoice for <t t-out=""doc_name or ''"">quotation</t> <strong t-out=""object.name or ''"">S00052</strong>
+            <t t-if=""object.origin"">
+                (with reference: <t t-out=""object.origin or ''""/> )
+            </t>
+            amounting in <strong t-out=""format_amount(object.amount_total, object.pricelist_id.currency_id) or ''"">$ 10.00</strong> is available.
+        </t>
+        <t t-else="""">
+            <t t-out=""doc_name or ''"">quotation</t> <strong t-out=""object.name or ''""/>
+            <t t-if=""object.origin"">
+                (with reference: <t t-out=""object.origin or ''"">S00052</t> )
+            </t>
+            amounting in <strong t-out=""format_amount(object.amount_total, object.pricelist_id.currency_id) or ''"">$ 10.00</strong> is ready for review.
+        </t>
+        <br/><br/>
+        Do not hesitate to contact us if you have any questions.
+        <br/>
+    </p>
+</div>
+            ","","","","sale.email_template_edi_sale","","{{ object.partner_id.lang }}","Quotation / Order","","","","",""
+"survey.mail_template_user_input_invite","Survey: Invite","Survey User Input","Participate to {{ object.survey_id.display_name }} survey","","{{ (object.partner_id.email_formatted or object.email) }}","","","","True","<div style=""margin: 0px; padding: 0px; font-size: 13px;"">
+    <p style=""margin: 0px; padding: 0px; font-size: 13px;"">
+        Dear <t t-out=""object.partner_id.name or 'participant'"">participant</t><br/><br/>
+        <t t-if=""object.survey_id.certification"">
+            You have been invited to take a new certification.
+        </t>
+        <t t-else="""">
+            We are conducting a survey and your response would be appreciated.
+        </t>
+        <div style=""margin: 16px 0px 16px 0px;"">
+            <a t-att-href=""(object.get_start_url())"" style=""background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"">
+                <t t-if=""object.survey_id.certification"">
+                    Start Certification
+                </t>
+                <t t-else="""">
+                    Start Survey
+                </t>
+            </a>
+        </div>
+        <t t-if=""object.deadline"">
+            Please answer the survey for <t t-out=""format_date(object.deadline) or ''"">05/05/2021</t>.<br/><br/>
+        </t>
+        Thank you for your participation.
+    </p>
+</div>
+            ","","","","survey.mail_template_user_input_invite","","{{ object.partner_id.lang }}","","","","","",""
+"survey.mail_template_certification","Survey: Send certification by email","Survey User Input","Certification: {{ object.survey_id.display_name }}","{{ (object.survey_id.create_uid.email_formatted or user.email_formatted or user.company_id.catchall_formatted) }}","{{ (object.partner_id.email_formatted or object.email) }}","","Certification Document","","True","<div style=""background:#F0F0F0;color:#515166;padding:10px 0px;font-family:Arial,Helvetica,sans-serif;font-size:14px;"">
+    <table style=""width:600px;margin:5px auto;"">
+        <tbody>
+            <tr><td>
+                <!-- We use the logo of the company that created the survey (to handle multi company cases) -->
+                <a href=""/""><img t-attf-src=""/logo.png?company={{ object.survey_id.create_uid.company_id.id }}"" style=""vertical-align:baseline;max-width:100px;""/></a>
+            </td><td style=""text-align:right;vertical-align:middle;"">
+                    Certification: <t t-out=""object.survey_id.display_name or ''"">Feedback Form</t>
+            </td></tr>
+        </tbody>
+    </table>
+    <table style=""width:600px;margin:0px auto;background:white;border:1px solid #e1e1e1;"">
+        <tbody>
+            <tr><td style=""padding:15px 20px 10px 20px;"">
+                <p>Dear <span t-out=""object.partner_id.name or 'participant'"">participant</span></p>
+                <p>
+                    Here is, in attachment, your certification document for
+                        <strong t-out=""object.survey_id.display_name or ''"">Feedback Form</strong>
+                </p>
+                <p>Congratulations for succeeding the test!</p>
+            </td></tr>
+        </tbody>
+    </table>
+</div>
+            ","","","","survey.mail_template_certification","","{{ object.partner_id.lang }}","Certifications","","","","",""
+"auth_totp_mail.mail_template_totp_invite","TOTP for users: Invite by email","Users","Invitation to activate two-factor authentication on your D-Soft account","","","{{ object.partner_id.id }}","","","True","<div style=""box-sizing:border-box;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;margin: 0px; padding: 0px; font-size: 13px;"">
+    <p style=""box-sizing:border-box;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;margin: 0px; padding: 0px; font-size: 13px;"">
+        Dear <t t-out=""object.partner_id.name or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;""></t><br style=""box-sizing:border-box;""><br style=""box-sizing:border-box;"">
+        <t t-out=""user.name  or ''"" data-oe-t-inline=""true"" style=""box-sizing:border-box;""></t> requested you activate two-factor authentication to protect your account.<br style=""box-sizing:border-box;""><br style=""box-sizing:border-box;"">
+        Two-factor Authentication (""2FA"") is a system of double authentication.
+        The first one is done with your password and the second one with a code you get from a dedicated mobile app.
+        Popular ones include Authy, Google Authenticator or the Microsoft Authenticator.
+
+        </p><p style=""box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;margin: 16px 0px 16px 0px; text-align: center;"">
+            <a t-att-href=""object.get_totp_invite_url()"" style=""box-sizing:border-box;background-color:#875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;"">
+                Activate my two-factor Authentication
+            </a>
+        </p>
+    <p style=""margin:0px;box-sizing:border-box;font-size:13px;font-family:&quot;Lucida Grande&quot;, Helvetica, Verdana, Arial, sans-serif;""></p>
+</div>
+        ","","","","auth_totp_mail.mail_template_totp_invite","","{{ object.partner_id.lang }}","","","","","",""
+"project.rating_project_request_email_template","Task: Rating Request","Task","{{ object.project_id.company_id.name }}: Satisfaction Survey","{{ (object.rating_get_rated_partner_id().email_formatted if object.rating_get_rated_partner_id() else user.email_formatted) }}","","{{ object.rating_get_partner_id().id }}","","","True","<div>
+    <t t-set=""access_token"" t-value=""object.rating_get_access_token()""/>
+    <t t-set=""partner"" t-value=""object.rating_get_partner_id()""/>
+    <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" style=""width:100%; margin:0px auto;"">
+    <tbody>
+        <tr><td valign=""top"" style=""font-size: 13px;"">
+            <t t-if=""partner.name"">
+                Hello <t t-out=""partner.name or ''"">Brandon Freeman</t>,<br/><br/>
+            </t>
+            <t t-else="""">
+                Hello,<br/><br/>
+            </t>
+            Please take a moment to rate our services related to the task ""<strong t-out=""object.name or ''"">Planning and budget</strong>""
+            <t t-if=""object.rating_get_rated_partner_id().name"">
+                assigned to <strong t-out=""object.rating_get_rated_partner_id().name or ''"">Mitchell Admin</strong>.<br/>
+            </t>
+            <t t-else="""">
+                .<br/>
+            </t>
+        </td></tr>
+        <tr><td style=""text-align: center;"">
+            <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""590"" summary=""o_mail_notification"" style=""width:100%; margin: 32px 0px 32px 0px;"">
+                <tr><td style=""font-size: 13px;"">
+                    <strong>Tell us how you feel about our service</strong><br/>
+                    <span style=""text-color: #888888"">(click on one of these smileys)</span>
+                </td></tr>
+                <tr><td style=""font-size: 13px;"">
+                    <table style=""width:100%;text-align:center;margin-top:2rem;"">
+                        <tr>
+                            <td>
+                                <a t-attf-href=""/rate/{{ access_token }}/5"">
+                                    <img alt=""Satisfied"" src=""/rating/static/src/img/rating_5.png"" title=""Satisfied""/>
+                                </a>
+                            </td>
+                            <td>
+                                <a t-attf-href=""/rate/{{ access_token }}/3"">
+                                    <img alt=""Okay"" src=""/rating/static/src/img/rating_3.png"" title=""Okay""/>
+                                </a>
+                            </td>
+                            <td>
+                                <a t-attf-href=""/rate/{{ access_token }}/1"">
+                                    <img alt=""Dissatisfied"" src=""/rating/static/src/img/rating_1.png"" title=""Dissatisfied""/>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </td></tr>
+            </table>
+        </td></tr>
+        <tr><td valign=""top"" style=""font-size: 13px;"">
+            We appreciate your feedback. It helps us to improve continuously.
+            <t t-if=""object.project_id.rating_status == 'stage'"">
+                <br/><span style=""margin: 0px 0px 0px 0px; font-size: 12px; opacity: 0.5; color: #454748;"">This customer survey has been sent because your task has been moved to the stage <b t-out=""object.stage_id.name or ''"">In progress</b></span>
+            </t>
+            <t t-if=""object.project_id.rating_status == 'periodic'"">
+                <br/><span style=""margin: 0px 0px 0px 0px; font-size: 12px; opacity: 0.5; color: #454748;"">This customer survey is sent <b t-out=""object.project_id.rating_status_period or ''"">Weekly</b> as long as the task is in the <b t-out=""object.stage_id.name or ''"">In progress</b> stage.</span>
+            </t>
+        </td></tr>
+    </tbody>
+    </table>
+</div>
+            ","","","","project.rating_project_request_email_template","","{{ object.rating_get_partner_id().lang }}","","","","","",""
+"project.mail_template_data_project_task","Task: Reception Acknowledgment","Task","Reception of {{ object.name }}","","","","","","True","<div>
+    Dear <t t-out=""object.partner_id.name or 'customer'"">Brandon Freeman</t>,<br/>
+    Thank you for your enquiry.<br/>
+    If you have any questions, please let us know.
+    <br/><br/>
+    Thank you,
+    <t t-if=""user.signature"">
+        <br/>
+        <t t-out=""user.signature or ''"">--<br/>Mitchell Admin</t>
+    </t>
+</div>
+        ","","True","","project.mail_template_data_project_task","","{{ object.partner_id.lang }}","","","","","",""
+"gamification.mail_template_data_new_rank_reached","User: New rank reached","Users","New rank: {{ object.rank_id.name }}","","","{{ object.partner_id.id }}","","","True","<div style=""background:#F0F0F0;color:#515166;padding:10px 0px;font-family:Arial,Helvetica,sans-serif;font-size:14px;"">
+<table style=""width:600px;margin:0px auto;background:white;border:1px solid #e1e1e1;"">
+    <tbody>
+        <tr>
+            <td style=""padding:15px 20px 10px 20px;"">
+                <p>
+                    Congratulations
+                    <span t-out=""object.name or ''"">Joel Willis</span>!
+                </p>
+                <p>
+                    You just reached a new rank : <strong t-out=""object.rank_id.name or ''"">Newbie</strong>
+                </p>
+                <t t-if=""object.next_rank_id.name"">
+                    <p>Continue your work to become a <strong t-out=""object.next_rank_id.name or ''"">Student</strong> !</p>
+                </t>
+                <div style=""margin: 16px 0px 16px 0px;"">
+                    <t t-set=""gamification_redirection_data"" t-value=""object.get_gamification_redirection_data()""/>
+                    <t t-foreach=""gamification_redirection_data"" t-as=""data"">
+                        <t t-set=""url"" t-value=""data['url']""/>
+                        <t t-set=""label"" t-value=""data['label']""/>
+                        <a t-att-href=""url"" style=""background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"" t-out=""label or ''"">LABEL</a>
+                    </t>
+                </div>
+            </td>
+            <td style=""padding:15px 20px 10px 20px;"">
+                <p style=""text-align: center;"">
+                    <img t-attf-src=""/web/image/gamification.karma.rank/{{ object.rank_id.id }}/image_128""/>
+                </p>
+            </td>
+        </tr>
+        <tr t-if=""user.signature"">
+            <td style=""padding:15px 20px 10px 20px;"">
+                <t t-out=""user.signature or ''"">--<br/>Mitchell Admin</t>
+            </td>
+        </tr>
+    </tbody>
+ </table>
+</div>","","","","gamification.mail_template_data_new_rank_reached","","{{ object.lang }}","","","","","",""
