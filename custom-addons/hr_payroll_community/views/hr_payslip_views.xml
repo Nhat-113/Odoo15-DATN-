@@ -168,7 +168,7 @@
                             <tree string="Worked Days" editable="bottom">
                                 <field name="name"/>
                                 <field name="code"/>
-                                <field name="number_of_days"/>
+                                <field name="number_of_days" digits="[12,1]"/>
                                 <!-- <field name="number_of_hours"/> -->
                                 <field name="contract_id"/>
                                 <field name="sequence" invisible="True"/>
@@ -178,7 +178,7 @@
                                     <field name="name"/>
                                     <field name="code"/>
                                     <field name="sequence"/>
-                                    <field name="number_of_days"/>
+                                    <field name="number_of_days" digits="[12,1]"/>
                                     <!-- <field name="number_of_hours"/> -->
                                     <field name="contract_id"/>
                                 </group>
@@ -189,7 +189,7 @@
                             <tree string="Input Data" editable="bottom">
                                 <field name="name"/>
                                 <field name="code"/>
-                                <field name="amount"/>
+                                <field name="amount" digits="[12,1]"/>
                                 <field name="contract_id"/>
                                 <field name="sequence" invisible="True"/>
                             </tree>
@@ -206,16 +206,16 @@
                     </page>
                     <page string="Salary Computation" >
                         <field name="line_ids" colspan="4" nolabel="1">
-                            <tree string="Salary Structure" editable="" decoration-success="code == 'NET'" decoration-bf="code in ('Basic', 'OT','TL', 'NET')" decoration-it="code in ('Basic', 'OT', 'TL')" decoration-muted="total == 0">
+                            <tree string="Salary Structure" editable="" decoration-success="code == 'NET'" decoration-bf="code in ('Basic', 'OT','TL', 'NET', 'TTNTT', 'TNC')" decoration-it="code in ('Basic', 'OT', 'TL', 'TTNTT', 'TNC')" decoration-muted="total == 0">
                                 <field name="sequence" invisible="0" string="No."/>
                                 <field name="name"/>
                                 <field name="code"/>
                                 <field name="category_id"/>
-                                <field name="quantity"/>
+                                <field name="quantity" digits="[12,0]"/>
                                 <!-- <field name="rate"/> -->
                                 <!-- <field name="salary_rule_id"/> -->
-                                <field name="amount"/>
-                                <field name="total"/>
+                                <field name="amount" digits="[12,0]"/>
+                                <field name="total" digits="[12,0]"/>
                             </tree>
                             <form string="Payslip Line">
                                 <group col="4">
@@ -223,10 +223,10 @@
                                     <field name="code"/>
                                     <field name="category_id"/>
                                     <field name="sequence"/>
-                                    <field name="quantity"/>
+                                    <field name="quantity" digits="[12,0]"/>
                                     <field name="rate"/>
-                                    <field name="amount"/>
-                                    <field name="total"/>
+                                    <field name="amount" digits="[12,0]"/>
+                                    <field name="total" digits="[12,0]"/>
                                     <field name="salary_rule_id"/>
                                 </group>
                             </form>
