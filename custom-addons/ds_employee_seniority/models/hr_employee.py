@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
-    seniority_by_days = fields.Integer(compute='_compute_seniority_by_days', string='Employee Seniority By Days', store=True)
+    seniority_by_days = fields.Integer(compute='_compute_seniority_by_days', string='Seniority By Days', store=True)
     seniority = fields.Char(compute='_compute_seniority', string='Employee Seniority')
 
     def _compute_seniority(self):
