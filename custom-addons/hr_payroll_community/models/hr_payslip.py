@@ -91,6 +91,13 @@ class HrPayslip(models.Model):
 
         if any(self.filtered(lambda payslip: payslip.date_from > payslip.date_to)):
             raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
+        
+        if self.contract_id.date_end:
+            if self.contract_id.date_start > self.date_from or self.contract_id.date_end < self.date_to:
+                if self.contract_id.date_start.month > self.date_from.month or self.contract_id.date_end.month < self.date_to.month :
+                    raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
+                    name=self.employee_id.name))
+        
 
     @api.constrains('name')
     def _check_payslips(self):
@@ -99,18 +106,14 @@ class HrPayslip(models.Model):
         if any(self.filtered(lambda payslip: payslip.name in payslip_names)):
             raise ValidationError(_("Do not create multiple payslips for an employee in the same month"))
 
-    @api.constrains('contract_id')
-    def _check_contract_id(self):
-
-        if self.employee_id.contract_id != self.contract_id:            
-            raise ValidationError(_('Cannot choose the wrong contract with the employee'))
-
-    @api.constrains('date_from', 'date_to')
-    def _check_contract_date(self):
-        if self.contract_id.date_end:
-            if self.contract_id.date_start < self.date_from or self.contract_id.date_end > self.date_to:
-                raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
-                name=self.employee_id.name))
+    # @api.constrains('date_from', 'date_to')
+    # def _check_contract_date(self):
+    #     if self.contract_id.date_end:
+    #         if self.contract_id.date_start < self.date_from or self.contract_id.date_end > self.date_to:
+    #             self.self.contract_id.date_end.month > self.self.date_to.month
+    #                 raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
+    #                 name=self.employee_id.name))
+        
 
     def action_payslip_draft(self):
 
@@ -190,7 +193,7 @@ class HrPayslip(models.Model):
                         self.get_contract(payslip.employee_id, payslip.date_from, payslip.date_to)
             lines = [(0, 0, line) for line in self._get_payslip_lines(contract_ids, payslip.id)]
             payslip.write({'line_ids': lines, 'number': number}) 
-        self._check_contract_id() 
+        # self._check_contract_id() 
         return self.write({'state': 'verify'})
        
     @api.model
