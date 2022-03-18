@@ -23,17 +23,17 @@ class Contract(models.Model):
                     'Please choose an employee for the contract.'
                 ))
 
-    def _assign_open_contract(self):
-        for contract in self:
-            if contract.date_end:
-                if contract.date_end >= date.today():
-                    contract.employee_id.sudo().write({'contract_id': contract.id})
-                else:
-                    raise ValidationError(_('Contract has expired on day (%(date_end)s)', date_end=contract.date_end))
+    # def _assign_open_contract(self):
+    #     for contract in self:
+    #         if contract.date_end:
+    #             if contract.date_end >= date.today():
+    #                 contract.employee_id.sudo().write({'contract_id': contract.id})
+    #             else:
+    #                 raise ValidationError(_('Contract has expired on day(%(date_end)s)', date_end=contract.date_end))
 
-    def write(self, vals):
-        res = super(Contract, self).write(vals)
-        if vals.get('state') == 'open' or 'draft':
-            self._assign_open_contract()
+    # def write(self, vals):
+    #     res = super(Contract, self).write(vals)
+    #     if vals.get('state') == 'open' or 'draft':
+    #         self._assign_open_contract()
         
-        return res
+    #     return res
