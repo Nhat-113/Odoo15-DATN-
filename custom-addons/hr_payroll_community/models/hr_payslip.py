@@ -92,6 +92,12 @@ class HrPayslip(models.Model):
         if any(self.filtered(lambda payslip: payslip.date_from > payslip.date_to)):
             raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
 
+        if self.contract_id.date_end:
+            if self.contract_id.date_start > self.date_from or self.contract_id.date_end < self.date_to:
+                if self.contract_id.date_start.month > self.date_from.month or self.contract_id.date_end.month < self.date_to.month :
+                    raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
+                    name=self.employee_id.name))
+
     @api.constrains('name')
     def _check_payslips(self):
         payslip_names = [payslip.name for payslip in self.employee_id.slip_ids][:-1]
@@ -99,10 +105,11 @@ class HrPayslip(models.Model):
         if any(self.filtered(lambda payslip: payslip.name in payslip_names)):
             raise ValidationError(_("Do not create multiple payslips for an employee in the same month"))
 
-    @api.constrains('contract_id')
-    def _check_contract_id(self):
-            if (self.employee_id.contract_id != self.employee_id.slip_ids.contract_id):            
-                raise UserError('Cannot choose the wrong contract with the employee')
+    # @api.constrains('contract_id')
+    # def _check_contract_id(self):
+
+    #     if self.employee_id.contract_id != self.contract_id:            
+    #         raise ValidationError(_('Cannot choose the wrong contract with the employee'))
 
     def action_payslip_draft(self):
 
@@ -171,7 +178,7 @@ class HrPayslip(models.Model):
         return self.env['hr.contract'].search(clause_final).ids
 
     def compute_sheet(self):
-
+        
         for payslip in self:
             number = payslip.number or self.env['ir.sequence'].next_by_code('salary.slip')
             # delete old payslip lines
@@ -179,11 +186,12 @@ class HrPayslip(models.Model):
             # set the list of contract for which the rules have to be applied
             # if we don't give the contract, then the rules to apply should be for all current contracts of the employee
             contract_ids = payslip.contract_id.ids or \
-                           self.get_contract(payslip.employee_id, payslip.date_from, payslip.date_to)
+                        self.get_contract(payslip.employee_id, payslip.date_from, payslip.date_to)
             lines = [(0, 0, line) for line in self._get_payslip_lines(contract_ids, payslip.id)]
-            payslip.write({'line_ids': lines, 'number': number})
+            payslip.write({'line_ids': lines, 'number': number}) 
+        # self._check_contract_id() 
         return self.write({'state': 'verify'})
-
+       
     @api.model
     def get_worked_day_lines(self, contracts, date_from, date_to):
 
@@ -481,6 +489,21 @@ class HrPayslip(models.Model):
             'input_line_ids': input_line_ids,
         })
         return res
+
+    @api.onchange('employee_id')
+    def onchange_employ(self):
+        if self.employee_id:
+            if not self.employee_id.contract_id:
+                self.contract_id = False
+                self.input_line_ids = False
+                self.worked_days_line_ids = False
+            else:
+                contract_ids = self.env['hr.contract'].search(['&', ('employee_id', '=', self.employee_id.id), ('state', '!=', 'cancel')]).ids
+                self.contract_id = self.env['hr.contract'].browse(contract_ids[0])
+                if not self.env['hr.contract'].browse(contract_ids[0]).struct_id:
+                     self.struct_id = False
+
+        return
 
     @api.onchange('employee_id', 'date_from', 'date_to')
     def onchange_employee(self):

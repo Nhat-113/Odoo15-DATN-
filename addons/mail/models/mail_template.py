@@ -316,3 +316,11 @@ class MailTemplate(models.Model):
         if force_send:
             mail.send(raise_exception=raise_exception)
         return mail.id  # TDE CLEANME: return mail + api.returns ?
+
+
+    @api.model
+    def get_import_templates(self):
+        return [{
+            'label': _('Download file email template'),
+            'template': '/mail/static/src/xls/Email_Templates.csv'
+        }]
