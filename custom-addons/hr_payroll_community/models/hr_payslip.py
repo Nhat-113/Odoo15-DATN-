@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 
-import re
 import babel
 from collections import defaultdict
 from datetime import date, datetime, time
