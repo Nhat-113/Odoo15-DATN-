@@ -23,6 +23,14 @@ class Contract(models.Model):
                     'Please choose an employee for the contract.'
                 ))
 
+    @api.onchange('state')
+    def onchage_state(self):
+        payslips = [payslip for payslip in self.env['hr.payslip'].search(['&', ('employee_id', '=', self.employee_id.id), ('state', '!=', 'done')])]
+        if self.state == 'cancel':
+            for payslip in payslips:
+                payslip.write({'state': 'cancel'})
+        return
+
     # def _assign_open_contract(self):
     #     for contract in self:
     #         if contract.date_end:
