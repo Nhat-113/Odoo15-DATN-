@@ -1,0 +1,5 @@
+.o_kanban_card_header_title  > .o_primary, .o_kanban_card_header_title  > .o_job_alias {
+        white-space: nowrap; 
+        overflow: hidden;
+        text-overflow: ellipsis;
+}
