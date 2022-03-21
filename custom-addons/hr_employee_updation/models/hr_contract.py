@@ -25,8 +25,8 @@ class Contract(models.Model):
 
     @api.onchange('state')
     def onchage_state(self):
-        payslips = [payslip for payslip in self.env['hr.payslip'].search(['&', ('employee_id', '=', self.employee_id.id), ('state', '!=', 'done')])]
         if self.state == 'cancel':
+            payslips = [payslip for payslip in self.env['hr.payslip'].search(['&', ('employee_id', '=', self.employee_id.id), ('state', '!=', 'done')])]
             for payslip in payslips:
                 payslip.write({'state': 'cancel'})
         return
