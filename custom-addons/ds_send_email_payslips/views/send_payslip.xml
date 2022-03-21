@@ -23,6 +23,18 @@
             <field name="code">action = records._send_multi_payslips()</field>
         </record>
 
+        <!-- Display the email send status in the Tree view -->
+        <record model="ir.ui.view" id="view_hr_payslip_tree_inherit_email_send_payslip_status">
+            <field name="name">hr.payslip.tree</field>
+            <field name="model">hr.payslip</field>
+            <field name="inherit_id" ref="hr_payroll_community.view_hr_payslip_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="email_send_status" string="Email send Status"/>
+                </xpath>
+            </field>
+        </record>
+
         <!-- Send Email Payslips Button in Batches action menu -->
         <record model="ir.ui.view" id="employee_payslip_batches_send_mail_form_view">
             <field name="name">hr.payslip.batches.form</field>

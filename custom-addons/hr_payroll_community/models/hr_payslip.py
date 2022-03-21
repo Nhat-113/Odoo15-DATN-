@@ -51,6 +51,8 @@ class HrPayslip(models.Model):
                 \n* If the payslip is under verification, the status is \'Waiting\'.
                 \n* If the payslip is confirmed then status is set to \'Done\'.
                 \n* When user cancel payslip the status is \'Rejected\'.""")
+    email_send_status = fields.Boolean(string='Email send status', readonly=True,
+                                 help="Indicates this payslip has sent to the employee by email or not")
     line_ids = fields.One2many('hr.payslip.line', 'slip_id', string='Payslip Lines', readonly=True,
                                states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
     company_id = fields.Many2one('res.company', string='Company', readonly=True, copy=False, help="Company",
