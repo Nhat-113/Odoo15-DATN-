@@ -7,4 +7,9 @@ class HrJobModel(models.Model):
     
     _sql_constraints = [
         ('unique_name', 'unique(name)', 'Job position has already been taken'),
+        (
+            'name_len_check',
+            'CHECK (length(name) <= 64)',
+            ('Job position field should be less than 65 characters')
+        ),
     ]
