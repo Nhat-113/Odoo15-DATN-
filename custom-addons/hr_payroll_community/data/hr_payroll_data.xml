@@ -418,9 +418,19 @@
             <field name="amount_python_compute">result = contract.union_fee</field>           
         </record>
 
-        <record id="hr_rule_ttntt" model="hr.salary.rule">
-            <field name="name">Tổng thu nhập trong tháng (VND) = (9) + (14) + (16) + (23) - (15) - (17)</field>
+        <record id="hr_rule_otct" model="hr.salary.rule">
+            <field name="name">Lương OT chịu thuế (VND) = (11)/8*(1.5-1)*(6) + (12)/8*(2-1)*(6) + (13)/8*(3-1)*(6)</field>
             <field name="sequence" eval="18"/>
+            <field name="code">OTCT</field>
+            <field name="category_id" ref="hr_payroll_community.OTH"/>
+            <field name="condition_select">none</field> 
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = ((inputs.TOT2 and inputs.TOT2.amount or 0)/8 * BQNC * 0.5) + ((inputs.TOT3 and inputs.TOT3.amount or 0)/8 * BQNC * 1) + ((inputs.TOT4 and inputs.TOT4.amount or 0)/8 * BQNC * 2)</field>           
+        </record>
+
+        <record id="hr_rule_ttntt" model="hr.salary.rule">
+            <field name="name">Tổng thu nhập trong tháng (VND) = (9) + (14) + (16) + (22) - (15) - (17)</field>
+            <field name="sequence" eval="19"/>
             <field name="code">TTNTT</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
@@ -430,7 +440,7 @@
 
         <record id="hr_rule_bh" model="hr.salary.rule">
             <field name="name">BHYT, BHXH, BHTN (VND) = (1) * 32%</field>
-            <field name="sequence" eval="19"/>
+            <field name="sequence" eval="20"/>
             <field name="code">BH</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
@@ -440,7 +450,7 @@
 
         <record id="hr_rule_gtgc" model="hr.salary.rule">
             <field name="name">Giảm trừ gia cảnh và tiêu dùng cá nhân (VND)</field>
-            <field name="sequence" eval="20"/>
+            <field name="sequence" eval="21"/>
             <field name="code">GTGC</field>
             <field name="category_id" ref="hr_payroll_community.GT"/>
             <field name="condition_select">none</field> 
@@ -449,30 +459,30 @@
         </record>
 
         <record id="hr_rule_tnc1" model="hr.salary.rule">
-            <field name="name">Thu nhập chịu thuế theo lương (VND) = (17) + (18) - (2) - (14) - (20) - (23)</field>
-            <field name="sequence" eval="21"/>
+            <field name="name">Thu nhập chịu thuế theo lương (VND) = (17) + (18) + (19) - (2) - (14) - (21) - (22)</field>
+            <field name="sequence" eval="23"/>
             <field name="code">TNC</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field> 
-            <field name="condition_python">result = (TTNTT - GTGC - PCK + PCD - (inputs.LBN and inputs.LBN.amount or 0) - OT) &gt; 0</field> 
+            <field name="condition_python">result = (TTNTT - GTGC - PCK + PCD - (inputs.LBN and inputs.LBN.amount or 0) - OT + OTCT) &gt; 0</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = (TTNTT - GTGC - PCK + PCD - (inputs.LBN and inputs.LBN.amount or 0) - OT)</field>
+            <field name="amount_python_compute">result = (TTNTT - GTGC - PCK + PCD - (inputs.LBN and inputs.LBN.amount or 0) - OT + OTCT)</field>
         </record>
 
         <record id="hr_rule_tnc2" model="hr.salary.rule">
-            <field name="name">Thu nhập chịu thuế theo lương (VND) = (17) + (18) - (2) - (14) - (20) - (23)</field>
-            <field name="sequence" eval="21"/>
+            <field name="name">Thu nhập chịu thuế theo lương (VND) = (17) + (18) + (19) - (2) - (14) - (21) - (22)</field>
+            <field name="sequence" eval="23"/>
             <field name="code">TNC</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field> 
-            <field name="condition_python">result = (TTNTT - GTGC - PCK + PCD - inputs.LBN.amount - OT) &lt;= 0</field> 
+            <field name="condition_python">result = (TTNTT - GTGC - PCK + PCD - inputs.LBN.amount - OT + OTCT) &lt;= 0</field> 
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = 0</field>
         </record>
 
         <record id="hr_rule_tncn1" model="hr.salary.rule">
             <field name="name">Thuế TNCN theo lương (VND)</field>
-            <field name="sequence" eval="22"/>
+            <field name="sequence" eval="24"/>
             <field name="code">TTNCN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field>
@@ -482,8 +492,8 @@
         </record>
 
         <record id="hr_rule_tncn2" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo lương (VND)</field>
-            <field name="sequence" eval="22 "/>
+            <field name="name">Thuế TNCN theo lương (VND) = (23) * 5%</field>
+            <field name="sequence" eval="24 "/>
             <field name="code">TTNCN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
@@ -495,8 +505,8 @@
         </record>
 
         <record id="hr_rule_tncn3" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo lương (VND)</field>
-            <field name="sequence" eval="22"/>
+            <field name="name">Thuế TNCN theo lương (VND) = (23) * 10% - 250000</field>
+            <field name="sequence" eval="24"/>
             <field name="code">TTNCN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
@@ -508,8 +518,8 @@
         </record>
 
         <record id="hr_rule_tncn4" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo lương (VND)</field>
-            <field name="sequence" eval="22"/>
+            <field name="name">Thuế TNCN theo lương (VND) = (23) * 15% - 750000</field>
+            <field name="sequence" eval="24"/>
             <field name="code">TTNCN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
@@ -521,8 +531,8 @@
         </record>
 
         <record id="hr_rule_tncn5" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo lương (VND)</field>
-            <field name="sequence" eval="22"/>
+            <field name="name">Thuế TNCN theo lương (VND) = (23) * 20% - 1650000</field>
+            <field name="sequence" eval="24"/>
             <field name="code">TTNCN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
@@ -534,8 +544,8 @@
         </record>
 
         <record id="hr_rule_tncn6" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo lương (VND)</field>
-            <field name="sequence" eval="22"/>
+            <field name="name">Thuế TNCN theo lương (VND) = (23) * 25% - 3250000</field>
+            <field name="sequence" eval="24"/>
             <field name="code">TTNCN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
@@ -547,8 +557,8 @@
         </record>
 
         <record id="hr_rule_tncn7" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo lương (VND)</field>
-            <field name="sequence" eval="22"/>
+            <field name="name">Thuế TNCN theo lương (VND) = (23) * 30% - 5850000</field>
+            <field name="sequence" eval="24"/>
             <field name="code">TTNCN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
@@ -560,8 +570,8 @@
         </record>
 
         <record id="hr_rule_tncn8" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo lương (VND)</field>
-            <field name="sequence" eval="22"/>
+            <field name="name">Thuế TNCN theo lương (VND) = (23) * 35% - 9850000</field>
+            <field name="sequence" eval="24"/>
             <field name="code">TTNCN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field>
@@ -572,7 +582,7 @@
 
         <record id="hr_rule_lbn" model="hr.salary.rule">
             <field name="name">Lương tháng 13/Bonus (VND)</field>
-            <field name="sequence" eval="23"/>
+            <field name="sequence" eval="22"/>
             <field name="code">LBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
@@ -588,107 +598,107 @@
 
         <record id="hr_rule_tncnbn1" model="hr.salary.rule">
             <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND)</field>
-            <field name="sequence" eval="24"/>
+            <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = (TTNTT - GTGC - PCK + PCD - OT) &lt;= 0</field> 
+            <field name="condition_python">result = (LBN + TNC) &lt;= 0</field> 
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = 0</field>
         </record>
 
         <record id="hr_rule_tncnbn2" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND)</field>
-            <field name="sequence" eval="24"/>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((22) + (23)) * 5% - (24)</field>
+            <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">TTNTT - GTGC - PCK + PCD - OT</field>
+            <field name="condition_range">LBN + TNC</field>
             <field name="condition_range_min">0</field>
             <field name="condition_range_max">5000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((TTNTT - GTGC - PCK + PCD - OT) * 0.05) - TTNCN</field>
+            <field name="amount_python_compute">result = ((LBN + TNC) * 0.05) - TTNCN</field>
         </record>
 
         <record id="hr_rule_tncnbn3" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND)</field>
-            <field name="sequence" eval="24"/>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((22) + (23)) * 10% - 250000 - (24)</field>
+            <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">TTNTT - GTGC - PCK + PCD - OT</field>
+            <field name="condition_range">LBN + TNC</field>
             <field name="condition_range_min">5000000</field>
             <field name="condition_range_max">10000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((TTNTT - GTGC - PCK + PCD - OT) * 0.1 - 250000) - TTNCN</field>
+            <field name="amount_python_compute">result = ((LBN + TNC) * 0.1 - 250000) - TTNCN</field>
         </record>
 
         <record id="hr_rule_tncnbn4" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND)</field>
-            <field name="sequence" eval="24"/>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((22) + (23)) * 15% - 750000 - (24)</field>
+            <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">TTNTT - GTGC - PCK + PCD - OT</field>
+            <field name="condition_range">LBN + TNC</field>
             <field name="condition_range_min">10000000</field>
             <field name="condition_range_max">18000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((TTNTT - GTGC - PCK + PCD - OT) * 0.15 - 750000) - TTNCN</field>
+            <field name="amount_python_compute">result = ((LBN + TNC) * 0.15 - 750000) - TTNCN</field>
         </record>
 
         <record id="hr_rule_tncnbn5" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND)</field>
-            <field name="sequence" eval="24"/>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((22) + (23)) * 20% - 1650000 - (24)</field>
+            <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">TTNTT - GTGC - PCK + PCD - OT</field>
+            <field name="condition_range">LBN + TNC</field>
             <field name="condition_range_min">18000000</field>
             <field name="condition_range_max">32000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((TTNTT - GTGC - PCK + PCD - OT) * 0.2 - 1650000) - TTNCN</field>
+            <field name="amount_python_compute">result = ((LBN + TNC) * 0.2 - 1650000) - TTNCN</field>
         </record>
 
         <record id="hr_rule_tncnbn6" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND)</field>
-            <field name="sequence" eval="24"/>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((22) + (23)) * 25% - 3250000 - (24)</field>
+            <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">TTNTT - GTGC - PCK + PCD - OT</field>
+            <field name="condition_range">LBN + TNC</field>
             <field name="condition_range_min">32000000</field>
             <field name="condition_range_max">52000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((TTNTT - GTGC - PCK + PCD - OT) * 0.25 - 3250000) - TTNCN</field>
+            <field name="amount_python_compute">result = ((LBN + TNC) * 0.25 - 3250000) - TTNCN</field>
         </record>
 
         <record id="hr_rule_tncnbn7" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND)</field>
-            <field name="sequence" eval="24"/>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((22) + (23)) * 30% - 5850000 - (24)</field>
+            <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">TTNTT - GTGC - PCK + PCD - OT</field>
+            <field name="condition_range">LBN + TNC</field>
             <field name="condition_range_min">52000000</field>
             <field name="condition_range_max">82000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((TTNTT - GTGC - PCK + PCD - OT) * 0.3 - 5850000) - TTNCN</field>
+            <field name="amount_python_compute">result = ((LBN + TNC) * 0.3 - 5850000) - TTNCN</field>
         </record>
 
         <record id="hr_rule_tncnbn8" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND)</field>
-            <field name="sequence" eval="24"/>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((22) + (23)) * 35% - 9850000 - (24)</field>
+            <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = (TTNTT - GTGC - PCK + PCD - OT) &gt; 82000000 </field> 
+            <field name="condition_python">result = (LBN + TNC) &gt; 82000000 </field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((TTNTT - GTGC - PCK + PCD - OT) * 0.35 - 9850000) - TTNCN</field>
+            <field name="amount_python_compute">result = ((LBN + TNC) * 0.35 - 9850000) - TTNCN</field>
         </record>
 
         <record id="hr_rule_ltl" model="hr.salary.rule">
-            <field name="name">Lương thực lĩnh (VND) = (18) - (24)</field>
-            <field name="sequence" eval="25"/>
+            <field name="name">Lương thực lĩnh (VND) = (19) - (25)</field>
+            <field name="sequence" eval="26"/>
             <field name="code">NET</field>
             <field name="category_id" ref="hr_payroll_community.NET"/>
             <field name="condition_select">none</field> 
@@ -713,7 +723,8 @@
                 ref('hr_rule_tot4'), ref('hr_rule_tnc2'), ref('hr_rule_other_kct'), ref('hr_rule_lbn'),
                 ref('hr_rule_tncnbn1'), ref('hr_rule_tncnbn2'), ref('hr_rule_tncnbn3'),
                 ref('hr_rule_tncnbn4'), ref('hr_rule_tncnbn5'), ref('hr_rule_tncnbn6'),
-                ref('hr_rule_tncnbn7'), ref('hr_rule_tncnbn8'), ref('hr_rule_ttntt')])]" name="rule_ids"/>
+                ref('hr_rule_tncnbn7'), ref('hr_rule_tncnbn8'), ref('hr_rule_ttntt'),
+                ref('hr_rule_otct')])]" name="rule_ids"/>
             <field name="company_id" ref="base.main_company"/>
         </record>
 

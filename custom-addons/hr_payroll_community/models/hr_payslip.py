@@ -493,16 +493,23 @@ class HrPayslip(models.Model):
     @api.onchange('employee_id')
     def onchange_employ(self):
         if self.employee_id:
-            if not self.employee_id.contract_id:
+            if not self.employee_id.contract_id :
                 self.contract_id = False
                 self.input_line_ids = False
                 self.worked_days_line_ids = False
             else:
                 contract_ids = self.env['hr.contract'].search(['&', ('employee_id', '=', self.employee_id.id), ('state', '!=', 'cancel')]).ids
-                self.contract_id = self.env['hr.contract'].browse(contract_ids[0])
-                if not self.env['hr.contract'].browse(contract_ids[0]).struct_id:
-                     self.struct_id = False
-
+                if contract_ids:
+                    self.contract_id = self.env['hr.contract'].browse(contract_ids[0])
+                    worked_days_line_ids = self.get_worked_day_lines(self.contract_id, self.date_from, self.date_to)
+                    worked_days_lines = self.worked_days_line_ids.browse([])
+                    for r in worked_days_line_ids:
+                        worked_days_lines += worked_days_lines.new(r)
+                    self.worked_days_line_ids = worked_days_lines
+                else:
+                    self.contract_id = False
+                    self.input_line_ids = False
+                    self.worked_days_line_ids = False
         return
 
     @api.onchange('employee_id', 'date_from', 'date_to')
