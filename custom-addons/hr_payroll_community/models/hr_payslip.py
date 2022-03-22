@@ -173,9 +173,21 @@ class HrPayslip(models.Model):
         clause_2 = ['&', ('date_start', '<=', date_to), ('date_start', '>=', date_from)]
         # OR if it starts before the date_from and finish after the date_end (or never finish)
         clause_3 = ['&', ('date_start', '<=', date_from), '|', ('date_end', '=', False), ('date_end', '>=', date_to)]
-        clause_final = [('employee_id', '=', employee.id), ('state', '=', 'open'), '|',
+        clause_final_open = [('employee_id', '=', employee.id), ('state', '=', 'open'), '|',
                         '|'] + clause_1 + clause_2 + clause_3
-        return self.env['hr.contract'].search(clause_final).ids
+        clause_final_close = [('employee_id', '=', employee.id), ('state', '=', 'close'), '|',
+                        '|'] + clause_1 + clause_2 + clause_3
+
+        contract_open = self.env['hr.contract'].search(clause_final_open)
+        contract_close = self.env['hr.contract'].search(clause_final_close)
+        if contract_open:
+            if contract_open.date_start <= date_to:
+                return contract_open.ids
+        elif contract_close:
+            if contract_close.date_end >= date_from:
+                return contract_close.ids
+
+        return []   
 
     def compute_sheet(self):
         
