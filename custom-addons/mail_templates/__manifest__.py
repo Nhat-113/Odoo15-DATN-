@@ -11,6 +11,7 @@
     ],
     'data': [
         'data/mail_templates.xml',
+        'views/disable_button_save_as_template_views.xml'
     ],
     'installable': True,
     'auto_install': False,
