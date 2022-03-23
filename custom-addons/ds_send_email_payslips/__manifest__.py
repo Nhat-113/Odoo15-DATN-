@@ -13,6 +13,7 @@
         'wizard/message_wizard_views.xml',
         'security/ir.model.access.csv',
         'data/payslip_mail_template.xml',
+        'data/send_email_cron.xml',
     ],
     'images': ['static/description/banner.jpg'],
     'license': 'AGPL-3',
