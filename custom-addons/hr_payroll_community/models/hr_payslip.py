@@ -183,9 +183,12 @@ class HrPayslip(models.Model):
         if contract_open:
             if contract_open.date_start <= date_to:
                 return contract_open.ids
-        elif contract_close:
+        elif len(contract_close) == 1:
             if contract_close.date_end >= date_from:
                 return contract_close.ids
+        elif len(contract_close) >= 2:
+            if contract_close[0].date_end >= date_from:
+                return contract_close[0].ids
 
         return []   
 
