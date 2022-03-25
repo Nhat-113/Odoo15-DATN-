@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Export Payslips in action menu -->
+        <record id="action_export_payslips" model="ir.actions.report">
+            <field name="name">Export Payslips Report</field>
+            <field name="model">hr.payslip</field>
+            <field name="report_type">xlsx</field>
+            <field name="report_name">ds_export_excel.payslips_xlsx</field>
+            <field name="report_file">ds_export_excel.payslips_xlsx</field>
+            <field name="print_report_name">Payslips Report</field>
+            <field name="binding_model_id" ref="model_hr_payslip"/>
+        </record>
+    </data>
+</odoo>
