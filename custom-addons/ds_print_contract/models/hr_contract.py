@@ -54,6 +54,9 @@ class HrContract(models.Model):
             if self.contract_document_type == 'internship':
                 template = self.env.ref(
                     'ds_print_contract.internship_contract_mail_template', False)
+            if self.contract_document_type == 'collaborator':
+                template = self.env.ref(
+                    'ds_print_contract.collaborator_contract_mail_template', False)
         except ValueError:
             template = False
         try:
