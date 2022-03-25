@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="collaborators_contract_qweb_report" name="collaborators_contract_qweb_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="e">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <link rel='stylesheet' href='/ds_print_contract/static/src/css/report.css'/>
+                        <div class="container contract-report">
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <div class="text-center">
+                                        <tr>
+                                            <th>
+                                                <b>
+                                                    <span >CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</span>
+                                                </b>
+                                            </th>
+                                        </tr>
+                                        <br/>
+                                        <tr>
+                                            <th>
+                                                <p><b class="top-header">Độc lập - Tự do - Hạnh phúc</b></p>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <span >-----****-----</span>
+                                            </th>
+                                        </tr>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12 contract-hdld">
+                                    <b>
+                                        <span class="title_contract">HỢP ĐỒNG CỘNG TÁC VIÊN</span>
+                                    </b>
+                                    <p style="font-size: 16px;">( Số:.. …./HĐCTV)</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p> 
+                                        - Căn cứ vào BLDS được Quốc hội nước Cộng hòa xã hội chủ nghĩa Việt Nam khóa XI, kỳ họp thứ 7 thông qua ngày 14 tháng 6 năm 2005;
+                                    </p>
+                                    <p>- Căn cứ vào khả năng nhu cầu của hai bên.</p>
+                                    <p>
+                                        Đà Nẵng,  
+                                                <t t-if='e.date_start'>
+                                                    ngày <span t-esc="e.date_start.strftime('%d')"/>
+                                                    tháng <span t-esc="e.date_start.strftime('%m')"/>
+                                                    năm <span t-esc="e.date_start.strftime('%Y')"/>
+                                                </t>
+                                                Công ty Cổ phần D-Soft, chúng tôi gồm:
+                                    </p>
+                                    <!-- Bên A -->
+                                    <div>
+                                        <p>
+                                            <b>
+                                                <t t-if='e.company_id.display_name'>
+                                                    <span t-field="e.company_id.display_name"/>
+                                                </t>
+                                                <t t-if="not e.company_id.display_name">Công ty CỔ PHẦN D-SOFT
+                                                </t>
+                                            </b>
+                                        </p>
+                                        <p>
+                                            - Địa chỉ: <span>
+                                                        <t t-if='e.company_id.street'>
+                                                            <span t-field="e.company_id.street"/>
+                                                        </t>
+                                                        <t t-if="not e.company_id.street">Số 10 Hải Phòng - P.Thạch Thang - Q.Hải Châu - TP.Đà Nẵng</t>
+                                                    </span>
+                                        </p>
+                                        <p>
+                                            - Điện thoại: <t t-if='e.company_id.phone'>
+                                                            <span t-field="e.company_id.phone"/>
+                                                        </t>
+                                        </p>
+                                        <p>
+                                            <div class="row">
+                                                <div class="col-6">- Người đại diện: Ông: <span>NGUYỄN HỒNG TÂN</span></div>
+                                                <div class="col-6">Chức vụ: Phó Giám đốc</div>
+                                            </div>
+                                        </p>
+                                        <p>
+                                            <p>Sau đây gọi tắt là bên A</p>
+                                        </p>
+                                    </div>
+                                    <!-- Bên B -->
+                                    <div>
+                                        <p>
+                                            <b>
+                                                CỘNG TÁC VIÊN
+                                            </b>
+                                        </p>
+                                        <p>- 
+                                            <span>
+                                                <t1 t-if='e.employee_id.gender'>
+                                                    <t t-if="e.employee_id.gender == 'male'">
+                                                        <span>Ông: </span>
+                                                    </t>
+                                                    <t t-if="e.employee_id.gender == 'female'">
+                                                        <span>Bà: </span>
+                                                    </t>
+                                                    <t t-if="e.employee_id.gender =='' ">
+                                                        <span>Ông/ Bà: </span>
+                                                    </t>
+                                                </t1>
+                                            </span>
+                                            <span style="text-transform: uppercase;">
+                                                <t t-if='e.employee_id.name'>
+                                                    <span t-field="e.employee_id.name"/>
+                                                </t>
+                                            </span>
+                                        </p>
+                                        <p>
+                                            - Năm sinh: <span>
+                                                            <t t-if='e.employee_id.birthday'>
+                                                                <span t-esc="e.employee_id.birthday.strftime('%d/%m/%Y')"/>
+                                                            </t>
+                                                        </span>
+                                        </p>
+                                        <p>
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    - Số CMND: <t t-if='e.employee_id.identification_id'>
+                                                        <span style="padding-right: 20px;" t-field="e.employee_id.identification_id"/>
+                                                        </t>
+                                                        <t t-if="not e.employee_id.identification_id">................</t>
+                                                </div>
+                                                <div class="col-3">
+                                                    Ngày cấp :
+                                                    <t t-if='e.employee_id.id_start_date'>
+                                                        <span style="padding-right: 20px;" t-esc="e.employee_id.id_start_date.strftime('%d/%m/%Y')"/>
+                                                    </t>
+                                                    <t t-if="not e.employee_id.id_start_date">..............</t>
+                                                </div>
+                                                <div class="col-6">
+                                                    Nơi cấp:
+                                                    <t t-if='e.employee_id.identification_place'>
+                                                        <span t-field="e.employee_id.identification_place"/>
+                                                    </t>
+                                                    <t t-if="not e.employee_id.identification_place">...............</t>
+                                                </div>
+                                            </div>
+                                        </p>
+                                        <p>
+                                            <p>
+                                            - Địa chỉ: 
+                                            <span>
+                                                <t t-if='e.employee_id.address_home_id.display_name'>
+                                                    <span t-field="e.employee_id.address_home_id.display_name"/>
+                                                </t>
+                                                <t t-if="not e.employee_id.address_home_id.display_name">...............</t>
+                                            </span>
+                                            </p>
+                                        </p>
+                                        <p>Sau đây gọi tắt là Bên B</p>
+                                    </div>
+                                    <!-- Nội dung chính -->
+                                    <div>
+                                        <p><b>Sau khi thỏa thuận hai bên thống nhất ký kết Hợp đồng cộng tác viên với những điều khoản như sau:</b></p>
+                                        <div>
+                                            <p><b>Điều 1: Nội dung công việc của Bên B</b> <br/></p>
+                                            <p>Bên B làm cộng tác viên cho Bên A để thực hiện các công việc theo bản mô tả công việc do Bên A soạn thảo và các công việc do cấp trên phân công</p>
+                                        </div>
+                                        <div>
+                                            <p><b>Điều 2. Địa điểm và thời giờ làm việc:</b></p>
+                                            <p>1. Địa điểm: Theo sự chỉ đạo của công ty</p>
+                                            <p>2. Thời giờ làm việc: Theo quy định của công ty</p>
+                                        </div>
+                                        <div>
+                                            <p><b>Điều 3: Trang bị dụng cụ làm việc, phương tiện đi lại</b></p>
+                                            <p>Bên A sẽ trang bị đầy đủ công cụ làm việc cần thiết cho Bên B để phục vụ cho công việc theo nội dung hợp đồng này</p>
+                                        </div>
+                                        <div>
+                                            <p><b>Điều 4: Thù lao và quyền lợi của cộng tác viên</b></p>
+                                            <p>- Thù lao thực nhận: 
+                                                <t t-if="e.wage">
+                                                    <span t-esc="'{:,}'.format(int(e.wage))"/>
+                                                VND/tháng </t>
+                                                <t t-if="not e.wage">... </t>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p><b>Điều 5: Quyền và nghĩa vụ của Bên A</b></p> 
+                                            <p>1. Quyền của Bên A</p>
+                                            <p>- Bên A có quyền đơn phương chấm dứt hợp đồng cộng tác viên với Bên B khi Bên B vi phạm nghĩa vụ bảo mật thông tin của Bên A hoặc Bên B không đáp ứng được yêu cầu công việc.</p>
+                                            <p>2. Nghĩa vụ của Bên A:</p>
+                                            <p>- Thanh toán đầy đủ, đúng hạn các chế độ và quyền lợi cho bên B theo nội dung của hợp đồng và theo từng phụ lục hợp đồng cụ thể (nếu có)</p>
+                                            <p>- Tạo điều kiện để Bên B thực hiện công việc được thuận lợi nhất.</p>
+                                        </div>
+                                        <div>
+                                            <p><b>Điều 6: Quyền và nghĩa vụ của Bên B</b></p> 
+                                            <p>1. Quyền của Bên B</p>
+                                            <p>- Yêu cầu Bên A thanh toán đầy đủ và đúng hạn các chế độ thù lao và các quyền, lợi ích vật chất khác theo Hợp đồng này.</p>
+                                            <p>- Được tham gia các cuộc họp, hội thảo liên quan đến công việc và nghiệp vụ khi có sự đồng ý của bên A</p>
+                                        </div>
+                                        <div>
+                                            <p><b>Điều 7: Hiệu lực và thời hạn hợp đồng</b></p> 
+                                            <p>Thời hạn hợp đồng từ ngày
+                                                <t t-if='e.date_start'>
+                                                    <span t-esc="e.date_start.strftime('%d/%m/%Y')"/>
+                                                </t>
+                                                <t t-if='not e.date_start'>
+                                                    ......
+                                                </t>
+                                                đến ngày 
+                                                <t t-if='e.date_end'>
+                                                    <span t-esc="e.date_end.strftime('%d/%m/%Y')"/>
+                                                </t>
+                                                <t t-if='not e.date_end'>
+                                                    ......
+                                                </t>
+                                             </p> 
+                                            <p>Hai bên có thể gia hạn hợp đồng theo nhu cầu thực tế công việc phát sinh.</p>
+                                        </div>
+                                        <div>
+                                            <p><b>Điều 8: Điều khoản thi hành</b></p> 
+                                            <p>- Hai bên cam kết thực hiện đúng các điều khoản đã thỏa thuận trong Hợp đồng này;</p>
+                                            <p>- Mọi sửa đổi, bổ sung liên quan đến nội dung hợp đồng này phải được hai bên thống nhất và thể hiện bằng văn bản;</p>
+                                            <p>- Hợp đồng này gồm 2 bản có giá trị pháp lý như nhau, mối bên giữ một bản</p>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <!-- Ký tên -->
+                                    <div class="row">
+                                        <div class="col-6 text-center"><p><b>Đại diện bên A</b></p></div>
+                                        <div class="col-6 text-center"><p><b>Đại diện bên B</b></p></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br/><br/><br/><br/><br/><br/>
+                            <div class="text-center" >------------------------------------------------------------------------</div>
+                        </div>
+                        <div class="footer"></div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

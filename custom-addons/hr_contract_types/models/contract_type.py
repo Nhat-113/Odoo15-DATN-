@@ -22,5 +22,6 @@ class ContractInherit(models.Model):
     contract_document_type = fields.Selection([
         ('offical_labor', 'Offical Labor Contract'),
         ('probationary', 'Probationary Contract'),
-        ('internship', 'Internship Contract')
+        ('internship', 'Internship Contract'),
+        ('collaborator', 'Collaborator Contract')
     ], 'Contract Document Type', default='offical_labor', index=True, required=True)
