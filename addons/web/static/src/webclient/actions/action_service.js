@@ -157,7 +157,7 @@ function makeActionManager(env) {
                 active_model: context.active_model,
             };
             const key = `${JSON.stringify(actionRequest)},${JSON.stringify(additional_context)}`;
-            if (!actionCache[key]) {
+            if (!actionCache[key] || (context.active_model == "hr.job" && context.active_ids.length === 0)) {
                 actionCache[key] = env.services.rpc("/web/action/load", {
                     action_id: actionRequest,
                     additional_context,
