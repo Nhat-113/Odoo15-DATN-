@@ -10,6 +10,7 @@ class HrContract(models.Model):
     """
     _inherit = 'hr.contract'
     _description = 'Employee Contract'
+    _order = 'date_start desc'
 
     struct_id = fields.Many2one('hr.payroll.structure', string='Salary Structure')
     schedule_pay = fields.Selection([
@@ -67,6 +68,14 @@ class HrContract(models.Model):
 
                 contract[code] = 0.0
 
+    # def search(self, args, offset=0, limit=None, order=None, count=False):
+    #     ctx = self._context
+        
+    #     order = 'id desc'
+    #     # order = ctx['order_display']
+    #     res = super(HrContract, self).search(
+    #        args, offset=offset, limit=limit, order=order, count=count)
+    #     return res
 
 class HrContractAdvandageTemplate(models.Model):
     _name = 'hr.contract.advantage.template'
