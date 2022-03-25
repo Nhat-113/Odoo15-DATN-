@@ -10,4 +10,14 @@
             </xpath>
         </field>
     </record>
+    <record id="hr_application_requester_recruiment" model="ir.ui.view">
+        <field name="name">hr.applicant.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="recruitment_requester" widget="many2many_tags" />
+            </xpath>
+        </field>
+    </record>
 </odoo>

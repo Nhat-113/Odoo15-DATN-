@@ -93,10 +93,9 @@ class HrPayslip(models.Model):
             raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
 
         if self.contract_id.date_end:
-            if self.contract_id.date_start > self.date_from or self.contract_id.date_end < self.date_to:
-                if self.contract_id.date_start.month > self.date_from.month or self.contract_id.date_end.month < self.date_to.month :
-                    raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
-                    name=self.employee_id.name))
+            if self.contract_id.date_start >= self.date_to or self.contract_id.date_end <= self.date_from:
+                raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
+                name=self.employee_id.name))
 
     @api.constrains('name')
     def _check_payslips(self):
@@ -173,9 +172,24 @@ class HrPayslip(models.Model):
         clause_2 = ['&', ('date_start', '<=', date_to), ('date_start', '>=', date_from)]
         # OR if it starts before the date_from and finish after the date_end (or never finish)
         clause_3 = ['&', ('date_start', '<=', date_from), '|', ('date_end', '=', False), ('date_end', '>=', date_to)]
-        clause_final = [('employee_id', '=', employee.id), ('state', '=', 'open'), '|',
+        clause_final_open = [('employee_id', '=', employee.id), ('state', '=', 'open'), '|',
                         '|'] + clause_1 + clause_2 + clause_3
-        return self.env['hr.contract'].search(clause_final).ids
+        clause_final_close = [('employee_id', '=', employee.id), ('state', '=', 'close'), '|',
+                        '|'] + clause_1 + clause_2 + clause_3
+
+        contract_open = self.env['hr.contract'].search(clause_final_open)
+        contract_close = self.env['hr.contract'].search(clause_final_close)
+        if contract_open:
+            if contract_open.date_start <= date_to:
+                return contract_open.ids
+        elif len(contract_close) == 1:
+            if contract_close.date_end >= date_from:
+                return contract_close.ids
+        elif len(contract_close) >= 2:
+            if contract_close[-1].date_end >= date_from:
+                return contract_close[-1].ids
+
+        return []   
 
     def compute_sheet(self):
         
