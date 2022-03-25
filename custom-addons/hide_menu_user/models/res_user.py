@@ -39,10 +39,16 @@ class HideMenuUser(models.Model):
         Else the menu will be still hidden even after removing from the list
         """
         res = super(HideMenuUser, self).write(vals)
-        for menu in self.hide_menu_ids:
-            menu.write({
-                'restrict_user_ids': [(4, self.id)]
-            })
+        if self.hide_menu_ids:
+            for menu in self.hide_menu_ids:
+                menu.write({
+                    'restrict_user_ids': [(4, self.id)]
+                })
+        else:
+            for menu in self.env['res.users'].search(['&', ('active', '=', False), ('login', '=', 'default')]).hide_menu_ids:
+                menu.write({
+                    'restrict_user_ids': [(4, self.id)]
+                })
         self.clear_caches()
         return res
 

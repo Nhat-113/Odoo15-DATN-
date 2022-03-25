@@ -93,10 +93,9 @@ class HrPayslip(models.Model):
             raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
 
         if self.contract_id.date_end:
-            if self.contract_id.date_start > self.date_from or self.contract_id.date_end < self.date_to:
-                if self.contract_id.date_start.month > self.date_from.month or self.contract_id.date_end.month < self.date_to.month :
-                    raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
-                    name=self.employee_id.name))
+            if self.contract_id.date_start >= self.date_to or self.contract_id.date_end <= self.date_from:
+                raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
+                name=self.employee_id.name))
 
     @api.constrains('name')
     def _check_payslips(self):
@@ -183,9 +182,12 @@ class HrPayslip(models.Model):
         if contract_open:
             if contract_open.date_start <= date_to:
                 return contract_open.ids
-        elif contract_close:
+        elif len(contract_close) == 1:
             if contract_close.date_end >= date_from:
                 return contract_close.ids
+        elif len(contract_close) >= 2:
+            if contract_close[-1].date_end >= date_from:
+                return contract_close[-1].ids
 
         return []   
 

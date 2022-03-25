@@ -14,11 +14,13 @@
              "views/duration_contract_view.xml",
              "views/information_security_commit_report.xml",
              "views/send_email_contract.xml",
+             "views/collaborators_contract_report.xml",
              "report/contract_qweb_report.xml",
              "report/information_security_commit_report.xml",
              "data/offical_labor_contract_mail_template.xml",
              "data/probationary_contract_mail_template.xml",
              "data/internship_contract_mail_template.xml",
+             "data/collaborator_contract_mail_template.xml"
              ],
     "installable": True,
     'auto_install': False,
