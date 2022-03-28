@@ -10,6 +10,7 @@ class HrContract(models.Model):
     """
     _inherit = 'hr.contract'
     _description = 'Employee Contract'
+    _order = 'date_start desc'
 
     struct_id = fields.Many2one('hr.payroll.structure', string='Salary Structure')
     schedule_pay = fields.Selection([
@@ -66,7 +67,7 @@ class HrContract(models.Model):
             else:
 
                 contract[code] = 0.0
-
+                
 
 class HrContractAdvandageTemplate(models.Model):
     _name = 'hr.contract.advantage.template'
