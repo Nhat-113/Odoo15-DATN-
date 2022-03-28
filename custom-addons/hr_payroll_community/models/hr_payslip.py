@@ -186,8 +186,8 @@ class HrPayslip(models.Model):
             if contract_close.date_end >= date_from:
                 return contract_close.ids
         elif len(contract_close) >= 2:
-            if contract_close[-1].date_end >= date_from:
-                return contract_close[-1].ids
+            if contract_close[0].date_end >= date_from:
+                return contract_close[0].ids
 
         return []   
 
@@ -547,7 +547,8 @@ class HrPayslip(models.Model):
         if not self.env.context.get('contract') or not self.contract_id:
             contract_ids = self.get_contract(employee, date_from, date_to)
             if not contract_ids:
-                return
+                self.contract_id = False
+                return 
             self.contract_id = self.env['hr.contract'].browse(contract_ids[0])
 
         if not self.contract_id.struct_id:
