@@ -1,7 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
-    <!-- custom footer email template [Sent by ... using odoo] -->
+    <!-- custom footer & header logo email template [Sent by ... using odoo] -->
     <template id="custom_email_template" inherit_id="mail.message_notification_email">
+        <xpath expr="//div/div[2]/table/tbody/tr/td[2]/img" position="replace">
+            <img src="/mail_templates/static/src/img/logo.png" style="padding: 0px; margin: 0px; height: auto; max-width: 200px; max-height: 36px;" t-att-alt="'%s' % company.name"/>
+        </xpath>
         <xpath expr="//div/p" position="replace">
             <p style="color: #555555; margin-top:32px;">
                 Sent
@@ -16,22 +19,31 @@
         </xpath>
     </template>
 
-    <!-- custom footer email template [Powered by ... odoo] notification_borders-->
+    <!-- custom footer & header logo email template [Powered by ... odoo] notification_borders-->
     <template id="custom_email_template_notification_borders" inherit_id="mail.mail_notification_borders">
+        <xpath expr="//div/table/tbody/tr/td/table/tr/td[2]/img" position="replace">
+            <img src="/mail_templates/static/src/img/logo.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;" t-att-alt="'%s' % company.name"/>
+        </xpath>
         <xpath expr="//div/table/tbody/tr[4]/td/a" position="replace">
             <a target="_blank" href="https://d-soft.com.vn/">D-Soft</a>
         </xpath>
     </template>
 
-    <!-- custom footer email template [Powered by ... odoo] notification_light-->
+    <!-- custom footer & header logo email template [Powered by ... odoo] notification_light-->
     <template id="custom_email_template_notification_light" inherit_id="mail.mail_notification_light">
+        <xpath expr="//table/tr/td/table/tbody/tr/td/table/tr/td[2]/img" position="replace">
+            <img src="/mail_templates/static/src/img/logo.png" style="padding: 0px; margin: 0px; height: 48px;" t-att-alt="'%s' % company.name"/>
+        </xpath>
         <xpath expr="//table/tr[2]/td/a" position="replace">
             <a target="_blank" href="https://d-soft.com.vn/" style="color: #875A7B;">D-Soft</a>
         </xpath>
     </template>
 
-    <!-- custom footer email template [Powered by ... odoo] notification_paynow-->
+    <!-- custom footer & header logo email template [Powered by ... odoo] notification_paynow-->
     <template id="custom_email_template_notification_paynow" inherit_id="mail.mail_notification_paynow">
+        <xpath expr="//table/tr/td/table/tbody/tr/td/table/tr/td[2]/img" position="replace">
+            <img src="/mail_templates/static/src/img/logo.png" style="padding: 0px; margin: 0px; height: 48px;" t-att-alt="'%s' % company.name"/>
+        </xpath>
         <xpath expr="//table/tr[2]/td/a" position="replace">
             <a target="_blank" href="https://d-soft.com.vn/" style="color: #875A7B;">D-Soft</a>
         </xpath>
