@@ -31,6 +31,20 @@ class Contract(models.Model):
                 payslip.write({'state': 'cancel'})
         return
 
+    @api.model
+    def create(self, vals):
+        contracts = super(Contract, self).create(vals)
+        if vals.get('state') == 'open':
+            contracts._assign_open_contract()
+        if vals.get('state') == 'close':
+            if not contracts.date_end:
+                contracts.date_end = max(date.today(), contracts.date_start)
+        open_contracts = contracts.filtered(lambda c: c.state == 'open' or c.state == 'draft' and c.kanban_state == 'done')
+        # sync contract calendar -> calendar employee
+        for contract in open_contracts.filtered(lambda c: c.employee_id and c.resource_calendar_id):
+            contract.employee_id.resource_calendar_id = contract.resource_calendar_id
+        return contracts
+
     # def _assign_open_contract(self):
     #     for contract in self:
     #         if contract.date_end:
