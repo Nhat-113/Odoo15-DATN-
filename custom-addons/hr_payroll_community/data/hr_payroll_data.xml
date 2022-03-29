@@ -696,14 +696,26 @@
             <field name="amount_python_compute">result = ((LBN + TNC) * 0.35 - 9850000) - TTNCN</field>
         </record>
 
-        <record id="hr_rule_ltl" model="hr.salary.rule">
+        <record id="hr_rule_ltl1" model="hr.salary.rule">
             <field name="name">Lương thực lĩnh (VND) = (19) - (25)</field>
             <field name="sequence" eval="26"/>
             <field name="code">NET</field>
             <field name="category_id" ref="hr_payroll_community.NET"/>
-            <field name="condition_select">none</field> 
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.contract_document_type != 'offical_labor'</field>  
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = TTNTT - TTNCNBN</field>
+        </record>
+
+        <record id="hr_rule_ltl2" model="hr.salary.rule">
+            <field name="name">Lương thực lĩnh (VND) = (19) - (25)</field>
+            <field name="sequence" eval="26"/>
+            <field name="code">NET</field>
+            <field name="category_id" ref="hr_payroll_community.NET"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.contract_document_type == 'offical_labor'</field>  
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = (TTNTT - TTNCNBN)*0.85</field>
         </record>
 
 
@@ -719,12 +731,12 @@
                 ref('hr_rule_lot'), ref('hr_rule_ltu'), ref('hr_rule_pcd'), ref('hr_rule_bh'), 
                 ref('hr_rule_gtgc'), ref('hr_rule_tnc1'), ref('hr_rule_tncn1'), ref('hr_rule_tncn2'), 
                 ref('hr_rule_tncn3'), ref('hr_rule_tncn4'), ref('hr_rule_tncn5'), ref('hr_rule_tncn6'), 
-                ref('hr_rule_tncn7'), ref('hr_rule_tncn8'), ref('hr_rule_ltl'), ref('hr_rule_kbs'),
+                ref('hr_rule_tncn7'), ref('hr_rule_tncn8'), ref('hr_rule_ltl1'), ref('hr_rule_kbs'),
                 ref('hr_rule_tot4'), ref('hr_rule_tnc2'), ref('hr_rule_other_kct'), ref('hr_rule_lbn'),
                 ref('hr_rule_tncnbn1'), ref('hr_rule_tncnbn2'), ref('hr_rule_tncnbn3'),
                 ref('hr_rule_tncnbn4'), ref('hr_rule_tncnbn5'), ref('hr_rule_tncnbn6'),
                 ref('hr_rule_tncnbn7'), ref('hr_rule_tncnbn8'), ref('hr_rule_ttntt'),
-                ref('hr_rule_otct')])]" name="rule_ids"/>
+                ref('hr_rule_otct'), ref('hr_rule_ltl2')])]" name="rule_ids"/>
             <field name="company_id" ref="base.main_company"/>
         </record>
 
