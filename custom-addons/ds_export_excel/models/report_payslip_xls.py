@@ -1,5 +1,8 @@
 from odoo import models, _
 
+class HrPayslip(models.Model):
+    _inherit = ['hr.payslip']
+
 
 class PayslipXlsx(models.AbstractModel):
     _name = 'report.ds_export_excel.payslips_xlsx'
