@@ -202,9 +202,12 @@ class HrPayslip(models.Model):
             contract_ids = payslip.contract_id.ids or \
                         self.get_contract(payslip.employee_id, payslip.date_from, payslip.date_to)
             lines = [(0, 0, line) for line in self._get_payslip_lines(contract_ids, payslip.id)]
-            payslip.write({'line_ids': lines, 'number': number}) 
-        # self._check_contract_id() 
-        return self.write({'state': 'verify'})
+            payslip.write({'line_ids': lines, 'number': number})
+            if len(payslip.contract_id) == 0:
+                payslip.write({'state': 'draft'})
+            else:
+                payslip.write({'state': 'verify'})
+        return
        
     @api.model
     def get_worked_day_lines(self, contracts, date_from, date_to):
@@ -548,6 +551,8 @@ class HrPayslip(models.Model):
             contract_ids = self.get_contract(employee, date_from, date_to)
             if not contract_ids:
                 self.contract_id = False
+                self.worked_days_line_ids = False
+                self.input_line_ids = False
                 return 
             self.contract_id = self.env['hr.contract'].browse(contract_ids[0])
 
