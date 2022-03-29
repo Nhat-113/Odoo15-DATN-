@@ -93,7 +93,7 @@ class HrPayslip(models.Model):
             raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
 
         if self.contract_id.date_end:
-            if self.contract_id.date_start >= self.date_to or self.contract_id.date_end <= self.date_from:
+            if self.contract_id.date_start > self.date_to or self.contract_id.date_end < self.date_from:
                 raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
                 name=self.employee_id.name))
 
