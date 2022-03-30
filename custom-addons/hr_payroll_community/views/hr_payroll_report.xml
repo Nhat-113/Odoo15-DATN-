@@ -20,7 +20,7 @@
             <field name="print_report_name">('Payslip - %s' % (object.employee_id.name))</field>
         </record>
 
-        <record id="payslip_details_report" model="ir.actions.report">
+        <!-- <record id="payslip_details_report" model="ir.actions.report">
             <field name="name">Payslip Details</field>
             <field name="model">hr.payslip</field>
             <field name="report_type">qweb-pdf</field>
@@ -28,5 +28,5 @@
             <field name="report_name">hr_payroll_community.report_payslipdetails</field>
             <field name="report_file">hr_payroll_community.report_payslipdetails</field>
             <field name="print_report_name">('Payslip Details - %s' % (object.employee_id.name))</field>
-        </record>
+        </record> -->
 </odoo>
