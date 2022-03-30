@@ -47,7 +47,15 @@ class PayslipXlsx(models.AbstractModel):
         ]
 
         # Set Column Ranges
-        sheet.set_column(col, col + 7, 20)
+        sheet.set_column(col, col + 28, 20)
+        sheet.set_column(3, 3, 23)
+        sheet.set_column(8, 8, 21)
+        sheet.set_column(11, 14, 25)
+        sheet.set_column(20, 20, 25)
+        sheet.set_column(22, 22, 35)
+        sheet.set_column(24, 24, 30)
+        sheet.set_column(25, 25, 23)
+        sheet.set_column(26, 26, 35)
 
         for i, name in enumerate(col_names):
             sheet.write(row, col + i, name, bold_center)
@@ -114,7 +122,7 @@ class PayslipXlsx(models.AbstractModel):
             ]
 
             for i, value in enumerate(col_values):
-                if i in range(3, 26):
+                if i in range(3, 28):
                     sheet.write(row, col + i, value, currency_format)
                 else:
                     sheet.write(row, col + i, value, border)
