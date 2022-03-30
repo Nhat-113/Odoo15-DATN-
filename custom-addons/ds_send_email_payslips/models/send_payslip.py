@@ -106,7 +106,7 @@ class SendPayslips(models.Model):
 
         time.sleep(1)
         message_id = self.env['ds_send_email_payslips.message.wizard'].create(
-            {'message': _("In the next 15 minutes, email payslips will be sent to employees.")})
+            {'message': _("In the next few minutes, email payslips will be sent to employees.")})
 
         return {
             'name': 'Message',
@@ -142,7 +142,7 @@ class HrPayslipRun(models.Model):
 
             time.sleep(2)
             message_id = self.env['ds_send_email_payslips.message.wizard'].create(
-                {'message': _("In the next 15 minutes, email payslips will be sent to employees.")})
+                {'message': _("In the next few minutes, email payslips will be sent to employees.")})
 
             return {
                 'name': 'Message',

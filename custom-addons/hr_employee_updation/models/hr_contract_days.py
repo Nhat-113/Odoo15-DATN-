@@ -35,8 +35,8 @@ class HrEmployeeContract(models.Model):
             if contract_end_date == exp_date:
                 """Send email notification to HR"""
                 for manager in self.env.ref("hr.group_hr_manager").users:
-                    mail_content = "  Hello  " + manager.name + ",<br>The Contract of employee " + contract.employee_id.name + " with name " + contract.name + " is going to expire on " + \
-                        str(contract.date_end) + \
+                    mail_content = "  Hello  " + manager.name + ",<br> The Contract of employee " + "<b>" + contract.employee_id.name + "</b>" + " with name " + "<b>" + contract.name + "</b>" + " is going to <b> expire on </b> " + \
+                        "<b>" + str(contract.date_end)+ "</b>" + \
                         ". Please renew contract before expiry date."
                     main_content = {
                         'subject': _('Contract-%s Expired On %s') % (
@@ -49,8 +49,8 @@ class HrEmployeeContract(models.Model):
                         main_content).send()
 
                 """Send email notification to employee"""
-                mail_content_emp = "  Hello  " + contract.employee_id.name + ",<br>Your current Contract with name " + contract.name + " is going to expire on " + \
-                    str(contract.date_end) + \
+                mail_content_emp = "  Hello  " + "<>" + contract.employee_id.name + "</>" + ",<br> Your current Contract with name " + "<b>" + contract.name + "</b>" + " is going to <b> expire on </b>" + \
+                    "<b>" + str(contract.date_end) + "</b>" + \
                     ". If you have any questions, do not hesitate to contact HR."
                 main_content_emp = {
                     'subject': _('Contract-%s Expired On %s') % (

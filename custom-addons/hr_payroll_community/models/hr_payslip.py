@@ -93,7 +93,7 @@ class HrPayslip(models.Model):
             raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
 
         if self.contract_id.date_end:
-            if self.contract_id.date_start >= self.date_to or self.contract_id.date_end <= self.date_from:
+            if self.contract_id.date_start > self.date_to or self.contract_id.date_end < self.date_from:
                 raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
                 name=self.employee_id.name))
 
@@ -186,8 +186,8 @@ class HrPayslip(models.Model):
             if contract_close.date_end >= date_from:
                 return contract_close.ids
         elif len(contract_close) >= 2:
-            if contract_close[-1].date_end >= date_from:
-                return contract_close[-1].ids
+            if contract_close[0].date_end >= date_from:
+                return contract_close[0].ids
 
         return []   
 
@@ -202,9 +202,12 @@ class HrPayslip(models.Model):
             contract_ids = payslip.contract_id.ids or \
                         self.get_contract(payslip.employee_id, payslip.date_from, payslip.date_to)
             lines = [(0, 0, line) for line in self._get_payslip_lines(contract_ids, payslip.id)]
-            payslip.write({'line_ids': lines, 'number': number}) 
-        # self._check_contract_id() 
-        return self.write({'state': 'verify'})
+            payslip.write({'line_ids': lines, 'number': number})
+            if len(payslip.contract_id) == 0:
+                payslip.write({'state': 'draft'})
+            else:
+                payslip.write({'state': 'verify'})
+        return
        
     @api.model
     def get_worked_day_lines(self, contracts, date_from, date_to):
@@ -547,7 +550,10 @@ class HrPayslip(models.Model):
         if not self.env.context.get('contract') or not self.contract_id:
             contract_ids = self.get_contract(employee, date_from, date_to)
             if not contract_ids:
-                return
+                self.contract_id = False
+                self.worked_days_line_ids = False
+                self.input_line_ids = False
+                return 
             self.contract_id = self.env['hr.contract'].browse(contract_ids[0])
 
         if not self.contract_id.struct_id:
