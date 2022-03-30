@@ -414,8 +414,9 @@
     </t>
 
     <t t-name="EmployeeWarning">
-        <div>
-            <h6 style="margin-top: 10%; text-align: center;">You are not an employee so cannot access the Dashboard!</h6>
+        <span class="pseudo"></span>
+        <div class="dashboard-not-employee">
+            <h6 class="dashboard-not-employee_content">You are not an employee so cannot access the Dashboard!</h6>
         </div>
     </t>
 
