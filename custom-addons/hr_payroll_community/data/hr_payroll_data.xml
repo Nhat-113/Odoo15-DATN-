@@ -228,12 +228,24 @@
             <field name="amount_python_compute">result = contract.non_taxable_allowance</field>
         </record>
 
-        <record id="hr_rule_Basic" model="hr.salary.rule">
+        <record id="hr_rule_Basic1" model="hr.salary.rule">
             <field name="name">Lương NET (VND) = (1) + (2) + (3)</field>
             <field name="sequence" eval="4"/>
             <field name="code">Basic</field>
             <field name="category_id" ref="hr_payroll_community.BASIC"/>
-            <field name="condition_select">none</field>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.contract_document_type == 'offical_labor'</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = (contract.wage + contract.other_allowance)*0.85</field>
+        </record>
+
+        <record id="hr_rule_Basic2" model="hr.salary.rule">
+            <field name="name">Lương NET (VND) = (1) + (2) + (3)</field>
+            <field name="sequence" eval="4"/>
+            <field name="code">Basic</field>
+            <field name="category_id" ref="hr_payroll_community.BASIC"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.contract_document_type != 'offical_labor'</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = contract.wage + contract.other_allowance</field>
         </record>
@@ -713,7 +725,7 @@
          <record id="structure_base" model="hr.payroll.structure">
             <field name="code">BASE</field>
             <field name="name">Base for new structures</field>
-            <field eval="[(6, 0, [ref('hr_rule_wage'), ref('hr_rule_other_ct'), ref('hr_rule_Basic'), 
+            <field eval="[(6, 0, [ref('hr_rule_wage'), ref('hr_rule_other_ct'), ref('hr_rule_Basic1'), 
                 ref('hr_rule_nctt'), ref('hr_rule_bqnc'), ref('hr_rule_nnkl'), ref('hr_rule_nctte'), 
                 ref('hr_rule_tl'), ref('hr_rule_tot1'), ref('hr_rule_tot2'), ref('hr_rule_tot3'),
                 ref('hr_rule_lot'), ref('hr_rule_ltu'), ref('hr_rule_pcd'), ref('hr_rule_bh'), 
@@ -724,7 +736,7 @@
                 ref('hr_rule_tncnbn1'), ref('hr_rule_tncnbn2'), ref('hr_rule_tncnbn3'),
                 ref('hr_rule_tncnbn4'), ref('hr_rule_tncnbn5'), ref('hr_rule_tncnbn6'),
                 ref('hr_rule_tncnbn7'), ref('hr_rule_tncnbn8'), ref('hr_rule_ttntt'),
-                ref('hr_rule_otct')])]" name="rule_ids"/>
+                ref('hr_rule_otct'), ref('hr_rule_Basic2')])]" name="rule_ids"/>
             <field name="company_id" ref="base.main_company"/>
         </record>
 
