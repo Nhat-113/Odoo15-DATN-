@@ -9,7 +9,7 @@
     <t t-name="LoginEmployeeDetails">
         <link rel="stylesheet" href="/hrms_dashboard/static/src/css/hrms_dashboard.css"/>
         <div class="row main-section">
-            <div class="col-md-2 col-sm-2 dummy"></div>
+            <div class="col-md-2 col-sm-2 dummy1"></div>
             <div class="col-md-2 col-sm-2 employee-prof">
                 <div class="oh-card">
                 <div class="oh-media">
@@ -92,7 +92,7 @@
                 </div>
                 </div></div>
             </div>
-            <div class="col-md-2 col-sm-6 hr_payslip oh-payslip" >
+            <div class="col-lg-3 hr_payslip oh-payslip" >
                 <div class="oh-card">
                     <div class="oh-card-body">
                         <div class="stat-widget-one">
@@ -105,7 +105,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-2 col-sm-6 hr_timesheets oh-payslip oh-timesheets">
+            <div class="col-lg-3 hr_timesheets oh-payslip oh-timesheets">
                 <div class="oh-card">
                     <div class="oh-card-body">
                         <div class="stat-widget-one">
@@ -118,7 +118,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-2 col-sm-6 hr_contract oh-payslip oh-contracts">
+            <div class="col-lg-3  hr_contract oh-payslip oh-contracts">
                 <div class="oh-card">
                     <div class="oh-card-body">
                         <div class="stat-widget-one">
@@ -131,7 +131,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-2 col-sm-6 login_broad_factor oh-payslip oh-broad-factor">
+            <!-- <div class="col-md-2 col-sm-6 login_broad_factor oh-payslip oh-broad-factor">
                 <div class="oh-card">
                     <div class="oh-card-body">
                         <div class="stat-widget-one">
@@ -167,7 +167,7 @@
                         </div>
                     </div>
                 </div>
-                </div>
+                </div> -->
         </div>
     </t>
     <t t-name="ManagerDashboard">
