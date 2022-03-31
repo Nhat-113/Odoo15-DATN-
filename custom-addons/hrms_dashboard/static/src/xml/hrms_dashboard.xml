@@ -174,8 +174,8 @@
         <div class="employee_dashboard_main">
             <div class="row main-section">
                 <div class="col-md-2 col-sm-2 dummy"></div>
-                <div class="col-sm-3 col-lg-3" style="padding-left: 0px;">
-                <div class="col-sm-12 col-lg-12 leave-manager">
+                <div class="col-sm-3 col-lg-3" style="padding-left: 7.5px;">
+                <div class="col-sm-12 col-lg-12 leave-manager" style="width: 100% !important;">
                     <div class="row" style="margin:0px">
                     <div class="col-sm-6 col-lg-6 hr_leave_request_approve" >
                         <div class=" text-color">
@@ -217,7 +217,7 @@
                     </div>
                         </div>
                 </div>
-                <div class="col-sm-12 col-lg-12" style="padding-right: 0;">
+                <div class="col-sm-12 col-lg-12" style="padding: 0;">
                     <div class="row" style="margin:0px">
                     <div class="col-sm-12 col-lg-12 hr_leave_allocations_approve">
                         <div class="oh-card text-color">
