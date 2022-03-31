@@ -234,7 +234,7 @@
             <field name="code">Basic</field>
             <field name="category_id" ref="hr_payroll_community.BASIC"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = contract.contract_document_type == 'offical_labor'</field>
+            <field name="condition_python">result = contract.contract_document_type == 'probationary'</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = (contract.wage + contract.other_allowance)*0.85</field>
         </record>
@@ -245,7 +245,7 @@
             <field name="code">Basic</field>
             <field name="category_id" ref="hr_payroll_community.BASIC"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = contract.contract_document_type != 'offical_labor'</field>
+            <field name="condition_python">result = contract.contract_document_type != 'probationary'</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = contract.wage + contract.other_allowance</field>
         </record>
