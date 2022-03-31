@@ -535,8 +535,8 @@ h4 .stat-count {
     display: inline-block;
     border-collapse: collapse;
     border-spacing: 0px;
-    margin-left: 90px !important;
-    margin-top: 77px !important;
+    margin-left: 90px ;
+    margin-top: 77px ;
 }
 .hr-chart-1{
     margin: 15px 0px;
@@ -1095,8 +1095,11 @@ h4 .stat-count {
     display: flex;
     justify-content: space-evenly;
     margin-top: 5.2em;
+    padding-right: 18rem !important;
+    padding-left: 18rem !important;
 }
 .emp_graph .legend {
     margin: 0 !important;
 }
+
 /* The End */
