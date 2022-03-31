@@ -1,0 +1,121 @@
+<odoo>
+    <record id="view_form_work" model="ir.ui.view">
+        <field name="name">Work Form</field>
+        <field name="model">estimation.work</field>
+        <field name="arch" type="xml">
+            <form>
+                
+                <sheet>
+                    <group name="group_top">
+                        <group name="group_left">
+                            <field name="project_name" />
+                            <field name="customer_ids" />
+                            <field name="estimator_ids" />
+                            <field name="reviewer_ids" />
+                            <field name="deadline" />
+                        </group>
+                        <group name="group_right">
+                            <field name="sale_date" />
+                            <field name="stage" placeholder="Select current stage" />
+                            <field name="sale_order" />
+                            <field name="currency_id" />
+                            <field name="expected_revenue" widget="monetary" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Overview">
+                            <field name="add_lines">
+                                <tree editable="bottom">
+                                    <field name="id" />
+                                    <field name="description" />
+                                    <field name="author"/>
+                                    <field name="write_date" string="Update Date" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Summary"></page>
+                        <page string="Resource Planning"></page>
+                        <page string="Module"></page>
+                    </notebook>
+                </sheet>
+            </form>
+
+        </field>
+    </record>
+
+    <record id="view_tree_work" model="ir.ui.view">
+        <field name="name">Work List</field>
+        <field name="model">estimation.work</field>
+        <field name="arch" type="xml">
+
+            <tree default_order='create_date desc'>
+                <field name="number"></field>
+                <field name="estimator_ids" />
+                <field name="reviewer_ids" />
+                <field name="customer_ids" />
+
+                <field name="expected_revenue" widget="monetary" />
+                <field name="deadline" />
+                <field name="stage" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_form_costrate" model="ir.ui.view">
+        <field name="name">Cost Rate Form</field>
+        <field name="model">cost.rate</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group name="group_top">
+                        <field name="role" />
+                        <field name="description" />
+                        <field name="cost" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_costrate" model="ir.ui.view">
+        <field name="name">Cost Rate List</field>
+        <field name="model">cost.rate</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name='sequence' widget='handle' />
+                <field name="role" />
+                <field name="description" />
+                <field name="cost" />
+
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_form_activity" model="ir.ui.view">
+        <field name="name">Activity Form</field>
+        <field name="model">config.activity</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group name="group_top">
+                        <field name="activities" />
+                        <field name="description" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_activity" model="ir.ui.view">
+        <field name="name">Activity List</field>
+        <field name="model">config.activity</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name='sequence' widget='handle' />
+                <field name="activities" />
+                <field name="description" />
+            </tree>
+        </field>
+    </record>
+
+</odoo>

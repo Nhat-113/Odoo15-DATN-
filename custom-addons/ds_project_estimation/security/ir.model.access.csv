@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_work_user,WorkUser,model_estimation_work,estimation_group_user,1,1,1,0
+access_work_manager,WorkManager,model_estimation_work,estimation_group_manager,1,1,1,1
+estimation_app.access_cost_rate,access_cost_rate,estimation_app.model_cost_rate,base.group_user,1,1,1,1
+estimation_app.access_config_activity,access_config_activity,estimation_app.model_config_activity,base.group_user,1,1,1,1
+estimation_app.access_estimation_overview,access_estimation_overview,estimation_app.model_estimation_overview,base.group_user,1,1,1,1

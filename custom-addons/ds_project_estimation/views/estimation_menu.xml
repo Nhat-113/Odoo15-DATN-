@@ -1,0 +1,59 @@
+<odoo>
+    <!-- Estimation App Menu -->
+    <menuitem id="menu_estimation" name="Estimations" />
+    
+    <!-- Action to open the Work list -->
+    <record id="action_estimation_work" model="ir.actions.act_window">
+        <field name="name">Estimations</field>
+        <field name="res_model">estimation.work</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu item to open the Work list -->
+    <menuitem id="menu_estimation_work"
+    name="Estimations"
+    parent="menu_estimation"
+    action="action_estimation_work"
+    />
+
+    <!-- Action to open the Cost rate list -->
+    <record id="action_cost_rate" model="ir.actions.act_window">
+        <field name="name">Cost Rate</field>
+        <field name="res_model">cost.rate</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu item to open the Cost rate list -->
+    <menuitem id="menu_cost_rate"
+    name="Cost Rate"
+    parent="menu_estimation"
+    action="action_cost_rate"
+    />
+
+
+    <!-- Menu item to open the Configuration -->
+    <menuitem id="menu_config"
+    name="Configuration"
+    parent="menu_estimation"
+    />
+
+    <menuitem id="menu_config_setting"
+    name="Setting"
+    parent="menu_config"
+    action="action_estimation_work"
+    />
+
+    <!-- Action to open the configuration activities list -->
+    <record id="action_config_activity" model="ir.actions.act_window">
+        <field name="name">Activities</field>
+        <field name="res_model">config.activity</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_config_activity"
+    name="Activities"
+    parent="menu_config"
+    action="action_config_activity"
+    />
+
+</odoo>
