@@ -92,10 +92,10 @@ class HrPayslip(models.Model):
         if any(self.filtered(lambda payslip: payslip.date_from > payslip.date_to)):
             raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
 
-        if self.contract_id.date_end:
-            if self.contract_id.date_start > self.date_to or self.contract_id.date_end < self.date_from:
-                raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
-                name=self.employee_id.name))
+        # if self.contract_id.date_end:
+        #     if self.contract_id.date_start > self.date_to or self.contract_id.date_end < self.date_from:
+        #         raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
+        #         name=self.employee_id.name))
 
     @api.constrains('name')
     def _check_payslips(self):
@@ -104,11 +104,11 @@ class HrPayslip(models.Model):
         if any(self.filtered(lambda payslip: payslip.name in payslip_names)):
             raise ValidationError(_("Do not create multiple payslips for an employee in the same month"))
 
-    # @api.constrains('contract_id')
-    # def _check_contract_id(self):
+    @api.constrains('contract_id')
+    def _check_contract_id(self):
 
-    #     if self.employee_id.contract_id != self.contract_id:            
-    #         raise ValidationError(_('Cannot choose the wrong contract with the employee'))
+        if len(self.contract_id) == 0:          
+            raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',name=self.employee_id.name))
 
     def action_payslip_draft(self):
 
@@ -203,11 +203,8 @@ class HrPayslip(models.Model):
                         self.get_contract(payslip.employee_id, payslip.date_from, payslip.date_to)
             lines = [(0, 0, line) for line in self._get_payslip_lines(contract_ids, payslip.id)]
             payslip.write({'line_ids': lines, 'number': number})
-            if len(payslip.contract_id) == 0:
-                payslip.write({'state': 'draft'})
-            else:
-                payslip.write({'state': 'verify'})
-        return
+            
+        return self.write({'state': 'verify'})
        
     @api.model
     def get_worked_day_lines(self, contracts, date_from, date_to):
