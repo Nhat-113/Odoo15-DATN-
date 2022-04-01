@@ -45,6 +45,14 @@ class Contract(models.Model):
             contract.employee_id.resource_calendar_id = contract.resource_calendar_id
         return contracts
 
+    def write(self, vals):
+        res = super(Contract, self).write(vals)
+        if self.state == 'close':
+            for contract in self.filtered(lambda c: not c.date_end):
+                contract.date_end = max(date.today(), contract.date_start)
+
+        return res
+
     # def _assign_open_contract(self):
     #     for contract in self:
     #         if contract.date_end:
