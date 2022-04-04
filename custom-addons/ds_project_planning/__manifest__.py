@@ -1,0 +1,16 @@
+{
+    "name": "DS Project Planning",
+    "version": "15.0.1.0.0",
+    "description": "",
+    "summary": "Manage project plan",
+    "author": "Dsoft",
+    "website": "https://d-soft.com.vn",
+    "category": "Project",
+    "license": "AGPL-3",
+    "depends": ['base', 'sale', 'project'],
+    "application": True,
+    "auto_install": False,
+    "data": ["views/planning_menu.xml",
+             "views/planning_views.xml",
+             "security/ir.model.access.csv", ],
+}

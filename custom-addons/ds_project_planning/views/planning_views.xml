@@ -1,0 +1,68 @@
+<odoo>
+    <record id="project.act_project_project_2_project_task_all" model="ir.actions.act_window">
+        <field name="view_mode">dhx_gantt</field>
+    </record>
+
+    <record id="view_form_calendar_resource" model="ir.ui.view">
+        <field name="name">Calendar Resource Form</field>
+        <field name="model">planning.calendar.resource</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group name="group_top">
+                        <field name="project_id" />
+                        <field name="employee_id" />
+                        <field name="start_date" />
+                        <field name="end_date" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_calendar_resource" model="ir.ui.view">
+        <field name="name">Calendar Resource List</field>
+        <field name="model">planning.calendar.resource</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="project_id" />
+                <field name="employee_id" />
+                <field name="start_date" />
+                <field name="end_date" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_form_project_phase" model="ir.ui.view">
+        <field name="name">Project Phase Form</field>
+        <field name="model">project.planning.phase</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group name="group_top">
+                        <field name='sequence' />
+                        <field name="name" />
+                        <field name="start_date" />
+                        <field name="end_date" />
+                        <field name="description" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_project_phase" model="ir.ui.view">
+        <field name="name">Project Phases</field>
+        <field name="model">project.planning.phase</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name='sequence' widget='handle' />
+                <field name="name" />
+                <field name="start_date" />
+                <field name="end_date" />
+                <field name="description" />
+            </tree>
+        </field>
+    </record>
+
+</odoo>
