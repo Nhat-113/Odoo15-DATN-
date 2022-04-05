@@ -535,8 +535,8 @@ h4 .stat-count {
     display: inline-block;
     border-collapse: collapse;
     border-spacing: 0px;
-    margin-left: 90px ;
-    margin-top: 77px ;
+    margin-left: 90px;
+    margin-top: 77px;
 }
 .hr-chart-1{
     margin: 15px 0px;
@@ -1041,65 +1041,3 @@ h4 .stat-count {
     right: 0;
     background-color: rgba(0, 0, 0, 0.3);
 }
-
-/* custom dashboard temporary. This will be removed from phase 2 by vietlx */
-.hr_payslip {
-    margin-right: 0 !important;
-}
-.oh-payslip {
-    margin-top: 0 !important;
-}
-.oh-card {
-    margin: 2rem 0 !important;
-}
-.stat-widget-one {
-    display: flex !important;
-    position: relative !important;
-}
-.stat-icon {
-    display: flex !important;
-    align-items: center !important;
-    margin: 0 auto !important;
-    padding-top: 0 !important;
-}
-.stat-icon i{
-    display: flex !important;
-    align-items: center !important;
-    margin: 0 auto !important;
-    padding-top: 0 !important;
-}
-.stat-content {
-    width: 70% !important;
-    text-align: center !important;
-    padding: 20px 0 !important;
-}
-.stat-text {
-    margin-top: 0 !important;
-    margin-left: 0 !important;
-}
-.stat-digit {
-    margin-left: 0 !important;
-    padding-left: 0 !important;
-}
-.leave-manager {
-    right: 0 !important;
-    margin-left: 0 !important;
-}
-.oh-card.text-color {
-    margin: 0 !important;
-}
-/* .hr-chart-1 {
-    margin-bottom: 0 !important;
-} */
-.emp_graph {
-    display: flex;
-    justify-content: space-evenly;
-    margin-top: 5.2em;
-    padding-right: 18rem !important;
-    padding-left: 18rem !important;
-}
-.emp_graph .legend {
-    margin: 0 !important;
-}
-
-/* The End */
