@@ -4,7 +4,7 @@
         <field name="model">estimation.work</field>
         <field name="arch" type="xml">
             <form>
-                
+
                 <sheet>
                     <group name="group_top">
                         <group name="group_left">
@@ -24,18 +24,40 @@
                     </group>
                     <notebook>
                         <page string="Overview">
-                            <field name="add_lines">
+                            <field name="add_lines_overview">
                                 <tree editable="bottom">
-                                    <field name="id" />
+                                    <field name="revision" />
                                     <field name="description" />
-                                    <field name="author"/>
+                                    <field name="author" />
                                     <field name="write_date" string="Update Date" />
                                 </tree>
                             </field>
                         </page>
                         <page string="Summary"></page>
                         <page string="Resource Planning"></page>
-                        <page string="Module"></page>
+                        <page string="Module">
+                            <separator string="Assumption" />
+                            <field name="add_lines_module_assumption">
+                                <tree editable="bottom">
+                                    <field name="assumption" />
+                                </tree>
+                            </field>
+                            <separator string="Summary" />
+                            <field name="add_lines_module_summary">
+                                <tree editable="bottom">
+                                    <field name="project_type" placeholder="Select project category" />
+                                    <field name="working_efforts" placeholder="Select working hours or efforts" />
+                                    <field name="time_effort_value" placeholder="Select value" />
+                                </tree>
+                            </field>
+                            <separator string="Effort distribution" />
+                            <field name="add_lines_module_effort">
+                                <tree editable="bottom">
+                                    <field name="id" string="No"/>
+                                    <field name="items"/>
+                                </tree>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
             </form>

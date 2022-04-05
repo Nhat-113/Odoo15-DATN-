@@ -28,7 +28,12 @@ class Estimation(models.Model):
     deadline = fields.Date("Deadline", required=True)
     stage = fields.Selection([("new","New"), ("in_progress","In Progress"), ("pending","Pending")], string="Stage", required=True)
     
-    add_lines = fields.One2many('estimation.overview', 'connect_estimation_work', string='Products')
+    add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
+    add_lines_module_assumption = fields.One2many('estimation.module.assumption', 'connect_module', string='Module Assumption')
+    add_lines_module_summary = fields.One2many('estimation.module.summary', 'connect_module', string='Module Summary')
+    add_lines_module_effort = fields.One2many('estimation.module.effort', 'connect_module', string='Module Effort')
+    
+
 
     @api.model
     def create(self, vals):
@@ -41,15 +46,13 @@ class Estimation(models.Model):
 class EstimationOverview(models.Model):
     _name = "estimation.overview"
     _description = "Overview of each estimation"
-    # _inherit = "estimation.work"
 
-
-    connect_estimation_work = fields.Many2one('estimation.work', string="Connect")
+    connect_overview = fields.Many2one('estimation.work', string="Connect Overview")
     
     # Notebook and pages
     author = fields.Many2one('res.users', string="Author", default=lambda self: self.env.user, readonly=True)
     revision = fields.Char("Revision", readonly=True, copy=False, index=False, default="/")
-    description = fields.Text("Description")
+    description = fields.Text("Description", default="Nothing")
 
     @api.model
     def create(self, vals):
@@ -57,6 +60,37 @@ class EstimationOverview(models.Model):
             vals["revision"] = self.env["ir.sequence"].next_by_code("estimation.overview") or "/"
         result = super(EstimationOverview, self).create(vals)
         return result
+
+
+class EstimationModuleAssumption(models.Model):
+    _name = "estimation.module.assumption"
+    _description = "Module Assumption of each estimation"
+
+    connect_module = fields.Many2one('estimation.work', string="Connect Module")
+    assumption = fields.Text("Assumption")
+
+
+class EstimationModuleSummary(models.Model):
+    _name = "estimation.module.summary"
+    _description = "Module Summary of each estimation"
+    
+    connect_module = fields.Many2one('estimation.work', string="Connect Module")
+    project_type = fields.Selection([("standard","Standard"), ("project","Project")], string="Project Type", required=True)
+    time_effort_value = fields.Float(string="Value", required=True)
+
+    working_efforts = fields.Selection([("hrs","Working hours per day"), ("days","Working days per month"),
+                                        ("effort_day","Total efforts in man-day unit"), ("effort_mon","Total efforts in man-month unit")], 
+                                        string="Working Time/Efforts", required=True)
+
+
+class EstimationModuleEffort(models.Model):
+    _name = "estimation.module.effort"
+    _description = "Module Effort of each estimation"
+
+    connect_module = fields.Many2one('estimation.work', string="Connect Module")
+    items = fields.Many2one('config.activity', string="Item")
+    
+
 
 
 class CostRate(models.Model):
@@ -81,7 +115,7 @@ class Activity(models.Model):
     _name = "config.activity"
     _description = "Activity"
     _order = "sequence,id"
-    _rec_name = "sequence"
+    _rec_name = "activities"
 
     sequence = fields.Integer()
     activities = fields.Char("Activities", required=True)
