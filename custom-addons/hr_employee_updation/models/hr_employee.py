@@ -121,7 +121,7 @@ class HrEmployee(models.Model):
         string='Family', help='Family Information')
     insurance_id = fields.Char(string='Insurance ID', groups="hr.group_hr_user",  tracking=True)
     personal_income_tax_code = fields.Char(string="Personal Income Tax Code", groups="hr.group_hr_user", tracking=True)
-
+    address = fields.Char(string='Address', groups="hr.group_hr_user",  tracking=True)
     def _first_contract(self):
         hr_contract = self.env['hr.contract'].sudo()
         return hr_contract.search([('employee_id', '=', self.id)],
