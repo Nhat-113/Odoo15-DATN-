@@ -1,0 +1,131 @@
+/* custom dashboard temporary. This will be removed from phase 2 by vietlx */
+.hr_payslip {
+    margin-right: 0 !important;
+    margin-left: 2% !important;
+}
+.oh-payslip {
+    margin-top: 0 !important;
+}
+.oh-card {
+    margin: 2rem 0 !important;
+}
+.stat-widget-one {
+    display: flex !important;
+    position: relative !important;
+}
+.stat-icon {
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    padding-top: 0 !important;
+}
+.stat-icon i{
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    padding-top: 0 !important;
+}
+.stat-content {
+    width: 70% !important;
+    text-align: center !important;
+    padding: 20px 0 !important;
+}
+.stat-text {
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+}
+.stat-digit {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+}
+.leave-manager {
+    right: 0 !important;
+    margin-left: 0 !important;
+}
+.oh-card.text-color {
+    margin: 0 !important;
+}
+.emp_graph {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 5.2em;
+}
+.graph_view .legend {
+    display: flex !important;
+    align-items: center !important;
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+}
+.hr_timesheets {
+    margin: 0 1% !important;
+}
+.employee-icon {
+    height: auto !important;
+    min-height: 50px;
+    max-width: 100%;
+}
+.align-self-center {
+    object-fit: contain;
+    vertical-align: middle;
+}
+/* Display in mobile */
+@media (max-width: 739px) {
+    .res_mobile {
+        margin-left: 16.66666666%;
+    }
+    .res_tablet {
+        margin-left: 16.66666666%;
+    }
+    .mr-tablet {
+        max-width: 82.2222222%;
+        width: 100%;
+    }
+    .employee-prof {
+        overflow: scroll;
+        z-index: 999;
+    }
+}
+@media (min-width: 739px) and (max-width: 992px) {
+    .res_tablet {
+        margin-left: 16.66666666%;
+    }
+    .mr-tablet {
+        max-width: 82.6%;
+        width: 100%;
+    }
+    .employee-prof {
+        overflow: scroll;
+        z-index: 999;
+    }
+}
+@media ( min-width: 992px) and (max-width: 1254px) {
+    .res_tablet {
+        margin-left: 16.66666666%;
+    }
+    .mr-tablet {
+        max-width: 82.66666%;
+        width: 100%;
+    }
+    .employee-prof {
+        overflow: scroll;
+        z-index: 999;
+    }
+    .employee-prof {
+        overflow: scroll;
+        z-index: 999;
+    }
+}
+@media ( min-width: 1200px) and (max-width: 1254px) {
+    .res_tablet {
+        margin-left: 16.66666666%;
+        padding-right: 0px;
+        flex: 0 0 83.33333333%;
+        max-width: 82.66666%;
+        width: 100%;
+    }
+    .mr-tablet {
+        flex: 0 0 83.33333333%;
+        max-width: 82.66666%;
+        width: 100%;
+    }
+}

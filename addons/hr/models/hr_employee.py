@@ -42,7 +42,7 @@ class HrEmployeePrivate(models.Model):
     company_country_code = fields.Char(related='company_country_id.code', readonly=True)
     # private partner
     address_home_id = fields.Many2one(
-        'res.partner', 'Address', help='Enter here the private address of the employee, not the one linked to your company.',
+        'res.partner', 'Account Holder', help='Enter here the private address of the employee, not the one linked to your company.',
         groups="hr.group_hr_user", tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     is_address_home_a_company = fields.Boolean(
@@ -301,10 +301,10 @@ class HrEmployeePrivate(models.Model):
         return employee
 
     def write(self, vals):
-        # if 'address_home_id' in vals:
-        #     account_id = vals.get('bank_account_id') or self.bank_account_id.id
-        #     if account_id:
-        #         self.env['res.partner.bank'].browse(account_id).partner_id = vals['address_home_id']
+        if 'address_home_id' in vals:
+            account_id = vals.get('bank_account_id') or self.bank_account_id.id
+            if account_id:
+                self.env['res.partner.bank'].browse(account_id).partner_id = vals['address_home_id']
         if vals.get('user_id'):
             # Update the profile pictures with user, except if provided 
             vals.update(self._sync_user(self.env['res.users'].browse(vals['user_id']),
