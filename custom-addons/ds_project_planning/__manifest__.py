@@ -7,10 +7,14 @@
     "website": "https://d-soft.com.vn",
     "category": "Project",
     "license": "AGPL-3",
-    "depends": ['base', 'sale', 'project'],
+    "depends": ['base', 'project', 'web_domain_field'],
     "application": True,
     "auto_install": False,
-    "data": ["views/planning_menu.xml",
-             "views/planning_views.xml",
-             "security/ir.model.access.csv", ],
+    "data": [
+        "security/planning_security.xml",
+        "security/ir.model.access.csv",
+        "views/planning_views.xml",
+        "views/planning_menu.xml",
+        "views/project_task_views.xml",
+    ],
 }

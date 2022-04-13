@@ -1,20 +1,13 @@
 <odoo>
     <!-- Planning App Menu -->
-    <menuitem id="planning_menu" name="Planning" />
-
-    <!-- <record id="action_planning_project_list" model="ir.actions.act_window">
-        <field name="name">Planning</field>
-        <field name="res_model">project.project</field>
-        <field name="view_mode">kanban</field>
-    </record> -->
+    <menuitem id="planning_menu" name="Planning" groups="ds_project_planning.group_project_pm,project.group_project_manager" />
 
     <record id="open_view_planning_project_all" model="ir.actions.act_window">
         <field name="name">Planning Projects</field>
         <field name="res_model">project.project</field>
-        <field name="domain">[]</field>
         <field name="view_mode">kanban,form</field>
-        <field name="view_id" ref="project.view_project_kanban"/>
-        <field name="search_view_id" ref="project.view_project_project_filter"/>
+        <field name="view_id" ref="ds_project_planning.project_planning_view_kanban"/>
+        <!-- <field name="search_view_id" ref="project.view_project_project_filter"/> -->
         <field name="target">main</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -28,42 +21,13 @@
 
     <menuitem id="planning_menu_child" name="Planning" parent="planning_menu" action="open_view_planning_project_all" sequence="1" />
 
-    <!-- Action to open the My Planning -->
-    <record id="action_my_planning" model="ir.actions.act_window">
-        <field name="name">My Planning Projects</field>
-        <field name="res_model">project.project</field>
-        <field name="domain">[('user_id', '=', uid)]</field>
-        <field name="view_mode">tree,form</field>
-        <!-- <field name="context">{'search_default_my_planning': 1, 'search_default_personal_stage': 1, 'all_planning': 0}</field> -->
-        <!-- <field name="search_view_id" ref="view_task_search_form_extended"/> -->
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                    No plans found. Let's create one!
-            </p>
-            <!-- <p>
-                    To get things done, use activities and status on tasks.<br/>
-                    Chat in real-time or by email to collaborate efficiently.
-            </p> -->
-        </field>
-    </record>
-
-    <!-- Menu item to open the My Planning -->
-    <menuitem id="menu_my_planning" name="My Planning" parent="planning_menu" action="action_my_planning" sequence="2" />
-
-    <!-- Action to open the Calendar Resource list -->
-    <record id="action_calendar_resource" model="ir.actions.act_window">
-        <field name="name">Calendar Resource</field>
-        <field name="res_model">planning.calendar.resource</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
     <!-- Menu item to open the Calendar Resource list -->
     <menuitem id="menu_calendar_resource" name="Calendar Resource" parent="planning_menu" action="action_calendar_resource" sequence="3" />
 
     <!-- Menu item to open the Configuration -->
-    <menuitem id="planning_config_menu" name="Configuration" parent="planning_menu" sequence="4" />
+    <menuitem id="planning_config_menu" name="Configuration" parent="planning_menu" groups="project.group_project_manager" sequence="4" />
 
-    <menuitem id="menu_config_setting" name="Setting" parent="planning_config_menu" action="open_view_planning_project_all" />
+    <menuitem id="menu_config_setting" name="Setting" parent="planning_config_menu" action="open_view_planning_project_all"/>
 
     <!-- Action to open the configuration phases of project -->
     <record id="action_config_phase" model="ir.actions.act_window">
@@ -72,6 +36,23 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="menu_config_planning_phase" name="Project Planning Phase" parent="planning_config_menu" action="action_config_phase" />
+    <menuitem id="menu_config_planning_phase" name="Project Planning Phase" parent="planning_config_menu" action="action_config_phase"/>
+
+    <!-- Action to open the configuration phases of project -->
+    <record id="action_config_role" model="ir.actions.act_window">
+        <field name="name">Roles</field>
+        <field name="res_model">planning.roles</field>
+        <!-- <field name="view_mode">tree,form</field> -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No roles found. Let's create one!
+            </p>
+            <p>
+                  Use roles to categorize members roles in project.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_config_planning_role" name="Roles" parent="planning_config_menu" action="action_config_role"/>
 
 </odoo>

@@ -21,4 +21,4 @@ class PlanningPhase(models.Model):
                                  date.today().replace(day=1)))
     end_date = fields.Date(
         string='Date End', readonly=False, required=True, help="End date of the phase")
-    description = fields.Char("Description", required=True, translate=True)
+    description = fields.Char("Description", translate=True)
