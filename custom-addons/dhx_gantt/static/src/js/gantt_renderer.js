@@ -38,7 +38,8 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             'click button.o_dhx_critical_path': '_onClickCriticalPath',
             'click button.o_dhx_reschedule': '_onClickReschedule',
             'click button.o_dhx_zoom_in': '_onClickZoomIn',
-            'click button.o_dhx_zoom_out': '_onClickZoomOut'
+            'click button.o_dhx_zoom_out': '_onClickZoomOut',
+            'click button.o_dhx_export_to_pdf': '_exportToPDF'
         }),
         init: function (parent, state, params) {
             // console.log('init GanttRenderer');
@@ -192,6 +193,10 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
         _onClickZoomOut: function(){
             // console.log('_onClickZoomOut');
             gantt.ext.zoom.zoomOut();
+        },
+
+        _exportToPDF: function() {
+            gantt.exportToPDF();
         },
         on_attach_callback: function () {
             this.renderGantt();

@@ -8,6 +8,7 @@
         'assets': {
             'web.assets_backend': [
                 '/dhx_gantt/static/lib/dhtmlxgantt/js/dhtmlxgantt.js',
+                '/dhx_gantt/static/lib/dhtmlxgantt/js/api.js',
                 '/dhx_gantt/static/lib/dhtmlxgantt/js/dhtmlxgantt_marker.js',
                 '/dhx_gantt/static/lib/dhtmlxgantt/skins/dhtmlxgantt_material.css',
                 '/dhx_gantt/static/lib/dhtmlxgantt/css/dhtmlxgantt.css',
