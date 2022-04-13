@@ -1,0 +1,8 @@
+.issue_type_img img {
+  border-radius: 50%;
+  width: 19px;
+  height: 19px;
+  object-fit: cover;
+  margin-right: 4px;
+}
+

@@ -1,0 +1,168 @@
+<odoo>
+    <data>
+        <record id="task_status" model="ir.ui.view">
+            <field name="name">task.status</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_form2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="status_id_domain" invisible="1"/>
+                    <field name="status" domain="status_id_domain" widget="selection"/>
+                    <field name="priority_type" widget="selection"/>
+                    <field name="complex" widget="selection"/>
+                </xpath>
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <label for="issues_type" string="Issues Type"/>
+                    <div>
+                        <field name="icon_path" class="issue_type_img oe_left" style="width :30%" attrs="{'invisible': [('icon_path', '=', False)]}"/>
+                        <field name="issues_type" widget="selection" style="width :70%"/>
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='recurring_task']" position="after">
+                    <field name="task_score" widget="priority" eval="5"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- <record id="date_task" model="ir.ui.view">
+            <field name="name">date.task</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_form2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="date_start"/>
+                </xpath>
+                <xpath expr="//field[@name='date_deadline']" position="replace">
+                    <field name="date_end"/>
+                </xpath>
+            </field>
+        </record> -->
+
+        <record model="ir.ui.view" id="project_status">
+            <field name="name">project.status</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='stage_id']" position="after">
+                    <field name="status" widget="statusbar" options="{'clickable': '1'}"/>
+                </xpath>
+                <xpath expr="//div[@name='dates']" position="after">
+                    <field name="status_color" widget='badge' decoration-info="status_color == 'Open'" decoration-success="status_color == 'Processing'" decoration-danger="status_color == 'Close'" decoration-warning="status_color == 'Pending'"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="project_status_view_kanban">
+            <field name="name">project.status.view.kanban</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="inside">
+                    <div>
+                        <field name="status_color" nolabel="1" widget='badge' decoration-info="status_color == 'Open'" decoration-success="status_color == 'Processing'" decoration-danger="status_color == 'Close'" decoration-warning="status_color == 'Pending'"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="issues_type_view_tree" model="ir.ui.view">
+            <field name="name">view.tree</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_tree2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <field name="icon_path" class="oe_avatar issue_type_img" attrs="{'invisible': [('icon_path', '=', False)]}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="issues_type_view_kanban" model="ir.ui.view">
+            <field name="name">issues.type.view.kanban</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="inside">
+                    <div class="issue_type_img" title="Issue type" modifiers="{}">
+                        <t t-if="record.icon.raw_value">
+                            <field name="icon" nolabel="1" widget="image"/>
+                        </t>
+                    </div>
+                    <field name="status" widget="badge" options="{'color_field': 'color'}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="issues_type_tree_view" model="ir.ui.view">
+            <field name="name">issues.type.tree.view</field>
+            <field name="model">project.issues.type</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="description_issues"/>
+                    <field name="icon_path" class="oe_avatar issue_type_img"/>
+                    <field name="status" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="issues_type_form_view" model="ir.ui.view">
+            <field name="name">issues.type.form.view</field>
+            <field name="model">project.issues.type</field>
+            <field name="arch" type="xml">
+                <form >
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="description_issues"/>
+                            <field name="icon" widget="image" class="oe_left issue_type_img"/>
+                            <field name="status" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="task_status_form_view">
+            <field name="name">Status</field>
+            <field name="model">project.task.status</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="task_status_tree_view">
+            <field name="name">Status</field>
+            <field name="model">project.task.status</field>
+            <field name="arch" type="xml">
+                <tree editable="top" sample="1">
+                    <field name="name"/>
+                    <field name="color" widget="color" optional="show"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="issues_type_action" model="ir.actions.act_window">
+            <field name="name">Issues Types</field>
+            <field name="res_model">project.issues.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="task_status_action" model="ir.actions.act_window">
+            <field name="name">Status</field>
+            <field name="res_model">project.task.status</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <menuitem id="issues_type_menu" name="Issues Types" parent="project.menu_project_config" action="issues_type_action" sequence="11"/>
+        <menuitem id="task_status_menu" name="Status" parent="project.menu_project_config" action="task_status_action" sequence="12"/>
+
+    </data>
+</odoo>
