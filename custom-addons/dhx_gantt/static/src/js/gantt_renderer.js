@@ -67,21 +67,13 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
 
             gantt.config.work_time = true;
             gantt.config.skip_off_time = true;
-            // console.log('columns');
-            // console.log(gantt.config.columns);
 
-            // gantt.i18n.setLocale({
-            //     labels:{
-            //         column_owner : 'Assignees'
-            //     }
-            // });
-
-            function byId(list, id) {
-                for (var i = 0; i < list.length; i++) {
-                    if (list[i].key == id)
-                        return list[i].label || "";
-                }
-                return "";
+            function byId(id) {
+                return `
+                    <div class="o_field_many2manytags avatar o_clickable_m2x_avatar o_field_widget o_field_many2manytags_multi" name="user_ids">
+                        <img src="/web/image/res.users/${id}/avatar_128" title="" data-id="2" class="rounded-circle o_m2m_avatar">
+                    </div>
+                `
             }
 
 
@@ -89,16 +81,24 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                 {name: "text", tree: true, resize: true},
                 {name: "start_date", align: "center", resize: true},
                 {name: "duration", align: "center", resize: true},
-                { name: "assignees", label: "Assignees", width: 80, align: "center", template: function (item) {
-                    return byId(gantt.serverList('assignees'), item.assignees)
-                }},
-                // {name: "add", width: 44, min_width: 44, max_width: 44}
+                {
+                    name: "assignees", width: 70, label: "Assignees", align: "center", resize: true, template: function (task) {
+                        var result = "";
+                        var assignees = task.user_ids
+    
+                        if (!assignees)
+                            return;
+    
+                        assignees.forEach(function (element) {
+                            var assignee = byId(element);
+                            result += assignee;
+                        });
+    
+                        return result
+                    }
+                }
             ]
-
-            gantt.serverList("assignees", [
-                {key: 0, label: ""},
-                {key: 14, label: "Hieu Le"},
-            ]);
+            
 
             if(this.is_total_float){
                 gantt.config.columns.push({name: "total_float", label: "Total Float", align: "center"})

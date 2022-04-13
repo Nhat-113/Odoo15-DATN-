@@ -25,7 +25,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_progress = params.progress;
             // HL
             this.map_child_ids = params.child_ids;
-            this.map_assignees = params.assignees;
+            this.map_user_ids = params.user_ids;
             this.map_portal_user_names = params.portal_user_names;
             // this.map_widget = params.widget
 
@@ -53,7 +53,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_widget && fieldNames.push(this.map_widget);
             this.map_progress && fieldNames.push(this.map_progress);
             this.map_portal_user_names && fieldNames.push(this.map_portal_user_names);
-            this.map_assignees && fieldNames.push(this.map_assignees);
+            this.map_user_ids && fieldNames.push(this.map_user_ids);
             this.map_child_ids && fieldNames.push(this.map_child_ids)
             this.map_total_float && fieldNames.push(this.map_total_float);
             this.map_parent && fieldNames.push(this.map_parent);
@@ -77,7 +77,8 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.res_ids = [];
             const links = [];
             const formatFunc = gantt.date.str_to_date("%Y-%m-%d %h:%i:%s", true);
-            records.forEach(function(record){ 
+
+            records.forEach(function(record){
                 self.res_ids.push(record[self.map_id]);
                 var datetime;
                 if(record[self.map_date_start]){
@@ -115,12 +116,12 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 task.open = record[self.map_open];
                 task.links_serialized_json = record[self.map_links_serialized_json];
                 task.total_float = record[self.map_total_float];
-                // HL
-                task.assignees = record[self.map_assignees].length ?  record[self.map_assignees][0] : 0;
+                task.user_ids = record[self.map_user_ids];
 
                 data.push(task);
                 links.push.apply(links, JSON.parse(record.links_serialized_json))
             });
+            // TODO COVERT pair user_ids and portal_user_name to assignees
 
             this.records = data;
             this.links = links;

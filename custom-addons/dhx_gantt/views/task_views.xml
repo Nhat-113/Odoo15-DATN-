@@ -16,7 +16,7 @@
                     link_model="project.depending.tasks"
                     progress="progress"
                     child_ids="child_ids"
-                    assignees="user_ids"
+                    user_ids="user_ids"
                     portal_user_names="portal_user_names"
                 />
             </field>

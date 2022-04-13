@@ -28,7 +28,7 @@ odoo.define('dhx_gantt.GanttView', function (require) {
             this.loadParams.text = this.arch.attrs.text;
             this.loadParams.links_serialized_json = this.arch.attrs.links_serialized_json;
             this.loadParams.child_ids = this.arch.attrs.child_ids;
-            this.loadParams.assignees = this.arch.attrs.assignees;
+            this.loadParams.user_ids = this.arch.attrs.user_ids;
             this.loadParams.portal_user_names = this.arch.attrs.portal_user_names;
             // this.loadParams.widget = this.arch.attrs.widget;
 
@@ -47,7 +47,7 @@ odoo.define('dhx_gantt.GanttView', function (require) {
                 this.arch.attrs.links_serialized_json,
                 // HL
                 this.arch.attrs.child_ids,
-                this.arch.attrs.assignees,
+                this.arch.attrs.user_ids,
                 this.arch.attrs.portal_user_names,
                 // this.arch.attrs.widget
             ];
@@ -66,7 +66,7 @@ odoo.define('dhx_gantt.GanttView', function (require) {
             // HL
             // this.rendererParams.map_widget = this.arch.attrs.widget;
             this.rendererParams.map_child_ids = this.arch.attrs.child_ids;
-            this.rendererParams.assignees = this.arch.attrs.assignees
+            this.rendererParams.user_ids = this.arch.attrs.user_ids
             this.rendererParams.portal_user_names = this.arch.attrs.portal_user_names
             this.rendererParams.link_model = this.arch.attrs.link_model;
             this.rendererParams.link_model = this.arch.attrs.link_model;
