@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_form_activity" model="ir.ui.view">
+        <field name="name">Activities Form</field>
+        <field name="model">config.activity</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group name="group_top">
+                        <field name="activity" />
+                        <field name="description" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_activity" model="ir.ui.view">
+        <field name="name">Activities List</field>
+        <field name="model">config.activity</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name='sequence' widget='handle' />
+                <field name="activity" />
+                <field name="description" />
+            </tree>
+        </field>
+    </record>
+</odoo>

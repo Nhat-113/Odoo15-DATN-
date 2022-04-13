@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from forex_python.converter import CurrencyRates
+
+c = CurrencyRates()
+data = c.get_rates('USD')
 
 
 class Estimation(models.Model):
@@ -10,7 +14,6 @@ class Estimation(models.Model):
     _name = "estimation.work"
     _description = "Estimation"
     _rec_name = "number"
-
 
     project_name = fields.Char("Project Name", required=True)
     number = fields.Char("No", readonly=True, required=True, copy=False, index=False, default="New")
@@ -23,6 +26,7 @@ class Estimation(models.Model):
     currency_id = fields.Many2one("res.currency", string="Currency")
     sale_order = fields.Many2one('sale.order', string="Sale Order")
     expected_revenue = fields.Monetary("Expected Revenue", related="sale_order.amount_total")
+    total_cost = fields.Monetary(string="Total Cost")
 
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
@@ -33,64 +37,12 @@ class Estimation(models.Model):
     add_lines_module_summary = fields.One2many('estimation.module.summary', 'connect_module', string='Module Summary')
     add_lines_module_effort = fields.One2many('estimation.module.effort', 'connect_module', string='Module Effort')
     
-
-
     @api.model
     def create(self, vals):
         if vals.get("number", "New") == "New":
             vals["number"] = self.env["ir.sequence"].next_by_code("estimation.work") or "New"
         result = super(Estimation, self).create(vals)
         return result
-
-
-class EstimationOverview(models.Model):
-    _name = "estimation.overview"
-    _description = "Overview of each estimation"
-
-    connect_overview = fields.Many2one('estimation.work', string="Connect Overview")
-    
-    # Notebook and pages
-    author = fields.Many2one('res.users', string="Author", default=lambda self: self.env.user, readonly=True)
-    revision = fields.Char("Revision", readonly=True, copy=False, index=False, default="/")
-    description = fields.Text("Description", default="Nothing")
-
-    @api.model
-    def create(self, vals):
-        if vals.get("revision", "/") == "/":
-            vals["revision"] = self.env["ir.sequence"].next_by_code("estimation.overview") or "/"
-        result = super(EstimationOverview, self).create(vals)
-        return result
-
-
-class EstimationModuleAssumption(models.Model):
-    _name = "estimation.module.assumption"
-    _description = "Module Assumption of each estimation"
-
-    connect_module = fields.Many2one('estimation.work', string="Connect Module")
-    assumption = fields.Text("Assumption")
-
-
-class EstimationModuleSummary(models.Model):
-    _name = "estimation.module.summary"
-    _description = "Module Summary of each estimation"
-    
-    connect_module = fields.Many2one('estimation.work', string="Connect Module")
-    project_type = fields.Selection([("standard","Standard"), ("project","Project")], string="Project Type", required=True)
-    time_effort_value = fields.Float(string="Value", required=True)
-
-    working_efforts = fields.Selection([("hrs","Working hours per day"), ("days","Working days per month"),
-                                        ("effort_day","Total efforts in man-day unit"), ("effort_mon","Total efforts in man-month unit")], 
-                                        string="Working Time/Efforts", required=True)
-
-
-class EstimationModuleEffort(models.Model):
-    _name = "estimation.module.effort"
-    _description = "Module Effort of each estimation"
-
-    connect_module = fields.Many2one('estimation.work', string="Connect Module")
-    items = fields.Many2one('config.activity', string="Item")
-    
-
 
 
 class CostRate(models.Model):
@@ -105,18 +57,44 @@ class CostRate(models.Model):
     sequence = fields.Integer()
     role = fields.Char("Role", required=True)
     description = fields.Char("Description", required=True)
-    cost = fields.Float("Cost (USD)")
+    cost_usd = fields.Float("Cost (USD)")
+    cost_yen = fields.Float("Cost (YEN)", compute="_compute_yen")
+    cost_vnd = fields.Float("Cost (VND)", compute="_compute_vnd")
+
+    def _compute_yen(self):
+        for rec in self:
+            rec.cost_yen = rec.cost_usd * data['JPY']
+
+    def _compute_vnd(self):
+        for rec in self:
+            rec.cost_vnd = rec.cost_usd * 22859.50
 
 
-class Activity(models.Model):
+class JobPosition(models.Model):
+    """
+    Describe job position in configuration.
+    """
+    _name = "config.job_position"
+    _description = "Job Position"
+    _order = "sequence,id"
+    _rec_name = "job_position"
+
+    sequence = fields.Integer()
+    job_position = fields.Char("Job Position", required=True)
+    description = fields.Char("Description", required=True)
+    effort = fields.Float(string="Effort", default=0.0)
+    percent = fields.Char(string="Percentage", default="0.0")
+
+
+class Activities(models.Model):
     """
     Describe activities in configuration.
     """
     _name = "config.activity"
-    _description = "Activity"
+    _description = "Activities"
     _order = "sequence,id"
-    _rec_name = "activities"
+    _rec_name = "activity"
 
-    sequence = fields.Integer()
-    activities = fields.Char("Activities", required=True)
+    sequence = fields.Integer(required=True, index=True, default=5, help='Use to arrange calculation sequence')
+    activity = fields.Char("Activity", required=True)
     description = fields.Char("Description", required=True)

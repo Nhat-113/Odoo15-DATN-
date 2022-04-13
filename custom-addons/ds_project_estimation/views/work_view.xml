@@ -4,7 +4,10 @@
         <field name="model">estimation.work</field>
         <field name="arch" type="xml">
             <form>
-
+                <!-- <header>
+                    <button string="Compute Sheet" name="compute_sheet" type="object" states="draft,verify" class="oe_highlight"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm"/>
+                </header> -->
                 <sheet>
                     <group name="group_top">
                         <group name="group_left">
@@ -53,9 +56,19 @@
                             <separator string="Effort distribution" />
                             <field name="add_lines_module_effort">
                                 <tree editable="bottom">
-                                    <field name="id" string="No"/>
-                                    <field name="items"/>
+                                    <field name="id" string="No" />
+                                    <field name="items" />
+                                    <field name="effort" />
+                                    <field name="percent" />
                                 </tree>
+                                <form string="Effort distribution">
+                                    <group col="4">
+                                        <field name="id" string="No"/>
+                                        <field name="items"/>
+                                        <field name="effort"/>
+                                        <field name="percent"/>
+                                    </group>
+                                </form>
                             </field>
                         </page>
                     </notebook>
@@ -77,67 +90,10 @@
                 <field name="customer_ids" />
 
                 <field name="expected_revenue" widget="monetary" />
+                <field name="total_cost" widget="monetary" />
                 <field name="deadline" />
                 <field name="stage" />
             </tree>
         </field>
     </record>
-
-    <record id="view_form_costrate" model="ir.ui.view">
-        <field name="name">Cost Rate Form</field>
-        <field name="model">cost.rate</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group name="group_top">
-                        <field name="role" />
-                        <field name="description" />
-                        <field name="cost" />
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="view_tree_costrate" model="ir.ui.view">
-        <field name="name">Cost Rate List</field>
-        <field name="model">cost.rate</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name='sequence' widget='handle' />
-                <field name="role" />
-                <field name="description" />
-                <field name="cost" />
-
-            </tree>
-        </field>
-    </record>
-
-    <record id="view_form_activity" model="ir.ui.view">
-        <field name="name">Activity Form</field>
-        <field name="model">config.activity</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group name="group_top">
-                        <field name="activities" />
-                        <field name="description" />
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="view_tree_activity" model="ir.ui.view">
-        <field name="name">Activity List</field>
-        <field name="model">config.activity</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name='sequence' widget='handle' />
-                <field name="activities" />
-                <field name="description" />
-            </tree>
-        </field>
-    </record>
-
 </odoo>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_form_costrate" model="ir.ui.view">
+        <field name="name">Cost Rate Form</field>
+        <field name="model">cost.rate</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group name="group_top">
+                        <field name="role" />
+                        <field name="description" />
+                        <field name="cost_usd" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_costrate" model="ir.ui.view">
+        <field name="name">Cost Rate List</field>
+        <field name="model">cost.rate</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name='sequence' widget='handle' />
+                <field name="role" />
+                <field name="description" />
+                <field name="cost_usd" />
+                <field name="cost_yen" />
+                <field name="cost_vnd" />
+                <field name="create_date" string="Creation Date"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

@@ -37,13 +37,36 @@
     parent="menu_estimation"
     />
 
+    <record id="action_setting" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+    </record>
+
     <menuitem id="menu_config_setting"
     name="Setting"
     parent="menu_config"
-    action="action_estimation_work"
+    sequence="10"
+    groups="base.group_system"
+    action="action_setting"
     />
 
-    <!-- Action to open the configuration activities list -->
+    <!-- Action to open the configuration job position list -->
+    <record id="action_config_job_position" model="ir.actions.act_window">
+        <field name="name">Job Position</field>
+        <field name="res_model">config.job_position</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_config_job_position"
+    name="Job Position"
+    parent="menu_config"
+    action="action_config_job_position"
+    />
+
+    <!-- Action to open Activities -->
     <record id="action_config_activity" model="ir.actions.act_window">
         <field name="name">Activities</field>
         <field name="res_model">config.activity</field>
