@@ -16,5 +16,6 @@
         "views/planning_views.xml",
         "views/planning_menu.xml",
         "views/project_task_views.xml",
+        "views/project_menu.xml",
     ],
 }
