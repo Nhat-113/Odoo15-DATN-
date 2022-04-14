@@ -14,12 +14,12 @@ class EstimationOverview(models.Model):
 
     @api.model
     def create(self, vals):
-        listRevision = self.env['estimation.overview'].search([])
-        revisionValue = 0
-        for item in listRevision:
+        list_revision = self.env['estimation.overview'].search([])
+        revision_value = 0
+        for item in list_revision:
             if item.connect_overview.id == vals["connect_overview"]:
-                if revisionValue < item.revision:
-                    revisionValue = item.revision
+                if revision_value < item.revision:
+                    revision_value = item.revision
         if vals.get("revision", 0) == 0:
-            vals["revision"] = (revisionValue + 0.1)
+            vals["revision"] = (revision_value + 0.1)
         return super(EstimationOverview, self).create(vals)
