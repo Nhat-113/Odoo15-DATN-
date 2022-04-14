@@ -17,10 +17,7 @@
                 '/dhx_gantt/static/src/js/gantt_controller.js',
                 '/dhx_gantt/static/src/js/gantt_view.js',
                 '/dhx_gantt/static/src/js/gantt_action.js',
-
-                '/dhx_gantt/static/src/css/gantt.css',
-                '/dhx_gantt/static/src/css/custom.css'
-
+                '/dhx_gantt/static/src/css/gantt.css'
             ],
             'web.assets_qweb': [
                 'dhx_gantt/static/src/xml/gantt.xml'

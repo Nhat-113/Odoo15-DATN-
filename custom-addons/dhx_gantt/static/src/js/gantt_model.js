@@ -111,6 +111,23 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 task.text = record[self.map_text];
                 task.start_date = datetime;
 
+                // Handle warning or danger task
+                // Convert to days
+                const currentDuration = (new Date() - datetime)/1000/86400;
+
+                // if Danger else if warning
+                if (currentDuration > record[self.map_duration] && record[self.map_progress] !=1) {
+                    task.deadline = 1;
+                } else if(currentDuration > 0 && currentDuration < record[self.map_duration]) {
+                    if(record[self.map_duration]) {
+                        let progress = (currentDuration) *(1/record[self.map_duration]);
+                        if(progress > record[self.map_progress]) {
+                            task.deadline = 2;
+                        }
+                    }
+                }
+
+
                 task.duration = record[self.map_duration];
                 task.progress = record[self.map_progress];
                 task.open = record[self.map_open];
@@ -122,7 +139,6 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 links.push.apply(links, JSON.parse(record.links_serialized_json))
             });
             // TODO COVERT pair user_ids and portal_user_name to assignees
-
             this.records = data;
             this.links = links;
         },

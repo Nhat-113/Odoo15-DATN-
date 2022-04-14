@@ -38,3 +38,23 @@
 .o_dhx_gantt_weekend{
     background: #f4f7f4 !important;
 }
+
+.danger {
+    border: 1px solid #990614;
+    color: #f30f0f;
+    background: #f30f0f;
+}
+
+.danger .gantt_task_progress {
+    background: #990614;
+}
+
+.warning {
+    border: 1px solid #eec41e;
+    color: #ffffcc;
+    background: #ffeb3b;
+}
+
+.warning .gantt_task_progress {
+    background: #eec41e;
+}

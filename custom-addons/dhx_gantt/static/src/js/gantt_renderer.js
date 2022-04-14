@@ -69,6 +69,10 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             gantt.config.work_time = true;
             gantt.config.skip_off_time = true;
 
+            gantt.plugins({
+                tooltip: true
+            });
+
             function byId(id) {
                 return `
                     <div class="o_field_many2manytags avatar o_clickable_m2x_avatar o_field_widget o_field_many2manytags_multi" name="user_ids">
@@ -99,6 +103,26 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                     }
                 }
             ]
+
+            gantt.templates.task_class = function (start, end, task) {
+                switch (task.deadline) {
+                    case 1:
+                        return "danger";
+                    case 2:
+                        return "warning";
+                }
+            };
+
+            const tooltips = gantt.ext.tooltips;
+            gantt.templates.tooltip_date_format = gantt.date.date_to_str("%F %j, %Y");
+			gantt.templates.tooltip_text = function (start, end, task) {
+                // Add assignee
+				return `<b>Task:</b> ${task.text}<br/>
+                <b>Duration:</b> ${task.duration}<br/>
+                <b>Start date:</b> ${gantt.templates.tooltip_date_format(start)} 
+                <br/><b>End date:</b> ${gantt.templates.tooltip_date_format(end)}`
+					
+			};
             
 
             if(this.is_total_float){
