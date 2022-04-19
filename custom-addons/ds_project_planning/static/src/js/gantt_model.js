@@ -27,7 +27,6 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_child_ids = params.child_ids;
             this.map_user_ids = params.user_ids;
             this.map_portal_user_names = params.portal_user_names;
-            // this.map_widget = params.widget
 
             
             this.map_open = params.open;

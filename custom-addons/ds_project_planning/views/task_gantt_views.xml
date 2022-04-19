@@ -1,27 +1,5 @@
 <odoo>
     <data>
-
-        <record id="task_gantt_view" model="ir.ui.view">
-            <field name="name">Tasks Gantt</field>
-            <field name="model">project.task</field>
-            <field name="priority">10</field>
-            <field name="type">dhx_gantt</field>
-            <field name="arch" type="xml">
-                <dhx_gantt
-                    id_field="id"
-                    text="name"
-                    date_start="date_start"
-                    duration="planned_duration"
-                    links_serialized_json="links_serialized_json"
-                    link_model="project.depending.tasks"
-                    progress="progress"
-                    child_ids="child_ids"
-                    user_ids="user_ids"
-                    portal_user_names="portal_user_names"
-                />
-            </field>
-        </record>
-
         <record id="view_task_gantt_data_form" model="ir.ui.view">
             <field name="name">project.task.gant.data.form</field>
             <field name="model">project.task</field>
@@ -55,11 +33,5 @@
                 </xpath>
             </field>
         </record>
-
-        <record id="project.act_project_project_2_project_task_all" model="ir.actions.act_window">
-            <field name="view_mode">kanban,tree,form,calendar,pivot,graph,activity,dhx_gantt</field>
-        </record>
-        
-
     </data>
 </odoo>

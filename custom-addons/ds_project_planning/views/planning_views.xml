@@ -1,4 +1,37 @@
 <odoo>
+    <record id="task_gantt_view" model="ir.ui.view">
+        <field name="name">Tasks Gantt</field>
+        <field name="model">project.task</field>
+        <field name="priority">10</field>
+        <field name="type">dhx_gantt</field>
+        <field name="arch" type="xml">
+            <dhx_gantt id_field="id" text="name" date_start="date_start" duration="planned_duration" links_serialized_json="links_serialized_json" link_model="project.depending.tasks" child_ids="child_ids" user_ids="user_ids" portal_user_names="portal_user_names" date_deadline="date_deadline" />
+        </field>
+    </record>
+
+    <record id="open_planning_task_all_on_gantt" model="ir.actions.act_window">
+        <field name="name">Tasks</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">dhx_gantt</field>
+        <field name="view_id" ref="ds_project_planning.task_gantt_view"/>
+        <field name="domain">[('display_project_id', '=', active_id)]</field>
+        <field name="context">{
+            'pivot_row_groupby': ['user_ids'],
+            'default_project_id': active_id,
+            'show_project_update': True,
+        }</field>
+        <!-- <field name="search_view_id" ref="view_task_search_form"/> -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No tasks found. Let's create one!
+            </p>
+            <p>
+                To get things done, use activities and status on tasks.<br/>
+                Chat in real-time or by email to collaborate efficiently.
+            </p>
+        </field>
+    </record>
+
     <record id="project_planning_view_kanban" model="ir.ui.view">
         <field name="name">project.planning.kanban</field>
         <field name="model">project.project</field>
@@ -8,23 +41,26 @@
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_content oe_kanban_global_click o_kanban_get_form">
-                            <div class="row">
-                                <div class="col-12">
-                                    <strong>
-                                        <field name="name" string="Project Name"/>
-                                    </strong>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-8">
-                                    <field name="partner_id" string="Contact"/>
-                                </div>
-                                <div class="col-4">
-                                    <div class="oe_kanban_bottom_right float-right">
-                                        <field name="user_id" widget="many2one_avatar_user"/>
+                            <a name="%(open_planning_task_all_on_gantt)d" type="action">
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <strong>
+                                            <field name="name" string="Project Name"/>
+                                        </strong>
                                     </div>
                                 </div>
-                            </div>
+                                <div class="row">
+                                    <div class="col-8">
+                                        <field name="partner_id" string="Contact"/>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="oe_kanban_bottom_right float-right">
+                                            <field name="user_id" widget="many2one_avatar_user"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
                     </t>
                 </templates>
