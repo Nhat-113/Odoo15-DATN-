@@ -1,4 +1,3 @@
-from asyncore import write
 import json
 from random import randint
 
@@ -14,7 +13,7 @@ class TaskStatus(models.Model):
         return randint(1, 11)
 
     name = fields.Char('Name', required=True)
-    color = fields.Char(string='Color')
+    color = fields.Integer(string='Color', default=_get_default_color)
 
     _sql_constraints = [
         ('name_uniq', 'unique (name_status)', "Status name already exists!"),
@@ -55,9 +54,9 @@ class Task(models.Model):
     _inherit = 'project.task'
 
     issues_type = fields.Many2one('project.issues.type',
-                                  string='Issues Type', required=True)
-    icon_path = fields.Html('Issues Type', related='issues_type.icon_path')
-    icon = fields.Image('Issues Type', related='issues_type.icon')
+                                  string='Type', required=True, tracking=True)
+    icon_path = fields.Html('Type Icon', related='issues_type.icon_path')
+    icon = fields.Image('Type Icon', related='issues_type.icon')
     priority_type = fields.Selection([
         ('urgent', 'Urgent'),
         ('high', 'High'),
@@ -85,13 +84,21 @@ class Task(models.Model):
         readonly=True,
         store=False
     )
+    is_readonly = fields.Boolean(compute='_check_user_readonly')
+    progress_input = fields.Float(string='Progress (%)')
 
-    # @api.onchange('issues_type')
-    # def m2mtom2o(self):
-    #     if len(self.issues_type.status) > 0:
-    #         self.status_selection = False
-    #         for stt in self.issues_type.status:
-    #             self.write({'status_selection': [(6, 0, [stt.id])]})
+
+    def _check_user_readonly(self):
+        if self.env.user.has_group('project.group_project_manager') == False or\
+            self.env.user.id != self.project_id.user_id.id:
+            self.is_readonly = True
+        else:
+            self.is_readonly = False
+
+    @api.onchange('planned_hours')
+    def _check_planned_hours(self):
+        if self.planned_hours < 0:
+           raise UserError('Required field Initial Planned Hours > 0')
 
     @api.depends('issues_type')
     def _get_status_id_domain(self):
@@ -101,33 +108,41 @@ class Task(models.Model):
                 [('id', 'in', status_ids)]
             )
 
-    @api.constrains('status')
+    @api.onchange('issues_type')
+    def _get_first_status(self):
+        self.status = self.issues_type.status[0]
+
+    @api.constrains('status', 'timesheet_ids')
     def _check_timesheet(self):
-        if self.status.name == 'Done':
+        if self.status.name == 'Done' or self.status.name == 'Closed':
             if len(self.timesheet_ids) == 0 or self.planned_hours == 0.0:
                 raise UserError(
                     'Time Sheet field and Initially Planned Hours field cannot be left blank')
-
-        if self.status.name == 'Closed':
-            if len(self.timesheet_ids) == 0 or self.planned_hours == 0.0:
+            if self.progress_input != 100.0:
                 raise UserError(
-                    'Time Sheet field and Initially Planned Hours field cannot be left blank')
-            else:
-                self.progress = 100.0
-        elif self.status.name != 'Closed':
-            if self.planned_hours == 0.0:
-                self.progress = 0
-            else:
-                self.progress = (self.effective_hours / self.planned_hours) * 100
+                    'Required when status Done or Closed, progess = 100%')
 
-    @api.onchange('status')
-    def _set_progress(self):
-        if self.status.name == 'Closed':
-            self.progress = 100.0
-        elif self.status.name != 'Closed':
-            if self.planned_hours == 0.0:
-                self.progress = 0
-            self.progress = (self.effective_hours / self.planned_hours) * 100
+    @api.constrains('progress_input')
+    def _check_progress(self):
+        if self.progress_input < 0 or self.progress_input > 100:
+            raise UserError('Progress must be between 0 and 100%')
+    
+    @api.constrains('progress_input', 'timesheet_ids')
+    def _check_timesheet_progress(self):
+        if self.progress_input > 0:
+            if len(self.timesheet_ids) == 0:
+                raise UserError('Timesheet required')
+        if len(self.timesheet_ids) > 0:
+            if self.progress_input == 0:
+                raise UserError('Progress > 0%')
+
+    @api.constrains('timesheet_ids')
+    def _check_hours_spent(self):
+        if len(self.timesheet_ids) > 0:
+            for ts in self.timesheet_ids:
+                if ts.unit_amount <= 0:
+                    raise UserError(
+                'Required Hours Spent > 0')
 
 
 class Project(models.Model):
@@ -145,5 +160,4 @@ class Project(models.Model):
     def _get_status(self):
 
         for stt in self:
-
             stt.status_color = stt.status

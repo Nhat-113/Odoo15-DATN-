@@ -12,7 +12,7 @@
                     <field name="complex" widget="selection"/>
                 </xpath>
                 <xpath expr="//field[@name='tag_ids']" position="after">
-                    <label for="issues_type" string="Issues Type"/>
+                    <label for="issues_type" string="Type"/>
                     <div>
                         <field name="icon_path" class="issue_type_img oe_left" style="width :30%" attrs="{'invisible': [('icon_path', '=', False)]}"/>
                         <field name="issues_type" widget="selection" style="width :70%"/>
@@ -21,20 +21,35 @@
                 <xpath expr="//field[@name='recurring_task']" position="after">
                     <field name="task_score" widget="priority" eval="5"/>
                 </xpath>
+                <xpath expr="//field[@name='progress']" position="replace">
+                    <field name="progress_input"/>
+                </xpath>
             </field>
         </record>
 
-        <!-- <record id="date_task" model="ir.ui.view">
-            <field name="name">date.task</field>
+        <record id="task_planned_hours" model="ir.ui.view">
+            <field name="name">task.planned.hours</field>
             <field name="model">project.task</field>
+            <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='planned_hours']" position="replace">
+                    <field name="is_readonly" attrs="{'invisible': True}"/>
+                    <field name="planned_hours" widget="timesheet_uom_no_toggle" nolabel="1" attrs="{'readonly': [('is_readonly','=', True)]}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- <record id="readonly_view" model="ir.ui.view">
+            <field name="name">readonly.view</field>
+            <field name="model">project.task</field>
+            <field name="groups_id" eval="[(6, 0,[ref('project.group_project_user')])]"/>
             <field name="inherit_id" ref="project.view_task_form2"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='partner_id']" position="after">
-                    <field name="date_start"/>
-                </xpath>
-                <xpath expr="//field[@name='date_deadline']" position="replace">
-                    <field name="date_end"/>
-                </xpath>
+                <data>
+                    <xpath expr="//field[@name='planned_hours']" position="attributes">
+                        <attribute name="readonly">True</attribute>
+                    </xpath>
+                </data>
             </field>
         </record> -->
 
@@ -65,13 +80,37 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="quick_create_task_form_inherit">
+            <field name="name">project.quick.create.task.form.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.quick_create_task_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_ids']" position="after">
+                    <field name="issues_type" widget="selection"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="project.act_project_project_2_project_task_all">
+            <field name="domain">[('display_project_id', '=', active_id), ('issues_type', '=', 'Task')]</field>
+        </record>
+
         <record id="issues_type_view_tree" model="ir.ui.view">
             <field name="name">view.tree</field>
             <field name="model">project.task</field>
             <field name="inherit_id" ref="project.view_task_tree2"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='tag_ids']" position="after">
-                    <field name="icon_path" class="oe_avatar issue_type_img" attrs="{'invisible': [('icon_path', '=', False)]}"/>
+                    <field name="issues_type" widget="badge"/>
+                </xpath>
+                <xpath expr="//field[@name='progress']" position="replace">
+                    <field name="progress_input"/>
+                </xpath>
+                <xpath expr="//field[@name='remaining_hours']" position="replace">
+                    <field name="remaining_hours" widget="timesheet_uom" sum="Remaining Hours" optional="hide" decoration-danger="progress_input &gt;= 100" decoration-warning="progress_input &gt;= 80 and progress_input &lt; 100"/>
+                </xpath>
+                <xpath expr="//field[@name='activity_ids']" position="replace">
+                    <field name="activity_ids" optional="hide"/>
                 </xpath>
             </field>
         </record>
@@ -82,11 +121,11 @@
             <field name="inherit_id" ref="project.view_task_kanban"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="inside">
-                    <div class="issue_type_img" title="Issue type" modifiers="{}">
+                    <!-- <div class="issue_type_img" title="Issue type" modifiers="{}">
                         <t t-if="record.icon.raw_value">
                             <field name="icon" nolabel="1" widget="image"/>
                         </t>
-                    </div>
+                    </div> -->
                     <field name="status" widget="badge" options="{'color_field': 'color'}"/>
                 </xpath>
             </field>
@@ -122,6 +161,19 @@
             </field>
         </record>
 
+        <record id="view_task_search_form_inherit" model="ir.ui.view">
+            <field name="name">project.task.search.form_inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_search_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='starred']" position="before">
+                    <filter string="Bug" name="bug" domain="[('issues_type.name', '=', 'Bug')]"/>
+                    <filter string="Q&amp;A" name="qa" domain="[('issues_type.name', '=', 'Q&amp;A')]"/>
+                    <separator/>
+                </xpath>
+            </field>
+        </record>
+
         <record model="ir.ui.view" id="task_status_form_view">
             <field name="name">Status</field>
             <field name="model">project.task.status</field>
@@ -143,7 +195,7 @@
             <field name="arch" type="xml">
                 <tree editable="top" sample="1">
                     <field name="name"/>
-                    <field name="color" widget="color" optional="show"/>
+                    <field name="color" widget="color_picker" optional="show"/>
                 </tree>
             </field>
         </record>
@@ -160,8 +212,24 @@
             <field name="view_mode">tree,form</field>
         </record>
 
+        <record id="issues_action" model="ir.actions.act_window">
+            <field name="name">Issues</field>
+            <field name="res_model">project.task</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('issues_type', '!=', 'Task')]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No tasks found. Let's create one!
+                </p>
+                <p>
+                    To get things done, use activities and status on tasks.<br/>
+                    Chat in real-time or by email to collaborate efficiently.
+                </p>
+            </field>
+        </record>
 
-        <menuitem id="issues_type_menu" name="Issues Types" parent="project.menu_project_config" action="issues_type_action" sequence="11"/>
+        <menuitem name="Issues" id="menu_issues" parent="project.menu_main_pm" action="issues_action" sequence="3" groups="base.group_no_one,project.group_project_user"/>
+        <menuitem id="issues_type_menu" name="Type" parent="project.menu_project_config" action="issues_type_action" sequence="11"/>
         <menuitem id="task_status_menu" name="Status" parent="project.menu_project_config" action="task_status_action" sequence="12"/>
 
     </data>
