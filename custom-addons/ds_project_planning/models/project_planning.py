@@ -2,10 +2,13 @@
 
 import json
 from calendar import calendar
+import string
+from xml import dom
 from numpy import require
 from odoo import models, fields, api, _
 from datetime import date, datetime, time
 from odoo.exceptions import UserError, ValidationError
+
 
 class Project(models.Model):
     _inherit = ['project.project']
@@ -23,6 +26,10 @@ class Project(models.Model):
     total_calendar_effort = fields.Float(
         string="Calendar Effort", compute="_compute_total_calendar_effort")
     total_estimate_effort = fields.Float(string="Estimate Effort")
+    total_phase = fields.Integer(
+        string="Total phases", compute="_count_phase_milestone")
+    total_milestone = fields.Integer(
+        string="Total milestones", compute="_count_phase_milestone")
 
     def _compute_total_calendar_effort(self):
         for project in self:
@@ -46,11 +53,22 @@ class Project(models.Model):
     @api.onchange('planning_calendar_resources')
     def _onchange_calendar_resources(self):
         # check the current user is the PM of this project
-        if self.user_id != self.env.user:
-            raise UserError(_('You are not the manager of this project, so you cannot assign members to it.'))
+        if self.user_id != self.env.user and not self.env.user.has_group('project.group_project_manager'):
+            raise UserError(
+                _('You are not the manager of this project, so you cannot assign members to it.'))
 
         # update member_ids list
         user_ids = [
             user.user_id.id for user in self.planning_calendar_resources.employee_id]
         self.member_ids = self.env['res.users'].search(
             [('id', 'in', user_ids)])
+
+    def _count_phase_milestone(self):
+        for project in self:
+            domain = [('project_id', '=', project.id)]
+            num_phase = self.env['project.planning.phase'].search(domain)
+            num_milestone = self.env['project.planning.milestone'].search(
+                domain)
+
+            project.total_phase = len(num_phase)
+            project.total_milestone = len(num_milestone)

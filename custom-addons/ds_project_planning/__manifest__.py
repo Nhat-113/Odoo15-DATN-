@@ -7,7 +7,7 @@
     "website": "https://d-soft.com.vn",
     "category": "Project",
     "license": "AGPL-3",
-    "depends": ['base', 'project', 'web_domain_field'],
+    "depends": ['base', 'project', 'mail', 'web_domain_field'],
     "application": True,
     "auto_install": False,
     "data": [

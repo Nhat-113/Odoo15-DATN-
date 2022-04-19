@@ -27,16 +27,42 @@
     <!-- Menu item to open the Configuration -->
     <menuitem id="planning_config_menu" name="Configuration" parent="planning_menu" groups="project.group_project_manager" sequence="4" />
 
-    <menuitem id="menu_config_setting" name="Setting" parent="planning_config_menu" action="open_view_planning_project_all"/>
+    <menuitem id="menu_config_setting" name="Setting" parent="planning_config_menu" action="open_view_planning_project_all" sequence="1"/>
 
     <!-- Action to open the configuration phases of project -->
     <record id="action_config_phase" model="ir.actions.act_window">
         <field name="name">Project Phases</field>
         <field name="res_model">project.planning.phase</field>
         <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No phases found. Let's create one!
+            </p>
+            <p>
+                Use phases to organize tasks inside a project.
+            </p>
+        </field>
     </record>
 
-    <menuitem id="menu_config_planning_phase" name="Project Planning Phase" parent="planning_config_menu" action="action_config_phase"/>
+    <menuitem id="menu_config_planning_phase" name="Planning Phases" parent="planning_config_menu" action="action_config_phase" sequence="2"/>
+
+    <!-- Action to open the configuration phases of project -->
+    <record id="action_config_milestone" model="ir.actions.act_window">
+        <field name="name">Project Milestone</field>
+        <field name="res_model">project.planning.milestone</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_project_planning_milestone_search_form"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No milestones found. Let's create one!
+            </p>
+            <p>
+                Use milestones to organize tasks inside a project's phases.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_config_planning_milestone" name="Planning Milestone" parent="planning_config_menu" action="action_config_milestone" sequence="3"/>
 
     <!-- Action to open the configuration phases of project -->
     <record id="action_config_role" model="ir.actions.act_window">
