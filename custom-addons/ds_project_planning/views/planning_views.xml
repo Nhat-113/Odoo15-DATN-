@@ -126,6 +126,112 @@
                          ]"/>
     </record>
 
+    <!-- Search filter Planning Phases -->
+    <record id="view_project_planning_phases_search_form" model="ir.ui.view">
+        <field name="name">project.planning.phase.search.form</field>
+        <field name="model">project.planning.phase</field>
+        <field name="arch" type="xml">
+            <search string="Search Project">
+                <field name="project_id" string="Project"/>
+                <field name="pm_user_id" string="Project Manager"/>
+                <separator/>
+                <filter string="My Projects" name="own_projects" domain="[('pm_user_id', '=', uid)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Project Manager" name="Manager" context="{'group_by': 'pm_user_id'}"/>
+                    <filter string="Project" name="Manager" context="{'group_by': 'project_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Search filter Planning Milestone -->
+    <record id="view_project_planning_milestone_search_form" model="ir.ui.view">
+        <field name="name">project.planning.milestone.search.form</field>
+        <field name="model">project.planning.milestone</field>
+        <field name="arch" type="xml">
+            <search string="Search Project">
+                <field name="project_id" string="Project"/>
+                <field name="pm_user_id" string="Project Manager"/>
+                <separator/>
+                <filter string="My Projects" name="own_projects" domain="[('pm_user_id', '=', uid)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Project Manager" name="Manager" context="{'group_by': 'pm_user_id'}"/>
+                    <filter string="Project" name="Manager" context="{'group_by': 'project_id'}"/>
+                    <filter string="Phase" name="Manager" context="{'group_by': 'phase_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="project_planning_phase" model="ir.actions.act_window">
+        <field name="name">Phases</field>
+        <field name="res_model">project.planning.phase</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_project_planning_phases_search_form"/>
+        <field name="context">{'default_project_id': active_id}</field>
+        <field name="domain">[('project_id', '=', active_id)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No phases found. Let's create one!
+            </p>
+            <p>
+                Use phases to organize tasks inside a project.
+            </p>
+        </field>
+    </record>
+
+    <record id="project_planning_milestone_from_phase" model="ir.actions.act_window">
+        <field name="name">Milestones</field>
+        <field name="res_model">project.planning.milestone</field>
+        <field name="view_mode">tree,form</field>
+        <!-- <field name="context">{'default_project_id': active_id}</field> -->
+        <field name="domain">[('phase_id', '=', active_id)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No milestones found. Let's create one!
+            </p>
+            <p>
+                Use milestones to organize tasks inside a project's phases.
+            </p>
+        </field>
+    </record>
+
+    <record id="project_planning_milestone_from_project" model="ir.actions.act_window">
+        <field name="name">Milestones</field>
+        <field name="res_model">project.planning.milestone</field>
+        <field name="view_mode">tree,form</field>
+        <!-- <field name="context">{'default_project_id': active_id}</field> -->
+        <field name="domain">[('project_id', '=', active_id)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            No milestones found. Let's create one!
+            </p>
+            <p>
+                Use milestones to organize tasks inside a project's phases.
+            </p>
+        </field>
+    </record>
+
+    <!-- Search filter Calendar Resources -->
+    <record id="view_project_calendar_resource_search_form" model="ir.ui.view">
+        <field name="name">project.calendar.resource.search.form</field>
+        <field name="model">project.project</field>
+        <field name="arch" type="xml">
+            <search string="Search Project">
+                <field name="name" string="Project"/>
+                <field name="user_id" string="Project Manager"/>
+                <separator/>
+                <filter string="My Projects" name="own_projects" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Project Manager" name="Manager" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="view_form_calendar_resource" model="ir.ui.view">
         <field name="name">Calendar Resource Form</field>
         <field name="model">project.project</field>
@@ -134,6 +240,29 @@
             <form string="Calendar Resources" class="o_form_project_project" edit="1" delete="0" create="0">
                 <sheet>
                     <div class="oe_button_box" name="button_box" groups="base.group_user">
+                        <button name="%(ds_project_planning.project_planning_phase)d" class="oe_stat_button" style="width: 13.5%" type="action" icon="fa-check-square-o">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="total_phase" readonly="1" nolabel="1" help="Total phases in the project"/>
+                                </span>
+                                <span class="o_stat_text">
+                                    Phases
+                                </span>
+                            </div>
+                        </button>
+                        <button name="%(ds_project_planning.project_planning_milestone_from_project)d" class="oe_stat_button" style="width: 13.5%" type="action" icon="fa-check-square-o">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="total_milestone" readonly="1" nolabel="1" help="Total milestones in the project"/>
+                                </span>
+                                <span class="o_stat_text">
+                                    Milestones
+                                </span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" type="action" name="%(project.dblc_proj)d" attrs="{'invisible': [('task_count_with_subtasks', '=', 0)]}" icon="fa-tasks">
+                            <field string="Tasks" name="task_count_with_subtasks" widget="statinfo"/>
+                        </button>
                         <button name="%(action_calendar_effort)d" class="oe_stat_button" style="width: 13.5%" type="action" icon="fa-clock-o">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_value">
@@ -182,7 +311,7 @@
                         </group>
                     </group>
                     <label for="member_ids" style="min-width: 150px"/>
-                    <field name="member_ids" widget="many2many_avatar_user" edit="0"/>
+                    <field name="member_ids" widget="many2many_avatar_user" readonly="1" force_save="1"/>
                     <notebook>
                         <page string="Calendar Resources">
                             <field name="planning_calendar_resources" colspan="4" nolabel="1">
@@ -222,6 +351,12 @@
                         </page>
                     </notebook>
                 </sheet>
+                <!-- Chatter -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="project.group_project_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
@@ -257,6 +392,7 @@
         <field name="name">Calendar Resource</field>
         <field name="res_model">project.project</field>
         <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_project_calendar_resource_search_form"/>
         <field name="view_ids" eval="[(5, 0, 0),
                           (0, 0, {'view_mode': 'tree', 'view_id': ref('ds_project_planning.view_tree_calendar_resource')}),
                           (0, 0, {'view_mode': 'form', 'view_id': ref('ds_project_planning.view_form_calendar_resource')})
@@ -272,20 +408,86 @@
 
     </record>
 
+    <!-- Opening task when clicking on phase Tasks -->
+    <record id="action_phase_tasks" model="ir.actions.act_window">
+        <field name="res_model">project.task</field>
+        <field name="name">Project's tasks</field>
+        <field name="view_mode">tree,form,calendar,graph,kanban</field>
+        <field name="domain">[('phase_id', '=', active_id)]</field>
+        <!-- <field name="context">{'project_id': active_id}</field> -->
+    </record>
+
+    <!-- Planning Phases -->
     <record id="view_form_project_phase" model="ir.ui.view">
-        <field name="name">Project Phase Form</field>
+        <field name="name">Project Phase</field>
         <field name="model">project.planning.phase</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button string="Compute Tasks" name="compute_tasks" type="object" class="oe_highlight"/>
+                </header>
                 <sheet>
-                    <group name="group_top">
-                        <field name='sequence' />
-                        <field name="name" />
+                    <div class="oe_button_box" name="button_box" groups="base.group_user">
+                        <button name="%(ds_project_planning.project_planning_milestone_from_phase)d" class="oe_stat_button" style="width: 13.5%" type="action" icon="fa-check-square-o">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="count_milestone" readonly="1" nolabel="1" help="Total milestones in the phase"/>
+                                </span>
+                                <span class="o_stat_text">
+                                    Milestones
+                                </span>
+                            </div>
+                        </button>
+                        <button class="oe_stat_button" type="action" name="%(ds_project_planning.action_phase_tasks)d" icon="fa-tasks">
+                            <field string="Tasks" name="tasks_count" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <div class="oe_title" style="width: 800px">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" class="o_text_overflow" placeholder="Phase Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name='sequence' invisible="1"/>
+                        <field name='project_id' options="{'no_create': True}"/>
+                    </group>
+                    <group>
                         <field name="start_date" />
                         <field name="end_date" />
-                        <field name="description" />
+                        <field name="description" placeholder="Add a description..."/>
                     </group>
+                    <notebook>
+                        <page string="Tasks">
+                            <field name="project_tasks" colspan="4" nolabel="1" readonly="1" force_save="1">
+                                <tree string="Tasks" multi_edit="1" sample="1" js_class="project_list">
+                                    <field name="is_closed" invisible="1" />
+                                    <field name="allow_subtasks" invisible="1" />
+                                    <field name="sequence" invisible="1" readonly="1"/>
+                                    <field name="name" widget="name_with_subtask_count"/>
+                                    <field name="child_text" invisible="1"/>
+                                    <field name="project_id" optional="show" readonly="1"/>
+                                    <field name="milestone_id" optional="show" readonly="1"/>
+                                    <field name="partner_id" optional="hide"/>
+                                    <field name="parent_id" optional="hide" attrs="{'invisible': [('allow_subtasks', '=', False)]}" groups="base.group_no_one"/>
+                                    <field name="user_ids" optional="show" widget="many2many_avatar_user" domain="[('active', '=', True)]"/>
+                                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                                    <field name="date_deadline" optional="hide" widget="remaining_days" attrs="{'invisible': [('is_closed', '=', True)]}"/>
+                                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="show"/>
+                                    <field name="kanban_state" widget="selection" optional="hide" />
+                                    <field name="stage_id" invisible="context.get('set_visible',False)" optional="show" readonly="not context.get('default_project_id')"/>
+                                    <field name="recurrence_id" invisible="1" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
+                <!-- Chatter -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="project.group_project_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
@@ -297,6 +499,113 @@
             <tree>
                 <field name='sequence' widget='handle' />
                 <field name="name" />
+                <field name="project_id" />
+                <field name="start_date" />
+                <field name="end_date" />
+                <field name="description" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Opening task when clicking on milestone Tasks -->
+    <record id="action_milestone_tasks" model="ir.actions.act_window">
+        <field name="res_model">project.task</field>
+        <field name="name">Project's tasks</field>
+        <field name="view_mode">tree,form,calendar,graph,kanban</field>
+        <field name="domain">[('milestone_id', '=', active_id)]</field>
+        <!-- <field name="context">{'project_id': active_id}</field> -->
+    </record>
+
+    <!-- Planning Milestone -->
+    <record id="view_form_project_milestone" model="ir.ui.view">
+        <field name="name">Project Milestone</field>
+        <field name="model">project.planning.milestone</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button string="Compute Tasks" name="compute_tasks" type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box" groups="base.group_user">
+                        <button class="oe_stat_button" type="action" name="%(ds_project_planning.action_milestone_tasks)d" icon="fa-tasks">
+                            <field string="Tasks" name="tasks_count" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <div class="oe_title" style="width: 800px">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" class="o_text_overflow" placeholder="Milestone Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name='sequence' invisible="1"/>
+                        <div class="oe_title" style="width: 800px">
+                            <label for="project_id" style="font-weight: 700;"/>
+                            <h2>
+                                <field name='project_id' options="{'no_create': True}"/>
+                            </h2>
+                        </div>
+                        <group>
+                            <field name='phase_id' domain="[('project_id', '=', project_id)]" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <label for="start_date_phase" string="Dates" attrs="{'invisible': [('phase_id', '=', False)]}"/>
+                            <div name="dates" class="o_row" attrs="{'invisible': [('phase_id', '=', False)]}">
+                                <field name="start_date_phase" widget="daterange" options='{"related_end_date": "end_date_phase"}' readonly="1"/>
+                                <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow" />
+                                <field name="end_date_phase" widget="daterange" options='{"related_start_date": "start_date_phase"}' readonly="1"/>
+                            </div>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="start_date" />
+                        <field name="end_date" />
+                        <field name="description" placeholder="Add a description..."/>
+                    </group>
+                    <notebook>
+                        <page string="Tasks">
+                            <field name="project_tasks" colspan="4" nolabel="1" readonly="1" force_save="1">
+                                <tree string="Tasks" multi_edit="1" sample="1" js_class="project_list">
+                                    <field name="is_closed" invisible="1" />
+                                    <field name="allow_subtasks" invisible="1" />
+                                    <field name="sequence" invisible="1" readonly="1"/>
+                                    <field name="name" widget="name_with_subtask_count"/>
+                                    <field name="child_text" invisible="1"/>
+                                    <field name="project_id" optional="show" readonly="1"/>
+                                    <field name="phase_id" optional="show" readonly="1"/>
+                                    <field name="partner_id" optional="hide"/>
+                                    <field name="parent_id" optional="hide" attrs="{'invisible': [('allow_subtasks', '=', False)]}" groups="base.group_no_one"/>
+                                    <field name="user_ids" optional="show" widget="many2many_avatar_user" domain="[('active', '=', True)]"/>
+                                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                                    <field name="date_deadline" optional="hide" widget="remaining_days" attrs="{'invisible': [('is_closed', '=', True)]}"/>
+                                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="show"/>
+                                    <field name="kanban_state" widget="selection" optional="hide" />
+                                    <field name="stage_id" invisible="context.get('set_visible',False)" optional="show" readonly="not context.get('default_project_id')"/>
+                                    <field name="recurrence_id" invisible="1" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- Chatter -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="project.group_project_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_project_milestone" model="ir.ui.view">
+        <field name="name">Project Milestones</field>
+        <field name="model">project.planning.milestone</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name='sequence' widget='handle' />
+                <field name="name" />
+                <field name="project_id" />
+                <field name="phase_id" />
                 <field name="start_date" />
                 <field name="end_date" />
                 <field name="description" />
