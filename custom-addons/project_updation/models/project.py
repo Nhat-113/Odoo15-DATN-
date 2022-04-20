@@ -86,6 +86,29 @@ class Task(models.Model):
     )
     is_readonly = fields.Boolean(compute='_check_user_readonly')
     progress_input = fields.Float(string='Progress (%)')
+    status_color = fields.Char(compute='_get_status_color', store=True)
+
+    @api.depends('status')
+    def _get_status_color(self):
+        for color in self:
+            color.status_color = color._color(color.status.color)
+
+
+    def _color(self, i):
+        switcher={
+            1:'red',
+            2:'orange',
+            3:'yellow',
+            4:'lightblue',
+            5:'darkpurple',
+            6:'salmonpink',
+            7:'mediumblue', 
+            8:'darkblue',
+            9:'fuchsia',
+            10:'green',
+            11:'purple'
+        }
+        return switcher.get(i,"Red")
 
 
     def _check_user_readonly(self):

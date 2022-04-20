@@ -15,7 +15,7 @@
                     <label for="issues_type" string="Type"/>
                     <div>
                         <field name="icon_path" class="issue_type_img oe_left" style="width :30%" attrs="{'invisible': [('icon_path', '=', False)]}"/>
-                        <field name="issues_type" widget="selection" style="width :70%"/>
+                        <field name="issues_type" style="width :70%"/>
                     </div>
                 </xpath>
                 <xpath expr="//field[@name='recurring_task']" position="after">
@@ -102,6 +102,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='tag_ids']" position="after">
                     <field name="issues_type" widget="badge"/>
+                    <field name="status_color" invisible="1"/>
+                    <field name="status" style="background-color:red;"/>
                 </xpath>
                 <xpath expr="//field[@name='progress']" position="replace">
                     <field name="progress_input"/>
@@ -126,7 +128,17 @@
                             <field name="icon" nolabel="1" widget="image"/>
                         </t>
                     </div> -->
-                    <field name="status" widget="badge" options="{'color_field': 'color'}"/>
+                    <field name="status_color" invisible="1"/>
+                    <t t-if="record.status_color.value != 'Yellow' and record.status_color.value != 'Lightblue'">
+                        <div class="color_status" t-attf-style="background-color: {{record.status_color.value}}; color: white">
+                            <field name="status"/>
+                        </div>
+                    </t>
+                    <t t-if="record.status_color.value == 'Yellow' or record.status_color.value == 'Lightblue'">
+                        <div class="color_status" t-attf-style="background-color: {{record.status_color.value}}; color: black">
+                            <field name="status"/>
+                        </div>
+                    </t>
                 </xpath>
             </field>
         </record>
