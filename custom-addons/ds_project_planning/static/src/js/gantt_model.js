@@ -33,6 +33,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_links_serialized_json = params.links_serialized_json;
             this.map_total_float = params.total_float;
             this.map_parent = 'project_id';
+            this.map_milestone = "milestone_id";
             this.modelName = params.modelName;
             this.linkModel = params.linkModel;
             return this._load(params);
@@ -56,6 +57,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_child_ids && fieldNames.push(this.map_child_ids)
             this.map_total_float && fieldNames.push(this.map_total_float);
             this.map_parent && fieldNames.push(this.map_parent);
+            this.map_milestone && fieldNames.push(this.map_milestone);
             return this._rpc({
                 model: this.modelName,
                 method: 'search_read',
@@ -105,7 +107,28 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                     }else{
                         task.parent = projectFound.id;
                     }
+
+                    if(record[self.map_milestone]){
+                        var milestoneFound = data.find(function(element) {
+                            return element.type === 'milestone' && element.serverId == record[self.map_milestone][0];
+                        });
+                        
+                        if(!milestoneFound){
+                            var milestone = {
+                                id: _.uniqueId(),
+                                parent: !projectFound ?  project.id : projectFound.id,
+                                serverId: record[self.map_milestone][0],
+                                text: record[self.map_milestone][1],
+                                type: 'milestone',
+                                // TODO: Fix start_date
+                                start_date: datetime,
+                                open: true,
+                            }
+                            data.push(milestone);
+                        }
+                    }
                 }
+           
                 task.id = record[self.map_id];
                 task.text = record[self.map_text];
                 task.start_date = datetime;

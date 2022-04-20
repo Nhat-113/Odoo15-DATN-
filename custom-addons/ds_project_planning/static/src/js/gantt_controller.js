@@ -14,9 +14,9 @@ var GanttController = AbstractController.extend({
     }),
     date_object: new Date(),
     init: function (parent, model, renderer, params) {
-        // console.log('controller init');
         this._super.apply(this, arguments);
         this.projectModel = 'project.project';  // todo: read from view arch
+        this.milestoneModel = 'project.planning.milestone';
     },
     _onGanttCreateDataProcessor: function(event){
         // console.log('_onGanttCreateDataProcessor');
@@ -126,7 +126,6 @@ var GanttController = AbstractController.extend({
         this.gantt_configured = true;
         gantt.attachEvent('onBeforeLightbox', function(id) {
             // todo: Change this to trigger_up from renderer !!! to avoid errors
-            // console.log('onBeforeLightbox');
             var task = gantt.getTask(id);
             var title = 'Open: ' + task.text;
             if(self.form_dialog && !self.form_dialog.isDestroyed()){
@@ -134,8 +133,8 @@ var GanttController = AbstractController.extend({
             }
             var session =  self.getSession();
             var context = session ? session.user_context : {};
-            var modelName = task.isProject && self.projectModel || self.model.modelName;
-            var target_id = task.isProject && task.serverId || task.id;
+            var modelName = task.type === 'project' && self.projectModel || task.type === 'milestone' && self.milestoneModel || self.model.modelName;
+            var target_id = task.type === 'project' && task.serverId || task.type === 'milestone' && task.serverId || task.id;
             var res_id = parseInt(target_id, 10).toString() === target_id ? parseInt(target_id, 10) : target_id;
             self.form_dialog = new dialogs.FormViewDialog(self, {
                 res_model: modelName,
