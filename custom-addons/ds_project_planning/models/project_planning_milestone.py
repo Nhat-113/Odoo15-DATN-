@@ -132,3 +132,15 @@ class PlanningMilestone(models.Model):
             num_tasks = self.env['project.task'].search(
                 ['&', ('project_id', '=', milestone.project_id.id), ('milestone_id', '=', milestone.id)])
             milestone.tasks_count = len(num_tasks)
+
+    @api.model
+    def open_create_milestone(self, project_id):
+        return {
+            "name": _("Create Milestone"),
+            "type": "ir.actions.act_window",
+            "res_model": "project.planning.milestone",
+            "views": [[False, "form"]],
+            "view_mode": 'form',
+            # "target": "new",
+            "context": {'default_project_id': project_id},
+        }

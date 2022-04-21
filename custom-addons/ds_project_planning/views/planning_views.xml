@@ -450,7 +450,7 @@
                     </div>
                     <group>
                         <field name='sequence' invisible="1"/>
-                        <field name='project_id' options="{'no_create': True}"/>
+                        <field name='project_id' options="{'no_create': True}" readonly="context.get('default_project_id')"/>
                     </group>
                     <group>
                         <field name="start_date" />
@@ -542,7 +542,7 @@
                         <div class="oe_title" style="width: 800px">
                             <label for="project_id" style="font-weight: 700;"/>
                             <h2>
-                                <field name='project_id' options="{'no_create': True}"/>
+                                <field name='project_id' options="{'no_create': True}" readonly="context.get('default_project_id')"/>
                             </h2>
                         </div>
                         <group>

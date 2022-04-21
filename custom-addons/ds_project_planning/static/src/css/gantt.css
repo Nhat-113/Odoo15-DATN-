@@ -35,6 +35,12 @@
     margin-top:4px;
     margin-bottom:4px;
 }
+.o_dhx_button_left{
+    float:left;
+    margin-left:10px;
+    margin-top:4px;
+    margin-bottom:4px;
+}
 .o_dhx_gantt_weekend{
     background: #f4f7f4 !important;
 }
