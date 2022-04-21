@@ -39,10 +39,11 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             'click button.o_dhx_reschedule': '_onClickReschedule',
             'click button.o_dhx_zoom_in': '_onClickZoomIn',
             'click button.o_dhx_zoom_out': '_onClickZoomOut',
-            'click button.o_dhx_export_to_pdf': '_exportToPDF'
+            'click button.o_dhx_export_to_pdf': '_exportToPDF',
+            'click a.o_dhx_create_phase': '_onBtnCreatePhase',
+            'click a.o_dhx_create_milestone': '_onBtnCreateMilestone',
         }),
         init: function (parent, state, params) {
-            // console.log('init GanttRenderer');
             this._super.apply(this, arguments);
             this.initDomain = params.initDomain;
             this.modelName = params.modelName;
@@ -221,6 +222,37 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
 
         _exportToPDF: function() {
             gantt.exportToPDF();
+        },
+        _onBtnCreatePhase: function (ev) {
+            // prevent the event propagation 
+            if (ev) {
+                ev.stopPropagation();
+            }
+            var self = this;
+            var project_id = this.initDomain[0][2];
+            return this._rpc({
+                model: 'project.planning.phase',
+                method: 'open_create_phase',
+                args: [project_id],
+            }).then(function(result) {
+                // location.reload();
+                self.do_action(result);
+            });
+        },
+        _onBtnCreateMilestone: function (ev) {
+            // prevent the event propagation 
+            if (ev) {
+                ev.stopPropagation();
+            }
+            var self = this;
+            var project_id = this.initDomain[0][2];
+            return this._rpc({
+                model: 'project.planning.milestone',
+                method: 'open_create_milestone',
+                args: [project_id],
+            }).then(function(result) {
+                self.do_action(result);
+            });
         },
         on_attach_callback: function () {
             this.renderGantt();

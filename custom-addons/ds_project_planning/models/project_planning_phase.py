@@ -18,10 +18,14 @@ class PlanningPhase(models.Model):
     _order = "sequence,id"
     _rec_name = "name"
 
+    def _get_default_project_id(self):
+        return self.env.context.get('default_project_id') or self.env.context.get('active_id')
+
     sequence = fields.Integer()
     project_id = fields.Many2one(
-        'project.project', string='Project', required=True, ondelete='cascade', help="Project", index=True)
-    pm_user_id = fields.Many2one(related='project_id.user_id', readonly=True, store=True)
+        'project.project', string='Project', required=True, ondelete='cascade', help="Project", index=True, default=_get_default_project_id)
+    pm_user_id = fields.Many2one(
+        related='project_id.user_id', readonly=True, store=True)
     project_tasks = fields.One2many(
         'project.task', 'phase_id', string='Tasks')
     name = fields.Char("Phase name", required=True)
@@ -33,7 +37,8 @@ class PlanningPhase(models.Model):
     description = fields.Html("Description")
     count_milestone = fields.Integer(
         string="Milestones", compute="_count_milestone_in_phase")
-    tasks_count = fields.Integer(string="Tasks", compute="_count_task_in_phase")
+    tasks_count = fields.Integer(
+        string="Tasks", compute="_count_task_in_phase")
 
     _sql_constraints = [
         ('name_uniq', 'unique (name)', "Phase name already exists!"),
@@ -99,6 +104,8 @@ class PlanningPhase(models.Model):
             # self.write({'project_tasks': [(3, task.id, 0) for task in self.project_tasks.ids]})
             self.write({'project_tasks': [(6, 0, tasks.ids)]})
 
+        return {}
+
     def _count_milestone_in_phase(self):
         for phase in self:
             num_milestone = self.env['project.planning.milestone'].search(
@@ -110,3 +117,18 @@ class PlanningPhase(models.Model):
             num_tasks = self.env['project.task'].search(
                 ['&', ('project_id', '=', phase.project_id.id), ('phase_id', '=', phase.id)])
             phase.tasks_count = len(num_tasks)
+
+    @api.model
+    def open_create_phase(self, project_id):
+        # res = { 'type': 'ir.actions.client', 'tag': 'reload' } # reload the current page/url
+        res = {
+            "name": _("Create Phase"),
+            "type": "ir.actions.act_window",
+            "res_model": "project.planning.phase",
+            "views": [[False, "form"]],
+            "view_mode": 'form',
+            # "target": "new",
+            "context": {'default_project_id': project_id},
+        }
+
+        return res

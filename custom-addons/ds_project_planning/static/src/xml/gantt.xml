@@ -6,6 +6,15 @@
         <div class="o_dhx_gantt_root">
             <div class="o_dhx_gantt_header">
                 <div class="">
+                    <div class="dropdown o_dhx_button_left">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-plus-circle"/> Create
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item o_dhx_create_phase" href="#">Create Phase</a>
+                            <a class="dropdown-item o_dhx_create_milestone" href="#">Create Milestone</a>
+                        </div>
+                    </div>
                     <button type="button" class="btn btn-secondary o_dhx_zoom_out o_dhx_button_right">Zoom Out</button>
                     <button type="button" class="btn btn-secondary o_dhx_zoom_in o_dhx_button_right">Zoom In</button>
                     <button type="button" class="btn btn-secondary o_dhx_export_to_pdf o_dhx_button_right">Export to PDF</button>
