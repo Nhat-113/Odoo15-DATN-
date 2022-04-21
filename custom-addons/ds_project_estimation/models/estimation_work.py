@@ -39,11 +39,71 @@ class Estimation(models.Model):
     
     @api.model
     def create(self, vals):
+        vals_over = {'connect_overview': '', 'description': ''}
         if vals.get("number", "New") == "New":
             vals["number"] = self.env["ir.sequence"].next_by_code("estimation.work") or "New"
         result = super(Estimation, self).create(vals)
+        est_current_id = self.env['estimation.work'].search([('number','=', vals["number"])])
+        vals_over["connect_overview"] = est_current_id.id
+        vals_over["description"] = 'Create New Estimation'
+        self.env["estimation.overview"].create(vals_over)
         return result
-
+    
+    def write(self, vals):
+        vals_over = {'connect_overview': self.id, 'description': ''}
+        if vals:
+            est_new_vals = vals.copy()
+            ls_message_values = self.env['estimation.work'].search([('id','=',self.id)])
+            est_old_vals = self.get_values(ls_message_values)
+            est_desc_content = Estimation.merge_dict_vals(est_old_vals, est_new_vals)
+            for key in est_desc_content:
+                vals_over["description"] += key + ' : ' + est_desc_content[key]
+                
+            result = super(Estimation, self).write(vals)
+            self.env["estimation.overview"].create(vals_over)
+            return result    
+        
+    def convert_to_str(strings):
+        for key in strings:
+            if type(strings[key]) == int:
+                strings[key] = str(strings[key])
+        return strings
+        
+    def merge_dict_vals(a, b) :
+        Estimation.convert_to_str(b)
+        for keyb in b:
+            for keya in a:
+                if keyb == keya:
+                    b[keyb] = ' --> '.join([a[keyb], b[keyb]])
+                    break
+        return b
+        
+    def get_values(self, est):
+        vals_values = []
+        mess_field = ["project_name",  "stage"] #"total_cost",
+        mess_field_obj = ["estimator_ids", "reviewer_ids", "customer_ids", "currency_id", "sale_order"] #, "message_main_attachment_id"
+        mess_field_date = ["sale_date", "deadline"]
+        for item in est:
+            for i in mess_field:
+                if item[i]:
+                    vals_values.append(item[i])
+                else:
+                    vals_values.append('None')
+            for j in mess_field_obj:
+                if item[j].display_name:
+                    vals_values.append(item[j].display_name)
+                else:
+                    vals_values.append('None')
+            for k in mess_field_date:
+                if item[k]:
+                    temp = str(item[k].day) + '-' + str(item[k].month) + '-' + str(item[k].year)
+                    vals_values.append(temp)
+                else:
+                    vals_values.append('None')
+        
+        vals_key = mess_field + mess_field_obj + mess_field_date
+        value = dict(zip(vals_key, vals_values))
+        return value
 
 class CostRate(models.Model):
     """
