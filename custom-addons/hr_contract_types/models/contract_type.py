@@ -23,5 +23,6 @@ class ContractInherit(models.Model):
         ('offical_labor', 'Offical Labor Contract'),
         ('probationary', 'Probationary Contract'),
         ('internship', 'Internship Contract'),
-        ('collaborator', 'Collaborator Contract')
+        ('collaborator', 'Collaborator Contract'),
+        ('annex', 'Annex Contract')
     ], 'Contract Document Type', default='offical_labor', index=True, required=True)
