@@ -5,7 +5,7 @@
         <field name="priority">10</field>
         <field name="type">dhx_gantt</field>
         <field name="arch" type="xml">
-            <dhx_gantt id_field="id" text="name" date_start="date_start" duration="planned_duration" links_serialized_json="links_serialized_json" link_model="project.depending.tasks" child_ids="child_ids" user_ids="user_ids" portal_user_names="portal_user_names" date_deadline="date_deadline" />
+            <dhx_gantt id_field="id" text="name" date_start="date_start" duration="planned_duration" links_serialized_json="links_serialized_json" link_model="project.depending.tasks" progress="progress" start_date_milestone="start_date_milestone" user_ids="user_ids" portal_user_names="portal_user_names" date_deadline="date_deadline" />
         </field>
     </record>
 

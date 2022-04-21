@@ -23,8 +23,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_date_start = params.date_start;
             this.map_duration = params.duration;
             this.map_progress = params.progress;
-            // HL
-            this.map_child_ids = params.child_ids;
+            this.map_start_date_milestone = params.start_date_milestone;
             this.map_user_ids = params.user_ids;
             this.map_portal_user_names = params.portal_user_names;
 
@@ -58,6 +57,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_total_float && fieldNames.push(this.map_total_float);
             this.map_parent && fieldNames.push(this.map_parent);
             this.map_milestone && fieldNames.push(this.map_milestone);
+            this.map_start_date_milestone && fieldNames.push(this.map_start_date_milestone);
             return this._rpc({
                 model: this.modelName,
                 method: 'search_read',
@@ -96,7 +96,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                     
                     if(!projectFound){
                         var project = {
-                            id: _.uniqueId('project-'),
+                            id: _.uniqueId(),
                             serverId: record[self.map_parent][0],
                             text: record[self.map_parent][1],
                             type: 'project',
@@ -120,8 +120,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                                 serverId: record[self.map_milestone][0],
                                 text: record[self.map_milestone][1],
                                 type: 'milestone',
-                                // TODO: Fix start_date
-                                start_date: datetime,
+                                start_date: formatFunc(record[self.map_start_date_milestone]),
                                 open: true,
                             }
                             data.push(milestone);
