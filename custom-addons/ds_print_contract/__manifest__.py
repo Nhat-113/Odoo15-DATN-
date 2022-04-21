@@ -20,7 +20,9 @@
              "data/offical_labor_contract_mail_template.xml",
              "data/probationary_contract_mail_template.xml",
              "data/internship_contract_mail_template.xml",
-             "data/collaborator_contract_mail_template.xml"
+             "data/collaborator_contract_mail_template.xml",
+             "views/annex_contract_report.xml",
+             "data/annex_contract_mail_template.xml"
              ],
     "installable": True,
     'auto_install': False,
