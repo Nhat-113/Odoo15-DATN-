@@ -239,8 +239,30 @@
             <field name="amount_python_compute">result = (contract.wage + contract.other_allowance)*0.85</field>
         </record>
 
+        <record id="hr_rule_gross1" model="hr.salary.rule">
+            <field name="name">Lương GROSS (VND) = (1) + (2) + (3)</field>
+            <field name="sequence" eval="4"/>
+            <field name="code">Basic</field>
+            <field name="category_id" ref="hr_payroll_community.BASIC"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.contract_document_type == 'probationary'</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = (contract.wage + contract.other_allowance)*0.85</field>
+        </record>
+
         <record id="hr_rule_Basic2" model="hr.salary.rule">
             <field name="name">Lương NET (VND) = (1) + (2) + (3)</field>
+            <field name="sequence" eval="4"/>
+            <field name="code">Basic</field>
+            <field name="category_id" ref="hr_payroll_community.BASIC"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.contract_document_type != 'probationary'</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.wage + contract.other_allowance</field>
+        </record>
+
+        <record id="hr_rule_gross2" model="hr.salary.rule">
+            <field name="name">Lương GROSS (VND) = (1) + (2) + (3)</field>
             <field name="sequence" eval="4"/>
             <field name="code">Basic</field>
             <field name="category_id" ref="hr_payroll_community.BASIC"/>
@@ -458,6 +480,16 @@
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = contract.wage * 0.32</field>
+        </record>
+
+        <record id="hr_rule_bhmirai" model="hr.salary.rule">
+            <field name="name">BHYT, BHXH, BHTN (VND) = (1) * 10.5%</field>
+            <field name="sequence" eval="20"/>
+            <field name="code">BH</field>
+            <field name="category_id" ref="hr_payroll_community.OTH"/>
+            <field name="condition_select">none</field> 
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.wage * 0.105</field>
         </record>
 
         <record id="hr_rule_gtgc" model="hr.salary.rule">
@@ -718,13 +750,23 @@
             <field name="amount_python_compute">result = TTNTT - TTNCNBN</field>
         </record>
 
+        <record id="hr_rule_ltlmirai" model="hr.salary.rule">
+            <field name="name">Lương thực lĩnh (VND) = (19) - (20) - (24) - (25)</field>
+            <field name="sequence" eval="26"/>
+            <field name="code">NET</field>
+            <field name="category_id" ref="hr_payroll_community.NET"/>
+            <field name="condition_select">none</field> 
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = TTNTT - TTNCNBN - BH - TTNCN</field>
+        </record>
+
 
 
         <!-- Salary Structure -->
 
          <record id="structure_base" model="hr.payroll.structure">
-            <field name="code">BASE</field>
-            <field name="name">Base for new structures</field>
+            <field name="code">DSOFT</field>
+            <field name="name">Base for Dsoft</field>
             <field eval="[(6, 0, [ref('hr_rule_wage'), ref('hr_rule_other_ct'), ref('hr_rule_Basic1'), 
                 ref('hr_rule_nctt'), ref('hr_rule_bqnc'), ref('hr_rule_nnkl'), ref('hr_rule_nctte'), 
                 ref('hr_rule_tl'), ref('hr_rule_tot1'), ref('hr_rule_tot2'), ref('hr_rule_tot3'),
@@ -737,6 +779,24 @@
                 ref('hr_rule_tncnbn4'), ref('hr_rule_tncnbn5'), ref('hr_rule_tncnbn6'),
                 ref('hr_rule_tncnbn7'), ref('hr_rule_tncnbn8'), ref('hr_rule_ttntt'),
                 ref('hr_rule_otct'), ref('hr_rule_Basic2')])]" name="rule_ids"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="structure_base_mirai" model="hr.payroll.structure">
+            <field name="code">MIRAI</field>
+            <field name="name">Base for Mirai</field>
+            <field eval="[(6, 0, [ref('hr_rule_wage'), ref('hr_rule_other_ct'), ref('hr_rule_gross1'), 
+                ref('hr_rule_nctt'), ref('hr_rule_bqnc'), ref('hr_rule_nnkl'), ref('hr_rule_nctte'), 
+                ref('hr_rule_tl'), ref('hr_rule_tot1'), ref('hr_rule_tot2'), ref('hr_rule_tot3'),
+                ref('hr_rule_lot'), ref('hr_rule_ltu'), ref('hr_rule_pcd'), ref('hr_rule_bhmirai'), 
+                ref('hr_rule_gtgc'), ref('hr_rule_tnc1'), ref('hr_rule_tncn1'), ref('hr_rule_tncn2'), 
+                ref('hr_rule_tncn3'), ref('hr_rule_tncn4'), ref('hr_rule_tncn5'), ref('hr_rule_tncn6'), 
+                ref('hr_rule_tncn7'), ref('hr_rule_tncn8'), ref('hr_rule_ltlmirai'), ref('hr_rule_kbs'),
+                ref('hr_rule_tot4'), ref('hr_rule_tnc2'), ref('hr_rule_other_kct'), ref('hr_rule_lbn'),
+                ref('hr_rule_tncnbn1'), ref('hr_rule_tncnbn2'), ref('hr_rule_tncnbn3'),
+                ref('hr_rule_tncnbn4'), ref('hr_rule_tncnbn5'), ref('hr_rule_tncnbn6'),
+                ref('hr_rule_tncnbn7'), ref('hr_rule_tncnbn8'), ref('hr_rule_ttntt'),
+                ref('hr_rule_otct'), ref('hr_rule_gross2')])]" name="rule_ids"/>
             <field name="company_id" ref="base.main_company"/>
         </record>
 
