@@ -133,7 +133,8 @@ class Task(models.Model):
 
     @api.onchange('issues_type')
     def _get_first_status(self):
-        self.status = self.issues_type.status[0]
+        if self.issues_type.status:
+            self.status = self.issues_type.status[0]
 
     @api.constrains('status', 'timesheet_ids')
     def _check_timesheet(self):

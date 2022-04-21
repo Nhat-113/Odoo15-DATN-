@@ -103,7 +103,7 @@
                 <xpath expr="//field[@name='tag_ids']" position="after">
                     <field name="issues_type" widget="badge"/>
                     <field name="status_color" invisible="1"/>
-                    <field name="status" style="background-color:red;"/>
+                    <field name="status" widget="badge"/>
                 </xpath>
                 <xpath expr="//field[@name='progress']" position="replace">
                     <field name="progress_input"/>
