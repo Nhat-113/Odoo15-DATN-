@@ -55,7 +55,7 @@ class Estimation(models.Model):
             est_new_vals = vals.copy()
             ls_message_values = self.env['estimation.work'].search([('id','=',self.id)])
             est_old_vals = self.get_values(ls_message_values)
-            est_desc_content = Estimation.merge_dict_vals(est_old_vals, est_new_vals)
+            est_desc_content = self.merge_dict_vals(est_old_vals, est_new_vals)
             est_desc_content_convert = est_desc_content.copy()
             self.convert_field_to_field_desc(est_desc_content_convert)
             for key in est_desc_content_convert:
@@ -64,7 +64,7 @@ class Estimation(models.Model):
             result = super(Estimation, self).write(vals)
             self.env["estimation.overview"].create(vals_over)
             return result 
-           
+
     def convert_field_to_field_desc(self, dic):
         result = dic.copy()
         field = self.env['ir.model.fields']
@@ -78,13 +78,28 @@ class Estimation(models.Model):
             if type(strings[key]) == int:
                 strings[key] = str(strings[key])
         return strings
+      
+    def convert_id_to_name_desc(self, vals):
+        # "estimator_ids" because "estimator_ids" can't update (readonly) -> unnecessary
+        # ls_keys = ["reviewer_ids", "customer_ids", "currency_id", "sale_order"]   because only fields  in vals have id
+        for item in vals:
+            if item == "reviewer_ids":
+                vals[item] = self.env['res.users'].search([('id','=',vals[item])]).name
+            elif item == "customer_ids":
+                vals[item] = self.env['res.partner'].search([('id','=',vals[item])]).name
+            elif item == "currency_id":
+                vals[item] = self.env['res.currency'].search([('id','=',vals[item])]).name
+            elif item == "sale_order":
+                vals[item] = self.env['sale.order'].search([('id','=',vals[item])]).name
+        return vals
         
-    def merge_dict_vals(a, b) :
+    def merge_dict_vals(self, a, b) :
         Estimation.convert_to_str(b)
+        self.convert_id_to_name_desc(b)
         for keyb in b:
             for keya in a:
                 if keyb == keya:
-                    b[keyb] = ' --> '.join([a[keyb], b[keyb]])
+                    b[keyb] = ' --> '.join([a[keyb], b[keyb]]) + '\n'
                     break
         return b
         
