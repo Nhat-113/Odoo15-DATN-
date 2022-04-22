@@ -10,7 +10,7 @@ class EstimationOverview(models.Model):
     # Notebook and pages
     author = fields.Many2one('res.users', string="User Update", default=lambda self: self.env.user, readonly=True)
     revision = fields.Float("Revision", readonly=True, copy=False, index=False, default=0, digits= (1,1))
-    description = fields.Text("Description", default="Nothing")
+    description = fields.Text("Description", default="Nothing", readonly=True)
 
     @api.model
     def create(self, vals):
