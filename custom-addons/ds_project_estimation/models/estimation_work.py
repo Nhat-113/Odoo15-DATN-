@@ -56,13 +56,23 @@ class Estimation(models.Model):
             ls_message_values = self.env['estimation.work'].search([('id','=',self.id)])
             est_old_vals = self.get_values(ls_message_values)
             est_desc_content = Estimation.merge_dict_vals(est_old_vals, est_new_vals)
-            for key in est_desc_content:
-                vals_over["description"] += key + ' : ' + est_desc_content[key]
-                
+            est_desc_content_convert = est_desc_content.copy()
+            self.convert_field_to_field_desc(est_desc_content_convert)
+            for key in est_desc_content_convert:
+                vals_over["description"] += key + ' : ' + est_desc_content_convert[key]
+            
             result = super(Estimation, self).write(vals)
             self.env["estimation.overview"].create(vals_over)
-            return result    
-        
+            return result 
+           
+    def convert_field_to_field_desc(self, dic):
+        result = dic.copy()
+        field = self.env['ir.model.fields']
+        for item in result:
+            if field.search([('name','=',item),('model','=','estimation.work')]):
+                dic[field.search([('name','=',item),('model','=','estimation.work')]).field_description] = dic.pop(item)
+        return dic
+    
     def convert_to_str(strings):
         for key in strings:
             if type(strings[key]) == int:
