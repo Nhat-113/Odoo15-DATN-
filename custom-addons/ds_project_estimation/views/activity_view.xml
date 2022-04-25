@@ -9,6 +9,8 @@
                     <group name="group_top">
                         <field name="activity" />
                         <field name="description" />
+                        <field name="effort" />
+                        <field name="percent" />
                     </group>
                 </sheet>
             </form>
@@ -20,9 +22,11 @@
         <field name="model">config.activity</field>
         <field name="arch" type="xml">
             <tree>
-                <field name='sequence' widget='handle' />
+                <!-- <field name='sequence' /> -->
                 <field name="activity" />
                 <field name="description" />
+                <field name="effort" />
+                <field name="percent" />
             </tree>
         </field>
     </record>

@@ -104,11 +104,11 @@ class HrPayslip(models.Model):
         if any(self.filtered(lambda payslip: payslip.name in payslip_names)):
             raise ValidationError(_("Do not create multiple payslips for an employee in the same month"))
 
-    # @api.constrains('contract_id')
-    # def _check_contract_id(self):
+    @api.constrains('contract_id')
+    def _check_contract_id(self):
 
-    #     if self.employee_id.contract_id != self.contract_id:            
-    #         raise ValidationError(_('Cannot choose the wrong contract with the employee'))
+        if len(self.contract_id) == 0:          
+            raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',name=self.employee_id.name))
 
     def action_payslip_draft(self):
 
@@ -292,6 +292,7 @@ class HrPayslip(models.Model):
                 }
                 res += [input_data]
         return res
+
 
     @api.model
     def _get_payslip_lines(self, contract_ids, payslip_id):
@@ -531,7 +532,6 @@ class HrPayslip(models.Model):
 
     @api.onchange('employee_id', 'date_from', 'date_to')
     def onchange_employee(self):
-
 
         if (not self.employee_id) or (not self.date_from) or (not self.date_to):
             return

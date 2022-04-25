@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from forex_python.converter import CurrencyRates
 
 c = CurrencyRates()
 data = c.get_rates('USD')
+
 
 
 class Estimation(models.Model):
@@ -21,21 +22,32 @@ class Estimation(models.Model):
     estimator_ids = fields.Many2one('res.users', string='Estimator', default=lambda self: self.env.user, readonly=True)
     reviewer_ids = fields.Many2one('res.users', string='Reviewer', default=lambda self: self.env.user)
     customer_ids = fields.Many2one("res.partner", string="Customer", required=True)
-
-    # company_id = fields.Many2one('res.company', 'Company',default=lambda self: self.env.user.company_id.id, index=1)
     currency_id = fields.Many2one("res.currency", string="Currency")
-    sale_order = fields.Many2one('sale.order', string="Sale Order")
-    expected_revenue = fields.Monetary("Expected Revenue", related="sale_order.amount_total")
-    total_cost = fields.Monetary(string="Total Cost")
+
+    expected_revenue = fields.Float(string="Expected Revenue")
+    total_cost = fields.Float(string="Total Cost")
 
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
-    stage = fields.Selection([("new","New"), ("in_progress","In Progress"), ("pending","Pending")], string="Stage", required=True)
+    stage = fields.Selection([("new","New"), ("in_progress","In Progress"), ("pending","Pending")], string="Status", required=True)
     
+    contract_id = fields.Many2one('hr.contract', string='Contract', help="Contract")
+    # struct_id = fields.Many2one('config.activity.structure', string='Structure', readonly=True)
+
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
     add_lines_module_assumption = fields.One2many('estimation.module.assumption', 'connect_module', string='Module Assumption')
     add_lines_module_summary = fields.One2many('estimation.module.summary', 'connect_module', string='Module Summary')
-    add_lines_module_effort = fields.One2many('estimation.module.effort', 'connect_module', string='Module Effort')
+    
+    # def _get_default_activities(self):
+    #     return self.env['config.activity'].search([])
+    add_lines_module_effort = fields.One2many('config.activity', 'activity_ids', string='Module Effort')
+    
+    
+    add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'connect_summary', string='Summary Total Cost')
+    add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate', string='Summary Cost Rate')
+
+    add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'connect_resource_plan', string='Resource Planning Effort')
+    
     
     @api.model
     def create(self, vals):
@@ -48,6 +60,51 @@ class Estimation(models.Model):
         vals_over["description"] = 'Create New Estimation'
         self.env["estimation.overview"].create(vals_over)
         return result
+
+    @api.model
+    def get_inputs(self, contracts):
+        res = []
+        structure_ids = contracts.get_all_structures()
+        
+        rule_ids = self.env['config.activity.structure'].browse(structure_ids).get_all_rules()
+        
+        sorted_rule_ids = [id for id, sequence in sorted(rule_ids, key=lambda x: x[1])]
+        inputs = self.env['config.activity'].browse(sorted_rule_ids)
+        
+        for contract in contracts:
+            for input in inputs:
+                input_data = {
+                    'sequence': input.sequence,
+                    'activity': input.activity,
+                    'effort': input.effort,
+                    'percent': input.percent
+                }
+                res += [input_data]
+        
+        return res
+
+    @api.onchange('')
+    def onchange_module_effort(self):
+        # if not self.contract_id.struct_id:
+        #     return
+
+        # if self.contract_id:
+        contract_ids = self.contract_id.ids
+        contracts = self.env['hr.contract'].browse(contract_ids)
+
+        effort_lines = self.get_inputs(contracts)
+        input_lines = self.add_lines_module_effort.browse([])
+        for r in effort_lines:
+            input_lines += input_lines.new(r)
+        self.add_lines_module_effort = input_lines
+        return
+
+    @api.onchange('contract_id')
+    def onchange_contract(self):
+        # if not self.contract_id:
+        #     self.struct_id = False
+        self.with_context(contract=True).onchange_module_effort()
+        return
     
     def write(self, vals):
         vals_over = {'connect_overview': self.id, 'description': ''}
@@ -89,8 +146,8 @@ class Estimation(models.Model):
                 vals[item] = self.env['res.partner'].search([('id','=',vals[item])]).name
             elif item == "currency_id":
                 vals[item] = self.env['res.currency'].search([('id','=',vals[item])]).name
-            elif item == "sale_order":
-                vals[item] = self.env['sale.order'].search([('id','=',vals[item])]).name
+            # elif item == "sale_order":
+            #     vals[item] = self.env['sale.order'].search([('id','=',vals[item])]).name
         return vals
         
     def merge_dict_vals(self, a, b) :
@@ -106,7 +163,7 @@ class Estimation(models.Model):
     def get_values(self, est):
         vals_values = []
         mess_field = ["project_name",  "stage"] #"total_cost",
-        mess_field_obj = ["estimator_ids", "reviewer_ids", "customer_ids", "currency_id", "sale_order"] #, "message_main_attachment_id"
+        mess_field_obj = ["estimator_ids", "reviewer_ids", "customer_ids", "currency_id",] #, "message_main_attachment_id"
         mess_field_date = ["sale_date", "deadline"]
         for item in est:
             for i in mess_field:
@@ -180,6 +237,55 @@ class Activities(models.Model):
     _order = "sequence,id"
     _rec_name = "activity"
 
-    sequence = fields.Integer(required=True, index=True, default=5, help='Use to arrange calculation sequence')
-    activity = fields.Char("Activity", required=True)
-    description = fields.Char("Description", required=True)
+    sequence = fields.Integer(string="No", index=True, help='Use to arrange calculation sequence')
+    activity_ids = fields.Many2one('estimation.work', string="Connect Module")
+    job_pos = fields.Many2one('config.job_position', string="Job Position")
+    activity = fields.Char("Activity")
+    description = fields.Char("Description", )
+    effort = fields.Float(string="Effort", default=0)
+    percent = fields.Char(string="Percentage", default="0.0")
+    parent_rule_id = fields.Many2one('config.activity', string='Parent Activity Rule', index=True)
+    child_ids = fields.One2many('config.activity', 'parent_rule_id', string='Child Activity Rule', copy=True)
+
+    def _recursive_search_of_rules(self):
+        """
+        @return: returns a list of tuple (id, sequence) which are all the children of the passed rule_ids
+        """
+        children_rules = []
+        for rule in self.filtered(lambda rule: rule.child_ids):
+            children_rules += rule.child_ids._recursive_search_of_rules()
+        return [(rule.id, rule.sequence) for rule in self] + children_rules
+
+
+#hr.payroll.structure
+class ActivityStructure(models.Model):
+    """
+    Describe activity structure
+    """
+    _name = "config.activity.structure"
+    _description = "Activity Structure"
+    
+    @api.model
+    def _get_parent(self):
+        return self.env.ref('ds_project_estimation.act_structure_base', False)
+    
+    name = fields.Char(string="Name")
+    parent_id = fields.Many2one('config.activity.structure', string='Parent', default=_get_parent)
+    children_ids = fields.One2many('config.activity.structure', 'parent_id', string='Children', copy=True)
+    rule_ids = fields.Many2many('config.activity', 'config_structure_activity_rule_rel', 'struct_id', 'rule_id', string='Activity Rules')
+    
+    def get_all_rules(self):
+        """
+        @return: returns a list of tuple (id, sequence) of rules that are maybe to apply
+        """
+        all_rules = []
+        for struct in self:
+            all_rules += struct.rule_ids._recursive_search_of_rules()
+        return all_rules
+    
+    def _get_parent_structure(self):
+        parent = self.mapped('parent_id')
+        if parent:
+            parent = parent._get_parent_structure()
+        return parent + self
+    

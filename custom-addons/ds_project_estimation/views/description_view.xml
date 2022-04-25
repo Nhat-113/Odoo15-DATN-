@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_form_description" model="ir.ui.view">
+        <field name="name">Description Form</field>
+        <field name="model">config.description</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group name="group_top">
+                        <field name="descript" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_description" model="ir.ui.view">
+        <field name="name">Description List</field>
+        <field name="model">config.description</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name='sequence' widget='handle' />
+                <field name="descript" />
+            </tree>
+        </field>
+    </record>
+</odoo>
