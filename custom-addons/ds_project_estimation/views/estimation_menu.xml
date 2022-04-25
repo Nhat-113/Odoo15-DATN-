@@ -79,4 +79,17 @@
     action="action_config_activity"
     />
 
+    <!-- Action to open Description -->
+    <record id="action_config_description" model="ir.actions.act_window">
+        <field name="name">Description</field>
+        <field name="res_model">config.description</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_config_description"
+    name="Description"
+    parent="menu_config"
+    action="action_config_description"
+    />
+
 </odoo>

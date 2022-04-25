@@ -20,13 +20,3 @@ class EstimationModuleSummary(models.Model):
     working_efforts = fields.Selection([("hrs","Working hours per day"), ("days","Working days per month"),
                                         ("effort_day","Total efforts in man-day unit"), ("effort_mon","Total efforts in man-month unit")], 
                                         string="Working Time/Efforts", required=True)
-
-
-class EstimationModuleEffort(models.Model):
-    _name = "estimation.module.effort"
-    _description = "Module Effort of each estimation"
-
-    connect_module = fields.Many2one('estimation.work', string="Connect Module")
-    items = fields.Many2one('config.job_position', string="Item")
-    effort = fields.Float(string="Effort")
-    percent = fields.Char(string="Percentage")

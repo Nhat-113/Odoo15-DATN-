@@ -4,10 +4,6 @@
         <field name="model">estimation.work</field>
         <field name="arch" type="xml">
             <form>
-                <!-- <header>
-                    <button string="Compute Sheet" name="compute_sheet" type="object" states="draft,verify" class="oe_highlight"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,confirm"/>
-                </header> -->
                 <sheet>
                     <group name="group_top">
                         <group name="group_left">
@@ -15,20 +11,19 @@
                             <field name="customer_ids" />
                             <field name="estimator_ids" />
                             <field name="reviewer_ids" />
-                            <field name="deadline" />
                         </group>
                         <group name="group_right">
+                            <field name="deadline" />
                             <field name="sale_date" />
                             <field name="stage" placeholder="Select current stage" />
-                            <field name="sale_order" />
                             <field name="currency_id" />
-                            <field name="expected_revenue" widget="monetary" />
+                            <field name="contract_id" />
                         </group>
                     </group>
                     <notebook>
                         <page string="Overview">
                             <field name="add_lines_overview">
-                                <tree editable="bottom">
+                                <tree create="0" editable="0" delete="0">
                                     <field name="revision" />
                                     <field name="description" />
                                     <field name="author" />
@@ -36,8 +31,48 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Summary"></page>
-                        <page string="Resource Planning"></page>
+                        <page string="Summary">
+                            <separator string="Total cost"/>
+                            <field name="add_lines_summary_totalcost">
+                                <tree editable="bottom">
+                                    <field name="sequence" />
+                                    <field name="module" />
+                                    <field name="design_effort" />
+                                    <field name="dev_effort" />
+                                    <field name="tester_effort" />
+                                    <field name="comtor_effort" />
+                                    <field name="brse_effort" />
+                                    <field name="pm_effort" />
+                                    <field name="total_effort" />
+                                    <field name="cost" />
+                                </tree>
+                            </field>
+                            <separator string="Cost Rate"/>
+                            <field name="add_lines_summary_costrate">
+                                <tree editable="bottom">
+                                    <field name="sequence" />
+                                    <field name="types" />
+                                    <field name="yen_month" />
+                                    <field name="yen_day" />
+                                    <field name="vnd_day" />
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Resource Planning">
+                            <separator string="Total Effort" />
+                            <field name="add_lines_resource_effort">
+                                <tree editable="bottom">
+                                    <field name="sequence"/>
+                                    <field name="design_effort" />
+                                    <field name="dev_effort" />
+                                    <field name="tester_effort" />
+                                    <field name="comtor_effort" />
+                                    <field name="brse_effort" />
+                                    <field name="pm_effort" />
+                                    <field name="total_effort" />
+                                </tree>
+                            </field>
+                        </page>
                         <page string="Module">
                             <separator string="Assumption" />
                             <field name="add_lines_module_assumption">
@@ -56,15 +91,17 @@
                             <separator string="Effort distribution" />
                             <field name="add_lines_module_effort">
                                 <tree editable="bottom">
-                                    <field name="id" string="No" />
-                                    <field name="items" />
+                                    <field name="sequence" />
+                                    <field name="activity" />
+                                    <field name="job_pos" invisible="1"/>
                                     <field name="effort" />
                                     <field name="percent" />
                                 </tree>
                                 <form string="Effort distribution">
                                     <group col="4">
-                                        <field name="id" string="No"/>
-                                        <field name="items"/>
+                                        <field name="sequence" string="No" />
+                                        <field name="activity"/>
+                                        <field name="job_pos" invisible="1"/>
                                         <field name="effort"/>
                                         <field name="percent"/>
                                     </group>
@@ -88,7 +125,6 @@
                 <field name="estimator_ids" />
                 <field name="reviewer_ids" />
                 <field name="customer_ids" />
-
                 <field name="expected_revenue" widget="monetary" />
                 <field name="total_cost" widget="monetary" />
                 <field name="deadline" />

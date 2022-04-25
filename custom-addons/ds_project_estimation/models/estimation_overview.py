@@ -9,12 +9,17 @@ class EstimationOverview(models.Model):
     
     # Notebook and pages
     author = fields.Many2one('res.users', string="User Update", default=lambda self: self.env.user, readonly=True)
-    revision = fields.Char("Revision", readonly=True, copy=False, index=False, default="/")
-    description = fields.Text("Description", default="Nothing")
+    revision = fields.Float("Revision", readonly=True, copy=False, index=False, default=0, digits= (1,1))
+    description = fields.Text("Description", default="Nothing", readonly=True)
 
     @api.model
     def create(self, vals):
-        if vals.get("revision", "/") == "/":
-            vals["revision"] = self.env["ir.sequence"].next_by_code("estimation.overview") or "/"
-        result = super(EstimationOverview, self).create(vals)
-        return result
+        list_revision = self.env['estimation.overview'].search([])
+        revision_value = 0
+        for item in list_revision:
+            if item.connect_overview.id == vals["connect_overview"]:
+                if revision_value < item.revision:
+                    revision_value = item.revision
+        if vals.get("revision", 0) == 0:
+            vals["revision"] = (revision_value + 0.1)
+        return super(EstimationOverview, self).create(vals)
