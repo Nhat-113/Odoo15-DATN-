@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from forex_python.converter import CurrencyRates
+
+c = CurrencyRates()
+data = c.get_rates('USD')
+
 
 
 class Estimation(models.Model):
@@ -242,11 +247,6 @@ class Activities(models.Model):
     parent_rule_id = fields.Many2one('config.activity', string='Parent Activity Rule', index=True)
     child_ids = fields.One2many('config.activity', 'parent_rule_id', string='Child Activity Rule', copy=True)
 
-    @api.constrains('parent_rule_id')
-    def _check_parent_rule_id(self):
-        if not self._check_recursion(parent='parent_rule_id'):
-            raise ValidationError(_('Error! You cannot create recursive hierarchy of Activity Rules.'))
-
     def _recursive_search_of_rules(self):
         """
         @return: returns a list of tuple (id, sequence) which are all the children of the passed rule_ids
@@ -273,11 +273,6 @@ class ActivityStructure(models.Model):
     parent_id = fields.Many2one('config.activity.structure', string='Parent', default=_get_parent)
     children_ids = fields.One2many('config.activity.structure', 'parent_id', string='Children', copy=True)
     rule_ids = fields.Many2many('config.activity', 'config_structure_activity_rule_rel', 'struct_id', 'rule_id', string='Activity Rules')
-    
-    @api.constrains('parent_id')
-    def _check_parent_id(self):
-        if not self._check_recursion():
-            raise ValidationError(_('You cannot create a recursive salary structure.'))
     
     def get_all_rules(self):
         """

@@ -274,12 +274,11 @@ class HrPayslip(models.Model):
         return res
 
     @api.model
-    def get_inputs(self, contracts ):
+    def get_inputs(self, contracts, date_from, date_to):
 
         res = []
 
         structure_ids = contracts.get_all_structures()
-        
         rule_ids = self.env['hr.payroll.structure'].browse(structure_ids).get_all_rules()
         sorted_rule_ids = [id for id, sequence in sorted(rule_ids, key=lambda x: x[1])]
         inputs = self.env['hr.salary.rule'].browse(sorted_rule_ids).mapped('input_ids')
@@ -293,6 +292,7 @@ class HrPayslip(models.Model):
                 }
                 res += [input_data]
         return res
+
 
     @api.model
     def _get_payslip_lines(self, contract_ids, payslip_id):
