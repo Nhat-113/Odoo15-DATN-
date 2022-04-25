@@ -32,10 +32,6 @@ class PlanningCalendarResource(models.Model):
     role_ids = fields.Many2many('planning.roles', string='Roles')
     note = fields.Text(string='Note')
 
-    _sql_constraints = [
-        ('project_id_employee_id_uniq', 'unique(project_id,employee_id)',
-         'The project has duplicate members assigned to it!')
-    ]
 
     @api.depends('start_date', 'end_date')
     def _compute_duration(self):
@@ -44,6 +40,8 @@ class PlanningCalendarResource(models.Model):
             if resource.end_date and resource.start_date:
                 delta = resource.end_date - resource.start_date
                 resource.duration = delta.days if delta.days > 0 else 1
+            else:
+                resource.duration = 1
 
     @api.depends('duration', 'calendar_effort')
     def _compute_effort_rate(self):
@@ -63,3 +61,16 @@ class PlanningCalendarResource(models.Model):
     @api.constrains('start_date', 'end_date')
     def _check_start_end(self):
         return self._check_dates()
+
+    @api.model
+    def open_calendar_resource(self, project_id):
+        target_project = self.env['project.project'].browse(project_id)
+
+        return {
+            "name": _("Calendar Resource (%s)", target_project.name),
+            "type": "ir.actions.act_window",
+            "res_model": "project.project",
+            "views": [[self.env.ref('ds_project_planning.view_form_calendar_resource').id, "form"]],
+            "target": "new",
+            "res_id": project_id
+        }

@@ -8,4 +8,3 @@ from . import planning_role
 from . import project_task
 from . import ir_act_window
 from . import ir_ui_view
-from . import task

@@ -42,6 +42,7 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             'click button.o_dhx_export_to_pdf': '_exportToPDF',
             'click a.o_dhx_create_phase': '_onBtnCreatePhase',
             'click a.o_dhx_create_milestone': '_onBtnCreateMilestone',
+            'click button.o_dhx_calendar_resource': '_onBtnCalendarResource',
         }),
         init: function (parent, state, params) {
             this._super.apply(this, arguments);
@@ -249,6 +250,22 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             return this._rpc({
                 model: 'project.planning.milestone',
                 method: 'open_create_milestone',
+                args: [project_id],
+            }).then(function(result) {
+                self.do_action(result);
+            });
+        },
+        _onBtnCalendarResource: function (ev) {
+            // prevent the event propagation 
+            if (ev) {
+                ev.stopPropagation();
+            }
+            var self = this;
+            var project_id = this.initDomain[0][2];
+            console.log('project_id', project_id);
+            return this._rpc({
+                model: 'planning.calendar.resource',
+                method: 'open_calendar_resource',
                 args: [project_id],
             }).then(function(result) {
                 self.do_action(result);

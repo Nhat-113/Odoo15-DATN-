@@ -13,7 +13,7 @@ class PlanningMilestone(models.Model):
     """
     _name = "project.planning.milestone"
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _description = "Planning for Milestone of the Phase in the project"
+    _description = "Milestone in the Phase of Project"
     _order = "sequence,id"
     _rec_name = "name"
 
