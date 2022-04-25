@@ -55,7 +55,6 @@ class Estimation(models.Model):
         vals_over["description"] = 'Create New Estimation'
         self.env["estimation.overview"].create(vals_over)
         return result
-<<<<<<< HEAD
 
     @api.model
     def get_inputs(self, contracts):
@@ -101,8 +100,6 @@ class Estimation(models.Model):
         #     self.struct_id = False
         self.with_context(contract=True).onchange_module_effort()
         return
-=======
->>>>>>> f496c4b6a331e03ee3c3efb7faa28f0f97502b23
     
     def write(self, vals):
         vals_over = {'connect_overview': self.id, 'description': ''}
@@ -144,13 +141,8 @@ class Estimation(models.Model):
                 vals[item] = self.env['res.partner'].search([('id','=',vals[item])]).name
             elif item == "currency_id":
                 vals[item] = self.env['res.currency'].search([('id','=',vals[item])]).name
-<<<<<<< HEAD
             # elif item == "sale_order":
             #     vals[item] = self.env['sale.order'].search([('id','=',vals[item])]).name
-=======
-            elif item == "sale_order":
-                vals[item] = self.env['sale.order'].search([('id','=',vals[item])]).name
->>>>>>> f496c4b6a331e03ee3c3efb7faa28f0f97502b23
         return vals
         
     def merge_dict_vals(self, a, b) :
@@ -166,11 +158,7 @@ class Estimation(models.Model):
     def get_values(self, est):
         vals_values = []
         mess_field = ["project_name",  "stage"] #"total_cost",
-<<<<<<< HEAD
         mess_field_obj = ["estimator_ids", "reviewer_ids", "customer_ids", "currency_id",] #, "message_main_attachment_id"
-=======
-        mess_field_obj = ["estimator_ids", "reviewer_ids", "customer_ids", "currency_id", "sale_order"] #, "message_main_attachment_id"
->>>>>>> f496c4b6a331e03ee3c3efb7faa28f0f97502b23
         mess_field_date = ["sale_date", "deadline"]
         for item in est:
             for i in mess_field:
@@ -193,10 +181,6 @@ class Estimation(models.Model):
         vals_key = mess_field + mess_field_obj + mess_field_date
         value = dict(zip(vals_key, vals_values))
         return value
-<<<<<<< HEAD
-
-=======
->>>>>>> f496c4b6a331e03ee3c3efb7faa28f0f97502b23
 
 class CostRate(models.Model):
     """
