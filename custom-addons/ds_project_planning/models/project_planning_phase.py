@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from asyncio import tasks
+from re import S
 from unicodedata import name
 from numpy import require
 from odoo import models, fields, api, _
 from datetime import date, datetime, time
+from dateutil import relativedelta
 from odoo.exceptions import ValidationError, UserError
 
 
@@ -30,10 +32,10 @@ class PlanningPhase(models.Model):
         'project.task', 'phase_id', string='Tasks')
     name = fields.Char("Phase name", required=True)
     start_date = fields.Datetime(string='Date Start', readonly=False, required=True, help="Start date of the phase",
-                                 default=lambda self: fields.Date.to_string(
-                                     date.today().replace(day=1)))
+                                 default=lambda self: fields.Datetime.to_string(
+                                     datetime.today().replace(day=1, hour=0, minute=0, second=0)))
     end_date = fields.Datetime(
-        string='Date End', readonly=False, required=True, help="End date of the phase")
+        string='Date End', readonly=False, required=True, help="End date of the phase", default=str(datetime.now() + relativedelta.relativedelta(months=+1, day=31, hour=16, minute=59, second=59))[:19])
     description = fields.Html("Description")
     count_milestone = fields.Integer(
         string="Milestones", compute="_count_milestone_in_phase")
@@ -41,7 +43,7 @@ class PlanningPhase(models.Model):
         string="Tasks", compute="_count_task_in_phase")
 
     _sql_constraints = [
-        ('name_uniq', 'unique (name)', "Phase name already exists!"),
+        ('name_uniq', 'unique (project_id, name)', "Phase name already exists!"),
     ]
 
     def _check_dates(self):
@@ -54,7 +56,7 @@ class PlanningPhase(models.Model):
 
     @api.constrains('start_date', 'end_date')
     def _check_start_end(self):
-        return self._check_dates()
+        return self._validate_by_start_end()
 
     def get_phase_between(self, project, start_date, end_date):
         """
@@ -72,12 +74,12 @@ class PlanningPhase(models.Model):
         # OR if it starts before the start_date and finish after the end_date
         clause_3 = ['&', ('start_date', '<=', start_date),
                     ('end_date', '>=', end_date)]
-        clause_final = [('project_id', '=', project.id), ('id', '!=', self.id.origin),
+        clause_final = [('project_id', '=', project.id), ('id', '!=', self.id or self.id.origin),
                         '|', '|'] + clause_1 + clause_2 + clause_3
 
         return self.env['project.planning.phase'].search(clause_final)
 
-    @api.onchange('start_date', 'end_date')
+    # @api.onchange('start_date', 'end_date')
     def _validate_by_start_end(self):
         self._check_dates()
 
@@ -132,3 +134,13 @@ class PlanningPhase(models.Model):
         }
 
         return res
+
+    def open_create_milestone_form(self):
+        return {
+            "name": _("Create Milestone"),
+            "type": "ir.actions.act_window",
+            "res_model": "project.planning.milestone",
+            "views": [[self.env.ref('ds_project_planning.view_form_project_milestone').id, "form"]],
+            'target': 'new',
+            "context": {'default_project_id': self.project_id.id, 'default_phase_id': self.id},
+        }
