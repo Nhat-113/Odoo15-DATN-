@@ -39,20 +39,6 @@
             </field>
         </record>
 
-        <!-- <record id="readonly_view" model="ir.ui.view">
-            <field name="name">readonly.view</field>
-            <field name="model">project.task</field>
-            <field name="groups_id" eval="[(6, 0,[ref('project.group_project_user')])]"/>
-            <field name="inherit_id" ref="project.view_task_form2"/>
-            <field name="arch" type="xml">
-                <data>
-                    <xpath expr="//field[@name='planned_hours']" position="attributes">
-                        <attribute name="readonly">True</attribute>
-                    </xpath>
-                </data>
-            </field>
-        </record> -->
-
         <record model="ir.ui.view" id="project_status">
             <field name="name">project.status</field>
             <field name="model">project.project</field>
@@ -123,11 +109,6 @@
             <field name="inherit_id" ref="project.view_task_kanban"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="inside">
-                    <!-- <div class="issue_type_img" title="Issue type" modifiers="{}">
-                        <t t-if="record.icon.raw_value">
-                            <field name="icon" nolabel="1" widget="image"/>
-                        </t>
-                    </div> -->
                     <field name="status_color" invisible="1"/>
                     <t t-if="record.status_color.value != 'Yellow' and record.status_color.value != 'Lightblue'">
                         <div class="color_status" t-attf-style="background-color: {{record.status_color.value}}; color: white">
