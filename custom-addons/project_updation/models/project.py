@@ -71,12 +71,12 @@ class Task(models.Model):
     ], string='Complex', index=True, copy=False, default='low')
 
     task_score = fields.Selection([
-        ('0', 'Nothing'),
-        ('1', 'Very Bad'),
-        ('2', 'Bad'),
-        ('3', 'Normal'),
-        ('4', 'Good'),
-        ('5', 'Very Good'),
+        ('0', '0'),
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('4', '4'),
+        ('5', '5'),
     ], default='0', index=True, string="Task Score", tracking=True)
     status = fields.Many2one('project.task.status', string="Status")
     status_id_domain = fields.Char(
