@@ -8,3 +8,4 @@ from . import estimation_job_position
 from . import estimation_description
 from . import estimation_summary
 from . import estimation_resource_plan
+from . import estimation_activity

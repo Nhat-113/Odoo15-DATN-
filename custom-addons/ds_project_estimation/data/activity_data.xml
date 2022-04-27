@@ -1,87 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
     <record id="act_prep" model="config.activity">
-        <field name="sequence" eval="1"/>
+        <field name="sequence" eval="1" />
         <field name="activity">Preparation</field>
         <field name="effort">0</field>
-        <field name="percent" />
+        <field name="percent">0</field>
     </record>
 
     <record id="act_req" model="config.activity">
-        <field name="sequence" eval="2"/>
+        <field name="sequence" eval="2" />
         <field name="activity">Requirement</field>
-        <field name="effort" >0</field>
-        <field name="percent" />
+        <field name="effort">0</field>
+        <field name="percent">0</field>
     </record>
 
     <record id="act_des" model="config.activity">
-        <field name="sequence" eval="3"/>
+        <field name="sequence" eval="3" />
         <field name="activity">Design</field>
-        <field name="effort" >0</field>
-        <field name="percent" />
+        <field name="effort">0</field>
+        <field name="percent">0</field>
     </record>
 
     <record id="act_implement" model="config.activity">
-        <field name="sequence" eval="4"/>
+        <field name="sequence" eval="4" />
         <field name="activity">Implementation</field>
-        <field name="effort" >0</field>
-        <field name="percent" />
+        <field name="effort">0</field>
+        <field name="percent">0</field>
     </record>
 
     <record id="act_review" model="config.activity">
-        <field name="sequence" eval="5"/>
+        <field name="sequence" eval="5" />
         <field name="activity">Review</field>
-        <field name="effort" >0</field>
-        <field name="percent" />
+        <field name="effort">0</field>
+        <field name="percent">0</field>
     </record>
 
     <record id="act_test" model="config.activity">
-        <field name="sequence" eval="6"/>
+        <field name="sequence" eval="6" />
         <field name="activity">Test</field>
-        <field name="effort" >0</field>
-        <field name="percent" />
+        <field name="effort">0</field>
+        <field name="percent">0</field>
     </record>
 
     <record id="act_trans" model="config.activity">
-        <field name="sequence" eval="7"/>
+        <field name="sequence" eval="7" />
         <field name="activity">Translation</field>
-        <field name="effort" >0</field>
-        <field name="percent" />
+        <field name="effort">0</field>
+        <field name="percent">0</field>
     </record>
 
     <record id="act_build" model="config.activity">
-        <field name="sequence" eval="8"/>
+        <field name="sequence" eval="8" />
         <field name="activity">Build and Release</field>
-        <field name="effort" >0</field>
-        <field name="percent" />
+        <field name="effort">0</field>
+        <field name="percent">0</field>
     </record>
 
     <record id="act_risk" model="config.activity">
-        <field name="sequence" eval="9"/>
+        <field name="sequence" eval="9" />
         <field name="activity">Risk Management</field>
-        <field name="effort" >0</field>
-        <field name="percent" />
+        <field name="effort">0</field>
+        <field name="percent">0</field>
     </record>
 
     <record id="act_accept" model="config.activity">
-        <field name="sequence" eval="10"/>
+        <field name="sequence" eval="10" />
         <field name="activity">Acceptance test support</field>
-        <field name="effort" >0</field>
-        <field name="percent" />
+        <field name="effort">0</field>
+        <field name="percent">0</field>
     </record>
 
     <record id="act_warranty" model="config.activity">
-        <field name="sequence" eval="11"/>
+        <field name="sequence" eval="11" />
         <field name="activity">Warranty</field>
-        <field name="effort" >0</field>
-        <field name="percent" />
+        <field name="effort">0</field>
+        <field name="percent">0</field>
     </record>
 
     <record id="act_pm" model="config.activity">
-        <field name="sequence" eval="12"/>
+        <field name="sequence" eval="12" />
         <field name="activity">Project Management</field>
-        <field name="effort" >0</field>
-        <field name="percent" />
+        <field name="effort">0</field>
+        <field name="percent">0</field>
     </record>
 
     <record id="act_structure_base" model="config.activity.structure">
@@ -89,7 +90,8 @@
         <field eval="[(6, 0, [ref('act_prep'), ref('act_req'), ref('act_des'), 
                 ref('act_implement'), ref('act_review'), ref('act_test'), ref('act_trans'), 
                 ref('act_build'), ref('act_risk'), ref('act_accept'), ref('act_warranty'),
-                ref('act_pm')])]" name="rule_ids"/>
+                ref('act_pm')])]" name="rule_ids" />
     </record>
+
 
 </odoo>

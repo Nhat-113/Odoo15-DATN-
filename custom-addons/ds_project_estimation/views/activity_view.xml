@@ -9,8 +9,8 @@
                     <group name="group_top">
                         <field name="activity" />
                         <field name="description" />
-                        <field name="effort" />
-                        <field name="percent" />
+                        <field name="effort" invisible="1"/>
+                        <field name="percent" invisible="1"/>
                     </group>
                 </sheet>
             </form>
@@ -25,8 +25,8 @@
                 <!-- <field name='sequence' /> -->
                 <field name="activity" />
                 <field name="description" />
-                <field name="effort" />
-                <field name="percent" />
+                <field name="effort" invisible="1"/>
+                <field name="percent" invisible="1"/>
             </tree>
         </field>
     </record>
