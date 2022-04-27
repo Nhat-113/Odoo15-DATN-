@@ -23,3 +23,4 @@ class EstimationOverview(models.Model):
         if vals.get("revision", 0) == 0:
             vals["revision"] = (revision_value + 0.1)
         return super(EstimationOverview, self).create(vals)
+

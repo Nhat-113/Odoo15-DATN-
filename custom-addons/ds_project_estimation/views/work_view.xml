@@ -32,7 +32,7 @@
                             </field>
                         </page>
                         <page string="Summary">
-                            <separator string="Total cost"/>
+                            <separator string="Total cost" />
                             <field name="add_lines_summary_totalcost">
                                 <tree editable="bottom">
                                     <field name="sequence" />
@@ -47,7 +47,7 @@
                                     <field name="cost" />
                                 </tree>
                             </field>
-                            <separator string="Cost Rate"/>
+                            <separator string="Cost Rate" />
                             <field name="add_lines_summary_costrate">
                                 <tree editable="bottom">
                                     <field name="sequence" />
@@ -62,7 +62,7 @@
                             <separator string="Total Effort" />
                             <field name="add_lines_resource_effort">
                                 <tree editable="bottom">
-                                    <field name="sequence"/>
+                                    <field name="sequence" />
                                     <field name="design_effort" />
                                     <field name="dev_effort" />
                                     <field name="tester_effort" />
@@ -93,18 +93,46 @@
                                 <tree editable="bottom">
                                     <field name="sequence" />
                                     <field name="activity" />
-                                    <field name="job_pos" invisible="1"/>
                                     <field name="effort" />
                                     <field name="percent" />
                                 </tree>
                                 <form string="Effort distribution">
                                     <group col="4">
                                         <field name="sequence" string="No" />
-                                        <field name="activity"/>
-                                        <field name="job_pos" invisible="1"/>
-                                        <field name="effort"/>
-                                        <field name="percent"/>
+                                        <field name="activity" />
+                                        <field name="effort" />
+                                        <field name="percent" />
                                     </group>
+                                </form>
+                            </field>
+                            <separator string='Work Breakdown Structure and Estimate' />
+                            <field name="add_lines_module_breakdown">
+                                <tree>
+                                    <field name="sequence" />
+                                    <field name="activity" />
+                                    <field name="effort" />
+                                    <field name="mandays" />
+                                </tree>
+                                <form string="Work Breakdown">
+                                    <group col="4">
+                                        <field name="sequence" />
+                                        <field name="activity" />
+                                        <field name="effort" />
+                                        <field name="mandays" />
+                                    </group>
+                                    <notebook>
+                                        <page string="Breakdown Estimation">
+                                            <field name="add_lines_breakdown_activity">
+                                                <tree editable="bottom">
+                                                    <field name="sequence" />
+                                                    <field name="activity" />
+                                                    <field name="job_pos" />
+                                                    <field name="effort" />
+                                                    <field name="mandays" />
+                                                </tree>
+                                            </field>
+                                        </page>
+                                    </notebook>
                                 </form>
                             </field>
                         </page>
