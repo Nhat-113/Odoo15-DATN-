@@ -407,7 +407,7 @@
 
 
         <record id="hr_rule_ltu" model="hr.salary.rule">
-            <field name="name">Lương tạm ứng (VND)</field>
+            <field name="name">Khấu trừ (VND)</field>
             <field name="sequence" eval="15"/>
             <field name="code">LTU</field>
             <field name="category_id" ref="hr_payroll_community.DED"/>
@@ -418,14 +418,14 @@
 
         <!-- input lương tạm ứng -->
         <record id="hr_rule_input_ltu" model="hr.rule.input">
-            <field name="name">Lương tạm ứng (VND)</field>
+            <field name="name">Khấu trừ (VND)</field>
             <field name="code">LTU</field>
             <field name="input_id" ref="hr_payroll_community.hr_rule_ltu"/>            
         </record>
         <!-- kết thúc -->
 
         <record id="hr_rule_kbs" model="hr.salary.rule">
-            <field name="name">Khoản bổ sung (VND)</field>
+            <field name="name">Khoản bổ sung/Tạm ứng (VND)</field>
             <field name="sequence" eval="16"/>
             <field name="code">KBS</field>
             <field name="category_id" ref="hr_payroll_community.BS"/>
@@ -436,7 +436,7 @@
 
         <!-- input lương tạm ứng -->
         <record id="hr_rule_input_kbs" model="hr.rule.input">
-            <field name="name">Khoản bổ sung (VND)</field>
+            <field name="name">Khoản bổ sung/Tạm ứng (VND)</field>
             <field name="code">KBS</field>
             <field name="input_id" ref="hr_payroll_community.hr_rule_kbs"/>            
         </record>
