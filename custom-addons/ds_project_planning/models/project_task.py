@@ -22,8 +22,10 @@ class ProjectTask(models.Model):
     planned_duration = fields.Float('Duration', default=0, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True)
     lag_time = fields.Integer('Lag Time')
     depending_task_ids = fields.One2many('project.depending.tasks', 'task_id')
-    dependency_task_ids = fields.One2many('project.depending.tasks', 'depending_task_id')
-    links_serialized_json = fields.Char('Serialized Links JSON', compute="compute_links_json")
+    dependency_task_ids = fields.One2many(
+        'project.depending.tasks', 'depending_task_id')
+    links_serialized_json = fields.Char(
+        'Serialized Links JSON', compute="compute_links_json")
     date_start = fields.Datetime('Start Date')
 
     recursive_dependency_task_ids = fields.Many2many(
@@ -40,26 +42,16 @@ class ProjectTask(models.Model):
             domain_exception = ['&', '&', ('project_id', '=', self.project_id.id), (
                 'start_date', '<=', self.date_end), ('end_date', '>=', self.date_end)]
             phase_id = self.env['project.planning.phase'].search(domain_normal)
-            milestone_id = self.env['project.planning.milestone'].search(
-                domain_normal)
             phase_id_exception = self.env['project.planning.phase'].search(
                 domain_exception)
-            milestone_id_exception = self.env['project.planning.milestone'].search(
-                domain_exception)
-            task_phase_id, task_milestone_id = False, False
+            task_phase_id = False
 
             if phase_id:
                 task_phase_id = phase_id.id
             elif phase_id_exception:
                 task_phase_id = phase_id_exception.id
 
-            if milestone_id:
-                task_milestone_id = milestone_id.id
-            elif milestone_id_exception:
-                task_milestone_id = milestone_id_exception.id
-
-            self.write({'phase_id': task_phase_id,
-                        'milestone_id': task_milestone_id})
+            self.write({'phase_id': task_phase_id})
 
         return res
 
@@ -109,12 +101,14 @@ class ProjectTask(models.Model):
                 links.append(json_obj)
             r.links_serialized_json = json.dumps(links)
 
+
 class DependingTasks(models.Model):
     _name = "project.depending.tasks"
     _description = "Tasks Dependency (m2m)"
 
     task_id = fields.Many2one('project.task', required=True)
-    project_id = fields.Many2one('project.project', compute='_compute_project_id', string='Project')
+    project_id = fields.Many2one(
+        'project.project', compute='_compute_project_id', string='Project')
     depending_task_id = fields.Many2one('project.task', required=True)
     relation_type = fields.Selection([
         ("0", "Finish to Start"),
@@ -122,10 +116,12 @@ class DependingTasks(models.Model):
         ("2", "Finish to Finish"),
         ("3", "Start to Finish")
     ], default="0", required=True)
-    state = fields.Selection([('draft', 'Draft'), ('confirm', 'Confirm'), ('done', 'Done')], default='draft')
+    state = fields.Selection(
+        [('draft', 'Draft'), ('confirm', 'Confirm'), ('done', 'Done')], default='draft')
 
     _sql_constraints = [
-        ('task_relation_unique', 'unique(task_id, depending_task_id)', 'Two tasks can have only one relation!'),
+        ('task_relation_unique', 'unique(task_id, depending_task_id)',
+         'Two tasks can have only one relation!'),
     ]
 
     @api.onchange('task_id', 'depending_task_id')
@@ -135,4 +131,3 @@ class DependingTasks(models.Model):
                 r.project_id = r.task_id.project_id
             elif r.depending_task_id:
                 r.project_id = r.depending_task_id.project_id
-

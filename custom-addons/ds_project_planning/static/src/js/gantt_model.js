@@ -31,8 +31,6 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_links_serialized_json = params.links_serialized_json;
             this.map_total_float = params.total_float;
             this.map_parent = 'project_id';
-            this.map_milestone = "milestone_id";
-            this.map_phase_duration = "phase_duration";
             this.map_phase = "phase_id";
             this.modelName = params.modelName;
             this.linkModel = params.linkModel;
@@ -57,9 +55,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_child_ids && fieldNames.push(this.map_child_ids)
             this.map_total_float && fieldNames.push(this.map_total_float);
             this.map_parent && fieldNames.push(this.map_parent);
-            this.map_milestone && fieldNames.push(this.map_milestone);
             this.map_phase && fieldNames.push(this.map_phase);
-            this.map_phase_duration && fieldNames.push(this.map_phase_duration);
             return this._rpc({
                 model: this.modelName,
                 method: 'search_read',
@@ -88,7 +84,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             return this._rpc({
                 model: 'project.planning.milestone',
                 method: 'search_read',
-                fields: ['name', 'start_date', 'type', 'phase_id'],
+                fields: ['name', 'milestone_date', 'type', 'phase_id'],
                 domain: [
                     ['project_id', '=', this.domain[0][2]]
                 ]
@@ -134,7 +130,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 if(record.type) {
                     // Add serverId to get real id in edit mode
                     task.serverId = record.serverId;
-                    datetime = formatFunc(record.start_date)
+                    datetime = record.start_date ? formatFunc(record.start_date) : formatFunc(record.milestone_date);
                 } else {
                     // Handle warning or danger of task
                     // Convert to days
