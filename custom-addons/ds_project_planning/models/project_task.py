@@ -19,10 +19,7 @@ class ProjectTask(models.Model):
     milestone_id = fields.Many2one(
         'project.planning.milestone', string='Milestone', required=False, domain=[('phase_id', '=', phase_id)], help="Project Milestone")
 
-    start_date_milestone = fields.Datetime(
-        readonly=True, related='milestone_id.start_date')
-
-    planned_duration = fields.Float('Duration', default=7, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True)
+    planned_duration = fields.Float('Duration', default=0, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True)
     lag_time = fields.Integer('Lag Time')
     depending_task_ids = fields.One2many('project.depending.tasks', 'task_id')
     dependency_task_ids = fields.One2many('project.depending.tasks', 'depending_task_id')
@@ -65,7 +62,7 @@ class ProjectTask(models.Model):
                         'milestone_id': task_milestone_id})
 
         return res
-    
+
     @api.depends('date_start', 'date_end')
     def _compute_planned_duration(self):
         for r in self:

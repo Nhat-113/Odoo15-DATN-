@@ -29,6 +29,10 @@ class PlanningPhase(models.Model):
     project_tasks = fields.One2many(
         'project.task', 'phase_id', string='Tasks')
     name = fields.Char("Phase name", required=True)
+    type = fields.Char("Type", required=True, default="phase")
+
+    phase_duration = fields.Float('Phase duration', compute='_compute_phase_duration', store=True)
+
     start_date = fields.Datetime(string='Date Start', readonly=False, required=True, help="Start date of the phase",
                                  default=lambda self: fields.Date.to_string(
                                      date.today().replace(day=1)))
@@ -43,6 +47,15 @@ class PlanningPhase(models.Model):
     _sql_constraints = [
         ('name_uniq', 'unique (name)', "Phase name already exists!"),
     ]
+
+    @api.depends('start_date', 'end_date')
+    def _compute_phase_duration(self):
+        for r in self:
+            if r.start_date and r.end_date:
+                elapsed_seconds = (r.end_date - r.start_date).total_seconds()
+                seconds_in_day = 24 * 60 * 60
+                r.phase_duration = elapsed_seconds / seconds_in_day
+                r = r.with_context(ignore_onchange_phase_duration=True)
 
     def _check_dates(self):
         for phase in self:

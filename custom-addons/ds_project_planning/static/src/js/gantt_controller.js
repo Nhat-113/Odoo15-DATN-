@@ -17,6 +17,7 @@ var GanttController = AbstractController.extend({
         this._super.apply(this, arguments);
         this.projectModel = 'project.project';  // todo: read from view arch
         this.milestoneModel = 'project.planning.milestone';
+        this.phaseModel = 'project.planning.phase';
     },
     _onGanttCreateDataProcessor: function(event){
         // console.log('_onGanttCreateDataProcessor');
@@ -133,8 +134,8 @@ var GanttController = AbstractController.extend({
             }
             var session =  self.getSession();
             var context = session ? session.user_context : {};
-            var modelName = task.type === 'project' && self.projectModel || task.type === 'milestone' && self.milestoneModel || self.model.modelName;
-            var target_id = task.type === 'project' && task.serverId || task.type === 'milestone' && task.serverId || task.id;
+            var modelName = task.type === 'project' && self.projectModel || task.type === 'milestone' && self.milestoneModel || task.type === 'phase' && self.phaseModel || self.model.modelName;
+            var target_id = task.type === 'project' && task.serverId || task.type === 'milestone' && task.serverId || task.type === 'phase' && task.serverId || task.id;
             var res_id = parseInt(target_id, 10).toString() === target_id ? parseInt(target_id, 10) : target_id;
             self.form_dialog = new dialogs.FormViewDialog(self, {
                 res_model: modelName,

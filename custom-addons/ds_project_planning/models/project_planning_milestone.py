@@ -33,6 +33,7 @@ class PlanningMilestone(models.Model):
     project_tasks = fields.One2many(
         'project.task', 'milestone_id', string='Tasks')
     name = fields.Char("Milestone name", required=True)
+    type = fields.Char("Type", required=True, default="milestone")
     start_date = fields.Datetime(string='Date Start', readonly=False, required=True, help="Start date of the milestone",
                                  default=lambda self: fields.Date.to_string(
                                      date.today().replace(day=1)))
