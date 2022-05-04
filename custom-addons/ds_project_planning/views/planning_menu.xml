@@ -27,7 +27,7 @@
     <!-- Menu item to open the Configuration -->
     <menuitem id="planning_config_menu" name="Configuration" parent="planning_menu" groups="project.group_project_manager" sequence="4" />
 
-    <menuitem id="menu_config_setting" name="Setting" parent="planning_config_menu" action="open_view_planning_project_all" sequence="1"/>
+    <!-- <menuitem id="menu_config_setting" name="Setting" parent="planning_config_menu" action="open_view_planning_project_all" sequence="1"/> -->
 
     <!-- Action to open the configuration phases of project -->
     <record id="action_config_phase" model="ir.actions.act_window">
@@ -80,5 +80,22 @@
     </record>
 
     <menuitem id="menu_config_planning_role" name="Roles" parent="planning_config_menu" action="action_config_role"/>
+
+    <!-- Action to open the configuration Member Type resource of project -->
+    <record id="action_config_member_type" model="ir.actions.act_window">
+        <field name="name">Member Type</field>
+        <field name="res_model">planning.member.type</field>
+        <field name="search_view_id" ref="planning_member_type_search_view"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Member Type found. Let's create one!
+            </p>
+            <p>
+                  Use Member Type to calculate effort rate of members in project.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_config_member_type" name="Member Type" parent="planning_config_menu" action="action_config_member_type"/>
 
 </odoo>

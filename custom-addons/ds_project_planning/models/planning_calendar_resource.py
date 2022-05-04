@@ -31,7 +31,14 @@ class PlanningCalendarResource(models.Model):
                                readonly=True, help="Effort Rate (%) = Calendar Effort * 20 / Duration")
     role_ids = fields.Many2many('planning.roles', string='Roles')
     note = fields.Text(string='Note')
-
+    member_type = fields.Many2one(
+        'planning.member.type', string="Member Type")
+    member_type_rate = fields.Float(
+        related='member_type.rate', string="Member Type (%)")
+    inactive = fields.Boolean(string="Inactive Member",
+                              default=False, store=True)
+    inactive_date = fields.Date(string='Inactive Date', help="The start date of the member's inactivity in the project.",
+                                default=fields.Date.today)
 
     @api.depends('start_date', 'end_date')
     def _compute_duration(self):
@@ -48,7 +55,7 @@ class PlanningCalendarResource(models.Model):
         """ Calculates effort rate (%)"""
         for resource in self:
             if resource.duration != 0:
-                resource.effort_rate = resource.calendar_effort * 20 / resource.duration
+                resource.effort_rate = resource.calendar_effort * 20 / resource.duration * 100
 
     def _check_dates(self):
         for resource in self:
@@ -62,6 +69,16 @@ class PlanningCalendarResource(models.Model):
     def _check_start_end(self):
         return self._check_dates()
 
+    @api.constrains('inactive', 'inactive_date')
+    def _unassign_member_in_tasks (self):
+        if self.inactive:
+            inactive_date = fields.Datetime.to_datetime(self.inactive_date)
+
+            tasks = self.env['project.task'].search(['&', '&', ('project_id', '=', self.project_id.id), ('user_ids', 'in', self.employee_id.user_id.id), ('date_start', '>=', inactive_date)])
+            for task in tasks:
+                user_ids = [x for x in task.user_ids.ids if x != self.employee_id.user_id.id]
+                task.write({'user_ids': [(6, 0, user_ids)]})
+            
     @api.model
     def open_calendar_resource(self, project_id):
         target_project = self.env['project.project'].browse(project_id)
@@ -74,3 +91,17 @@ class PlanningCalendarResource(models.Model):
             "target": "new",
             "res_id": project_id
         }
+
+
+class PlanningAllocateEffortRate(models.Model):
+    """ Type of member in project planning """
+    _name = "planning.member.type"
+    _description = "Member Type of Project"
+    _rec_name = "name"
+
+    name = fields.Char('Name', required=True)
+    rate = fields.Float(string='Rate', default=50.0)
+
+    _sql_constraints = [
+        ('name_uniq', 'unique (name)', "Member Type name already exists!"),
+    ]

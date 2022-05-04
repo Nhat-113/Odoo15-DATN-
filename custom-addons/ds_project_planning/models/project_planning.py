@@ -37,7 +37,10 @@ class Project(models.Model):
 
             if len(project.planning_calendar_resources) > 0:
                 for resource in project.planning_calendar_resources:
-                    total_effort += resource.calendar_effort
+                    if resource.member_type:
+                        total_effort += resource.calendar_effort * resource.member_type.rate / 100
+                    else:
+                        total_effort += resource.calendar_effort
             project.total_calendar_effort = total_effort
 
     @api.depends('planning_calendar_resources')
@@ -58,20 +61,21 @@ class Project(models.Model):
                 _('You are not the manager of this project, so you cannot assign members to it.'))
 
         # validate calendar resource duplicate
-        current_member_ids = [
-            employee.employee_id.id for employee in self.planning_calendar_resources[:-1]]
-        new_calendar_resource = self.planning_calendar_resources[-1]
-        if new_calendar_resource.employee_id.id in current_member_ids:
-            calendar_duplicate = list(filter(
-                lambda member: member.employee_id['id'] == new_calendar_resource.employee_id.id and
-                member.start_date <= new_calendar_resource.start_date and
-                member.end_date >= new_calendar_resource.start_date, self.planning_calendar_resources[:-1]))[0]
+        if len(self.planning_calendar_resources) > 0:
+            current_member_ids = [
+                employee.employee_id.id for employee in self.planning_calendar_resources[:-1]]
+            new_calendar_resource = self.planning_calendar_resources[-1]
+            if new_calendar_resource.employee_id.id in current_member_ids:
+                calendar_duplicate = list(filter(
+                    lambda member: member.employee_id['id'] == new_calendar_resource.employee_id.id and
+                    member.start_date <= new_calendar_resource.start_date and
+                    member.end_date >= new_calendar_resource.start_date, self.planning_calendar_resources[:-1]))[0]
 
-            if len(calendar_duplicate) > 0:
-                # if new_calendar_resource.start_date >= calendar_duplicate.start_date and new_calendar_resource.start_date <= calendar_duplicate.end_date:
-                raise ValidationError(
-                    _('The project has duplicate members assigned in the range (%(start)s) to (%(end)s)!',
-                      start=calendar_duplicate.start_date, end=calendar_duplicate.end_date))
+                if len(calendar_duplicate) > 0:
+                    # if new_calendar_resource.start_date >= calendar_duplicate.start_date and new_calendar_resource.start_date <= calendar_duplicate.end_date:
+                    raise ValidationError(
+                        _('The project has duplicate members assigned in the range (%(start)s) to (%(end)s)!',
+                          start=calendar_duplicate.start_date, end=calendar_duplicate.end_date))
 
         # update member_ids list
         user_ids = [

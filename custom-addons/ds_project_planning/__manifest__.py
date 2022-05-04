@@ -36,6 +36,7 @@
         "views/project_task_views.xml",
         "views/project_menu.xml",
         "views/project_gantt_views.xml",
-        "views/task_gantt_views.xml"
+        "views/task_gantt_views.xml",
+        "data/member_type_data.xml",
     ],
 }

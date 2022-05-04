@@ -72,7 +72,7 @@
         <field name="name">Calendar Resource</field>
         <field name="model">planning.calendar.resource</field>
         <field name="arch" type="xml">
-            <tree string="Calendar Resource Effort" create="0" delete="0" multi_edit="1" sample="1">
+            <tree string="Calendar Resource Effort" decoration-warning="inactive == True" create="0" delete="0" multi_edit="1" sample="1">
                 <field name="project_id" />
                 <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
                 <field name="start_date" />
@@ -80,7 +80,10 @@
                 <field name="duration" string="Duration (days)"/>
                 <field name="calendar_effort" digits="[12,1]" string="Calendar Effort (MM)"/>
                 <field name="effort_rate" digits="[12,1]" string="Effort Rate (%)"/>
+                <field name="member_type" string="Member Type"/>
                 <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="inactive" invisible="1"/>
+                <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)]}" />
                 <field name="note" optional="hide" />
             </tree>
         </field>
@@ -102,12 +105,21 @@
                         <field name="end_date" />
                         <field name="duration" />
                         <field name="calendar_effort" digits="[12,1]"/>
+                        <label for="member_type"/>
+                        <div class="o_row" name="member_type">
+                            <field name="member_type" nolabel="1"/>
+                            <span>
+                                <field name="member_type_rate" digits="[12,1]" nolabel="1"/>
+                            </span> %
+                        </div>
                         <label for="effort_rate"/>
                         <div class="o_row" name="effort_rate">
                             <field name="effort_rate" digits="[12,1]" nolabel="1"/>
                             <span> % </span>
                         </div>
                         <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                        <field name="inactive" />
+                        <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
                     </group>
                     <field name="note" string="Note" placeholder="Add a note..." colspan="2"/>
                 </sheet>
@@ -119,6 +131,7 @@
     <record id="action_calendar_effort" model="ir.actions.act_window">
         <field name="name">Calendar Resource Effort</field>
         <field name="res_model">planning.calendar.resource</field>
+        <field name="domain">[('project_id', '=', active_id)]</field>
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
                           (0, 0, {'view_mode': 'tree', 'view_id': ref('ds_project_planning.view_tree_calendar_effort')}),
@@ -315,14 +328,17 @@
                     <notebook>
                         <page string="Calendar Resources">
                             <field name="planning_calendar_resources" colspan="4" nolabel="1">
-                                <tree string="Assign Members">
+                                <tree string="Assign Members" decoration-warning="inactive == True">
                                     <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
                                     <field name="start_date" />
                                     <field name="end_date" />
                                     <field name="duration" string="Duration (days)"/>
                                     <field name="calendar_effort" digits="[12,1]" string="Calendar Effort (MM)"/>
+                                    <field name="member_type" string="Member Type"/>
                                     <field name="effort_rate" digits="[12,1]" string="Effort Rate (%)"/>
                                     <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                    <field name="inactive" invisible="1"/>
+                                    <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)]}" />
                                     <field name="note" optional="hide" />
                                 </tree>
                                 <form string="Assign Member">
@@ -337,12 +353,21 @@
                                             <field name="end_date" />
                                             <field name="duration" />
                                             <field name="calendar_effort" digits="[12,1]"/>
+                                            <label for="member_type"/>
+                                            <div class="o_row" name="member_type">
+                                                <field name="member_type" nolabel="1"/>
+                                                <span>
+                                                    <field name="member_type_rate" digits="[12,1]" nolabel="1"/>
+                                                </span> %
+                                            </div>
                                             <label for="effort_rate"/>
                                             <div class="o_row" name="effort_rate">
                                                 <field name="effort_rate" digits="[12,1]" nolabel="1"/>
                                                 <span> % </span>
                                             </div>
                                             <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                            <field name="inactive" />
+                                            <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
                                         </group>
                                         <field name="note" string="Note" placeholder="Add a note..." colspan="2"/>
                                     </sheet>
@@ -603,6 +628,43 @@
             <tree string="Roles" editable="top" sample="1">
                 <field name="name" />
                 <field name="color" widget="color_picker" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Member Type -->
+    <record model="ir.ui.view" id="planning_member_type_search_view">
+        <field name="name">Member Type</field>
+        <field name="model">planning.member.type</field>
+        <field name="arch" type="xml">
+            <search string="Member Type">
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_form_planning_member_type" model="ir.ui.view">
+        <field name="name">Member Type</field>
+        <field name="model">planning.member.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name" />
+                        <field name="rate" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_tree_planning_member_type" model="ir.ui.view">
+        <field name="name">Member Type</field>
+        <field name="model">planning.member.type</field>
+        <field name="arch" type="xml">
+            <tree editable="top" sample="1">
+                <field name="name" />
+                <field name="rate" />
             </tree>
         </field>
     </record>
