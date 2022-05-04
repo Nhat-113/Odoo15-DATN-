@@ -2,15 +2,13 @@
 <odoo>
     <record id="view_form_activity" model="ir.ui.view">
         <field name="name">Activities Form</field>
-        <field name="model">config.activity</field>
+        <field name="model">data.activity</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
                     <group name="group_top">
                         <field name="activity" />
                         <field name="description" />
-                        <field name="effort" invisible="1"/>
-                        <field name="percent" invisible="1"/>
                     </group>
                 </sheet>
             </form>
@@ -19,14 +17,12 @@
 
     <record id="view_tree_activity" model="ir.ui.view">
         <field name="name">Activities List</field>
-        <field name="model">config.activity</field>
+        <field name="model">data.activity</field>
         <field name="arch" type="xml">
             <tree>
                 <!-- <field name='sequence' /> -->
                 <field name="activity" />
                 <field name="description" />
-                <field name="effort" invisible="1"/>
-                <field name="percent" invisible="1"/>
             </tree>
         </field>
     </record>
