@@ -36,6 +36,7 @@ class PlanningMilestone(models.Model):
     end_date_phase = fields.Datetime(
         readonly=True, related='phase_id.end_date')
     name = fields.Char("Milestone name", required=True)
+    type = fields.Char("Type", required=True, default="milestone")
     milestone_date = fields.Datetime(string='Milestone Date', required=True, help="Date of the milestone",
                                      default=lambda self: fields.Datetime.to_string(
                                          datetime.today().replace(day=1, hour=0, minute=0, second=0)))

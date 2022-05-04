@@ -3,33 +3,6 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
 
     var AbstractRenderer = require('web.AbstractRenderer');
     var FormRenderer = require('web.FormRenderer');
-    // var BasicRenderer = require('web.BasicRenderer');
-    // var dialogs = require('web.view_dialogs');
-
-    // FormRenderer.include({
-    //     events: _.extend({}, FormRenderer.prototype.events, {
-    //         'click button.o_dhx_gantt': '_onClickShowGantt',
-    //     }),
-    //     _onClickShowGantt: function(){
-    //         console.log('well hello');
-    //     },
-    //     init: function () {
-    //         this._super.apply(this, arguments);
-    //         console.log('init() GanttFormRenderer');
-    //     },
-    // });
-    // function formatDate(date) {
-    //     // var d = new Date(date),
-    //     let month = '' + (date.getMonth() + 1);
-    //     let day = '' + date.getDate();
-    //     let year = date.getFullYear();
-    
-    //     if (month.length < 2) 
-    //         month = '0' + month;
-    //     if (day.length < 2) 
-    //         day = '0' + day;
-    //     return [day, month, year].join('-');
-    // }
     var GanttRenderer = AbstractRenderer.extend({
         template: "dhx_gantt.gantt_view",
         ganttApiUrl: "/gantt_api",
@@ -57,17 +30,10 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             this.map_links_serialized_json = params.map_links_serialized_json;
             this.link_model = params.link_model;
             this.is_total_float = params.is_total_float;
-            // console.log('params');
-            // console.log(params);
+
 
             var self = this;
-            // todo: make this read from some database variable
-            // gantt.templates.scale_cell_class = function(date){
-            //     if(date.getDay()==5||date.getDay()==6){
-            //         return "o_dhx_gantt_weekend";
-            //     }
-            // };
-
+            gantt.config.grid_width = 580;
             gantt.config.work_time = true;
             gantt.config.skip_off_time = true;
 
@@ -83,13 +49,14 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                 `
             }
 
-
+            gantt.config.drag_progress = false;
             gantt.config.columns = [
-                {name: "text", tree: true, resize: true},
-                {name: "start_date", align: "center", resize: true},
+                {name: "text", tree: true, resize: true, label: this.state.records.data[0].project_name, width: 180},
+                {name: "start_date", align: "center", resize: true, width: 120},
+                {name: "end_date", label: "End time", align: "center", resize: true, width: 120},
                 {name: "duration", align: "center", resize: true},
                 {
-                    name: "assignees", width: 70, label: "Assignees", align: "center", resize: true, template: function (task) {
+                    name: "assignees", width: 80, label: "Assignees", align: "center", resize: true, template: function (task) {
                         var result = "";
                         var assignees = task.user_ids
     
@@ -115,6 +82,20 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                 }
             };
 
+            gantt.templates.grid_header_class = function(columnName, column){
+                if(columnName == 'text') {
+                    return "projectHeaderColor"
+                }
+                return "headerColor";
+              };
+
+            gantt.templates.rightside_text = function (start, end, task) {
+                if (task.type === "milestone") {
+                    return task.text;
+                }
+                return "";
+            };
+
             const tooltips = gantt.ext.tooltips;
             gantt.templates.tooltip_date_format = gantt.date.date_to_str("%F %j, %Y");
 			gantt.templates.tooltip_text = function (start, end, task) {
@@ -136,13 +117,7 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             gantt.setWorkTime({day:6, hours: true });
             gantt.setWorkTime({day:0, hours: true });
             gantt.setWorkTime({hours: [0,23]});
-            // (duplicate)todo: make this read from some database variable
-            // gantt.templates.timeline_cell_class = function(task, date){
-            //     // if(date.getDay()==5||date.getDay()==6){ 
-            //     if(!gantt.isWorkTime({task:task, date: date})){
-            //         return "o_dhx_gantt_weekend";
-            //     }
-            // };
+
             var zoomConfig = {
                 levels: [
                     {
@@ -278,7 +253,6 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
         },
 
         renderGantt: function(){
-            // console.log('renderGantt');
             gantt.init(this.$('.o_dhx_gantt').get(0));
             this.trigger_up('gantt_config');
             this.trigger_up('gantt_create_dp');

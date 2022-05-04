@@ -64,3 +64,11 @@
 .warning .gantt_task_progress {
     background: #eec41e;
 }
+
+.projectHeaderColor {
+    color: #71639e!important;
+    font-weight: 700 !important;
+}
+.headerColor{
+    color: #71639e!important;
+}

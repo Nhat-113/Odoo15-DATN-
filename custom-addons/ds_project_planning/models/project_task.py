@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from cmath import phase
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from datetime import timedelta
 import json
 
+from odoo.exceptions import ValidationError
 
 class ProjectTask(models.Model):
     _inherit = ['project.task']
@@ -16,11 +17,10 @@ class ProjectTask(models.Model):
     )
     phase_id = fields.Many2one(
         'project.planning.phase', string='Phase', required=False, help="Project Phase")
-    start_date_milestone = fields.Datetime(
-        readonly=True, related='phase_id.start_date')
+    milestone_id = fields.Many2one(
+        'project.planning.milestone', string='Milestone', required=False, domain=[('phase_id', '=', phase_id)], help="Project Milestone")
 
-    planned_duration = fields.Float(
-        'Duration', default=7, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True)
+    planned_duration = fields.Float('Duration', default=1, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True)
     lag_time = fields.Integer('Lag Time')
     depending_task_ids = fields.One2many('project.depending.tasks', 'task_id')
     dependency_task_ids = fields.One2many(
@@ -62,7 +62,7 @@ class ProjectTask(models.Model):
             if r.date_start and r.date_end:
                 elapsed_seconds = (r.date_end - r.date_start).total_seconds()
                 seconds_in_day = 24 * 60 * 60
-                r.planned_duration = elapsed_seconds / seconds_in_day
+                r.planned_duration = round(elapsed_seconds / seconds_in_day, 1)
                 r = r.with_context(ignore_onchange_planned_duration=True)
 
     @api.onchange('planned_duration', 'date_start')
@@ -102,6 +102,15 @@ class ProjectTask(models.Model):
                 links.append(json_obj)
             r.links_serialized_json = json.dumps(links)
 
+    @api.constrains('date_start', 'date_end')
+    def _check_start_end(self):
+        for task in self:
+            if task.date_end and task.date_start > task.date_end:
+                raise ValidationError(_(
+                    'Task "%(task)s": start date (%(start)s) must be earlier than end date (%(end)s).',
+                    task=task.name, start=task.date_start, end=task.date_end,
+                ))
+        
 
 class DependingTasks(models.Model):
     _name = "project.depending.tasks"

@@ -4,7 +4,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
     var AbstractModel = require('web.AbstractModel');
     var time = require('web.time');
     var GanttModel = AbstractModel.extend({
-        get: function(){
+        get: function () {
             var data = [];
             var links = [];
 
@@ -17,30 +17,29 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             };
             return res;
         },
-        load: function(params){
+        load: function (params) {
             this.map_id = params.id_field;
             this.map_text = params.text;
             this.map_date_start = params.date_start;
             this.map_duration = params.duration;
             this.map_progress = params.progress;
-            this.map_start_date_milestone = params.start_date_milestone;
             this.map_user_ids = params.user_ids;
             this.map_portal_user_names = params.portal_user_names;
 
-            
+
             this.map_open = params.open;
             this.map_links_serialized_json = params.links_serialized_json;
             this.map_total_float = params.total_float;
             this.map_parent = 'project_id';
-            this.map_milestone = "phase_id";
+            this.map_phase = "phase_id";
             this.modelName = params.modelName;
             this.linkModel = params.linkModel;
             return this._load(params);
         },
-        reload: function(id, params){
+        reload: function (id, params) {
             return this._load(params);
         },
-        _load: function(params){
+        _load: function (params) {
             params = params ? params : {};
             this.domain = params.domain || this.domain || [];
             this.modelName = params.modelName || this.modelName;
@@ -56,142 +55,157 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_child_ids && fieldNames.push(this.map_child_ids)
             this.map_total_float && fieldNames.push(this.map_total_float);
             this.map_parent && fieldNames.push(this.map_parent);
-            this.map_milestone && fieldNames.push(this.map_milestone);
-            this.map_start_date_milestone && fieldNames.push(this.map_start_date_milestone);
+            this.map_phase && fieldNames.push(this.map_phase);
             return this._rpc({
                 model: this.modelName,
                 method: 'search_read',
                 fields: fieldNames,
-                domain: this.domain,
-                orderBy: [{
-                    name: this.map_date_start,
-                    asc: true,
-                }]
+                domain: this.domain
+            }).then(async (records) =>  {
+                var  milestones = await self.getMilestones();
+                var  phases = await self.getPhases();
+                phases = phases.map((phase) => ({...phase, serverId: phase.id, id: parseInt(_.uniqueId())}))
+                milestones = milestones.map((milestone) => ({...milestone, serverId: milestone.id, id: parseInt(_.uniqueId())}))
+                self.convertData(records.concat(phases, milestones), phases);
             })
-            .then(function (records) {
-                self.convertData(records);
-            });
         },
-        convertData: function(records){
+        getPhases: function() {
+            return this._rpc({
+                model: 'project.planning.phase',
+                method: 'search_read',
+                fields: ['name', 'start_date', 'phase_duration', 'type'],
+                domain: [['project_id', '=', this.domain[0][2]]]
+            }).then(function (data) {
+                return data;
+            })
+        },
+
+        getMilestones: function() {
+            return this._rpc({
+                model: 'project.planning.milestone',
+                method: 'search_read',
+                fields: ['name', 'milestone_date', 'type', 'phase_id'],
+                domain: [
+                    ['project_id', '=', this.domain[0][2]]
+                ]
+            }).then(function (data) {
+                return data;
+            })
+        },
+        convertData: function (records, phases) {
             const data = [];
             var self = this;
             this.res_ids = [];
             const links = [];
             const formatFunc = gantt.date.str_to_date("%Y-%m-%d %h:%i:%s", true);
 
-            records.forEach(function(record){
+
+            records.forEach(function (record) {
                 self.res_ids.push(record[self.map_id]);
+
                 var datetime;
-                if(record[self.map_date_start]){
-                    datetime = formatFunc(record[self.map_date_start]);
-                }else{
-                    datetime = false;
-                }
-
                 const task = {};
-                if(self.map_parent){
-                    var projectFound = data.find(function(element) {
-                        return element.type === 'project' && element.serverId == record[self.map_parent][0];
-                    });
-                    
-                    if(!projectFound){
-                        var project = {
-                            id: _.uniqueId(),
-                            serverId: record[self.map_parent][0],
-                            text: record[self.map_parent][1],
-                            type: 'project',
-                            open: true,
-                        }
-                        task.parent = project.id;
-                        data.push(project);
-                    }else{
-                        task.parent = projectFound.id;
+
+                // Find phase parent of task
+                if (record[self.map_phase]) {
+                    const phaseFound = phases.find((item) => item.name === record[self.map_phase][1])
+                    if(phaseFound) {
+                        task.parent = phaseFound.id;
+                    }
+                }
+
+                // Find phase parent of milestone
+                if (record.phase_id) {
+                    const phaseFound = phases.find((item) => item.name === record.phase_id[1])
+                    if(phaseFound) {
+                        task.parent = phaseFound.id;
+                    }
+                }
+
+                task.id = record[self.map_id] ? record[self.map_id] : parseInt(_.uniqueId());
+                task.text = record[self.map_text] ? record[self.map_text] : record.name;
+                task.duration = record[self.map_duration] ? record[self.map_duration]  : record.phase_duration;
+                task.progress = typeof record[self.map_progress] === 'undefined' ? 1 : record[self.map_progress] / 100;
+
+                if(record.type) {
+                    // Add serverId to get real id in edit mode
+                    task.serverId = record.serverId;
+                    datetime = record.start_date ? formatFunc(record.start_date) : formatFunc(record.milestone_date);
+                } else {
+                    // Show start time of task
+                    if (record[self.map_date_start]) {
+                        datetime = formatFunc(record[self.map_date_start]);
+                    } else {
+                        datetime = false;
                     }
 
-                    if(record[self.map_milestone]){
-                        var milestoneFound = data.find(function(element) {
-                            return element.type === 'milestone' && element.serverId == record[self.map_milestone][0];
-                        });
-                        
-                        if(!milestoneFound){
-                            var milestone = {
-                                id: _.uniqueId(),
-                                parent: !projectFound ?  project.id : projectFound.id,
-                                serverId: record[self.map_milestone][0],
-                                text: record[self.map_milestone][1],
-                                type: 'milestone',
-                                start_date: formatFunc(record[self.map_start_date_milestone]),
-                                open: true,
+                    // Handle warning or danger of task
+                    // Convert to days
+                    const currentDuration = (new Date() - datetime) / 1000 / 86400;
+
+                    // if Danger else if warning
+                    if (currentDuration > record[self.map_duration] && task.progress != 1) {
+                        task.deadline = 1;
+                    } else if (currentDuration > 0 && currentDuration < record[self.map_duration]) {
+                        if (record[self.map_duration]) {
+                            let progress = (currentDuration) * (1 / record[self.map_duration]);
+                            if (progress > task.progress) {
+                                task.deadline = 2;
                             }
-                            data.push(milestone);
                         }
                     }
                 }
-           
-                task.id = record[self.map_id];
-                task.text = record[self.map_text];
+
                 task.start_date = datetime;
-
-                // Handle warning or danger task
-                // Convert to days
-                const currentDuration = (new Date() - datetime)/1000/86400;
-
-                // if Danger else if warning
-                if (currentDuration > record[self.map_duration] && record[self.map_progress] !=1) {
-                    task.deadline = 1;
-                } else if(currentDuration > 0 && currentDuration < record[self.map_duration]) {
-                    if(record[self.map_duration]) {
-                        let progress = (currentDuration) *(1/record[self.map_duration]);
-                        if(progress > record[self.map_progress]) {
-                            task.deadline = 2;
-                        }
-                    }
-                }
-
-
-                task.duration = record[self.map_duration];
-                task.progress = record[self.map_progress];
-                task.open = record[self.map_open];
+                task.open = record[self.map_open] ? record[self.map_open] : 'true';
                 task.links_serialized_json = record[self.map_links_serialized_json];
                 task.total_float = record[self.map_total_float];
                 task.user_ids = record[self.map_user_ids];
+                task.project_name = record[self.map_parent] ? record[self.map_parent][1] : "";
+                task.type = record.type ? record.type : "";
 
                 data.push(task);
-                links.push.apply(links, JSON.parse(record.links_serialized_json))
+                if(!record.type) {
+                    links.push.apply(links, JSON.parse(record.links_serialized_json))
+                }
             });
+
             // TODO COVERT pair user_ids and portal_user_name to assignees
             this.records = data;
             this.links = links;
         },
-        updateTask: function(data){
-            if(data.isProject){
+        updateTask: function (data, modelName, id) {
+            if (data.isProject) {
                 return $.when();
             }
-            var args = [];
-            var values = {};
 
-            var id = data.id;
-            values[this.map_text] = data.text;
-            values[this.map_duration] = data.duration;
-            if (this.map_open){
-                values[this.map_open] = data.open;
-            }
-            if (this.map_progress){
-                values[this.map_progress] = data.progress;
-            }
-            // TODO
-            // convert time from dhx's string, to a javascript datetime, then to odoo's sting format :D
             var formatFunc = gantt.date.str_to_date("%d-%m-%Y %h:%i");
-            values[this.map_date_start] = time.datetime_to_str(formatFunc(data.start_date));
-            args.push(id);
-            args.push(values)
+            const values = {
+                name:  data.text,
+            }
+            const datetime = time.datetime_to_str(formatFunc(data.start_date));
+
+            switch (data.type) {
+                case "milestone":
+                    values['milestone_date'] = datetime;
+                    break;
+                case "phase":
+                    values['start_date'] = datetime;
+                    values['phase_duration'] = data.duration;
+                    values['end_date'] = time.datetime_to_str(formatFunc(data.end_date));
+                    break;
+                default:
+                    values[this.map_date_start] = datetime;
+                    values[this.map_duration] = data.duration;
+                    break;
+            }
             return this._rpc({
-                model: this.modelName,
+                model: modelName,
                 method: 'write',
-                args: args,
+                args: [].concat(id, values),
             });
         },
-        createLink: function(data){
+        createLink: function (data) {
             // console.log('createLink');
             // console.log({data});
             var args = [];
@@ -209,7 +223,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 args: args,
             });
         },
-        deleteLink: function(data){
+        deleteLink: function (data) {
             // console.log('deleteLink');
             // console.log({data});
             var args = [];
@@ -221,19 +235,19 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 args: args,
             });
         },
-        getCriticalPath: function(){
+        getCriticalPath: function () {
             return this._rpc({
                 model: this.modelName,
                 method: 'compute_critical_path',
-                args:[this.res_ids],
+                args: [this.res_ids],
             });
         },
-        schedule: function(){
+        schedule: function () {
             var self = this;
             return this._rpc({
                 model: this.modelName,
                 method: 'bf_traversal_schedule',
-                args:[this.res_ids],
+                args: [this.res_ids],
             });
         },
     });
