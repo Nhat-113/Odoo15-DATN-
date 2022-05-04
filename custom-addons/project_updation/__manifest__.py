@@ -3,7 +3,7 @@
     'version': '15.0.1.0.0',
     'summary': """""",
     'description': """""",
-    'category': 'Generic Modules/Services',
+    'category': 'Services/Project',
     'live_test_url': '',
     'author': 'phuongtn',
     'company': 'Dsoft',
@@ -21,12 +21,8 @@
     'assets': {
         'web.assets_backend': [
             'project_updation/static/src/lib/bootstrap-colorpicker/css/style.css',
-            # 'project_updation/static/src/lib/bootstrap-colorpicker/css/bootstrap-colorpicker.css',
-            # 'project_updation/static/src/js/widget.js',
-            # 'project_updation/static/src/lib/bootstrap-colorpicker/js/bootstrap-colorpicker.js',
         ],
         'web.assets_qweb': [
-            # 'project_updation/static/src/xml/widget.xml',
         ],
     },
 
