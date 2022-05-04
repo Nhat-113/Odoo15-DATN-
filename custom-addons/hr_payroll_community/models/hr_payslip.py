@@ -22,7 +22,7 @@ class HrPayslip(models.Model):
     _description = 'Pay Slip'
 
     struct_id = fields.Many2one('hr.payroll.structure', string='Structure',
-                                readonly=True, states={'draft': [('readonly', False)]},
+                                readonly=True, states={'draft': [('readonly', False)]}, required=True,
                                 help='Defines the rules that have to be applied to this payslip, accordingly '
                                      'to the contract chosen. If you let empty the field contract, this field isn\'t '
                                      'mandatory anymore and thus the rules applied will be all the rules set on the '
@@ -96,6 +96,11 @@ class HrPayslip(models.Model):
         #     if self.contract_id.date_start > self.date_to or self.contract_id.date_end < self.date_from:
         #         raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
         #         name=self.employee_id.name))
+
+    @api.constrains('struct_id')
+    def _check_struct_id(self):
+        if not self.struct_id:
+            raise ValidationError(_("Field Structure cannot be left blank"))
 
     @api.constrains('name')
     def _check_payslips(self):

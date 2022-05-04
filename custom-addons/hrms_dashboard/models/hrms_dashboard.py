@@ -8,6 +8,8 @@ from pytz import utc
 from odoo import models, fields, api, _
 from odoo.http import request
 from odoo.tools import float_utils
+from datetime import date
+import calendar
 
 ROUNDING_FACTOR = 16
 
@@ -18,7 +20,13 @@ class HrLeave(models.Model):
                                    help="Field allowing to see the leave request duration"
                                         " in days or hours depending on the leave_type_request_unit")
 
-
+# class Calendar(models.Model):
+#      _inherit = 'calendar.event'    
+# @api.multi   
+# def count_name(self):
+#      for partner in self:
+#          partner.associate_count = len(partner.associate_ids)
+        #  len(self.env['ten.bang'].search([]))
 class Employee(models.Model):
     _inherit = 'hr.employee'
 
@@ -38,6 +46,17 @@ class Employee(models.Model):
         uid = request.session.uid
         employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
         leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1'])])
+        recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ])])
+
+        my_date = date.today()
+
+        temp = str(my_date.year) + '-' + str(my_date.month) + '-' + str(my_date.day)
+              
+        total_len = self.env['calendar.event'].search_count([('start', '=', temp)])
+        #todayMeeting = len(self.env['calendar.event'].search([]))
+        #today_meeting = self.env['calendar.event'].sudo().search_count([])
+
+        
         today = datetime.strftime(datetime.today(), '%Y-%m-%d')
         query = """
         select count(id)
@@ -92,7 +111,10 @@ class Employee(models.Model):
                     'job_applications': job_applications,
                     'timesheet_view_id': timesheet_view_id,
                     'experience': experience,
-                    'age': age
+                    'age': age,
+                    'recruitment': recruitment,
+                    'total_len': total_len
+
                 }
                 employee[0].update(data)
             return employee
@@ -105,37 +127,25 @@ class Employee(models.Model):
         uid = request.session.uid
         employee = self.env['hr.employee'].search([('user_id', '=', uid)], limit=1)
 
-        cr.execute("""select *,
-        (to_char(dob,'ddd')::int-to_char(now(),'ddd')::int+total_days)%total_days as dif
-        from (select he.id, he.name, to_char(he.birthday, 'Month dd') as birthday,
-        hj.name as job_id , he.birthday as dob,
-        (to_char((to_char(now(),'yyyy')||'-12-31')::date,'ddd')::int) as total_days
-        FROM hr_employee he
-        join hr_job hj
-        on hj.id = he.job_id
-        ) birth
-        where (to_char(dob,'ddd')::int-to_char(now(),'DDD')::int+total_days)%total_days between 0 and 15
-        order by dif;""")
+        cr.execute("""
+          select *,
+            (to_char(dob,'ddd')::int-to_char(now(),'ddd')::int+total_days)%total_days as dif
+            from (select he.id, he.name, to_char(he.birthday, 'Month dd') as birthday, he.birthday as dob,
+            (to_char((to_char(now(),'yyyy')||'-12-31')::date,'ddd')::int) as total_days
+            FROM hr_employee he
+            ) birth
+            where (to_char(dob,'ddd')::int-to_char(now(),'DDD')::int+total_days)%total_days between 0 and 15
+            order by dif;""")
         birthday = cr.fetchall()
         # e.is_online # was there below
         #        where e.state ='confirm' on line 118/9 #change
-        cr.execute("""select e.name, e.date_begin, e.date_end, rc.name as location
-        from event_event e
-        left join res_partner rp
-        on e.address_id = rp.id
-        left join res_country rc
-        on rc.id = rp.country_id
-        and (e.date_begin >= now()
-        and e.date_begin <= now() + interval '15 day')
-        or (e.date_end >= now()
-        and e.date_end <= now() + interval '15 day')
-        order by e.date_begin """)
+        cr.execute("""select event_event.name , event_event.date_begin,  event_event.date_end from event_event   where event_event.stage_id = '1' or  event_event.stage_id = '2' or  event_event.stage_id = '3'""")
         event = cr.fetchall()
         announcement = []
         if employee:
             department = employee.department_id
             job_id = employee.job_id
-            sql = """select ha.name, ha.announcement_reason
+            sql = """select ha.announcement_reason, ha.date_start
             from hr_announcement ha
             left join hr_employee_announcements hea
             on hea.announcement = ha.id
@@ -173,8 +183,8 @@ class Employee(models.Model):
     def get_dept_employee(self):
         cr = self._cr
         cr.execute("""select department_id, hr_department.name,count(*)
-from hr_employee join hr_department on hr_department.id=hr_employee.department_id
-group by hr_employee.department_id,hr_department.name""")
+        from hr_employee join hr_department on hr_department.id=hr_employee.department_id
+        group by hr_employee.department_id,hr_department.name""")
         dat = cr.fetchall()
         data = []
         for i in range(0, len(dat)):

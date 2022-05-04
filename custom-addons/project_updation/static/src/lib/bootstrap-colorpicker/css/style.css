@@ -1,0 +1,16 @@
+.issue_type_img img {
+  border-radius: 50%;
+  width: 19px;
+  height: 19px;
+  object-fit: cover;
+  margin-right: 4px;
+}
+
+.color_status {
+  border-radius: 10rem;
+  padding-right: 0.5em;
+  padding-left: 0.5em;
+  padding-top: 0.15em;
+  padding-bottom: 0.15em;
+}
+
