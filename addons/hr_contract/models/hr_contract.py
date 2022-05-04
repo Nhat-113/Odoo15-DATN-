@@ -160,16 +160,20 @@ class Contract(models.Model):
                 _("The contract of %s is about to expire.", contract.employee_id.name),
                 user_id=contract.hr_responsible_id.id or self.env.uid)
 
-        contracts.write({'kanban_state': 'blocked'})
+        for contract in contracts:
+            contract.write({'kanban_state': 'blocked'})
 
-        self.search([
+        contract_exps = self.search([
             ('state', '=', 'open'),
             '|',
             ('date_end', '<=', fields.Date.to_string(date.today() + relativedelta(days=1))),
             ('visa_expire', '<=', fields.Date.to_string(date.today() + relativedelta(days=1))),
-        ]).write({
-            'state': 'close'
-        })
+        ])
+        
+        for contract in contract_exps:
+            contract.write({
+                'state': 'close'
+            })
 
         self.search([('state', '=', 'draft'), ('kanban_state', '=', 'done'), ('date_start', '<=', fields.Date.to_string(date.today())),]).write({
             'state': 'open'

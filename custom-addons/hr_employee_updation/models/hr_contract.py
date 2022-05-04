@@ -1,7 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from datetime import date
-from dateutil.relativedelta import relativedelta
 
 
 class Contract(models.Model):
@@ -53,33 +52,6 @@ class Contract(models.Model):
                 contract.date_end = max(date.today(), contract.date_start)
 
         return res
-
-    @api.model
-    def update_state(self):
-        contracts = self.search([
-            ('state', '=', 'open'), ('kanban_state', '!=', 'blocked'),
-            '|',
-            '&',
-            ('date_end', '<=', fields.Date.to_string(date.today() + relativedelta(days=7))),
-            ('date_end', '>=', fields.Date.to_string(date.today() + relativedelta(days=1))),
-            '&',
-            ('visa_expire', '<=', fields.Date.to_string(date.today() + relativedelta(days=60))),
-            ('visa_expire', '>=', fields.Date.to_string(date.today() + relativedelta(days=1))),
-        ])
-
-        for contract in contracts:
-            contract.write({'kanban_state': 'blocked'})
-
-        contract_exps = self.search([
-            ('state', '=', 'open'),
-            '|',
-            ('date_end', '<=', fields.Date.to_string(date.today() + relativedelta(days=1))),
-            ('visa_expire', '<=', fields.Date.to_string(date.today() + relativedelta(days=1))),
-        ])
-        for contract in contract_exps:
-            contract.write({
-            'state': 'close'
-        })
 
     # def _assign_open_contract(self):
     #     for contract in self:
