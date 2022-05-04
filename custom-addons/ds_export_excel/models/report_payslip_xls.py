@@ -21,7 +21,7 @@ class PayslipXlsx(models.AbstractModel):
             "Tên CN ngân hàng",
             "Phụ cấp không chịu thuế",
             "Phụ cấp chịu thuế",
-            "Lương NET",
+            "Lương",
             "Ngày công trong tháng",
             "Bình quân ngày công",
             "Ngày nghỉ không lương",
@@ -32,8 +32,8 @@ class PayslipXlsx(models.AbstractModel):
             "Thời Gian OT 200% Lương",
             "Thời Gian OT 300% Lương",
             "Lương OT",
-            "Lương tạm ứng",
-            "Khoản bổ sung",
+            "Khấu trừ",
+            "Khoản bổ sung/Tạm ứng",
             "Tiền công đoàn",
             "Lương OT chịu thuế",
             "Tổng thu nhâp trong tháng",
@@ -51,6 +51,7 @@ class PayslipXlsx(models.AbstractModel):
         sheet.set_column(3, 3, 23)
         sheet.set_column(8, 8, 21)
         sheet.set_column(11, 14, 25)
+        sheet.set_column(17, 17, 25)
         sheet.set_column(20, 20, 25)
         sheet.set_column(22, 22, 35)
         sheet.set_column(24, 24, 30)
