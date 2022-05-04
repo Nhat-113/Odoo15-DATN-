@@ -1279,12 +1279,13 @@ button:hover, button:focus{
     flex: 100%;
     margin: 1% auto;
 }
-.legend > tbody {
+.emp_graph .legend > tbody {
     display: flex;
     align-content: space-around;
-    flex-wrap: wrap;
-    align-items: flex-end;
+    flex-wrap: nowrap;
+    align-items: flex-start;
     justify-content: center;
+    flex-direction: column;
 }
 .emp_graph svg {
     flex: 100%;
@@ -1329,7 +1330,7 @@ button:hover, button:focus{
     display: inline-block;
     flex: 20%;
     background: #6869AC;
-    border-radius: 24px;
+    border-radius: 12px;
     border: 1px solid #6869AC;
     display: flex;
     flex-direction: row;
@@ -1738,6 +1739,9 @@ button:hover, button:focus{
     border-radius: 24px;
     height: 100%;
 }
+.Birthday .list {
+    height: 100%;
+}
 /* .Birthday_user {
     flex: 50%;
     display: flex;
@@ -1780,7 +1784,7 @@ button:hover, button:focus{
     width: 90%;
     border-radius: 16px;
     position: relative;
-    height: 8%;
+    height: 7%;
 }
 .birthday-detail p {
     font-weight: bold;

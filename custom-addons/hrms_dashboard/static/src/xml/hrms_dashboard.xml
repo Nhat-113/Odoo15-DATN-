@@ -386,12 +386,12 @@
                                                                 margin: 0 auto;
                                                                 border-radius: 26px;
                                                                 height:80%">
-                            <t t-foreach="widget.announcements" t-as="announcement">
-                            <div class="text_detail_user">
-                                <h2 class="text_news_user" style="font-size: 15px;"><t t-esc="announcement[1]"/> </h2>
-                                <h6 class="new_code_user"><t t-esc="announcement[0]"/></h6>
-                            </div>
-                            </t>
+                                <t t-foreach="widget.upcoming_events" t-as="event">
+                                    <div class="event-detail" >         
+                                        <p><t t-esc="event[0]"/></p>
+                                        <p style="float: right;margin-top: 6px;" ><t t-esc="event[1]"/> - <t t-esc="event[2]"/></p>
+                                    </div>    
+                                </t>   
                             </div>
                         </div>
 
