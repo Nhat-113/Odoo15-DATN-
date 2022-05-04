@@ -14,19 +14,3 @@
   padding-bottom: 0.15em;
 }
 
-.color_status_treeview {
-  position: absolute;
-  width: auto;
-  height: 1.7em;
-  display: flex;
-  align-items: center;
-  margin-top: 0.41em;
-  font-weight: bold;
-  color: #fff;
-  text-align: center;
-  font-size: 12px;
-}
-
-.background_color_red {
-  background-color: red;
-}

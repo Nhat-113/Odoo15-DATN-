@@ -155,10 +155,10 @@ class Task(models.Model):
     def _check_timesheet_progress(self):
         if self.progress_input > 0:
             if len(self.timesheet_ids) == 0:
-                raise UserError('Timesheet required')
+                raise UserError('Please update your timesheet.')
         if len(self.timesheet_ids) > 0:
             if self.progress_input == 0:
-                raise UserError('Progress > 0%')
+                raise UserError('Please update current progress.')
 
     @api.constrains('timesheet_ids')
     def _check_hours_spent(self):

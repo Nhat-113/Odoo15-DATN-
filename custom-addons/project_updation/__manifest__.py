@@ -9,10 +9,7 @@
     'company': 'Dsoft',
     'maintainer': '',
     'website': "",
-    'depends': ['hr', 'base', 'project', 'web_domain_field', 'ds_project_planning'],
-    'external_dependencies': {
-        'python': ['pandas'],
-    },
+    'depends': ['hr', 'base', 'project', 'web_domain_field'],
     'data': [
         'views/project_view.xml',
         'security/ir.model.access.csv',
@@ -26,8 +23,8 @@
         ],
     },
 
-    'images': ['project_updation/static/img/tick.png'],
+    'images': [],
     'license': "AGPL-3",
     'installable': True,
-    'application': True,
+    'application': False,
 }
