@@ -125,13 +125,20 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 task.id = record[self.map_id] ? record[self.map_id] : parseInt(_.uniqueId());
                 task.text = record[self.map_text] ? record[self.map_text] : record.name;
                 task.duration = record[self.map_duration] ? record[self.map_duration]  : record.phase_duration;
-                task.progress = record[self.map_progress] ? record[self.map_progress] / 100 : 1 ;
+                task.progress = typeof record[self.map_progress] === 'undefined' ? 1 : record[self.map_progress] / 100;
 
                 if(record.type) {
                     // Add serverId to get real id in edit mode
                     task.serverId = record.serverId;
                     datetime = record.start_date ? formatFunc(record.start_date) : formatFunc(record.milestone_date);
                 } else {
+                    // Show start time of task
+                    if (record[self.map_date_start]) {
+                        datetime = formatFunc(record[self.map_date_start]);
+                    } else {
+                        datetime = false;
+                    }
+
                     // Handle warning or danger of task
                     // Convert to days
                     const currentDuration = (new Date() - datetime) / 1000 / 86400;
@@ -146,13 +153,6 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                                 task.deadline = 2;
                             }
                         }
-                    }
-
-                    // Show start time of task
-                    if (record[self.map_date_start]) {
-                        datetime = formatFunc(record[self.map_date_start]);
-                    } else {
-                        datetime = false;
                     }
                 }
 
@@ -169,36 +169,40 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                     links.push.apply(links, JSON.parse(record.links_serialized_json))
                 }
             });
+
             // TODO COVERT pair user_ids and portal_user_name to assignees
             this.records = data;
             this.links = links;
         },
-        updateTask: function (data) {
+        updateTask: function (data, modelName, id) {
             if (data.isProject) {
                 return $.when();
             }
-            var args = [];
-            var values = {};
 
-            var id = data.id;
-            values[this.map_text] = data.text;
-            values[this.map_duration] = data.duration;
-            if (this.map_open) {
-                values[this.map_open] = data.open;
-            }
-            if (this.map_progress) {
-                values[this.map_progress] = data.progress;
-            }
-            // TODO
-            // convert time from dhx's string, to a javascript datetime, then to odoo's sting format :D
             var formatFunc = gantt.date.str_to_date("%d-%m-%Y %h:%i");
-            values[this.map_date_start] = time.datetime_to_str(formatFunc(data.start_date));
-            args.push(id);
-            args.push(values)
+            const values = {
+                name:  data.text,
+            }
+            const datetime = time.datetime_to_str(formatFunc(data.start_date));
+
+            switch (data.type) {
+                case "milestone":
+                    values['milestone_date'] = datetime;
+                    break;
+                case "phase":
+                    values['start_date'] = datetime;
+                    values['phase_duration'] = data.duration;
+                    values['end_date'] = time.datetime_to_str(formatFunc(data.end_date));
+                    break;
+                default:
+                    values[this.map_date_start] = datetime;
+                    values[this.map_duration] = data.duration;
+                    break;
+            }
             return this._rpc({
-                model: this.modelName,
+                model: modelName,
                 method: 'write',
-                args: args,
+                args: [].concat(id, values),
             });
         },
         createLink: function (data) {

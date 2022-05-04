@@ -27,29 +27,25 @@ var GanttController = AbstractController.extend({
         }
         this.dp_created = true;
         var dp = gantt.createDataProcessor(function(entity, action, data, id){
-            // console.log('createDataProcessor');
-            // console.log('entity');
-            // console.log({entity});
-            // console.log({action});
-            // console.log({data});
-            // console.log({id});
-            // const services = {
-            //     "task": this.taskService,
-            //     "link": this.linkService
-            // };
-            // const service = services[entity];
             switch (action) {
+                
                 case "update":
                     // return self.trigger_up('gantt_data_updated', {entity, data});
                     switch(entity){
                         case "task":
-                            var res_deferred = $.Deferred();
-                            self.model.updateTask(data).then(function(res) {
+                            const modelName = data.type === 'project' && self.projectModel || data.type === 'milestone' && self.milestoneModel || data.type === 'phase' && self.phaseModel || 'project.task';
+                            const target_id = data.type === 'project' && data.serverId || data.type === 'milestone' && data.serverId || data.type === 'phase' && data.serverId || data.id;
+                            const res_id = parseInt(target_id, 10).toString() === target_id ? parseInt(target_id, 10) : target_id;
+                            const res_deferred = $.Deferred();
+                            self.model.updateTask(data, modelName, res_id).then(function(res) {
                                 res_deferred.resolve(res.result);
                                 self.update({});
                             }, function(res){
-                                res_deferred.resolve({state: "error"});
-                                gantt.deleteLink(data.id);
+                                if(res.message.data.name !== 'odoo.exceptions.ValidationError') {
+                                    res_deferred.resolve({state: "error"});
+                                    gantt.deleteLink(res_id);
+                                }
+                                self.update({});
                             });
                             return res_deferred;
                         break;
@@ -108,17 +104,7 @@ var GanttController = AbstractController.extend({
             return true;
         });
     },
-    // _onGanttUpdated: function(event){
-    //     event.stopPropagation();
-    //     console.log('_onGanttUpdated');
-    //     console.log(event.data.entity);
-    //     console.log(event.data.data);
-    //     switch(event.data.entity){
-    //         case "task":
-    //             return this.model.updateTask(event.data.data);
-    //         case "link":
-    //     }
-    // }
+
     _onGanttConfig: function(){
         var self = this;
         if(this.gantt_configured){

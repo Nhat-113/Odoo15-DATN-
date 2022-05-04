@@ -19,6 +19,18 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
         }),
         init: function (parent, state, params) {
             this._super.apply(this, arguments);
+            this.initDomain = params.initDomain;
+            this.modelName = params.modelName;
+            this.map_text = params.map_text;
+            this.map_id_field = params.map_id_field;
+            this.map_date_start = params.map_date_start;
+            this.map_duration = params.map_duration;
+            this.map_open = params.map_open;
+            this.map_progress = params.map_progress;
+            this.map_links_serialized_json = params.map_links_serialized_json;
+            this.link_model = params.link_model;
+            this.is_total_float = params.is_total_float;
+
 
             var self = this;
             gantt.config.grid_width = 580;

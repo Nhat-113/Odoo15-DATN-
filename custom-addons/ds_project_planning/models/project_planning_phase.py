@@ -5,7 +5,7 @@ from re import S
 from unicodedata import name
 from numpy import require
 from odoo import models, fields, api, _
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from dateutil import relativedelta
 from odoo.exceptions import ValidationError, UserError
 
@@ -33,7 +33,7 @@ class PlanningPhase(models.Model):
     name = fields.Char("Phase name", required=True)
     type = fields.Char("Type", required=True, default="phase")
 
-    phase_duration = fields.Float('Phase duration', compute='_compute_phase_duration', store=True)
+    phase_duration = fields.Float('Phase duration', compute='_compute_phase_duration', inverse='_inverse_phase_duration', store=True)
 
     start_date = fields.Datetime(string='Date Start', readonly=False, required=True, help="Start date of the phase",
                                  default=lambda self: fields.Datetime.to_string(
@@ -56,8 +56,15 @@ class PlanningPhase(models.Model):
             if r.start_date and r.end_date:
                 elapsed_seconds = (r.end_date - r.start_date).total_seconds()
                 seconds_in_day = 24 * 60 * 60
-                r.phase_duration = elapsed_seconds / seconds_in_day
+                r.phase_duration = round(elapsed_seconds / seconds_in_day, 1)
                 r = r.with_context(ignore_onchange_phase_duration=True)
+    
+    @api.onchange('phase_duration', 'start_date')
+    def _inverse_phase_duration(self):
+        for r in self:
+            if r.start_date and r.phase_duration and not r.env.context.get('ignore_onchange_phase_duration', False):
+                r.end_date = r.start_date + timedelta(days=r.phase_duration)
+
 
     def _check_dates(self):
         for phase in self:
