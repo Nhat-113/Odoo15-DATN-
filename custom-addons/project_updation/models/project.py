@@ -85,7 +85,7 @@ class Task(models.Model):
         store=False
     )
     is_readonly = fields.Boolean(compute='_check_user_readonly')
-    progress_input = fields.Float(string='Progress (%)')
+    progress_input = fields.Integer(string='Progress (%)')
     status_color = fields.Char(compute='_get_status_color', store=True)
 
     @api.depends('status')
@@ -142,7 +142,7 @@ class Task(models.Model):
             if len(self.timesheet_ids) == 0 or self.planned_hours == 0.0:
                 raise UserError(
                     'Time Sheet field and Initially Planned Hours field cannot be left blank')
-            if self.progress_input != 100.0:
+            if self.progress_input != 100:
                 raise UserError(
                     'Required when status Done or Closed, progess = 100%')
 

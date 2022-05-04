@@ -9,7 +9,7 @@
     'company': 'Dsoft',
     'maintainer': '',
     'website': "",
-    'depends': ['hr', 'base', 'project', 'web_domain_field'],
+    'depends': ['hr', 'base', 'project', 'web_domain_field', 'ds_project_planning'],
     'external_dependencies': {
         'python': ['pandas'],
     },
