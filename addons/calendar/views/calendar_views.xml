@@ -267,7 +267,9 @@
             <calendar js_class="attendee_calendar" string="Meetings" date_start="start" date_stop="stop" date_delay="duration" all_day="allday"
                 event_open_popup="true"
                 event_limit="5"
-                color="partner_ids">
+                color="partner_ids"
+                mode="day"
+                >
                 <field name="attendee_status" invisible="1"/>
                 <field name="partner_ids" options="{'block': True, 'icon': 'fa fa-users'}"
                        filters="1" widget="many2manyattendee" write_model="calendar.filters"
