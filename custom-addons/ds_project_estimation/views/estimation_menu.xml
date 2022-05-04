@@ -67,16 +67,16 @@
     />
 
     <!-- Action to open Activities -->
-    <record id="action_config_activity" model="ir.actions.act_window">
+    <record id="action_data_activity" model="ir.actions.act_window">
         <field name="name">Activities</field>
-        <field name="res_model">config.activity</field>
+        <field name="res_model">data.activity</field>
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="menu_config_activity"
+    <menuitem id="menu_data_activity"
     name="Activities"
     parent="menu_config"
-    action="action_config_activity"
+    action="action_data_activity"
     />
 
     <!-- Action to open Description -->

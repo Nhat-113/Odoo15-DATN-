@@ -87,3 +87,30 @@ class ActivityStructure(models.Model):
             parent = parent._get_parent_structure()
         return parent + self
 
+
+class DataActivity(models.Model):
+    """
+    Describe Data Activity
+    """
+    _name = "data.activity"
+    _description = "Data Activity"
+    _order = "sequence,id"
+
+    sequence = fields.Integer(string="No", index=True, help='Use to arrange calculation sequence')
+    activity = fields.Char("Activity")
+    description = fields.Char("Description")
+
+
+class DataActivityStructure(models.Model):
+    """
+    Describe Data Activity Structure
+    """
+    _name = "data.activity.structure"
+    _description = "Data Activity Structure"
+
+    @api.model
+    def _get_parent(self):
+        return self.env.ref('ds_project_estimation.act_structure_default_base', False)
+    
+    name = fields.Char(string="Name")
+    rule_ids = fields.Many2many('data.activity', 'data_structure_activity_rule_rel', 'struct_id', 'rule_id', string='Activity Rules')
