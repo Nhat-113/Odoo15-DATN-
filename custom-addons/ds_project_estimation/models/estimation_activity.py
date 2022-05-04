@@ -17,23 +17,33 @@ class Activities(models.Model):
 
     activity = fields.Char("Activity")
     description = fields.Char("Description")
-    effort = fields.Float(string="Effort", default=0,)
-    percent = fields.Float(string="Percentage", default=0,)
-    mandays = fields.Float(string="Expected (man-days)", default=0,)
+    effort = fields.Float(string="Effort", default=0, compute='_compute_total_effort')
+    percent = fields.Float(string="Percentage", default=0)
+    mandays = fields.Float(string="Expected (man-days)", default=0, compute='_compute_total_manday')
     parent_rule_id = fields.Many2one('config.activity', string='Parent Activity Rule', index=True)
     child_ids = fields.One2many('config.activity', 'parent_rule_id', string='Child Activity Rule', copy=True)
 
-    total_efforts = fields.Float(string="Total efforts", compute="_compute_total", store=True)
-    total_mandays = fields.Float(string="Total man-days", compute="_compute_total", store=True)
-
     add_lines_breakdown_activity = fields.One2many('module.breakdown.activity', 'connect_module', string="Breakdown Activity")
 
-    @api.depends('add_lines_breakdown_activity.effort', 'add_lines_breakdown_activity.mandays')
-    def _compute_total(self):
-        for line in self:
-            pass
-    
-
+    @api.depends('add_lines_breakdown_activity.effort')
+    def _compute_total_effort(self):
+        ls_break = self.env['module.breakdown.activity'].search([])
+        for record in self:
+            final_effort = 0.0
+            for item in ls_break:
+                if item.connect_module and (record.id == item.connect_module.id):
+                    final_effort += item.effort
+            record.effort = final_effort
+            
+    @api.depends('add_lines_breakdown_activity.mandays')
+    def _compute_total_manday(self):
+        ls_break = self.env['module.breakdown.activity'].search([])
+        for record in self:
+            final_manday = 0.0
+            for item in ls_break:
+                if item.connect_module and (record.id == item.connect_module.id):
+                    final_manday += item.mandays
+            record.mandays = final_manday
         
     def _recursive_search_of_rules(self):
         """

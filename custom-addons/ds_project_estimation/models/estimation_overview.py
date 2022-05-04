@@ -4,7 +4,8 @@ from odoo import models, fields, api
 class EstimationOverview(models.Model):
     _name = "estimation.overview"
     _description = "Overview of each estimation"
-
+    _order= "revision desc"
+    
     connect_overview = fields.Many2one('estimation.work', string="Connect Overview")
     
     # Notebook and pages
