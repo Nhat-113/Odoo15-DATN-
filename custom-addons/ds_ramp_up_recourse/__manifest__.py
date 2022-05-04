@@ -3,7 +3,7 @@
     'version': '15.0.1.0.0',
     'summary': """""",
     'description': """""",
-    'category': 'Generic Modules/Services',
+    'category': 'Services/Project',
     'live_test_url': '',
     'author': 'phuongtn',
     'company': 'Dsoft',
