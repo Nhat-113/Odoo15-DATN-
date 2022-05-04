@@ -147,8 +147,8 @@
                                     <td style="border: none; border-top: none;">
                                         <span>:  </span>
                                         <span>
-                                            <t t-if='e.employee_id.address_home_id.display_name'>
-                                                <span t-field="e.employee_id.address_home_id.display_name"/>
+                                            <t t-if='e.employee_id.address'>
+                                                <span t-field="e.employee_id.address"/>
                                             </t>
                                         </span>
                                     </td>
