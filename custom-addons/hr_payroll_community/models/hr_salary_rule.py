@@ -16,16 +16,16 @@ class HrPayrollStructure(models.Model):
     _name = 'hr.payroll.structure'
     _description = 'Salary Structure'
 
-    @api.model
-    def _get_parent(self):
-        return self.env.ref('hr_payroll_community.structure_base', False)
+    # @api.model
+    # def _get_parent(self):
+    #     return self.env.ref('hr_payroll_community.structure_base', False)
 
     name = fields.Char(required=True)
     code = fields.Char(string='Reference', required=True)
     company_id = fields.Many2one('res.company', string='Company', required=True,
         copy=False, default=lambda self: self.env['res.company']._company_default_get())
     note = fields.Text(string='Description')
-    parent_id = fields.Many2one('hr.payroll.structure', string='Parent', default=_get_parent)
+    parent_id = fields.Many2one('hr.payroll.structure', string='Parent')
     children_ids = fields.One2many('hr.payroll.structure', 'parent_id', string='Children', copy=True)
     rule_ids = fields.Many2many('hr.salary.rule', 'hr_structure_salary_rule_rel', 'struct_id', 'rule_id', string='Salary Rules')
 
