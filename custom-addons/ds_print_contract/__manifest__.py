@@ -7,7 +7,7 @@
     "license": "AGPL-3",
     "summary": """Print Contract Detail for the employee.
                 Send Email with attach Contract file to Employee""",
-    "depends": ["hr", "hr_contract", "hr_employee_updation", "hr_contract_types"],
+    "depends": ["hr", "hr_contract", "hr_employee_updation", "hr_contract_types", "base"],
     "data": ["views/contract_report.xml",
              "views/probationary_contract_report.xml",
              "views/internship_contract_report.xml",
@@ -22,7 +22,8 @@
              "data/internship_contract_mail_template.xml",
              "data/collaborator_contract_mail_template.xml",
              "views/annex_contract_report.xml",
-             "data/annex_contract_mail_template.xml"
+             "data/annex_contract_mail_template.xml",
+             "views/res_company_views.xml"
              ],
     "installable": True,
     'auto_install': False,

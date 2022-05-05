@@ -52,7 +52,12 @@
                                                     tháng <span t-esc="e.date_start.strftime('%m')"/>
                                                     năm <span t-esc="e.date_start.strftime('%Y')"/>
                                                 </t>
-                                                Công ty Cổ phần D-Soft, chúng tôi gồm:
+                                                Công ty , chúng tôi gồm:
+                                            <b>
+                                                <t t-if='e.company_id.display_name'>
+                                                    <span t-field="e.company_id.display_name"/>
+                                                </t>
+                                            </b>
                                     </p>
                                     <!-- Bên A -->
                                     <div>
@@ -80,8 +85,16 @@
                                         </p>
                                         <p>
                                             <div class="row">
-                                                <div class="col-6">- Người đại diện: Ông: <span>NGUYỄN HỒNG TÂN</span></div>
-                                                <div class="col-6">Chức vụ: Phó Giám đốc</div>
+                                                <div class="col-6">- Người đại diện: Ông: <span>
+                                                    <t t-if='e.company_id.representative'>
+                                                        <span t-field="e.company_id.representative"/>
+                                                    </t>
+                                                </span></div>
+                                                <div class="col-6">Chức vụ:
+                                                    <t t-if='e.company_id.position'>
+                                                        <span t-field="e.company_id.position"/>
+                                                    </t>
+                                                </div>
                                             </div>
                                         </p>
                                         <p>

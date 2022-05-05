@@ -11,7 +11,14 @@
                                 <div class="col-4 text-center">
                                     <tr>
                                         <th>
-                                            <img src="/ds_print_contract/static/description/img/d-soft.jpg" style="width:100%;"/>
+<!--                                            <img src="/ds_print_contract/static/description/img/d-soft.jpg" style="width:100%;"/>-->
+                                            <b>
+                                                <t t-if='e.company_id.display_name'>
+                                                    <span t-field="e.company_id.display_name"/>
+                                                </t>
+                                                <t t-if="not e.company_id.display_name">CÔNG TY CỔ PHẦN D-SOFT
+                                                </t>
+                                            </b>
                                         </th>
                                     </tr>
                                 </div>
@@ -100,14 +107,22 @@
                                     <th>Người đại diện</th>
                                     <td>
                                         <span>:  </span>Ông
-                                        <b>NGUYỄN HỒNG TÂN</b>
+                                        <b>
+                                            <t t-if='e.company_id.representative'>
+                                                <span t-field="e.company_id.representative"/>
+                                            </t>
+                                        </b>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Chức vụ</th>
                                     <td>
                                         <span>:  </span>
-                                                Phó giám đốc
+                                            <b>
+                                                <t t-if='e.company_id.position'>
+                                                    <span t-field="e.company_id.position"/>
+                                                </t>
+                                            </b>
                                     </td>
                                 </tr>
                                 <tr>
@@ -240,7 +255,15 @@
  được lập thành 02 (hai) bản có giá trị như nhau, mỗi bên giữ 01 (một) bản
                                         </p>
                                         <p>Phụ lục hợp đồng được lập tại:
-                                            <span class="font-weight-bold">CÔNG TY CỔ PHẦN D-SOFT</span>
+                                            <span class="font-weight-bold">
+                                                <b>
+                                                    <t t-if='e.company_id.display_name'>
+                                                        <span t-field="e.company_id.display_name"/>
+                                                    </t>
+                                                    <t t-if="not e.company_id.display_name">CÔNG TY CỔ PHẦN D-SOFT
+                                                    </t>
+                                                </b>
+                                            </span>
                                         </p>
                                     </div>
                                 </div>
@@ -251,8 +274,20 @@
                                     <p class="font-italic">(Ký, ghi rõ họ tên)</p>
                                 </div>
                                 <div class="col-6 text-center">
-                                    <p class="font-weight-bold">ĐẠI DIỆN CÔNG TY CỔ PHẦN D-SOFT</p>
-                                    <p class="font-italic">(Phó giám đốc)</p>
+                                    <p class="font-weight-bold">ĐẠI DIỆN CÔNG TY
+                                        <b>
+                                            <t t-if='e.company_id.display_name'>
+                                                    <span t-field="e.company_id.display_name"/>
+                                            </t>
+                                            <t t-if="not e.company_id.display_name">CÔNG TY CỔ PHẦN D-SOFT
+                                            </t>
+                                        </b>
+                                    </p>
+                                    <p class="font-italic">(
+                                        <t t-if='e.company_id.position'>
+                                            <span t-field="e.company_id.position"/>
+                                        </t>
+                                        )</p>
                                 </div>
                             </div>
                         </div>
