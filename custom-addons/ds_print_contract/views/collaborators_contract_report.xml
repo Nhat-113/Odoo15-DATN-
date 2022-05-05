@@ -53,8 +53,8 @@
                                                     năm <span t-esc="e.date_start.strftime('%Y')"/>
                                                 </t>
                                                 Công ty , chúng tôi gồm:
-                                            <b>
-                                                <t t-if='e.company_id.display_name'>
+                                            <b>Công ty
+                                                <t>
                                                     <span t-field="e.company_id.display_name"/>
                                                 </t>
                                             </b>
