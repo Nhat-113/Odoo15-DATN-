@@ -52,6 +52,7 @@ class IssuesType(models.Model):
 
 class Task(models.Model):
     _inherit = 'project.task'
+    _order= 'create_date desc'
 
     issues_type = fields.Many2one('project.issues.type',
                                   string='Type', required=True, tracking=True)
