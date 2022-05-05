@@ -91,6 +91,7 @@
                     <field name="status_color" invisible="1"/>
                     <field name="status" widget="badge"/>
                     <field name="create_date" string="Create Date"/>
+                    <field name="write_date" string="Update Date"/>
                 </xpath>
                 <xpath expr="//field[@name='progress']" position="replace">
                     <field name="progress_input"/>
