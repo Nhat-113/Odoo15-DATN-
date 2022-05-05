@@ -89,7 +89,7 @@
                 <xpath expr="//field[@name='tag_ids']" position="after">
                     <field name="issues_type" widget="badge"/>
                     <field name="status_color" invisible="1"/>
-                    <field name="status" widget="badge"/>
+                    <field name="status" widget="badge" string="Status"/>
                     <field name="create_date" string="Create Date"/>
                     <field name="write_date" string="Update Date"/>
                 </xpath>

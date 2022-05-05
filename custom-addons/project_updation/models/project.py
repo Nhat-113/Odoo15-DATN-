@@ -28,7 +28,7 @@ class IssuesType(models.Model):
     description_issues = fields.Html(string='Description Issues')
     icon = fields.Binary(name='Icon', store=True, attachment=True)
     icon_path = fields.Html('Icon', compute='_get_img_html')
-    status = fields.Many2many('project.task.status', string='Status')
+    status = fields.Many2many('project.task.status', string='Status Issues')
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', "Issues type name already exists!"),
@@ -79,7 +79,7 @@ class Task(models.Model):
         ('4', 'Good'),
         ('5', 'Very Good'),
     ], default='0', index=True, string="Task Score", tracking=True)
-    status = fields.Many2one('project.task.status', string="Status")
+    status = fields.Many2one('project.task.status', string="Status Task")
     status_id_domain = fields.Char(
         compute='_get_status_id_domain',
         readonly=True,
