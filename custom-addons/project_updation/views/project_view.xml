@@ -7,9 +7,9 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='parent_id']" position="after">
                     <field name="status_id_domain" invisible="1"/>
-                    <field name="status" domain="status_id_domain" widget="selection"/>
-                    <field name="priority_type" widget="selection"/>
-                    <field name="complex" widget="selection"/>
+                    <field name="status" domain="status_id_domain"  attrs="{'invisible': [('issues_type', '=', False)], 'required': [('issues_type', '!=', False)]}"/>
+                    <field name="priority_type"/>
+                    <field name="complex"/>
                 </xpath>
                 <xpath expr="//field[@name='tag_ids']" position="after">
                     <label for="issues_type" string="Type"/>
