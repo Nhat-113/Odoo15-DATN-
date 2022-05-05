@@ -144,7 +144,7 @@ class Task(models.Model):
                     'Time Sheet field and Initially Planned Hours field cannot be left blank')
             if self.progress_input != 100:
                 raise UserError(
-                    'Required when status Done or Closed, progess = 100%')
+                    'Required when status Done or Closed, progress = 100%')
 
     @api.constrains('progress_input')
     def _check_progress(self):
