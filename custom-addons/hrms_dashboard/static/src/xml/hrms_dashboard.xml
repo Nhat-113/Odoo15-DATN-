@@ -44,7 +44,9 @@
                 <div class= "list_future">
                     <button class="btn_leave_request  hr_leave_request_approve">
                         <h4><i class="fa fa-plus"></i></h4>
-                        <h4  class="fearure_detail"> Leave Request</h4>
+                        <h4  class="fearure_detail">    
+                            Leave Request <t t-esc="widget.login_employee.leaves_to_approve"/>
+                        </h4>
                     </button>
                     <button class="btn_payslip hr_payslip">
                         <h4>  
@@ -57,7 +59,7 @@
                     <button class="btn_expried hr_contract">
                         <h4><i class="fa fa-fw fa-book"></i></h4>
                         <h4  class="fearure_detail">
-                            Contract <t t-esc="widget.login_employee['']"/>
+                            Contract <t t-esc="widget.login_employee['contracts_count']"/>
                         </h4>
                     </button>
                 </div>
@@ -318,7 +320,7 @@
                 <div class= "list_menu" style="height:5%">
                     <button class="btn_dashboard_detail_user" style="height:100% !important">
                         <h5><i class='fa fa-home '></i></h5>
-                        <h5 class="text_btn_dashboard_detail">Overvieww</h5>
+                        <h5 class="text_btn_dashboard_detail">Overview</h5>
                     </button >
                 </div>
                 <hr></hr>
