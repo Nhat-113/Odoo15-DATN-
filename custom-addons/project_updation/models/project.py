@@ -3,6 +3,7 @@ from random import randint
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+from collections import defaultdict
 
 
 class TaskStatus(models.Model):
@@ -169,6 +170,11 @@ class Task(models.Model):
                     raise UserError(
                 'Required Hours Spent > 0')
 
+    @api.constrains('project_id')
+    def _check_project_id(self):
+        if not self.project_id:
+            raise UserError('Please chose project.')
+
 
 class Project(models.Model):
     _inherit = 'project.project'
@@ -186,3 +192,17 @@ class Project(models.Model):
 
         for stt in self:
             stt.status_color = stt.status
+
+    def _compute_issue_count(self):
+        for project in self:
+            project.issue_count = self.env['project.task'].search_count(['&',('issues_type','!=',1),('project_id','=',project.id)])
+    
+    issue_count = fields.Integer(compute='_compute_issue_count')
+
+
+    def action_view_issues(self):
+        action = self.with_context(active_id=self.id, active_ids=self.ids) \
+            .env.ref('project_updation.act_project_project_2_project_issue_all') \
+            .sudo().read()[0]
+        action['display_name'] = self.name
+        return action
