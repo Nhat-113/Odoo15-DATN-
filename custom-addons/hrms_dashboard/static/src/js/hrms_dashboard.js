@@ -705,6 +705,18 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var hrs = dateTime.getHours();
             var min = dateTime.getMinutes();
             var sec = dateTime.getSeconds();
+            // hrs = checkTime(m);
+            // min = checkTime(s);
+            // sec = checkTime(m);
+            if (hrs < 10 ){
+                hrs = "0" + hrs
+            }
+            if (min < 10 ){
+                min = "0" + min
+            }
+              if (sec < 10 ){
+                sec = "0" + sec
+            }
             var session = document.getElementById('session');
 
             if (!session) return
@@ -718,11 +730,18 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             if (hrs > 12) {
                 hrs = hrs - 12;
             }
+
             // console.log(hrs + '-' + min + '-' + sec);
             document.getElementById('hours').innerHTML = hrs;
             document.getElementById('minutes').innerHTML = min;
             document.getElementById('seconds').innerHTML = sec;
         },
+        // checkTime :function() {
+        //     if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+        //     return i;
+        // }
+
+
         //end o clock
         update_join_resign_trends: function() {
             var elem = this.$(".join_resign_trend");
