@@ -44,7 +44,9 @@
                 <div class= "list_future">
                     <button class="btn_leave_request  hr_leave_request_approve">
                         <h4><i class="fa fa-plus"></i></h4>
-                        <h4  class="fearure_detail"> Leave Request</h4>
+                        <h4  class="fearure_detail">    
+                            Leave Request <t t-esc="widget.login_employee.leaves_to_approve"/>
+                        </h4>
                     </button>
                     <button class="btn_payslip hr_payslip">
                         <h4>  
@@ -57,7 +59,7 @@
                     <button class="btn_expried hr_contract">
                         <h4><i class="fa fa-fw fa-book"></i></h4>
                         <h4  class="fearure_detail">
-                            Contract <t t-esc="widget.login_employee['']"/>
+                            Contract <t t-esc="widget.login_employee['contracts_count']"/>
                         </h4>
                     </button>
                 </div>
@@ -86,68 +88,6 @@
                         </div>
                     </div>
                     
-                    <div class="Leave-Request">
-                        <h3>
-                            <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon" style="margin-right:5px"></i>
-                            Leave Request
-                        </h3>
-        
-                        <div class="request_detail">
-                            <div class="all-request hr_leave_request_approve" >
-                                <p class="text">All Request</p>
-                                <button class="btn_hr_leave_request_approve">
-                                    <p class="stat-count"><t t-esc="widget.login_employee.leaves_to_approve"/></p>
-                                </button>
-                            </div>
-        
-                            <div class="all-request leaves_request_today">
-                                <p>To Day request</p>
-                                <button>
-                                    <p class="stat-count"><t t-esc="widget.login_employee.leaves_today"/></p>
-                                </button>
-                            </div>
-        
-                            <div class="all-request leaves_request_month" >
-                                <p>This Month</p>
-                                <button>
-                                <p class="stat-count"><t t-esc="widget.login_employee.leaves_this_month"/></p>
-                                </button>
-                            </div>
-        
-                            <div class="all-request hr_leave_allocations_approve" >
-                                <p>Allocation Request</p>
-                                <button>
-                                <p class="stat-count"><t t-esc="widget.login_employee.leaves_alloc_req"/></p>
-                                </button>
-                            </div>
-                        </div>
-                        <!-- job application -->
-                        <h3 class="">
-                            <i class="fa fa-list-ul" style="margin-right:8px"></i>
-                            Job Application
-                        </h3>
-                        <div class="request_detail_job">
-                            <div class="job-request hr_job_application_approve" >
-                                <p>New</p>
-                                <button>
-                                    <p class="stat-count"><t t-esc="widget.login_employee.job_applications"/></p>
-                                </button>
-                            </div>
-                            <div class="job-request dashboard_in_recruiment">
-                                <p>In Recruiment</p>
-                                <button>
-                                    <p class="stat-count"><t t-esc="widget.login_employee.recruitment"/></p>
-                                </button>
-                            </div>
-                            <div class="job-request dashboard_today_meeting" >
-                                <p>Today Meeting</p>
-                                <button>
-                                <p class="stat-count"><t t-esc="widget.login_employee.total_len"/></p>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="New-employee">
                         <div class="list-employee">
                             <div class="text-employee" style="background: #FFFFFF;color: #6869AC">
@@ -202,10 +142,71 @@
                                     <p>Web Developer</p>
                                 </div>
                             </div> -->
-
-
                         </div>
                     </div>
+                    <div class="Leave-Request">
+                        <h3>
+                            <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon" style="margin-right:5px"></i>
+                            Leave Request
+                        </h3>
+        
+                        <div class="request_detail">
+                            <div class="all-request hr_leave_request_approve" >
+                                <p class="text">All Request</p>
+                                <button class="btn_hr_leave_request_approve">
+                                    <p class="stat-count"><t t-esc="widget.login_employee.leaves_to_approve"/></p>
+                                </button>
+                            </div>
+        
+                            <div class="all-request leaves_request_today">
+                                <p>To Day request</p>
+                                <button>
+                                    <p class="stat-count"><t t-esc="widget.login_employee.leaves_today"/></p>
+                                </button>
+                            </div>
+        
+                            <div class="all-request leaves_request_month" >
+                                <p>This Month</p>
+                                <button>
+                                <p class="stat-count"><t t-esc="widget.login_employee.leaves_this_month"/></p>
+                                </button>
+                            </div>
+        
+                            <div class="all-request hr_leave_allocations_approve" >
+                                <p>Allocation Request</p>
+                                <button>
+                                <p class="stat-count"><t t-esc="widget.login_employee.leaves_alloc_req"/></p>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- job application -->
+                        <h3 class="">
+                            <i class="fa fa-list-ul" style="margin-right:8px"></i>
+                            Job Application
+                        </h3>
+                        <div class="request_detail_job">
+                            <div class="job-request hr_job_application_approve" >
+                                <p>All Application</p>
+                                <button>
+                                    <p class="stat-count"><t t-esc="widget.login_employee.job_applications"/></p>
+                                </button>
+                            </div>
+                            <div class="job-request dashboard_in_recruiment">
+                                <p>In Recruiment</p>
+                                <button>
+                                    <p class="stat-count"><t t-esc="widget.login_employee.recruitment"/></p>
+                                </button>
+                            </div>
+                            <div class="job-request dashboard_today_meeting" >
+                                <p>Today Meeting</p>
+                                <button>
+                                <p class="stat-count"><t t-esc="widget.login_employee.total_len"/></p>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    
                     <div class="welcome_employee" >
                         <div class="detail_welcome">
                             <img src="https://cdn-icons-png.flaticon.com/512/890/890347.png"></img>
@@ -318,7 +319,7 @@
                 <div class= "list_menu" style="height:5%">
                     <button class="btn_dashboard_detail_user" style="height:100% !important">
                         <h5><i class='fa fa-home '></i></h5>
-                        <h5 class="text_btn_dashboard_detail">Overvieww</h5>
+                        <h5 class="text_btn_dashboard_detail">Overview</h5>
                     </button >
                 </div>
                 <hr></hr>
