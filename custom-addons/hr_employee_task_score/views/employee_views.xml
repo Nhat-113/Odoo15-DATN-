@@ -37,9 +37,4 @@
             </field>
         </record>
 
-<!--        <record id="project_task_score_action_view_tree" model="ir.actions.act_window.view">-->
-<!--            <field name="sequence">1</field>-->
-<!--            <field name="view_mode">tree</field>-->
-<!--            <field name="view_id" ref="project_task_view_tree_activity1"/>-->
-<!--        </record>-->
 </odoo>

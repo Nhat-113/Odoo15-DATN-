@@ -12,7 +12,6 @@
     "license": "AGPL-3",
     "data": [
         "views/employee_views.xml",
-        # "security/ir.model.access.csv",
     ],
     "installable": True,
     "auto_install": False,
