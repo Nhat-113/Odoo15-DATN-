@@ -54,7 +54,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             "click .dashboard_today_meeting": "dashboard_today_meeting",
             "click .dashboard_in_recruiment": "dashboard_in_recruiment",
 
-            
+
             "click .hr_timesheets": "hr_timesheets",
             "click .login_broad_factor": "employee_broad_factor",
             "click .o_hr_attendance_sign_in_out_icon": function() {
@@ -481,7 +481,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         domain: [
                             ["state", "in", ["recruit"]]
                         ],
-                        
+
                     });
                 }
             });
@@ -708,13 +708,13 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             // hrs = checkTime(m);
             // min = checkTime(s);
             // sec = checkTime(m);
-            if (hrs < 10 ){
+            if (hrs < 10) {
                 hrs = "0" + hrs
             }
-            if (min < 10 ){
+            if (min < 10) {
                 min = "0" + min
             }
-              if (sec < 10 ){
+            if (sec < 10) {
                 sec = "0" + sec
             }
             var session = document.getElementById('session');
@@ -736,11 +736,6 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             document.getElementById('minutes').innerHTML = min;
             document.getElementById('seconds').innerHTML = sec;
         },
-        // checkTime :function() {
-        //     if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
-        //     return i;
-        // }
-
 
         //end o clock
         update_join_resign_trends: function() {
@@ -777,7 +772,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         height = 250 - margin.top - margin.bottom;
 
                     // Set the ranges
-                    var x = d3.scale.ordinal().rangeRoundBands([-(margin.right+20), width], 1);
+                    var x = d3.scale.ordinal().rangeRoundBands([-(margin.right + 20), width], 1);
 
                     var y = d3.scale.linear().range([height, 0]);
 
@@ -801,7 +796,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         .append("g")
                         .attr(
                             "transform",
-                            "translate(" + (margin.left + 25)  + "," + margin.top + ")"
+                            "translate(" + (margin.left + 25) + "," + margin.top + ")"
                         );
 
                     // Add the X Axis
