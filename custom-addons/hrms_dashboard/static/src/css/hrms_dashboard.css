@@ -124,14 +124,10 @@ body .text-color {
 
 /* Leave graph */
 
-path {  stroke: #fff; }
+/* path {  stroke: #fff; } */
 
 path:hover {
     opacity: 0.9;
-}
-
-rect:hover {
-    fill: #934da5;
 }
 
 .axis {
@@ -502,13 +498,17 @@ h4 .stat-count {
 }
 
 .emp_graph {
-    margin-top: -11%;
+    margin-top: -7%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     align-content: center;
     justify-content: space-around;
 }
+.emp_graph .legend >tbody>tr {
+    width: 50%;
+}
+
 
 .leave-manager {
     background-color: #fff;
@@ -907,6 +907,7 @@ h4 .stat-count {
     overflow: hidden;
     height: 98%;
     padding-left : 1% ;
+    padding-right: 0.5%;
 }
 
 .welcome_employee {
@@ -1238,16 +1239,13 @@ button:hover, button:focus{
 }
 
 .employee_dashboard_detail .department {
-    flex: 40%;
+    width: 33%;
     border-radius: 24px;
     height: 100%;
 }
-.Leave-Request {
 
-}
 .employee_dashboard_detail .Leave-Request {
-    width: 30%;
-    /* flex: 30%; */
+    width: 33%;
     margin-left: 1%;
     background: white;
     border-radius: 24px;
@@ -1259,7 +1257,7 @@ button:hover, button:focus{
     align-items: flex-start;
     padding: 0px 0px 16px;
     position: static;
-    width: 30.85%;
+    width: 32.65%;
     top: 0px;
     background: #FFFFFF;
     border-radius: 24px;
@@ -1281,10 +1279,12 @@ button:hover, button:focus{
 .emp_graph .legend > tbody {
     display: flex;
     align-content: space-around;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: center;
-    flex-direction: column;
+    flex-direction: row;
+    width: 55%;
+    margin: 0 auto;
 }
 .emp_graph svg {
     flex: 100%;
@@ -1465,17 +1465,28 @@ button:hover, button:focus{
     height: 100%;
 }
 .list-employee .leave_graph {
+    margin-top: 2%;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-end;
     align-items: flex-end;
     justify-content: center;
 }
+.list-employee .leave_graph .legend {
+    margin-top: 8%;
+}
 .leave_graph .legend > tbody {
+    width: 75%;
     display: flex;
-    align-content: center;
-    flex-wrap: wrap;
+    flex-direction: row-reverse;
     justify-content: space-between;
+    align-items: center;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    margin: 0 auto;
+}
+.leave_graph .legend > tbody >tr {
+    width: 50%;
 }
 .legend >tbody>tr>td>svg {
     border-radius: 50%;
@@ -1980,6 +1991,17 @@ button:hover, button:focus{
     .emp_graph .legend {
         margin-top: 2%;
     }
+    .list_future button h4 {
+        font-size: 1rem;
+    }
+    .list_menu button h5 {
+        font-size: 1rem;
+    }
+    .o_clock {
+        font-size: 1rem;
+    }
+
+    
 }
 @media only screen and (min-width: 1800px) {
     .emp_graph .legend {

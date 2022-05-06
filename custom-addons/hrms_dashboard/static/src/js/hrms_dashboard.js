@@ -606,8 +606,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
 
         render_department_employee: function() {
             var self = this;
-            var w = 300;
-            var h = 300;
+            var w = 380;
+            var h = 380;
             var r = h / 2;
             var elem = this.$(".emp_graph");
             //        var colors = ['#ff8762', '#5ebade', '#b298e1', '#70cac1', '#cf2030'];
@@ -1153,11 +1153,11 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             //        var color = d3.scale.category10();
             var colors = [
-                "#70cac1",
-                "#659d4e",
-                "#208cc2",
-                "#4d6cb1",
-                "#584999",
+                "#5E3FBE",
+                "#E53935",
+                "#00ACC1",
+                "#4CAF50",
+                "#FDD835",
                 "#8e559e",
                 "#cf3650",
                 "#f65337",
@@ -1335,7 +1335,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     // function to handle pieChart.
                     function pieChart(pD) {
                         var pC = {},
-                            pieDim = { w: 300, h: 300 };
+                            pieDim = { w: 400, h: 400 };
                         pieDim.r = Math.min(pieDim.w, pieDim.h) / 2;
 
                         // create svg for pie chart.
