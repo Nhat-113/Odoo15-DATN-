@@ -34,6 +34,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_phase = "phase_id";
             this.modelName = params.modelName;
             this.linkModel = params.linkModel;
+            this.configStartDate = params.configStartDate;
             return this._load(params);
         },
         reload: function (id, params) {
@@ -136,7 +137,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                     if (record[self.map_date_start]) {
                         datetime = formatFunc(record[self.map_date_start]);
                     } else {
-                        datetime = false;
+                        datetime = self.configStartDate;
                     }
 
                     // Handle warning or danger of task

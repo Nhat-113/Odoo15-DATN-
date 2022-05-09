@@ -65,6 +65,10 @@
     background: #eec41e;
 }
 
+.none {
+    display: none;
+}
+
 .projectHeaderColor {
     color: #71639e!important;
     font-weight: 700 !important;
