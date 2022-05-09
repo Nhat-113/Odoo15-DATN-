@@ -179,12 +179,12 @@ class Task(models.Model):
 class Project(models.Model):
     _inherit = 'project.project'
 
-    status = fields.Selection([
-        ('Open', 'Open'),
-        ('Processing', 'Processing'),
-        ('Close', 'Close'),
-        ('Pending', 'Pending'),
-    ], string='Status', index=True, copy=False, default='Open')
+    # status = fields.Selection([
+    #     ('Open', 'Open'),
+    #     ('Processing', 'Processing'),
+    #     ('Close', 'Close'),
+    #     ('Pending', 'Pending'),
+    # ], string='Status', index=True, copy=False, default='Open')
 
     status_color = fields.Char('Status', compute='_get_status')
 
