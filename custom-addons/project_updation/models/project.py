@@ -114,10 +114,11 @@ class Task(models.Model):
 
 
     def _check_user_readonly(self):
-        if self.env.user.has_group('project.group_project_manager') == False:
-            self.is_readonly = True
-        else:
+        if self.env.user.has_group('project.group_project_manager') == True or\
+            self.env.user.id == self.project_id.user_id.id:
             self.is_readonly = False
+        else:
+            self.is_readonly = True
 
     @api.onchange('planned_hours')
     def _check_planned_hours(self):
