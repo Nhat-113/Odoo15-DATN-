@@ -114,8 +114,7 @@ class Task(models.Model):
 
 
     def _check_user_readonly(self):
-        if self.env.user.has_group('project.group_project_manager') == False or\
-            self.env.user.id != self.project_id.user_id.id:
+        if self.env.user.has_group('project.group_project_manager') == False:
             self.is_readonly = True
         else:
             self.is_readonly = False
