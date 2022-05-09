@@ -36,31 +36,32 @@
         <field name="name">project.planning.kanban</field>
         <field name="model">project.project</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile" create="0">
+            <kanban class="o_kanban_mobile" create="0" js_class="project_project_kanban">
                 <field name="user_id" string="Project Manager"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_content oe_kanban_global_click o_kanban_get_form">
-                            <a name="%(open_planning_task_all_on_gantt)d" type="action">
-
-                                <div class="row">
-                                    <div class="col-12">
-                                        <strong>
-                                            <field name="name" string="Project Name"/>
-                                        </strong>
+                            <div class="row">
+                                <div class="col-12">
+                                    <strong>
+                                        <field name="name" string="Project Name"/>
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-8">
+                                    <field name="partner_id" string="Contact"/>
+                                </div>
+                                <div class="col-4">
+                                    <div class="oe_kanban_bottom_right float-right">
+                                        <field name="user_id" widget="many2one_avatar_user"/>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-8">
-                                        <field name="partner_id" string="Contact"/>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="oe_kanban_bottom_right float-right">
-                                            <field name="user_id" widget="many2one_avatar_user"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
+                            </div>
+                            <div class="o_project_kanban_boxes">
+                                <a class="o_project_kanban_box" name="open_planning_task_all" type="object">
+                                </a>
+                            </div>
                         </div>
                     </t>
                 </templates>
