@@ -30,6 +30,7 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             this.map_links_serialized_json = params.map_links_serialized_json;
             this.link_model = params.link_model;
             this.is_total_float = params.is_total_float;
+            this.configStartDate = params.configStartDate;
 
 
             var self = this;
@@ -52,9 +53,30 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             gantt.config.drag_progress = false;
             gantt.config.columns = [
                 {name: "text", tree: true, resize: true, label: this.state.records.data[0].project_name, width: 180},
-                {name: "start_date", align: "center", resize: true, width: 120},
-                {name: "end_date", label: "End time", align: "center", resize: true, width: 120},
-                {name: "duration", align: "center", resize: true},
+                {name: "start_date", align: "center", resize: true, width: 120,
+                    template: function (item) {
+                        if (item.start_date - self.configStartDate === 0) {
+                            return "";
+                        }
+                        return item.start_date;
+                    }
+                },
+                {name: "end_date", label: "End time", align: "center", resize: true, width: 120,
+                    template: function (item) {
+                        if (item.start_date - self.configStartDate === 0) {
+                            return "";
+                        }
+                        return item.end_date;
+                    }
+                },
+                {name: "duration", align: "center", resize: true,
+                    template: function (item) {
+                        if (item.start_date - self.configStartDate === 0) {
+                            return 0;
+                        }
+                        return item.duration;
+                    }
+                },
                 {
                     name: "assignees", width: 80, label: "Assignees", align: "center", resize: true, template: function (task) {
                         var result = "";
@@ -74,6 +96,10 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             ]
 
             gantt.templates.task_class = function (start, end, task) {
+                if(start - self.configStartDate === 0) {
+                    return "none"
+
+                }
                 switch (task.deadline) {
                     case 1:
                         return "danger";
