@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+        <record id="project_task_score_view_tree" model="ir.ui.view">
+            <field name="name">project.task.tree.activity1</field>
+            <field name="model">project.task</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="project_id"/>
+                    <field name="name" string="Task Name"/>
+                    <field name="task_score" widget="priority" readonly="1" type="int" avg="A"/>
+                    <field name="effective_hours" sum="Sum of effective hours"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="project_task_score_action" model="ir.actions.act_window">
+            <field name="name">Task Score</field>
+            <field name="res_model">project.task</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="project_task_score_view_tree"/>
+            <field name="domain">[('user_ids', 'in', active_id)]</field>
+            <field name="context">{}</field>
+        </record>
+
+        <record model="ir.ui.view" id="hr_employee_kanban_task_score_inherit">
+            <field name="name">hr.employee.kanban.task.score</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.hr_kanban_view_employees"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='work_email']" position="after">
+                    <field name="task_score" invisible="1"/>
+                        <a name="%(project_task_score_action)d" type="action" >
+                            <li>Task Score: <t t-esc="record.task_score.value"/> Star</li>
+                        </a>
+                </xpath>
+            </field>
+        </record>
+
+</odoo>
