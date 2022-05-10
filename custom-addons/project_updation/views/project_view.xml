@@ -97,19 +97,6 @@
             </field>
         </record>
 
-        <!-- <record model="ir.ui.view" id="project_view_kanban_inherit_project2">
-            <field name="name">project.view.kanban.inherit.project2</field>
-            <field name="model">project.project</field>
-            <field name="inherit_id" ref="project.project_view_kanban_inherit_project"/>
-            <field name="arch" type="xml">
-                <xpath expr="//div[@id='test']" position="replace">
-                    <div role="menuitem" groups="ds_project_planning.group_project_pm">
-                        <a name="%(project.project_update_all_action)d" type="action" t-attf-context="{'active_id': #{record.id.raw_value}}">Project Updates</a>
-                    </div>
-                </xpath>
-            </field>
-        </record> -->
-
         <record model="ir.ui.view" id="quick_create_task_form_inherit">
             <field name="name">project.quick.create.task.form.inherit</field>
             <field name="model">project.task</field>
