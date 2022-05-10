@@ -80,6 +80,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             this.employee_birthday = [];
             this.upcoming_events = [];
             this.announcements = [];
+            this.task_for_day = [];
             this.login_employee = [];
         },
 
@@ -115,6 +116,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     .then(function(res) {
                         self.employee_birthday = res["birthday"];
                         self.upcoming_events = res["event"];
+                        self.task_for_day = res["task_for_day"];
                         self.announcements = res["announcement"];
                     });
                 return $.when(def0, def1, def2);
@@ -125,7 +127,6 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             this.set("title", "Dashboard");
             return this._super().then(function() {
-
                 self.update_cp();
                 self.render_dashboards()
                 self.render_graphs();
@@ -164,6 +165,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 .then(function(res) {
                     self.employee_birthday = res["birthday"];
                     self.upcoming_events = res["event"];
+                    self.task_for_day = res["task_for_day"];
                     self.announcements = res["announcement"];
                 });
             return $.when(def0, def1, def2);
@@ -409,7 +411,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            session.user_has_group("hr.group_hr_manager").then(function(has_group) {
+            session.user_has_group("hr.group_hr_manager" || "hr.group_hr_user").then(function(has_group) {
                 if (has_group) {
                     var options = {
                         on_reverse_breadcrumb: self.on_reverse_breadcrumb,
@@ -437,7 +439,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            session.user_has_group("hr.group_hr_manager").then(function(has_group) {
+            session.user_has_group("hr.group_hr_user").then(function(has_group) {
                 if (has_group) {
                     var options = {
                         on_reverse_breadcrumb: self.on_reverse_breadcrumb,
@@ -463,7 +465,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            session.user_has_group("hr.group_hr_manager").then(function(has_group) {
+            session.user_has_group("hr.group_hr_user").then(function(has_group) {
                 if (has_group) {
                     var options = {
                         on_reverse_breadcrumb: self.on_reverse_breadcrumb,
@@ -506,9 +508,11 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         [false, "form"],
                     ],
                     domain: [
-                        ["date_from", "<=", date],
-                        ["date_to", ">=", date],
-                        ["state", "=", "validate"],
+                        // string.substring(start, end)
+
+                        ["create_date", "=", date],
+                        // ["date_to", ">=", date],
+                        ["state", "=", "confirm"],
                     ],
                     target: "current",
                 },
