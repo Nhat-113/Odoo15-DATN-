@@ -94,9 +94,6 @@
                         </div>
                     </div>
                 </xpath>
-                <xpath expr="//div[hasclass('o_project_kanban_boxes')]/a/div/span[2]" position="replace">
-                    <span class="o_label">Tasks</span>
-                </xpath>
             </field>
         </record>
 
