@@ -114,11 +114,11 @@ class Task(models.Model):
 
 
     def _check_user_readonly(self):
-        if self.env.user.has_group('project.group_project_manager') == False or\
-            self.env.user.id != self.project_id.user_id.id:
-            self.is_readonly = True
-        else:
+        if self.env.user.has_group('project.group_project_manager') == True or\
+            self.env.user.id == self.project_id.user_id.id:
             self.is_readonly = False
+        else:
+            self.is_readonly = True
 
     @api.onchange('planned_hours')
     def _check_planned_hours(self):
@@ -179,12 +179,12 @@ class Task(models.Model):
 class Project(models.Model):
     _inherit = 'project.project'
 
-    status = fields.Selection([
-        ('Open', 'Open'),
-        ('Processing', 'Processing'),
-        ('Close', 'Close'),
-        ('Pending', 'Pending'),
-    ], string='Status', index=True, copy=False, default='Open')
+    # status = fields.Selection([
+    #     ('Open', 'Open'),
+    #     ('Processing', 'Processing'),
+    #     ('Close', 'Close'),
+    #     ('Pending', 'Pending'),
+    # ], string='Status', index=True, copy=False, default='Open')
 
     status_color = fields.Char('Status', compute='_get_status')
 

@@ -44,11 +44,19 @@
             <field name="model">project.project</field>
             <field name="inherit_id" ref="project.edit_project"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='stage_id']" position="after">
-                    <field name="status" widget="statusbar" options="{'clickable': '1'}"/>
+                <xpath expr="//div[@name='alias_def']" position="attributes">
+                    <attribute name="invisible">1</attribute>
                 </xpath>
-                <xpath expr="//div[@name='dates']" position="after">
-                    <field name="status_color" widget='badge' decoration-info="status_color == 'Open'" decoration-success="status_color == 'Processing'" decoration-danger="status_color == 'Close'" decoration-warning="status_color == 'Pending'"/>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="project_update">
+            <field name="name">project.update</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.project_project_view_form_simplified"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='alias_def']" position="attributes">
+                    <attribute name="invisible">1</attribute>
                 </xpath>
             </field>
         </record>
@@ -58,10 +66,8 @@
             <field name="model">project.project</field>
             <field name="inherit_id" ref="project.view_project_kanban"/>
             <field name="arch" type="xml">
-                <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="inside">
-                    <div>
-                        <field name="status_color" nolabel="1" widget='badge' decoration-info="status_color == 'Open'" decoration-success="status_color == 'Processing'" decoration-danger="status_color == 'Close'" decoration-warning="status_color == 'Pending'"/>
-                    </div>
+                <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/span" position="before">
+                    <field name="last_update_status" widget="badge" decoration-success="last_update_status == 'on_track'" decoration-warning="last_update_status == 'at_risk'" decoration-danger="last_update_status == 'off_track'" decoration-info="last_update_status == 'on_hold'"/>
                 </xpath>
             </field>
         </record>
@@ -345,6 +351,7 @@
                                         <field name="activity_ids" widget="kanban_activity"/>
                                     </div>
                                     <div class="oe_kanban_bottom_right">
+                                        <field name="last_update_status" widget="badge" decoration-success="last_update_status == 'on_track'" decoration-warning="last_update_status == 'at_risk'" decoration-danger="last_update_status == 'off_track'" decoration-info="last_update_status == 'on_hold'"/>
                                         <span t-att-class="'o_status_bubble mx-0 o_color_bubble_' + record.last_update_color.value" t-att-title="record.last_update_status.value"></span>
                                         <field name="user_id" widget="many2one_avatar_user" t-if="record.user_id.raw_value"/>
                                     </div>
