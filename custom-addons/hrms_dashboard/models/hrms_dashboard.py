@@ -153,15 +153,14 @@ class Employee(models.Model):
         cr.execute("""select event_event.name , event_event.date_begin,  event_event.date_end from event_event   where event_event.stage_id = '1' or  event_event.stage_id = '2' or  event_event.stage_id = '3'""")
         event = cr.fetchall()
         announcement = []
-        if employee:
-            user_id = request.session.uid
-            sql=("""
+        user_id = request.session.uid
+        sql=("""
                 select CURRENT_DATE, project_task.priority_type, project_task.name , project_task.id ,project_task.date_start  , hr_employee.name  from  project_task  
                 INNER JOIN  project_task_user_rel on project_task_user_rel.task_id = project_task.id 
                 INNER JOIN  hr_employee on hr_employee.user_id = project_task_user_rel.user_id and hr_employee.user_id = %s where DATE(project_task.date_start) = CURRENT_DATE
                             """) %  user_id
-            cr.execute(sql)
-            task_for_day = cr.fetchall()
+        cr.execute(sql)
+        task_for_day = cr.fetchall()
         
         if employee:
             department = employee.department_id
