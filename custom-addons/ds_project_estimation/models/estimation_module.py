@@ -81,9 +81,49 @@ class BreakdownActivities(models.Model):
     job_pos = fields.Many2one('config.job_position', string="Job Position")
     effort = fields.Float(string="Effort", default=0)
     mandays = fields.Float(string="Expected (man-days)", default=0)
-
+    
+    persons = fields.Integer(string="Persons", default=0)
+    days = fields.Float(string="Days", default=0)
+    percent_effort = fields.Float(string="Percent Effort", default=0.0)
+    type = fields.Selection(string="Type", related='connect_module.activity_type')
+    
     @api.depends('effort', 'mandays')
     def _compute_all(self):
         pass
+
+            
+class EffortActivities(models.Model):
+    _name = "module.effort.activity"
+    _description = "Module effort distribute activity"
     
+    estimation_id = fields.Many2one('estimation.work', string="Estimation")
+    activity_id = fields.Many2one('config.activity', string="Connect Module")
     
+    sequence = fields.Integer(string="No", index=True, readonly=True, help='Use to arrange calculation sequence')
+    activity = fields.Char("Activity", readonly=True, store=True, compute='_compute_activity') #store=True, compute='_compute_activity'
+    effort = fields.Float(string="Effort", default=0, readonly=True, store=True, compute='_compute_total_effort')
+    percent = fields.Float(string="Percentage", default=0, readonly=True, store=False, compute='_compute_percentage') #, store=False, compute='_compute_percentage'
+
+    
+    @api.depends('activity_id.effort')
+    def _compute_total_effort(self):
+        for rec in self:
+            rec.effort = rec.activity_id.effort
+            
+    @api.depends('effort')
+    def _compute_percentage(self):
+        total_effort = 0.0        
+        for record in self:
+            total_effort += record.effort
+        for record in self:
+            if total_effort != 0.0:
+                record.percent = round((record.effort / total_effort ) * 100, 2 )
+            else:
+                record.percent = total_effort
+                
+                
+    @api.depends('activity_id.activity')
+    def _compute_activity(self):
+        for rec in self:
+            rec.activity = rec.activity_id.activity
+
