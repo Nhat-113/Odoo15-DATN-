@@ -195,7 +195,7 @@ class Project(models.Model):
 
     def _compute_issue_count(self):
         for project in self:
-            project.issue_count = self.env['project.task'].search_count(['&',('issues_type','!=',1),('project_id','=',project.id)])
+            project.issue_count = self.env['project.task'].search_count(['&',('issues_type','!=',1),('project_id','=',project.id),('display_project_id','=',project.id),('active','=',True)])
     
     issue_count = fields.Integer(compute='_compute_issue_count')
 
