@@ -94,6 +94,22 @@
                         </div>
                     </div>
                 </xpath>
+                <xpath expr="//div[hasclass('o_kanban_manage_view')]" position="replace">
+                    <div class="col-6 o_kanban_card_manage_section o_kanban_manage_view">
+                        <div role="menuitem" class="o_kanban_card_manage_title">
+                            <span>View</span>
+                        </div>
+                        <div role="menuitem">
+                            <a name="action_view_tasks" type="object">Tasks</a>
+                        </div>
+                        <div role="menuitem" t-if="record.doc_count.raw_value">
+                            <a name="attachment_tree_view" type="object">Documents</a>
+                        </div>
+                        <div role="menuitem" groups="ds_project_planning.group_project_pm">
+                            <a name="%(project.project_update_all_action)d" type="action" t-attf-context="{'active_id': #{record.id.raw_value}}">Project Updates</a>
+                        </div>
+                    </div>
+                </xpath>
             </field>
         </record>
 
