@@ -22,6 +22,8 @@ class Estimation(models.Model):
 
     expected_revenue = fields.Float(string="Expected Revenue")
     total_cost = fields.Float(string="Total Cost")
+    
+    total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays")
 
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
@@ -45,7 +47,7 @@ class Estimation(models.Model):
 
     add_lines_module_effort = fields.One2many('config.activity', 'activity_ids', string='Module Effort')
     add_lines_module_breakdown = fields.One2many('config.activity', 'activity_ids_break', string="Breakdown Structure")
-    
+    add_lines_module_effort_distribute = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
 
     @api.model
     def create(self, vals):
@@ -106,6 +108,15 @@ class Estimation(models.Model):
         #     self.struct_id = False
         self.with_context(contract=True).onchange_module_effort()
         return
+    
+    @api.depends('add_lines_module_breakdown.mandays')
+    def _compute_total_mandays(self):
+        ls_activity = self.env['config.activity'].search([('activity_ids_break', '=', self.id)])
+        total = 0.0
+        for item in ls_activity:
+            total += item.mandays
+        for record in self:
+            record.total_manday = total
     
     def write(self, vals):
         vals_over = {'connect_overview': self.id, 'description': ''}

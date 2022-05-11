@@ -89,8 +89,8 @@
                                 </tree>
                             </field>
                             <separator string="Effort distribution" />
-                            <field name="add_lines_module_effort">
-                                <tree editable="bottom">
+                            <field name="add_lines_module_effort_distribute">
+                                <tree create="0" editable="0" delete="0">
                                     <field name="sequence" />
                                     <field name="activity" />
                                     <field name="effort" />
@@ -119,22 +119,35 @@
                                         <field name="activity" />
                                         <field name="effort" />
                                         <field name="mandays" />
+                                        <field name="activity_type" />
                                     </group>
                                     <notebook>
                                         <page string="Breakdown Estimation">
                                             <field name="add_lines_breakdown_activity">
                                                 <tree editable="bottom">
-                                                    <field name="sequence" />
-                                                    <field name="activity" />
-                                                    <field name="job_pos" />
-                                                    <field name="effort" />
-                                                    <field name="mandays" />
+                                                    <field name="sequence"/>
+                                                    <field name="activity"/>
+                                                    <field name="persons" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
+                                                    <field name="days" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
+                                                    <field name="job_pos"/>
+                                                    <field name="effort"/>
+                                                    <field name="mandays"/>
+                                                    <field name="percent_effort"  attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_1')]}" />
+                                                    <field name="type" invisible="1"/>
                                                 </tree>
                                             </field>
                                         </page>
                                     </notebook>
+
                                 </form>
                             </field>
+                            <group name="note_group" col="6" class="mt-2 mt-md-0">
+                                <group class="oe_subtotal_footer" colspan="2" name="sale_total">
+                                    <field name="total_manday" readonly="1" />
+                                </group>
+                                <div class="oe_clear"/>
+                            </group>
+                            
                         </page>
                     </notebook>
                 </sheet>
