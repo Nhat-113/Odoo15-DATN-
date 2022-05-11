@@ -140,7 +140,7 @@ class Task(models.Model):
 
     @api.constrains('status', 'timesheet_ids')
     def _check_timesheet(self):
-        if self.status.name == 'Done' or self.status.name == 'Closed':
+        if self.status.name == 'Done' or self.status.name == 'Closed' and self.issues_type.name == 'Task':
             if len(self.timesheet_ids) == 0 or self.planned_hours == 0.0:
                 raise UserError(
                     'Time Sheet field and Initially Planned Hours field cannot be left blank')
