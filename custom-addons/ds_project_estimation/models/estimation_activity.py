@@ -17,12 +17,20 @@ class Activities(models.Model):
 
     activity = fields.Char("Activity")
     description = fields.Char("Description")
-    effort = fields.Float(string="Effort", default=0, compute='_compute_total_effort')
+    effort = fields.Float(string="Effort", default=0, store=True, compute='_compute_total_effort')
     percent = fields.Float(string="Percentage", default=0)
-    mandays = fields.Float(string="Expected (man-days)", default=0, compute='_compute_total_manday')
+    mandays = fields.Float(string="Expected (man-days)", default=0, store=True, compute='_compute_total_manday')
     parent_rule_id = fields.Many2one('config.activity', string='Parent Activity Rule', index=True)
     child_ids = fields.One2many('config.activity', 'parent_rule_id', string='Child Activity Rule', copy=True)
-
+    activity_type = fields.Selection([('type_1', 'Type 1'),
+                                      ('type_2', 'Type 2'),
+                                      ('type_3', 'Type 3')],
+                                    string='Activity type', 
+                                    required=True,
+                                    default='type_2',
+                                    help='Please select activity type'
+                                    )
+    
     add_lines_breakdown_activity = fields.One2many('module.breakdown.activity', 'connect_module', string="Breakdown Activity")
 
     @api.depends('add_lines_breakdown_activity.effort')
@@ -54,7 +62,39 @@ class Activities(models.Model):
             children_rules += rule.child_ids._recursive_search_of_rules()
         return [(rule.id, rule.sequence) for rule in self] + children_rules
 
+    @api.model
+    def create(self, vals):
+        if vals:
+            check = False
+            for key in vals:
+                if key =='activity_ids_break':
+                    check = True
+                    break
+            if check == True:
+                result = super(Activities, self).create(vals)
+                ctx = {
+                    'sequence': vals['sequence'],
+                    'activity': vals['activity'],
+                    'effort': 0,
+                    'percent': 0,
+                    'estimation_id': vals['activity_ids_break'],
+                    'activity_id': result['id']
+                }
+                self.env['module.effort.activity'].create(ctx)
+                return result
+            else:
+                return super(Activities, self).create(vals)
 
+    def unlink(self):
+        for item in self:
+            effort_distribute = self.env['module.effort.activity'].search([('activity_id','=', item.id)])
+            breakdown_activity = self.env['module.breakdown.activity'].search([('connect_module','=', item.id)])
+            if effort_distribute:
+                effort_distribute.unlink()
+            if breakdown_activity:
+                breakdown_activity.unlink()
+        return super(Activities, self).unlink()
+        
 #hr.payroll.structure
 class ActivityStructure(models.Model):
     """
