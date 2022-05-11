@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_project_issuse_type,project.project_issuse_type_manager,model_project_issues_type,project.group_project_manager,1,1,1,1
+access_project_issuse_type,project.project_issuse_type,model_project_issues_type,project.group_project_user,1,0,0,0
+access_project_issuse_type_manager,project.project_issuse_type_manager,model_project_issues_type,ds_project_planning.group_project_pm,1,1,1,1
 access_project_task_status,project.project_task_status_manager,model_project_task_status,project.group_project_manager,1,1,1,1
+access_project_task_status_user,project.project_task_status_manager_user,model_project_task_status,project.group_project_user,1,0,0,0

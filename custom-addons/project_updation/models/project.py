@@ -3,6 +3,7 @@ from random import randint
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+from collections import defaultdict
 
 
 class TaskStatus(models.Model):
@@ -28,7 +29,7 @@ class IssuesType(models.Model):
     description_issues = fields.Html(string='Description Issues')
     icon = fields.Binary(name='Icon', store=True, attachment=True)
     icon_path = fields.Html('Icon', compute='_get_img_html')
-    status = fields.Many2many('project.task.status', string='Status')
+    status = fields.Many2many('project.task.status', string='Status Issues')
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', "Issues type name already exists!"),
@@ -52,6 +53,7 @@ class IssuesType(models.Model):
 
 class Task(models.Model):
     _inherit = 'project.task'
+    _order= 'create_date desc'
 
     issues_type = fields.Many2one('project.issues.type',
                                   string='Type', required=True, tracking=True)
@@ -78,7 +80,7 @@ class Task(models.Model):
         ('4', 'Good'),
         ('5', 'Very Good'),
     ], default='0', index=True, string="Task Score", tracking=True)
-    status = fields.Many2one('project.task.status', string="Status")
+    status = fields.Many2one('project.task.status', string="Status Task")
     status_id_domain = fields.Char(
         compute='_get_status_id_domain',
         readonly=True,
@@ -112,11 +114,11 @@ class Task(models.Model):
 
 
     def _check_user_readonly(self):
-        if self.env.user.has_group('project.group_project_manager') == False or\
-            self.env.user.id != self.project_id.user_id.id:
-            self.is_readonly = True
-        else:
+        if self.env.user.has_group('project.group_project_manager') == True or\
+            self.env.user.id == self.project_id.user_id.id:
             self.is_readonly = False
+        else:
+            self.is_readonly = True
 
     @api.onchange('planned_hours')
     def _check_planned_hours(self):
@@ -138,13 +140,13 @@ class Task(models.Model):
 
     @api.constrains('status', 'timesheet_ids')
     def _check_timesheet(self):
-        if self.status.name == 'Done' or self.status.name == 'Closed':
+        if self.status.name == 'Done' or self.status.name == 'Closed' and self.issues_type.name == 'Task':
             if len(self.timesheet_ids) == 0 or self.planned_hours == 0.0:
                 raise UserError(
                     'Time Sheet field and Initially Planned Hours field cannot be left blank')
             if self.progress_input != 100:
                 raise UserError(
-                    'Required when status Done or Closed, progess = 100%')
+                    'Required when status Done or Closed, progress = 100%')
 
     @api.constrains('progress_input')
     def _check_progress(self):
@@ -168,16 +170,21 @@ class Task(models.Model):
                     raise UserError(
                 'Required Hours Spent > 0')
 
+    @api.constrains('project_id')
+    def _check_project_id(self):
+        if not self.project_id:
+            raise UserError('Please chose project.')
+
 
 class Project(models.Model):
     _inherit = 'project.project'
 
-    status = fields.Selection([
-        ('Open', 'Open'),
-        ('Processing', 'Processing'),
-        ('Close', 'Close'),
-        ('Pending', 'Pending'),
-    ], string='Status', index=True, copy=False, default='Open')
+    # status = fields.Selection([
+    #     ('Open', 'Open'),
+    #     ('Processing', 'Processing'),
+    #     ('Close', 'Close'),
+    #     ('Pending', 'Pending'),
+    # ], string='Status', index=True, copy=False, default='Open')
 
     status_color = fields.Char('Status', compute='_get_status')
 
@@ -185,3 +192,17 @@ class Project(models.Model):
 
         for stt in self:
             stt.status_color = stt.status
+
+    def _compute_issue_count(self):
+        for project in self:
+            project.issue_count = self.env['project.task'].search_count(['&',('issues_type','!=',1),('project_id','=',project.id)])
+    
+    issue_count = fields.Integer(compute='_compute_issue_count')
+
+
+    def action_view_issues(self):
+        action = self.with_context(active_id=self.id, active_ids=self.ids) \
+            .env.ref('project_updation.act_project_project_2_project_issue_all') \
+            .sudo().read()[0]
+        action['display_name'] = self.name
+        return action

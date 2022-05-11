@@ -34,6 +34,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_phase = "phase_id";
             this.modelName = params.modelName;
             this.linkModel = params.linkModel;
+            this.configStartDate = params.configStartDate;
             return this._load(params);
         },
         reload: function (id, params) {
@@ -74,7 +75,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 model: 'project.planning.phase',
                 method: 'search_read',
                 fields: ['name', 'start_date', 'phase_duration', 'type'],
-                domain: [['project_id', '=', this.domain[0][2]]]
+                domain: [['project_id', '=', this.domain[1][2]]]
             }).then(function (data) {
                 return data;
             })
@@ -86,7 +87,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 method: 'search_read',
                 fields: ['name', 'milestone_date', 'type', 'phase_id'],
                 domain: [
-                    ['project_id', '=', this.domain[0][2]]
+                    ['project_id', '=', this.domain[1][2]]
                 ]
             }).then(function (data) {
                 return data;
@@ -125,7 +126,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 task.id = record[self.map_id] ? record[self.map_id] : parseInt(_.uniqueId());
                 task.text = record[self.map_text] ? record[self.map_text] : record.name;
                 task.duration = record[self.map_duration] ? record[self.map_duration]  : record.phase_duration;
-                task.progress = typeof record[self.map_progress] === 'undefined' ? 1 : record[self.map_progress] / 100;
+                task.progress = typeof record[self.map_progress] === 'undefined' ? 0 : record[self.map_progress] / 100;
 
                 if(record.type) {
                     // Add serverId to get real id in edit mode
@@ -136,7 +137,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                     if (record[self.map_date_start]) {
                         datetime = formatFunc(record[self.map_date_start]);
                     } else {
-                        datetime = false;
+                        datetime = self.configStartDate;
                     }
 
                     // Handle warning or danger of task

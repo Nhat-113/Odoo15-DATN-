@@ -92,3 +92,10 @@ class Project(models.Model):
 
             project.total_phase = len(num_phase)
             project.total_milestone = len(num_milestone)
+
+    def open_planning_task_all(self):
+        action = self.with_context(active_id=self.id, active_ids=self.ids) \
+            .env.ref('ds_project_planning.open_planning_task_all_on_gantt') \
+            .sudo().read()[0]
+        action['display_name'] = self.name
+        return action

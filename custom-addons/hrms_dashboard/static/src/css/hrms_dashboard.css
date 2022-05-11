@@ -28,6 +28,9 @@
 .buttons button {
     margin: 2px 0;
 }
+/* .breadcrumb {
+    display: none;
+} */
 
 /* Button Reset */
 
@@ -124,14 +127,10 @@ body .text-color {
 
 /* Leave graph */
 
-path {  stroke: #fff; }
+/* path {  stroke: #fff; } */
 
 path:hover {
     opacity: 0.9;
-}
-
-rect:hover {
-    fill: #934da5;
 }
 
 .axis {
@@ -502,14 +501,16 @@ h4 .stat-count {
 }
 
 .emp_graph {
-    margin-top: -11%;
+    margin-top: -7%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     align-content: center;
     justify-content: space-around;
 }
-
+.emp_graph .legend >tbody>tr {
+    width: 50%;
+}
 .leave-manager {
     background-color: #fff;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -907,6 +908,7 @@ h4 .stat-count {
     overflow: hidden;
     height: 98%;
     padding-left : 1% ;
+    padding-right: 0.5%;
 }
 
 .welcome_employee {
@@ -1238,14 +1240,13 @@ button:hover, button:focus{
 }
 
 .employee_dashboard_detail .department {
-    flex: 40%;
+    width: 33%;
     border-radius: 24px;
     height: 100%;
 }
 
 .employee_dashboard_detail .Leave-Request {
-    flex: 30%;
-    /* margin-top: 0; */
+    width: 33%;
     margin-left: 1%;
     background: white;
     border-radius: 24px;
@@ -1253,19 +1254,16 @@ button:hover, button:focus{
 }
 
 .employee_dashboard_detail .New-employee {
-    flex: 30%;
-    margin-top: -18px;
     flex-direction: column;
     align-items: flex-start;
     padding: 0px 0px 16px;
     position: static;
-    width: 28%;
-    /* left: 437px; */
+    width: 32.65%;
     top: 0px;
     background: #FFFFFF;
     border-radius: 24px;
     flex: none;
-    order: 1;
+    /* order: 1; */
     flex-grow: 0;
     margin: 0% 0% 0% 1%;
     height: 100%;
@@ -1282,10 +1280,12 @@ button:hover, button:focus{
 .emp_graph .legend > tbody {
     display: flex;
     align-content: space-around;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: center;
-    flex-direction: column;
+    flex-direction: row;
+    width: 55%;
+    margin: 0 auto;
 }
 .emp_graph svg {
     flex: 100%;
@@ -1466,17 +1466,28 @@ button:hover, button:focus{
     height: 100%;
 }
 .list-employee .leave_graph {
+    margin-top: 2%;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-end;
     align-items: flex-end;
     justify-content: center;
 }
+.list-employee .leave_graph .legend {
+    margin-top: 8%;
+}
 .leave_graph .legend > tbody {
+    width: 75%;
     display: flex;
-    align-content: center;
-    flex-wrap: wrap;
+    flex-direction: row-reverse;
     justify-content: space-between;
+    align-items: center;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    margin: 0 auto;
+}
+.leave_graph .legend > tbody >tr {
+    width: 50%;
 }
 .legend >tbody>tr>td>svg {
     border-radius: 50%;
@@ -1588,19 +1599,38 @@ button:hover, button:focus{
 .announcements_detail_user {
     flex: none;
     margin-right: 1.5rem;
-    width: 50%;
-
+    width: 33%;
     background: #FFFFFF;
     border-radius: 24px;
 }
 .Event_user {
     flex: none;
     margin-right: 1.5rem;
-    width: 50%;
+    width: 32%;
     background: #FFFFFF;
     border-radius: 24px;
 }
-
+.list_event_user {
+    width: 90%;
+    margin: 0 auto;
+    border-radius: 26px;
+    height:80%;
+}
+.list_event_user .event-detail {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    top: 0px;
+    background: #FAFAFA;
+    border-radius: 18px;
+    flex: none;
+    width: 90%;
+    text-align: center;
+    margin: 0 auto;
+    height: 18%;
+    margin-top: 3.5%;
+}
 .announcements_detail h3 {
     text-align: center;
     display: flex;
@@ -1981,6 +2011,17 @@ button:hover, button:focus{
     .emp_graph .legend {
         margin-top: 2%;
     }
+    .list_future button h4 {
+        font-size: 1rem;
+    }
+    .list_menu button h5 {
+        font-size: 1rem;
+    }
+    .o_clock {
+        font-size: 1rem;
+    }
+
+    
 }
 @media only screen and (min-width: 1800px) {
     .emp_graph .legend {

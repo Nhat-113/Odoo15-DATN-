@@ -54,7 +54,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             "click .dashboard_today_meeting": "dashboard_today_meeting",
             "click .dashboard_in_recruiment": "dashboard_in_recruiment",
 
-            
+
             "click .hr_timesheets": "hr_timesheets",
             "click .login_broad_factor": "employee_broad_factor",
             "click .o_hr_attendance_sign_in_out_icon": function() {
@@ -80,6 +80,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             this.employee_birthday = [];
             this.upcoming_events = [];
             this.announcements = [];
+            this.task_for_day = [];
             this.login_employee = [];
         },
 
@@ -115,6 +116,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     .then(function(res) {
                         self.employee_birthday = res["birthday"];
                         self.upcoming_events = res["event"];
+                        self.task_for_day = res["task_for_day"];
                         self.announcements = res["announcement"];
                     });
                 return $.when(def0, def1, def2);
@@ -125,7 +127,6 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             this.set("title", "Dashboard");
             return this._super().then(function() {
-
                 self.update_cp();
                 self.render_dashboards()
                 self.render_graphs();
@@ -164,6 +165,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 .then(function(res) {
                     self.employee_birthday = res["birthday"];
                     self.upcoming_events = res["event"];
+                    self.task_for_day = res["task_for_day"];
                     self.announcements = res["announcement"];
                 });
             return $.when(def0, def1, def2);
@@ -409,7 +411,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            session.user_has_group("hr.group_hr_manager").then(function(has_group) {
+            session.user_has_group("hr.group_hr_manager" || "hr.group_hr_user").then(function(has_group) {
                 if (has_group) {
                     var options = {
                         on_reverse_breadcrumb: self.on_reverse_breadcrumb,
@@ -437,7 +439,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            session.user_has_group("hr.group_hr_manager").then(function(has_group) {
+            session.user_has_group("hr.group_hr_user").then(function(has_group) {
                 if (has_group) {
                     var options = {
                         on_reverse_breadcrumb: self.on_reverse_breadcrumb,
@@ -463,7 +465,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            session.user_has_group("hr.group_hr_manager").then(function(has_group) {
+            session.user_has_group("hr.group_hr_user").then(function(has_group) {
                 if (has_group) {
                     var options = {
                         on_reverse_breadcrumb: self.on_reverse_breadcrumb,
@@ -481,7 +483,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         domain: [
                             ["state", "in", ["recruit"]]
                         ],
-                        
+
                     });
                 }
             });
@@ -506,9 +508,11 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         [false, "form"],
                     ],
                     domain: [
-                        ["date_from", "<=", date],
-                        ["date_to", ">=", date],
-                        ["state", "=", "validate"],
+                        // string.substring(start, end)
+
+                        ["create_date", "=", date],
+                        // ["date_to", ">=", date],
+                        ["state", "=", "confirm"],
                     ],
                     target: "current",
                 },
@@ -606,8 +610,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
 
         render_department_employee: function() {
             var self = this;
-            var w = 300;
-            var h = 300;
+            var w = 380;
+            var h = 380;
             var r = h / 2;
             var elem = this.$(".emp_graph");
             //        var colors = ['#ff8762', '#5ebade', '#b298e1', '#70cac1', '#cf2030'];
@@ -705,6 +709,18 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var hrs = dateTime.getHours();
             var min = dateTime.getMinutes();
             var sec = dateTime.getSeconds();
+            // hrs = checkTime(m);
+            // min = checkTime(s);
+            // sec = checkTime(m);
+            if (hrs < 10) {
+                hrs = "0" + hrs
+            }
+            if (min < 10) {
+                min = "0" + min
+            }
+            if (sec < 10) {
+                sec = "0" + sec
+            }
             var session = document.getElementById('session');
 
             if (!session) return
@@ -718,11 +734,13 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             if (hrs > 12) {
                 hrs = hrs - 12;
             }
+
             // console.log(hrs + '-' + min + '-' + sec);
             document.getElementById('hours').innerHTML = hrs;
             document.getElementById('minutes').innerHTML = min;
             document.getElementById('seconds').innerHTML = sec;
         },
+
         //end o clock
         update_join_resign_trends: function() {
             var elem = this.$(".join_resign_trend");
@@ -758,7 +776,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         height = 250 - margin.top - margin.bottom;
 
                     // Set the ranges
-                    var x = d3.scale.ordinal().rangeRoundBands([-(margin.right+20), width], 1);
+                    var x = d3.scale.ordinal().rangeRoundBands([-(margin.right + 20), width], 1);
 
                     var y = d3.scale.linear().range([height, 0]);
 
@@ -782,7 +800,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         .append("g")
                         .attr(
                             "transform",
-                            "translate(" + (margin.left + 25)  + "," + margin.top + ")"
+                            "translate(" + (margin.left + 25) + "," + margin.top + ")"
                         );
 
                     // Add the X Axis
@@ -1139,11 +1157,11 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             //        var color = d3.scale.category10();
             var colors = [
-                "#70cac1",
-                "#659d4e",
-                "#208cc2",
-                "#4d6cb1",
-                "#584999",
+                "#5E3FBE",
+                "#E53935",
+                "#00ACC1",
+                "#4CAF50",
+                "#FDD835",
                 "#8e559e",
                 "#cf3650",
                 "#f65337",
@@ -1321,7 +1339,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     // function to handle pieChart.
                     function pieChart(pD) {
                         var pC = {},
-                            pieDim = { w: 300, h: 300 };
+                            pieDim = { w: 400, h: 400 };
                         pieDim.r = Math.min(pieDim.w, pieDim.h) / 2;
 
                         // create svg for pie chart.
