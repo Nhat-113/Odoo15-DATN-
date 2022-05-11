@@ -5,6 +5,7 @@ from datetime import timedelta, datetime, date
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 from pytz import utc
+from soupsieve import select
 from odoo import models, fields, api, _
 from odoo.http import request
 from odoo.tools import float_utils
@@ -32,11 +33,19 @@ class Employee(models.Model):
 
     birthday = fields.Date('Date of Birth', groups="base.group_user", help="Birthday")
 
+
+   # current_user = fields.Many2one('res.users','Current User', default=lambda self: self.env.uid) 
+
+    # def get_user_id(self):
+    #     return self.env.uid
+
     @api.model
     def check_user_group(self):
         uid = request.session.uid
         user = self.env['res.users'].sudo().search([('id', '=', uid)], limit=1)
         if user.has_group('hr.group_hr_manager'):
+            return True
+        elif user.has_group('hr.group_hr_user'):
             return True
         else:
             return False
@@ -48,11 +57,13 @@ class Employee(models.Model):
         leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1'])])
         recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ])])
 
+        #meeting  =  select calendar_event.start from calendar_event
         my_date = date.today()
 
         temp = str(my_date.year) + '-' + str(my_date.month) + '-' + str(my_date.day)
               
         total_len = self.env['calendar.event'].search_count([('start', '=', temp)])
+        
         #todayMeeting = len(self.env['calendar.event'].search([]))
         #today_meeting = self.env['calendar.event'].sudo().search_count([])
 
@@ -81,7 +92,7 @@ class Employee(models.Model):
         timesheet_count = self.env['account.analytic.line'].sudo().search_count(
             [('project_id', '!=', False), ('user_id', '=', uid)])
         timesheet_view_id = self.env.ref('hr_timesheet.hr_timesheet_line_search')
-        job_applications = self.env['hr.applicant'].sudo().search_count([])
+        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False)])
         if employee:
             sql = """select broad_factor from hr_employee_broad_factor where id =%s"""
             self.env.cr.execute(sql, (employee[0]['id'],))
@@ -142,6 +153,15 @@ class Employee(models.Model):
         cr.execute("""select event_event.name , event_event.date_begin,  event_event.date_end from event_event   where event_event.stage_id = '1' or  event_event.stage_id = '2' or  event_event.stage_id = '3'""")
         event = cr.fetchall()
         announcement = []
+        user_id = request.session.uid
+        sql=("""
+                select CURRENT_DATE, project_task.priority_type, project_task.name , project_task.id ,project_task.date_start  , hr_employee.name  from  project_task  
+                INNER JOIN  project_task_user_rel on project_task_user_rel.task_id = project_task.id 
+                INNER JOIN  hr_employee on hr_employee.user_id = project_task_user_rel.user_id and hr_employee.user_id = %s where DATE(project_task.date_start) = CURRENT_DATE
+                            """) %  user_id
+        cr.execute(sql)
+        task_for_day = cr.fetchall()
+        
         if employee:
             department = employee.department_id
             job_id = employee.job_id
@@ -176,7 +196,8 @@ class Employee(models.Model):
         return {
             'birthday': birthday,
             'event': event,
-            'announcement': announcement
+            'announcement': announcement ,
+            'task_for_day' : task_for_day
         }
 
     @api.model

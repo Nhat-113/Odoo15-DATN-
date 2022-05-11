@@ -34,7 +34,7 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
 
 
             var self = this;
-            gantt.config.grid_width = 580;
+            gantt.config.grid_width = 660;
             gantt.config.work_time = true;
             gantt.config.skip_off_time = true;
 
@@ -50,10 +50,13 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                 `
             }
 
+            const startDateEditor = {type: "date", map_to: "start_date"};
+            const endDateEditor = {type: "date", map_to: "end_date"};
+
             gantt.config.drag_progress = false;
             gantt.config.columns = [
                 {name: "text", tree: true, resize: true, label: this.state.records.data[0].project_name, width: 180},
-                {name: "start_date", align: "center", resize: true, width: 120,
+                {name: "start_date", align: "center", resize: true, editor: startDateEditor, width: 120,
                     template: function (item) {
                         if (item.start_date - self.configStartDate === 0) {
                             return "";
@@ -61,12 +64,20 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                         return item.start_date;
                     }
                 },
-                {name: "end_date", label: "End time", align: "center", resize: true, width: 120,
+                {name: "end_date", label: "End time", align: "center", resize: true, editor: endDateEditor, width: 120,
                     template: function (item) {
                         if (item.start_date - self.configStartDate === 0) {
                             return "";
                         }
                         return item.end_date;
+                    }
+                },
+                {name: "progress", label: "Progress", align: "center", resize: true,
+                    template: function (item) {
+                        if(item.progress) {
+                            return item.progress*100 + "%";
+                        }
+                        return "";
                     }
                 },
                 {name: "duration", align: "center", resize: true,
@@ -223,7 +234,9 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
         },
 
         _exportToPDF: function() {
-            gantt.exportToPDF();
+            gantt.exportToPDF({
+				header:"<style>.danger {border: 1px solid #990614;color: #f30f0f;background: #f30f0f;}.danger .gantt_task_progress {background: #990614;}.warning {border: 1px solid #eec41e;color: #ffffcc;background: #ffeb3b;}.warning .gantt_task_progress {background: #eec41e;}</style>"
+			});
         },
         _onBtnCreatePhase: function (ev) {
             // prevent the event propagation 
