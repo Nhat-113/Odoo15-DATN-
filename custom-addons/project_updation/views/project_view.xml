@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='parent_id']" position="after">
                     <field name="status_id_domain" invisible="1"/>
-                    <field name="status" domain="status_id_domain" attrs="{'invisible': [('issues_type', '=', False)], 'required': [('issues_type', '!=', False)]}"/>
+                    <field name="status" domain="status_id_domain" attrs="{'invisible': [('issues_type', '=', False)], 'required': [('issues_type', '!=', False)]}" string="Status"/>
                     <field name="priority_type"/>
                     <field name="complex"/>
                 </xpath>
