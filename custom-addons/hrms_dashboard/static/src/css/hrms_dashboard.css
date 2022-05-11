@@ -28,6 +28,9 @@
 .buttons button {
     margin: 2px 0;
 }
+/* .breadcrumb {
+    display: none;
+} */
 
 /* Button Reset */
 
@@ -508,8 +511,6 @@ h4 .stat-count {
 .emp_graph .legend >tbody>tr {
     width: 50%;
 }
-
-
 .leave-manager {
     background-color: #fff;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -1598,19 +1599,38 @@ button:hover, button:focus{
 .announcements_detail_user {
     flex: none;
     margin-right: 1.5rem;
-    width: 50%;
-
+    width: 33%;
     background: #FFFFFF;
     border-radius: 24px;
 }
 .Event_user {
     flex: none;
     margin-right: 1.5rem;
-    width: 50%;
+    width: 32%;
     background: #FFFFFF;
     border-radius: 24px;
 }
-
+.list_event_user {
+    width: 90%;
+    margin: 0 auto;
+    border-radius: 26px;
+    height:80%;
+}
+.list_event_user .event-detail {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    top: 0px;
+    background: #FAFAFA;
+    border-radius: 18px;
+    flex: none;
+    width: 90%;
+    text-align: center;
+    margin: 0 auto;
+    height: 18%;
+    margin-top: 3.5%;
+}
 .announcements_detail h3 {
     text-align: center;
     display: flex;
