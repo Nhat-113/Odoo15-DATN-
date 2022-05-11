@@ -13,7 +13,7 @@ from odoo.exceptions import ValidationError
 class PlanningCalendarResource(models.Model):
     _name = "planning.calendar.resource"
     _description = "Planning Calendar Resource Of Project"
-    _order = "start_date desc"
+    _order = "start_date"
     _rec_name = "employee_id"
 
     project_id = fields.Many2one(
@@ -49,6 +49,11 @@ class PlanningCalendarResource(models.Model):
                 resource.duration = delta.days if delta.days > 0 else 1
             else:
                 resource.duration = 1
+    
+    @api.onchange('start_date', 'end_date')
+    def _calculate_default_calendar_effort(self):
+        if self.start_date and self.end_date:
+            self.calendar_effort = self.duration / 20
 
     @api.depends('duration', 'calendar_effort')
     def _compute_effort_rate(self):
@@ -71,13 +76,14 @@ class PlanningCalendarResource(models.Model):
 
     @api.constrains('inactive', 'inactive_date')
     def _unassign_member_in_tasks (self):
-        if self.inactive:
-            inactive_date = fields.Datetime.to_datetime(self.inactive_date)
+        for resource in self:
+            if resource.inactive:
+                inactive_date = fields.Datetime.to_datetime(resource.inactive_date)
 
-            tasks = self.env['project.task'].search(['&', '&', ('project_id', '=', self.project_id.id), ('user_ids', 'in', self.employee_id.user_id.id), ('date_start', '>=', inactive_date)])
-            for task in tasks:
-                user_ids = [x for x in task.user_ids.ids if x != self.employee_id.user_id.id]
-                task.write({'user_ids': [(6, 0, user_ids)]})
+                tasks = self.env['project.task'].search(['&', '&', ('project_id', '=', resource.project_id.id), ('user_ids', 'in', resource.employee_id.user_id.id), ('date_start', '>=', inactive_date)])
+                for task in tasks:
+                    user_ids = [x for x in task.user_ids.ids if x != resource.employee_id.user_id.id]
+                    task.write({'user_ids': [(6, 0, user_ids)]})
             
     @api.model
     def open_calendar_resource(self, project_id):
