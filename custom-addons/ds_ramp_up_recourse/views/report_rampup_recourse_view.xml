@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Export Ramp Up Recourse in action menu -->
+        <record id="action_export_payslips" model="ir.actions.report">
+            <field name="name">Export RampUp Report</field>
+            <field name="model">hr.employee</field>
+            <field name="report_type">xlsx</field>
+            <field name="report_name">ds_export_excel.rampup_xlsx</field>
+            <field name="report_file">ds_export_excel.rampup_xlsx</field>
+            <field name="print_report_name">'Ram Up Reporting'</field>
+            <field name="binding_model_id" ref="model_hr_employee"/>
+        </record>
+    </data>
+</odoo>
