@@ -411,7 +411,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            session.user_has_group("hr.group_hr_manager" || "hr.group_hr_user").then(function(has_group) {
+            session.user_has_group("hr.group_hr_user").then(function(has_group) {
                 if (has_group) {
                     var options = {
                         on_reverse_breadcrumb: self.on_reverse_breadcrumb,
@@ -712,9 +712,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             // hrs = checkTime(m);
             // min = checkTime(s);
             // sec = checkTime(m);
-            if (hrs < 10) {
-                hrs = "0" + hrs
-            }
+            
             if (min < 10) {
                 min = "0" + min
             }
@@ -733,6 +731,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
 
             if (hrs > 12) {
                 hrs = hrs - 12;
+            }
+            if (hrs < 10) {
+                hrs = "0" + hrs
             }
 
             // console.log(hrs + '-' + min + '-' + sec);

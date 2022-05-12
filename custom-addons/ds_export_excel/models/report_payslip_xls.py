@@ -66,10 +66,7 @@ class PayslipXlsx(models.AbstractModel):
             pcd = list(
                 filter(lambda line: line['code'] == 'PCD', obj.line_ids))
             bh = list(filter(lambda line: line['code'] == 'BH', obj.line_ids))
-            ttncn = [x for x in obj.line_ids if x.code == 'TTNCN']
             ot = list(filter(lambda line: line['code'] == 'OT', obj.line_ids))
-            net = list(
-                filter(lambda line: line['code'] == 'NET', obj.line_ids))
             pck = list(filter(lambda line: line['code'] == 'PCK', obj.line_ids))
             pc = list(filter(lambda line: line['code'] == 'PC', obj.line_ids))
             basic = list(filter(lambda line: line['code'] == 'Basic', obj.line_ids))
@@ -90,6 +87,15 @@ class PayslipXlsx(models.AbstractModel):
             lbn = list(filter(lambda line: line['code'] == 'LBN', obj.line_ids))
             tnc = list(filter(lambda line: line['code'] == 'TNC', obj.line_ids))
             ttncnbn = list(filter(lambda line: line['code'] == 'TTNCNBN', obj.line_ids))
+
+            if obj.struct_id.id == 1:
+                net = list(
+                    filter(lambda line: line['code'] == 'NET', obj.line_ids))
+                ttncn = [x for x in obj.line_ids if x.code == 'TTNCN']
+            elif obj.struct_id.id == 2:
+                net = list(
+                    filter(lambda line: line['code'] == 'NET1', obj.line_ids))
+                ttncn = [x for x in obj.line_ids if x.code == 'TTNCN1']
 
             col_values = [
                 obj.employee_id.name,
