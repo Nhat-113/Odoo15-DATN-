@@ -135,6 +135,10 @@
                     <field name="status_color" invisible="1"/>
                     <field name="status" widget="badge" string="Status"/>
                     <field name="create_date" string="Create Date"/>
+                    <field name="write_date" string="Update Date"/>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="before">
+                    <field name="id" string="ID"/>
                 </xpath>
                 <xpath expr="//field[@name='progress']" position="replace">
                     <field name="progress_input"/>
@@ -144,6 +148,20 @@
                 </xpath>
                 <xpath expr="//field[@name='activity_ids']" position="replace">
                     <field name="activity_ids" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='project_id']" position="replace">
+                    <field name="project_id" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='effective_hours']" position="replace">
+                    <field name="effective_hours" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='stage_id']" position="replace">
+                    <field name="stage_id" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='company_id']" position="replace">
+                    <field name="company_id" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='kanban_state']" position="replace">
                 </xpath>
             </field>
         </record>
@@ -253,7 +271,7 @@
         <record id="act_project_project_2_project_issue_all" model="ir.actions.act_window">
             <field name="name">Tasks</field>
             <field name="res_model">project.task</field>
-            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_mode">tree,form</field>
             <field name="domain">[('display_project_id', '=', active_id), ('issues_type', '!=', 1)]</field>
             <field name="context">{
                 'pivot_row_groupby': ['user_ids'],
