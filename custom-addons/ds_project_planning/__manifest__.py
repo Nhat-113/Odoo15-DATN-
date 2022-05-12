@@ -21,6 +21,9 @@
             'ds_project_planning/static/src/xml/gantt.xml'
         ],
     },
+    'external_dependencies': {
+        'python': ['pandas'],
+    },
     "author": "Dsoft",
     "website": "https://d-soft.com.vn",
     "category": "Project",

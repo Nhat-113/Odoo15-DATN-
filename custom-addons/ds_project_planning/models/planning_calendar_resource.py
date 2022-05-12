@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pandas as pd
 
 from calendar import calendar
 from email.policy import default
@@ -45,11 +46,12 @@ class PlanningCalendarResource(models.Model):
         """ Calculates duration working time"""
         for resource in self:
             if resource.end_date and resource.start_date:
-                delta = resource.end_date - resource.start_date
-                resource.duration = delta.days if delta.days > 0 else 1
+                working_days = len(pd.bdate_range(resource.start_date.strftime('%Y-%m-%d'),
+                                                  resource.end_date.strftime('%Y-%m-%d')))
+                resource.duration = working_days if working_days > 0 else 1
             else:
                 resource.duration = 1
-    
+
     @api.onchange('start_date', 'end_date')
     def _calculate_default_calendar_effort(self):
         if self.start_date and self.end_date:
@@ -75,16 +77,19 @@ class PlanningCalendarResource(models.Model):
         return self._check_dates()
 
     @api.constrains('inactive', 'inactive_date')
-    def _unassign_member_in_tasks (self):
+    def _unassign_member_in_tasks(self):
         for resource in self:
             if resource.inactive:
-                inactive_date = fields.Datetime.to_datetime(resource.inactive_date)
+                inactive_date = fields.Datetime.to_datetime(
+                    resource.inactive_date)
 
-                tasks = self.env['project.task'].search(['&', '&', ('project_id', '=', resource.project_id.id), ('user_ids', 'in', resource.employee_id.user_id.id), ('date_start', '>=', inactive_date)])
+                tasks = self.env['project.task'].search(['&', '&', ('project_id', '=', resource.project_id.id), (
+                    'user_ids', 'in', resource.employee_id.user_id.id), ('date_start', '>=', inactive_date)])
                 for task in tasks:
-                    user_ids = [x for x in task.user_ids.ids if x != resource.employee_id.user_id.id]
+                    user_ids = [x for x in task.user_ids.ids if x !=
+                                resource.employee_id.user_id.id]
                     task.write({'user_ids': [(6, 0, user_ids)]})
-            
+
     @api.model
     def open_calendar_resource(self, project_id):
         target_project = self.env['project.project'].browse(project_id)
