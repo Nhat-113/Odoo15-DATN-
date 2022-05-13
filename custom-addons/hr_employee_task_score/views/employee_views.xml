@@ -5,7 +5,7 @@
             <field name="name">project.task.tree.activity1</field>
             <field name="model">project.task</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree create="0">
                     <field name="project_id"/>
                     <field name="name" string="Task Name"/>
                     <field name="task_score" widget="priority" readonly="1" type="int" avg="A"/>
@@ -33,6 +33,17 @@
                         <a name="%(project_task_score_action)d" type="action" >
                             <li>Task Score: <t t-esc="record.task_score.value"/> Star</li>
                         </a>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="hr_employee_tree_task_score_inherit">
+            <field name="name">hr.employee.tree.task.score</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='activity_ids']" position="after">
+                    <field name="task_score"/>
                 </xpath>
             </field>
         </record>
