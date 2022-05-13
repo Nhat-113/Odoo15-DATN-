@@ -95,11 +95,9 @@
                                             <th>Chức vụ</th>
                                             <td>
                                                 <span>:  </span>
-                                                <b>
                                                     <t t-if='e.company_id.position'>
                                                         <span t-field="e.company_id.position"/>
                                                     </t>
-                                                </b>
                                             </td>
                                         </tr>
                                         <tr>

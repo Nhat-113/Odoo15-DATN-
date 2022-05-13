@@ -118,11 +118,9 @@
                                     <th>Chức vụ</th>
                                     <td>
                                         <span>:  </span>
-                                            <b>
-                                                <t t-if='e.company_id.position'>
-                                                    <span t-field="e.company_id.position"/>
-                                                </t>
-                                            </b>
+                                            <t t-if='e.company_id.position'>
+                                                <span t-field="e.company_id.position"/>
+                                            </t>
                                     </td>
                                 </tr>
                                 <tr>
@@ -283,11 +281,11 @@
                                             </t>
                                         </b>
                                     </p>
-                                    <p class="font-italic">(
-                                        <t t-if='e.company_id.position'>
+                                    <p class="font-italic">
+                                        <t t-if='e.company_id.position'>(
                                             <span t-field="e.company_id.position"/>
-                                        </t>
-                                        )</p>
+                                        )</t>
+                                        </p>
                                 </div>
                             </div>
                         </div>
