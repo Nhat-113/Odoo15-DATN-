@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.      
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+from builtins import print, set
+
 from odoo import fields, models, api
 
 
@@ -23,4 +25,16 @@ class HrEmployee(models.Model):
                     employee.task_score = '0'
             else:
                 employee.task_score = '0'
+
+    def project_task_score_action(self):
+        user_id = self.user_id.id
+        name_view = 'Task Score/ ' + self.name
+        action = {
+            "name": name_view,
+            "type": "ir.actions.act_window",
+            "res_model": "project.task",
+            "views": [[self.env.ref('hr_employee_task_score.project_task_score_view_tree').id, "tree"]],
+            "domain": [('user_ids', 'in', user_id)]
+        }
+        return action
 
