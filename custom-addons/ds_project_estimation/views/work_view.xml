@@ -8,7 +8,8 @@
                     <group name="group_top">
                         <group name="group_left">
                             <field name="project_name" />
-                            <field name="customer_ids" />
+                            <field name="project_code" />
+                            <field name="project_type_id" placeholder="Select project type ..."/>
                             <field name="estimator_ids" />
                             <field name="reviewer_ids" />
                         </group>
@@ -17,9 +18,11 @@
                             <field name="sale_date" />
                             <field name="stage" placeholder="Select current stage" />
                             <field name="currency_id" />
-                            <field name="contract_id" />
+                            <field name="customer_ids" />
                         </group>
                     </group>
+                    <separator string="Description" />
+                    <field name="description" placeholder="Description"/>
                     <notebook>
                         <page string="Overview">
                             <field name="add_lines_overview">
@@ -83,13 +86,13 @@
                             <separator string="Summary" />
                             <field name="add_lines_module_summary">
                                 <tree editable="bottom">
-                                    <field name="project_type" placeholder="Select project category" />
+                                    <field name="summary_type" placeholder="Select project category" />
                                     <field name="working_efforts" placeholder="Select working hours or efforts" />
                                     <field name="time_effort_value" placeholder="Select value" />
                                 </tree>
                             </field>
                             <separator string="Effort distribution" />
-                            <field name="add_lines_module_effort_distribute">
+                            <field name="add_lines_module_effort_distribute_activity">
                                 <tree create="0" editable="0" delete="0">
                                     <field name="sequence" />
                                     <field name="activity" />
@@ -106,20 +109,22 @@
                                 </form>
                             </field>
                             <separator string='Work Breakdown Structure and Estimate' />
-                            <field name="add_lines_module_breakdown">
+                            <field name="add_lines_module_activity">
                                 <tree>
                                     <field name="sequence" />
                                     <field name="activity" />
                                     <field name="effort" />
-                                    <field name="mandays" />
                                 </tree>
-                                <form string="Work Breakdown">
+                                <form>
                                     <group col="4">
                                         <field name="sequence" />
                                         <field name="activity" />
                                         <field name="effort" />
-                                        <field name="mandays" />
+                                        <field name="estimation_id" invisible="1"/>
                                         <field name="activity_type" />
+                                        <field name="activity_current" 
+                                                attrs="{'invisible': [('activity_type', '!=', 'type_1')], 'required' : [('activity_type', '=', 'type_1')]}" 
+                                                placeholder="Please select activity ..." />
                                     </group>
                                     <notebook>
                                         <page string="Breakdown Estimation">
@@ -130,24 +135,23 @@
                                                     <field name="persons" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
                                                     <field name="days" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
                                                     <field name="job_pos"/>
-                                                    <field name="effort"/>
-                                                    <field name="mandays"/>
-                                                    <field name="percent_effort"  attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_1')]}" />
+                                                    <field name="percent_effort" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_1')]}" />
+                                                    <field name="mandays" attrs="{'column_invisible': [('parent.activity_type', '=', 'type_3')], 'readonly': [('parent.activity_type', '=', 'type_1')]}" />
                                                     <field name="type" invisible="1"/>
                                                 </tree>
                                             </field>
+                                            <button string="Compute" name="action_refresh" type="object" class="btn-primary" attrs="{'invisible': [ ('estimation_id', '=', False)]}"/>
                                         </page>
                                     </notebook>
-
                                 </form>
                             </field>
                             <group name="note_group" col="6" class="mt-2 mt-md-0">
+                                <button string="Compute" name="action_refresh_estimation" type="object" class="btn-primary"/>
                                 <group class="oe_subtotal_footer" colspan="2" name="sale_total">
                                     <field name="total_manday" readonly="1" />
                                 </group>
                                 <div class="oe_clear"/>
                             </group>
-                            
                         </page>
                     </notebook>
                 </sheet>
@@ -160,7 +164,6 @@
         <field name="name">Work List</field>
         <field name="model">estimation.work</field>
         <field name="arch" type="xml">
-
             <tree default_order='create_date desc'>
                 <field name="number"></field>
                 <field name="estimator_ids" />
@@ -173,4 +176,5 @@
             </tree>
         </field>
     </record>
+
 </odoo>

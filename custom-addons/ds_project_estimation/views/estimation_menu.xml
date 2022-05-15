@@ -78,6 +78,18 @@
     parent="menu_config"
     action="action_data_activity"
     />
+    <!-- Action to open Project type -->
+    <record id="action_data_project_type" model="ir.actions.act_window">
+        <field name="name">Project Type</field>
+        <field name="res_model">project.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_data_project_type"
+    name="Project Type"
+    parent="menu_config"
+    action="action_data_project_type"
+    />
 
     <!-- Action to open Description -->
     <record id="action_config_description" model="ir.actions.act_window">

@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
 from email.policy import default
+import string
 from odoo import models, fields, api, _
-
 
 class Estimation(models.Model):
     """
@@ -15,39 +13,38 @@ class Estimation(models.Model):
     project_name = fields.Char("Project Name", required=True)
     number = fields.Char("No", readonly=True, required=True, copy=False, index=False, default="New")
 
-    estimator_ids = fields.Many2one('res.users', string='Estimator', default=lambda self: self.env.user, readonly=True)
+    estimator_ids = fields.Many2one('res.users', string='Estimator', default=lambda self: self.env.user)
     reviewer_ids = fields.Many2one('res.users', string='Reviewer', default=lambda self: self.env.user)
     customer_ids = fields.Many2one("res.partner", string="Customer", required=True)
     currency_id = fields.Many2one("res.currency", string="Currency")
+    project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
 
     expected_revenue = fields.Float(string="Expected Revenue")
     total_cost = fields.Float(string="Total Cost")
-    
     total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays")
-
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
-    stage = fields.Selection([("new","New"), ("in_progress","In Progress"), ("pending","Pending")], string="Status", required=True)
-
-    contract_id = fields.Many2one('hr.contract', string='Contract', help="Contract")
-    # struct_id = fields.Many2one('config.activity.structure', string='Structure', readonly=True)
-
+    project_code = fields.Char(string="Project Code", required=True)
+    description = fields.Text(string="Description", help="Description estimation")
+    stage = fields.Selection([("new","New"), 
+                              ("created","Created"),
+                              ("approved","Approved"),
+                              ("reject","Reject"),
+                              ("updated","Updated"),
+                              ("in_progress","In Progress"), 
+                              ("completed","Completed"),
+                              ("pending","Pending")], 
+                            string="Status", 
+                            required=True)
+    
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
-
     add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'connect_summary', string='Summary Total Cost')
     add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate', string='Summary Cost Rate')
-    
     add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'connect_resource_plan', string='Resource Planning Effort')
-
     add_lines_module_assumption = fields.One2many('estimation.module.assumption', 'connect_module', string='Module Assumption')
     add_lines_module_summary = fields.One2many('estimation.module.summary', 'connect_module', string='Module Summary')
-    
-    # def _get_default_activities(self):
-    #     return self.env['config.activity'].search([])
-
-    add_lines_module_effort = fields.One2many('config.activity', 'activity_ids', string='Module Effort')
-    add_lines_module_breakdown = fields.One2many('config.activity', 'activity_ids_break', string="Breakdown Structure")
-    add_lines_module_effort_distribute = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
+    add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Breakdown Structure")
+    add_lines_module_effort_distribute_activity = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
 
     @api.model
     def create(self, vals):
@@ -61,60 +58,32 @@ class Estimation(models.Model):
         self.env["estimation.overview"].create(vals_over)
         return result
 
+    # Automatically load 12 activities data when creating an estimation
     @api.model
-    def get_inputs(self, contracts):
-        res = []
-        structure_ids = contracts.get_all_structures()
-        
-        rule_ids = self.env['config.activity.structure'].browse(structure_ids).get_all_rules()
-        sorted_rule_ids = [id for id, sequence in sorted(rule_ids, key=lambda x: x[1])]
-        inputs = self.env['config.activity'].browse(sorted_rule_ids)
-
-        for contract in contracts:
-            for input in inputs:
-                input_data = {
-                    'sequence': input.sequence,
-                    'activity': input.activity,
-                    'effort': input.effort,
-                    'percent': input.percent
-                }
-                res += [input_data]
+    def default_get(self, fields):
+        res = super(Estimation, self).default_get(fields)
+        get_data_activities = self.env['data.activity'].search([])
+        activities_line = []
+        for record in get_data_activities:
+            line = (0, 0, {
+                'sequence': record.sequence, 
+                'activity': record.activity,
+                'effort': 0.0,
+                'percent': 0.0,
+                'activity_type': record.activity_type
+            })
+            activities_line.append(line)
+        res.update({
+            'add_lines_module_activity': activities_line
+        })
         return res
-
-    @api.onchange('reviewer_ids')
-    def onchange_module_effort(self):
-        # if not self.contract_id.struct_id:
-        #     return
-
-        # if self.contract_id:
-        contract_ids = self.contract_id.ids
-        contracts = self.env['hr.contract'].browse(contract_ids)
-
-        effort_lines = self.get_inputs(contracts)
-        input_lines = self.add_lines_module_effort.browse([])
-        input_lines_breakdown = self.add_lines_module_breakdown.browse([])
-        # input_lines_sum = self.add_lines_module_summary.browse([])
-        for r in effort_lines:
-            input_lines += input_lines.new(r)
-            input_lines_breakdown += input_lines_breakdown.new(r)
     
-        self.add_lines_module_breakdown = input_lines_breakdown
-        self.add_lines_module_effort = input_lines
-        return
-
-    @api.onchange('contract_id')
-    def onchange_contract(self):
-        # if not self.contract_id:
-        #     self.struct_id = False
-        self.with_context(contract=True).onchange_module_effort()
-        return
-    
-    @api.depends('add_lines_module_breakdown.mandays')
+    @api.depends('add_lines_module_activity.effort')
     def _compute_total_mandays(self):
-        ls_activity = self.env['config.activity'].search([('activity_ids_break', '=', self.id)])
+        ls_activity = self.env['config.activity'].search([('estimation_id', '=', self.id)])
         total = 0.0
         for item in ls_activity:
-            total += item.mandays
+            total += item.effort
         for record in self:
             record.total_manday = total
     
@@ -152,8 +121,7 @@ class Estimation(models.Model):
         return strings
       
     def convert_id_to_name_desc(self, vals):
-        # "estimator_ids" because "estimator_ids" can't update (readonly) -> unnecessary
-        # ls_keys = ["reviewer_ids", "customer_ids", "currency_id", "sale_order"]   because only fields  in vals have id
+        # ls_keys = ["reviewer_ids", "customer_ids", "currency_id", "sale_order", "estimator_ids"]   because only fields  in vals have id
         for item in vals:
             if item == "reviewer_ids" and vals[item] != '':
                 vals[item] = self.env['res.users'].search([('id','=',vals[item])]).name
@@ -161,10 +129,10 @@ class Estimation(models.Model):
                 vals[item] = self.env['res.partner'].search([('id','=',vals[item])]).name
             elif item == "currency_id" and vals[item] != '':
                 vals[item] = self.env['res.currency'].search([('id','=',vals[item])]).name
-            # elif item == "sale_order" and vals[item] != '':
-            #     vals[item] = self.env['sale.order'].search([('id','=',vals[item])]).name
-            elif item == "contract_id" and vals[item] != '':
-                vals[item] = self.env['hr.contract'].search([('id','=',vals[item])]).name
+            elif item == "estimator_ids" and vals[item] != '':
+                vals[item] = self.env['res.users'].search([('id','=',vals[item])]).name
+            elif item == "project_type_id" and vals[item] != '':
+                vals[item] = self.env['project.type'].search([('id','=',vals[item])]).name
         return vals
         
     def merge_dict_vals(self, a, b, vals_tab_module) :
@@ -188,9 +156,10 @@ class Estimation(models.Model):
                          'add_lines_resource_effort': 'Total Effort', 
                          'add_lines_module_assumption': 'Assumption', 
                          'add_lines_module_summary': 'Summary', 
-                         'add_lines_module_effort': 'Effort Distribution',
-                         'add_lines_module_breakdown': 'Work Breakdown Structure and Estimate'}
-        key_output = {'add_lines_summary': 'Summary', 'add_lines_resource': 'Resource Planning', 'add_lines_module': 'Module'}
+                         'add_lines_module_effort_distribute_activity': 'Effort Distribution',
+                         'add_lines_module_activity': 'Work Breakdown Structure and Estimate',
+                         'total_manday': 'Total (mandays)'}
+        key_output = {'add_lines_summary': 'Summary', 'add_lines_resource': 'Resource Planning', 'add_lines_module': 'Module', 'total_manday': 'Module'}
         for key in vals_tab_module:
             for tab in mess_tab_list:
                 if key == tab:
@@ -213,25 +182,24 @@ class Estimation(models.Model):
                 check = True
         return check
         
-        
     # delete mess_tab_list fields in vals and transfer to new dict
     def convert_new_dict(self, dic):
         dic_temp = dic.copy()
         temp = {}
-        mess_tab_list = ["add_lines_module_effort", "add_lines_summary_totalcost", "add_lines_summary_costrate",
-                         "add_lines_resource_effort", "add_lines_module_assumption", "add_lines_module_summary", "add_lines_module_breakdown"]
+        mess_tab_list = ["add_lines_module_effort_distribute_activity", "add_lines_summary_totalcost", "add_lines_summary_costrate",
+                         "add_lines_resource_effort", "add_lines_module_assumption", "add_lines_module_summary", "add_lines_module_activity", 
+                         "total_manday"] # add total_manday field as it is not needed to track changes
         for i in mess_tab_list:
             for key in dic_temp:
                 if key == i:
                     temp[i] = dic.pop(key)
         return temp
-            
     
     def get_values(self, est):
         vals_values = []
-        mess_field = ["project_name",  "stage"] #"total_cost",
-        mess_field_obj = ["estimator_ids", "reviewer_ids", "customer_ids", "currency_id", "contract_id"] #, "message_main_attachment_id"
-        mess_field_date = ["sale_date", "deadline"]
+        mess_field = ["project_name",  "stage", "project_code", "description"] # List type String
+        mess_field_obj = ["estimator_ids", "reviewer_ids", "customer_ids", "currency_id", "project_type_id"] # List type Int (id)
+        mess_field_date = ["sale_date", "deadline"] #List type Date
        
         for item in est:
             for i in mess_field:
@@ -254,3 +222,25 @@ class Estimation(models.Model):
         vals_key = mess_field + mess_field_obj + mess_field_date
         value = dict(zip(vals_key, vals_values))
         return value
+    
+    def action_refresh_estimation(self):
+        # refresh total mandays in estimation work
+        ls_activity = self.env['config.activity'].search([('estimation_id', '=', self.id)])
+        # ls_estimation_work = self.env['estimation.work'].search([('id', '=', self.estimation_id.id)])
+        total = 0.0
+        for item in ls_activity:
+            total += item.effort
+        for record in self:
+            record.total_manday = total
+            
+        # refresh Percentage in Effort distribution activity
+        ls_effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', self.id)]) #self.env.context['params']['id']
+        total_effort = 0.0        
+        for record in ls_effort_distribute:
+            total_effort += record.effort
+        for record in ls_effort_distribute:
+            if total_effort != 0.0:
+                record.percent = round((record.effort / total_effort ) * 100, 2 )
+            else:
+                record.percent = total_effort
+        return

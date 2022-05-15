@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_form_job_position" model="ir.ui.view">
+    <!-- <record id="view_form_job_position" model="ir.ui.view">
         <field name="name">Job Position Form</field>
         <field name="model">config.job_position</field>
         <field name="arch" type="xml">
@@ -13,14 +13,14 @@
                 </sheet>
             </form>
         </field>
-    </record>
+    </record> -->
 
     <record id="view_tree_job_position" model="ir.ui.view">
         <field name="name">Job Position List</field>
         <field name="model">config.job_position</field>
         <field name="arch" type="xml">
-            <tree>
-                <field name='sequence' widget='handle' />
+            <tree editable="bottom">
+                <field name='sequence' />
                 <field name="job_position" />
                 <field name="description" />
             </tree>
