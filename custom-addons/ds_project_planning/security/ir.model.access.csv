@@ -9,3 +9,4 @@ ds_project_planning.access_config_planning_member_type,access_config_planning_me
 access_report_project_task_user_officer,report.project.task.user,project.model_report_project_task_user,ds_project_planning.group_project_pm,1,1,1,1
 access_project_depending_tasks,project.depending.tasks,model_project_depending_tasks,,1,1,1,1
 access_sale_order_line_pm,sale.order.line.pm,sale.model_sale_order_line,ds_project_planning.group_project_pm,1,0,0,0
+access_project_task_type_delete_wizard_pm,project.task.type.delete.wizard.pm,project.model_project_task_type_delete_wizard,ds_project_planning.group_project_pm,1,1,1,1
