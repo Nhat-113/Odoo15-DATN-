@@ -69,13 +69,14 @@ class Project(models.Model):
                 calendar_duplicate = list(filter(
                     lambda member: member.employee_id['id'] == new_calendar_resource.employee_id.id and
                     member.start_date <= new_calendar_resource.start_date and
-                    member.end_date >= new_calendar_resource.start_date, self.planning_calendar_resources[:-1]))[0]
+                    member.end_date >= new_calendar_resource.start_date, self.planning_calendar_resources[:-1]))
 
                 if len(calendar_duplicate) > 0:
-                    # if new_calendar_resource.start_date >= calendar_duplicate.start_date and new_calendar_resource.start_date <= calendar_duplicate.end_date:
-                    raise ValidationError(
-                        _('The project has duplicate members assigned in the range (%(start)s) to (%(end)s)!',
-                          start=calendar_duplicate.start_date, end=calendar_duplicate.end_date))
+                    for i in range(len(calendar_duplicate)):
+                        if new_calendar_resource.start_date >= calendar_duplicate[i].start_date and new_calendar_resource.start_date <= calendar_duplicate[i].end_date:
+                            raise ValidationError(
+                                _('The project has duplicate members assigned in the range (%(start)s) to (%(end)s)!',
+                                start=calendar_duplicate[i].start_date, end=calendar_duplicate[i].end_date))
 
         # update member_ids list
         user_ids = [
