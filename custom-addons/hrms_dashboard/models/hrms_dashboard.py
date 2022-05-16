@@ -60,9 +60,13 @@ class Employee(models.Model):
         #meeting  =  select calendar_event.start from calendar_event
         my_date = date.today()
 
-        temp = str(my_date.year) + '-' + str(my_date.month) + '-' + str(my_date.day)
-              
-        total_len = self.env['calendar.event'].search_count([('start', '=', temp)])
+        today = datetime.strftime(datetime.today(), '%Y-%m-%d')
+        query = """
+        select count(id)
+        from calendar_event where DATE(calendar_event.start)  = '%s' and  calendar_event.user_id = '%s' """ % (today, uid)
+        cr = self._cr
+        cr.execute(query)
+        today_meeting = cr.fetchall()
         
         #todayMeeting = len(self.env['calendar.event'].search([]))
         #today_meeting = self.env['calendar.event'].sudo().search_count([])
@@ -72,11 +76,11 @@ class Employee(models.Model):
         query = """
         select count(id)
         from hr_leave
-        WHERE (hr_leave.date_from::DATE,hr_leave.date_to::DATE) OVERLAPS ('%s', '%s') and
-        state='validate'""" % (today, today)
+        where   DATE(hr_leave.create_date) = '%s' and state= 'validate' """ %  today
         cr = self._cr
         cr.execute(query)
         leaves_today = cr.fetchall()
+        
         first_day = date.today().replace(day=1)
         last_day = (date.today() + relativedelta(months=1, day=1)) - timedelta(1)
         query = """
@@ -124,7 +128,7 @@ class Employee(models.Model):
                     'experience': experience,
                     'age': age,
                     'recruitment': recruitment,
-                    'total_len': total_len
+                    'today_meeting': today_meeting
 
                 }
                 employee[0].update(data)

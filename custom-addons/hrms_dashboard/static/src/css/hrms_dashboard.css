@@ -28,9 +28,12 @@
 .buttons button {
     margin: 2px 0;
 }
+
+
 /* .breadcrumb {
     display: none;
 } */
+
 
 /* Button Reset */
 
@@ -45,6 +48,7 @@
     border-radius: 0;
     cursor: pointer;
 }
+
 
 /*    Widget One
 ---------------------------*/
@@ -122,10 +126,11 @@ body .text-color {
 .slice {
     stroke: #fff;
     stroke-width: 0px;
-
 }
 
+
 /* Leave graph */
+
 
 /* path {  stroke: #fff; } */
 
@@ -136,6 +141,7 @@ path:hover {
 .axis {
     font: 10px sans-serif;
 }
+
 
 /* .legend tr {
     border-bottom: 1px solid grey;
@@ -150,12 +156,11 @@ path:hover {
     fill: none;
     stroke: #000;
     shape-rendering: crispEdges;
-  }
-  
+}
 
 .x.axis path {
     display: none;
-    margin-left: 120px ;
+    margin-left: 120px;
 }
 
 .monthly_leave_graph_view .legend {
@@ -178,6 +183,7 @@ path:hover {
     width: 50px;
 }
 
+
 /* Leave broadfactor graph */
 
 .broad_factor_graph .axis path,
@@ -185,7 +191,6 @@ path:hover {
     fill: none;
     stroke: black;
     shape-rendering: crispEdges;
-
 }
 
 .broad_factor_graph .axis text {
@@ -221,6 +226,7 @@ path:hover {
     height: auto;
 }
 
+
 /*=====================New Dashboard===========================*/
 
 .oh_dashboards {
@@ -246,7 +252,6 @@ path:hover {
 }
 
 
-
 /*.dummy{
     height:130vh;
 }*/
@@ -254,9 +259,11 @@ path:hover {
 .oh-card {
     padding-top: 0px;
 }
+
 .oh-card_oh-card {
     border-radius: 25px;
 }
+
 .employee-prof .employee-icon {
     float: left;
     padding-right: 0px;
@@ -420,15 +427,15 @@ path:hover {
 }
 
 .oh-timesheets .stat-icon {
-    background: #6869AC ;
+    background: #6869AC;
 }
 
 .oh-contracts .stat-icon {
-    background: #b298e1 ;
+    background: #b298e1;
 }
 
 .oh-broad-factor .stat-icon {
-    background: #6869AC ;
+    background: #6869AC;
 }
 
 .oh-timesheets .stat-widget-one .stat-text {
@@ -487,16 +494,17 @@ h4 .stat-count {
     font-size: 15px;
     margin-left: 24px;
     width: 100%;
-    color:#6869AC ;
+    color: #6869AC;
     font-weight: bold;
     margin-top: 1%;
 }
+
 .start-head {
     text-align: left !important;
     font-size: 15px;
     margin: 1% 0 1% 3%;
     width: 100%;
-    color:#6869AC ;
+    color: #6869AC;
     font-weight: bold;
 }
 
@@ -508,9 +516,11 @@ h4 .stat-count {
     align-content: center;
     justify-content: space-around;
 }
-.emp_graph .legend >tbody>tr {
+
+.emp_graph .legend>tbody>tr {
     width: 50%;
 }
+
 .leave-manager {
     background-color: #fff;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -525,36 +535,42 @@ h4 .stat-count {
 }
 
 .hr_attendance_login .oh-card {
-    margin: 0;
-    margin-bottom: 0px;
-    margin-bottom: 0px;
-    background: #134c8a;
-    padding-bottom: 7px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    will-change: transform, box-shadow;
-    box-shadow: 0 10px 40px 0 rgba(62, 57, 107, 0.07), 0 2px 9px 0 rgba(62, 57, 107, 0.06);
+    border-radius: 7px;
+    width: 90%;
+    margin: 0 auto;
+    background: green;
+    height: 100%;
 }
 
 .hr_attendance_login .stat-widget-one {
     background: none;
+    display: flex;
+    flex-direction: row;
+    align-content: center
 }
 
 .hr_attendance_login .stat-widget-one .stat-icon {
     text-align: center;
-    padding-top: 9px;
+    display: flex;
+    font-weight: 100;
+    justify-content: flex-end;
 }
 
 .hr_attendance_login .stat-content {
     width: 100%;
+    display: flex;
     color: #fff !important;
+    flex-direction: column;
+    justify-content: center;
+    align-content: flex-start;
+    flex-wrap: nowrap;
 }
 
 .hr_attendance_login .stat-widget-one .stat-text {
-    margin: 0;
-    text-align: center;
     width: 100% !important;
     padding: 0;
     color: #fff;
+    margin: 0 11px;
 }
 
 .hr_attendance_login .stat-widget-one .stat-icon .fa {
@@ -568,7 +584,9 @@ h4 .stat-count {
 }
 
 .hr_attendance_login {
-    margin-top: 1.5%;
+    margin-top: 5%;
+    height: 5.5%;
+    z-index: 1000;
 }
 
 .monthly_leave_graph_view .oh-card {
@@ -665,7 +683,7 @@ h4 .stat-count {
     margin-bottom: 9px;
 }
 
-.monthly_leave_trend .oh-card{
+.monthly_leave_trend .oh-card {
     background: #fff;
     transition: none !important;
     will-change: none !important;
@@ -686,25 +704,30 @@ h4 .stat-count {
     stroke-width: 1;
     shape-rendering: crispEdges;
 }
-.monthly_leave_trend circle{
+
+.monthly_leave_trend circle {
     fill: #6869AC;
     stroke: #6869AC;
     stroke-width: 1.5;
 }
+
 .hr-chart-1 {
     margin: 15px 0px;
     background: #fff;
     padding: 0px !important;
-        padding-top: 0px;
+    padding-top: 0px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     will-change: transform, box-shadow;
-    box-shadow: 0 10px 40px 0 rgba(62,57,107,0.07), 0 2px 9px 0 rgba(62,57,107,0.06);
+    box-shadow: 0 10px 40px 0 rgba(62, 57, 107, 0.07), 0 2px 9px 0 rgba(62, 57, 107, 0.06);
     padding-top: 3px !important;
 }
+
 .monthly_leave_trend {
     background: #fff;
     border-radius: 24px;
 }
+
+
 /* .monthly_leave_trend:hover{
     transform: translateY(-2px) translateZ(0) !important;
     box-shadow: 0 10px 10px 0 rgba(62, 57, 107, 0.12), 0 0 0 transparent !important;
@@ -720,13 +743,17 @@ h4 .stat-count {
     box-shadow: 0 10px 40px 0 rgba(62, 57, 107, 0.07), 0 2px 9px 0 rgba(62, 57, 107, 0.06);
     padding-top: 3px !important;
 }
+
+
 /* .monthly_leave_trend:hover {
     transform: translateY(-2px) translateZ(0) !important;
     box-shadow: 0 10px 10px 0 rgba(62, 57, 107, 0.12), 0 0 0 transparent !important;
 } */
 
+
 /*----------------------*/
-.monthly_join_resign_trend{
+
+.monthly_join_resign_trend {
     margin-bottom: 1%;
     padding-right: 0px !important;
 }
@@ -737,25 +764,26 @@ h4 .stat-count {
 
 .monthly_join_resign_trend .axis path,
 .monthly_join_resign_trend .axis line {
-      fill: none;
-      shape-rendering: crispEdges;
-    }
+    fill: none;
+    shape-rendering: crispEdges;
+}
 
 .monthly_join_resign_trend .line {
-      fill: none;
-      stroke-width: 3px;
-    }
+    fill: none;
+    stroke-width: 3px;
+}
 
 .monthly_join_resign_trend .area {
-      fill: steelblue;
-      opacity: 0.5;
-    }
+    fill: steelblue;
+    opacity: 0.5;
+}
 
 .monthly_join_resign_trend .dot {
-      fill: steelblue;
-      stroke: steelblue;
-      stroke-width: 1.5px;
-    }
+    fill: steelblue;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
 
 /*----------------------------------------*/
 
@@ -772,7 +800,8 @@ h4 .stat-count {
     stroke-width: 1;
     shape-rendering: crispEdges;
 }
-.monthly_attrition_rate circle{
+
+.monthly_attrition_rate circle {
     fill: #ffffff;
     stroke: #44b7ac;
     stroke-width: 1.5;
@@ -782,11 +811,11 @@ h4 .stat-count {
     background: #fff;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     will-change: transform, box-shadow;
-    box-shadow: 0 10px 40px 0 rgba(62,57,107,0.07), 0 2px 9px 0 rgba(62,57,107,0.06);
+    box-shadow: 0 10px 40px 0 rgba(62, 57, 107, 0.07), 0 2px 9px 0 rgba(62, 57, 107, 0.06);
     padding: 15px;
 }
 
-.monthly_attrition_rate .oh-card:hover{
+.monthly_attrition_rate .oh-card:hover {
     transform: translateY(-2px) translateZ(0) !important;
     box-shadow: 0 10px 10px 0 rgba(62, 57, 107, 0.12), 0 0 0 transparent !important;
 }
@@ -795,11 +824,13 @@ h4 .stat-count {
     margin-right: 0px !important;
 }
 
+
 /* width */
 
 .hr_notification::-webkit-scrollbar {
     width: 4px;
 }
+
 
 /* Track */
 
@@ -807,11 +838,13 @@ h4 .stat-count {
     background: #f1f1f1;
 }
 
+
 /* Handle */
 
 .hr_notification::-webkit-scrollbar-thumb {
     background: #5ebade;
 }
+
 
 /* Handle on hover */
 
@@ -821,8 +854,10 @@ h4 .stat-count {
 
 .oh-card-body {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    flex-direction: row;
+    height: 100%;
+    flex-wrap: nowrap;
 }
 
 .oh-ribbon {
@@ -883,6 +918,7 @@ h4 .stat-count {
     margin-left: 17px;
 }
 
+
 /* new code */
 
 .employee_infomation {
@@ -907,7 +943,7 @@ h4 .stat-count {
 .employee-right {
     overflow: hidden;
     height: 98%;
-    padding-left : 1% ;
+    padding-left: 1%;
     padding-right: 0.5%;
 }
 
@@ -922,18 +958,21 @@ h4 .stat-count {
     border-radius: 24px;
     color: #00438b;
 }
-.detail_welcome{
+
+.detail_welcome {
     height: 100%;
     text-align: center;
     margin: 0 auto;
     align-items: center;
     display: flex;
 }
+
 .detail_welcome img {
     align-items: center;
     height: 30%;
     margin-right: 14px;
 }
+
 .text_welcome {
     margin: 0 auto;
     text-align: center;
@@ -1008,7 +1047,6 @@ h4 .stat-count {
     border-radius: 8px;
 }
 
-
 .list_menu button h5 {
     color: #BDBDBD;
     padding: 0;
@@ -1018,22 +1056,27 @@ h4 .stat-count {
     padding-left: 8%;
     font-weight: 700;
 }
-button:hover, button:focus{
+
+button:hover,
+button:focus {
     outline: none;
 }
-.list_menu .active{
+
+.list_menu .active {
     background-color: #F0F0FF !important;
     border: none;
-    border:#6869AC ;
+    border: #6869AC;
 }
-.list_menu .active > h5{
-    color: #6869AC;
-}
-.list_menu .active >h5> i{
+
+.list_menu .active>h5 {
     color: #6869AC;
 }
 
-.list_menu button > h5 > i {
+.list_menu .active>h5>i {
+    color: #6869AC;
+}
+
+.list_menu button>h5>i {
     color: #BDBDBD;
     font-weight: 700;
     margin: 0 auto;
@@ -1043,9 +1086,11 @@ button:hover, button:focus{
 .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
     padding-left: 2%;
 }
+
 .leave_trend_border {
-    border-radius:24px
+    border-radius: 24px
 }
+
 
 /* .announcements {
     height: 100%;
@@ -1067,9 +1112,11 @@ button:hover, button:focus{
 .list_menu .btn_annalys .text_btn_annalys {
     padding-left: 3%;
 }
-.list_menu{
+
+.list_menu {
     height: 24%;
 }
+
 .list_future {
     text-align: center;
     height: 20%;
@@ -1089,19 +1136,31 @@ button:hover, button:focus{
     margin-bottom: 0 !important;
     float: left;
     font-size: 1.4rem;
-    padding-left: 7%;
+    padding-left: 19px;
 }
 
-.fearure_detail {
-    margin-left: 11%;
-}
 
 .btn_leave_request {
     display: flex;
     justify-content: flex-start;
     align-items: center;
 }
+.fearure_detail {
+    color: #6869AC;
+    margin: 0;
+    margin: 0;
+    margin-left: 0px;
+    float: left;
+    padding-left: 27px;
 
+}
+.hr_leave_request_approve  > h3 {
+    margin-left: 6px;
+}
+
+.hr_contract > h3 {
+    margin-left: -4px;
+}
 .btn_leave_request h4 {
     display: inline;
     color: #6869AC;
@@ -1131,7 +1190,7 @@ button:hover, button:focus{
 
 .time {
     background: #ffffff;
-    height: 7%;
+    height: 5.5%;
     margin: 0 auto;
     width: 90%;
     display: flex;
@@ -1143,16 +1202,20 @@ button:hover, button:focus{
     margin-top: 8%;
     background: #F0F0FF;
 }
+
 .o_clock {
     text-align: center;
     font-size: 20px;
     font-weight: bold;
     color: #6869AC;
 }
+
+
 /* .o_clock span {
     display: inline-block;
     font-size: ;
 } */
+
 
 /* Phần button */
 
@@ -1167,6 +1230,7 @@ button:hover, button:focus{
 .button_request .Payslip {
     flex: 35%;
 }
+
 
 /* 
 .button_request .expried {
@@ -1185,6 +1249,7 @@ button:hover, button:focus{
     padding: 16px;
     margin: 5px;
 }
+
 
 /* phần dashboard details */
 
@@ -1211,7 +1276,8 @@ button:hover, button:focus{
     margin-top: 1%;
     height: 81.5%;
 }
-.employee_dashboard_detail_user{
+
+.employee_dashboard_detail_user {
     display: flex;
     margin-top: 1%;
     height: 40%;
@@ -1269,6 +1335,7 @@ button:hover, button:focus{
     height: 100%;
 }
 
+
 /* department */
 
 .legend {
@@ -1277,7 +1344,8 @@ button:hover, button:focus{
     flex: 100%;
     margin: 1% auto;
 }
-.emp_graph .legend > tbody {
+
+.emp_graph .legend>tbody {
     display: flex;
     align-content: space-around;
     flex-wrap: wrap;
@@ -1287,12 +1355,14 @@ button:hover, button:focus{
     width: 55%;
     margin: 0 auto;
 }
+
 .emp_graph svg {
     flex: 100%;
     display: block;
     margin: 0 auto;
     border-radius: 50%;
 }
+
 
 /* leave request */
 
@@ -1318,14 +1388,17 @@ button:hover, button:focus{
     height: 20%;
     padding-right: 0;
 }
-.request_detail{
+
+.request_detail {
     height: 40%;
     margin-bottom: 12%;
 }
-.request_detail_job{
+
+.request_detail_job {
     height: 30%;
     margin-bottom: 6%;
 }
+
 .job-request button {
     display: inline-block;
     flex: 20%;
@@ -1365,7 +1438,7 @@ button:hover, button:focus{
     color: #343A40;
 }
 
-.request_detail_job > div {
+.request_detail_job>div {
     /* height: 20%; */
     display: flex;
     flex-direction: row;
@@ -1387,6 +1460,7 @@ button:hover, button:focus{
     margin: 3.5% auto;
     height: 29%;
 }
+
 .all-request button {
     display: inline-block;
     flex: 20%;
@@ -1424,6 +1498,7 @@ button:hover, button:focus{
     align-items: center;
     color: #343A40;
 }
+
 
 /* phần newployee */
 
@@ -1465,6 +1540,7 @@ button:hover, button:focus{
     margin: 0px 16px;
     height: 100%;
 }
+
 .list-employee .leave_graph {
     margin-top: 2%;
     display: flex;
@@ -1473,10 +1549,12 @@ button:hover, button:focus{
     align-items: flex-end;
     justify-content: center;
 }
+
 .list-employee .leave_graph .legend {
     margin-top: 8%;
 }
-.leave_graph .legend > tbody {
+
+.leave_graph .legend>tbody {
     width: 75%;
     display: flex;
     flex-direction: row-reverse;
@@ -1485,13 +1563,17 @@ button:hover, button:focus{
     align-content: flex-start;
     flex-wrap: wrap;
     margin: 0 auto;
+    margin-left: 18%;
 }
-.leave_graph .legend > tbody >tr {
+
+.leave_graph .legend>tbody>tr {
     width: 50%;
 }
-.legend >tbody>tr>td>svg {
+
+.legend>tbody>tr>td>svg {
     border-radius: 50%;
 }
+
 .leave_graph>svg:first-child {
     display: none;
 }
@@ -1516,10 +1598,12 @@ button:hover, button:focus{
     line-height: 22px;
     height: 6%;
 }
-.show_employee_new{
+
+.show_employee_new {
     height: 90%;
     width: 100%;
 }
+
 .employee-new {
     display: flex;
     flex-direction: row;
@@ -1559,11 +1643,8 @@ button:hover, button:focus{
     font-size: 13px;
     line-height: 16px;
     /* identical to box height, or 120% */
-
     letter-spacing: 0.015em;
-
     /* Fade */
-
     color: #343A40;
 }
 
@@ -1573,6 +1654,7 @@ button:hover, button:focus{
     line-height: 18px;
     color: #343A40;
 }
+
 
 /* Announcements */
 
@@ -1596,6 +1678,7 @@ button:hover, button:focus{
     background: #FFFFFF;
     border-radius: 24px;
 }
+
 .announcements_detail_user {
     flex: none;
     margin-right: 1.5rem;
@@ -1603,6 +1686,7 @@ button:hover, button:focus{
     background: #FFFFFF;
     border-radius: 24px;
 }
+
 .Event_user {
     flex: none;
     margin-right: 1.5rem;
@@ -1610,12 +1694,14 @@ button:hover, button:focus{
     background: #FFFFFF;
     border-radius: 24px;
 }
+
 .list_event_user {
     width: 90%;
     margin: 0 auto;
     border-radius: 26px;
-    height:80%;
+    height: 80%;
 }
+
 .list_event_user .event-detail {
     display: flex;
     flex-direction: row;
@@ -1631,6 +1717,7 @@ button:hover, button:focus{
     height: 18%;
     margin-top: 3.5%;
 }
+
 .announcements_detail h3 {
     text-align: center;
     display: flex;
@@ -1652,6 +1739,7 @@ button:hover, button:focus{
     flex-grow: 0;
     margin: 3.2% 0% 2.3% 0%;
 }
+
 .announcements_detail_user h3 {
     display: flex;
     justify-content: center;
@@ -1667,6 +1755,7 @@ button:hover, button:focus{
     margin-top: 4% !important;
     margin-bottom: 3%;
 }
+
 .Event_user h3 {
     display: flex;
     justify-content: center;
@@ -1682,6 +1771,7 @@ button:hover, button:focus{
     margin-top: 4% !important;
     margin-bottom: 3%;
 }
+
 .text_detail {
     display: flex;
     background-color: #FAFAFA;
@@ -1698,14 +1788,14 @@ button:hover, button:focus{
 .text_news {
     color: #000;
     margin-bottom: 0;
-    
 }
+
 .text_detail .new_code {
     padding-right: 4%;
     margin-bottom: 0;
 }
 
-.text_detail_user{
+.text_detail_user {
     display: flex;
     background-color: #FAFAFA;
     height: 16%;
@@ -1721,8 +1811,8 @@ button:hover, button:focus{
 .text_news_user {
     color: #000;
     margin-bottom: 0;
-    
 }
+
 .text_detail_user .new_code_user {
     padding-right: 4%;
     margin-bottom: 0;
@@ -1769,9 +1859,12 @@ button:hover, button:focus{
     border-radius: 24px;
     height: 100%;
 }
+
 .Birthday .list {
     height: 100%;
 }
+
+
 /* .Birthday_user {
     flex: 50%;
     display: flex;
@@ -1790,20 +1883,25 @@ button:hover, button:focus{
     /* height: 2.5%; */
     margin-bottom: 3.4%;
 }
+
 .Event_user h3 {
     text-align: center;
     color: #4D4E8B;
     margin-top: 35px;
 }
-.btn_dashboard_detail_user{
+
+.btn_dashboard_detail_user {
     background: #F0F0FF !important;
 }
-.btn_dashboard_detail_user >h5 {
+
+.btn_dashboard_detail_user>h5 {
     color: #4D4E8B !important;
 }
-.btn_dashboard_detail_user >h5>i {
+
+.btn_dashboard_detail_user>h5>i {
     color: #4D4E8B !important;
 }
+
 .birthday-detail {
     display: flex;
     align-items: center;
@@ -1816,14 +1914,17 @@ button:hover, button:focus{
     position: relative;
     height: 7%;
 }
+
 .birthday-detail p {
     font-weight: bold;
 }
+
 .list-birthday {
     margin-top: 1%;
     height: 88%;
-    overflow-y: scroll ;
+    overflow-y: scroll;
 }
+
 .name {
     display: inline;
     font-weight: 400;
@@ -1832,6 +1933,7 @@ button:hover, button:focus{
     margin: 0;
     color: black;
 }
+
 .days {
     display: inline;
     font-weight: 400;
@@ -1881,8 +1983,9 @@ button:hover, button:focus{
     margin-top: 8%;
     height: 80%;
 }
+
 .annalys {
-    margin-top :1.25% ;
+    margin-top: 1.25%;
 }
 
 .event-detail {
@@ -1910,6 +2013,7 @@ button:hover, button:focus{
     font-weight: bold;
 }
 
+
 /* phần dashboard */
 
 .dashboard-top {
@@ -1920,6 +2024,7 @@ button:hover, button:focus{
     flex: 19%
 }
 
+
 /* phan quyen */
 
 .image-user {
@@ -1929,6 +2034,7 @@ button:hover, button:focus{
     margin: 0 auto;
     border-radius: 3%;
 }
+
 
 /* Responsive layout -  */
 
@@ -1971,7 +2077,7 @@ button:hover, button:focus{
     .legend {
         margin-top: 25px;
     }
-    .employee_dashboard_detail .Leave-Request{
+    .employee_dashboard_detail .Leave-Request {
         margin-top: 0px;
     }
     .welcome_employee {
@@ -1990,7 +2096,7 @@ button:hover, button:focus{
         height: 250px !important;
         display: flex !important;
     }
-    .join_resign_trend > svg {
+    .join_resign_trend>svg {
         height: 245px !important;
     }
     .join_resign_trend .legend {
@@ -2020,9 +2126,8 @@ button:hover, button:focus{
     .o_clock {
         font-size: 1rem;
     }
-
-    
 }
+
 @media only screen and (min-width: 1800px) {
     .emp_graph .legend {
         margin-top: 10%;
@@ -2030,11 +2135,14 @@ button:hover, button:focus{
     .join_resign_trend {
         display: flex;
     }
-    .join_resign_trend >svg {
+    .join_resign_trend>svg {
         flex: 150%
     }
 }
+
+
 /* not employee */
+
 .dashboard-not-employee {
     max-width: 24%;
     width: 100%;
@@ -2049,7 +2157,7 @@ button:hover, button:focus{
     background-color: #fff;
     margin-top: 20%;
 }
+
 .dashboard-not-employee_content {
     margin: 0;
 }
-

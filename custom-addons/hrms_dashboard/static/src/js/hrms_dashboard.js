@@ -492,14 +492,14 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
         //leave request today
         leaves_request_today: function(e) {
             var self = this;
-            var date = new Date();
             e.stopPropagation();
             e.preventDefault();
             var options = {
                 on_reverse_breadcrumb: this.on_reverse_breadcrumb,
             };
+            var date = new Date();
             this.do_action({
-                    name: _t("Leaves Today"),
+                    name: _t("Leave Request Today"),
                     type: "ir.actions.act_window",
                     res_model: "hr.leave",
                     view_mode: "tree,form,calendar",
@@ -508,11 +508,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         [false, "form"],
                     ],
                     domain: [
-                        // string.substring(start, end)
-
                         ["create_date", "=", date],
-                        // ["date_to", ">=", date],
-                        ["state", "=", "confirm"],
+                        ["state", "=", "validate"],
+                        
                     ],
                     target: "current",
                 },
@@ -712,7 +710,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             // hrs = checkTime(m);
             // min = checkTime(s);
             // sec = checkTime(m);
-            
+
             if (min < 10) {
                 min = "0" + min
             }

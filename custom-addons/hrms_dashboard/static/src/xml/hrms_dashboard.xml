@@ -44,23 +44,23 @@
                 <div class= "list_future">
                     <button class="btn_leave_request  hr_leave_request_approve">
                         <h4><i class="fa fa-plus"></i></h4>
-                        <h4  class="fearure_detail">    
+                        <h3  class="fearure_detail">    
                             Leave Request <t t-esc="widget.login_employee.leaves_to_approve"/>
-                        </h4>
+                        </h3>
                     </button>
                     <button class="btn_payslip hr_payslip">
                         <h4>  
                             <i class="fa fa-money"/>
                         </h4>
-                        <h4  class="fearure_detail" >
+                        <h3  class="fearure_detail" >
                              Payslip <t t-esc="widget.login_employee['payslip_count']"/>
-                        </h4>
+                        </h3>
                     </button>
                     <button class="btn_expried hr_contract">
                         <h4><i class="fa fa-fw fa-book"></i></h4>
-                        <h4  class="fearure_detail">
+                        <h3  class="fearure_detail">
                             Contract <t t-esc="widget.login_employee['contracts_count']"/>
-                        </h4>
+                        </h3>
                     </button>
                 </div>
                 <div class="time">
@@ -73,6 +73,31 @@
                         <span id="session">AM</span>
                     </div>
                 </div>
+
+                <div class="hr_attendance_login">
+                    <div class="oh-card">
+                        <div class="oh-card-body">
+                            <div class="stat-widget-one">
+                                <t t-if="widget.login_employee['attendance_state'] =='checked_out'">
+                                    <div class="stat-icon hr_attendance_btn">
+                                        <i class="fa fa-sign-in o_hr_attendance_sign_in_out_icon"/>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-text">Check In</div>
+                                    </div>
+                                </t>
+                                <t t-if="widget.login_employee['attendance_state'] =='checked_in'">
+                                    <div class="stat-icon hr_attendance_btn">
+                                        <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon"/>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-text">Check out</div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
             </div>
             <div class="col-md-10 col-sm-12 employee-right"> 
                 <div class="employee_dashboard_detail tabcontent" style="" id="employee_dashboard_detail"  >
@@ -200,7 +225,7 @@
                             <div class="job-request dashboard_today_meeting" >
                                 <p>Today Meeting</p>
                                 <button>
-                                <p class="stat-count"><t t-esc="widget.login_employee.total_len"/></p>
+                                <p class="stat-count"><t t-esc="widget.login_employee.today_meeting"/></p>
                                 </button>
                             </div>
                         </div>
@@ -327,7 +352,7 @@
                 <div class= "list_future" style="margin-bottom:50% !important">
                     <button class="btn_leave_request  hr_leave_request_approve">
                         <h4><i class="fa fa-plus"></i></h4>
-                        <h4 class="fearure_detail">Leave Request</h4>
+                        <h3 class="fearure_detail">Leave Request</h3>
                     </button>
                     <button class="btn_payslip hr_payslip">
                         <h4>  
@@ -352,6 +377,31 @@
                         <span id="minutes">00</span>
                         <span>:</span>
                         <span id="seconds">00</span>
+                    </div>
+                </div>
+
+                <div class="hr_attendance_login">
+                    <div class="oh-card">
+                        <div class="oh-card-body">
+                            <div class="stat-widget-one">
+                                <t t-if="widget.login_employee['attendance_state'] =='checked_out'">
+                                    <div class="stat-icon hr_attendance_btn">
+                                        <i class="fa fa-sign-in o_hr_attendance_sign_in_out_icon"/>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-text">Check In</div>
+                                    </div>
+                                </t>
+                                <t t-if="widget.login_employee['attendance_state'] =='checked_in'">
+                                    <div class="stat-icon hr_attendance_btn">
+                                        <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon"/>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-text">Check out</div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
