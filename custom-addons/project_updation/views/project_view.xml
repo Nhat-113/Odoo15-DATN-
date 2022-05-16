@@ -21,6 +21,15 @@
                 <xpath expr="//field[@name='recurring_task']" position="after">
                     <field name="task_score" widget="priority" eval="5"/>
                 </xpath>
+                <xpath expr="//group/group[2]/field[@name='date_deadline']" position="replace">
+                    <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}" string="Actual End Date"/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='sub_tasks_page']/field/tree/field[@name='date_deadline']" position="replace">
+                    <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}" optional="show" string="Actual End Date"/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='task_dependencies']/field/tree/field[@name='date_deadline']" position="replace">
+                    <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}" optional="show" string="Actual End Date"/>
+                </xpath>
             </field>
         </record>
 
