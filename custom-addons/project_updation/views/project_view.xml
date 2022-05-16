@@ -131,6 +131,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='user_ids']" position="after">
                     <field name="issues_type" widget="selection"/>
+                    <field name="status_id_domain" invisible="1"/>
+                    <field name="status" domain="status_id_domain" attrs="{'invisible': [('issues_type', '=', False)], 'required': [('issues_type', '!=', False)]}" string="Status"/>
                 </xpath>
             </field>
         </record>
