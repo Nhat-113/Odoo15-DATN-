@@ -32,6 +32,7 @@ class HrEmployee(models.Model):
         action = {
             "name": name_view,
             "type": "ir.actions.act_window",
+            'search_view_id': [self.env.ref('hr_employee_task_score.view_task_score_search').id, 'search'],
             "res_model": "project.task",
             "views": [[self.env.ref('hr_employee_task_score.project_task_score_view_tree').id, "tree"]],
             "domain": [('user_ids', 'in', user_id)]
