@@ -64,13 +64,13 @@ class Task(models.Model):
         ('high', 'High'),
         ('medium', 'Medium'),
         ('low', 'Low'),
-    ], string='Priority Type', index=True, copy=False, default='low')
+    ], string='Priority Type', index=True, copy=False, default='low', tracking=True)
 
     complex = fields.Selection([
         ('high', 'High'),
         ('medium', 'Medium'),
         ('low', 'Low'),
-    ], string='Complex', index=True, copy=False, default='low')
+    ], string='Complex', index=True, copy=False, default='low', tracking=True)
 
     task_score = fields.Selection([
         ('0', 'Nothing'),
@@ -80,14 +80,14 @@ class Task(models.Model):
         ('4', 'Good'),
         ('5', 'Very Good'),
     ], default='0', index=True, string="Task Score", tracking=True)
-    status = fields.Many2one('project.task.status', string="Status Task")
+    status = fields.Many2one('project.task.status', string="Status Task", tracking=True)
     status_id_domain = fields.Char(
         compute='_get_status_id_domain',
         readonly=True,
         store=False
     )
     is_readonly = fields.Boolean(compute='_check_user_readonly')
-    progress_input = fields.Integer(string='Progress (%)')
+    progress_input = fields.Integer(string='Progress (%)', tracking=True)
     status_color = fields.Char(compute='_get_status_color', store=True)
 
     @api.depends('status')
