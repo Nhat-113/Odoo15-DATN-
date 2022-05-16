@@ -455,8 +455,10 @@
 
 
         <menuitem name="Issues" id="menu_issues" parent="project.menu_main_pm" action="issues_action" sequence="3" groups="base.group_no_one,project.group_project_user"/>
-        <menuitem id="issues_type_menu" name="Type" parent="project.menu_project_config" action="issues_type_action" sequence="11"/>
-        <menuitem id="task_status_menu" name="Status" parent="project.menu_project_config" action="task_status_action" sequence="12"/>
+        <menuitem id="issues_type_menu" name="Type" parent="project.menu_project_config" action="issues_type_action" sequence="11" groups="project.group_project_manager"/>
+        <menuitem id="task_status_menu" name="Status" parent="project.menu_project_config" action="task_status_action" sequence="12" groups="project.group_project_manager"/>
+        <menuitem action="project.project_tags_action" id="project.menu_project_tags_act" parent="project.menu_project_config" groups="project.group_project_manager"/>
+        <menuitem id="project.project_menu_config_activity_type" action="project.mail_activity_type_action_config_project_types" parent="project.menu_project_config" groups="project.group_project_manager"/>
 
     </data>
 </odoo>
