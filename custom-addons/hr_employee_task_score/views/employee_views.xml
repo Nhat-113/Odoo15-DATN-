@@ -21,7 +21,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='work_email']" position="after">
                     <field name="task_score" invisible="1"/>
-                        <a name="project_task_score_action" type="object" >
+                        <a name="project_task_score_action" type="object" groups="ds_project_planning.group_project_pm">
                             <li>Task Score: <t t-esc="record.task_score.value"/> Star</li>
                         </a>
                 </xpath>
