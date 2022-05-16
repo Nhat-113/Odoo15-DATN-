@@ -95,7 +95,7 @@ class Project(models.Model):
 
     def open_planning_task_all(self):
         for project in self:
-            if self.env['project.task'].search_count([('project_id','=',project.id)]) == 0:
+            if self.env['project.task'].search_count(['&',('project_id','=',project.id),('issues_type','=',1)]) == 0:
                 raise UserError(
                      _("No tasks found. Let's create one!"))
             else:
