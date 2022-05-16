@@ -17,9 +17,12 @@
         "views/cost_rate_view.xml",
         "views/activity_view.xml",
         "views/description_view.xml",
+        "views/project_type_view.xml",
         "security/estimation_security.xml",
         "security/ir.model.access.csv",
         "data/activity_data.xml",
+        "data/project_type_data.xml",
+        "data/job_position_data.xml",
     ],
     'assets': {
         'web.assets_backend': [

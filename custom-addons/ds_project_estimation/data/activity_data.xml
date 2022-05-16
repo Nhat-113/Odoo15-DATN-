@@ -1,178 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="act_prep" model="config.activity">
-        <field name="sequence" eval="1" />
-        <field name="activity">Preparation</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_req" model="config.activity">
-        <field name="sequence" eval="2" />
-        <field name="activity">Requirement</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_des" model="config.activity">
-        <field name="sequence" eval="3" />
-        <field name="activity">Design</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_implement" model="config.activity">
-        <field name="sequence" eval="4" />
-        <field name="activity">Implementation</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_review" model="config.activity">
-        <field name="sequence" eval="5" />
-        <field name="activity">Review</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_test" model="config.activity">
-        <field name="sequence" eval="6" />
-        <field name="activity">Test</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_trans" model="config.activity">
-        <field name="sequence" eval="7" />
-        <field name="activity">Translation</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_build" model="config.activity">
-        <field name="sequence" eval="8" />
-        <field name="activity">Build and Release</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_risk" model="config.activity">
-        <field name="sequence" eval="9" />
-        <field name="activity">Risk Management</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_accept" model="config.activity">
-        <field name="sequence" eval="10" />
-        <field name="activity">Acceptance test support</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_warranty" model="config.activity">
-        <field name="sequence" eval="11" />
-        <field name="activity">Warranty</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_pm" model="config.activity">
-        <field name="sequence" eval="12" />
-        <field name="activity">Project Management</field>
-        <field name="effort">0</field>
-        <field name="percent">0</field>
-    </record>
-
-    <record id="act_structure_base" model="config.activity.structure">
-        <field name="name">Base for new structures</field>
-        <field eval="[(6, 0, [ref('act_prep'), ref('act_req'), ref('act_des'), 
-                ref('act_implement'), ref('act_review'), ref('act_test'), ref('act_trans'), 
-                ref('act_build'), ref('act_risk'), ref('act_accept'), ref('act_warranty'),
-                ref('act_pm')])]" name="rule_ids" />
-    </record>
-
-    <!-- ******************************************************************************** -->
-
     <record id="act_prep_default" model="data.activity">
         <field name="sequence" eval="1" />
         <field name="activity">Preparation</field>
         <field name="description">Preparation</field>
+        <field name="activity_type">type_2</field>
     </record>
 
     <record id="act_req_default" model="data.activity">
         <field name="sequence" eval="2" />
         <field name="activity">Requirement</field>
         <field name="description">Requirement</field>
+        <field name="activity_type">type_2</field>
     </record>
 
     <record id="act_des_default" model="data.activity">
         <field name="sequence" eval="3" />
         <field name="activity">Design</field>
         <field name="description">Design</field>
+        <field name="activity_type">type_2</field>
     </record>
 
     <record id="act_implement_default" model="data.activity">
         <field name="sequence" eval="4" />
         <field name="activity">Implementation</field>
         <field name="description">Implementation</field>
+        <field name="activity_type">type_2</field>
     </record>
 
     <record id="act_review_default" model="data.activity">
         <field name="sequence" eval="5" />
         <field name="activity">Review</field>
         <field name="description">Review</field>
+        <field name="activity_type">type_2</field>
     </record>
 
     <record id="act_test_default" model="data.activity">
         <field name="sequence" eval="6" />
         <field name="activity">Test</field>
         <field name="description">Test</field>
+        <field name="activity_type">type_2</field>
     </record>
 
     <record id="act_trans_default" model="data.activity">
         <field name="sequence" eval="7" />
         <field name="activity">Translation</field>
         <field name="description">Translation</field>
+        <field name="activity_type">type_2</field>
     </record>
 
     <record id="act_build_default" model="data.activity">
         <field name="sequence" eval="8" />
         <field name="activity">Build and Release</field>
         <field name="description">Build and Release</field>
+        <field name="activity_type">type_2</field>
     </record>
 
     <record id="act_risk_default" model="data.activity">
         <field name="sequence" eval="9" />
         <field name="activity">Risk Management</field>
         <field name="description">Risk Management</field>
+        <field name="activity_type">type_1</field>
     </record>
 
     <record id="act_accept_default" model="data.activity">
         <field name="sequence" eval="10" />
         <field name="activity">Acceptance test support</field>
         <field name="description">Acceptance test support</field>
+        <field name="activity_type">type_3</field>
     </record>
 
     <record id="act_warranty_default" model="data.activity">
         <field name="sequence" eval="11" />
         <field name="activity">Warranty</field>
         <field name="description">Warranty</field>
+        <field name="activity_type">type_2</field>
     </record>
 
     <record id="act_pm_default" model="data.activity">
         <field name="sequence" eval="12" />
         <field name="activity">Project Management</field>
         <field name="description">Project Management</field>
-    </record>
-
-    <record id="act_structure_default_base" model="data.activity.structure">
-        <field name="name">Base for new structures</field>
-        <field eval="[(6, 0, [ref('act_prep_default'), ref('act_req_default'), ref('act_des_default'), 
-                ref('act_implement_default'), ref('act_review_default'), ref('act_test_default'), ref('act_trans_default'), 
-                ref('act_build_default'), ref('act_risk_default'), ref('act_accept_default'), ref('act_warranty_default'),
-                ref('act_pm_default')])]" name="rule_ids" />
+        <field name="activity_type">type_1</field>
     </record>
 
 </odoo>
