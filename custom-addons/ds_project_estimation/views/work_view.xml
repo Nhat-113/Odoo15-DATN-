@@ -85,10 +85,11 @@
                             </field>
                             <separator string="Summary" />
                             <field name="add_lines_module_summary">
-                                <tree editable="bottom">
-                                    <field name="summary_type" placeholder="Select project category" />
-                                    <field name="working_efforts" placeholder="Select working hours or efforts" />
-                                    <field name="time_effort_value" placeholder="Select value" />
+                                <tree create="0" editable="0" delete="0">
+                                    <field name="summary_type"/>
+                                    <field name="description" />
+                                    <field name="value"/>
+                                    <field name="type" invisible="1"/>
                                 </tree>
                             </field>
                             <separator string="Effort distribution" />
@@ -121,6 +122,7 @@
                                         <field name="activity" />
                                         <field name="effort" />
                                         <field name="estimation_id" invisible="1"/>
+                                        <!-- <field name="estimation_id"/> -->
                                         <field name="activity_type" />
                                         <field name="activity_current" 
                                                 attrs="{'invisible': [('activity_type', '!=', 'type_1')], 'required' : [('activity_type', '=', 'type_1')]}" 

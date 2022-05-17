@@ -1,3 +1,7 @@
 .o_list_number_th, .o_list_number {
     text-align: left !important;
 }
+
+div[name="add_lines_module_effort_distribute_activity"], div[name="add_lines_module_summary"] {
+    pointer-events: none !important;
+}

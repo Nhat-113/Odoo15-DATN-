@@ -23,6 +23,7 @@
         "data/activity_data.xml",
         "data/project_type_data.xml",
         "data/job_position_data.xml",
+        "data/summary_data.xml",
     ],
     'assets': {
         'web.assets_backend': [

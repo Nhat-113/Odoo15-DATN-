@@ -42,7 +42,7 @@ class Estimation(models.Model):
     add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate', string='Summary Cost Rate')
     add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'connect_resource_plan', string='Resource Planning Effort')
     add_lines_module_assumption = fields.One2many('estimation.module.assumption', 'connect_module', string='Module Assumption')
-    add_lines_module_summary = fields.One2many('estimation.module.summary', 'connect_module', string='Module Summary')
+    add_lines_module_summary = fields.One2many('estimation.module.summary', 'estimation_id', string='Module Summary')
     add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Breakdown Structure")
     add_lines_module_effort_distribute_activity = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
 
@@ -58,23 +58,44 @@ class Estimation(models.Model):
         self.env["estimation.overview"].create(vals_over)
         return result
 
-    # Automatically load 12 activities data when creating an estimation
+    # Automatically load 12 activities and module summary data when creating an estimation
     @api.model
     def default_get(self, fields):
         res = super(Estimation, self).default_get(fields)
         get_data_activities = self.env['data.activity'].search([])
+        data_summary = self.env['data.module.summary'].search([])
         activities_line = []
+        activities_effort_line = []
+        summary_line = []
         for record in get_data_activities:
-            line = (0, 0, {
+            content = {
                 'sequence': record.sequence, 
                 'activity': record.activity,
                 'effort': 0.0,
                 'percent': 0.0,
                 'activity_type': record.activity_type
-            })
+            }
+            line = (0, 0, content)
             activities_line.append(line)
+            
+            temp = content.copy()
+            temp.pop('activity_type')
+            line_effort = (0, 0, temp)
+            activities_effort_line.append(line_effort)
+        
+        for item in data_summary:
+            line = (0, 0, {
+                'summary_type': item.summary_type,
+                'description' : item.description,
+                'value': item.value,
+                'type': item.type
+            })
+            summary_line.append(line)
+        
         res.update({
-            'add_lines_module_activity': activities_line
+            'add_lines_module_summary': summary_line,
+            'add_lines_module_activity': activities_line,
+            'add_lines_module_effort_distribute_activity': activities_effort_line
         })
         return res
     
@@ -121,7 +142,7 @@ class Estimation(models.Model):
         return strings
       
     def convert_id_to_name_desc(self, vals):
-        # ls_keys = ["reviewer_ids", "customer_ids", "currency_id", "sale_order", "estimator_ids"]   because only fields  in vals have id
+        # ls_keys = ["reviewer_ids", "customer_ids", "currency_id", "estimator_ids", "project_type_id"]   because only fields  in vals have id
         for item in vals:
             if item == "reviewer_ids" and vals[item] != '':
                 vals[item] = self.env['res.users'].search([('id','=',vals[item])]).name
@@ -226,15 +247,16 @@ class Estimation(models.Model):
     def action_refresh_estimation(self):
         # refresh total mandays in estimation work
         ls_activity = self.env['config.activity'].search([('estimation_id', '=', self.id)])
-        # ls_estimation_work = self.env['estimation.work'].search([('id', '=', self.estimation_id.id)])
         total = 0.0
         for item in ls_activity:
             total += item.effort
         for record in self:
-            record.total_manday = total
+            #if total mandays not modify -> nothing to do
+            if record.total_manday != total:
+                record.total_manday = total
             
         # refresh Percentage in Effort distribution activity
-        ls_effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', self.id)]) #self.env.context['params']['id']
+        ls_effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', self.id)])
         total_effort = 0.0        
         for record in ls_effort_distribute:
             total_effort += record.effort
@@ -243,4 +265,34 @@ class Estimation(models.Model):
                 record.percent = round((record.effort / total_effort ) * 100, 2 )
             else:
                 record.percent = total_effort
+        
+        # refresh total effort of the module breakdown activity
+        ls_break = self.env['module.breakdown.activity'].search([])
+        for record in ls_activity:
+            final_manday = 0.0
+            for item in ls_break:
+                if item.activity_id and (record.id == item.activity_id.id):
+                    if item.type == 'type_2':
+                        final_manday += item.mandays
+                    elif item.type == 'type_3':
+                        final_manday += item.persons * item.days
+                    elif item.type == 'type_1':
+                        if record.activity_current:
+                            item.mandays = round((item.percent_effort * record.activity_current.effort)/ 100, 2)
+                        else:
+                            item.mandays = 0
+                        final_manday += item.mandays 
+            record.effort = final_manday
+        
+        # compute summary module
+        module_summary = self.env['estimation.module.summary']
+        days_per_month = module_summary.search([('estimation_id', '=', self.id), ('type', '=', 'default_per_month')])
+        ls_module_summary = module_summary.search([('estimation_id', '=', self.id)])
+        for record in ls_module_summary:
+            if record.type == 'man_day':
+                record.value = self.total_manday
+            elif record.type =='man_month':
+                record.value = round(self.total_manday / days_per_month.value, 2)
         return
+
+    
