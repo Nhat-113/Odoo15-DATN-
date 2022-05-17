@@ -25,30 +25,12 @@ class Activities(models.Model):
                                     )
     activity_current = fields.Many2one("config.activity", 
                                        string="Activities", 
-                                       default= 4, #4 is sequence of implementation
+                                       default= 4, #4 is implementation
                                        domain="[('estimation_id', '=', estimation_id), ('sequence', '!=', sequence)]")
     
     add_lines_breakdown_activity = fields.One2many('module.breakdown.activity', 'activity_id', string="Breakdown Activity")
         
-    @api.depends('add_lines_breakdown_activity.mandays', 'activity_current')
-    def _compute_total_effort(self):
-        ls_break = self.env['module.breakdown.activity'].search([])
-        for record in self:
-            final_manday = 0.0
-            for item in ls_break:
-                if item.activity_id and (record.id == item.activity_id.id):
-                    if item.type == 'type_2':
-                        final_manday += item.mandays
-                    elif item.type == 'type_3':
-                        final_manday += item.persons * item.days
-                    elif item.type == 'type_1':
-                        item.mandays = round((item.percent_effort * record.activity_current.effort)/ 100, 2)
-                        final_manday += item.mandays 
-            record.effort = final_manday
-
-    def action_refresh(self):
-        #refresh manday in module breakdown activity and effort in config activity
-        ls_break = self.env['module.breakdown.activity'].search([('activity_id', '=', self.id)])
+    def action_content(self, ls_break):
         if ls_break:
             for record in self:
                 final_manday = 0.0
@@ -59,23 +41,54 @@ class Activities(models.Model):
                         elif item.type == 'type_3':
                             final_manday += item.persons * item.days
                         elif item.type == 'type_1':
-                            item.mandays = round((item.percent_effort * record.activity_current.effort)/ 100, 2)
-                            final_manday += item.mandays 
+                            if record.activity_current:
+                                item.mandays = round((item.percent_effort * record.activity_current.effort)/ 100, 2)
+                            else:
+                                item.mandays = 0
+                            final_manday += item.mandays
                 record.effort = final_manday
+        
+    @api.depends('add_lines_breakdown_activity.mandays', 'activity_current')
+    def _compute_total_effort(self):
+        ls_break = self.env['module.breakdown.activity'].search([])
+        Activities.action_content(self, ls_break)
+        
+    def action_refresh(self):
+        #refresh manday in module breakdown activity and effort in config activity
+        # ls_break = self.env['module.breakdown.activity'].search([('activity_id', '=', self.id)])
+        ls_break = self.env['module.breakdown.activity'].search([])
+        Activities.action_content(self, ls_break)
                 
         # refresh activity name, effort in module effort activity
         ls_effort_distribute = self.env['module.effort.activity'].search([('activity_id', '=', self.id)])
         for record in ls_effort_distribute:
             record.effort = record.activity_id.effort
-            record.activity = record.activity_id.activity
         return 
 
     @api.model
     def create(self, vals):
         if vals:
-            # ls_activity = self.env['config.activity'].search([('estimation_id', '=', self.env.context['params']['id'])])
+            # load sequence
             ls_activity = self.env['config.activity'].search([('estimation_id', '=', vals['estimation_id'])])
             self.env['config.activity'].auto_increase_sequence(vals, ls_activity)
+            
+            # check if values is default data or new data
+            check = False
+            is_data_default = False
+            for key in vals:
+                if key == 'add_lines_breakdown_activity':
+                    check = True
+                    for item in vals[key]:
+                        if item[2] == 0:
+                            is_data_default = True
+                            break
+                    break
+                
+            #if values is default data    
+            if check == True and is_data_default == True:
+                return super(Activities, self).create(vals)
+            
+            #if values is new data
             result = super(Activities, self).create(vals)
             ctx = {
                 'sequence': vals['sequence'],
@@ -88,9 +101,24 @@ class Activities(models.Model):
             self.env['module.effort.activity'].create(ctx)
             return result
 
+    def write(self, vals):
+        if vals:
+            effort_activity_vals = {}
+            check = False
+            for key in vals:
+                if key == 'activity':
+                    check = True
+            if check == True:
+                ls_effort_acivity = self.env['module.effort.activity'].search([('estimation_id', '=', self.estimation_id.id), ('sequence', '=', self.sequence )])
+                effort_activity_vals['activity'] = vals['activity']
+                ls_effort_acivity.write(effort_activity_vals)
+                return super(Activities, self).write(vals)
+            else:
+                return super(Activities, self).write(vals)
+
     def unlink(self):
         for item in self:
-            effort_distribute = self.env['module.effort.activity'].search([('activity_id','=', item.id)])
+            effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', self.estimation_id.id), ('sequence', '=', self.sequence )])
             breakdown_activity = self.env['module.breakdown.activity'].search([('activity_id','=', item.id)])
             if effort_distribute:
                 effort_distribute.unlink()
