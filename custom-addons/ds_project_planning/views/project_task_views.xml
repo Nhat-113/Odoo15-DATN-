@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Assignees: Only show users who have been assigned to the project in Planning Calendar Resources. -->
+    <record model="ir.ui.view" id="project_task_inherit_form2_view">
+        <field name="name">project.task.form.view</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <field name="user_ids" position="replace">
+                <field name="user_id_domain" invisible="1"/>
+                <field name="user_ids" class="o_task_user_field" options="{'no_open': True, 'no_create': True}" widget="many2many_avatar_user" domain="user_id_domain"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

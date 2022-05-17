@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Project Configuration menu (modified)-->
+    <menuitem id="project.menu_project_config" name="Configuration" parent="project.menu_main_pm" sequence="100" groups="ds_project_planning.group_project_pm"/>
+
+    <!-- Project Reporting menus (modified)-->
+    <menuitem id="project.menu_project_report" name="Reporting" groups="ds_project_planning.group_project_pm" parent="project.menu_main_pm" sequence="99"/>
+
+    <!-- Planning menu config -->
+    <menuitem id="project_planning_menu_config" name="Planning" action="ds_project_planning.open_view_planning_project_all" groups="ds_project_planning.group_project_pm" parent="project.menu_project_config" sequence="99"/>
+
+</odoo>

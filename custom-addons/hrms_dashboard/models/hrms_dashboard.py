@@ -5,9 +5,12 @@ from datetime import timedelta, datetime, date
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 from pytz import utc
+from soupsieve import select
 from odoo import models, fields, api, _
 from odoo.http import request
 from odoo.tools import float_utils
+from datetime import date
+import calendar
 
 ROUNDING_FACTOR = 16
 
@@ -18,17 +21,31 @@ class HrLeave(models.Model):
                                    help="Field allowing to see the leave request duration"
                                         " in days or hours depending on the leave_type_request_unit")
 
-
+# class Calendar(models.Model):
+#      _inherit = 'calendar.event'    
+# @api.multi   
+# def count_name(self):
+#      for partner in self:
+#          partner.associate_count = len(partner.associate_ids)
+        #  len(self.env['ten.bang'].search([]))
 class Employee(models.Model):
     _inherit = 'hr.employee'
 
     birthday = fields.Date('Date of Birth', groups="base.group_user", help="Birthday")
+
+
+   # current_user = fields.Many2one('res.users','Current User', default=lambda self: self.env.uid) 
+
+    # def get_user_id(self):
+    #     return self.env.uid
 
     @api.model
     def check_user_group(self):
         uid = request.session.uid
         user = self.env['res.users'].sudo().search([('id', '=', uid)], limit=1)
         if user.has_group('hr.group_hr_manager'):
+            return True
+        elif user.has_group('hr.group_hr_user'):
             return True
         else:
             return False
@@ -38,6 +55,19 @@ class Employee(models.Model):
         uid = request.session.uid
         employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
         leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1'])])
+        recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ])])
+
+        #meeting  =  select calendar_event.start from calendar_event
+        my_date = date.today()
+
+        temp = str(my_date.year) + '-' + str(my_date.month) + '-' + str(my_date.day)
+              
+        total_len = self.env['calendar.event'].search_count([('start', '=', temp)])
+        
+        #todayMeeting = len(self.env['calendar.event'].search([]))
+        #today_meeting = self.env['calendar.event'].sudo().search_count([])
+
+        
         today = datetime.strftime(datetime.today(), '%Y-%m-%d')
         query = """
         select count(id)
@@ -62,7 +92,7 @@ class Employee(models.Model):
         timesheet_count = self.env['account.analytic.line'].sudo().search_count(
             [('project_id', '!=', False), ('user_id', '=', uid)])
         timesheet_view_id = self.env.ref('hr_timesheet.hr_timesheet_line_search')
-        job_applications = self.env['hr.applicant'].sudo().search_count([])
+        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False)])
         if employee:
             sql = """select broad_factor from hr_employee_broad_factor where id =%s"""
             self.env.cr.execute(sql, (employee[0]['id'],))
@@ -92,7 +122,10 @@ class Employee(models.Model):
                     'job_applications': job_applications,
                     'timesheet_view_id': timesheet_view_id,
                     'experience': experience,
-                    'age': age
+                    'age': age,
+                    'recruitment': recruitment,
+                    'total_len': total_len
+
                 }
                 employee[0].update(data)
             return employee
@@ -105,37 +138,34 @@ class Employee(models.Model):
         uid = request.session.uid
         employee = self.env['hr.employee'].search([('user_id', '=', uid)], limit=1)
 
-        cr.execute("""select *,
-        (to_char(dob,'ddd')::int-to_char(now(),'ddd')::int+total_days)%total_days as dif
-        from (select he.id, he.name, to_char(he.birthday, 'Month dd') as birthday,
-        hj.name as job_id , he.birthday as dob,
-        (to_char((to_char(now(),'yyyy')||'-12-31')::date,'ddd')::int) as total_days
-        FROM hr_employee he
-        join hr_job hj
-        on hj.id = he.job_id
-        ) birth
-        where (to_char(dob,'ddd')::int-to_char(now(),'DDD')::int+total_days)%total_days between 0 and 15
-        order by dif;""")
+        cr.execute("""
+          select *,
+            (to_char(dob,'ddd')::int-to_char(now(),'ddd')::int+total_days)%total_days as dif
+            from (select he.id, he.name, to_char(he.birthday, 'Month dd') as birthday, he.birthday as dob,
+            (to_char((to_char(now(),'yyyy')||'-12-31')::date,'ddd')::int) as total_days
+            FROM hr_employee he
+            ) birth
+            where (to_char(dob,'ddd')::int-to_char(now(),'DDD')::int+total_days)%total_days between 0 and 15
+            order by dif;""")
         birthday = cr.fetchall()
         # e.is_online # was there below
         #        where e.state ='confirm' on line 118/9 #change
-        cr.execute("""select e.name, e.date_begin, e.date_end, rc.name as location
-        from event_event e
-        left join res_partner rp
-        on e.address_id = rp.id
-        left join res_country rc
-        on rc.id = rp.country_id
-        and (e.date_begin >= now()
-        and e.date_begin <= now() + interval '15 day')
-        or (e.date_end >= now()
-        and e.date_end <= now() + interval '15 day')
-        order by e.date_begin """)
+        cr.execute("""select event_event.name , event_event.date_begin,  event_event.date_end from event_event   where event_event.stage_id = '1' or  event_event.stage_id = '2' or  event_event.stage_id = '3'""")
         event = cr.fetchall()
         announcement = []
+        user_id = request.session.uid
+        sql=("""
+                select CURRENT_DATE, project_task.priority_type, project_task.name , project_task.id ,project_task.date_start  , hr_employee.name  from  project_task  
+                INNER JOIN  project_task_user_rel on project_task_user_rel.task_id = project_task.id 
+                INNER JOIN  hr_employee on hr_employee.user_id = project_task_user_rel.user_id and hr_employee.user_id = %s where DATE(project_task.date_start) = CURRENT_DATE
+                            """) %  user_id
+        cr.execute(sql)
+        task_for_day = cr.fetchall()
+        
         if employee:
             department = employee.department_id
             job_id = employee.job_id
-            sql = """select ha.name, ha.announcement_reason
+            sql = """select ha.announcement_reason, ha.date_start
             from hr_announcement ha
             left join hr_employee_announcements hea
             on hea.announcement = ha.id
@@ -166,15 +196,16 @@ class Employee(models.Model):
         return {
             'birthday': birthday,
             'event': event,
-            'announcement': announcement
+            'announcement': announcement ,
+            'task_for_day' : task_for_day
         }
 
     @api.model
     def get_dept_employee(self):
         cr = self._cr
         cr.execute("""select department_id, hr_department.name,count(*)
-from hr_employee join hr_department on hr_department.id=hr_employee.department_id
-group by hr_employee.department_id,hr_department.name""")
+        from hr_employee join hr_department on hr_department.id=hr_employee.department_id
+        group by hr_employee.department_id,hr_department.name""")
         dat = cr.fetchall()
         data = []
         for i in range(0, len(dat)):
