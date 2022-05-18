@@ -518,11 +518,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             // var options = {
             //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
             // };
-            var date = new Date();
-            var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-            var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-            var fday = firstDay.toJSON().slice(0, 10).replace(/-/g, "-");
-            var lday = lastDay.toJSON().slice(0, 10).replace(/-/g, "-");
+            var today     = moment();
+            var tomorrow  = moment().add(1,'days');
+            var yesterday = moment().add(-1, 'days');
             this.do_action({
                     name: _t("Leave Request Today"),
                     type: "ir.actions.act_window",
@@ -533,8 +531,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         [false, "form"],
                     ],
                     domain: [
-                        ["create_date", "<", lday],
-                        ["state", "=", "validate"],
+                        ["create_date", "<", tomorrow],
+                        ["create_date", ">", yesterday],
+                        ["state", "=", "confirm"],
                         
                     ],
                     target: "current",
@@ -553,7 +552,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             // };
             var date = new Date();
             var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-            var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+            var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 1);
             var fday = firstDay.toJSON().slice(0, 10).replace(/-/g, "-");
             var lday = lastDay.toJSON().slice(0, 10).replace(/-/g, "-");
             this.do_action({
@@ -567,8 +566,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     ],
                     domain: [
                         ["date_from", ">", fday],
-                        ["state", "=", "validate"],
-                        ["date_from", "<", lday],
+                        ["state", "=", "confirm"],
+                        ["date_from", "<=", lday],
                     ],
                     target: "current",
                 },

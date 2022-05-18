@@ -55,6 +55,7 @@ class Employee(models.Model):
         uid = request.session.uid
         employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
         leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1'])])
+
         recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ])])
 
         # user_id = self.env['res.users'].search([('id', '=', uid)])
@@ -70,15 +71,11 @@ class Employee(models.Model):
         cr.execute(query)
         today_meeting = cr.fetchall()
         
-        #todayMeeting = len(self.env['calendar.event'].search([]))
-        #today_meeting = self.env['calendar.event'].sudo().search_count([])
 
-        
-        today = datetime.strftime(datetime.today(), '%Y-%m-%d')
         query = """
         select count(id)
         from hr_leave
-        where   DATE(hr_leave.create_date) = '%s' and state= 'validate' """ %  today
+        where  DATE(hr_leave.create_date) = '%s' and state= 'confirm' """ %  (today)
         cr = self._cr
         cr.execute(query)
         leaves_today = cr.fetchall()
@@ -89,12 +86,12 @@ class Employee(models.Model):
                 select count(id)
                 from hr_leave
                 WHERE (hr_leave.date_from::DATE,hr_leave.date_to::DATE) OVERLAPS ('%s', '%s')
-                and  state='validate'""" % (first_day, last_day)
+                and  state='confirm'""" % (first_day, last_day)
         cr = self._cr
         cr.execute(query)
         leaves_this_month = cr.fetchall()
         leaves_alloc_req = self.env['hr.leave.allocation'].sudo().search_count(
-            [('state', 'in', ['confirm', 'validate'])])
+            [('state', 'in', ['validate'])])
         timesheet_count = self.env['account.analytic.line'].sudo().search_count(
             [('project_id', '!=', False), ('user_id', '=', uid)])
 
