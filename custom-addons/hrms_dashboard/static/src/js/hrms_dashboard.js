@@ -135,7 +135,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 session.user_has_group("hr_contract.group_hr_contract_manager").then(function(has_group) {
                     let button_contract = document.getElementById("btn-contract");
     
-                    console.log("has_group", has_group);
+                    // console.log("has_group", has_group);
                     if (!button_contract) return;
     
                     if (has_group){
