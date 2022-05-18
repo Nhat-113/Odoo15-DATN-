@@ -104,7 +104,7 @@ class Employee(models.Model):
         
         user_id = self.env['res.users'].search([('id', '=', uid)])
 
-        company_id = self.env.user.company_ids.ids
+        company_ids = self.env.user.company_ids.ids
         
         # query = """
         #         select count(id)
@@ -115,7 +115,7 @@ class Employee(models.Model):
         # cr.execute(query)
         # job_applications_all = cr.fetchall()
 
-        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False),('company_id','=' , company_id )])
+        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False),('company_id','in' , company_ids )])
         
         if employee:
             sql = """select broad_factor from hr_employee_broad_factor where id =%s"""
