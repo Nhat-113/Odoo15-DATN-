@@ -108,14 +108,22 @@
                                             <th>Người đại diện</th>
                                             <td>
                                                 <span>:  </span>Ông
-                                                <b>NGUYỄN HỒNG TÂN</b>
+                                                <b>
+                                                    <t t-if='e.company_id.representative'>
+                                                        <span t-field="e.company_id.representative"/>
+                                                    </t>
+                                                </b>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>Chức vụ</th>
                                             <td>
                                                 <span>:  </span>
-                                                Phó giám đốc
+                                                <b>
+                                                    <t t-if='e.company_id.position'>
+                                                        <span t-field="e.company_id.position"/>
+                                                    </t>
+                                                </b>
                                             </td>
                                         </tr>
                                         <tr>
@@ -310,8 +318,16 @@
                                     <p class="font-italic">(Ký, ghi rõ họ tên)</p>
                                 </div>
                                 <div class="col-6 text-center">
-                                    <p class="font-weight-bold">Đại diện công ty CP D-Soft</p>
-                                    <p class="font-italic">Phó giám đốc</p>
+                                    <p class="font-weight-bold">Đại diện công ty
+                                        <t t-if='e.company_id.display_name'>
+                                            <span t-field="e.company_id.display_name"/>
+                                        </t>
+                                    </p>
+                                    <p class="font-italic">(
+                                        <t t-if='e.company_id.position'>
+                                            <span t-field="e.company_id.position"/>
+                                        </t>
+                                    )</p>
                                 </div>
                             </div>
                         </div>

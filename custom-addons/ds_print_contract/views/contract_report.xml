@@ -115,14 +115,22 @@
                                             <th>Người đại diện</th>
                                             <td>
                                                 <span>:  </span>Ông
-                                                <b>NGUYỄN HỒNG TÂN</b>
+                                                <b>
+                                                    <t t-if='e.company_id.representative'>
+                                                        <span t-field="e.company_id.representative"/>
+                                                    </t>
+                                                </b>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>Chức vụ</th>
                                             <td>
                                                 <span>:  </span>
-                                                Phó giám đốc
+                                                <b>
+                                                    <t t-if='e.company_id.position'>
+                                                        <span t-field="e.company_id.position"/>
+                                                    </t>
+                                                </b>
                                             </td>
                                         </tr>
                                         <tr>
@@ -312,7 +320,9 @@
                                         <p>2.   Khi hai bên ký kết phụ lục hợp đồng thì nội dung của phụ lục cũng có giá trị như các nội dung của bản hợp đồng này.</p>
                                         <p>3.   Hợp đồng lao động này làm thành hai (02) bản có giá trị như nhau, mỗi bên giữ một bản, và có hiệu lực từ ngày ký.</p>
                                         <p>4.   Người lao động đọc kỹ, hiểu rõ và cam kết thực hiện các điều khoản và quy định ghi tại hợp đồng lao động.</p>
-                                        <p>5.   Hợp đồng lao động làm tại Công ty Cổ phần D-Soft ngày
+                                        <p>5.   Hợp đồng lao động làm tại <t t-if='e.company_id.display_name'>
+                                            <span t-field="e.company_id.display_name"/>
+                                        </t> ngày
                                             <span t-esc="e.date_start.strftime('%d')"/>
                                     tháng
                                             <span t-esc="e.date_start.strftime('%m')"/>
@@ -328,8 +338,18 @@
                                     <p class="font-italic">(Ký, ghi rõ họ tên)</p>
                                 </div>
                                 <div class="col-6 text-center">
-                                    <p class="font-weight-bold">Đại diện công ty CP D-Soft</p>
-                                    <p class="font-italic">Phó giám đốc</p>
+                                    <p class="font-weight-bold">Đại diện công ty
+                                        <t t-if='e.company_id.display_name'>
+                                            <span t-field="e.company_id.display_name"/>
+                                        </t>
+                                    </p>
+                                    <p class="font-italic">
+                                        <b>
+                                            <t t-if='e.company_id.position'>
+                                                <span t-field="e.company_id.position"/>
+                                            </t>
+                                        </b>
+                                    </p>
                                 </div>
                             </div>
                             <!-- PHỤ LỤC HỢP ĐỒNG SỐ 1 -->
@@ -339,7 +359,11 @@
                                     <tr>
                                         <th>
                                             <b>
-                                                <span>CÔNG TY CỔ PHẦN D-SOFT</span>
+                                                <span>
+                                                    <t t-if='e.company_id.display_name'>
+                                                        <span t-field="e.company_id.display_name"/>
+                                                    </t>
+                                                </span>
                                             </b>
                                         </th>
                                     </tr>
@@ -428,14 +452,22 @@
                                     <th>Người đại diện</th>
                                     <td>
                                         <span>:  </span>Ông
-                                        <b>NGUYỄN HỒNG TÂN</b>
+                                        <b>
+                                            <t t-if='e.company_id.representative'>
+                                                <span t-field="e.company_id.representative"/>
+                                            </t>
+                                        </b>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Chức vụ</th>
                                     <td>
                                         <span>:  </span>
-                                                Phó giám đốc
+                                        <b>
+                                            <t t-if='e.company_id.position'>
+                                                <span t-field="e.company_id.position"/>
+                                            </t>
+                                        </b>
                                     </td>
                                 </tr>
                                 <tr>
@@ -568,7 +600,11 @@
  được lập thành 02 (hai) bản có giá trị như nhau, mỗi bên giữ 01 (một) bản
                                         </p>
                                         <p>Phụ lục hợp đồng được lập tại:
-                                            <span>CÔNG TY CỔ PHẦN D-SOFT</span>
+                                            <span>
+                                                <t t-if='e.company_id.display_name'>
+                                                    <span t-field="e.company_id.display_name"/>
+                                                </t>
+                                            </span>
                                         </p>
                                     </div>
                                 </div>
@@ -576,11 +612,21 @@
                             <div class="row contract-signature">
                                 <div class="col-6 text-center">
                                     <p class="font-weight-bold">NGƯỜI LAO ĐỘNG</p>
-                                    <p class="font-italic">(Ký, ghi rõ họ tên)</p>
+                                    <p class="font-italic"><span>(Ký, ghi rõ họ tên)</span></p>
                                 </div>
                                 <div class="col-6 text-center">
-                                    <p class="font-weight-bold">ĐẠI DIỆN CÔNG TY CỔ PHẦN D-SOFT</p>
-                                    <p class="font-italic">(Phó giám đốc)</p>
+                                    <p class="font-weight-bold">ĐẠI DIỆN CÔNG TY
+                                        <t t-if='e.company_id.display_name'>
+                                            <span t-field="e.company_id.display_name"/>
+                                        </t>
+                                    </p>
+                                    <p class="font-italic">
+                                        (
+                                            <t t-if='e.company_id.position'>
+                                                <span t-field="e.company_id.position"/>
+                                            </t>
+                                            )
+                                    </p>
                                 </div>
                             </div>
                         </div>

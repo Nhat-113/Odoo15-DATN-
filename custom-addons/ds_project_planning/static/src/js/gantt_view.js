@@ -34,6 +34,7 @@ odoo.define('dhx_gantt.GanttView', function (require) {
             this.loadParams.total_float = this.arch.attrs.total_float;
             this.loadParams.modelName = params.modelName;
             this.loadParams.linkModel = this.arch.attrs.link_model;
+            this.loadParams.configStartDate = new Date();
 
             this.loadParams.fieldNames = [
                 this.arch.attrs.id_field,
@@ -48,6 +49,7 @@ odoo.define('dhx_gantt.GanttView', function (require) {
                 this.arch.attrs.date_deadline
             ];
 
+            this.rendererParams.configStartDate = this.loadParams.configStartDate;
             this.rendererParams.initDomain = params.domain;
             this.rendererParams.modelName = params.modelName;
             this.rendererParams.map_id_field = this.arch.attrs.id_field;

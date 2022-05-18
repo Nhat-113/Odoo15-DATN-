@@ -57,6 +57,11 @@
             <field name="color">6</field>
         </record>
 
+        <record id="status_deploy" model="project.task.status">
+            <field name="name">Deployment</field>
+            <field name="color">0</field>
+        </record>
+
         <record id="task_type" model="project.issues.type">
             <field name="name">Task</field>
             <field eval="[(6, 0, [ref('status_open'), ref('status_doing'),
@@ -68,7 +73,7 @@
             <field name="name">Bug</field>
             <field eval="[(6, 0, [ref('status_open'), ref('status_inprocess'),
                 ref('status_fixed'), ref('status_closed'),ref('status_reopen'),
-                ref('status_pending'),ref('status_notfix')])]" name="status"/>
+                ref('status_pending'),ref('status_notfix'),ref('status_deploy')])]" name="status"/>
         </record>
 
         <record id="qc_type" model="project.issues.type">

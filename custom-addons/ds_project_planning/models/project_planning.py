@@ -31,6 +31,12 @@ class Project(models.Model):
     total_milestone = fields.Integer(
         string="Total milestones", compute="_count_phase_milestone")
 
+    def _compute_task_total(self):
+        for project in self:
+            project.task_total = self.env['project.task'].search_count(['&',('issues_type','=',1),('project_id','=',project.id),('display_project_id','=',project.id),('active','=',True)])
+
+    task_total = fields.Integer(compute='_compute_task_total')
+
     def _compute_total_calendar_effort(self):
         for project in self:
             total_effort = 0
@@ -69,13 +75,14 @@ class Project(models.Model):
                 calendar_duplicate = list(filter(
                     lambda member: member.employee_id['id'] == new_calendar_resource.employee_id.id and
                     member.start_date <= new_calendar_resource.start_date and
-                    member.end_date >= new_calendar_resource.start_date, self.planning_calendar_resources[:-1]))[0]
+                    member.end_date >= new_calendar_resource.start_date, self.planning_calendar_resources[:-1]))
 
                 if len(calendar_duplicate) > 0:
-                    # if new_calendar_resource.start_date >= calendar_duplicate.start_date and new_calendar_resource.start_date <= calendar_duplicate.end_date:
-                    raise ValidationError(
-                        _('The project has duplicate members assigned in the range (%(start)s) to (%(end)s)!',
-                          start=calendar_duplicate.start_date, end=calendar_duplicate.end_date))
+                    for i in range(len(calendar_duplicate)):
+                        if new_calendar_resource.start_date >= calendar_duplicate[i].start_date and new_calendar_resource.start_date <= calendar_duplicate[i].end_date:
+                            raise ValidationError(
+                                _('The project has duplicate members assigned in the range (%(start)s) to (%(end)s)!',
+                                start=calendar_duplicate[i].start_date, end=calendar_duplicate[i].end_date))
 
         # update member_ids list
         user_ids = [
@@ -92,3 +99,15 @@ class Project(models.Model):
 
             project.total_phase = len(num_phase)
             project.total_milestone = len(num_milestone)
+
+    def open_planning_task_all(self):
+        for project in self:
+            if self.env['project.task'].search_count(['&',('project_id','=',project.id),('issues_type','=',1)]) == 0:
+                raise UserError(
+                     _("No tasks found. Let's create one!"))
+            else:
+                action = self.with_context(active_id=self.id, active_ids=self.ids) \
+                    .env.ref('ds_project_planning.open_planning_task_all_on_gantt') \
+                    .sudo().read()[0]
+            action['display_name'] = self.name
+        return action

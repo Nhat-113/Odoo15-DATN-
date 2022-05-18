@@ -1,5 +1,5 @@
 {
-    'name': "Project Updation",
+    'name': "Ramp Up Resource",
     'version': '15.0.1.0.0',
     'summary': """""",
     'description': """""",
@@ -9,23 +9,25 @@
     'company': 'Dsoft',
     'maintainer': '',
     'website': "",
-    'depends': ['hr', 'base', 'project', 'web_domain_field'],
+    'depends': ['hr', 'base', 'project', 'ds_project_planning'],
+    'external_dependencies': {
+        'python': ['pandas'],
+    },
     'data': [
-        'views/project_view.xml',
-        'views/report_timesheet_templates_update.xml',
-        'security/ir.model.access.csv',
-        'data/type_default.xml',
+        'views/ramp_up.xml',
+        'views/ramp_up_menu.xml',
+        'views/report_rampup_recourse_view.xml'
     ],
     'assets': {
         'web.assets_backend': [
-            'project_updation/static/src/lib/bootstrap-colorpicker/css/style.css',
         ],
         'web.assets_qweb': [
+           
         ],
     },
 
     'images': [],
     'license': "AGPL-3",
     'installable': True,
-    'application': False,
+    'application': True,
 }
