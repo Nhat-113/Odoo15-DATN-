@@ -790,8 +790,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         });
                     });
                     var margin = { top: 30, right: 30, bottom: 30, left: 20 },
-                        width = 800 - margin.left - margin.right,
-                        height = 250 - margin.top - margin.bottom;
+                    
+                    width = 800 - margin.left - margin.right,
+                    height = 250 - margin.top - margin.bottom;
 
                     // Set the ranges
                     var x = d3.scale.ordinal().rangeRoundBands([-(margin.right + 20), width], 1);
@@ -1362,7 +1363,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                                 pieDim = { w: 260, h: 260 };
                         } else {
                             var pC = {},
-                                pieDim = { w: 380, h: 380 };
+                                pieDim = { w: 400, h: 400 };
                         }
 
                         // var pC = {},

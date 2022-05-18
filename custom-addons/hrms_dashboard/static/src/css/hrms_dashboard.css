@@ -1295,17 +1295,17 @@ button:focus {
 }
 
 .department .detail {
-    margin-top: 4.2%;
+    margin-top: 28px;
     padding: 0;
-    /* margin: 0; */
-    margin-bottom: 0;
+    margin-bottom: -22px;
     margin-left: 4%;
 }
 
 .department .detail h3 {
+    
     color: #6869AC;
     padding: 0;
-    margin-bottom: 15%;
+    margin-bottom: 67px;
 }
 
 .employee_dashboard_detail {
@@ -1322,7 +1322,7 @@ button:focus {
 }
 
 .employee_dashboard_detail>div>h3 {
-    color: #6869AC;
+     color: #6869AC;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -1330,15 +1330,13 @@ button:focus {
     position: static;
     left: 0px;
     top: 0px;
-    /* White */
     background: #FFFFFF;
     border-radius: 24px;
-    /* Inside auto layout */
     flex: none;
     order: 0;
     align-self: stretch;
     flex-grow: 0;
-    margin: 16px 0px 0px 0px;
+    margin: 19.5px 0px -4px 0px;
     height: 5%;
 }
 
@@ -2206,6 +2204,9 @@ button:focus {
         /* font-size: 1.4rem; */
         /* padding-left: 7px; */
         /* font-weight: 700; */
+    }
+    .department .detail {
+        margin-top: 6.2%;
     }
 }
 
