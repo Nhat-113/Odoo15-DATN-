@@ -129,6 +129,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
 
         start: function() {
             var self = this; 
+            this.set("title", "Dashboard");
             return this._super().then(function() {
                
                 session.user_has_group("hr_contract.group_hr_contract_manager").then(function(has_group) {
