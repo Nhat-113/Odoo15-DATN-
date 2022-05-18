@@ -268,7 +268,7 @@
                                         <p class="font-weight-bold">A- Quyền lợi: </p>
                                         <p>Phương tiện đi lại làm việc: Do Người lao động tự túc</p>
                                         <p class="font-weight-bold">1.   Mức lương chính hoặc tiền công</p>
-                                        <p class="font-weight-bold">Mức lương:</p>
+                                        <p class="font-weight-bold">Mức lương: <span t-esc="'{:,}'.format(int(e.wage))"/> VND (Lương cơ bản)</p>
                                         <p>Mức lương này là căn cứ đóng bảo hiểm bắt buộc theo quy định của pháp luật lao động là cơ sở để giải quyết các chế độ bảo hiểm xã hội (ốm đau, thai sản, tai nạn lao động, bệnh nghề nghiệp, hưu trí, tử tuất) theo quy định của Luật Bảo hiểm xã hội, và các chế độ khác liên qua đến hợp đồng lao động.</p>
                                         <p class="font-weight-bold">2.   Hình thức trả lương</p>
                                         <p class="ml-2">Theo tháng bằng chuyển khoản, trả một lần vào ngày 02 hàng tháng. Nếu trùng vào ngày nghỉ thì được trả vào ngày làm việc đầu tiên tiếp theo. Người lao động đồng ý mở tài khoản cá nhân tại ngân hàng do Công ty chỉ định để trả tiền lương ngay sau khi ký Hợp đồng lao động với Công ty.</p>

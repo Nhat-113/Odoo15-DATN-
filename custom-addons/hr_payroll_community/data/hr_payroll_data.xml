@@ -524,6 +524,28 @@
             <field name="amount_python_compute">result = 0</field>
         </record>
 
+        <record id="hr_rule_tnc_gross1" model="hr.salary.rule">
+            <field name="name">Thu nhập chịu thuế theo lương (VND) = (17) + (18) + (19) - (2) - (14) - (20) - (21) - (22)</field>
+            <field name="sequence" eval="23"/>
+            <field name="code">TNC1</field>
+            <field name="category_id" ref="hr_payroll_community.OTH"/>
+            <field name="condition_select">python</field> 
+            <field name="condition_python">result = (TTNTT - GTGC - PCK + PCD - (inputs.LBN and inputs.LBN.amount or 0) - OT - BH + OTCT) &gt; 0</field> 
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = (TTNTT - GTGC - PCK + PCD - (inputs.LBN and inputs.LBN.amount or 0) - OT - BH + OTCT)</field>
+        </record>
+
+        <record id="hr_rule_tnc_gross2" model="hr.salary.rule">
+            <field name="name">Thu nhập chịu thuế theo lương (VND) = (17) + (18) + (19) - (2) - (14) - (20) - (21) - (22)</field>
+            <field name="sequence" eval="23"/>
+            <field name="code">TNC1</field>
+            <field name="category_id" ref="hr_payroll_community.OTH"/>
+            <field name="condition_select">python</field> 
+            <field name="condition_python">result = (TTNTT - GTGC - PCK + PCD - (inputs.LBN and inputs.LBN.amount or 0) - OT - BH + OTCT) &lt;= 0</field> 
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = 0</field>
+        </record>
+
         <record id="hr_rule_tncn1" model="hr.salary.rule">
             <field name="name">Thuế TNCN theo lương (VND)</field>
             <field name="sequence" eval="24"/>
@@ -751,7 +773,7 @@
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = (LBN + TNC) &lt;= 0</field> 
+            <field name="condition_python">result = (LBN + TNC1) &lt;= 0</field> 
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = 0</field>
         </record>
@@ -762,11 +784,11 @@
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">LBN + TNC</field>
+            <field name="condition_range">LBN + TNC1</field>
             <field name="condition_range_min">0</field>
             <field name="condition_range_max">5000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((LBN + TNC) * 0.05)</field>
+            <field name="amount_python_compute">result = ((LBN + TNC1) * 0.05)</field>
         </record>
 
         <record id="hr_rule_tncnbn3_mirai" model="hr.salary.rule">
@@ -775,11 +797,11 @@
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">LBN + TNC</field>
+            <field name="condition_range">LBN + TNC1</field>
             <field name="condition_range_min">5000000</field>
             <field name="condition_range_max">10000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((LBN + TNC) * 0.1 - 250000)</field>
+            <field name="amount_python_compute">result = ((LBN + TNC1) * 0.1 - 250000)</field>
         </record>
 
         <record id="hr_rule_tncnbn4_mirai" model="hr.salary.rule">
@@ -788,11 +810,11 @@
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">LBN + TNC</field>
+            <field name="condition_range">LBN + TNC1</field>
             <field name="condition_range_min">10000000</field>
             <field name="condition_range_max">18000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((LBN + TNC) * 0.15 - 750000)</field>
+            <field name="amount_python_compute">result = ((LBN + TNC1) * 0.15 - 750000)</field>
         </record>
 
         <record id="hr_rule_tncnbn5_mirai" model="hr.salary.rule">
@@ -801,11 +823,11 @@
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">LBN + TNC</field>
+            <field name="condition_range">LBN + TNC1</field>
             <field name="condition_range_min">18000000</field>
             <field name="condition_range_max">32000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((LBN + TNC) * 0.2 - 1650000)</field>
+            <field name="amount_python_compute">result = ((LBN + TNC1) * 0.2 - 1650000)</field>
         </record>
 
         <record id="hr_rule_tncnbn6_mirai" model="hr.salary.rule">
@@ -814,11 +836,11 @@
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">LBN + TNC</field>
+            <field name="condition_range">LBN + TNC1</field>
             <field name="condition_range_min">32000000</field>
             <field name="condition_range_max">52000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((LBN + TNC) * 0.25 - 3250000)</field>
+            <field name="amount_python_compute">result = ((LBN + TNC1) * 0.25 - 3250000)</field>
         </record>
 
         <record id="hr_rule_tncnbn7_mirai" model="hr.salary.rule">
@@ -827,11 +849,11 @@
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">range</field>
-            <field name="condition_range">LBN + TNC</field>
+            <field name="condition_range">LBN + TNC1</field>
             <field name="condition_range_min">52000000</field>
             <field name="condition_range_max">82000000</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((LBN + TNC) * 0.3 - 5850000)</field>
+            <field name="amount_python_compute">result = ((LBN + TNC1) * 0.3 - 5850000)</field>
         </record>
 
         <record id="hr_rule_tncnbn8_mirai" model="hr.salary.rule">
@@ -840,9 +862,9 @@
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = (LBN + TNC) &gt; 82000000 </field> 
+            <field name="condition_python">result = (LBN + TNC1) &gt; 82000000 </field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((LBN + TNC) * 0.35 - 9850000)</field>
+            <field name="amount_python_compute">result = ((LBN + TNC1) * 0.35 - 9850000)</field>
         </record>
 
 
@@ -900,11 +922,11 @@
                 ref('hr_rule_tl'), ref('hr_rule_tot1'), ref('hr_rule_tot2'), ref('hr_rule_tot3'),
                 ref('hr_rule_lot'), ref('hr_rule_ltu'), ref('hr_rule_pcd'), ref('hr_rule_bhmirai'), 
                 ref('hr_rule_gtgc'), ref('hr_rule_ltlmirai'), ref('hr_rule_kbs'),
-                ref('hr_rule_tot4'), ref('hr_rule_tnc2'), ref('hr_rule_other_kct'), ref('hr_rule_lbn'),
+                ref('hr_rule_tot4'), ref('hr_rule_tnc_gross2'), ref('hr_rule_other_kct'), ref('hr_rule_lbn'),
                 ref('hr_rule_tncnbn1_mirai'), ref('hr_rule_tncnbn2_mirai'), ref('hr_rule_tncnbn3_mirai'),
                 ref('hr_rule_tncnbn4_mirai'), ref('hr_rule_tncnbn5_mirai'), ref('hr_rule_tncnbn6_mirai'),
                 ref('hr_rule_tncnbn7_mirai'), ref('hr_rule_tncnbn8_mirai'), ref('hr_rule_ttntt'),
-                ref('hr_rule_otct'), ref('hr_rule_gross2'), ref('hr_rule_tnc1')])]" name="rule_ids"/>
+                ref('hr_rule_otct'), ref('hr_rule_gross2'), ref('hr_rule_tnc_gross1')])]" name="rule_ids"/>
             <field name="company_id" ref="base.main_company"/>
         </record>
 

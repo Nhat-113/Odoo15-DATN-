@@ -206,7 +206,7 @@
                     </page>
                     <page string="Salary Computation" >
                         <field name="line_ids" colspan="4" nolabel="1">
-                            <tree string="Salary Structure" editable="" decoration-success="code in ('NET', 'NET1')" decoration-bf="code in ('Basic', 'OT','TL', 'NET', 'NET1', 'TTNTT', 'TNC')" decoration-it="code in ('Basic', 'OT', 'TL', 'TTNTT', 'TNC')" decoration-muted="total == 0">
+                            <tree string="Salary Structure" editable="" decoration-success="code in ('NET', 'NET1')" decoration-bf="code in ('Basic', 'OT','TL', 'NET', 'NET1', 'TTNTT', 'TNC', 'TNC1')" decoration-it="code in ('Basic', 'OT', 'TL', 'TTNTT', 'TNC', 'TNC1')" decoration-muted="total == 0">
                                 <field name="sequence" invisible="0" string="No."/>
                                 <field name="name"/>
                                 <field name="code"/>
