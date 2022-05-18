@@ -20,10 +20,12 @@
             <field name="inherit_id" ref="hr.hr_kanban_view_employees"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[hasclass('oe_kanban_details')]" position="inside">
-                    <field name="task_score" invisible="1" digits="[10,1]"/>
+                    <ul>
+                        <field name="task_score" invisible="1" digits="[10,1]"/>
                         <a name="project_task_score_action" type="object" groups="ds_project_planning.group_project_pm">
                             <li style ="list-style-type: none;">Task Score: <t t-esc="record.task_score.value"/> Star</li>
                         </a>
+                    </ul>
                 </xpath>
             </field>
         </record>
