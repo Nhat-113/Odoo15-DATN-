@@ -31,6 +31,12 @@ class Project(models.Model):
     total_milestone = fields.Integer(
         string="Total milestones", compute="_count_phase_milestone")
 
+    def _compute_task_total(self):
+        for project in self:
+            project.task_total = self.env['project.task'].search_count(['&',('issues_type','=',1),('project_id','=',project.id),('display_project_id','=',project.id),('active','=',True)])
+
+    task_total = fields.Integer(compute='_compute_task_total')
+
     def _compute_total_calendar_effort(self):
         for project in self:
             total_effort = 0
