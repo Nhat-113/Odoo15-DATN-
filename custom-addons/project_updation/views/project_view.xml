@@ -21,6 +21,19 @@
                 <xpath expr="//field[@name='recurring_task']" position="after">
                     <field name="task_score" widget="priority" eval="5"/>
                 </xpath>
+                <xpath expr="//group/group[2]/field[@name='date_deadline']" position="replace">
+                    <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}" string="Actual End Date"/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='sub_tasks_page']/field/tree/field[@name='date_deadline']" position="replace">
+                    <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}" optional="show" string="Actual End Date"/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='task_dependencies']/field/tree/field[@name='date_deadline']" position="replace">
+                    <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}" optional="show" string="Actual End Date"/>
+                </xpath>
+                <xpath expr="//page[@name='sub_tasks_page']/field/tree/field[@name='user_ids']" position="replace">
+                    <field name="user_id_domain" invisible="1"/>
+                    <field name="user_ids" class="o_task_user_field" options="{'no_open': True, 'no_create': True}" widget="many2many_avatar_user" domain="user_id_domain"/>
+                </xpath>
             </field>
         </record>
 
@@ -30,7 +43,6 @@
             <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
             <field name="arch" type="xml">
                 <xpath expr="//page[@id='timesheets_tab']/group[1]" position="replace">
-                    
                     <group>
                         <group>
                             <div class="o_td_label">
@@ -131,7 +143,14 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='user_ids']" position="after">
                     <field name="issues_type" widget="selection"/>
+                    <field name="status_id_domain" invisible="1"/>
+                    <field name="status" domain="status_id_domain" attrs="{'invisible': [('issues_type', '=', False)], 'required': [('issues_type', '!=', False)]}" string="Status"/>
                 </xpath>
+                <field name="user_ids" position="replace">
+                    <field name="project_id" context="{'active_id': True}" invisible="1"/>
+                    <field name="user_id_domain" invisible="1"/>
+                    <field name="user_ids" class="o_task_user_field" options="{'no_open': True, 'no_create': True}" widget="many2many_avatar_user" domain="user_id_domain"/>
+                </field>
             </field>
         </record>
 
@@ -231,19 +250,6 @@
             </field>
         </record>
 
-        <record id="view_task_search_form_inherit" model="ir.ui.view">
-            <field name="name">project.task.search.form_inherit</field>
-            <field name="model">project.task</field>
-            <field name="inherit_id" ref="project.view_task_search_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//filter[@name='starred']" position="before">
-                    <filter string="Bug" name="bug" domain="[('issues_type.name', '=', 'Bug')]"/>
-                    <filter string="Q&amp;A" name="qa" domain="[('issues_type.name', '=', 'Q&amp;A')]"/>
-                    <separator/>
-                </xpath>
-            </field>
-        </record>
-
         <record model="ir.ui.view" id="task_status_form_view">
             <field name="name">Status</field>
             <field name="model">project.task.status</field>
@@ -282,11 +288,36 @@
             <field name="view_mode">tree,form</field>
         </record>
 
+        <record id="view_issue_search_form" model="ir.ui.view">
+            <field name="name">project.task.search.form</field>
+            <field name="model">project.task</field>
+            <field name="arch" type="xml">
+                <search string="Issues">
+                    <field name="user_ids" context="{'active_test': False}"/>
+                    <field name="status" />
+                    <filter string="My Open Issue" name="my_issues" domain="[('user_ids', 'in', uid),('status.name','=','Open')]"/>
+                    <filter string="Unassigned" name="unassigned" domain="[('user_ids', '=', False)]"/>
+                    <filter string="Open Issue" name="open_issues" domain="[('status.name','=','Open')]"/>
+                    <filter string="Closed Issue" name="closed_issues" domain="[('status.name','=','Closed')]"/>
+                    <separator/>
+                    <filter string="Bug" name="bug" domain="[('issues_type.name', '=', 'Bug')]"/>
+                    <filter string="Q&amp;A" name="qa" domain="[('issues_type.name', '=', 'Q&amp;A')]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Assignees" name="user" context="{'group_by': 'user_ids'}"/>
+                        <separator/>
+                        <filter name="status_group" string="Status" domain="[]" context="{'group_by':'status'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+
         <record id="act_project_project_2_project_issue_all" model="ir.actions.act_window">
             <field name="name">Tasks</field>
             <field name="res_model">project.task</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('display_project_id', '=', active_id), ('issues_type', '!=', 1)]</field>
+            <field name="search_view_id" ref="view_issue_search_form"/>
             <field name="context">{
                 'pivot_row_groupby': ['user_ids'],
                 'default_project_id': active_id,
@@ -453,8 +484,10 @@
 
 
         <menuitem name="Issues" id="menu_issues" parent="project.menu_main_pm" action="issues_action" sequence="3" groups="base.group_no_one,project.group_project_user"/>
-        <menuitem id="issues_type_menu" name="Type" parent="project.menu_project_config" action="issues_type_action" sequence="11"/>
-        <menuitem id="task_status_menu" name="Status" parent="project.menu_project_config" action="task_status_action" sequence="12"/>
+        <menuitem id="issues_type_menu" name="Type" parent="project.menu_project_config" action="issues_type_action" sequence="11" groups="project.group_project_manager"/>
+        <menuitem id="task_status_menu" name="Status" parent="project.menu_project_config" action="task_status_action" sequence="12" groups="project.group_project_manager"/>
+        <menuitem action="project.project_tags_action" id="project.menu_project_tags_act" parent="project.menu_project_config" groups="project.group_project_manager"/>
+        <menuitem id="project.project_menu_config_activity_type" action="project.mail_activity_type_action_config_project_types" parent="project.menu_project_config" groups="project.group_project_manager"/>
 
     </data>
 </odoo>

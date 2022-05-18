@@ -59,6 +59,25 @@
         <value eval="{'noupdate': True}" />
     </function>
 
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'project'), ('name', '=', 'task_type_manager_rule')]" />
+        </function>
+        <value eval="{'noupdate': False}"/>
+    </function>
+
+    <record model="ir.rule" id="project.task_type_manager_rule">
+        <field name="groups" eval="[(4, ref('project.group_project_manager')), (4, ref('ds_project_planning.group_project_pm'))]"/>
+    </record>
+
+    <!-- reset noupdate -->
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'project'), ('name', '=', 'task_type_manager_rule')]" />
+        </function>
+        <value eval="{'noupdate': True}" />
+    </function>
+
     <data noupdate="1">
         <record id="update_visibility_project_officer" model="ir.rule">
             <field name="name">Project updates : Project Officer user can see all project updates</field>
