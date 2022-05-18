@@ -90,7 +90,7 @@ class Employee(models.Model):
         cr = self._cr
         cr.execute(query)
         leaves_this_month = cr.fetchall()
-        leaves_alloc_req = self.env['hr.leave.allocation'].sudo().search_count(
+        leaves_alloc_req = self.env['hr.leave'].sudo().search_count(
             [('state', 'in', ['validate'])])
         timesheet_count = self.env['account.analytic.line'].sudo().search_count(
             [('project_id', '!=', False), ('user_id', '=', uid)])
@@ -181,7 +181,7 @@ class Employee(models.Model):
                 INNER JOIN  hr_employee on hr_employee.user_id = project_task_user_rel.user_id and hr_employee.user_id = %s where DATE(project_task.date_start) = CURRENT_DATE
                             """) %  user_id
         cr.execute(sql)
-        task_for_day = cr.fetchall()
+        # task_for_day = cr.fetchall()
         
         if employee:
             department = employee.department_id
@@ -218,7 +218,7 @@ class Employee(models.Model):
             'birthday': birthday,
             'event': event,
             'announcement': announcement ,
-            'task_for_day' : task_for_day
+            # 'task_for_day' : task_for_day
         }
 
     @api.model

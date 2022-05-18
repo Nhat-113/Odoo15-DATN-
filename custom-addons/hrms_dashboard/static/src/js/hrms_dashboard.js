@@ -68,8 +68,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
         },
 
         init: function(parent, context) {
-            
-           
+
+
             this._super(parent, context);
             this.date_range = "week"; // possible values : 'week', 'month', year'
             this.date_from = moment().subtract(1, "week");
@@ -82,14 +82,14 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             this.employee_birthday = [];
             this.upcoming_events = [];
             this.announcements = [];
-            this.task_for_day = [];
+            // this.task_for_day = [];
             this.login_employee = [];
         },
 
         willStart: function() {
             var self = this;
             this.login_employee = {};
-            
+
             return this._super().then(function() {
                 var def0 = self
                     ._rpc({
@@ -97,7 +97,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         method: "check_user_group",
                     })
                     .then(function(result) {
-                        
+
                         if (result == true) {
                             self.is_manager = true;
                         } else {
@@ -120,7 +120,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     .then(function(res) {
                         self.employee_birthday = res["birthday"];
                         self.upcoming_events = res["event"];
-                        self.task_for_day = res["task_for_day"];
+                        // self.task_for_day = res["task_for_day"];
                         self.announcements = res["announcement"];
                     });
                 return $.when(def0, def1, def2);
@@ -128,23 +128,23 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
         },
 
         start: function() {
-            var self = this; 
+            var self = this;
             this.set("title", "Dashboard");
             return this._super().then(function() {
-               
+
                 session.user_has_group("hr_contract.group_hr_contract_manager").then(function(has_group) {
                     let button_contract = document.getElementById("btn-contract");
-    
+
                     // console.log("has_group", has_group);
                     if (!button_contract) return;
-    
-                    if (has_group){
+
+                    if (has_group) {
                         document.getElementById("btn-contract").style.display = "block";
                     } else {
                         document.getElementById("btn-contract").style.display = "none";
                     }
                 });
-                
+
                 setTimeout(() => {
                     setInterval(self.startTime, 1000)
                 }, 500);
@@ -152,7 +152,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 self.render_dashboards()
                 self.render_graphs();
                 self.$el.parent().addClass("oe_background_grey");
-                
+
             });
         },
 
@@ -184,7 +184,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 .then(function(res) {
                     self.employee_birthday = res["birthday"];
                     self.upcoming_events = res["event"];
-                    self.task_for_day = res["task_for_day"];
+                    // self.task_for_day = res["task_for_day"];
                     self.announcements = res["announcement"];
                 });
             return $.when(def0, def1, def2);
@@ -208,7 +208,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         .append(QWeb.render(template, { widget: self }));
 
                 });
-               
+
             } else {
                 self
                     .$(".o_hr_dashboard")
@@ -219,7 +219,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
         },
 
         render_graphs: function() {
-            
+
             var self = this;
             if (this.login_employee) {
                 self.render_department_employee();
@@ -307,8 +307,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     ["employee_id", "=", this.login_employee.id]
                 ],
                 target: "current", //self on some of them
-            }, {
-            });
+            }, {});
         },
         swap_menu: function(events) {
             var i, tabcontent, tablinks, targetClass, target;
@@ -340,20 +339,19 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
             // };
             this.do_action({
-                    name: _t("Leave Request"),
-                    type: "ir.actions.act_window",
-                    res_model: "hr.leave",
-                    view_mode: "tree,form,calendar",
-                    views: [
-                        [false, "list"],
-                        [false, "form"],
-                    ],
-                    domain: [
-                        ["state", "in", ["confirm", "validate1"]]
-                    ],
-                    target: "current",
-                },
-            );
+                name: _t("Leave Request"),
+                type: "ir.actions.act_window",
+                res_model: "hr.leave",
+                view_mode: "tree,form,calendar",
+                views: [
+                    [false, "list"],
+                    [false, "form"],
+                ],
+                domain: [
+                    ["state", "in", ["confirm", "validate1"]]
+                ],
+                target: "current",
+            }, );
         },
 
         //employee broad factor
@@ -374,23 +372,22 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             //        today = mm + '/' + dd + '/' + yyyy;
 
             this.do_action({
-                    name: _t("Leave Request"),
-                    type: "ir.actions.act_window",
-                    res_model: "hr.leave",
-                    view_mode: "tree,form,calendar",
-                    views: [
-                        [false, "list"],
-                        [false, "form"],
-                    ],
-                    domain: [
-                        ["state", "in", ["validate"]],
-                        ["employee_id", "=", this.login_employee.id],
-                        ["date_to", "<=", today],
-                    ],
-                    target: "current",
-                    context: { order: "duration_display" },
-                },
-            );
+                name: _t("Leave Request"),
+                type: "ir.actions.act_window",
+                res_model: "hr.leave",
+                view_mode: "tree,form,calendar",
+                views: [
+                    [false, "list"],
+                    [false, "form"],
+                ],
+                domain: [
+                    ["state", "in", ["validate"]],
+                    ["employee_id", "=", this.login_employee.id],
+                    ["date_to", "<=", today],
+                ],
+                target: "current",
+                context: { order: "duration_display" },
+            }, );
         },
 
         //hr timesheets
@@ -448,9 +445,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         },
                         target: "current",
                     });
-                }
-                else {
-                    document.getElementById("none_for_contract").style.display="none"
+                } else {
+                    document.getElementById("none_for_contract").style.display = "none"
                 }
             });
         },
@@ -518,27 +514,26 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             // var options = {
             //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
             // };
-            var today     = moment();
-            var tomorrow  = moment().add(1,'days');
+            var today = moment();
+            var tomorrow = moment().add(1, 'days');
             var yesterday = moment().add(-1, 'days');
             this.do_action({
-                    name: _t("Leave Request Today"),
-                    type: "ir.actions.act_window",
-                    res_model: "hr.leave",
-                    view_mode: "tree,form,calendar",
-                    views: [
-                        [false, "list"],
-                        [false, "form"],
-                    ],
-                    domain: [
-                        ["create_date", "<", tomorrow],
-                        ["create_date", ">", yesterday],
-                        ["state", "=", "confirm"],
-                        
-                    ],
-                    target: "current",
-                },
-            );
+                name: _t("Leave Request Today"),
+                type: "ir.actions.act_window",
+                res_model: "hr.leave",
+                view_mode: "tree,form,calendar",
+                views: [
+                    [false, "list"],
+                    [false, "form"],
+                ],
+                domain: [
+                    ["create_date", "<", tomorrow],
+                    ["create_date", ">", yesterday],
+                    ["state", "=", "confirm"],
+
+                ],
+                target: "current",
+            }, );
         },
 
         //leave requests this month
@@ -556,22 +551,21 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var fday = firstDay.toJSON().slice(0, 10).replace(/-/g, "-");
             var lday = lastDay.toJSON().slice(0, 10).replace(/-/g, "-");
             this.do_action({
-                    name: _t("This Month Leaves"),
-                    type: "ir.actions.act_window",
-                    res_model: "hr.leave",
-                    view_mode: "tree,form,calendar",
-                    views: [
-                        [false, "list"],
-                        [false, "form"],
-                    ],
-                    domain: [
-                        ["date_from", ">", fday],
-                        ["state", "=", "confirm"],
-                        ["date_from", "<=", lday],
-                    ],
-                    target: "current",
-                },
-            );
+                name: _t("This Month Leaves"),
+                type: "ir.actions.act_window",
+                res_model: "hr.leave",
+                view_mode: "tree,form,calendar",
+                views: [
+                    [false, "list"],
+                    [false, "form"],
+                ],
+                domain: [
+                    ["date_from", ">", fday],
+                    ["state", "=", "confirm"],
+                    ["date_from", "<=", lday],
+                ],
+                target: "current",
+            }, );
         },
 
         leave_allocations_to_approve: function(e) {
@@ -582,20 +576,19 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
             // };
             this.do_action({
-                    name: _t("Leave Allocation Request"),
-                    type: "ir.actions.act_window",
-                    res_model: "hr.leave.allocation",
-                    view_mode: "tree,form,calendar",
-                    views: [
-                        [false, "list"],
-                        [false, "form"],
-                    ],
-                    domain: [
-                        ["state", "in", ["validate"]]
-                    ],
-                    target: "current",
-                },
-            );
+                name: _t("Leave Allocation Request"),
+                type: "ir.actions.act_window",
+                res_model: "hr.leave",
+                view_mode: "tree,form,calendar",
+                views: [
+                    [false, "list"],
+                    [false, "form"],
+                ],
+                domain: [
+                    ["state", "in", ["validate"]]
+                ],
+                target: "current",
+            }, );
         },
 
         job_applications_to_approve: function(event) {
@@ -606,22 +599,21 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
             // };
             this.do_action({
-                    name: _t("Applications"),
-                    type: "ir.actions.act_window",
-                    res_model: "hr.applicant",
-                    view_mode: "tree,kanban,form,pivot,graph,calendar",
-                    views: [
-                        [false, "list"],
-                        [false, "kanban"],
-                        [false, "form"],
-                        [false, "pivot"],
-                        [false, "graph"],
-                        [false, "calendar"],
-                    ],
-                    context: {},
-                    target: "current",
-                },
-            );
+                name: _t("Applications"),
+                type: "ir.actions.act_window",
+                res_model: "hr.applicant",
+                view_mode: "tree,kanban,form,pivot,graph,calendar",
+                views: [
+                    [false, "list"],
+                    [false, "kanban"],
+                    [false, "form"],
+                    [false, "pivot"],
+                    [false, "graph"],
+                    [false, "calendar"],
+                ],
+                context: {},
+                target: "current",
+            }, );
         },
 
         //End Events
@@ -1367,12 +1359,12 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         const mediaQuery = window.matchMedia('(max-width: 1500px)')
                         if (mediaQuery.matches) {
                             var pC = {},
-                            pieDim = { w: 260, h: 260 };
+                                pieDim = { w: 260, h: 260 };
                         } else {
                             var pC = {},
-                            pieDim = { w: 380, h: 380 };
+                                pieDim = { w: 380, h: 380 };
                         }
-            
+
                         // var pC = {},
                         //     pieDim = { w: 250, h: 250 };
                         pieDim.r = Math.min(pieDim.w, pieDim.h) / 2;
