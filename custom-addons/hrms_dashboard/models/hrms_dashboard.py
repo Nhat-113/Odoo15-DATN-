@@ -57,8 +57,10 @@ class Employee(models.Model):
         leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1'])])
         recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ])])
 
+        # user_id = self.env['res.users'].search([('id', '=', uid)])
+        # company_id = self.env.user.company_ids.ids
         #meeting  =  select calendar_event.start from calendar_event
-        my_date = date.today()
+
 
         today = datetime.strftime(datetime.today(), '%Y-%m-%d')
         query = """
@@ -80,7 +82,7 @@ class Employee(models.Model):
         cr = self._cr
         cr.execute(query)
         leaves_today = cr.fetchall()
-        
+
         first_day = date.today().replace(day=1)
         last_day = (date.today() + relativedelta(months=1, day=1)) - timedelta(1)
         query = """
@@ -92,11 +94,29 @@ class Employee(models.Model):
         cr.execute(query)
         leaves_this_month = cr.fetchall()
         leaves_alloc_req = self.env['hr.leave.allocation'].sudo().search_count(
-            [('state', 'in', ['confirm', 'validate1'])])
+            [('state', 'in', ['confirm', 'validate'])])
         timesheet_count = self.env['account.analytic.line'].sudo().search_count(
             [('project_id', '!=', False), ('user_id', '=', uid)])
+
+
         timesheet_view_id = self.env.ref('hr_timesheet.hr_timesheet_line_search')
-        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False)])
+        
+        
+        user_id = self.env['res.users'].search([('id', '=', uid)])
+
+        company_id = self.env.user.company_ids.ids
+        
+        # query = """
+        #         select count(id)
+        #         from hr_applicant
+        #         WHERE hr_applicant.company_id = '%s' and active = 'true'
+        #         """ % (company_id)
+        # cr = self._cr
+        # cr.execute(query)
+        # job_applications_all = cr.fetchall()
+
+        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False),('company_id','=' , company_id )])
+        
         if employee:
             sql = """select broad_factor from hr_employee_broad_factor where id =%s"""
             self.env.cr.execute(sql, (employee[0]['id'],))

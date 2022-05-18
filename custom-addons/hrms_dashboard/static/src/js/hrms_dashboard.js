@@ -68,6 +68,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
         },
 
         init: function(parent, context) {
+            
+           
             this._super(parent, context);
             this.date_range = "week"; // possible values : 'week', 'month', year'
             this.date_from = moment().subtract(1, "week");
@@ -87,6 +89,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
         willStart: function() {
             var self = this;
             this.login_employee = {};
+            
             return this._super().then(function() {
                 var def0 = self
                     ._rpc({
@@ -94,6 +97,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         method: "check_user_group",
                     })
                     .then(function(result) {
+                        
                         if (result == true) {
                             self.is_manager = true;
                         } else {
@@ -124,16 +128,30 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
         },
 
         start: function() {
-            var self = this;
-            this.set("title", "Dashboard");
+            var self = this; 
             return this._super().then(function() {
+               
+                session.user_has_group("hr_contract.group_hr_contract_manager").then(function(has_group) {
+                    let button_contract = document.getElementById("btn-contract");
+    
+                    console.log("has_group", has_group);
+                    if (!button_contract) return;
+    
+                    if (has_group){
+                        document.getElementById("btn-contract").style.display = "block";
+                    } else {
+                        document.getElementById("btn-contract").style.display = "none";
+                    }
+                });
+                
+                setTimeout(() => {
+                    setInterval(self.startTime, 1000)
+                }, 500);
                 self.update_cp();
                 self.render_dashboards()
                 self.render_graphs();
                 self.$el.parent().addClass("oe_background_grey");
-                setTimeout(() => {
-                    setInterval(self.startTime, 1000)
-                }, 1000);
+                
             });
         },
 
@@ -189,15 +207,18 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         .append(QWeb.render(template, { widget: self }));
 
                 });
+               
             } else {
                 self
                     .$(".o_hr_dashboard")
                     .append(QWeb.render("EmployeeWarning", { widget: self }));
             }
 
+
         },
 
         render_graphs: function() {
+            
             var self = this;
             if (this.login_employee) {
                 self.render_department_employee();
@@ -264,13 +285,13 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
 
         hr_payslip: function(ev) {
             var self = this;
-            ev.stopPropagation();
-            ev.preventDefault();
+            // ev.stopPropagation();
+            // ev.preventDefault();
             //            var $action = $(ev.currentTarget);
 
-            var options = {
-                on_reverse_breadcrumb: this.on_reverse_breadcrumb,
-            };
+            // var options = {
+            //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
+            // };
 
             this.do_action({
                 name: _t("Employee Payslips"),
@@ -286,7 +307,6 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 ],
                 target: "current", //self on some of them
             }, {
-                on_reverse_breadcrumb: this.on_reverse_breadcrumb,
             });
         },
         swap_menu: function(events) {
@@ -306,7 +326,6 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 target.className.includes("btn_announcements") ?
                 "announcements" :
                 "annalys";
-            console.log(targetClass);
             document.querySelector(`.${targetClass}`).removeAttribute("style");
             events.currentTarget.className += " active";
         },
@@ -316,9 +335,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             e.stopPropagation();
             e.preventDefault();
 
-            var options = {
-                on_reverse_breadcrumb: this.on_reverse_breadcrumb,
-            };
+            // var options = {
+            //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
+            // };
             this.do_action({
                     name: _t("Leave Request"),
                     type: "ir.actions.act_window",
@@ -333,7 +352,6 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     ],
                     target: "current",
                 },
-                options
             );
         },
 
@@ -341,11 +359,11 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
 
         employee_broad_factor: function(e) {
             var self = this;
-            e.stopPropagation();
-            e.preventDefault();
-            var options = {
-                on_reverse_breadcrumb: this.on_reverse_breadcrumb,
-            };
+            // e.stopPropagation();
+            // e.preventDefault();
+            // var options = {
+            //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
+            // };
             var today = new Date();
 
             var dd = String(today.getDate()).padStart(2, "0");
@@ -371,7 +389,6 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     target: "current",
                     context: { order: "duration_display" },
                 },
-                options
             );
         },
 
@@ -411,7 +428,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            session.user_has_group("hr.group_hr_user").then(function(has_group) {
+            session.user_has_group("hr_contract.group_hr_contract_manager").then(function(has_group) {
                 if (has_group) {
                     var options = {
                         on_reverse_breadcrumb: self.on_reverse_breadcrumb,
@@ -430,6 +447,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         },
                         target: "current",
                     });
+                }
+                else {
+                    document.getElementById("none_for_contract").style.display="none"
                 }
             });
         },
@@ -494,10 +514,14 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            var options = {
-                on_reverse_breadcrumb: this.on_reverse_breadcrumb,
-            };
+            // var options = {
+            //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
+            // };
             var date = new Date();
+            var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+            var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+            var fday = firstDay.toJSON().slice(0, 10).replace(/-/g, "-");
+            var lday = lastDay.toJSON().slice(0, 10).replace(/-/g, "-");
             this.do_action({
                     name: _t("Leave Request Today"),
                     type: "ir.actions.act_window",
@@ -508,13 +532,12 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         [false, "form"],
                     ],
                     domain: [
-                        ["create_date", "=", date],
+                        ["create_date", "<", lday],
                         ["state", "=", "validate"],
                         
                     ],
                     target: "current",
                 },
-                options
             );
         },
 
@@ -524,9 +547,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            var options = {
-                on_reverse_breadcrumb: this.on_reverse_breadcrumb,
-            };
+            // var options = {
+            //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
+            // };
             var date = new Date();
             var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
             var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
@@ -548,7 +571,6 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     ],
                     target: "current",
                 },
-                options
             );
         },
 
@@ -556,9 +578,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            var options = {
-                on_reverse_breadcrumb: this.on_reverse_breadcrumb,
-            };
+            // var options = {
+            //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
+            // };
             this.do_action({
                     name: _t("Leave Allocation Request"),
                     type: "ir.actions.act_window",
@@ -569,11 +591,10 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         [false, "form"],
                     ],
                     domain: [
-                        ["state", "in", ["confirm", "validate1"]]
+                        ["state", "in", ["validate"]]
                     ],
                     target: "current",
                 },
-                options
             );
         },
 
@@ -581,9 +602,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             event.stopPropagation();
             event.preventDefault();
-            var options = {
-                on_reverse_breadcrumb: this.on_reverse_breadcrumb,
-            };
+            // var options = {
+            //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
+            // };
             this.do_action({
                     name: _t("Applications"),
                     type: "ir.actions.act_window",
@@ -600,7 +621,6 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     context: {},
                     target: "current",
                 },
-                options
             );
         },
 
@@ -608,8 +628,15 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
 
         render_department_employee: function() {
             var self = this;
-            var w = 380;
-            var h = 380;
+            const mediaQuery = window.matchMedia('(max-width: 1500px)')
+            if (mediaQuery.matches) {
+                var w = 245;
+                var h = 245;
+            } else {
+                var w = 375;
+                var h = 375;
+            }
+
             var r = h / 2;
             var elem = this.$(".emp_graph");
             //        var colors = ['#ff8762', '#5ebade', '#b298e1', '#70cac1', '#cf2030'];
@@ -1337,8 +1364,17 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
 
                     // function to handle pieChart.
                     function pieChart(pD) {
-                        var pC = {},
-                            pieDim = { w: 400, h: 400 };
+                        const mediaQuery = window.matchMedia('(max-width: 1500px)')
+                        if (mediaQuery.matches) {
+                            var pC = {},
+                            pieDim = { w: 260, h: 260 };
+                        } else {
+                            var pC = {},
+                            pieDim = { w: 380, h: 380 };
+                        }
+            
+                        // var pC = {},
+                        //     pieDim = { w: 250, h: 250 };
                         pieDim.r = Math.min(pieDim.w, pieDim.h) / 2;
 
                         // create svg for pie chart.
