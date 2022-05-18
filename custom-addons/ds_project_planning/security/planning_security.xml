@@ -10,6 +10,14 @@
         <field name="implied_ids" eval="[(4, ref('project.group_project_user'))]"/>
         <field name="category_id" ref="base.module_category_services_project"/>
     </record>
+    
+    <!-- Add new Director group--> 
+    <!-- This group only view all project & task -->
+    <record id="group_project_director" model="res.groups">
+        <field name="name">Director</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="category_id" ref="base.module_category_services_project"/>
+    </record>
 
     <record id="project.group_project_manager" model="res.groups">
         <field name="implied_ids" eval="[(4, ref('project.group_project_user')), (4, ref('ds_project_planning.group_project_pm'))]"/>
@@ -21,6 +29,22 @@
         <field name="model_id" ref="model_project_project"/>
         <field name="domain_force">[('member_ids', 'in', user.id)]</field>
         <field name="groups" eval="[(4,ref('project.group_project_user'))]"/>
+    </record>
+   
+    <!-- Project Director: can see all projects -->
+    <record model="ir.rule" id="project_project_director_rule">
+        <field name="name">Project: Director rule: see all projects</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_director'))]"/>
+    </record>
+  
+    <!-- Project Director: can see all tasks -->
+    <record model="ir.rule" id="project_task_director_rule">
+        <field name="name">Project: Director rule: see all tasks</field>
+        <field name="model_id" ref="model_project_task"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_director'))]"/>
     </record>
 
     <!-- Project Officer: can see only managed projects for PM and can see all projects assigned -->
