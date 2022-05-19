@@ -12,8 +12,6 @@ class RampUp(models.Model):
 
     planning_calendar_resources = fields.One2many(
         'planning.calendar.resource', 'project_id', string='Planning Calendar Resources', readonly=True, compute='_get_calendar_resources')
-    timesheet_source = fields.One2many(
-        'account.analytic.line', string='Timesheet Hour Spent', readonly=True, compute='_get_timesheet_amount')
 
     total_effort_rate = fields.Float(string='Total Effort Rate (%)', compute='_get_effort_rate_total', store=True)
     total_calendar_effort_rate = fields.Float(string='Calendar Effort', compute='_get_calendar_effort_rate_total')
@@ -41,13 +39,10 @@ class RampUp(models.Model):
                 total += calendar_rate
             employee.total_calendar_effort_rate = total
 
-    def _get_timesheet_amount(self):
-        for employee in self:
-            employee.timesheet_source = self.env['account.analytic.line'].search([('employee_id', '=', employee.id)])
-
     def _get_actual_effort(self):
         for employee in self:
-            employee_unit_amount = [x.unit_amount for x in employee.timesheet_source]
+            timesheet_source = self.env['account.analytic.line'].search([('employee_id', '=', employee.id)])
+            employee_unit_amount = [x.unit_amount for x in timesheet_source]
             total = 0
             for unit_amount in employee_unit_amount:
                 total += unit_amount
@@ -61,4 +56,4 @@ class RampUp(models.Model):
             for task in tasks:
                 if employee.user_id.id in task.user_ids.ids:
                     total += task.planned_hours
-            employee.estimation_effort_rate = round(total/8/20)
+            employee.estimation_effort_rate = round(total/8/20, 2)
