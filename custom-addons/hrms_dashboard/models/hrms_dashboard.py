@@ -55,44 +55,65 @@ class Employee(models.Model):
         uid = request.session.uid
         employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
         leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1'])])
+
         recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ])])
 
+        # user_id = self.env['res.users'].search([('id', '=', uid)])
+        # company_id = self.env.user.company_ids.ids
         #meeting  =  select calendar_event.start from calendar_event
-        my_date = date.today()
 
-        temp = str(my_date.year) + '-' + str(my_date.month) + '-' + str(my_date.day)
-              
-        total_len = self.env['calendar.event'].search_count([('start', '=', temp)])
-        
-        #todayMeeting = len(self.env['calendar.event'].search([]))
-        #today_meeting = self.env['calendar.event'].sudo().search_count([])
 
-        
         today = datetime.strftime(datetime.today(), '%Y-%m-%d')
         query = """
         select count(id)
+        from calendar_event where DATE(calendar_event.start)  = '%s' and  calendar_event.user_id = '%s' """ % (today, uid)
+        cr = self._cr
+        cr.execute(query)
+        today_meeting = cr.fetchall()
+        
+
+        query = """
+        select count(id)
         from hr_leave
-        WHERE (hr_leave.date_from::DATE,hr_leave.date_to::DATE) OVERLAPS ('%s', '%s') and
-        state='validate'""" % (today, today)
+        where  DATE(hr_leave.create_date) = '%s' and state= 'confirm' """ %  (today)
         cr = self._cr
         cr.execute(query)
         leaves_today = cr.fetchall()
+
         first_day = date.today().replace(day=1)
         last_day = (date.today() + relativedelta(months=1, day=1)) - timedelta(1)
         query = """
                 select count(id)
                 from hr_leave
                 WHERE (hr_leave.date_from::DATE,hr_leave.date_to::DATE) OVERLAPS ('%s', '%s')
-                and  state='validate'""" % (first_day, last_day)
+                and  state='confirm'""" % (first_day, last_day)
         cr = self._cr
         cr.execute(query)
         leaves_this_month = cr.fetchall()
-        leaves_alloc_req = self.env['hr.leave.allocation'].sudo().search_count(
-            [('state', 'in', ['confirm', 'validate1'])])
+        leaves_alloc_req = self.env['hr.leave'].sudo().search_count(
+            [('state', 'in', ['validate'])])
         timesheet_count = self.env['account.analytic.line'].sudo().search_count(
             [('project_id', '!=', False), ('user_id', '=', uid)])
+
+
         timesheet_view_id = self.env.ref('hr_timesheet.hr_timesheet_line_search')
-        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False)])
+        
+        
+        user_id = self.env['res.users'].search([('id', '=', uid)])
+
+        company_ids = self.env.user.company_ids.ids
+        
+        # query = """
+        #         select count(id)
+        #         from hr_applicant
+        #         WHERE hr_applicant.company_id = '%s' and active = 'true'
+        #         """ % (company_id)
+        # cr = self._cr
+        # cr.execute(query)
+        # job_applications_all = cr.fetchall()
+
+        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False),('company_id','in' , company_ids )])
+        
         if employee:
             sql = """select broad_factor from hr_employee_broad_factor where id =%s"""
             self.env.cr.execute(sql, (employee[0]['id'],))
@@ -124,7 +145,7 @@ class Employee(models.Model):
                     'experience': experience,
                     'age': age,
                     'recruitment': recruitment,
-                    'total_len': total_len
+                    'today_meeting': today_meeting
 
                 }
                 employee[0].update(data)
@@ -160,7 +181,7 @@ class Employee(models.Model):
                 INNER JOIN  hr_employee on hr_employee.user_id = project_task_user_rel.user_id and hr_employee.user_id = %s where DATE(project_task.date_start) = CURRENT_DATE
                             """) %  user_id
         cr.execute(sql)
-        task_for_day = cr.fetchall()
+        # task_for_day = cr.fetchall()
         
         if employee:
             department = employee.department_id
@@ -197,7 +218,7 @@ class Employee(models.Model):
             'birthday': birthday,
             'event': event,
             'announcement': announcement ,
-            'task_for_day' : task_for_day
+            # 'task_for_day' : task_for_day
         }
 
     @api.model
