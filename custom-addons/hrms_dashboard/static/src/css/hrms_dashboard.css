@@ -1084,7 +1084,7 @@ button:focus {
 }
 
 .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
-    padding-left: 2%;
+    padding-left: 0px;
 }
 
 .leave_trend_border {
@@ -1101,8 +1101,7 @@ button:focus {
 }
 
 .list_menu .btn_announcements .text_btn_announcements {
-    padding-left: 2% !important;
-    padding: 0;
+    margin-left: -23px;
 }
 
 .list_menu .btn_annalys {
@@ -1110,7 +1109,7 @@ button:focus {
 }
 
 .list_menu .btn_annalys .text_btn_annalys {
-    padding-left: 3%;
+    padding-left: 1px;
 }
 
 .list_menu {
@@ -1183,7 +1182,7 @@ button:focus {
     margin-left: 19px;
 }
 .hr_leave_request_approve > h3 {
-    margin-left: 6px;
+    margin-left: 4px;
 }
 .fearure_detail_user {
     color: #6869AC;
@@ -1586,7 +1585,7 @@ button:focus {
 }
 
 .list-employee .leave_graph .legend {
-    margin-top: 8%;
+    margin-top: 19px;
 }
 
 .leave_graph .legend>tbody {
@@ -1600,6 +1599,7 @@ button:focus {
     margin: 0 auto;
     margin-left: 18%;
 }
+
 
 .leave_graph .legend>tbody>tr {
     width: 50%;
@@ -2175,21 +2175,26 @@ button:focus {
         font-size: 1rem;
     }
     .btn_leave_request  > h3 {
-        margin-left: 3px;
-    }
-    .emp_graph .legend>tbody{
-        display: contents;
-        flex: 0;
+        margin-left: 0px;
     }
     .list-employee .leave_graph .legend {
         margin-top:0;
     }
+    .emp_graph .legend>tbody>tr {
+        width: 50%;
+        font-size: 10px;
+    }
     .leave_graph .legend>tbody {
-        display: contents;
+        display: flex;
+        width: 90%;
+        margin: 0;
+        margin-left: 12%;
     }
-    .list-employee .leave_graph .legend {
-        flex: 0;
+    .leave_graph .legend>tbody>tr {
+        width: 50%;
+        font-size: 10px;
     }
+
     .list_future button h4 {
         margin-bottom: 0 !important;
         float: left;
@@ -2208,11 +2213,103 @@ button:focus {
     .department .detail {
         margin-top: 6.2%;
     }
+    .list_future .btn_payslip .fearure_detail {
+        padding-left: 24px;
+    } 
+    .emp_graph {
+        margin-top: -14%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        align-content: center;
+        justify-content: space-around;
+    }
+    .emp_graph .legend>tbody {
+        display: flex;
+        align-content: space-around;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: center;
+        flex-direction: row;
+        width: 71%;
+        margin: 0 auto;
+    }
+    .list_menu .btn_announcements .text_btn_announcements {
+        margin-left: 8px;
+    }
+    .all-request p {
+        font-weight: 700;
+        display: flex;
+        margin: 0;
+        padding: 0;
+        align-items: center;
+        color: #343A40;
+        font-size: 1rem;
+    }
+    .job-request p {
+        font-weight: 700;
+        display: flex;
+        margin: 0;
+        padding: 0;
+        align-items: center;
+        color: #343A40;
+        font-size: 1rem;
+    }
+    .list-employee .text-employee {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 8px 8px 8px 6px;
+        position: static;
+        left: 0px;
+        top: 0px;
+        background: #FFFFFF;
+        border-radius: 24px;
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+        margin: 16px 0px 0px 0px;
+        border: white;
+        font-weight: 700;
+        font-size: 18px;
+        line-height: 22px;
+        height: 6%;
+        font-size: 1.3rem;
+    }
+    .department .detail h3 {
+        color: #6869AC;
+        padding: 0;
+        margin-bottom: 67px;
+        font-size: 1.3rem;
+    }  
+    .information h2 {
+        margin-top: 3%;
+        color: #6869AC;
+        font-size: 1.3rem;
+    }  
+    .employee_dashboard_detail>div>h3 {
+        font-size: 1.3rem;
+    }
+    .announcements_detail h3 {
+        font-size: 1.2rem;
+    }
+    .Birthday h3 {
+        font-size: 1.2rem;
+    }
+    .text_news{
+        font-size: 12px !important;
+    }
+    .text_detail .new_code {
+        font-size: 12px !important;
+    }
+    .information p {
+        font-size: 10px;
+    }
 }
 
 @media only screen and (min-width: 1800px) {
     .emp_graph .legend {
-        margin-top: 10%;
+        margin-top: 34px;
     }
     .join_resign_trend {
         display: flex;

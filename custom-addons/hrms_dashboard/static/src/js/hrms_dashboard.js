@@ -1365,7 +1365,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                                 pieDim = { w: 260, h: 260 };
                         } else {
                             var pC = {},
-                                pieDim = { w: 400, h: 400 };
+                                pieDim = { w: 395, h: 395 };
                         }
 
                         // var pC = {},
