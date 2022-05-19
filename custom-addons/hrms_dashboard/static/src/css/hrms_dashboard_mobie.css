@@ -105,17 +105,28 @@
         margin: 0;
         margin-left: 28%;
     } */
+    .employee_infomation {
+        background: #FFFFFF;
+        border-radius: 24px;
+        margin-top: 1%;
+        padding-right: 1%;
+        height: 50%;
+        padding-left: 1%;
+    }
     .image-employee {
         border-radius: 3%;
         height: 22%;
         background-color: #00438b;
-        min-width: 59%;
-        margin: 0 auto;
-        width: 54%;
-        margin-top: 9%;
+        min-width: 26%;
+        margin: 1px auto;
+        width: 30%;
+    }
+    .information {
+        text-align: center;
+        height: 9%;
     }
     .list_menu {
-        height: 24%;
+        height: 8%;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -127,7 +138,6 @@
         margin-top: 0px;
     }
     .list_menu button {
-        z-index: 999999;
         display: flex;
         width: 90%;
         margin-left: 2%;
@@ -147,7 +157,7 @@
     }
     .list_future {
         text-align: center;
-        height: 5%;
+        height: 8%;
         display: flex;
     }
     .list_future button {
@@ -159,8 +169,7 @@
         border-radius: 5px;
     }
     .time {
-        background: #ffffff;
-        height: 5.5%;
+        height: 11%;
         margin: 0 auto;
         width: 90%;
         display: flex;
@@ -174,7 +183,7 @@
     }
     .hr_attendance_login {
         margin-top: 8px;
-        height: 5.5%;
+        height: 9.5%;
         z-index: 1000;
     }
     .employee_dashboard_detail {
@@ -209,5 +218,12 @@
         background: white;
         border-radius: 24px;
         height: 100%;
+    }
+    legend {
+        border-collapse: collapse;
+        border-spacing: 0px;
+        flex: 100%;
+        /* margin: 1% auto; */
+        margin-left: 15%;
     }
 }
