@@ -514,9 +514,11 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             // var options = {
             //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
             // };
-            var today = moment();
-            var tomorrow = moment().add(1, 'days');
-            var yesterday = moment().add(-1, 'days');
+            const start = new Date();
+            start.setHours(0, 0, 0, 0);
+
+            const end = new Date();
+            end.setHours(23, 59, 59, 999);
             this.do_action({
                 name: _t("Leave Request Today"),
                 type: "ir.actions.act_window",
@@ -527,8 +529,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     [false, "form"],
                 ],
                 domain: [
-                    ["create_date", "<", tomorrow],
-                    ["create_date", ">", yesterday],
+                    ["create_date", "<=", end],
+                    ["create_date", ">=", start],
                     ["state", "=", "confirm"],
 
                 ],
