@@ -622,13 +622,13 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
 
         render_department_employee: function() {
             var self = this;
-            const mediaQuery = window.matchMedia('(max-width: 1500px)')
+            const mediaQuery = window.matchMedia('(max-width: 1700px)')
             if (mediaQuery.matches) {
                 var w = 245;
                 var h = 245;
             } else {
-                var w = 375;
-                var h = 375;
+                var w = 385;
+                var h = 385;
             }
 
             var r = h / 2;
@@ -1359,13 +1359,13 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
 
                     // function to handle pieChart.
                     function pieChart(pD) {
-                        const mediaQuery = window.matchMedia('(max-width: 1500px)')
+                        const mediaQuery = window.matchMedia('(max-width: 1700px)')
                         if (mediaQuery.matches) {
                             var pC = {},
-                                pieDim = { w: 260, h: 260 };
+                                pieDim = { w: 265.2, h: 265.2 };
                         } else {
                             var pC = {},
-                                pieDim = { w: 395, h: 395 };
+                                pieDim = { w: 402, h: 402 };
                         }
 
                         // var pC = {},

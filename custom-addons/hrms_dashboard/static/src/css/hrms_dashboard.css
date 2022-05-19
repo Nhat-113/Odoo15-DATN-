@@ -1576,16 +1576,16 @@ button:focus {
 }
 
 .list-employee .leave_graph {
-    margin-top: 2%;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-end;
     align-items: flex-end;
     justify-content: center;
+    margin-top: 5px;
 }
 
 .list-employee .leave_graph .legend {
-    margin-top: 19px;
+    margin-top: 27px;
 }
 
 .leave_graph .legend>tbody {
@@ -2160,7 +2160,7 @@ button:focus {
         width: 280px;
     } */
     .emp_graph .legend {
-        margin-top: 2%;
+        margin-top: 10px;
     }
     .list_future button h4 {
         font-size: 1rem;
@@ -2211,13 +2211,13 @@ button:focus {
         /* font-weight: 700; */
     }
     .department .detail {
-        margin-top: 6.2%;
+        margin-top: 25px;
     }
     .list_future .btn_payslip .fearure_detail {
         padding-left: 24px;
     } 
     .emp_graph {
-        margin-top: -14%;
+        margin-top: -42px;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -2289,6 +2289,7 @@ button:focus {
     }  
     .employee_dashboard_detail>div>h3 {
         font-size: 1.3rem;
+        margin-top: 17.5px
     }
     .announcements_detail h3 {
         font-size: 1.2rem;
@@ -2305,6 +2306,9 @@ button:focus {
     .information p {
         font-size: 10px;
     }
+    /* .emp_graph svg { 
+        margin-top: 11.5px;
+    } */
 }
 
 @media only screen and (min-width: 1800px) {
