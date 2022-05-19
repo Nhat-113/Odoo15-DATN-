@@ -517,7 +517,7 @@
         <field name="name">Project Phase</field>
         <field name="model">project.planning.phase</field>
         <field name="arch" type="xml">
-            <form>
+            <form duplicate="0">
                 <header>
                     <button string="Compute Tasks" name="compute_tasks" type="object" class="oe_highlight"/>
                     <button string="Create Milestone" name="open_create_milestone_form" type="object" class="btn btn-secondary"/>
@@ -607,7 +607,7 @@
         <field name="name">Project Milestone</field>
         <field name="model">project.planning.milestone</field>
         <field name="arch" type="xml">
-            <form>
+            <form duplicate="0">
                 <sheet>
                     <div class="oe_title" style="width: 800px">
                         <label for="name" class="oe_edit_only"/>

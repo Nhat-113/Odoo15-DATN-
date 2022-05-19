@@ -15,7 +15,7 @@
     <!-- This group only view all project & task -->
     <record id="group_project_director" model="res.groups">
         <field name="name">Director</field>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="implied_ids" eval="[(4, ref('project.group_project_user'))]"/>
         <field name="category_id" ref="base.module_category_services_project"/>
     </record>
 
