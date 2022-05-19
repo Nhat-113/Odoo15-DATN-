@@ -2180,6 +2180,9 @@ button:focus {
     .list-employee .leave_graph .legend {
         margin-top:0;
     }
+    .list-employee .leave_graph {
+        margin-top: 14px;
+    }
     .emp_graph .legend>tbody>tr {
         width: 50%;
         font-size: 10px;
