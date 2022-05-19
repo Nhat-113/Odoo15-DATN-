@@ -1053,7 +1053,7 @@ h4 .stat-count {
     margin: 0;
     padding-right: 11%;
     font-size: 1.4rem;
-    padding-left: 8%;
+    margin-left: 20px;
     font-weight: 700;
 }
 
@@ -1084,7 +1084,7 @@ button:focus {
 }
 
 .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
-    padding-left: 0px;
+    margin-left: 3px;
 }
 
 .leave_trend_border {
@@ -1101,7 +1101,7 @@ button:focus {
 }
 
 .list_menu .btn_announcements .text_btn_announcements {
-    margin-left: -23px;
+    margin-left: 2px;
 }
 
 .list_menu .btn_annalys {
@@ -1109,7 +1109,7 @@ button:focus {
 }
 
 .list_menu .btn_annalys .text_btn_annalys {
-    padding-left: 1px;
+    margin-left: 3px;
 }
 
 .list_menu {
@@ -2137,9 +2137,16 @@ button:focus {
 }
 
 @media only screen and (max-width: 1800px) {
+    .fearure_detail{
+        padding-left: 0;
+    }
+
     .join_resign_trend {
         height: 250px !important;
         display: flex !important;
+    }
+    .list_menu .btn_annalys .text_btn_annalys{
+        margin-left: 4px;
     }
     .join_resign_trend>svg {
         height: 245px !important;
@@ -2216,9 +2223,15 @@ button:focus {
     .department .detail {
         margin-top: 25px;
     }
-    .list_future .btn_payslip .fearure_detail {
-        padding-left: 24px;
-    } 
+    .list_future > button > h3 {
+        margin-left: 22px;
+    }
+    .hr_payslip > h3 {
+        margin-left: 18px !important;
+    }
+    .hr_contract > h3 {
+        margin-left: 17px !important;
+    }
     .emp_graph {
         margin-top: -42px;
         display: flex;
@@ -2238,7 +2251,7 @@ button:focus {
         margin: 0 auto;
     }
     .list_menu .btn_announcements .text_btn_announcements {
-        margin-left: 8px;
+        margin-left: 2px;
     }
     .all-request p {
         font-weight: 700;
