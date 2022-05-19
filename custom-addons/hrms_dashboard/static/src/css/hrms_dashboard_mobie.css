@@ -1,0 +1,108 @@
+@media only screen and (max-width: 720px) {
+    .employee_dashboard_detail {
+        display: flex;
+        margin-top: 1%;
+        height: 100%;
+        flex-direction: column;
+        overflow-y: scroll;
+    }
+    .image-employee {
+        border-radius: 3%;
+        height: 8%;
+        background-color: #00438b;
+        min-width: 80%;
+        margin: 0 auto;
+        width: 90%;
+        margin-top: 9%;
+    }
+    .employee_dashboard_detail .department {
+        width: 100%;
+        border-radius: 24px;
+        height: 22%;
+    }
+    .employee_dashboard_detail .Leave-Request {
+        width: 100%;
+        margin-left: 1%;
+        background: white;
+        border-radius: 24px;
+        height: 21%;
+    }
+    .employee_dashboard_detail .New-employee {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0px 0px 16px;
+        position: static;
+        width: 100%;
+        top: 0px;
+        background: #FFFFFF;
+        border-radius: 24px;
+        flex: none;
+        flex-grow: 0;
+        margin: 0% 0% 0% 1%;
+        height: 21%;
+    }
+    .welcome_employee {
+        width: 98%;
+        height: 14.7%;
+        background-color: #FFFFFF;
+        position: absolute;
+        bottom: 0;
+        display: flex;
+        align-content: center;
+        border-radius: 24px;
+        color: #00438b;
+    }
+    .welcome_employee {
+        display: none;
+    }
+    .employee_infomation {
+        background: #FFFFFF;
+        border-radius: 24px;
+        margin-top: 1%;
+        padding-right: 1%;
+        height: 96%;
+        padding-left: 1%;
+    }
+    .information {
+        text-align: center;
+        height: 2%;
+    }
+    .list_menu {
+        height: 8%;
+    }
+    .list_future {
+        text-align: center;
+        height: 11%;
+    }
+    .time {
+        background: #ffffff;
+        height: 2.5%;
+        margin: 0 auto;
+        width: 90%;
+        display: flex;
+        align-content: space-around;
+        flex-direction: column;
+        border-style: unset;
+        border-radius: 7px;
+        justify-content: space-around;
+        margin-top: 8%;
+        background: #F0F0FF;
+    }
+    .hr_attendance_login {
+        margin-top: 5%;
+        height: 2.5%;
+        z-index: 1000;
+    }
+    .employee-right {
+        overflow: hidden;
+        height: 99%;
+        padding-left: 1%;
+        padding-right: 0.5%;
+    }
+    .leave_graph .legend>tbody {
+        display: flex;
+        width: 59%;
+        margin: 0;
+        margin-left: 28%;
+    }
+}

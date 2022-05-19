@@ -2083,59 +2083,6 @@ button:focus {
 
 /* Responsive layout -  */
 
-@media only screen and (max-width: 739px) {
-    .employee_dashboard_detail {
-        display: table;
-    }
-    .department {
-        width: 100%;
-        top: 100px;
-        margin: 0 auto;
-    }
-    .Leave-Request {
-        width: 100%;
-        top: 200px;
-        margin: 0 auto;
-    }
-    .New-employee {
-        width: 100%;
-        top: 150px;
-        margin: 0 auto;
-    }
-    .list_menu .btn_announcements {
-        margin-top: 0;
-    }
-    .list_menu button {
-        width: 30%;
-        display: inline-block;
-        padding: 0;
-    }
-    .list_menu .btn_annalys {
-        margin-top: 0;
-    }
-    .time {
-        display: none;
-    }
-    .employee_infomation {
-        height: 80%;
-    }
-    .legend {
-        margin-top: 25px;
-    }
-    .employee_dashboard_detail .Leave-Request {
-        margin-top: 0px;
-    }
-    .welcome_employee {
-        display: none;
-    }
-    .New-employee {
-        margin-top: 1rem;
-    }
-    .list-employee {
-        margin-top: 12px;
-    }
-}
-
 @media only screen and (max-width: 1800px) {
     .fearure_detail{
         padding-left: 0;
