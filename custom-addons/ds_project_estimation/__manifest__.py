@@ -7,7 +7,7 @@
     'category': 'Services/Estimation',
     "version": "15.0.1.0.0",
     "license": "AGPL-3",
-    'depends': ['base','sale','web'],
+    'depends': ['base'],
     "application": True,
     'data': [
         "views/estimation_menu.xml",
@@ -18,12 +18,14 @@
         "views/activity_view.xml",
         "views/description_view.xml",
         "views/project_type_view.xml",
+        "views/currency_rate_view.xml",
         "security/estimation_security.xml",
         "security/ir.model.access.csv",
         "data/activity_data.xml",
         "data/project_type_data.xml",
         "data/job_position_data.xml",
         "data/summary_data.xml",
+        "data/currency_rate_data.xml",
     ],
     'assets': {
         'web.assets_backend': [

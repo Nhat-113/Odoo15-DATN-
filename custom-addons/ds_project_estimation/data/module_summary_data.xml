@@ -1,32 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="hrs_per_day" model="estimation.module.summary">
-        <field name="project_type">Standard</field>
-        <field name="working_efforts">Working hours per day</field>
-        <field name="time_effort_value">8</field>
-    </record>
+    <data noupdate="1">
+        <record id="hrs_per_day" model="estimation.module.summary">
+            <field name="project_type">Standard</field>
+            <field name="working_efforts">Working hours per day</field>
+            <field name="time_effort_value">8</field>
+        </record>
 
-    <record id="days_per_month" model="estimation.module.summary">
-        <field name="project_type">Standard</field>
-        <field name="working_efforts">Working days per month</field>
-        <field name="time_effort_value">20</field>
-    </record>
+        <record id="days_per_month" model="estimation.module.summary">
+            <field name="project_type">Standard</field>
+            <field name="working_efforts">Working days per month</field>
+            <field name="time_effort_value">20</field>
+        </record>
 
-    <record id="man_days" model="estimation.module.summary">
-        <field name="project_type">Project</field>
-        <field name="working_efforts">Total efforts in man-day unit</field>
-        <field name="time_effort_value">88.2</field>
-    </record>
+        <record id="man_days" model="estimation.module.summary">
+            <field name="project_type">Project</field>
+            <field name="working_efforts">Total efforts in man-day unit</field>
+            <field name="time_effort_value">88.2</field>
+        </record>
 
-    <record id="man_months" model="estimation.module.summary">
-        <field name="project_type">Project</field>
-        <field name="working_efforts">Total efforts in man-month unit</field>
-        <field name="time_effort_value">4.41</field>
-    </record>
+        <record id="man_months" model="estimation.module.summary">
+            <field name="project_type">Project</field>
+            <field name="working_efforts">Total efforts in man-month unit</field>
+            <field name="time_effort_value">4.41</field>
+        </record>
 
-    <record id="module_summary_base" model="module.summary.structure">
-        <field name="name">Base for new summary structures</field>
-        <field eval="[(6, 0, [ref('hrs_per_day'), ref('days_per_month'), ref('man_days'), 
+        <record id="module_summary_base" model="module.summary.structure">
+            <field name="name">Base for new summary structures</field>
+            <field eval="[(6, 0, [ref('hrs_per_day'), ref('days_per_month'), ref('man_days'), 
                 ref('man_months')])]" name="rule_ids" />
-    </record>
+        </record>
+    </data>
 </odoo>

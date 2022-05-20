@@ -13,8 +13,8 @@ class Estimation(models.Model):
     project_name = fields.Char("Project Name", required=True)
     number = fields.Char("No", readonly=True, required=True, copy=False, index=False, default="New")
 
-    estimator_ids = fields.Many2one('res.users', string='Estimator', default=lambda self: self.env.user)
-    reviewer_ids = fields.Many2one('res.users', string='Reviewer', default=lambda self: self.env.user)
+    estimator_ids = fields.Many2one('res.users', string='Estimator')
+    reviewer_ids = fields.Many2one('res.users', string='Reviewer')
     customer_ids = fields.Many2one("res.partner", string="Customer", required=True)
     currency_id = fields.Many2one("res.currency", string="Currency")
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
