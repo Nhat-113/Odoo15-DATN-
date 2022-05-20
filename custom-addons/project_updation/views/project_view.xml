@@ -58,7 +58,7 @@
                             <field name="subtask_planned_hours" widget="timesheet_uom_no_toggle" nolabel="1" groups="project.group_subtask_project" attrs="{'invisible': ['|', ('allow_subtasks', '=', False), ('subtask_count', '=', 0)]}"/>
                         </group>
                         <group>
-                            <field name="progress_input"/>
+                            <field name="progress_input" widget="progressbar" options="{'current_value': 'progress_input', 'max_value': '100', 'editable': true}"/>
                         </group>
                     </group>
                 </xpath>
@@ -93,7 +93,7 @@
             <field name="inherit_id" ref="project.view_project_kanban"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/span" position="before">
-                    <field name="last_update_status" widget="badge" decoration-success="last_update_status == 'on_track'" decoration-warning="last_update_status == 'at_risk'" decoration-danger="last_update_status == 'off_track'" decoration-info="last_update_status == 'on_hold'"/>
+                    <field name="last_update_status" widget="badge" decoration-success="last_update_status == 'on_track'" decoration-warning="last_update_status == 'at_risk'" decoration-danger="last_update_status == 'off_track'" decoration-info="last_update_status == 'on_hold'" decoration-primary="last_update_status == 'missing_resource'"/>
                 </xpath>
                 <xpath expr="//div[hasclass('o_kanban_card_manage_settings')]" position="replace">
                     <div class="o_kanban_card_manage_settings row" groups="ds_project_planning.group_project_pm">
@@ -359,7 +359,7 @@
                     <field name="last_update_color"/>
                     <field name="last_update_status"/>
                     <field name="tag_ids"/>
-                    <progressbar field="last_update_status" colors='{"on_track": "success", "at_risk": "warning", "off_track": "danger", "on_hold": "info"}'/>
+                    <progressbar field="last_update_status" colors='{"on_track": "success", "at_risk": "warning", "off_track": "danger", "on_hold": "info", "missing_resource":"primary"}'/>
                     <templates>
                         <t t-name="kanban-box">
                             <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click o_has_icon oe_kanban_content oe_kanban_card">
@@ -453,7 +453,7 @@
                                         <field name="activity_ids" widget="kanban_activity"/>
                                     </div>
                                     <div class="oe_kanban_bottom_right">
-                                        <field name="last_update_status" widget="badge" decoration-success="last_update_status == 'on_track'" decoration-warning="last_update_status == 'at_risk'" decoration-danger="last_update_status == 'off_track'" decoration-info="last_update_status == 'on_hold'"/>
+                                        <field name="last_update_status" widget="badge" decoration-success="last_update_status == 'on_track'" decoration-warning="last_update_status == 'at_risk'" decoration-danger="last_update_status == 'off_track'" decoration-info="last_update_status == 'on_hold'" decoration-primary="last_update_status == 'missing_resource'"/>
                                         <span t-att-class="'o_status_bubble mx-0 o_color_bubble_' + record.last_update_color.value" t-att-title="record.last_update_status.value"></span>
                                         <field name="user_id" widget="many2one_avatar_user" t-if="record.user_id.raw_value"/>
                                     </div>
@@ -480,6 +480,21 @@
                     Chat in real-time or by email to collaborate efficiently.
                 </p>
             </field>
+        </record>
+
+        <record id="ir_cron_data_project_update_status" model="ir.cron">
+            <field name="name">Project: update status</field>
+            <field name="model_id" ref="model_project_project"/>
+            <field name="type">ir.actions.server</field>
+            <field name="state">code</field>
+            <field name="code">model.update_status()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field
+                name="nextcall"
+                eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 16:59:59')"
+            />
         </record>
 
 

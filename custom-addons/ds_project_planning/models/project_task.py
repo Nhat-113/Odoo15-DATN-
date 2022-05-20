@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import pandas as pd
 
 from cmath import phase
 from odoo import models, fields, api, _
@@ -60,7 +61,9 @@ class ProjectTask(models.Model):
     def _compute_planned_duration(self):
         for r in self:
             if r.date_start and r.date_end:
-                elapsed_seconds = (r.date_end - r.date_start).total_seconds()
+                working_days = len(pd.bdate_range(r.date_start.strftime('%Y-%m-%d'),
+                                                  r.date_end.strftime('%Y-%m-%d')))
+                elapsed_seconds = working_days * 24 * 60 * 60
                 seconds_in_day = 24 * 60 * 60
                 r.planned_duration = round(elapsed_seconds / seconds_in_day, 1)
                 r = r.with_context(ignore_onchange_planned_duration=True)

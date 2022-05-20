@@ -1,6 +1,6 @@
 <odoo>
     <!-- Planning App Menu -->
-    <menuitem id="planning_menu" name="Planning" groups="ds_project_planning.group_project_pm,project.group_project_manager" />
+    <menuitem id="planning_menu" name="Planning" groups="ds_project_planning.group_project_director,ds_project_planning.group_project_pm,project.group_project_manager" />
 
     <record id="open_view_planning_project_all" model="ir.actions.act_window">
         <field name="name">Planning Projects</field>
