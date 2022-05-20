@@ -1053,7 +1053,7 @@ h4 .stat-count {
     margin: 0;
     padding-right: 11%;
     font-size: 1.4rem;
-    padding-left: 8%;
+    margin-left: 20px;
     font-weight: 700;
 }
 
@@ -1084,7 +1084,7 @@ button:focus {
 }
 
 .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
-    padding-left: 2%;
+    margin-left: 3px;
 }
 
 .leave_trend_border {
@@ -1101,8 +1101,7 @@ button:focus {
 }
 
 .list_menu .btn_announcements .text_btn_announcements {
-    padding-left: 2% !important;
-    padding: 0;
+    margin-left: 2px;
 }
 
 .list_menu .btn_annalys {
@@ -1110,7 +1109,7 @@ button:focus {
 }
 
 .list_menu .btn_annalys .text_btn_annalys {
-    padding-left: 3%;
+    margin-left: 3px;
 }
 
 .list_menu {
@@ -1139,7 +1138,9 @@ button:focus {
     padding-left: 19px;
 }
 
+
 /* List future for user */
+
 .list_future_user {
     text-align: center;
     height: 20%;
@@ -1167,6 +1168,7 @@ button:focus {
     justify-content: flex-start;
     align-items: center;
 }
+
 .fearure_detail {
     color: #6869AC;
     margin: 0;
@@ -1174,17 +1176,20 @@ button:focus {
     margin-left: 0px;
     float: left;
     padding-left: 27px;
+}
 
-}
-.hr_leave_request_approve_user  > h3 {
+.hr_leave_request_approve_user>h3 {
     margin-left: 19px;
 }
-.list_future_user .hr_leave_request_approve > h3 {
+
+.list_future_user .hr_leave_request_approve>h3 {
     margin-left: 19px;
 }
-.hr_leave_request_approve > h3 {
-    margin-left: 6px;
+
+.hr_leave_request_approve>h3 {
+    margin-left: 4px;
 }
+
 .fearure_detail_user {
     color: #6869AC;
     margin: 0;
@@ -1195,9 +1200,10 @@ button:focus {
     padding-left: 27px;
 }
 
-.hr_contract > h3 {
+.hr_contract>h3 {
     margin-left: -4px;
 }
+
 .btn_leave_request h4 {
     display: inline;
     color: #6869AC;
@@ -1302,7 +1308,6 @@ button:focus {
 }
 
 .department .detail h3 {
-    
     color: #6869AC;
     padding: 0;
     margin-bottom: 67px;
@@ -1322,7 +1327,7 @@ button:focus {
 }
 
 .employee_dashboard_detail>div>h3 {
-     color: #6869AC;
+    color: #6869AC;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -1577,16 +1582,16 @@ button:focus {
 }
 
 .list-employee .leave_graph {
-    margin-top: 2%;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-end;
     align-items: flex-end;
     justify-content: center;
+    margin-top: 5px;
 }
 
 .list-employee .leave_graph .legend {
-    margin-top: 8%;
+    margin-top: 27px;
 }
 
 .leave_graph .legend>tbody {
@@ -1722,13 +1727,14 @@ button:focus {
     border-radius: 24px;
 }
 
-.list_news{
+.list_news {
     width: 90%;
     margin: 0 auto;
     border-radius: 26px;
-    height:80%;
+    height: 80%;
     overflow-y: scroll;
 }
+
 .Event_user {
     flex: none;
     margin-right: 1.5rem;
@@ -2083,136 +2089,9 @@ button:focus {
 
 /* Responsive layout -  */
 
-@media only screen and (max-width: 739px) {
-    .employee_dashboard_detail {
-        display: table;
-    }
-    .department {
-        width: 100%;
-        top: 100px;
-        margin: 0 auto;
-    }
-    .Leave-Request {
-        width: 100%;
-        top: 200px;
-        margin: 0 auto;
-    }
-    .New-employee {
-        width: 100%;
-        top: 150px;
-        margin: 0 auto;
-    }
-    .list_menu .btn_announcements {
-        margin-top: 0;
-    }
-    .list_menu button {
-        width: 30%;
-        display: inline-block;
-        padding: 0;
-    }
-    .list_menu .btn_annalys {
-        margin-top: 0;
-    }
-    .time {
-        display: none;
-    }
-    .employee_infomation {
-        height: 80%;
-    }
-    .legend {
-        margin-top: 25px;
-    }
-    .employee_dashboard_detail .Leave-Request {
-        margin-top: 0px;
-    }
-    .welcome_employee {
-        display: none;
-    }
-    .New-employee {
-        margin-top: 1rem;
-    }
-    .list-employee {
-        margin-top: 12px;
-    }
-}
-
-@media only screen and (max-width: 1800px) {
-    .join_resign_trend {
-        height: 250px !important;
-        display: flex !important;
-    }
-    .join_resign_trend>svg {
-        height: 245px !important;
-    }
-    .join_resign_trend .legend {
-        border-collapse: collapse !important;
-        border-spacing: 0px;
-        /* flex: 0; */
-        margin: 0 !important;
-        flex: 0 !important;
-    }
-    .monthly_join_resign_trend {
-        margin-top: 0;
-        margin-bottom: 1%;
-    }
-    /* .emp_graph >svg {
-        height: 280px;
-        width: 280px;
-    } */
-    .emp_graph .legend {
-        margin-top: 2%;
-    }
-    .list_future button h4 {
-        font-size: 1rem;
-    }
-    .list_menu button h5 {
-        font-size: 1rem;
-    }
-    .o_clock {
-        font-size: 1rem;
-    }
-    .fearure_detail {
-        font-size: 1rem;
-    }
-    .btn_leave_request  > h3 {
-        margin-left: 3px;
-    }
-    .emp_graph .legend>tbody{
-        display: contents;
-        flex: 0;
-    }
-    .list-employee .leave_graph .legend {
-        margin-top:0;
-    }
-    .leave_graph .legend>tbody {
-        display: contents;
-    }
-    .list-employee .leave_graph .legend {
-        flex: 0;
-    }
-    .list_future button h4 {
-        margin-bottom: 0 !important;
-        float: left;
-        padding-left: 7px;
-    }
-    .list_menu button h5 {
-        color: #BDBDBD;
-        padding: 0;
-        margin: 0;
-        padding-right: 17px;
-        margin-left: 8px;
-        /* font-size: 1.4rem; */
-        /* padding-left: 7px; */
-        /* font-weight: 700; */
-    }
-    .department .detail {
-        margin-top: 6.2%;
-    }
-}
-
 @media only screen and (min-width: 1800px) {
     .emp_graph .legend {
-        margin-top: 10%;
+        margin-top: 34px;
     }
     .join_resign_trend {
         display: flex;
