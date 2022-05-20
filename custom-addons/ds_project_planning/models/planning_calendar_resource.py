@@ -106,7 +106,7 @@ class PlanningCalendarResource(models.Model):
     def unlink(self):
         if self.end_date < date.today():
             raise UserError(_(
-                    'Please do not delete member (%(resource)s) with End Date (%(end)s) < Current Date (%(current)s).',
+                    'Can not delete member (%(resource)s) with End Date (%(end)s) < Current Date (%(current)s).',
                     resource=self.employee_id.name, end=self.end_date, current=date.today()
                 ))
 
