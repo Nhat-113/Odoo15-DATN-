@@ -53,10 +53,11 @@ class Employee(models.Model):
     @api.model
     def get_user_employee_details(self):
         uid = request.session.uid
+        company_ids = self.env.user.company_ids.ids
         employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
         leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1'])])
 
-        recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ])])
+        recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ]),('company_id','in' , company_ids )])
 
         # user_id = self.env['res.users'].search([('id', '=', uid)])
         # company_id = self.env.user.company_ids.ids
@@ -99,10 +100,7 @@ class Employee(models.Model):
         timesheet_view_id = self.env.ref('hr_timesheet.hr_timesheet_line_search')
         
         
-        user_id = self.env['res.users'].search([('id', '=', uid)])
-
-        company_ids = self.env.user.company_ids.ids
-        
+        user_id = self.env['res.users'].search([('id', '=', uid)])        
         # query = """
         #         select count(id)
         #         from hr_applicant
