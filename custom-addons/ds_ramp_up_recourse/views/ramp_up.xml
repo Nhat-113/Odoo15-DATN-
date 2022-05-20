@@ -7,6 +7,9 @@
                 <field name="name"/>
                 <field name="job_title" string="Position"/>
                 <field name="department_id"/>
+                <field name="total_calendar_effort_rate"/>
+                <field name="actual_effort_rate"/>
+                <field name="estimation_effort_rate"/>
                 <field name="total_effort_rate"/>
             </tree>
         </field>

@@ -126,11 +126,11 @@
                                             <th>Chức vụ</th>
                                             <td>
                                                 <span>:  </span>
-                                                <b>
-                                                    <t t-if='e.company_id.position'>
+
+                                                <t t-if='e.company_id.position'>
                                                         <span t-field="e.company_id.position"/>
-                                                    </t>
-                                                </b>
+                                                </t>
+
                                             </td>
                                         </tr>
                                         <tr>
@@ -344,11 +344,9 @@
                                         </t>
                                     </p>
                                     <p class="font-italic">
-                                        <b>
-                                            <t t-if='e.company_id.position'>
+                                            <t t-if='e.company_id.position'>(
                                                 <span t-field="e.company_id.position"/>
-                                            </t>
-                                        </b>
+                                            )</t>
                                     </p>
                                 </div>
                             </div>
@@ -621,11 +619,9 @@
                                         </t>
                                     </p>
                                     <p class="font-italic">
-                                        (
-                                            <t t-if='e.company_id.position'>
+                                            (<t t-if='e.company_id.position'>
                                                 <span t-field="e.company_id.position"/>
-                                            </t>
-                                            )
+                                            </t>)
                                     </p>
                                 </div>
                             </div>
