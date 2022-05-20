@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_exchange_rate_tree" model="ir.ui.view">
+        <field name="name">estimation.exchange.rate.tree</field>
+        <field name="model">estimation.exchange.rate</field>
+        <field name="arch" type="xml">
+            <tree string="Cost Rate">
+                <field name="name"/>
+                <field name="usd_number" />
+                <field name="value" />
+                <field name="currency_id" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_exchange_rate_form" model="ir.ui.view">
+        <field name="name">estimation.exchange.rate.form</field>
+        <field name="model">estimation.exchange.rate</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group name="group_top">
+                        <group name="group_left">
+                            <field name="name" />
+                            <field name="usd_number" />
+                        </group>
+                        <group name="group_right">
+                            <field name="currency_id" />
+                            <field name="value" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

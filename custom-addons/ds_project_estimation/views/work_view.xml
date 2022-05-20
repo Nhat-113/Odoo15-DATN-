@@ -10,14 +10,14 @@
                             <field name="project_name" />
                             <field name="project_code" />
                             <field name="project_type_id" placeholder="Select project type ..."/>
-                            <field name="estimator_ids" />
-                            <field name="reviewer_ids" />
+                            <field name="estimator_ids" placeholder="Please select estimator ..."/>
+                            <field name="reviewer_ids" placeholder="Please select reviewer ..."/>
                         </group>
                         <group name="group_right">
                             <field name="deadline" />
                             <field name="sale_date" />
                             <field name="stage" placeholder="Select current stage" />
-                            <field name="currency_id" />
+                            <field name="currency_id" placeholder="Please select currency ..."/>
                             <field name="customer_ids" />
                         </group>
                     </group>
