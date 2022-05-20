@@ -8,7 +8,7 @@ from numpy import require
 from odoo import models, fields, api, _
 from datetime import date, datetime, time
 from dateutil.relativedelta import relativedelta
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 
 
 class PlanningCalendarResource(models.Model):
@@ -102,6 +102,15 @@ class PlanningCalendarResource(models.Model):
             "target": "new",
             "res_id": project_id
         }
+
+    def unlink(self):
+        if self.end_date < date.today():
+            raise UserError(_(
+                    'Can not delete member (%(resource)s) with End Date (%(end)s) < Current Date (%(current)s).',
+                    resource=self.employee_id.name, end=self.end_date, current=date.today()
+                ))
+
+        return super(PlanningCalendarResource, self).unlink()
 
 
 class PlanningAllocateEffortRate(models.Model):
