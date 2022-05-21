@@ -5,7 +5,7 @@ class JobPosition(models.Model):
     """
     Describe job position in configuration.
     """
-    _name = "config.job_position"
+    _name = "config.job.position"
     _description = "Job Position"
     _order = "sequence,id"
     _rec_name = "job_position"

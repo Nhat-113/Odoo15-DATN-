@@ -56,7 +56,7 @@
     <!-- Action to open the configuration job position list -->
     <record id="action_config_job_position" model="ir.actions.act_window">
         <field name="name">Job Position</field>
-        <field name="res_model">config.job_position</field>
+        <field name="res_model">config.job.position</field>
         <field name="view_mode">tree,form</field>
     </record>
 
