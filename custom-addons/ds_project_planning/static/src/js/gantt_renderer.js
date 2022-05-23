@@ -131,7 +131,16 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                     return task.text;
                 }
                 return "";
+                
             };
+            //deny drag phase 
+            gantt.attachEvent("onBeforeTaskDrag", function(id, mode, e){
+                var taskObj = gantt.getTask(id);
+                if (taskObj.type == "phase") {
+                    return false;
+                }
+                return true;
+            });
 
             const tooltips = gantt.ext.tooltips;
             gantt.templates.tooltip_date_format = gantt.date.date_to_str("%F %j, %Y");
