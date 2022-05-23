@@ -132,21 +132,22 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             this.set("title", "Dashboard");
             return this._super().then(function() {
 
-                session.user_has_group("hr_contract.group_hr_contract_manager").then(function(has_group) {
-                    let button_contract = document.getElementById("btn-contract");
-
-                    // console.log("has_group", has_group);
-                    if (!button_contract) return;
-
-                    if (has_group) {
-                        document.getElementById("btn-contract").style.display = "block";
-                    } else {
-                        document.getElementById("btn-contract").style.display = "none";
-                    }
-                });
+               
 
                 setTimeout(() => {
                     setInterval(self.startTime, 1000)
+                    session.user_has_group("hr_contract.group_hr_contract_manager").then(function(has_group) {
+                        let button_contract = document.getElementById("btn-contract");
+    
+                        // console.log("has_group", has_group);
+                        if (!button_contract) return;
+    
+                        if (has_group) {
+                            document.getElementById("btn-contract").style.display = "block";
+                        } else {
+                            document.getElementById("btn-contract").style.display = "none";
+                        }
+                    });
                 }, 500);
                 self.update_cp();
                 self.render_dashboards()

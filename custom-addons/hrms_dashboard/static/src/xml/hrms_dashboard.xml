@@ -56,7 +56,7 @@
                              Payslip <t t-esc="widget.login_employee['payslip_count']"/>
                         </h3>
                     </button>
-                    <button id="btn-contract" class="btn_expried hr_contract" style="display: block">
+                    <button id="btn-contract" class="btn_expried hr_contract" style="display: none">
                         <h4><i class="fa fa-fw fa-book" style="margin-left: -1px;"></i></h4>
                         <h3  class="fearure_detail">
                             Contract <t t-esc="widget.login_employee['contracts_count']"/>
@@ -404,7 +404,7 @@
                                         <i class="fa fa-sign-in o_hr_attendance_sign_in_out_icon"/>
                                     </div>
                                     <div class="stat-content">
-                                        <div class="stat-text">Check In</div>
+                                        <p class="stat-text">Check In</p>
                                     </div>
                                 </t>
                                 <t t-if="widget.login_employee['attendance_state'] =='checked_in'">
@@ -412,7 +412,7 @@
                                         <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon"/>
                                     </div>
                                     <div class="stat-content">
-                                        <div class="stat-text">Check out</div>
+                                        <p class="stat-text">Check out</p>
                                     </div>
                                 </t>
                             </div>

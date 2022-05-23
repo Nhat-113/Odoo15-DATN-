@@ -538,10 +538,12 @@ h4 .stat-count {
     border-radius: 7px;
     width: 90%;
     margin: 0 auto;
-    background: green;
+    background: #4CAF50;
     height: 100%;
 }
-
+.o_hr_attendance_sign_in_out_icon {
+    z-index: 100000;
+}
 .hr_attendance_login .stat-widget-one {
     background: none;
     display: flex;
