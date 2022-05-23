@@ -1944,7 +1944,9 @@ button:focus {
 .btn_dashboard_detail_user {
     background: #F0F0FF !important;
 }
-
+.btn_dashboard_detail_user .text_btn_dashboard_detail {
+    margin-left: 17px;
+}
 .btn_dashboard_detail_user>h5 {
     color: #4D4E8B !important;
 }
