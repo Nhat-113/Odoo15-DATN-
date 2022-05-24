@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import pandas as pd
 
 from cmath import phase
@@ -71,8 +72,11 @@ class ProjectTask(models.Model):
     @api.onchange('planned_duration', 'date_start')
     def _inverse_planned_duration(self):
         for r in self:
+            working_days = len(pd.bdate_range(r.date_start.strftime('%Y-%m-%d'),
+                                                  r.date_end.strftime('%Y-%m-%d')))
+            off_day = (r.date_end - r.date_start).days - working_days
             if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', False):
-                r.date_end = r.date_start + timedelta(days=r.planned_duration)
+                r.date_end = r.date_start + timedelta(days=r.planned_duration+off_day)
 
     @api.depends('dependency_task_ids')
     def _compute_recursive_dependency_task_ids(self):
@@ -113,7 +117,15 @@ class ProjectTask(models.Model):
                     'Task "%(task)s": start date (%(start)s) must be earlier than end date (%(end)s).',
                     task=task.name, start=task.date_start, end=task.date_end,
                 ))
-        
+
+    @api.constrains('user_ids','date_start', 'date_end')
+    def _check_user(self):
+        for user_id in self.user_ids:
+            employee_id = self.env['hr.employee'].search([('user_id','=',user_id.id)]).id
+            calendar_resources = self.env['planning.calendar.resource'].search(['&',('project_id','=',self.project_id.id),('employee_id','=',employee_id)])
+            for calendar_resource in calendar_resources:
+                if datetime.datetime.combine(calendar_resource.start_date, datetime.time(0, 0)) > self.date_start or datetime.datetime.combine(calendar_resource.end_date, datetime.time(0, 0)) < self.date_end:
+                    raise ValidationError("tesst")
 
 class DependingTasks(models.Model):
     _name = "project.depending.tasks"

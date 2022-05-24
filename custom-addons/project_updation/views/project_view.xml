@@ -293,11 +293,19 @@
             <field name="model">project.task</field>
             <field name="arch" type="xml">
                 <search string="Issues">
+                    <field name="name" string="Task"/>
+                    <field name="tag_ids"/>
                     <field name="user_ids" context="{'active_test': False}"/>
+                    <field string="Project" name="display_project_id"/>
+                    <field name="stage_id"/>
+                    <field name="id" string="ID"/>
+                    <field name="partner_id" operator="child_of"/>
+                    <field name="parent_id"/>
                     <field name="status" />
-                    <filter string="My Open Issue" name="my_issues" domain="[('user_ids', 'in', uid),('status.name','=','Open')]"/>
+                    <filter string="My Open Issue" name="my_issues" domain="[('user_ids', 'in', uid),('status.name','!=','Closed'),('status.name','!=','Fixed'),('status.name','!=','Pending'),('status.name','!=','Not Fixed'),('status.name','!=','Deployment')]"/>
                     <filter string="Unassigned" name="unassigned" domain="[('user_ids', '=', False)]"/>
-                    <filter string="Open Issue" name="open_issues" domain="[('status.name','=','Open')]"/>
+                    <filter string="Open Issue" name="open_issues" domain="[('status.name','!=','Closed'),('status.name','!=','Fixed'),('status.name','!=','Pending'),('status.name','!=','Not Fixed'),('status.name','!=','Deployment')]"/>
+                    <filter string="Deployment" name="deploy_issues" domain="[('status.name','=','Deployment')]"/>
                     <filter string="Closed Issue" name="closed_issues" domain="[('status.name','=','Closed')]"/>
                     <separator/>
                     <filter string="Bug" name="bug" domain="[('issues_type.name', '=', 'Bug')]"/>
