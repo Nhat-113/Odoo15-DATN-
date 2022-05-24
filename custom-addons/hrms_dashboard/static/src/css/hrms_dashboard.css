@@ -556,6 +556,7 @@ h4 .stat-count {
     display: flex;
     font-weight: 100;
     justify-content: flex-end;
+    margin-left: -50px;
 }
 
 .hr_attendance_login .stat-content {
@@ -576,13 +577,7 @@ h4 .stat-count {
 }
 
 .hr_attendance_login .stat-widget-one .stat-icon .fa {
-    font-size: 50px;
-}
-
-.hr_attendance_login .stat-widget-one .stat-icon .fa {
-    font-size: 50px;
-    margin: 0px;
-    box-shadow: none;
+    font-size: 20px;
 }
 
 .hr_attendance_login {
