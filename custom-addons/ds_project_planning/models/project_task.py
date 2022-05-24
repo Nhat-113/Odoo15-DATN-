@@ -22,7 +22,7 @@ class ProjectTask(models.Model):
     milestone_id = fields.Many2one(
         'project.planning.milestone', string='Milestone', required=False, domain=[('phase_id', '=', phase_id)], help="Project Milestone")
 
-    planned_duration = fields.Float('Duration', default=0, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True)
+    planned_duration = fields.Float('Duration', default=0, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True, readonly=True)
     lag_time = fields.Integer('Lag Time')
     depending_task_ids = fields.One2many('project.depending.tasks', 'task_id')
     dependency_task_ids = fields.One2many(
@@ -69,14 +69,14 @@ class ProjectTask(models.Model):
                 r.planned_duration = round(elapsed_seconds / seconds_in_day, 1)
                 r = r.with_context(ignore_onchange_planned_duration=True)
 
-    @api.onchange('planned_duration', 'date_start')
-    def _inverse_planned_duration(self):
-        for r in self:
-            working_days = len(pd.bdate_range(r.date_start.strftime('%Y-%m-%d'),
-                                                  r.date_end.strftime('%Y-%m-%d')))
-            off_day = (r.date_end - r.date_start).days - working_days
-            if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', False):
-                r.date_end = r.date_start + timedelta(days=r.planned_duration+off_day)
+    # @api.onchange('planned_duration', 'date_start')
+    # def _inverse_planned_duration(self):
+    #     for r in self:
+    #         working_days = len(pd.bdate_range(r.date_start.strftime('%Y-%m-%d'),
+    #                                               r.date_end.strftime('%Y-%m-%d')))
+    #         off_day = (r.date_end - r.date_start).days - working_days
+    #         if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', False):
+    #             r.date_end = r.date_start + timedelta(days=r.planned_duration+off_day)
 
     @api.depends('dependency_task_ids')
     def _compute_recursive_dependency_task_ids(self):
@@ -125,7 +125,10 @@ class ProjectTask(models.Model):
             calendar_resources = self.env['planning.calendar.resource'].search(['&',('project_id','=',self.project_id.id),('employee_id','=',employee_id)])
             for calendar_resource in calendar_resources:
                 if datetime.datetime.combine(calendar_resource.start_date, datetime.time(0, 0)) > self.date_start or datetime.datetime.combine(calendar_resource.end_date, datetime.time(0, 0)) < self.date_end:
-                    raise ValidationError("tesst")
+                    raise ValidationError(_(
+                    '"%(user)s" outside the time set in the Calendar Resource',
+                    user=calendar_resource.employee_id.name,
+                ))
 
 class DependingTasks(models.Model):
     _name = "project.depending.tasks"
