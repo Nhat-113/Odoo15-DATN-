@@ -171,6 +171,9 @@
                     <field name="create_date" string="Create Date"/>
                     <field name="write_date" string="Update Date"/>
                 </xpath>
+                <xpath expr="//field[@name='user_ids']" position="after">
+                    <field name="priority_type" string="Priority" widget="badge" decoration-primary="priority_type == 'medium'" decoration-warning="priority_type == 'high'" decoration-danger="priority_type == 'urgent'"/>
+                </xpath>
                 <xpath expr="//field[@name='name']" position="before">
                     <field name="id" string="ID"/>
                 </xpath>
