@@ -6451,10 +6451,12 @@ module.exports = function () {
             milestone: "milestone"
         },
         auto_types: false,
-        duration_unit: "day",
-        work_time: false,
+        // covert duration_unit from day to hour to input time is timestamp for task
+        duration_unit: "minute",
+        //duration_unit: "day",
+        work_time: true,
         correct_work_time: false,
-        skip_off_time: false,
+        skip_off_time: task_area_pulls,
         cascade_delete: true,
         autosize: false,
         autosize_min_width: 0,
@@ -6470,7 +6472,10 @@ module.exports = function () {
         show_loading: false,
         show_chart: true,
         show_grid: true,
-        min_duration: 60 * 60 * 1000,
+        //sets the minimum duration (in milliseconds) that can be set for a task during resizing.
+        min_duration: 24 * 60 * 60 * 1000,
+        //min_duration: 60 * 60 * 1000,
+        
         date_format: "%d-%m-%Y %H:%i",
         xml_date: undefined,
         start_on_monday: true,
@@ -6516,7 +6521,7 @@ module.exports = function () {
             }
         ],
         // 		date_scale: "%d %M",
-        time_step: 60,
+        time_step: 1,
         duration_step: 1,
         task_date: "%d %F %Y",
         time_picker: "%H:%i",
