@@ -1477,7 +1477,6 @@ button:focus {
 
 .request_detail_job>div {
     /* height: 20%; */
-    display: flex;
     flex-direction: row;
     justify-content: space-between;
     padding: 5px 0px 0px 16px;
@@ -1496,6 +1495,9 @@ button:focus {
     background-color: #FAFAFA;
     margin: 3.5% auto;
     height: 29%;
+}
+.dashboard_today_meeting {
+    display: flex;
 }
 
 .all-request button {
@@ -1732,6 +1734,10 @@ button:focus {
     overflow-y: scroll;
 }
 
+.list_news::-webkit-scrollbar {
+    /* This is the magic bit for WebKit */
+    display: none;
+  }
 .Event_user {
     flex: none;
     margin-right: 1.5rem;
@@ -1821,7 +1827,6 @@ button:focus {
 .text_detail {
     display: flex;
     background-color: #FAFAFA;
-    height: 7.5%;
     margin-bottom: 3.6%;
     border-radius: 15px;
     align-content: space-around;
@@ -1834,10 +1839,12 @@ button:focus {
 .text_news {
     color: #000;
     margin-bottom: 0;
+    width: 80%;
 }
 
 .text_detail .new_code {
     padding-right: 4%;
+    width: 20%;
     margin-bottom: 0;
 }
 
@@ -1971,7 +1978,16 @@ button:focus {
     margin-top: 1%;
     height: 88%;
     overflow-y: scroll;
+    
 }
+.list-birthday::-webkit-scrollbar {
+    /* This is the magic bit for WebKit */
+    display: none;
+  }
+#list-birthday ::-webkit-scrollbar {
+    display: none;
+}
+
 
 .name {
     display: inline;
