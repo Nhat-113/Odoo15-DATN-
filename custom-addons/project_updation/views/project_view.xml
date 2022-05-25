@@ -73,6 +73,7 @@
                 <xpath expr="//div[@name='alias_def']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
+                
             </field>
         </record>
 
@@ -306,9 +307,9 @@
                     <field name="partner_id" operator="child_of"/>
                     <field name="parent_id"/>
                     <field name="status" />
-                    <filter string="My Open Issue" name="my_issues" domain="[('user_ids', 'in', uid),('status.name','!=','Closed'),('status.name','!=','Fixed'),('status.name','!=','Pending'),('status.name','!=','Not Fixed'),('status.name','!=','Deployment')]"/>
+                    <filter string="My Open Issue" name="my_issues" domain="[('user_ids', 'in', uid),('status.name','!=','Closed'),('status.name','!=','Fixed'),('status.name','!=','Pending'),('status.name','!=','Not Fixed'),('status.name','!=','Deployment'),('status.name','!=','Cancel')]"/>
                     <filter string="Unassigned" name="unassigned" domain="[('user_ids', '=', False)]"/>
-                    <filter string="Open Issue" name="open_issues" domain="[('status.name','!=','Closed'),('status.name','!=','Fixed'),('status.name','!=','Pending'),('status.name','!=','Not Fixed'),('status.name','!=','Deployment')]"/>
+                    <filter string="Open Issue" name="open_issues" domain="[('status.name','!=','Closed'),('status.name','!=','Fixed'),('status.name','!=','Pending'),('status.name','!=','Not Fixed'),('status.name','!=','Deployment'),('status.name','!=','Cancel')]"/>
                     <filter string="Deployment" name="deploy_issues" domain="[('status.name','=','Deployment')]"/>
                     <filter string="Closed Issue" name="closed_issues" domain="[('status.name','=','Closed')]"/>
                     <separator/>
