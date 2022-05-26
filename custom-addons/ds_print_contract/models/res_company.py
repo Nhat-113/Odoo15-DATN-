@@ -7,5 +7,5 @@ class ResPartner(models.Model):
     _inherit = "res.company"
     _description = 'Res Partner Director'
 
-    representative = fields.Char(string="Representative", default='NGUYỄN HỒNG QUÂN')
+    representative = fields.Char(string="Representative", default='NGUYỄN HỒNG TÂN')
     position = fields.Char(string="Position", default='Phó giám đốc')
