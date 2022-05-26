@@ -15,4 +15,3 @@ class JobPosition(models.Model):
     description = fields.Char("Description", required=True)
     effort = fields.Float(string="Effort", default=0.0)
     percent = fields.Char(string="Percentage", default="0.0")
-    
