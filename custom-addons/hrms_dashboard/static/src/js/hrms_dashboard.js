@@ -131,22 +131,59 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             this.set("title", "Dashboard");
             return this._super().then(function() {
-
-                session.user_has_group("hr_contract.group_hr_contract_manager").then(function(has_group) {
-                    let button_contract = document.getElementById("btn-contract");
-
-                    // console.log("has_group", has_group);
-                    if (!button_contract) return;
-
-                    if (has_group) {
-                        document.getElementById("btn-contract").style.display = "block";
-                    } else {
-                        document.getElementById("btn-contract").style.display = "none";
-                    }
-                });
-
                 setTimeout(() => {
                     setInterval(self.startTime, 1000)
+                    //hide for role contract none
+                    session.user_has_group("hr_contract.group_hr_contract_manager").then(function(has_group) {
+                        let button_contract = document.getElementById("btn-contract");
+    
+                        // console.log("has_group", has_group);
+                        if (!button_contract) return;
+    
+                        if (has_group) {
+                            document.getElementById("btn-contract").style.display = "block";
+                        } else {
+                            document.getElementById("btn-contract").style.display = "none";
+                        }
+                    });
+                    //hide for role payroll none
+                    session.user_has_group("hr_payroll_community.group_hr_payroll_community_user").then(function(has_group) {
+                        let button_payslip = document.getElementById("btn-payslip");
+    
+                        console.log("has_group", has_group);
+                        if (!button_payslip) return;
+    
+                        if (has_group) {
+                            document.getElementById("btn-payslip").style.display = "block";
+                        } else {
+                            document.getElementById("btn-payslip").style.display = "none";
+                        }
+                    });
+                    //hide for role recruitment none 
+                    session.user_has_group("hr_recruitment.group_hr_recruitment_user").then(function(has_group) {
+                        let hide_recruitment = document.getElementById("hide-recruitment");
+    
+                        // console.log("has_group", has_group);
+                        if (!hide_recruitment) return;
+    
+                        if (has_group) {
+                            document.getElementById("hide-recruitment").style.display = "flex";
+                        } else {
+                            document.getElementById("hide-recruitment").style.display = "none";
+                        }
+                    });
+                    session.user_has_group("hr_recruitment.group_hr_recruitment_user").then(function(has_group) {
+                        let button_application = document.getElementById("hide-application");
+    
+                        // console.log("has_group", has_group);
+                        if (!button_application) return;
+    
+                        if (has_group) {
+                            document.getElementById("hide-application").style.display = "flex";
+                        } else {
+                            document.getElementById("hide-application").style.display = "none";
+                        }
+                    });
                 }, 500);
                 self.update_cp();
                 self.render_dashboards()
@@ -482,27 +519,35 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             e.stopPropagation();
             e.preventDefault();
-            session.user_has_group("hr.group_hr_user").then(function(has_group) {
-                if (has_group) {
-                    var options = {
-                        on_reverse_breadcrumb: self.on_reverse_breadcrumb,
-                    };
+                    // var options = {
+                    //     on_reverse_breadcrumb: self.on_reverse_breadcrumb,
+                    // };
                     self.do_action({
                         name: _t("In Recruiment"),
                         type: "ir.actions.act_window",
                         res_model: "hr.job",
-                        view_mode: "tree, kanban",
+                        view_mode: " kanban",
                         views: [
-                            [false, "kanban"],
-                            [false, "list"],
-
+                            [view_hr_job_kanban, "kanban"],
                         ],
                         domain: [
                             ["state", "in", ["recruit"]]
                         ],
 
                     });
-                }
+            self._rpc({
+                // Get view id
+                model:'ir.model.data',
+                args: ['hr_recruitment.view_hr_job_kanban'], // View id goes here
+            }).then(function(data){                
+                // Open view
+                self.do_action({
+                    name: 'In Recruiment',
+                    type: 'ir.actions.act_window',
+                    res_model: 'hr.job', // Module name goes here
+                    target: 'new',
+                    views: [[view_hr_job_kanban, 'kanban']], // data[1] variable contains the view id
+                 });
             });
         },
 
