@@ -109,7 +109,7 @@ class ProjectTask(models.Model):
                 links.append(json_obj)
             r.links_serialized_json = json.dumps(links)
 
-    @api.constrains('date_start', 'date_end')
+    @api.onchange('date_start', 'date_end')
     def _check_start_end(self):
         for task in self:
             if task.date_end and task.date_start > task.date_end:
