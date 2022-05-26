@@ -178,6 +178,7 @@ class Employee(models.Model):
         cr.execute("""select event_event.name , event_event.date_begin,  event_event.date_end from event_event  
          where event_event.stage_id = '1' or  event_event.stage_id = '2' or  event_event.stage_id = '3'""")
         event = cr.fetchall()
+        announcement = []
         user_id = request.session.uid
         sql=("""
                 select CURRENT_DATE, project_task.priority_type, project_task.name , project_task.id ,project_task.date_start  , hr_employee.name  from  project_task  
@@ -187,40 +188,41 @@ class Employee(models.Model):
         cr.execute(sql)
         # task_for_day = cr.fetchall()
         
-        # if employee:
-        #     department = employee.department_id
-        #     job_id = employee.job_id
-        #     sql = """select ha.date_end, ha.date_start,ha.announcement_reason
-        #     from hr_announcement ha
-        #     left join hr_employee_announcements hea
-        #     on hea.announcement = ha.id
-        #     left join hr_department_announcements hda
-        #     on hda.announcement = ha.id
-        #     left join hr_job_position_announcements hpa
-        #     on hpa.announcement = ha.id
-        #     where ha.state = 'approved' and
-        #     ha.date_start <= now()::date and
-        #     ha.date_end >= now()::date and
-        #     (ha.is_announcement = True or
-        #     (ha.is_announcement = False
-        #     and ha.announcement_type = 'employee'
-        #     and hea.employee = %s)""" % employee.id
-        #     if department:
-        #         sql += """ or
-        #         (ha.is_announcement = False and
-        #         ha.announcement_type = 'department'
-        #         and hda.department = %s)""" % department.id
-        #     if job_id:
-        #         sql += """ or
-        #         (ha.is_announcement = False and
-        #         ha.announcement_type = 'job_position'
-        #         and hpa.job_position = %s)""" % job_id.id
-        #     sql += ')'
-        #     cr.execute(sql)
-        #     announcement = cr.fetchall()
-        cr.execute("""
-         select CURRENT_DATE """)
-        announcement = cr.fetchall()
+        if employee:
+            department = employee.department_id
+            job_id = employee.job_id
+            sql = """select ha.date_end, ha.date_start,ha.announcement_reason
+            from hr_announcement ha
+            left join hr_employee_announcements hea
+            on hea.announcement = ha.id
+            left join hr_department_announcements hda
+            on hda.announcement = ha.id
+            left join hr_job_position_announcements hpa
+            on hpa.announcement = ha.id
+            where ha.state = 'approved' and
+            ha.date_start <= now()::date and
+            ha.date_end >= now()::date and
+            (ha.is_announcement = True or
+            (ha.is_announcement = False
+            and ha.announcement_type = 'employee'
+            and hea.employee = %s)""" % employee.id
+            if department:
+                sql += """ or
+                (ha.is_announcement = False and
+                ha.announcement_type = 'department'
+                and hda.department = %s)""" % department.id
+            if job_id:
+                sql += """ or
+                (ha.is_announcement = False and
+                ha.announcement_type = 'job_position'
+                and hpa.job_position = %s)""" % job_id.id
+            sql += ')'
+            cr.execute(sql)
+            announcement = cr.fetchall()
+        # cr.execute("""
+        #  select hr_announcement.announcement_reason , hr_announcement.date_start,hr_announcement.date_end from hr_announcement where  
+        #        hr_announcement.date_start = '2022-05-26' AND hr_announcement.date_end > '2022-05-26' and hr_announcement.state = 'approved' """)
+        #announcement = cr.fetchall()
         return {
             'birthday': birthday,
             'event': event,
