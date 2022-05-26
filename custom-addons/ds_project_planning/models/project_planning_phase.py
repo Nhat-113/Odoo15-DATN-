@@ -4,7 +4,6 @@ from asyncio import tasks
 from re import S
 from unicodedata import name
 from numpy import require
-from pytz import timezone
 from odoo import models, fields, api, _
 from datetime import date, datetime, time, timedelta
 from dateutil import relativedelta
