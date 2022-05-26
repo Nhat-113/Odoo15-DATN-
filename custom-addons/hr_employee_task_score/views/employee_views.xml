@@ -9,7 +9,7 @@
                     <field name="project_id"/>
                     <field name="name" string="Task Name"/>
                     <field name="task_score" widget="priority" readonly="1" type="int" avg="A"/>
-                    <field name="effective_hours" sum="Sum of effective hours"/>
+                    <field name="number_score" avg="Average of task score"/>
                 </tree>
             </field>
         </record>
