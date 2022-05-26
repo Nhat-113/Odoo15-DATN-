@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import pandas as pd
 
 from cmath import phase
@@ -21,7 +22,7 @@ class ProjectTask(models.Model):
     milestone_id = fields.Many2one(
         'project.planning.milestone', string='Milestone', required=False, domain=[('phase_id', '=', phase_id)], help="Project Milestone")
 
-    planned_duration = fields.Float('Duration', default=0, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True)
+    planned_duration = fields.Float('Duration', default=0, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True, readonly=True)
     lag_time = fields.Integer('Lag Time')
     depending_task_ids = fields.One2many('project.depending.tasks', 'task_id')
     dependency_task_ids = fields.One2many(
@@ -68,11 +69,14 @@ class ProjectTask(models.Model):
                 r.planned_duration = round(elapsed_seconds / seconds_in_day, 1)
                 r = r.with_context(ignore_onchange_planned_duration=True)
 
-    @api.onchange('planned_duration', 'date_start')
-    def _inverse_planned_duration(self):
-        for r in self:
-            if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', False):
-                r.date_end = r.date_start + timedelta(days=r.planned_duration)
+    # @api.onchange('planned_duration', 'date_start')
+    # def _inverse_planned_duration(self):
+    #     for r in self:
+    #         working_days = len(pd.bdate_range(r.date_start.strftime('%Y-%m-%d'),
+    #                                               r.date_end.strftime('%Y-%m-%d')))
+    #         off_day = (r.date_end - r.date_start).days - working_days
+    #         if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', False):
+    #             r.date_end = r.date_start + timedelta(days=r.planned_duration+off_day)
 
     @api.depends('dependency_task_ids')
     def _compute_recursive_dependency_task_ids(self):
@@ -113,7 +117,7 @@ class ProjectTask(models.Model):
                     'Task "%(task)s": start date (%(start)s) must be earlier than end date (%(end)s).',
                     task=task.name, start=task.date_start, end=task.date_end,
                 ))
-        
+
 
 class DependingTasks(models.Model):
     _name = "project.depending.tasks"
