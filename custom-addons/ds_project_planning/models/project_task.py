@@ -118,17 +118,6 @@ class ProjectTask(models.Model):
                     task=task.name, start=task.date_start, end=task.date_end,
                 ))
 
-    @api.constrains('user_ids','date_start', 'date_end')
-    def _check_user(self):
-        for user_id in self.user_ids:
-            employee_id = self.env['hr.employee'].search([('user_id','=',user_id.id)]).id
-            calendar_resources = self.env['planning.calendar.resource'].search(['&',('project_id','=',self.project_id.id),('employee_id','=',employee_id)])
-            for calendar_resource in calendar_resources:
-                if datetime.datetime.combine(calendar_resource.start_date, datetime.time(0, 0)) > self.date_start or datetime.datetime.combine(calendar_resource.end_date, datetime.time(0, 0)) < self.date_end:
-                    raise ValidationError(_(
-                    '"%(user)s" outside the time set in the Calendar Resource',
-                    user=calendar_resource.employee_id.name,
-                ))
 
 class DependingTasks(models.Model):
     _name = "project.depending.tasks"

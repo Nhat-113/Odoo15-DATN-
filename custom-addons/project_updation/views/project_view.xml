@@ -73,7 +73,7 @@
                 <xpath expr="//div[@name='alias_def']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                
+
             </field>
         </record>
 
@@ -307,9 +307,9 @@
                     <field name="partner_id" operator="child_of"/>
                     <field name="parent_id"/>
                     <field name="status" />
-                    <filter string="My Open Issue" name="my_issues" domain="[('user_ids', 'in', uid),('status.name','!=','Closed'),('status.name','!=','Fixed'),('status.name','!=','Pending'),('status.name','!=','Not Fixed'),('status.name','!=','Deployment'),('status.name','!=','Cancel')]"/>
+                    <filter string="My Open Issue" name="my_issues" domain="[('user_ids', 'in', uid),('status.name','not in',['Closed','Fixed','Pending','Not Fixed','Deployment','Cancel'])]"/>
                     <filter string="Unassigned" name="unassigned" domain="[('user_ids', '=', False)]"/>
-                    <filter string="Open Issue" name="open_issues" domain="[('status.name','!=','Closed'),('status.name','!=','Fixed'),('status.name','!=','Pending'),('status.name','!=','Not Fixed'),('status.name','!=','Deployment'),('status.name','!=','Cancel')]"/>
+                    <filter string="Open Issue" name="open_issues" domain="[('status.name','not in',['Closed','Fixed','Pending','Not Fixed','Deployment','Cancel'])]"/>
                     <filter string="Deployment" name="deploy_issues" domain="[('status.name','=','Deployment')]"/>
                     <filter string="Closed Issue" name="closed_issues" domain="[('status.name','=','Closed')]"/>
                     <separator/>
@@ -376,7 +376,6 @@
                     <templates>
                         <t t-name="kanban-box">
                             <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click o_has_icon oe_kanban_content oe_kanban_card">
-
                                 <div class="o_project_kanban_main ">
                                     <div class="o_kanban_card_content mw-100">
                                         <div class="o_kanban_primary_left">
@@ -411,45 +410,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="container o_kanban_card_manage_pane dropdown-menu" role="menu" groups="base.group_user">
-                                        <div class="row">
-                                            <div class="col-6 o_kanban_card_manage_section o_kanban_manage_view">
-                                                <div role="menuitem" class="o_kanban_card_manage_title">
-                                                    <span>View</span>
-                                                </div>
-                                                <div role="menuitem">
-                                                    <a name="action_view_issues" type="object">Issues</a>
-                                                </div>
-                                                <div role="menuitem" t-if="record.doc_count.raw_value">
-                                                    <a name="attachment_tree_view" type="object">Documents</a>
-                                                </div>
-                                            </div>
-                                            <div class="col-6 o_kanban_card_manage_section o_kanban_manage_reporting" groups="project.group_project_manager">
-                                                <div role="menuitem" class="o_kanban_card_manage_title">
-                                                    <span>Reporting</span>
-                                                </div>
-                                                <div role="menuitem">
-                                                    <a name="action_view_tasks_analysis" type="object">Tasks Analysis</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="o_kanban_card_manage_settings row" groups="project.group_project_manager">
-                                            <div role="menuitem" aria-haspopup="true" class="col-8">
-                                                <ul class="oe_kanban_colorpicker" data-field="color" role="popup"/>
-                                            </div>
-                                            <div role="menuitem" class="col-4">
-                                                <a t-if="record.privacy_visibility.raw_value == 'portal'" class="dropdown-item" role="menuitem" name="%(project.project_share_wizard_action)d" type="action">Share</a>
-                                                <!-- [XBO] TODO: remove the name attribute in this a tag in master -->
-                                                <a class="dropdown-item" role="menuitem" type="edit" name="action_view_kanban_project">Edit</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <a class="o_kanban_manage_toggle_button o_dropdown_kanban" href="#" groups="base.group_user">
-                                        <i class="fa fa-ellipsis-v" role="img" aria-label="Manage" title="Manage"/>
-                                    </a>
-                                    <span>
-                                        <field name="is_favorite" widget="boolean_favorite" nolabel="1" force_save="1" />
-                                    </span>
+
                                 </div>
                                 <div class="o_kanban_record_bottom mt-3">
                                     <div class="oe_kanban_bottom_left">
@@ -459,11 +420,10 @@
                                                     <span class="o_value">
                                                         <t t-esc="record.issue_count.value"/>
                                                     </span>
-                                                    <span class="o_label">Issues</span>
+                                                    <span class="o_label">Issue</span>
                                                 </div>
                                             </a>
                                         </div>
-                                        <field name="activity_ids" widget="kanban_activity"/>
                                     </div>
                                     <div class="oe_kanban_bottom_right">
                                         <field name="last_update_status" widget="badge" decoration-success="last_update_status == 'on_track'" decoration-warning="last_update_status == 'at_risk'" decoration-danger="last_update_status == 'off_track'" decoration-info="last_update_status == 'on_hold'" decoration-primary="last_update_status == 'missing_resource'"/>
@@ -471,7 +431,6 @@
                                         <field name="user_id" widget="many2one_avatar_user" t-if="record.user_id.raw_value"/>
                                     </div>
                                 </div>
-
                             </div>
                         </t>
                     </templates>
@@ -504,10 +463,7 @@
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
-            <field
-                name="nextcall"
-                eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 16:59:59')"
-            />
+            <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 16:59:59')" />
         </record>
 
 
