@@ -219,7 +219,8 @@ class Employee(models.Model):
         #     cr.execute(sql)
         #     announcement = cr.fetchall()
         cr.execute("""
-         select CURRENT_DATE """)
+         select hr_announcement.announcement_reason , hr_announcement.date_start,hr_announcement.date_end from hr_announcement where  
+               hr_announcement.date_start = '2022-05-26' AND hr_announcement.date_end > '2022-05-26' and hr_announcement.state = 'approved' """)
         announcement = cr.fetchall()
         return {
             'birthday': birthday,
