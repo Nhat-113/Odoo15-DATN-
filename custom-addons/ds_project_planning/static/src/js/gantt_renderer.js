@@ -1,8 +1,9 @@
-odoo.define('dhx_gantt.GanttRenderer', function (require) {
+odoo.define('dhx_gantt.GanttRenderer', function(require) {
     "use strict";
 
     var AbstractRenderer = require('web.AbstractRenderer');
     var FormRenderer = require('web.FormRenderer');
+    var session = require("web.session");
     var GanttRenderer = AbstractRenderer.extend({
         template: "dhx_gantt.gantt_view",
         ganttApiUrl: "/gantt_api",
@@ -17,7 +18,7 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             'click a.o_dhx_create_milestone': '_onBtnCreateMilestone',
             'click button.o_dhx_calendar_resource': '_onBtnCalendarResource',
         }),
-        init: function (parent, state, params) {
+        init: function(parent, state, params) {
             this._super.apply(this, arguments);
             this.initDomain = params.initDomain;
             this.modelName = params.modelName;
@@ -50,38 +51,56 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                 `
             }
 
-            const startDateEditor = {type: "date", map_to: "start_date"};
-            const endDateEditor = {type: "date", map_to: "end_date"};
+            const startDateEditor = { type: "date", map_to: "start_date" };
+            const endDateEditor = { type: "date", map_to: "end_date" };
 
             gantt.config.drag_progress = false;
             gantt.config.columns = [
-                {name: "text", tree: true, resize: true, label: this.state.records.data[0].project_name, width: 180},
-                {name: "start_date", align: "center", resize: true, editor: startDateEditor, width: 120,
-                    template: function (item) {
+                { name: "text", tree: true, resize: true, label: this.state.records.data[0].project_name, width: 180 },
+                {
+                    name: "start_date",
+                    align: "center",
+                    resize: true,
+                    editor: startDateEditor,
+                    width: 120,
+                    template: function(item) {
                         if (item.start_date - self.configStartDate === 0) {
                             return "";
                         }
                         return item.start_date;
                     }
                 },
-                {name: "end_date", label: "End time", align: "center", resize: true, editor: endDateEditor, width: 120,
-                    template: function (item) {
+                {
+                    name: "end_date",
+                    label: "End time",
+                    align: "center",
+                    resize: true,
+                    editor: endDateEditor,
+                    width: 120,
+                    template: function(item) {
                         if (item.start_date - self.configStartDate === 0) {
                             return "";
                         }
                         return item.end_date;
                     }
                 },
-                {name: "progress", label: "Progress", align: "center", resize: true,
-                    template: function (item) {
-                        if(item.progress) {
-                            return item.progress*100 + "%";
+                {
+                    name: "progress",
+                    label: "Progress",
+                    align: "center",
+                    resize: true,
+                    template: function(item) {
+                        if (item.progress) {
+                            return item.progress * 100 + "%";
                         }
                         return "";
                     }
                 },
-                {name: "duration", align: "center", resize: true,
-                    template: function (item) {
+                {
+                    name: "duration",
+                    align: "center",
+                    resize: true,
+                    template: function(item) {
                         if (item.start_date - self.configStartDate === 0) {
                             return 0;
                         }
@@ -89,25 +108,30 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                     }
                 },
                 {
-                    name: "assignees", width: 80, label: "Assignees", align: "center", resize: true, template: function (task) {
+                    name: "assignees",
+                    width: 80,
+                    label: "Assignees",
+                    align: "center",
+                    resize: true,
+                    template: function(task) {
                         var result = "";
                         var assignees = task.user_ids
-    
+
                         if (!assignees)
                             return;
-    
-                        assignees.forEach(function (element) {
+
+                        assignees.forEach(function(element) {
                             var assignee = byId(element);
                             result += assignee;
                         });
-    
+
                         return result
                     }
                 }
             ]
 
-            gantt.templates.task_class = function (start, end, task) {
-                if(start - self.configStartDate === 0) {
+            gantt.templates.task_class = function(start, end, task) {
+                if (start - self.configStartDate === 0) {
                     return "none"
 
                 }
@@ -119,83 +143,88 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                 }
             };
 
-            gantt.templates.grid_header_class = function(columnName, column){
-                if(columnName == 'text') {
+            gantt.templates.grid_header_class = function(columnName, column) {
+                if (columnName == 'text') {
                     return "projectHeaderColor"
                 }
                 return "headerColor";
-              };
+            };
 
-            gantt.templates.rightside_text = function (start, end, task) {
+            gantt.templates.rightside_text = function(start, end, task) {
                 if (task.type === "milestone") {
                     return task.text;
                 }
                 return "";
-            };
 
+            };
+           
             const tooltips = gantt.ext.tooltips;
             gantt.templates.tooltip_date_format = gantt.date.date_to_str("%F %j, %Y");
-			gantt.templates.tooltip_text = function (start, end, task) {
+            gantt.templates.tooltip_text = function(start, end, task) {
                 // Add assignee
-				return `<b>Task:</b> ${task.text}<br/>
+                return `<b>Task:</b> ${task.text}<br/>
                 <b>Duration:</b> ${task.duration}<br/>
                 <b>Start date:</b> ${gantt.templates.tooltip_date_format(start)} 
                 <br/><b>End date:</b> ${gantt.templates.tooltip_date_format(end)}`
-					
-			};
-            
 
-            if(this.is_total_float){
-                gantt.config.columns.push({name: "total_float", label: "Total Float", align: "center"})
+            };
+
+
+            if (this.is_total_float) {
+                gantt.config.columns.push({ name: "total_float", label: "Total Float", align: "center" })
             }
 
             //TODO: setup configurable weekend days.
-            gantt.setWorkTime({day:5, hours: true });
-            gantt.setWorkTime({day:6, hours: true });
-            gantt.setWorkTime({day:0, hours: true });
-            gantt.setWorkTime({hours: [0,23]});
+            gantt.setWorkTime({ day: 5, hours: true });
+            gantt.setWorkTime({ day: 6, hours: true });
+            gantt.setWorkTime({ day: 0, hours: true });
+            gantt.setWorkTime({ hours: [0, 23] });
 
             var zoomConfig = {
-                levels: [
-                    {
-                        name:"day",
+                levels: [{
+                        name: "day",
                         scale_height: 27,
-                        min_column_width:80,
-                        scales:[
-                            {unit: "day", step: 1, format: "%d %M"}
+                        min_column_width: 80,
+                        scales: [
+                            { unit: "day", step: 1, format: "%d %M" }
                         ]
                     },
                     {
-                        name:"week",
+                        name: "week",
                         scale_height: 50,
-                        min_column_width:50,
-                        scales:[
-                            {unit: "week", step: 1, format: function (date) {
-                                var dateToStr = gantt.date.date_to_str("%d %M");
-                                var endDate = gantt.date.add(date, +6, "day");
-                                var weekNum = gantt.date.date_to_str("%W")(date);
-                                return "#" + weekNum + ", " + dateToStr(date) + " - " + dateToStr(endDate);
-                            }},
-                            {unit: "day", step: 1, format: "%j %D"}
+                        min_column_width: 50,
+                        scales: [{
+                                unit: "week",
+                                step: 1,
+                                format: function(date) {
+                                    var dateToStr = gantt.date.date_to_str("%d %M");
+                                    var endDate = gantt.date.add(date, +6, "day");
+                                    var weekNum = gantt.date.date_to_str("%W")(date);
+                                    return "#" + weekNum + ", " + dateToStr(date) + " - " + dateToStr(endDate);
+                                }
+                            },
+                            { unit: "day", step: 1, format: "%j %D" }
                         ]
                     },
                     {
-                        name:"month",
+                        name: "month",
                         scale_height: 50,
-                        min_column_width:120,
-                        scales:[
-                            {unit: "month", format: "%F, %Y"},
-                            {unit: "week", format: "Week #%W"}
+                        min_column_width: 120,
+                        scales: [
+                            { unit: "month", format: "%F, %Y" },
+                            { unit: "week", format: "Week #%W" }
                         ]
                     },
                     {
-                        name:"quarter",
+                        name: "quarter",
                         height: 50,
-                        min_column_width:90,
-                        scales:[
-                            {unit: "month", step: 1, format: "%M"},
+                        min_column_width: 90,
+                        scales: [
+                            { unit: "month", step: 1, format: "%M" },
                             {
-                                unit: "quarter", step: 1, format: function (date) {
+                                unit: "quarter",
+                                step: 1,
+                                format: function(date) {
                                     var dateToStr = gantt.date.date_to_str("%M");
                                     var endDate = gantt.date.add(gantt.date.add(date, 3, "month"), -1, "day");
                                     return dateToStr(date) + " - " + dateToStr(endDate);
@@ -204,11 +233,11 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                         ]
                     },
                     {
-                        name:"year",
+                        name: "year",
                         scale_height: 50,
                         min_column_width: 30,
-                        scales:[
-                            {unit: "year", step: 1, format: "%Y"}
+                        scales: [
+                            { unit: "year", step: 1, format: "%Y" }
                         ]
                     }
                 ]
@@ -216,29 +245,29 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             gantt.ext.zoom.init(zoomConfig);
             gantt.ext.zoom.setLevel("week");
         },
-        _onClickCriticalPath: function(){
+        _onClickCriticalPath: function() {
             // console.log('_onClickCriticalPath');
             this.trigger_up('gantt_show_critical_path');
         },
-        _onClickReschedule: function(){
+        _onClickReschedule: function() {
             // console.log('_onClickReschedule');
             this.trigger_up('gantt_schedule');
         },
-        _onClickZoomIn: function(){
+        _onClickZoomIn: function() {
             // console.log('_onClickZoomIn');
             gantt.ext.zoom.zoomIn();
         },
-        _onClickZoomOut: function(){
+        _onClickZoomOut: function() {
             // console.log('_onClickZoomOut');
             gantt.ext.zoom.zoomOut();
         },
 
         _exportToPDF: function() {
             gantt.exportToPDF({
-				header:"<style>.danger {border: 1px solid #990614;color: #f30f0f;background: #f30f0f;}.danger .gantt_task_progress {background: #990614;}.warning {border: 1px solid #eec41e;color: #ffffcc;background: #ffeb3b;}.warning .gantt_task_progress {background: #eec41e;}</style>"
-			});
+                header: "<style>.danger {border: 1px solid #990614;color: #f30f0f;background: #f30f0f;}.danger .gantt_task_progress {background: #990614;}.warning {border: 1px solid #eec41e;color: #ffffcc;background: #ffeb3b;}.warning .gantt_task_progress {background: #eec41e;}</style>"
+            });
         },
-        _onBtnCreatePhase: function (ev) {
+        _onBtnCreatePhase: function(ev) {
             // prevent the event propagation 
             if (ev) {
                 ev.stopPropagation();
@@ -254,7 +283,7 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                 self.do_action(result);
             });
         },
-        _onBtnCreateMilestone: function (ev) {
+        _onBtnCreateMilestone: function(ev) {
             // prevent the event propagation 
             if (ev) {
                 ev.stopPropagation();
@@ -269,7 +298,7 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                 self.do_action(result);
             });
         },
-        _onBtnCalendarResource: function (ev) {
+        _onBtnCalendarResource: function(ev) {
             // prevent the event propagation 
             if (ev) {
                 ev.stopPropagation();
@@ -285,17 +314,17 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                 self.do_action(result);
             });
         },
-        on_attach_callback: function () {
+        on_attach_callback: function() {
             this.renderGantt();
             // console.log('on_attach_callback');
             // console.log(this.$el);
         },
 
-        renderGantt: function(){
+        renderGantt: function() {
             gantt.init(this.$('.o_dhx_gantt').get(0));
             this.trigger_up('gantt_config');
             this.trigger_up('gantt_create_dp');
-            if(!this.events_set){
+            if (!this.events_set) {
                 var self = this;
                 gantt.attachEvent('onBeforeGanttRender', function() {
                     // console.log('tadaaaa, onBeforeGanttRender');
@@ -311,16 +340,15 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
                 start_date: new Date(), //a Date object that sets the marker's date
                 css: "today", //a CSS class applied to the marker
                 text: "Today", //the marker title
-                title:date_to_str( new Date()) // the marker's tooltip
+                title: date_to_str(new Date()) // the marker's tooltip
             });
             var rootHeight = this.$el.height();
             var headerHeight = this.$('.o_dhx_gantt_header').height();
             this.$('.o_dhx_gantt').height(rootHeight - headerHeight);
             gantt.parse(this.state.records);
         },
-        _onUpdate: function () {
-        },
-        updateState: function (state, params) {
+        _onUpdate: function() {},
+        updateState: function(state, params) {
             // this method is called by the controller when the search view is changed. we should 
             // clear the gantt chart, and add the new tasks resulting from the search
             var res = this._super.apply(this, arguments);
@@ -328,41 +356,41 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
             this.renderGantt();
             return res;
         },
-        disableAllButtons: function(){
+        disableAllButtons: function() {
             // console.log('disableAllButtons:: Renderer');
             this.$('.o_dhx_gantt_header').find('button').prop('disabled', true);
         },
-        enableAllButtons: function(){
+        enableAllButtons: function() {
             // console.log('enableAllButtons:: Renderer');
             this.$('.o_dhx_gantt_header').find('button').prop('disabled', false);
         },
-        undoRenderCriticalTasks: function(data){
-            gantt.eachTask(function(item){
+        undoRenderCriticalTasks: function(data) {
+            gantt.eachTask(function(item) {
                 item.color = "";
             });
-            gantt.getLinks().forEach(function(item){
+            gantt.getLinks().forEach(function(item) {
                 item.color = "";
             });
             gantt.render();
         },
-        renderCriticalTasks: function(data){
-            data.tasks.forEach(function(item){
+        renderCriticalTasks: function(data) {
+            data.tasks.forEach(function(item) {
                 var task = gantt.getTask(item);
-                if(task){
+                if (task) {
                     task.color = "red";
                 }
             });
-            data.links.forEach(function(item){
+            data.links.forEach(function(item) {
                 var link = gantt.getLink(item);
-                if(link){
+                if (link) {
                     link.color = "red";
                 }
             });
-            if(data.tasks.length > 0){
+            if (data.tasks.length > 0) {
                 gantt.render();
             }
         },
-        destroy: function () {
+        destroy: function() {
             gantt.clearAll();
             this._super.apply(this, arguments);
         },
@@ -371,113 +399,113 @@ odoo.define('dhx_gantt.GanttRenderer', function (require) {
 });
 
 // code that i worked so hard for i am not ready to throw it yet :D
-            // Approach 1: use dhx_gantt's dataProcessor to read from server api(controller)
-            // console.log('ganttApiUrl');
-            // console.log(this.ganttApiUrl);
-            // console.log('initDomain');
-            // console.log(JSON.stringify(this.initDomain));
-            // console.log('JSON.stringify(this.undefinedStuff)');
-            // console.log(JSON.stringify(this.undefinedStuff));
-            // console.log('1243');
-            // console.log(this.ganttApiUrl);
-            // console.log(this.ganttApiUrl + '?domain=');
-            // console.log(this.ganttApiUrl + '?domain=' + this.initDomain ? JSON.stringify(this.initDomain) : 'False');
-            // console.log(this.ganttApiUrl + '?domain=' + (this.initDomain ? JSON.stringify(this.initDomain) : 'False'));
-            // console.log(this.ganttApiUrl + '?domain=' + this.initDomain);
+// Approach 1: use dhx_gantt's dataProcessor to read from server api(controller)
+// console.log('ganttApiUrl');
+// console.log(this.ganttApiUrl);
+// console.log('initDomain');
+// console.log(JSON.stringify(this.initDomain));
+// console.log('JSON.stringify(this.undefinedStuff)');
+// console.log(JSON.stringify(this.undefinedStuff));
+// console.log('1243');
+// console.log(this.ganttApiUrl);
+// console.log(this.ganttApiUrl + '?domain=');
+// console.log(this.ganttApiUrl + '?domain=' + this.initDomain ? JSON.stringify(this.initDomain) : 'False');
+// console.log(this.ganttApiUrl + '?domain=' + (this.initDomain ? JSON.stringify(this.initDomain) : 'False'));
+// console.log(this.ganttApiUrl + '?domain=' + this.initDomain);
 
-            // var domain_value = (this.initDomain ? JSON.stringify(this.initDomain) : 'False');
-            // var initUrl = this.ganttApiUrl +
-            // '?domain=' + domain_value +
-            // '&model_name=' + this.modelName +
-            // '&timezone_offset=' + (-this.date_object.getTimezoneOffset());
-            // console.log('initUrl');
-            // console.log(initUrl);
+// var domain_value = (this.initDomain ? JSON.stringify(this.initDomain) : 'False');
+// var initUrl = this.ganttApiUrl +
+// '?domain=' + domain_value +
+// '&model_name=' + this.modelName +
+// '&timezone_offset=' + (-this.date_object.getTimezoneOffset());
+// console.log('initUrl');
+// console.log(initUrl);
 
-            // [
-            //     {name:"add", label:"", width:50, align:"left" },
+// [
+//     {name:"add", label:"", width:50, align:"left" },
 
-            //     {name:"text",       label:textFilter, width:250, tree:true },
-            //     {name:"start_date", label:"Start time", width:80, align:"center" },
-            //     {name:"duration",   label:"Duration",   width:60, align:"center" }
-            // ]
- 
+//     {name:"text",       label:textFilter, width:250, tree:true },
+//     {name:"start_date", label:"Start time", width:80, align:"center" },
+//     {name:"duration",   label:"Duration",   width:60, align:"center" }
+// ]
 
-            // gantt.load(initUrl);
-            // var dp = new gantt.dataProcessor(initUrl);
-            // keep the order of the next 3 lines below
-            // var dp = gantt.createDataProcessor({
-            //     url: initUrl,
-            //     mode:"REST",
-            // });
-            // // dp.init(gantt);
-            // dp.setTransactionMode({
-            //     mode: "REST",
-            //     payload: {
-            //         csrf_token: core.csrf_token,
-            //         link_model: this.link_model,
-            //         model_name: self.modelName
-            //     },
-            // });
-            // var dp = gantt.createDataProcessor(function(entity, action, data, id){
-            //     console.log('createDataProcessor');
-            //     console.log('entity');
-            //     console.log({entity});
-            //     console.log({action});
-            //     console.log({data});
-            //     console.log({id});
-            //     const services = {
-            //         "task": this.taskService,
-            //         "link": this.linkService
-            //     };
-            //     const service = services[entity];
-            //     switch (action) {
-            //         case "update":
-            //             self.trigger_up('gantt_data_updated', {entity, data});
-            //             return true;
-            //             // return service.update(data);
-            //         case "create":
-            //             self.trigger_up('gantt_data_created', {entity, data});
-            //             // return service.insert(data);
-            //         case "delete":
-            //             self.trigger_up('gantt_data_deleted', {entity, data});
-            //             // return service.remove(id);
-            //     }
-            // });
 
-            // dp.attachEvent("onAfterUpdate", function(id, action, tid, response){
-            //     if(action == "error"){
-            //         console.log('nice "an error occured :)"');
-            //     }else{
-            //         // self.renderGantt();
-            //         return true;
-            //     }
-            // });
-            // dp.attachEvent("onBeforeUpdate", function(id, state, data){
-            //     console.log('BeforeUpdate. YAY!');
-            //     data.csrf_token = core.csrf_token;
-            //     data.model_name = self.modelName;
-            //     data.timezone_offset = (-self.date_object.getTimezoneOffset());
-            //     data.map_text = self.map_text;
-            //     data.map_text = self.map_text;
-            //     data.map_id_field = self.map_id_field;
-            //     data.map_date_start = self.map_date_start;
-            //     data.map_duration = self.map_duration;
-            //     data.map_open = self.map_open;
-            //     data.map_progress = self.map_progress;
-            //     data.link_model = self.link_model;
-            //     console.log('data are ');
-            //     console.log(data);
-            //     return true;
-            // });
+// gantt.load(initUrl);
+// var dp = new gantt.dataProcessor(initUrl);
+// keep the order of the next 3 lines below
+// var dp = gantt.createDataProcessor({
+//     url: initUrl,
+//     mode:"REST",
+// });
+// // dp.init(gantt);
+// dp.setTransactionMode({
+//     mode: "REST",
+//     payload: {
+//         csrf_token: core.csrf_token,
+//         link_model: this.link_model,
+//         model_name: self.modelName
+//     },
+// });
+// var dp = gantt.createDataProcessor(function(entity, action, data, id){
+//     console.log('createDataProcessor');
+//     console.log('entity');
+//     console.log({entity});
+//     console.log({action});
+//     console.log({data});
+//     console.log({id});
+//     const services = {
+//         "task": this.taskService,
+//         "link": this.linkService
+//     };
+//     const service = services[entity];
+//     switch (action) {
+//         case "update":
+//             self.trigger_up('gantt_data_updated', {entity, data});
+//             return true;
+//             // return service.update(data);
+//         case "create":
+//             self.trigger_up('gantt_data_created', {entity, data});
+//             // return service.insert(data);
+//         case "delete":
+//             self.trigger_up('gantt_data_deleted', {entity, data});
+//             // return service.remove(id);
+//     }
+// });
 
-            // gantt.attachEvent("onBeforeLinkDelete", function(id, item){
-            //     data.csrf_token = core.csrf_token;
-            //     data.link_model = self.link_model;
-            //     return true;
-            // });
-            // Approach 2: use odoo's mvc
-            // console.log('this.state');
-            // console.log(this.state);
-            // console.log('SETTING TO ');
-            // console.log(this.state.records);
-            // gantt.init(this.$el.find('.o_dhx_gantt').get(0));
+// dp.attachEvent("onAfterUpdate", function(id, action, tid, response){
+//     if(action == "error"){
+//         console.log('nice "an error occured :)"');
+//     }else{
+//         // self.renderGantt();
+//         return true;
+//     }
+// });
+// dp.attachEvent("onBeforeUpdate", function(id, state, data){
+//     console.log('BeforeUpdate. YAY!');
+//     data.csrf_token = core.csrf_token;
+//     data.model_name = self.modelName;
+//     data.timezone_offset = (-self.date_object.getTimezoneOffset());
+//     data.map_text = self.map_text;
+//     data.map_text = self.map_text;
+//     data.map_id_field = self.map_id_field;
+//     data.map_date_start = self.map_date_start;
+//     data.map_duration = self.map_duration;
+//     data.map_open = self.map_open;
+//     data.map_progress = self.map_progress;
+//     data.link_model = self.link_model;
+//     console.log('data are ');
+//     console.log(data);
+//     return true;
+// });
+
+// gantt.attachEvent("onBeforeLinkDelete", function(id, item){
+//     data.csrf_token = core.csrf_token;
+//     data.link_model = self.link_model;
+//     return true;
+// });
+// Approach 2: use odoo's mvc
+// console.log('this.state');
+// console.log(this.state);
+// console.log('SETTING TO ');
+// console.log(this.state.records);
+// gantt.init(this.$el.find('.o_dhx_gantt').get(0));
