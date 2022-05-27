@@ -167,9 +167,13 @@ class EstimationResourcePlan(models.Model):
             
         elif vals_effort_mm >= 1 and vals_effort_mm < 13:
             mm_end = math.floor(vals_effort_mm)
-           
-            yy_end = yy_start
             surplus = vals_effort_mm - mm_end
+            if mm_end == 12:
+                mm_end = 1
+                yy_end = yy_start + 1
+            else:
+                mm_end = mm_end + 1
+                yy_end = yy_start
             result_dd_end = EstimationResourcePlan.compute_days(mm_end, surplus, dd_end)
             if result_dd_end == 0:
                 dd_end = 1
@@ -204,7 +208,12 @@ class EstimationResourcePlan(models.Model):
         elif check_vals <= 12:
             mm_end = math.floor(check_vals)
             surplus = check_vals - mm_end
-            yy_end = yy_start + index
+            if mm_end == 12:
+                mm_end = 1
+                yy_end = yy_start + index + 1
+            else:
+                mm_end = mm_end + 1
+                yy_end = yy_start + index
             dd_end = EstimationResourcePlan.compute_days(mm_end, surplus, dd_end)
         return {'dd_end': dd_end, 'mm_end': mm_end, 'yy_end': yy_end}
         
@@ -242,7 +251,7 @@ class GanttResourcePlanning(models.Model):
     job_position_id = fields.Many2one('config.job.position')
     start_date = fields.Date(string="Start date")
     end_date = fields.Date(string="End date")
-    value_man_month = fields.Float(string="MM")
+    value_man_month = fields.Float(string="Total (MM)")
     planned_duration = fields.Integer(string="Duration", default= 100)
     links_serialized_json = fields.Char(string="json", default="[]")
 

@@ -23,8 +23,8 @@
                 <field name="start_date"/>
                 <field name="end_date"/>
                 <field name="value_man_month"/>
-                <field name="links_serialized_json"/>
-                <field name="planned_duration"/>
+                <!-- <field name="links_serialized_json"/>
+                <field name="planned_duration"/> -->
             </tree>
         </field>
     </record>
