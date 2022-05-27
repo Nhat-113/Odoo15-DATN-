@@ -11,6 +11,7 @@ class CostRate(models.Model):
 
     role = fields.Char("Role", required=True)
     description = fields.Char("Description", required=True)
+    job_type = fields.Many2one('config.job.position', string='Type')
     currency_usd_id = fields.Many2one('res.currency', default= 2) # 2 is USD , string="Currency"
     currency_yen_id = fields.Many2one('res.currency', default= 25) # 2 is YEN , string="Currency"
     currency_vnd_id = fields.Many2one('res.currency', default= 23) # 2 is VND , string="Currency"
@@ -29,7 +30,8 @@ class CostRate(models.Model):
         exchange_rate_vnd = self.env['estimation.exchange.rate'].search([('currency_id','=', self.currency_vnd_id.id)])
         for rec in self:
             rec.cost_vnd = rec.cost_usd * exchange_rate_vnd.value
-    
+
+
 class EstimationExchangeRate(models.Model):
     _name="estimation.exchange.rate"
     
