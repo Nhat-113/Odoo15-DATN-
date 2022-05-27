@@ -6,15 +6,15 @@ from datetime import date
 class Contract(models.Model):
     _inherit = 'hr.contract'
 
-    @api.constrains('date_start', 'date_end')
-    def _check_dates(self):
-        for contract in self:
-            if contract.date_end:
-                if contract.date_end and contract.date_start > contract.date_end or contract.date_end < date.today():
-                    raise ValidationError(_(
-                        'Contract %(contract)s: start date (%(start)s) must be earlier than contract end date (%(end)s) and end date (%(end)s) must be later than today (%(today)s)',
-                        contract=contract.name, start=contract.date_start, end=contract.date_end, today=date.today()
-                    ))
+    # @api.constrains('date_start', 'date_end')
+    # def _check_dates(self):
+    #     for contract in self:
+    #         if contract.date_end:
+    #             if contract.date_end and contract.date_start > contract.date_end:
+    #                 raise ValidationError(_(
+    #                     'Contract %(contract)s: start date (%(start)s) must be earlier than contract end date (%(end)s',
+    #                     contract=contract.name, start=contract.date_start, end=contract.date_end
+    #                 ))
 
     @api.constrains('employee_id')
     def _check_employee(self):
@@ -44,6 +44,14 @@ class Contract(models.Model):
         for contract in open_contracts.filtered(lambda c: c.employee_id and c.resource_calendar_id):
             contract.employee_id.resource_calendar_id = contract.resource_calendar_id
         return contracts
+
+    def write(self, vals):
+        res = super(Contract, self).write(vals)
+        if self.state == 'close':
+            for contract in self.filtered(lambda c: not c.date_end):
+                contract.date_end = max(date.today(), contract.date_start)
+
+        return res
 
     # def _assign_open_contract(self):
     #     for contract in self:

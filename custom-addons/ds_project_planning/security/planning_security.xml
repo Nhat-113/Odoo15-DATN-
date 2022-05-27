@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        PROJECT MODIFY access rules
+        -->
+
+    <!-- Add new group-->
+    <record id="group_project_pm" model="res.groups">
+        <field name="name">Officer (PM)</field>
+        <field name="implied_ids" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="category_id" ref="base.module_category_services_project"/>
+    </record>
+    
+    <!-- Add new Director group--> 
+    <!-- This group only view all project & task -->
+    <record id="group_project_director" model="res.groups">
+        <field name="name">Director</field>
+        <field name="implied_ids" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="category_id" ref="base.module_category_services_project"/>
+    </record>
+
+    <record id="project.group_project_manager" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('project.group_project_user')), (4, ref('ds_project_planning.group_project_pm'))]"/>
+    </record>
+
+    <!-- Project User: can see only projects assigned -->
+    <record model="ir.rule" id="project_project_user_rule">
+        <field name="name">Project: User rule: see only projects assigned</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">[('member_ids', 'in', user.id)]</field>
+        <field name="groups" eval="[(4,ref('project.group_project_user'))]"/>
+    </record>
+   
+    <!-- Project Director: can see all projects -->
+    <record model="ir.rule" id="project_project_director_rule">
+        <field name="name">Project: Director rule: see all projects</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_director'))]"/>
+    </record>
+  
+    <!-- Project Director: can see all tasks -->
+    <record model="ir.rule" id="project_task_director_rule">
+        <field name="name">Project: Director rule: see all tasks</field>
+        <field name="model_id" ref="model_project_task"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_director'))]"/>
+    </record>
+
+    <!-- Project Officer: can see only managed projects for PM and can see all projects assigned -->
+    <record model="ir.rule" id="project_project_pm_rule">
+        <field name="name">Project: Officer (PM) rule: see only projects assigned</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">['|',('user_id', '=', user.id), ('member_ids', 'in', user.id)]</field>
+        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_pm'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'project'), ('name', '=', 'ir_rule_private_task')]" />
+        </function>
+        <value eval="{'noupdate': False}"/>
+    </function>
+
+    <record id="project.ir_rule_private_task" model="ir.rule">
+        <field name="name">Project: See private tasks</field>
+        <field name="domain_force">[
+            '|', '|', ('project_id', '!=', False),
+                      ('parent_id', '!=', False),
+                 ('user_ids', 'in', user.id),
+        ]</field>
+    </record>
+
+    <!-- reset noupdate -->
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'project'), ('name', '=', 'ir_rule_private_task')]" />
+        </function>
+        <value eval="{'noupdate': True}" />
+    </function>
+
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'project'), ('name', '=', 'task_type_manager_rule')]" />
+        </function>
+        <value eval="{'noupdate': False}"/>
+    </function>
+
+    <record model="ir.rule" id="project.task_type_manager_rule">
+        <field name="groups" eval="[(4, ref('project.group_project_manager')), (4, ref('ds_project_planning.group_project_pm'))]"/>
+    </record>
+
+    <!-- reset noupdate -->
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'project'), ('name', '=', 'task_type_manager_rule')]" />
+        </function>
+        <value eval="{'noupdate': True}" />
+    </function>
+
+    <data noupdate="1">
+        <record id="update_visibility_project_officer" model="ir.rule">
+            <field name="name">Project updates : Project Officer user can see all project updates</field>
+            <field name="model_id" ref="project.model_project_update"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4,ref('ds_project_planning.group_project_pm'))]"/>
+        </record>
+
+
+        <!-- Employees (modified): Projects visible to team members not in followers privacy visibility -->
+        <!-- <record model="ir.rule" id="project.project_public_members_rule">
+        <field name="name">Project: employees: public, employees, followers or team members (modified)</field>
+        <field name="domain_force">['|',('privacy_visibility', '!=', 'followers'),
+                                            ('member_ids', 'in', [user.id])
+                                        ]</field>
+    </record> -->
+    </data>
+
+</odoo>

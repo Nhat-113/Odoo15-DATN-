@@ -115,14 +115,22 @@
                                             <th>Người đại diện</th>
                                             <td>
                                                 <span>:  </span>Ông
-                                                <b>NGUYỄN HỒNG TÂN</b>
+                                                <b>
+                                                    <t t-if='e.company_id.representative'>
+                                                        <span t-field="e.company_id.representative"/>
+                                                    </t>
+                                                </b>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>Chức vụ</th>
                                             <td>
                                                 <span>:  </span>
-                                                Phó giám đốc
+
+                                                <t t-if='e.company_id.position'>
+                                                        <span t-field="e.company_id.position"/>
+                                                </t>
+
                                             </td>
                                         </tr>
                                         <tr>
@@ -165,8 +173,8 @@
                                             <td style="border: none; border-top: none;">
                                                 <span>:  </span>
                                                 <span>
-                                                    <t t-if='e.employee_id.address_home_id.display_name'>
-                                                        <span t-field="e.employee_id.address_home_id.display_name"/>
+                                                    <t t-if='e.employee_id.address'>
+                                                        <span t-field="e.employee_id.address"/>
                                                     </t>
                                                 </span>
                                             </td>
@@ -260,7 +268,7 @@
                                         <p class="font-weight-bold">A- Quyền lợi: </p>
                                         <p>Phương tiện đi lại làm việc: Do Người lao động tự túc</p>
                                         <p class="font-weight-bold">1.   Mức lương chính hoặc tiền công</p>
-                                        <p class="font-weight-bold">Mức lương:</p>
+                                        <p class="font-weight-bold">Mức lương: <span t-esc="'{:,}'.format(int(e.wage))"/> VND (Lương cơ bản)</p>
                                         <p>Mức lương này là căn cứ đóng bảo hiểm bắt buộc theo quy định của pháp luật lao động là cơ sở để giải quyết các chế độ bảo hiểm xã hội (ốm đau, thai sản, tai nạn lao động, bệnh nghề nghiệp, hưu trí, tử tuất) theo quy định của Luật Bảo hiểm xã hội, và các chế độ khác liên qua đến hợp đồng lao động.</p>
                                         <p class="font-weight-bold">2.   Hình thức trả lương</p>
                                         <p class="ml-2">Theo tháng bằng chuyển khoản, trả một lần vào ngày 02 hàng tháng. Nếu trùng vào ngày nghỉ thì được trả vào ngày làm việc đầu tiên tiếp theo. Người lao động đồng ý mở tài khoản cá nhân tại ngân hàng do Công ty chỉ định để trả tiền lương ngay sau khi ký Hợp đồng lao động với Công ty.</p>
@@ -312,7 +320,9 @@
                                         <p>2.   Khi hai bên ký kết phụ lục hợp đồng thì nội dung của phụ lục cũng có giá trị như các nội dung của bản hợp đồng này.</p>
                                         <p>3.   Hợp đồng lao động này làm thành hai (02) bản có giá trị như nhau, mỗi bên giữ một bản, và có hiệu lực từ ngày ký.</p>
                                         <p>4.   Người lao động đọc kỹ, hiểu rõ và cam kết thực hiện các điều khoản và quy định ghi tại hợp đồng lao động.</p>
-                                        <p>5.   Hợp đồng lao động làm tại Công ty Cổ phần D-Soft ngày
+                                        <p>5.   Hợp đồng lao động làm tại <t t-if='e.company_id.display_name'>
+                                            <span t-field="e.company_id.display_name"/>
+                                        </t> ngày
                                             <span t-esc="e.date_start.strftime('%d')"/>
                                     tháng
                                             <span t-esc="e.date_start.strftime('%m')"/>
@@ -328,8 +338,16 @@
                                     <p class="font-italic">(Ký, ghi rõ họ tên)</p>
                                 </div>
                                 <div class="col-6 text-center">
-                                    <p class="font-weight-bold">Đại diện công ty CP D-Soft</p>
-                                    <p class="font-italic">Phó giám đốc</p>
+                                    <p class="font-weight-bold">Đại diện công ty
+                                        <t t-if='e.company_id.display_name'>
+                                            <span t-field="e.company_id.display_name"/>
+                                        </t>
+                                    </p>
+                                    <p class="font-italic">
+                                            <t t-if='e.company_id.position'>(
+                                                <span t-field="e.company_id.position"/>
+                                            )</t>
+                                    </p>
                                 </div>
                             </div>
                             <!-- PHỤ LỤC HỢP ĐỒNG SỐ 1 -->
@@ -339,7 +357,11 @@
                                     <tr>
                                         <th>
                                             <b>
-                                                <span>CÔNG TY CỔ PHẦN D-SOFT</span>
+                                                <span>
+                                                    <t t-if='e.company_id.display_name'>
+                                                        <span t-field="e.company_id.display_name"/>
+                                                    </t>
+                                                </span>
                                             </b>
                                         </th>
                                     </tr>
@@ -428,14 +450,22 @@
                                     <th>Người đại diện</th>
                                     <td>
                                         <span>:  </span>Ông
-                                        <b>NGUYỄN HỒNG TÂN</b>
+                                        <b>
+                                            <t t-if='e.company_id.representative'>
+                                                <span t-field="e.company_id.representative"/>
+                                            </t>
+                                        </b>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Chức vụ</th>
                                     <td>
                                         <span>:  </span>
-                                                Phó giám đốc
+                                        <b>
+                                            <t t-if='e.company_id.position'>
+                                                <span t-field="e.company_id.position"/>
+                                            </t>
+                                        </b>
                                     </td>
                                 </tr>
                                 <tr>
@@ -475,8 +505,8 @@
                                     <td style="border: none; border-top: none;">
                                         <span>:  </span>
                                         <span>
-                                            <t t-if='e.employee_id.address_home_id.display_name'>
-                                                <span t-field="e.employee_id.address_home_id.display_name"/>
+                                            <t t-if='e.employee_id.address'>
+                                                <span t-field="e.employee_id.address"/>
                                             </t>
                                         </span>
                                     </td>
@@ -568,7 +598,11 @@
  được lập thành 02 (hai) bản có giá trị như nhau, mỗi bên giữ 01 (một) bản
                                         </p>
                                         <p>Phụ lục hợp đồng được lập tại:
-                                            <span>CÔNG TY CỔ PHẦN D-SOFT</span>
+                                            <span>
+                                                <t t-if='e.company_id.display_name'>
+                                                    <span t-field="e.company_id.display_name"/>
+                                                </t>
+                                            </span>
                                         </p>
                                     </div>
                                 </div>
@@ -576,11 +610,19 @@
                             <div class="row contract-signature">
                                 <div class="col-6 text-center">
                                     <p class="font-weight-bold">NGƯỜI LAO ĐỘNG</p>
-                                    <p class="font-italic">(Ký, ghi rõ họ tên)</p>
+                                    <p class="font-italic"><span>(Ký, ghi rõ họ tên)</span></p>
                                 </div>
                                 <div class="col-6 text-center">
-                                    <p class="font-weight-bold">ĐẠI DIỆN CÔNG TY CỔ PHẦN D-SOFT</p>
-                                    <p class="font-italic">(Phó giám đốc)</p>
+                                    <p class="font-weight-bold">ĐẠI DIỆN CÔNG TY
+                                        <t t-if='e.company_id.display_name'>
+                                            <span t-field="e.company_id.display_name"/>
+                                        </t>
+                                    </p>
+                                    <p class="font-italic">
+                                            (<t t-if='e.company_id.position'>
+                                                <span t-field="e.company_id.position"/>
+                                            </t>)
+                                    </p>
                                 </div>
                             </div>
                         </div>

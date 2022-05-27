@@ -67,4 +67,17 @@
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="ds_print_contract.contract_paperformat_qweb" />
     </record>
+
+    <!-- Phụ lục hợp đồng -->
+    <record id="action_report_annex_contract" model="ir.actions.report">
+        <field name="name">Employee Annex Contract</field>
+        <field name="model">hr.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ds_print_contract.annex_contract_qweb_report</field>
+        <field name="report_file">ds_print_contract.annex_contract_qweb_report</field>
+        <field name="print_report_name">'Annex Contract - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_hr_contract"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="ds_print_contract.contract_paperformat_qweb" />
+    </record>
 </odoo>

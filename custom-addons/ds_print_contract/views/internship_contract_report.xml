@@ -11,8 +11,13 @@
                                 <div class="col-4 text-center">
                                     <tr>
                                         <th>
-                                            <img src="/ds_print_contract/static/description/img/d-soft.jpg" style="width:100%;"/>
-                                        </th>
+                                            <b>
+                                                <t t-if='e.company_id.display_name'>
+                                                    <span t-field="e.company_id.display_name"/>
+                                                </t>
+                                                <t t-if="not e.company_id.display_name">CÔNG TY CỔ PHẦN D-SOFT
+                                                </t>
+                                            </b>                                        </th>
                                     </tr>
                                 </div>
                                 <div class="col-8 text-center">
@@ -54,7 +59,12 @@
                                         <span t-esc="e.date_start.strftime('%m')"/>
                         năm
                                         <span t-esc="e.date_start.strftime('%Y')"/>
- tại Văn phòng Công ty D-Soft.
+                                            tại Văn phòng
+                                        <t t-if='e.company_id.display_name'>
+                                            <span t-field="e.company_id.display_name"/>
+                                        </t>
+                                        <t t-if="not e.company_id.display_name">Công ty CỔ PHẦN D-SOFT
+                                        </t>
                                     </p>
                                     <table style="width:100%">
                                         <tr>
@@ -74,14 +84,20 @@
                                             <th>Đại diện ông</th>
                                             <td>
                                                 <span>:  </span>
-                                                <b>NGUYỄN HỒNG TÂN</b>
+                                                <b>
+                                                    <t t-if='e.company_id.representative'>
+                                                        <span t-field="e.company_id.representative"/>
+                                                    </t>
+                                                </b>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>Chức vụ</th>
                                             <td>
                                                 <span>:  </span>
-                                                Phó giám đốc
+                                                    <t t-if='e.company_id.position'>
+                                                        <span t-field="e.company_id.position"/>
+                                                    </t>
                                             </td>
                                         </tr>
                                         <tr>
@@ -157,8 +173,8 @@
                                             <td style="border: none; border-top: none;">
                                                 <span>:  </span>
                                                 <span>
-                                                    <t t-if='e.employee_id.address_home_id.display_name'>
-                                                        <span t-field="e.employee_id.address_home_id.display_name"/>
+                                                    <t t-if='e.employee_id.address'>
+                                                        <span t-field="e.employee_id.address"/>
                                                     </t>
                                                 </span>
                                             </td>

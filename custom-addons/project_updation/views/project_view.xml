@@ -1,0 +1,477 @@
+<odoo>
+    <data>
+        <record id="task_status" model="ir.ui.view">
+            <field name="name">task.status</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_form2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="status_id_domain" invisible="1"/>
+                    <field name="status" domain="status_id_domain" attrs="{'invisible': [('issues_type', '=', False)], 'required': [('issues_type', '!=', False)]}" string="Status"/>
+                    <field name="priority_type"/>
+                    <field name="complex"/>
+                </xpath>
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <label for="issues_type" string="Type"/>
+                    <div>
+                        <field name="icon_path" class="issue_type_img oe_left" style="width :30%" attrs="{'invisible': [('icon_path', '=', False)]}"/>
+                        <field name="issues_type" style="width :70%"/>
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='recurring_task']" position="after">
+                    <field name="task_score" widget="priority" eval="5"/>
+                </xpath>
+                <xpath expr="//group/group[2]/field[@name='date_deadline']" position="replace">
+                    <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}" string="Actual End Date"/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='sub_tasks_page']/field/tree/field[@name='date_deadline']" position="replace">
+                    <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}" optional="show" string="Actual End Date"/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='task_dependencies']/field/tree/field[@name='date_deadline']" position="replace">
+                    <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}" optional="show" string="Actual End Date"/>
+                </xpath>
+                <xpath expr="//page[@name='sub_tasks_page']/field/tree/field[@name='user_ids']" position="replace">
+                    <field name="user_id_domain" invisible="1"/>
+                    <field name="user_ids" class="o_task_user_field" options="{'no_open': True, 'no_create': True}" widget="many2many_avatar_user" domain="user_id_domain"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="task_planned_hours" model="ir.ui.view">
+            <field name="name">task.planned.hours</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@id='timesheets_tab']/group[1]" position="replace">
+                    <group>
+                        <group>
+                            <div class="o_td_label">
+                                <label for="planned_hours" string="Initially Planned Hours" attrs="{'invisible': [('encode_uom_in_days', '=', True)]}"/>
+                                <label for="planned_hours" string="Initially Planned Days" attrs="{'invisible': [('encode_uom_in_days', '=', False)]}"/>
+                            </div>
+                            <field name="planned_hours" widget="timesheet_uom_no_toggle" nolabel="1" attrs="{'readonly': [('is_readonly','=', True)]}"/>
+                            <field name="is_readonly" invisible="1"/>
+                            <div class="o_td_label" groups="project.group_subtask_project" attrs="{'invisible': ['|', ('allow_subtasks', '=', False), ('subtask_count', '=', 0)]}">
+                                <label for="subtask_planned_hours" string="Sub-tasks Planned Hours" attrs="{'invisible': [('encode_uom_in_days', '=', True)]}"/>
+                                <label for="subtask_planned_hours" string="Sub-tasks Planned Days" attrs="{'invisible': [('encode_uom_in_days', '=', False)]}"/>
+                            </div>
+                            <field name="subtask_planned_hours" widget="timesheet_uom_no_toggle" nolabel="1" groups="project.group_subtask_project" attrs="{'invisible': ['|', ('allow_subtasks', '=', False), ('subtask_count', '=', 0)]}"/>
+                        </group>
+                        <group>
+                            <field name="progress_input" widget="progressbar" options="{'current_value': 'progress_input', 'max_value': '100', 'editable': true}"/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="project_status">
+            <field name="name">project.status</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='alias_def']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="project_update">
+            <field name="name">project.update</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.project_project_view_form_simplified"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='alias_def']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="project_status_view_kanban">
+            <field name="name">project.status.view.kanban</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/span" position="before">
+                    <field name="last_update_status" widget="badge" decoration-success="last_update_status == 'on_track'" decoration-warning="last_update_status == 'at_risk'" decoration-danger="last_update_status == 'off_track'" decoration-info="last_update_status == 'on_hold'" decoration-primary="last_update_status == 'missing_resource'"/>
+                </xpath>
+                <xpath expr="//div[hasclass('o_kanban_card_manage_settings')]" position="replace">
+                    <div class="o_kanban_card_manage_settings row" groups="ds_project_planning.group_project_pm">
+                        <div role="menuitem" aria-haspopup="true" class="col-8">
+                            <ul class="oe_kanban_colorpicker" data-field="color" role="popup"/>
+                        </div>
+                        <div role="menuitem" class="col-4">
+                            <a t-if="record.privacy_visibility.raw_value == 'portal'" class="dropdown-item" role="menuitem" name="%(project.project_share_wizard_action)d" type="action">Share</a>
+
+                            <a class="dropdown-item" role="menuitem" type="edit" name="action_view_kanban_project">Edit</a>
+                        </div>
+                    </div>
+                </xpath>
+                <xpath expr="//div[hasclass('o_kanban_manage_reporting')]" position="replace">
+                    <div class="col-6 o_kanban_card_manage_section o_kanban_manage_reporting" groups="ds_project_planning.group_project_pm">
+                        <div role="menuitem" class="o_kanban_card_manage_title">
+                            <span>Reporting</span>
+                        </div>
+                        <div role="menuitem">
+                            <a name="action_view_tasks_analysis" type="object">Tasks Analysis</a>
+                        </div>
+                        <div role="menuitem">
+                            <a name="%(project.action_project_task_burndown_chart_report)d" type="action">Burndown Chart</a>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="project_kanban_inherit">
+            <field name="name">project.kanban.inherit2</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.project_view_kanban_inherit_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('o_kanban_manage_view')]/div[position()=last()]" position="replace">
+                    <div role="menuitem" groups="ds_project_planning.group_project_pm">
+                        <a name="189" type="action" t-attf-context="{'active_id': #{record.id.raw_value}}">Project Updates</a>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="quick_create_task_form_inherit">
+            <field name="name">project.quick.create.task.form.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.quick_create_task_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_ids']" position="after">
+                    <field name="issues_type" widget="selection"/>
+                    <field name="status_id_domain" invisible="1"/>
+                    <field name="status" domain="status_id_domain" attrs="{'invisible': [('issues_type', '=', False)], 'required': [('issues_type', '!=', False)]}" string="Status"/>
+                </xpath>
+                <field name="user_ids" position="replace">
+                    <field name="project_id" context="{'active_id': True}" invisible="1"/>
+                    <field name="user_id_domain" invisible="1"/>
+                    <field name="user_ids" class="o_task_user_field" options="{'no_open': True, 'no_create': True}" widget="many2many_avatar_user" domain="user_id_domain"/>
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="project.act_project_project_2_project_task_all">
+            <field name="domain">[('display_project_id', '=', active_id), ('issues_type', '=', 'Task')]</field>
+        </record>
+
+        <record id="issues_type_view_tree" model="ir.ui.view">
+            <field name="name">view.tree</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_tree2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <field name="issues_type" widget="badge"/>
+                    <field name="status_color" invisible="1"/>
+                    <field name="status" widget="badge" string="Status"/>
+                    <field name="write_uid" string="Create By" widget="many2one_avatar_user"/>
+                    <field name="create_date" string="Create Date"/>
+                    <field name="write_date" string="Update Date"/>
+                </xpath>
+                <xpath expr="//field[@name='user_ids']" position="after">
+                    <field name="priority_type" string="Priority" widget="badge" decoration-primary="priority_type == 'medium'" decoration-warning="priority_type == 'high'" decoration-danger="priority_type == 'urgent'"/>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="before">
+                    <field name="id" string="ID"/>
+                </xpath>
+                <xpath expr="//field[@name='progress']" position="replace">
+                    <field name="progress_input"/>
+                </xpath>
+                <xpath expr="//field[@name='remaining_hours']" position="replace">
+                    <field name="remaining_hours" widget="timesheet_uom" sum="Remaining Hours" optional="hide" decoration-danger="progress_input &gt;= 100" decoration-warning="progress_input &gt;= 80 and progress_input &lt; 100"/>
+                </xpath>
+                <xpath expr="//field[@name='activity_ids']" position="replace">
+                    <field name="activity_ids" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='project_id']" position="replace">
+                    <field name="project_id" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='effective_hours']" position="replace">
+                    <field name="effective_hours" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='stage_id']" position="replace">
+                    <field name="stage_id" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='company_id']" position="replace">
+                    <field name="company_id" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='kanban_state']" position="replace">
+                </xpath>
+            </field>
+        </record>
+
+        <record id="issues_type_view_kanban" model="ir.ui.view">
+            <field name="name">issues.type.view.kanban</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="inside">
+                    <field name="status_color" invisible="1"/>
+                    <t t-if="record.status_color.value != 'Yellow' and record.status_color.value != 'Lightblue'">
+                        <div class="color_status" t-attf-style="background-color: {{record.status_color.value}}; color: white">
+                            <field name="status"/>
+                        </div>
+                    </t>
+                    <t t-if="record.status_color.value == 'Yellow' or record.status_color.value == 'Lightblue'">
+                        <div class="color_status" t-attf-style="background-color: {{record.status_color.value}}; color: black">
+                            <field name="status"/>
+                        </div>
+                    </t>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="issues_type_tree_view" model="ir.ui.view">
+            <field name="name">issues.type.tree.view</field>
+            <field name="model">project.issues.type</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="description_issues"/>
+                    <field name="icon_path" class="oe_avatar issue_type_img"/>
+                    <field name="status" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="issues_type_form_view" model="ir.ui.view">
+            <field name="name">issues.type.form.view</field>
+            <field name="model">project.issues.type</field>
+            <field name="arch" type="xml">
+                <form >
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="description_issues"/>
+                            <field name="icon" widget="image" class="oe_left issue_type_img"/>
+                            <field name="status" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="task_status_form_view">
+            <field name="name">Status</field>
+            <field name="model">project.task.status</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="task_status_tree_view">
+            <field name="name">Status</field>
+            <field name="model">project.task.status</field>
+            <field name="arch" type="xml">
+                <tree editable="top" sample="1">
+                    <field name="name"/>
+                    <field name="color" widget="color_picker" optional="show"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="issues_type_action" model="ir.actions.act_window">
+            <field name="name">Issues Types</field>
+            <field name="res_model">project.issues.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="task_status_action" model="ir.actions.act_window">
+            <field name="name">Status</field>
+            <field name="res_model">project.task.status</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="view_issue_search_form" model="ir.ui.view">
+            <field name="name">project.task.search.form</field>
+            <field name="model">project.task</field>
+            <field name="arch" type="xml">
+                <search string="Issues">
+                    <field name="name" string="Task"/>
+                    <field name="tag_ids"/>
+                    <field name="user_ids" context="{'active_test': False}"/>
+                    <field string="Project" name="display_project_id"/>
+                    <field name="stage_id"/>
+                    <field name="id" string="ID"/>
+                    <field name="partner_id" operator="child_of"/>
+                    <field name="parent_id"/>
+                    <field name="status" />
+                    <filter string="My Open Issue" name="my_issues" domain="[('user_ids', 'in', uid),('status.name','not in',['Closed','Fixed','Pending','Not Fixed','Deployment','Cancel'])]"/>
+                    <filter string="Unassigned" name="unassigned" domain="[('user_ids', '=', False)]"/>
+                    <filter string="Open Issue" name="open_issues" domain="[('status.name','not in',['Closed','Fixed','Pending','Not Fixed','Deployment','Cancel'])]"/>
+                    <filter string="Deployment" name="deploy_issues" domain="[('status.name','=','Deployment')]"/>
+                    <filter string="Closed Issue" name="closed_issues" domain="[('status.name','=','Closed')]"/>
+                    <separator/>
+                    <filter string="Bug" name="bug" domain="[('issues_type.name', '=', 'Bug')]"/>
+                    <filter string="Q&amp;A" name="qa" domain="[('issues_type.name', '=', 'Q&amp;A')]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Assignees" name="user" context="{'group_by': 'user_ids'}"/>
+                        <separator/>
+                        <filter name="status_group" string="Status" domain="[]" context="{'group_by':'status'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+
+        <record id="act_project_project_2_project_issue_all" model="ir.actions.act_window">
+            <field name="name">Tasks</field>
+            <field name="res_model">project.task</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('display_project_id', '=', active_id), ('issues_type', '!=', 1)]</field>
+            <field name="search_view_id" ref="view_issue_search_form"/>
+            <field name="context">{
+                'pivot_row_groupby': ['user_ids'],
+                'default_project_id': active_id,
+                'show_project_update': True,
+            }</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No tasks found. Let's create one!
+                </p>
+                <p>
+                    To get things done, use activities and status on tasks.<br/>
+                    Chat in real-time or by email to collaborate efficiently.
+                </p>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="project_issues_view_kanban">
+            <field name="name">project.issue.kanban</field>
+            <field name="model">project.project</field>
+            <field name="arch" type="xml">
+                <kanban class="oe_background_grey o_kanban_dashboard o_project_kanban o_emphasize_colors" on_create="project.open_create_project" js_class="project_project_kanban" sample="1">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="commercial_partner_id"/>
+                    <field name="color"/>
+                    <field name="issue_count"/>
+                    <field name="label_tasks"/>
+                    <field name="alias_id"/>
+                    <field name="alias_name"/>
+                    <field name="alias_domain"/>
+                    <field name="is_favorite"/>
+                    <field name="rating_percentage_satisfaction"/>
+                    <field name="rating_status"/>
+                    <field name="rating_active" />
+                    <field name="analytic_account_id"/>
+                    <field name="date"/>
+                    <field name="doc_count"/>
+                    <field name="privacy_visibility"/>
+                    <field name="last_update_color"/>
+                    <field name="last_update_status"/>
+                    <field name="tag_ids"/>
+                    <progressbar field="last_update_status" colors='{"on_track": "success", "at_risk": "warning", "off_track": "danger", "on_hold": "info", "missing_resource":"primary"}'/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click o_has_icon oe_kanban_content oe_kanban_card">
+                                <div class="o_project_kanban_main ">
+                                    <div class="o_kanban_card_content mw-100">
+                                        <div class="o_kanban_primary_left">
+                                            <div class="o_primary">
+                                                <span class="o_text_overflow">
+                                                    <t t-esc="record.name.value"/>
+                                                </span>
+                                                <span class="o_text_overflow text-muted" t-if="record.partner_id.value">
+                                                    <span class="fa fa-user mr-2" aria-label="Partner" title="Partner"></span>
+                                                    <t t-esc="record.partner_id.value"/>
+                                                </span>
+                                                <div t-if="record.date.raw_value or record.date_start.raw_value" class="text-muted o_row">
+                                                    <span class="fa fa-clock-o mr-2" title="Dates"></span>
+                                                    <field name="date_start"/>
+                                                    <i t-if="record.date.raw_value and record.date_start.raw_value" class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow"/>
+                                                    <field name="date"/>
+                                                </div>
+                                                <div t-if="record.alias_name.value and record.alias_domain.value" class="text-muted">
+                                                    <span class="fa fa-envelope-o mr-2" aria-label="Domain Alias" title="Domain Alias"></span>
+                                                    <t t-esc="record.alias_id.value"/>
+                                                </div>
+                                                <div t-if="record.rating_active.raw_value" class="text-muted" title="Percentage of happy ratings over the past 30 days." groups="project.group_project_rating">
+                                                    <b>
+                                                        <t t-if="record.rating_percentage_satisfaction.value != -1">
+                                                            <i class="fa fa-smile-o" role="img" aria-label="Percentage of satisfaction" title="Percentage of satisfaction"/>
+                                                            <t t-esc="record.rating_percentage_satisfaction.value"/>
+%
+                                                        </t>
+                                                    </b>
+                                                </div>
+                                                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="o_kanban_record_bottom mt-3">
+                                    <div class="oe_kanban_bottom_left">
+                                        <div class="o_project_kanban_boxes">
+                                            <a class="o_project_kanban_box" name="action_view_issues" type="object">
+                                                <div>
+                                                    <span class="o_value">
+                                                        <t t-esc="record.issue_count.value"/>
+                                                    </span>
+                                                    <span class="o_label">Issue</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="last_update_status" widget="badge" decoration-success="last_update_status == 'on_track'" decoration-warning="last_update_status == 'at_risk'" decoration-danger="last_update_status == 'off_track'" decoration-info="last_update_status == 'on_hold'" decoration-primary="last_update_status == 'missing_resource'"/>
+                                        <span t-att-class="'o_status_bubble mx-0 o_color_bubble_' + record.last_update_color.value" t-att-title="record.last_update_status.value"></span>
+                                        <field name="user_id" widget="many2one_avatar_user" t-if="record.user_id.raw_value"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="issues_action" model="ir.actions.act_window">
+            <field name="name">Issues</field>
+            <field name="res_model">project.project</field>
+            <field name="view_mode">kanban,form</field>
+            <field name="view_id" ref="project_updation.project_issues_view_kanban"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No tasks found. Let's create one!
+                </p>
+                <p>
+                    To get things done, use activities and status on tasks.<br/>
+                    Chat in real-time or by email to collaborate efficiently.
+                </p>
+            </field>
+        </record>
+
+        <record id="ir_cron_data_project_update_status" model="ir.cron">
+            <field name="name">Project: update status</field>
+            <field name="model_id" ref="model_project_project"/>
+            <field name="type">ir.actions.server</field>
+            <field name="state">code</field>
+            <field name="code">model.update_status()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 16:59:59')" />
+        </record>
+
+
+        <menuitem name="Issues" id="menu_issues" parent="project.menu_main_pm" action="issues_action" sequence="3" groups="base.group_no_one,project.group_project_user"/>
+        <menuitem id="issues_type_menu" name="Type" parent="project.menu_project_config" action="issues_type_action" sequence="11" groups="project.group_project_manager"/>
+        <menuitem id="task_status_menu" name="Status" parent="project.menu_project_config" action="task_status_action" sequence="12" groups="project.group_project_manager"/>
+        <menuitem action="project.project_tags_action" id="project.menu_project_tags_act" parent="project.menu_project_config" groups="project.group_project_manager"/>
+        <menuitem id="project.project_menu_config_activity_type" action="project.mail_activity_type_action_config_project_types" parent="project.menu_project_config" groups="project.group_project_manager"/>
+
+    </data>
+</odoo>
