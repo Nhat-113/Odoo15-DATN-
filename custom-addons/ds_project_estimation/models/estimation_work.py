@@ -47,7 +47,8 @@ class Estimation(models.Model):
     add_lines_module_summary = fields.One2many('estimation.module.summary', 'estimation_id', string='Module Summary')
     add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Breakdown Structure")
     add_lines_module_effort_distribute_activity = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
-
+    check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
+    
     @api.model
     def create(self, vals):
         vals_over = {'connect_overview': '', 'description': ''}
@@ -339,3 +340,23 @@ class Estimation(models.Model):
         for se in self:
             se.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', se.id)]).cost
 
+    def action_generate_project(self):
+        for estimation in self:
+            project = self.env['project.project'].create({
+                'name': estimation.project_name,
+                'user_id':estimation.estimator_ids.id
+            })
+            activity = self.env['config.activity'].search([('estimation_id','=',estimation.id)])
+            for act in activity:
+                for breakdown in self.env['module.breakdown.activity'].search([('activity_id','=',act.id)]):
+                    self.env['project.task'].create({
+                        'project_id':project.id,
+                        'stage_id':self.env['project.task.type'].search([('name','=','Backlog')])[0].id,
+                        'name':breakdown.activity,
+                        'user_ids':[],
+                        'issues_type':1,
+                        'status':2,
+                        'planned_hours':breakdown.mandays * 8
+                    })
+            estimation.check_generate_project = True
+            return project
