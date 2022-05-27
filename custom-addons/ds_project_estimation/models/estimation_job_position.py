@@ -13,4 +13,3 @@ class JobPosition(models.Model):
     sequence = fields.Integer()
     job_position = fields.Char("Job Position", required=True)
     description = fields.Char("Description", required=True)
-    

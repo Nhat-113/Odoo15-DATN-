@@ -8,6 +8,7 @@
             <tree editable="bottom">
                 <field name="role"/>
                 <field name="description" />
+                <field name="job_type"/>
                 <field name="currency_usd_id" invisible="1" />
                 <field name="currency_yen_id" invisible="1" />
                 <field name="currency_vnd_id" invisible="1" />

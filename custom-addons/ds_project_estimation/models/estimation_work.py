@@ -1,6 +1,8 @@
 from email.policy import default
 import string
+
 from odoo import models, fields, api, _
+
 
 class Estimation(models.Model):
     """
@@ -20,7 +22,7 @@ class Estimation(models.Model):
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
 
     expected_revenue = fields.Float(string="Expected Revenue")
-    total_cost = fields.Float(string="Total Cost")
+    total_cost = fields.Float(string="Total Cost (YEN)", compute='_compute_total_cost')
     total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays")
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
@@ -45,7 +47,8 @@ class Estimation(models.Model):
     add_lines_module_summary = fields.One2many('estimation.module.summary', 'estimation_id', string='Module Summary')
     add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Activity")
     add_lines_module_effort_distribute_activity = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
-
+    check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
+    
     @api.model
     def create(self, vals):
         vals_over = {'connect_overview': '', 'description': ''}
@@ -63,12 +66,48 @@ class Estimation(models.Model):
     def default_get(self, fields):
         res = super(Estimation, self).default_get(fields)
         get_data_activities = self.env['data.activity'].search([])
+        get_data_cost_rate = self.env['config.job.position'].search([])
         data_summary = self.env['data.module.summary'].search([])
         data_resource_plan = self.env['estimation.resource.planning.data'].search([])
         activities_line = []
         activities_effort_line = []
         summary_line = []
         resource_plan_line = []
+        summary_total_cost_line = []
+        cost_rate_line = []
+
+        # TODO missing add many module
+        # get_data_summary_total_cost = self.env['estimation.summary.totalcost'].search([])
+        # for record in get_data_summary_total_cost:
+        content = {
+            'connect_summary': '',
+            'sequence': 1,
+            'module': 'Module 1',
+            'design_effort': 0.0,
+            'dev_effort': 0.0,
+            'tester_effort': 0.0,
+            'comtor_effort': 0.0,
+            'brse_effort': 0.0,
+            'pm_effort': 0.0,
+
+            'total_effort': 0.0,
+            'cost': 0.0
+        }
+        line = (0, 0, content)
+        summary_total_cost_line.append(line)
+
+        for re in get_data_cost_rate:
+            content = {
+                'sequence': re.sequence,
+                'types': re.job_position,
+                'role': '',
+                'yen_month': 0.0,
+                'yen_day': 0.0,
+                'vnd_day': 0.0
+            }
+            line = (0, 0, content)
+            cost_rate_line.append(line)
+
         for record in get_data_activities:
             content = {
                 'sequence': record.sequence, 
@@ -113,6 +152,8 @@ class Estimation(models.Model):
             'add_lines_module_activity': activities_line,
             'add_lines_module_effort_distribute_activity': activities_effort_line,
             'add_lines_resource_effort': resource_plan_line
+            'add_lines_summary_totalcost': summary_total_cost_line,
+            'add_lines_summary_costrate': cost_rate_line
         })
         return res
     
@@ -312,4 +353,27 @@ class Estimation(models.Model):
                 record.value = round(self.total_manday / days_per_month.value, 2)
         return
 
-    
+    def _compute_total_cost(self):
+        for se in self:
+            se.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', se.id)]).cost
+
+    def action_generate_project(self):
+        for estimation in self:
+            project = self.env['project.project'].create({
+                'name': estimation.project_name,
+                'user_id':estimation.estimator_ids.id
+            })
+            activity = self.env['config.activity'].search([('estimation_id','=',estimation.id)])
+            for act in activity:
+                for breakdown in self.env['module.breakdown.activity'].search([('activity_id','=',act.id)]):
+                    self.env['project.task'].create({
+                        'project_id':project.id,
+                        'stage_id':self.env['project.task.type'].search([('name','=','Backlog')])[0].id,
+                        'name':breakdown.activity,
+                        'user_ids':[],
+                        'issues_type':1,
+                        'status':2,
+                        'planned_hours':breakdown.mandays * 8
+                    })
+            estimation.check_generate_project = True
+            return project
