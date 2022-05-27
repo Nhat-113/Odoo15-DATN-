@@ -151,7 +151,7 @@ class Estimation(models.Model):
             'add_lines_module_summary': summary_line,
             'add_lines_module_activity': activities_line,
             'add_lines_module_effort_distribute_activity': activities_effort_line,
-            'add_lines_resource_effort': resource_plan_line
+            'add_lines_resource_effort': resource_plan_line,
             'add_lines_summary_totalcost': summary_total_cost_line,
             'add_lines_summary_costrate': cost_rate_line
         })
