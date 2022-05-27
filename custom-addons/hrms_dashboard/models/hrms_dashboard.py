@@ -55,7 +55,13 @@ class Employee(models.Model):
         uid = request.session.uid
         company_ids = self.env.user.company_ids.ids
         employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
-        leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1'])])
+
+        leave_manager_id = self.env['hr.employee'].search([('leave_manager_id', '=' ,uid)])
+        if  self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
+            leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),('employee_company_id','in' , company_ids )])
+        else:
+            leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),('employee_company_id','in' , company_ids ), ('employee_id', 'in',leave_manager_id.ids)])
+
 
         recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ]),('company_id','in' , company_ids )])
 
@@ -169,7 +175,8 @@ class Employee(models.Model):
         birthday = cr.fetchall()
         # e.is_online # was there below
         #        where e.state ='confirm' on line 118/9 #change
-        cr.execute("""select event_event.name , event_event.date_begin,  event_event.date_end from event_event   where event_event.stage_id = '1' or  event_event.stage_id = '2' or  event_event.stage_id = '3'""")
+        cr.execute("""select event_event.name , event_event.date_begin,  event_event.date_end from event_event  
+         where event_event.stage_id = '1' or  event_event.stage_id = '2' or  event_event.stage_id = '3'""")
         event = cr.fetchall()
         announcement = []
         user_id = request.session.uid
@@ -184,7 +191,7 @@ class Employee(models.Model):
         if employee:
             department = employee.department_id
             job_id = employee.job_id
-            sql = """select ha.announcement_reason, ha.date_start
+            sql = """select ha.date_end, ha.date_start,ha.announcement_reason
             from hr_announcement ha
             left join hr_employee_announcements hea
             on hea.announcement = ha.id
@@ -212,6 +219,10 @@ class Employee(models.Model):
             sql += ')'
             cr.execute(sql)
             announcement = cr.fetchall()
+        # cr.execute("""
+        #  select hr_announcement.announcement_reason , hr_announcement.date_start,hr_announcement.date_end from hr_announcement where  
+        #        hr_announcement.date_start = '2022-05-26' AND hr_announcement.date_end > '2022-05-26' and hr_announcement.state = 'approved' """)
+        #announcement = cr.fetchall()
         return {
             'birthday': birthday,
             'event': event,

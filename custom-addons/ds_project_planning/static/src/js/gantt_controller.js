@@ -3,6 +3,7 @@ odoo.define('dhx_gantt.GanttController', function (require) {
 var AbstractController = require('web.AbstractController');
 var core = require('web.core');
 var dialogs = require('web.view_dialogs');
+var session = require("web.session");
 // var BasicController = require('web.BasicController');
 var GanttController = AbstractController.extend({
     custom_events: _.extend({}, AbstractController.prototype.custom_events, {
@@ -103,6 +104,49 @@ var GanttController = AbstractController.extend({
             // console.log(data);
             return true;
         });
+
+         //deny drag for director
+        // session.user_has_group("project.group_project_manager").then(function(has_group) {
+        //     console.log("a", has_group);
+
+        //     gantt.attachEvent("onBeforeTaskDrag", function(id, mode, e) {
+        //         var taskObj = gantt.getTask(id);
+
+        //         if (has_group) {
+        //             if (taskObj.type === "phase") {
+        //                 console.log("phase");
+        //                 return false;
+        //             }
+        //         }
+    
+        //         console.log("taskObj", taskObj);
+        //         return true;
+        //     });
+            
+        // });
+        session.user_has_group("ds_project_planning.group_project_director").then(function(has_group) {
+            console.log("a", has_group);
+
+            gantt.attachEvent("onBeforeTaskDrag", function (id, mode, e) {
+                var taskObj = gantt.getTask(id);
+
+                if (has_group || taskObj.type == "phase") {
+                    console.log(`taskObj.type`, taskObj.type);
+                  return false;
+                }
+                return true;
+            });
+        });
+         
+
+        //deny drag phase 
+        // gantt.attachEvent("onBeforeTaskDrag", function(id, mode, e){
+        //     var taskObj = gantt.getTask(id);
+        //     if (taskObj.type == "phase") {
+        //         return false;
+        //     }
+        //     return true;
+        // });
     },
 
     _onGanttConfig: function(){

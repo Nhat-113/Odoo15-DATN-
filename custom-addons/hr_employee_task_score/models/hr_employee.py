@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from builtins import print, set
 
 from odoo import fields, models, api
 
@@ -17,6 +16,7 @@ class HrEmployee(models.Model):
         for employee in self:
             list_score = []
             for task in tasks:
+                task.number_score = float(task.task_score)
                 if employee.user_id.id in task.user_ids.ids:
                     list_score.append(int(task.task_score))
             if len(list_score):
@@ -37,3 +37,8 @@ class HrEmployee(models.Model):
         }
         return action
 
+
+class ProjectTask(models.Model):
+    _inherit = 'project.task'
+
+    number_score = fields.Float('Number Score', digits=(12, 1), group_operator='avg')

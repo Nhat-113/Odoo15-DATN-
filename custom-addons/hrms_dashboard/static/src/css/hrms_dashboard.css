@@ -538,10 +538,12 @@ h4 .stat-count {
     border-radius: 7px;
     width: 90%;
     margin: 0 auto;
-    background: green;
+    background: #4CAF50;
     height: 100%;
 }
-
+.o_hr_attendance_sign_in_out_icon {
+    z-index: 100000;
+}
 .hr_attendance_login .stat-widget-one {
     background: none;
     display: flex;
@@ -554,6 +556,7 @@ h4 .stat-count {
     display: flex;
     font-weight: 100;
     justify-content: flex-end;
+    margin-left: -50px;
 }
 
 .hr_attendance_login .stat-content {
@@ -574,13 +577,7 @@ h4 .stat-count {
 }
 
 .hr_attendance_login .stat-widget-one .stat-icon .fa {
-    font-size: 50px;
-}
-
-.hr_attendance_login .stat-widget-one .stat-icon .fa {
-    font-size: 50px;
-    margin: 0px;
-    box-shadow: none;
+    font-size: 20px;
 }
 
 .hr_attendance_login {
@@ -1480,7 +1477,6 @@ button:focus {
 
 .request_detail_job>div {
     /* height: 20%; */
-    display: flex;
     flex-direction: row;
     justify-content: space-between;
     padding: 5px 0px 0px 16px;
@@ -1499,6 +1495,9 @@ button:focus {
     background-color: #FAFAFA;
     margin: 3.5% auto;
     height: 29%;
+}
+.dashboard_today_meeting {
+    display: flex;
 }
 
 .all-request button {
@@ -1735,6 +1734,10 @@ button:focus {
     overflow-y: scroll;
 }
 
+.list_news::-webkit-scrollbar {
+    /* This is the magic bit for WebKit */
+    display: none;
+  }
 .Event_user {
     flex: none;
     margin-right: 1.5rem;
@@ -1824,24 +1827,50 @@ button:focus {
 .text_detail {
     display: flex;
     background-color: #FAFAFA;
-    height: 7.5%;
     margin-bottom: 3.6%;
     border-radius: 15px;
     align-content: space-around;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     padding-left: 4%;
     align-items: center;
     justify-content: space-between;
+    min-height: 7.6%;
+    flex-direction: row;
 }
 
 .text_news {
     color: #000;
     margin-bottom: 0;
+    width: 70%;
+    margin-bottom: 0;
+    /* width: 80%; */
+    /* width: 206px; */
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 18px;
+    letter-spacing: 0.02em;
+    color: #343A40;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
 }
 
 .text_detail .new_code {
     padding-right: 4%;
-    margin-bottom: 0;
+    width: 29%;
+    /* margin-bottom: 0; */
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: 0.015em;
+    color: #343A40;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
 }
 
 .text_detail_user {
@@ -1857,10 +1886,7 @@ button:focus {
     justify-content: space-between;
 }
 
-.text_news_user {
-    color: #000;
-    margin-bottom: 0;
-}
+
 
 .text_detail_user .new_code_user {
     padding-right: 4%;
@@ -1942,7 +1968,9 @@ button:focus {
 .btn_dashboard_detail_user {
     background: #F0F0FF !important;
 }
-
+.btn_dashboard_detail_user .text_btn_dashboard_detail {
+    margin-left: 17px;
+}
 .btn_dashboard_detail_user>h5 {
     color: #4D4E8B !important;
 }
@@ -1972,7 +2000,16 @@ button:focus {
     margin-top: 1%;
     height: 88%;
     overflow-y: scroll;
+    
 }
+.list-birthday::-webkit-scrollbar {
+    /* This is the magic bit for WebKit */
+    display: none;
+  }
+#list-birthday ::-webkit-scrollbar {
+    display: none;
+}
+
 
 .name {
     display: inline;
@@ -2056,7 +2093,6 @@ button:focus {
 }
 
 .event-detail p {
-    isplay: inline;
     color: #000;
     height: 18px;
     margin: 0 !important;

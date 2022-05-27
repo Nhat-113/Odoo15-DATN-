@@ -2,7 +2,7 @@ from re import search
 
 from lxml.html.diff import token
 
-from odoo import models, fields
+from odoo import api, models, fields
 from odoo.service.server import empty_pipe
 
 
@@ -13,6 +13,7 @@ class RampUp(models.Model):
     planning_calendar_resources = fields.One2many(
         'planning.calendar.resource', 'project_id', string='Planning Calendar Resources', readonly=True, compute='_get_calendar_resources')
 
+    effort_rate_related = fields.Float(related='planning_calendar_resources.effort_rate')
     total_effort_rate = fields.Float(string='Total Effort Rate (%)', compute='_get_effort_rate_total', store=True)
     total_calendar_effort_rate = fields.Float(string='Calendar Effort', compute='_get_calendar_effort_rate_total')
     actual_effort_rate = fields.Float(string='Actual Effort', compute='_get_actual_effort')
@@ -22,7 +23,7 @@ class RampUp(models.Model):
         for employee in self:
             employee.planning_calendar_resources = self.env['planning.calendar.resource'].search([('employee_id', '='
                                                                                                    , employee.id)])
-
+    @api.depends('effort_rate_related')
     def _get_effort_rate_total(self):
         for employee in self:
             effort_rates = [x.effort_rate for x in employee.planning_calendar_resources]

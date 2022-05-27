@@ -104,13 +104,25 @@ class PlanningCalendarResource(models.Model):
         }
 
     def unlink(self):
-        if self.end_date < date.today():
-            raise UserError(_(
-                    'Can not delete member (%(resource)s) with End Date (%(end)s) < Current Date (%(current)s).',
-                    resource=self.employee_id.name, end=self.end_date, current=date.today()
-                ))
+        for calendar in self:
+            if calendar.end_date < date.today() and calendar.env.user.has_group('project.group_project_manager') == False:
+                raise UserError(_(
+                        'Can not delete member (%(resource)s) with End Date (%(end)s) < Current Date (%(current)s).',
+                        resource=calendar.employee_id.name, end=calendar.end_date, current=date.today()
+                    ))
 
         return super(PlanningCalendarResource, self).unlink()
+
+    def write(self, vals):
+        for calendar in self:
+            if calendar.end_date < date.today() and calendar.env.user.has_group('project.group_project_manager') == False:
+                raise UserError(_(
+                        'Can not edit member (%(resource)s) with End Date (%(end)s) < Current Date (%(current)s).',
+                        resource=calendar.employee_id.name, end=calendar.end_date, current=date.today()
+                    ))
+
+        return super(PlanningCalendarResource, self).write(vals)
+
 
 
 class PlanningAllocateEffortRate(models.Model):
