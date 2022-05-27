@@ -344,7 +344,7 @@ class Estimation(models.Model):
         for estimation in self:
             project = self.env['project.project'].create({
                 'name': estimation.project_name,
-                'user_id':2
+                'user_id':estimation.estimator_ids.id
             })
             activity = self.env['config.activity'].search([('estimation_id','=',estimation.id)])
             for act in activity:
