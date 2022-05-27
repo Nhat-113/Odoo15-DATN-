@@ -17,7 +17,7 @@
 
     <record id="view_tree_job_position" model="ir.ui.view">
         <field name="name">Job Position List</field>
-        <field name="model">config.job_position</field>
+        <field name="model">config.job.position</field>
         <field name="arch" type="xml">
             <tree editable="bottom">
                 <field name='sequence' />

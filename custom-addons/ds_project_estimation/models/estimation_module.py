@@ -45,7 +45,7 @@ class BreakdownActivities(models.Model):
     activity_id = fields.Many2one('config.activity', string="Connect Activity Module")
     sequence = fields.Integer(string="No", index=True, readonly=True, help='Use to arrange calculation sequence')
     activity = fields.Char("Activity", required=True)
-    job_pos = fields.Many2one('config.job_position', string="Job Position")
+    job_pos = fields.Many2one('config.job.position', string="Job Position", required=True)
     mandays = fields.Float(string="Expected (man-days)", default=0)
     persons = fields.Integer(string="Persons", default=0)
     days = fields.Float(string="Days", default=0)
