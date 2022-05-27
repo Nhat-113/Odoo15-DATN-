@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="planning_member_internal_type" model="planning.member.type">
+            <field name="name">Internal</field>
+            <field name="rate" eval="50"/>
+        </record>
+
+        <record id="planning_member_external_type" model="planning.member.type">
+            <field name="name">External</field>
+            <field name="rate" eval="100"/>
+        </record>
+
+    </data>
+</odoo>

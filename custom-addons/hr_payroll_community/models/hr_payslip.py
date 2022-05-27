@@ -22,7 +22,7 @@ class HrPayslip(models.Model):
     _description = 'Pay Slip'
 
     struct_id = fields.Many2one('hr.payroll.structure', string='Structure',
-                                readonly=True, states={'draft': [('readonly', False)]},
+                                readonly=True, states={'draft': [('readonly', False)]}, required=True,
                                 help='Defines the rules that have to be applied to this payslip, accordingly '
                                      'to the contract chosen. If you let empty the field contract, this field isn\'t '
                                      'mandatory anymore and thus the rules applied will be all the rules set on the '
@@ -92,10 +92,15 @@ class HrPayslip(models.Model):
         if any(self.filtered(lambda payslip: payslip.date_from > payslip.date_to)):
             raise ValidationError(_("Payslip 'Date From' must be earlier 'Date To'."))
 
-        if self.contract_id.date_end:
-            if self.contract_id.date_start > self.date_to or self.contract_id.date_end < self.date_from:
-                raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
-                name=self.employee_id.name))
+        # if self.contract_id.date_end:
+        #     if self.contract_id.date_start > self.date_to or self.contract_id.date_end < self.date_from:
+        #         raise ValidationError(_('The following employees have a contract outside of the payslip period : %(name)s',
+        #         name=self.employee_id.name))
+
+    @api.constrains('struct_id')
+    def _check_struct_id(self):
+        if not self.struct_id:
+            raise ValidationError(_("Field Structure cannot be left blank"))
 
     @api.constrains('name')
     def _check_payslips(self):
@@ -203,11 +208,8 @@ class HrPayslip(models.Model):
                         self.get_contract(payslip.employee_id, payslip.date_from, payslip.date_to)
             lines = [(0, 0, line) for line in self._get_payslip_lines(contract_ids, payslip.id)]
             payslip.write({'line_ids': lines, 'number': number})
-            if len(payslip.contract_id) == 0:
-                payslip.write({'state': 'draft'})
-            else:
-                payslip.write({'state': 'verify'})
-        return
+            
+        return self.write({'state': 'verify'})
        
     @api.model
     def get_worked_day_lines(self, contracts, date_from, date_to):

@@ -39,7 +39,8 @@ class Activities(models.Model):
                         if item.type == 'type_2':
                             final_manday += item.mandays
                         elif item.type == 'type_3':
-                            final_manday += item.persons * item.days
+                            item.mandays = item.persons * item.days     # for resource plannings
+                            final_manday += item.mandays
                         elif item.type == 'type_1':
                             if record.activity_current:
                                 item.mandays = round((item.percent_effort * record.activity_current.effort)/ 100, 2)

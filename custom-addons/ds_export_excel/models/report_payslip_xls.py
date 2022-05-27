@@ -21,7 +21,7 @@ class PayslipXlsx(models.AbstractModel):
             "Tên CN ngân hàng",
             "Phụ cấp không chịu thuế",
             "Phụ cấp chịu thuế",
-            "Lương NET",
+            "Lương",
             "Ngày công trong tháng",
             "Bình quân ngày công",
             "Ngày nghỉ không lương",
@@ -32,8 +32,8 @@ class PayslipXlsx(models.AbstractModel):
             "Thời Gian OT 200% Lương",
             "Thời Gian OT 300% Lương",
             "Lương OT",
-            "Lương tạm ứng",
-            "Khoản bổ sung",
+            "Khấu trừ",
+            "Khoản bổ sung/Tạm ứng",
             "Tiền công đoàn",
             "Lương OT chịu thuế",
             "Tổng thu nhâp trong tháng",
@@ -51,6 +51,7 @@ class PayslipXlsx(models.AbstractModel):
         sheet.set_column(3, 3, 23)
         sheet.set_column(8, 8, 21)
         sheet.set_column(11, 14, 25)
+        sheet.set_column(17, 17, 25)
         sheet.set_column(20, 20, 25)
         sheet.set_column(22, 22, 35)
         sheet.set_column(24, 24, 30)
@@ -65,10 +66,7 @@ class PayslipXlsx(models.AbstractModel):
             pcd = list(
                 filter(lambda line: line['code'] == 'PCD', obj.line_ids))
             bh = list(filter(lambda line: line['code'] == 'BH', obj.line_ids))
-            ttncn = [x for x in obj.line_ids if x.code == 'TTNCN']
             ot = list(filter(lambda line: line['code'] == 'OT', obj.line_ids))
-            net = list(
-                filter(lambda line: line['code'] == 'NET', obj.line_ids))
             pck = list(filter(lambda line: line['code'] == 'PCK', obj.line_ids))
             pc = list(filter(lambda line: line['code'] == 'PC', obj.line_ids))
             basic = list(filter(lambda line: line['code'] == 'Basic', obj.line_ids))
@@ -89,6 +87,15 @@ class PayslipXlsx(models.AbstractModel):
             lbn = list(filter(lambda line: line['code'] == 'LBN', obj.line_ids))
             tnc = list(filter(lambda line: line['code'] == 'TNC', obj.line_ids))
             ttncnbn = list(filter(lambda line: line['code'] == 'TTNCNBN', obj.line_ids))
+
+            if obj.struct_id.id == 1:
+                net = list(
+                    filter(lambda line: line['code'] == 'NET', obj.line_ids))
+                ttncn = [x for x in obj.line_ids if x.code == 'TTNCN']
+            elif obj.struct_id.id == 2:
+                net = list(
+                    filter(lambda line: line['code'] == 'NET1', obj.line_ids))
+                ttncn = [x for x in obj.line_ids if x.code == 'TTNCN1']
 
             col_values = [
                 obj.employee_id.name,

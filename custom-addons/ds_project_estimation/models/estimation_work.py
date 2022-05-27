@@ -42,10 +42,10 @@ class Estimation(models.Model):
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
     add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'connect_summary', string='Summary Total Cost')
     add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate', string='Summary Cost Rate')
-    add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'connect_resource_plan', string='Resource Planning Effort')
+    add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'estimation_id', string='Resource Planning Effort')
     add_lines_module_assumption = fields.One2many('estimation.module.assumption', 'connect_module', string='Module Assumption')
     add_lines_module_summary = fields.One2many('estimation.module.summary', 'estimation_id', string='Module Summary')
-    add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Breakdown Structure")
+    add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Activity")
     add_lines_module_effort_distribute_activity = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
     check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
     
@@ -68,9 +68,11 @@ class Estimation(models.Model):
         get_data_activities = self.env['data.activity'].search([])
         get_data_cost_rate = self.env['config.job.position'].search([])
         data_summary = self.env['data.module.summary'].search([])
+        data_resource_plan = self.env['estimation.resource.planning.data'].search([])
         activities_line = []
         activities_effort_line = []
         summary_line = []
+        resource_plan_line = []
         summary_total_cost_line = []
         cost_rate_line = []
 
@@ -131,10 +133,25 @@ class Estimation(models.Model):
             })
             summary_line.append(line)
         
+        for rec in data_resource_plan:
+            data = (0, 0, {
+                'sequence': rec.sequence,
+                'name': rec.name,
+                'design_effort': rec.design_effort,
+                'dev_effort': rec.dev_effort,
+                'tester_effort': rec.tester_effort,
+                'comtor_effort': rec.comtor_effort,
+                'brse_effort': rec.brse_effort,
+                'pm_effort': rec.pm_effort,
+                'total_effort': rec.total_effort
+            })
+            resource_plan_line.append(data)
+        
         res.update({
             'add_lines_module_summary': summary_line,
             'add_lines_module_activity': activities_line,
             'add_lines_module_effort_distribute_activity': activities_effort_line,
+            'add_lines_resource_effort': resource_plan_line
             'add_lines_summary_totalcost': summary_total_cost_line,
             'add_lines_summary_costrate': cost_rate_line
         })

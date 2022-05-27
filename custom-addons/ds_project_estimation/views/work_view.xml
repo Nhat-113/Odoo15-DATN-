@@ -75,8 +75,9 @@
                         <page string="Resource Planning">
                             <separator string="Total Effort" />
                             <field name="add_lines_resource_effort">
-                                <tree editable="bottom">
+                                <tree create="0" editable="0" delete="0">
                                     <field name="sequence" />
+                                    <field name="name" />
                                     <field name="design_effort" />
                                     <field name="dev_effort" />
                                     <field name="tester_effort" />
@@ -86,6 +87,7 @@
                                     <field name="total_effort" />
                                 </tree>
                             </field>
+                            <button string="View Gantts" name="%(ds_project_estimation.action_view_gantt_resource_plan)d" type="action" class="btn-primary"/>
                         </page>
                         <page string="Module">
                             <separator string="Assumption" />
@@ -135,9 +137,7 @@
                                         <field name="estimation_id" invisible="1"/>
                                         <!-- <field name="estimation_id"/> -->
                                         <field name="activity_type" />
-                                        <field name="activity_current" 
-                                                attrs="{'invisible': [('activity_type', '!=', 'type_1')], 'required' : [('activity_type', '=', 'type_1')]}" 
-                                                placeholder="Please select activity ..." />
+                                        <field name="activity_current" attrs="{'invisible': [('activity_type', '!=', 'type_1')], 'required' : [('activity_type', '=', 'type_1')]}" placeholder="Please select activity ..." />
                                     </group>
                                     <notebook>
                                         <page string="Breakdown Estimation">
@@ -149,7 +149,7 @@
                                                     <field name="days" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
                                                     <field name="job_pos"/>
                                                     <field name="percent_effort" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_1')]}" />
-                                                    <field name="mandays" attrs="{'column_invisible': [('parent.activity_type', '=', 'type_3')], 'readonly': [('parent.activity_type', '=', 'type_1')]}" />
+                                                    <field name="mandays" attrs="{'readonly': [('parent.activity_type', '=', 'type_1')]}" />
                                                     <field name="type" invisible="1"/>
                                                 </tree>
                                             </field>

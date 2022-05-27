@@ -22,11 +22,18 @@
         <field name="inherit_id" ref="hr.view_employee_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='birthday']" position="after">
+                <field name="identification_id"/>
                 <field name="gender" string="Gender"/>
-                <field name="address_home_id" optional="hide" string="Address"/>
+                <field name="address" optional="hide" string="Address"/>
                 <field name="certificate" optional="hide" string="Certificate"/>
                 <field name="seniority_by_days" optional="hide" string="Seniority By Days"/>
                 <field name="seniority" optional="hide" string="Seniority"/>
+            </xpath>
+            <xpath expr="//field[@name='activity_ids']" position="replace">
+                <field name="activity_ids" widget="list_activity" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='activity_date_deadline']" position="replace">
+                <field name="activity_date_deadline" widget="remaining_days" options="{'allow_order': '1'}" optional="hide"/>
             </xpath>
         </field>
     </record>

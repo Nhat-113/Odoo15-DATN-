@@ -13,5 +13,3 @@ class JobPosition(models.Model):
     sequence = fields.Integer()
     job_position = fields.Char("Job Position", required=True)
     description = fields.Char("Description", required=True)
-    effort = fields.Float(string="Effort", default=0.0)
-    percent = fields.Char(string="Percentage", default="0.0")

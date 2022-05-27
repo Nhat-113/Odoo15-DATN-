@@ -11,7 +11,14 @@
                                 <div class="col-4 text-center">
                                     <tr>
                                         <th>
-                                            <img src="/ds_print_contract/static/description/img/d-soft.jpg" style="width:100%;"/>
+<!--                                            <img src="/ds_print_contract/static/description/img/d-soft.jpg" style="width:100%;"/>-->
+                                            <b>
+                                                <t t-if='e.company_id.display_name'>
+                                                    <span t-field="e.company_id.display_name"/>
+                                                </t>
+                                                <t t-if="not e.company_id.display_name">CÔNG TY CỔ PHẦN D-SOFT
+                                                </t>
+                                            </b>
                                         </th>
                                     </tr>
                                 </div>
@@ -61,7 +68,15 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <p>Bản cam kết này nhằm được đảm bảo các thông tin cần được bảo mật thuộc quyền sở hữu của công ty Cổ phần D-SOFT Đà Nẵng, được bảo mật, không bị thất thoát, tiết lộ cho một bên thứ 3 nào.
+                                    <p>Bản cam kết này nhằm được đảm bảo các thông tin cần được bảo mật thuộc quyền sở hữu của công ty
+                                        <b>
+                                            <t t-if='e.company_id.display_name'>
+                                                <span t-field="e.company_id.display_name"/>
+                                            </t>
+                                            <t t-if="not e.company_id.display_name">CÔNG TY CỔ PHẦN D-SOFT
+                                            </t>
+                                            </b>
+                                        Đà Nẵng, được bảo mật, không bị thất thoát, tiết lộ cho một bên thứ 3 nào.
                                     </p>
                                     <table style="width:100%">
                                         <tr>
@@ -118,8 +133,8 @@
                                             <td style="border: none; border-top: none;">
                                                 <span>:  </span>
                                                 <span>
-                                                    <t t-if='e.employee_id.address_home_id.display_name'>
-                                                        <span t-field="e.employee_id.address_home_id.display_name"/>
+                                                    <t t-if='e.employee_id.address'>
+                                                        <span t-field="e.employee_id.address"/>
                                                     </t>
                                                 </span>
                                             </td>

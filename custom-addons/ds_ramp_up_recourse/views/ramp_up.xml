@@ -1,0 +1,54 @@
+<odoo>
+    <record id="ramp_up_view_tree" model="ir.ui.view">
+        <field name="name">ramp.up.view.tree</field>
+        <field name="model">hr.employee</field>
+        <field name="arch" type="xml">
+            <tree edit="0" delete="0" create="0" default_order="total_effort_rate asc">
+                <field name="name"/>
+                <field name="job_title" string="Position"/>
+                <field name="department_id"/>
+                <field name="total_calendar_effort_rate"/>
+                <field name="actual_effort_rate"/>
+                <field name="estimation_effort_rate"/>
+                <field name="total_effort_rate"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="ramp_up_view_form" model="ir.ui.view">
+        <field name="name">ramp.up.view.form</field>
+        <field name="model">hr.employee</field>
+        <field name="arch" type="xml">
+            <form string="Effot Detail" class="o_form_project_project" edit="0" delete="0" create="0">
+                <sheet>
+                    <div class="oe_title" style="width: 800px">
+                        <h1>
+                            <field name="name" class="o_text_overflow" readonly="1"/>
+                        </h1>
+
+                    </div>
+                    <group>
+                        <group>
+                            <field name="job_title" string="Position"/>
+                        </group>
+                        <group>
+                            <field name="company_id" invisible="1"/>
+                            <field name="department_id" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Calendar Resources">
+                            <field name="planning_calendar_resources" colspan="4" nolabel="1">
+                                <tree string="Assign Members">
+                                    <field name="project_id"/>
+                                    <field name="effort_rate" string="Effort Rate (%)"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>
