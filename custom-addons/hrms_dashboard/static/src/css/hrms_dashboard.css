@@ -1876,7 +1876,7 @@ button:focus {
 .text_detail_user {
     display: flex;
     background-color: #FAFAFA;
-    height: 16%;
+    min-height: 16%;
     margin-bottom: 1.6%;
     border-radius: 25px;
     align-content: space-around;
