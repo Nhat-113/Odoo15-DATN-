@@ -1885,7 +1885,13 @@ button:focus {
     align-items: center;
     justify-content: space-between;
 }
-
+.text_detail_user .text_news_user  {
+    font-size: 15px;
+    word-break: break-word;
+    width: 80%;
+    padding: 10px 0px 10px 0px;
+    margin: 0; 
+}
 
 
 .text_detail_user .new_code_user {

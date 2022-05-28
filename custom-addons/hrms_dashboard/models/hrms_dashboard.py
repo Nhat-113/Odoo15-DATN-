@@ -55,12 +55,12 @@ class Employee(models.Model):
         uid = request.session.uid
         company_ids = self.env.user.company_ids.ids
         employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
-
+        company_id = self.env.company.ids
         leave_manager_id = self.env['hr.employee'].search([('leave_manager_id', '=' ,uid)])
         if  self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
-            leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),('employee_company_id','in' , company_ids )])
+            leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),('employee_company_id','in' , company_id )])
         else:
-            leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),('employee_company_id','in' , company_ids ), ('employee_id', 'in',leave_manager_id.ids)])
+            leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),('employee_company_id','in' , company_id ), ('employee_id', 'in',leave_manager_id.ids)])
 
 
         recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ]),('company_id','in' , company_ids )])
@@ -116,7 +116,7 @@ class Employee(models.Model):
         # cr.execute(query)
         # job_applications_all = cr.fetchall()
 
-        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False),('company_id','in' , company_ids )])
+        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False),('company_id','in' , company_id )])
         
         if employee:
             sql = """select broad_factor from hr_employee_broad_factor where id =%s"""
