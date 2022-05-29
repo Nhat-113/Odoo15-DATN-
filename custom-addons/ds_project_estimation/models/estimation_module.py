@@ -70,7 +70,7 @@ class EffortActivities(models.Model):
     sequence = fields.Integer(string="No", index=True, help='Use to arrange calculation sequence')
     activity = fields.Char(string="Activity")
     effort = fields.Float(string="Effort", default=0, store=True, compute='_compute_total_effort')
-    percent = fields.Float(string="Percentage", default=0, store=True, compute='_compute_percentage')
+    percent = fields.Float(string="Percentage (%)", default=0, store=True, compute='_compute_percentage')
 
     
     @api.depends('activity_id.effort')
