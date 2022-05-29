@@ -1,8 +1,4 @@
-from email.policy import default
-import string
-
 from odoo import models, fields, api, _
-
 
 class Estimation(models.Model):
     """

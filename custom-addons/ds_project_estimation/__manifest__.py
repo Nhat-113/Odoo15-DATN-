@@ -28,6 +28,7 @@
         "data/summary_data.xml",
         "data/currency_rate_data.xml",
         "data/resource_planing_data.xml",
+        "data/cost_rate_data.xml",
     ],
     'assets': {
         'web.assets_backend': [
