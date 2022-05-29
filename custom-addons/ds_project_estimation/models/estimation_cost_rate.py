@@ -33,6 +33,7 @@ class CostRate(models.Model):
 
 class EstimationExchangeRate(models.Model):
     _name="estimation.exchange.rate"
+    _rec_name = "name"
     
     name = fields.Char(string="Name", store=True, compute="compute_name")
     usd_number = fields.Integer(string="USD", default= 1, readonly= True, help="Number of USD")
@@ -42,6 +43,10 @@ class EstimationExchangeRate(models.Model):
                                   help="Choosea Currency", 
                                   required=True)
     value = fields.Monetary(string="Exchange Rate", currency_field="currency_id", required=True, digits=(12,6))
+    
+    _sql_constraints = [
+            ('unique_name', 'unique (currency_id)', 'Currency rates already exist!')
+    ]
     
     @api.depends('currency_id')
     def compute_name(self):

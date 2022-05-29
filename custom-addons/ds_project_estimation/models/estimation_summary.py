@@ -1,7 +1,4 @@
-from builtins import set, int
-
 from odoo import models, fields, api
-
 
 class EstimationSummaryTotalCost(models.Model):
     _name = "estimation.summary.totalcost"
@@ -15,7 +12,7 @@ class EstimationSummaryTotalCost(models.Model):
     sequence = fields.Integer(string="No", index=True, readonly=True, help='Use to arrange calculation sequence', default=1)
     module = fields.Char(string="Components",)
     design_effort = fields.Float(string="Design", compute='_compute_effort')
-    dev_effort = fields.Float(string="Dev", compute='_compute_effort')
+    dev_effort = fields.Float(string="Developer", compute='_compute_effort')
     tester_effort = fields.Float(string="Tester", compute='_compute_effort')
     comtor_effort = fields.Float(string="Comtor", compute='_compute_effort')
     brse_effort = fields.Float(string="Brse", compute='_compute_effort')
