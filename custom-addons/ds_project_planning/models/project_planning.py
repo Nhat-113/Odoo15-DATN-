@@ -61,10 +61,10 @@ class Project(models.Model):
 
     @api.onchange('planning_calendar_resources')
     def _onchange_calendar_resources(self):
-        # check the current user is the PM of this project
-        if self.user_id != self.env.user and not self.env.user.has_group('project.group_project_manager'):
-            raise UserError(
-                _('You are not the manager of this project, so you cannot assign members to it.'))
+    #     # check the current user is the PM of this project
+    #     if self.user_id != self.env.user and not self.env.user.has_group('project.group_project_manager'):
+    #         raise UserError(
+    #             _('You are not the manager of this project, so you cannot assign members to it.'))
 
         # validate calendar resource duplicate
         if len(self.planning_calendar_resources) > 0:
