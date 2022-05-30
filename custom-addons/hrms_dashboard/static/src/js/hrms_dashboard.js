@@ -528,27 +528,30 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         res_model: "hr.job",
                         view_mode: " kanban",
                         views: [
-                            [view_hr_job_kanban, "kanban"],
+                            [false, "kanban"],
                         ],
                         domain: [
                             ["state", "in", ["recruit"]]
                         ],
+                        target: "current",
+
 
                     });
-            self._rpc({
-                // Get view id
-                model:'ir.model.data',
-                args: ['hr_recruitment.view_hr_job_kanban'], // View id goes here
-            }).then(function(data){                
-                // Open view
-                self.do_action({
-                    name: 'In Recruiment',
-                    type: 'ir.actions.act_window',
-                    res_model: 'hr.job', // Module name goes here
-                    target: 'new',
-                    views: [[view_hr_job_kanban, 'kanban']], // data[1] variable contains the view id
-                 });
-            });
+
+                    // self._rpc({
+                    //     // Get view id
+                    //     model:'ir.model.data',
+                    //     args: ['hr_recruitment.view_hr_job_kanban'], // View id goes here
+                    // }).then(function(data){                
+                    //     // Open view
+                    //     self.do_action({
+                    //         name: 'Example',
+                    //         type: 'ir.actions.act_window',
+                    //         res_model: 'hr.job', // Module name goes here
+                    //         target: 'new',
+                    //         views: [[data[1], 'form']], // data[1] variable contains the view id
+                    //      });
+                    // });
         },
 
         //leave request today
