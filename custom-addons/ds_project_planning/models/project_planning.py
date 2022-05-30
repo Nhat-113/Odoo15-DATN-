@@ -118,9 +118,10 @@ class Project(models.Model):
     @api.constrains('planning_calendar_resources')
     def _onchange_calendar(self):
         # check the current user is the PM of this project
-        if self.user_id != self.env.user and not self.env.user.has_group('project.group_project_manager'):
-            raise UserError(
-                _('You are not the manager of this project, so you cannot assign members to it.'))
+        for project in self:
+            if project.user_id != project.env.user and not project.env.user.has_group('project.group_project_manager'):
+                raise UserError(
+                    _('You are not the manager of this project, so you cannot assign members to it.'))
 
     def open_planning_task_all(self):
         for project in self:
