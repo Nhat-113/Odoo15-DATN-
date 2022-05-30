@@ -295,6 +295,7 @@ class HrPayslip(models.Model):
                 res += [input_data]
         return res
 
+
     @api.model
     def _get_payslip_lines(self, contract_ids, payslip_id):
 
@@ -533,7 +534,6 @@ class HrPayslip(models.Model):
 
     @api.onchange('employee_id', 'date_from', 'date_to')
     def onchange_employee(self):
-
 
         if (not self.employee_id) or (not self.date_from) or (not self.date_to):
             return
