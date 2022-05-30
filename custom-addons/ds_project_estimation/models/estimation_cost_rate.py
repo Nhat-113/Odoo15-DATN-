@@ -31,6 +31,7 @@ class CostRate(models.Model):
         for rec in self:
             rec.cost_vnd = rec.cost_usd * exchange_rate_vnd.value
 
+
 class EstimationExchangeRate(models.Model):
     _name="estimation.exchange.rate"
     _rec_name = "name"

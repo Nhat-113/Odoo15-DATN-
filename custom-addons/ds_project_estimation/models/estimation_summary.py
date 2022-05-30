@@ -1,3 +1,5 @@
+from builtins import set
+
 from odoo import models, fields, api
 
 class EstimationSummaryTotalCost(models.Model):
@@ -19,7 +21,7 @@ class EstimationSummaryTotalCost(models.Model):
     pm_effort = fields.Float(string="PM", compute='_compute_effort')
     
     total_effort = fields.Float(string="Total Effort (MD)", readonly=True, compute='_compute_total_effort')
-    cost = fields.Float(string="Cost (YEN)", readonly=True, compute='_compute_total_effort')
+    cost = fields.Float(string="Cost", readonly=True, compute='_compute_total_effort')
 
     @api.depends('estimation_id')
     def _compute_effort(self):
@@ -93,19 +95,38 @@ class EstimationSummaryCostRate(models.Model):
     sequence = fields.Integer(string="No", )
     types = fields.Char(string="Type", )
     role = fields.Many2one('cost.rate', string='Role')
-    yen_month = fields.Float(string="Unit (YEN/Month)", compute='_compute_yen_month')
-    yen_day = fields.Float(string="Unit (YEN/Day)", compute='_compute_yen_month')
-    vnd_day = fields.Float(string="Unit (VND/Day)", compute='_compute_yen_month')
+    currency_id = fields.Many2one('res.currency', compute='_compute_currency_id')
+    yen_month = fields.Monetary(string="Unit (Currency/Month)", currency_field="currency_id", compute='_compute_yen_month', default=0.00)
+    yen_day = fields.Monetary(string="Unit (Currency/Day)", currency_field="currency_id",  compute='_compute_yen_month', default=0.00)
+    vnd_day = fields.Monetary(string="Unit (VND/Day)", currency_field="currency_id", compute='_compute_yen_month', default=0.00)
 
+    def _compute_currency_id(self):
+        for item in self:
+            estimation_id = self.connect_summary_costrate.id
+            if type(estimation_id) != 'int':
+                estimation_id = self.connect_summary_costrate.ids[0]
+            item.currency_id = self.env['estimation.work'].search([('id', '=', estimation_id)]).currency_id
+
+    @api.depends('role')
     def _compute_yen_month(self):
-        for se in self:
-            cost_rate = self.env['cost.rate'].search([('id', '=', se.role.id)])
+        for item in self:
+            cost_rate = self.env['cost.rate'].search([('id', '=', item.role.id)])
             if cost_rate:
-                se.yen_month = cost_rate.cost_yen
-                se.yen_day = cost_rate.cost_yen / 20
-                se.vnd_day = cost_rate.cost_vnd / 20
+                estimation_id = self.connect_summary_costrate.id
+                if type(estimation_id) != 'int':
+                    estimation_id = self.connect_summary_costrate.ids[0]
+                currency_id = self.env['estimation.work'].search([('id', '=', estimation_id)]).currency_id
+                value_exchange = self.env['estimation.exchange.rate'].search([('currency_id', '=', currency_id.id)]).value
+                if currency_id.id == 2:
+                    item.yen_month = cost_rate.cost_usd
+                    item.yen_day = cost_rate.cost_usd / 20
+                    item.vnd_day = cost_rate.cost_vnd / 20
+                else:
+                    item.yen_month = cost_rate.cost_usd * value_exchange
+                    item.yen_day = cost_rate.cost_usd * value_exchange / 20
+                    item.vnd_day = cost_rate.cost_vnd / 20
             else:
-                se.yen_month = 0.0
-                se.yen_day = 0.0
-                se.vnd_day = 0.0
+                item.yen_month = 0.0
+                item.yen_day = 0.0
+                item.vnd_day = 0.0
 
