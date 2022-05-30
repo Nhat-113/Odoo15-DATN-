@@ -9,8 +9,8 @@
                 <xpath expr="//page[@name='description_page']" position="after">
                     <page string="Dependencies">
                         <group string="Gantt Info">
-                            <field name="date_start"/>
-                            <field name="date_end" string="End date"/>
+                            <field name="date_start" required="True"/>
+                            <field name="date_end" string="End date" required="True"/>
                             <field name="planned_duration"/>
                         </group>
                         <separator string="Predecessors"/>
