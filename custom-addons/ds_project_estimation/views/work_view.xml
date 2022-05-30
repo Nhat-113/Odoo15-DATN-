@@ -61,7 +61,7 @@
                                 <div class="oe_clear"/>
                             </group>
                             <separator string="Cost Rate" />
-                            <field name="add_lines_summary_costrate" >
+                            <field name="add_lines_summary_costrate">
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="sequence" />
                                     <field name="types" />
@@ -149,11 +149,12 @@
                                                     <field name="days" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
                                                     <field name="job_pos"/>
                                                     <field name="percent_effort" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_1')]}" />
-                                                    <field name="mandays" attrs="{'readonly': [('parent.activity_type', '=', 'type_1')]}" />
-                                                    <field name="type" invisible="1"/>
+                                                    <field name="mandays" attrs="{'readonly': [('parent.activity_type', '=', 'type_1'), ('type', '=', 'type_3')]}" />
+                                                    <field name="type" />
+                                                    <!-- <field name="type" invisible="1"/> -->
                                                 </tree>
                                             </field>
-                                            <button string="Compute" name="action_refresh" type="object" class="btn-primary" attrs="{'invisible': [ ('estimation_id', '=', False)]}"/>
+                                            <!-- <button string="Compute" name="action_refresh" type="object" class="btn-primary" attrs="{'invisible': [ ('estimation_id', '=', False)]}"/> -->
                                         </page>
                                     </notebook>
                                 </form>
