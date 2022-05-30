@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="project_type_internal" model="project.type">
+            <field name="sequence" eval="1" />
+            <field name="name">Internal</field>
+            <field name="description">Internal</field>
+        </record>
+        <record id="project_type_estimation_fixed" model="project.type">
+            <field name="sequence" eval="2" />
+            <field name="name">Fixed Price</field>
+            <field name="description">Fixed Price</field>
+        </record>
+        <record id="project_type_estimation_based" model="project.type">
+            <field name="sequence" eval="3" />
+            <field name="name">Based on Timesheet</field>
+            <field name="description">Based on Timesheet</field>
+        </record>
+    </data>
+</odoo>

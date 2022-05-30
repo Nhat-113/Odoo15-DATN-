@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- <record id="view_form_activity" model="ir.ui.view">
+        <field name="name">Activities Form</field>
+        <field name="model">data.activity</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group name="group_top">
+                        <field name="sequence" />
+                        <field name="activity" />
+                        <field name="description" />
+                        <field name="activity_type" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record> -->
+
+    <record id="view_tree_activity" model="ir.ui.view">
+        <field name="name">Activities List</field>
+        <field name="model">data.activity</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" string="Activities view">
+                <!-- <header>
+                    <button name="refresh_sequence" type="object" string="Refresh Sequence" class="btn btn-secondary"/>
+                </header> -->
+                <field name='sequence' />
+                <field name="activity" />
+                <field name="description" />
+                <field name="activity_type" />
+            </tree>
+        </field>
+    </record>
+</odoo>

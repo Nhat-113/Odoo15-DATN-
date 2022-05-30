@@ -1,0 +1,120 @@
+<odoo>
+    <!-- Estimation App Menu -->
+    <menuitem id="menu_estimation" name="Estimations" />
+    
+    <!-- Action to open the Work list -->
+    <record id="action_estimation_work" model="ir.actions.act_window">
+        <field name="name">Estimations</field>
+        <field name="res_model">estimation.work</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu item to open the Work list -->
+    <menuitem id="menu_estimation_work"
+    name="Estimations"
+    parent="menu_estimation"
+    action="action_estimation_work"
+    />
+
+    <!-- Action to open the Cost rate list -->
+    <record id="action_cost_rate" model="ir.actions.act_window">
+        <field name="name">Cost Rate</field>
+        <field name="res_model">cost.rate</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu item to open the Cost rate list -->
+    <menuitem id="menu_cost_rate"
+    name="Cost Rate"
+    parent="menu_estimation"
+    action="action_cost_rate"
+    />
+
+
+    <!-- Menu item to open the Configuration -->
+    <menuitem id="menu_config"
+    name="Configuration"
+    parent="menu_estimation"
+    />
+
+    <record id="action_setting" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+    </record>
+
+    <menuitem id="menu_config_setting"
+    name="Setting"
+    parent="menu_config"
+    sequence="10"
+    groups="base.group_system"
+    action="action_setting"
+    />
+
+    <!-- Action to open the configuration job position list -->
+    <record id="action_config_job_position" model="ir.actions.act_window">
+        <field name="name">Job Position</field>
+        <field name="res_model">config.job.position</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_config_job_position"
+    name="Job Position"
+    parent="menu_config"
+    action="action_config_job_position"
+    />
+
+    <!-- Action to open Activities -->
+    <record id="action_data_activity" model="ir.actions.act_window">
+        <field name="name">Activities</field>
+        <field name="res_model">data.activity</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_data_activity"
+    name="Activities"
+    parent="menu_config"
+    action="action_data_activity"
+    />
+    <!-- Action to open Project type -->
+    <record id="action_data_project_type" model="ir.actions.act_window">
+        <field name="name">Project Type</field>
+        <field name="res_model">project.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_data_project_type"
+    name="Project Type"
+    parent="menu_config"
+    action="action_data_project_type"
+    />
+
+    <!-- Action to open Description -->
+    <record id="action_config_description" model="ir.actions.act_window">
+        <field name="name">Description</field>
+        <field name="res_model">config.description</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_config_description"
+    name="Description"
+    parent="menu_config"
+    action="action_config_description"
+    />
+
+    <!-- Action to open Currency Rate -->
+    <record id="action_config_currency_rate" model="ir.actions.act_window">
+        <field name="name">Currency Rate</field>
+        <field name="res_model">estimation.exchange.rate</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_config_currency_rate"
+    name="Currency Rate"
+    parent="menu_config"
+    action="action_config_currency_rate"
+    />
+
+</odoo>
