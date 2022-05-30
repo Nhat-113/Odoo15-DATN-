@@ -119,7 +119,7 @@ class Activities(models.Model):
 
     def unlink(self):
         for item in self:
-            effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', self.estimation_id.id), ('sequence', '=', self.sequence )])
+            effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', item.estimation_id.id), ('sequence', '=', item.sequence )])
             breakdown_activity = self.env['module.breakdown.activity'].search([('activity_id','=', item.id)])
             if effort_distribute:
                 effort_distribute.unlink()
