@@ -157,6 +157,23 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
             return "warning";
         }
       };
+  
+    //   gantt.attachEvent("onTaskDrag", function(id, task, is_new){
+    //     var taskStart = task.start_date;
+    //     var taskEnd = task.end_date;
+    //     console.log("t.s t.e p.s p.e" ,taskStart );
+    //     console.log("t.s t.e p.s p.e" ,taskEnd );
+    //     check if the task is out of the range
+    //     if(scaleStart > taskEnd || scaleEnd < taskStart ){
+    //         gantt.message({
+    //             type:"warning", 
+    //             text:"Warning! The task is outside the date range!",
+    //             expire:5000
+    //         });
+    //           return false;
+    //     } 
+    //     return true;
+    // });
 
       gantt.templates.grid_header_class = function (columnName, column) {
         if (columnName == "text") {
