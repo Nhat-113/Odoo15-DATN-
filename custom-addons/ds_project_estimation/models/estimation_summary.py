@@ -108,7 +108,7 @@ class EstimationSummaryCostRate(models.Model):
     #             estimation_id = self.connect_summary_costrate.ids[0]
     #         item.currency_id = self.env['estimation.work'].search([('id', '=', estimation_id)]).currency_id
 
-    @api.depends('role', 'connect_summary_costrate.currency_id')
+    @api.depends('role')
     def _compute_yen_month(self):
         for item in self:
             cost_rate = self.env['cost.rate'].search([('id', '=', item.role.id)])
