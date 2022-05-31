@@ -21,6 +21,11 @@ class Project(models.Model):
         readonly=True,
         store=False,
     )
+    employee_id_domain = fields.Char(
+        compute="_compute_employee_id_domain",
+        readonly=True,
+        store=False,
+    )
     member_ids = fields.Many2many('res.users', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
     total_calendar_effort = fields.Float(
@@ -59,12 +64,22 @@ class Project(models.Model):
                 [('id', 'in', user_ids)]
             )
 
+    @api.depends('planning_calendar_resources')
+    def _compute_employee_id_domain(self):
+        for project in self:
+            user_ids = [
+                user.id for user in project.planning_calendar_resources.employee_id]
+            user_ids.append(self.env.user.employee_id.id)
+            project.employee_id_domain = json.dumps(
+                [('id', 'in', user_ids)]
+            )
+
     @api.onchange('planning_calendar_resources')
     def _onchange_calendar_resources(self):
-    #     # check the current user is the PM of this project
-    #     if self.user_id != self.env.user and not self.env.user.has_group('project.group_project_manager'):
-    #         raise UserError(
-    #             _('You are not the manager of this project, so you cannot assign members to it.'))
+        # check the current user is the PM of this project
+        # if self.user_id != self.env.user and not self.env.user.has_group('project.group_project_manager'):
+        #     raise UserError(
+        #         _('You are not the manager of this project, so you cannot assign members to it.'))
 
         # validate calendar resource duplicate
         if len(self.planning_calendar_resources) > 0:
@@ -99,6 +114,14 @@ class Project(models.Model):
 
             project.total_phase = len(num_phase)
             project.total_milestone = len(num_milestone)
+
+    @api.constrains('planning_calendar_resources')
+    def _onchange_calendar(self):
+        # check the current user is the PM of this project
+        for project in self:
+            if project.user_id != project.env.user and not project.env.user.has_group('project.group_project_manager'):
+                raise UserError(
+                    _('You are not the manager of this project, so you cannot assign members to it.'))
 
     def open_planning_task_all(self):
         for project in self:

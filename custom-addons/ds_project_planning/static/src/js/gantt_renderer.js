@@ -26,6 +26,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       this.map_id_field = params.map_id_field;
       this.map_date_start = params.map_date_start;
       this.map_duration = params.map_duration;
+      this.map_working_day = params.map_working_day;
       this.map_open = params.map_open;
       this.map_progress = params.map_progress;
       this.map_links_serialized_json = params.map_links_serialized_json;
@@ -112,6 +113,19 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
               return item.progress * 100 + "%";
             }
             return "";
+          },
+        },
+        {
+          name: "working_day",
+          label: "Working Day",
+          align: "center",
+          resize: true,
+          template: function (item) {
+            console.log("working_day", item.working_day);
+            if (item.working_day) {
+              return item.working_day;
+            }
+            return 0;
           },
         },
         {

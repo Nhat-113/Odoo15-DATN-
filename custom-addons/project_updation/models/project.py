@@ -262,3 +262,14 @@ class ProjectUpdate(models.Model):
     def _compute_color(self):
         for update in self:
             update.color = STATUS_COLOR[update.status]
+
+
+class TimeSheet(models.Model):
+    _inherit = 'account.analytic.line'
+
+    employee_id_domain = fields.Char(
+        related='project_id.employee_id_domain',
+        readonly=True,
+        store=False,
+    )
+    

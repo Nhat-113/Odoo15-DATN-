@@ -370,7 +370,7 @@ class Estimation(models.Model):
 
     def action_generate_project(self):
         for estimation in self:
-            project = self.env['project.project'].create({
+            project = self.env['project.project'].sudo().create({
                 'name': estimation.project_name,
                 'user_id':estimation.estimator_ids.id
             })
