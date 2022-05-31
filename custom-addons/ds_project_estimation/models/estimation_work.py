@@ -43,7 +43,7 @@ class Estimation(models.Model):
     add_lines_module_summary = fields.One2many('estimation.module.summary', 'estimation_id', string='Module Summary')
     add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Activity")
     add_lines_module_effort_distribute_activity = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
-    # check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
+    check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
     
     @api.model
     def create(self, vals):
@@ -353,38 +353,24 @@ class Estimation(models.Model):
         for item in self:
             item.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', item.id)]).cost
 
-    # def action_generate_project(self):
-    #     for estimation in self:
-    #         project = self.env['project.project'].create({
-    #             'name': estimation.project_name,
-    #             'user_id':estimation.estimator_ids.id
-    #         })
-    #         activity = self.env['config.activity'].search([('estimation_id','=',estimation.id)])
-    #         for act in activity:
-    #             for breakdown in self.env['module.breakdown.activity'].search([('activity_id','=',act.id)]):
-    #                 self.env['project.task'].create({
-    #                     'project_id':project.id,
-    #                     'stage_id':self.env['project.task.type'].search([('name','=','Backlog')])[0].id,
-    #                     'name':breakdown.activity,
-    #                     'user_ids':[],
-    #                     'issues_type':1,
-    #                     'status':2,
-    #                     'planned_hours':breakdown.mandays * 8
-    #                 })
-    #         estimation.check_generate_project = True
-    #         return project
+    def action_generate_project(self):
+        for estimation in self:
+            project = self.env['project.project'].create({
+                'name': estimation.project_name,
+                'user_id':estimation.estimator_ids.id
+            })
+            activity = self.env['config.activity'].search([('estimation_id','=',estimation.id)])
+            for act in activity:
+                for breakdown in self.env['module.breakdown.activity'].search([('activity_id','=',act.id)]):
+                    self.env['project.task'].create({
+                        'project_id':project.id,
+                        'stage_id':self.env['project.task.type'].search([('name','=','Backlog')])[0].id,
+                        'name':breakdown.activity,
+                        'user_ids':[],
+                        'issues_type':1,
+                        'status':2,
+                        'planned_hours':breakdown.mandays * 8
+                    })
+            estimation.check_generate_project = True
+            return project
 
-    # @api.depends('currency_id')
-    # def _compute_summary_costrate(self):
-    #     for item in self:
-    #         summary_item = self.env['estimation.summary.costrate'].search([('connect_summary_costrate', '=' ,item.id)])
-    #         for summary in summary_item:
-    #             cost_rate = self.env['cost.rate'].search([('id', '=', summary.role.id)])
-    #             if cost_rate:
-    #                 summary.yen_month = cost_rate.cost_yen
-    #                 summary.yen_day = cost_rate.cost_yen / 20
-    #                 summary.vnd_day = cost_rate.cost_vnd / 20
-    #             else:
-    #                 summary.yen_month = 0.0
-    #                 summary.yen_day = 0.0
-    #                 summary.vnd_day = 0.0

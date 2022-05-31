@@ -4,10 +4,10 @@
         <field name="model">estimation.work</field>
         <field name="arch" type="xml">
             <form>
-<!--                <header>-->
-<!--                    <field name="check_generate_project" invisible="1"/>-->
-<!--                    <button name="action_generate_project" type="object" string="Generate Project" attrs="{'invisible': ['|', ('stage', '!=', 'completed'), ('check_generate_project', '=', True)]}" class="oe_highlight" confirm="Generate Project Confirm"/>-->
-<!--                </header>-->
+                <header>
+                    <field name="check_generate_project" invisible="1"/>
+                    <button name="action_generate_project" type="object" string="Generate Project" attrs="{'invisible': ['|', ('stage', '!=', 'completed'), ('check_generate_project', '=', True)]}" class="oe_highlight" confirm="Generate Project Confirm"/>
+                </header>
                 <sheet>
                     <group name="group_top">
                         <group name="group_left">
