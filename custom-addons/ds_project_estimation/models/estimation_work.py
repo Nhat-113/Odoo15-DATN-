@@ -1,4 +1,6 @@
 from odoo import models, fields, api, _
+import json
+
 
 class Estimation(models.Model):
     """
@@ -14,11 +16,13 @@ class Estimation(models.Model):
     estimator_ids = fields.Many2one('res.users', string='Estimator')
     reviewer_ids = fields.Many2one('res.users', string='Reviewer')
     customer_ids = fields.Many2one("res.partner", string="Customer", required=True)
-    currency_id = fields.Many2one("res.currency", string="Currency")
+    currency_id = fields.Many2one("estimation.currency", string="Currency",)
+    currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
+
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
 
     expected_revenue = fields.Float(string="Expected Revenue")
-    total_cost = fields.Float(string="Total Cost (YEN)", compute='_compute_total_cost')
+    total_cost = fields.Float(string="Total Cost", compute='_compute_total_cost')
     total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays")
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
@@ -44,7 +48,18 @@ class Estimation(models.Model):
     add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Activity")
     add_lines_module_effort_distribute_activity = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
     check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
-    
+
+    @api.depends('currency_id')
+    def _compute_currency_id_domain(self):
+        currencies = self.env['estimation.exchange.rate'].search([])
+        currency_ids = []
+        for currency in currencies:
+            currency_ids.append(currency.currency_id.id)
+
+        self.currency_id_domain = json.dumps(
+                [('id', 'in', currency_ids)]
+            )
+
     @api.model
     def create(self, vals):
         vals_over = {'connect_overview': '', 'description': ''}
@@ -203,7 +218,7 @@ class Estimation(models.Model):
             elif item == "customer_ids" and vals[item] != '':
                 vals[item] = self.env['res.partner'].search([('id','=',vals[item])]).name
             elif item == "currency_id" and vals[item] != '':
-                vals[item] = self.env['res.currency'].search([('id','=',vals[item])]).name
+                vals[item] = self.env['estimation.currency'].search([('id','=',vals[item])]).name
             elif item == "estimator_ids" and vals[item] != '':
                 vals[item] = self.env['res.users'].search([('id','=',vals[item])]).name
             elif item == "project_type_id" and vals[item] != '':
@@ -350,8 +365,8 @@ class Estimation(models.Model):
         return
 
     def _compute_total_cost(self):
-        for se in self:
-            se.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', se.id)]).cost
+        for item in self:
+            item.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', item.id)]).cost
 
     def action_generate_project(self):
         for estimation in self:
@@ -373,3 +388,9 @@ class Estimation(models.Model):
                     })
             estimation.check_generate_project = True
             return project
+
+
+class Lead(models.Model):
+    _inherit = ['crm.lead']
+
+    estimation_count = fields.Integer(string='# Registrations')

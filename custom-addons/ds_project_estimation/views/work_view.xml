@@ -21,8 +21,8 @@
                             <field name="deadline" />
                             <field name="sale_date" />
                             <field name="stage" placeholder="Select current stage" />
-                            <field name="currency_id" placeholder="Please select currency ..."/>
-                            <field name="customer_ids" />
+                            <field name="currency_id_domain" invisible="1"/>
+                            <field name="currency_id" domain='currency_id_domain'/>                            <field name="customer_ids" />
                         </group>
                     </group>
                     <separator string="Description" />

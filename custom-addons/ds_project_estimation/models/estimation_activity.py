@@ -1,5 +1,6 @@
 from odoo import models, fields, api, _
 
+
 class Activities(models.Model):
     """
     Describe activities in configuration.

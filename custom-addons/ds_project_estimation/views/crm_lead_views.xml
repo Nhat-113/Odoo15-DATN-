@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_lead_view_form" model="ir.ui.view">
+        <field name="name">crm.lead.view.form.inherit.estimation.crm</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_schedule_meeting']" position="after">
+<!--                <field name="registration_ids" invisible="1"/>-->
+                <button name="%(action_estimation_work)d" type="action" class="oe_stat_button" icon="fa-ticket">
+                    <div class="o_stat_info">
+                        <span>
+                            <field name="estimation_count"/>
+                        </span>
+                        <span class="o_stat_text"> Estimation</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>
