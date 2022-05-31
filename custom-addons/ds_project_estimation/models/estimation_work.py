@@ -43,7 +43,7 @@ class Estimation(models.Model):
     add_lines_module_summary = fields.One2many('estimation.module.summary', 'estimation_id', string='Module Summary')
     add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Activity")
     add_lines_module_effort_distribute_activity = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
-    check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
+    # check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
     
     @api.model
     def create(self, vals):
@@ -155,11 +155,10 @@ class Estimation(models.Model):
     
     @api.depends('add_lines_module_activity.effort')
     def _compute_total_mandays(self):
-        ls_activity = self.env['config.activity'].search([('estimation_id', '=', self.id)])
         total = 0.0
-        for item in ls_activity:
-            total += item.effort
         for record in self:
+            for item in record.add_lines_module_activity:
+                total += item.effort
             record.total_manday = total
     
     def write(self, vals):
