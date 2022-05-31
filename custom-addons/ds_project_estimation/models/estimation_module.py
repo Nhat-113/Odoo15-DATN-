@@ -17,15 +17,27 @@ class EstimationModuleSummary(models.Model):
     estimation_id = fields.Many2one('estimation.work', string="Estimation")
     summary_type = fields.Char(string="Summary Type")
     description = fields.Char(string="Working Time/Efforts")
-    value = fields.Float(string="Value")
+    value = fields.Float(string="Value", store=True, compute='_compute_value')
     type = fields.Char(string="Type")
 
-    @api.model
-    def create(self, vals):
-        if vals:
-            result = super(EstimationModuleSummary, self).create(vals)
-            return result
-
+    
+    @api.depends('estimation_id.total_manday')
+    def _compute_value(self):
+        man_day_val = 0.0
+        day_per_month = 0
+        for record in self:
+            if record.type == 'man_day':
+                record.value = record.estimation_id.total_manday
+                man_day_val = record.estimation_id.total_manday
+            elif record.type == 'default_per_month':
+                record.value = 20
+                day_per_month = record.value
+            elif record.type == 'default_per_day':
+                record.value = 8
+        for record in self:
+            if record.type == 'man_month':
+                # if day_per_month != 0:
+                record.value = round(man_day_val / day_per_month, 2)
 
 class EstimationModuleSummaryData(models.Model):
     _name = "data.module.summary"
@@ -48,7 +60,7 @@ class BreakdownActivities(models.Model):
     activity_id = fields.Many2one(
         'config.activity', string="Connect Activity Module")
     sequence = fields.Integer(
-        string="No", index=True, readonly=True, help='Use to arrange calculation sequence')
+        string="No", index=True, readonly=True, help='Use to arrange calculation sequence') #compute='_compute_sequence', 
     activity = fields.Char("Activity", required=True)
     job_pos = fields.Many2one('config.job.position',
                               string="Job Position", required=True)
@@ -69,16 +81,9 @@ class BreakdownActivities(models.Model):
                 vals, ls_breakdown)
             return super(BreakdownActivities, self).create(vals)
 
-    @api.depends('activity_id.activity_type', 'persons', 'days', 'percent_effort', 'sequence')
+    @api.depends('activity_id.activity_type', 'activity_id.activity_current', 'persons', 'days', 'percent_effort', 'sequence')
     def _compute_mandays(self):
-        ls_breakdown = self.env['module.breakdown.activity'].search([('activity_id', '=', self.activity_id.ids[0])])
-        result_sequence = {}
-        self.env['config.activity'].auto_increase_sequence(result_sequence, ls_breakdown)
-        result_sequence['sequence'] = result_sequence['sequence'] - 1
         for record in self:
-            if record.sequence == 0:
-                record.sequence = result_sequence['sequence'] + 1
-
             if record.type == 'type_3':
                 record.mandays = record.persons * record.days
             elif record.type == 'type_1':
@@ -86,6 +91,12 @@ class BreakdownActivities(models.Model):
                     record.mandays = round((record.percent_effort * record.activity_id.activity_current.effort)/ 100, 2)
                 else:
                     record.mandays = 0
+                    
+    # @api.depends('activity')
+    # def _compute_sequence(self):
+    #     for record in self:
+    #         if record.activity is not None:
+    #             record.sequence += 1
 
 class EffortActivities(models.Model):
     _name = "module.effort.activity"
@@ -93,30 +104,29 @@ class EffortActivities(models.Model):
     _rec_name = "activity"
     
     estimation_id = fields.Many2one('estimation.work', string="Estimation")
-    activity_id = fields.Many2one('config.activity', string="Connect Module")
+    activity_id = fields.Many2one('config.activity', string="Activities Work Breakdown")
     
     sequence = fields.Integer(string="No", index=True, help='Use to arrange calculation sequence')
     activity = fields.Char(string="Activity")
-    effort = fields.Float(string="Effort", default=0, store=True, compute='_compute_total_effort')
-    percent = fields.Float(string="Percentage (%)", default=0, store=True, compute='_compute_percentage')
-
+    effort = fields.Float(string="Effort", default=0, store=True, compute='_compute_effort')
+    percent = fields.Float(string="Percentage (%)", default=0, store=True, )  #compute='_compute_percentage'
     
     @api.depends('activity_id.effort')
-    def _compute_total_effort(self):
+    def _compute_effort(self):
         for rec in self:
             rec.effort = rec.activity_id.effort
             
-    @api.depends('effort')
-    def _compute_percentage(self):
-        ls_effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', self.estimation_id.ids[0])]) #self.env.context['params']['id']
-        total_effort = 0.0        
-        for record in ls_effort_distribute:
-            total_effort += record.effort
-        for record in ls_effort_distribute:
-            if total_effort != 0.0:
-                record.percent = round((record.effort / total_effort ) * 100, 2 )
-            else:
-                record.percent = total_effort
+    # @api.depends('effort')
+    # def _compute_percentage(self):
+    #     ls_effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', self.estimation_id.ids[0])]) #self.env.context['params']['id']
+    #     total_effort = 0.0        
+    #     for record in ls_effort_distribute:
+    #         total_effort += record.effort
+    #     for record in ls_effort_distribute:
+    #         if total_effort != 0.0:
+    #             record.percent = round((record.effort / total_effort ) * 100, 2 )
+    #         else:
+    #             record.percent = total_effort
     
     @api.model
     def create(self, vals):

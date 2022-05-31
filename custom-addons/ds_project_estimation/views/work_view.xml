@@ -5,8 +5,8 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <field name="check_generate_project" invisible="1"/>
-                    <button name="action_generate_project" type="object" string="Generate Project" attrs="{'invisible': ['|', ('stage', '!=', 'completed'), ('check_generate_project', '=', True)]}" class="oe_highlight" confirm="Generate Project Confirm"/>
+                    <!-- <field name="check_generate_project" invisible="1"/>
+                    <button name="action_generate_project" type="object" string="Generate Project" attrs="{'invisible': ['|', ('stage', '!=', 'completed'), ('check_generate_project', '=', True)]}" class="oe_highlight" confirm="Generate Project Confirm"/> -->
                 </header>
                 <sheet>
                     <group name="group_top">
@@ -150,8 +150,8 @@
                                                     <field name="job_pos"/>
                                                     <field name="percent_effort" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_1')]}" />
                                                     <field name="mandays" attrs="{'readonly': [('parent.activity_type', '=', 'type_1'), ('type', '=', 'type_3')]}" />
-                                                    <field name="type" />
-                                                    <!-- <field name="type" invisible="1"/> -->
+                                                    <!-- <field name="type" /> -->
+                                                    <field name="type" invisible="1"/>
                                                 </tree>
                                             </field>
                                             <!-- <button string="Compute" name="action_refresh" type="object" class="btn-primary" attrs="{'invisible': [ ('estimation_id', '=', False)]}"/> -->
