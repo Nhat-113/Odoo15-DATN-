@@ -22,6 +22,7 @@
         "views/currency_rate_view.xml",
         "security/estimation_security.xml",
         "security/ir.model.access.csv",
+        "data/currency_data.xml",
         "data/activity_data.xml",
         "data/project_type_data.xml",
         "data/job_position_data.xml",
@@ -30,7 +31,7 @@
         "data/resource_planing_data.xml",
         "data/cost_rate_data.xml",
         "views/crm_lead_views.xml",
-        "data/currency_data.xml"
+
     ],
     'assets': {
         'web.assets_backend': [
