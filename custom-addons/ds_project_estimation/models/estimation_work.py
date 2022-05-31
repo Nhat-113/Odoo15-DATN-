@@ -374,3 +374,8 @@ class Estimation(models.Model):
             estimation.check_generate_project = True
             return project
 
+
+class Lead(models.Model):
+    _inherit = ['crm.lead']
+
+    estimation_count = fields.Integer(string='# Registrations')
