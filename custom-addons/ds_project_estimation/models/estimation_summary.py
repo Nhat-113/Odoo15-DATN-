@@ -95,10 +95,10 @@ class EstimationSummaryCostRate(models.Model):
     sequence = fields.Integer(string="No", )
     types = fields.Char(string="Type", )
     role = fields.Many2one('cost.rate', string='Role')
-    currency_id = fields.Many2one('res.currency', compute='_compute_currency_id')
-    yen_month = fields.Monetary(string="Unit (Currency/Month)", currency_field="currency_id", compute='_compute_yen_month', default=0.00)
-    yen_day = fields.Monetary(string="Unit (Currency/Day)", currency_field="currency_id",  compute='_compute_yen_month', default=0.00)
-    vnd_day = fields.Monetary(string="Unit (VND/Day)", currency_field="currency_id", compute='_compute_yen_month', default=0.00)
+    currency_id = fields.Many2one('estimation.currency', compute='_compute_currency_id')
+    yen_month = fields.Float(string="Unit (Currency/Month)", compute='_compute_yen_month', default=0.00)
+    yen_day = fields.Float(string="Unit (Currency/Day)", compute='_compute_yen_month', default=0.00)
+    vnd_day = fields.Float(string="Unit (VND/Day)", compute='_compute_yen_month', default=0.00)
 
     def _compute_currency_id(self):
         for item in self:
@@ -117,7 +117,7 @@ class EstimationSummaryCostRate(models.Model):
                     estimation_id = self.connect_summary_costrate.ids[0]
                 currency_id = self.env['estimation.work'].search([('id', '=', estimation_id)]).currency_id
                 value_exchange = self.env['estimation.exchange.rate'].search([('currency_id', '=', currency_id.id)]).value
-                if currency_id.id == 2:
+                if currency_id.id == 1:
                     item.yen_month = cost_rate.cost_usd
                     item.yen_day = cost_rate.cost_usd / 20
                     item.vnd_day = cost_rate.cost_vnd / 20

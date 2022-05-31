@@ -29,7 +29,8 @@
         "data/currency_rate_data.xml",
         "data/resource_planing_data.xml",
         "data/cost_rate_data.xml",
-        "views/crm_lead_views.xml"
+        "views/crm_lead_views.xml",
+        "data/currency_data.xml"
     ],
     'assets': {
         'web.assets_backend': [

@@ -33,17 +33,17 @@ class CostRate(models.Model):
 
 
 class EstimationExchangeRate(models.Model):
-    _name="estimation.exchange.rate"
+    _name = "estimation.exchange.rate"
     _rec_name = "name"
     
     name = fields.Char(string="Name", store=True, compute="compute_name")
     usd_number = fields.Integer(string="USD", default= 1, readonly= True, help="Number of USD")
-    currency_id = fields.Many2one('res.currency', 
+    currency_id = fields.Many2one('estimation.currency',
                                   string="Currency", 
-                                  domain="[('name', '!=', 'USD')]",
+                                  # domain="[('name', '!=', 'USD')]",
                                   help="Choosea Currency", 
                                   required=True)
-    value = fields.Monetary(string="Exchange Rate", currency_field="currency_id", required=True, digits=(12,6))
+    value = fields.Float(string="Exchange Rate", required=True, digits=(12,2))
     
     _sql_constraints = [
             ('unique_name', 'unique (currency_id)', 'Currency rates already exist!')
@@ -54,4 +54,12 @@ class EstimationExchangeRate(models.Model):
         for record in self:
             if record.currency_id:
                 record.name = "USD" + " --> " + record.currency_id.name
-    
+
+
+class EstimationExchangeRate(models.Model):
+    _name = "estimation.currency"
+    _description = "Estimation Currency"
+
+    name = fields.Char(string='Currency', size=3, required=True, help="Currency Code (ISO 4217)")
+    full_name = fields.Char(string='Name')
+    symbol = fields.Char(help="Currency sign, to be used when printing amounts.", required=True)
