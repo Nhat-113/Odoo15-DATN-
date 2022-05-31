@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 
+
 class ProjectType(models.Model):
     """
     Project Type

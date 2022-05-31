@@ -1,5 +1,6 @@
 from odoo import models, fields, api, _
 
+
 class Activities(models.Model):
     """
     Describe activities in configuration.
@@ -29,42 +30,15 @@ class Activities(models.Model):
                                        domain="[('estimation_id', '=', estimation_id), ('sequence', '!=', sequence)]")
     
     add_lines_breakdown_activity = fields.One2many('module.breakdown.activity', 'activity_id', string="Breakdown Activity")
-        
-    def action_content(self, ls_break):
-        if ls_break:
-            for record in self:
-                final_manday = 0.0
-                for item in ls_break:
-                    if item.activity_id and (record.id == item.activity_id.id):
-                        if item.type == 'type_2':
-                            final_manday += item.mandays
-                        elif item.type == 'type_3':
-                            item.mandays = item.persons * item.days     # for resource plannings
-                            final_manday += item.mandays
-                        elif item.type == 'type_1':
-                            if record.activity_current:
-                                item.mandays = round((item.percent_effort * record.activity_current.effort)/ 100, 2)
-                            else:
-                                item.mandays = 0
-                            final_manday += item.mandays
-                record.effort = final_manday
+
         
     @api.depends('add_lines_breakdown_activity.mandays', 'activity_current')
     def _compute_total_effort(self):
-        ls_break = self.env['module.breakdown.activity'].search([])
-        Activities.action_content(self, ls_break)
-        
-    def action_refresh(self):
-        #refresh manday in module breakdown activity and effort in config activity
-        # ls_break = self.env['module.breakdown.activity'].search([('activity_id', '=', self.id)])
-        ls_break = self.env['module.breakdown.activity'].search([])
-        Activities.action_content(self, ls_break)
-                
-        # refresh activity name, effort in module effort activity
-        ls_effort_distribute = self.env['module.effort.activity'].search([('activity_id', '=', self.id)])
-        for record in ls_effort_distribute:
-            record.effort = record.activity_id.effort
-        return 
+        final_manday = 0.0
+        for record in self:
+            for item in record.add_lines_breakdown_activity:
+                final_manday += item.mandays 
+            record.effort = final_manday
 
     @api.model
     def create(self, vals):
@@ -119,7 +93,7 @@ class Activities(models.Model):
 
     def unlink(self):
         for item in self:
-            effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', self.estimation_id.id), ('sequence', '=', self.sequence )])
+            effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', item.estimation_id.id), ('sequence', '=', item.sequence )])
             breakdown_activity = self.env['module.breakdown.activity'].search([('activity_id','=', item.id)])
             if effort_distribute:
                 effort_distribute.unlink()

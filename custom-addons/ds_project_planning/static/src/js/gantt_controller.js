@@ -97,6 +97,7 @@ var GanttController = AbstractController.extend({
             data.map_id_field = self.map_id_field;
             data.map_date_start = self.map_date_start;
             data.map_duration = self.map_duration;
+            data.map_working_day = self.map_working_day;
             data.map_open = self.map_open;
             data.map_progress = self.map_progress;
             data.link_model = self.link_model;

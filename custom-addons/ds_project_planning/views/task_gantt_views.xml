@@ -11,7 +11,7 @@
                         <group string="Gantt Info">
                             <field name="date_start" required="True"/>
                             <field name="date_end" string="End date" required="True"/>
-                            <field name="planned_duration"/>
+                            <field name="working_day"/>
                         </group>
                         <separator string="Predecessors"/>
                         <field name="dependency_task_ids">

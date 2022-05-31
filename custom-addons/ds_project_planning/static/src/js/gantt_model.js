@@ -24,6 +24,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_duration = params.duration;
             this.map_progress = params.progress;
             this.map_user_ids = params.user_ids;
+            this.map_working_day = params.working_day;
             this.map_portal_user_names = params.portal_user_names;
 
 
@@ -53,7 +54,8 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_progress && fieldNames.push(this.map_progress);
             this.map_portal_user_names && fieldNames.push(this.map_portal_user_names);
             this.map_user_ids && fieldNames.push(this.map_user_ids);
-            this.map_child_ids && fieldNames.push(this.map_child_ids)
+            this.map_working_day && fieldNames.push(this.map_working_day);
+            this.map_child_ids && fieldNames.push(this.map_child_ids);
             this.map_total_float && fieldNames.push(this.map_total_float);
             this.map_parent && fieldNames.push(this.map_parent);
             this.map_phase && fieldNames.push(this.map_phase);
@@ -162,6 +164,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 task.links_serialized_json = record[self.map_links_serialized_json];
                 task.total_float = record[self.map_total_float];
                 task.user_ids = record[self.map_user_ids];
+                task.working_day = record[self.map_working_day];
                 task.project_name = record[self.map_parent] ? record[self.map_parent][1] : "";
                 task.type = record.type ? record.type : "";
 
