@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 
+
 class CostRate(models.Model):
     """
     Describe cost rate.

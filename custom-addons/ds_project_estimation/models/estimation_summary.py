@@ -1,6 +1,5 @@
-from builtins import set
-
 from odoo import models, fields, api
+
 
 class EstimationSummaryTotalCost(models.Model):
     _name = "estimation.summary.totalcost"
