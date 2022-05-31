@@ -29,34 +29,15 @@ class Activities(models.Model):
                                        domain="[('estimation_id', '=', estimation_id), ('sequence', '!=', sequence)]")
     
     add_lines_breakdown_activity = fields.One2many('module.breakdown.activity', 'activity_id', string="Breakdown Activity")
-        
-    def action_content(self, ls_break):
-        if ls_break:
-            for record in self:
-                final_manday = 0.0
-                for item in ls_break:
-                    if item.activity_id is not None and (record.ids[0] == item.activity_id.id):
-                        final_manday += item.mandays
-                record.effort = final_manday
+
         
     @api.depends('add_lines_breakdown_activity.mandays', 'activity_current')
     def _compute_total_effort(self):
+        final_manday = 0.0
         for record in self:
-            final_manday = 0.0
             for item in record.add_lines_breakdown_activity:
                 final_manday += item.mandays 
             record.effort = final_manday
-    # def action_refresh(self):
-    #     #refresh manday in module breakdown activity and effort in config activity
-    #     # ls_break = self.env['module.breakdown.activity'].search([('activity_id', '=', self.id)])
-    #     ls_break = self.env['module.breakdown.activity'].search([])
-    #     Activities.action_content(self, ls_break)
-                
-    #     # refresh activity name, effort in module effort activity
-    #     ls_effort_distribute = self.env['module.effort.activity'].search([('activity_id', '=', self.id)])
-    #     for record in ls_effort_distribute:
-    #         record.effort = record.activity_id.effort
-    #     return 
 
     @api.model
     def create(self, vals):

@@ -43,7 +43,7 @@ class Estimation(models.Model):
     add_lines_module_summary = fields.One2many('estimation.module.summary', 'estimation_id', string='Module Summary')
     add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Activity")
     add_lines_module_effort_distribute_activity = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
-    # check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
+    check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
     
     @api.model
     def create(self, vals):
@@ -262,7 +262,7 @@ class Estimation(models.Model):
         temp = {}
         mess_tab_list = ["add_lines_module_effort_distribute_activity", "add_lines_summary_totalcost", "add_lines_summary_costrate",
                          "add_lines_resource_effort", "add_lines_module_assumption", "add_lines_module_summary", "add_lines_module_activity", 
-                         "total_manday"] # add total_manday field as it is not needed to track changes
+                         "total_manday", "check_generate_project"] # add total_manday field as it is not needed to track changes
         for i in mess_tab_list:
             for key in dic_temp:
                 if key == i:
@@ -296,57 +296,6 @@ class Estimation(models.Model):
         vals_key = mess_field + mess_field_obj + mess_field_date
         value = dict(zip(vals_key, vals_values))
         return value
-    
-    def action_refresh_estimation(self):
-        # refresh total mandays in estimation work
-        ls_activity = self.env['config.activity'].search([('estimation_id', '=', self.id)])
-        total = 0.0
-        for item in ls_activity:
-            total += item.effort
-        for record in self:
-            #if total mandays not modify -> nothing to do
-            if record.total_manday != total:
-                record.total_manday = total
-            
-        # refresh Percentage in Effort distribution activity
-        ls_effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', self.id)])
-        total_effort = 0.0        
-        for record in ls_effort_distribute:
-            total_effort += record.effort
-        for record in ls_effort_distribute:
-            if total_effort != 0.0:
-                record.percent = round((record.effort / total_effort ) * 100, 2 )
-            else:
-                record.percent = total_effort
-        
-        # refresh total effort of the module breakdown activity
-        ls_break = self.env['module.breakdown.activity'].search([])
-        for record in ls_activity:
-            final_manday = 0.0
-            for item in ls_break:
-                if item.activity_id and (record.id == item.activity_id.id):
-                    if item.type == 'type_2':
-                        final_manday += item.mandays
-                    elif item.type == 'type_3':
-                        final_manday += item.persons * item.days
-                    elif item.type == 'type_1':
-                        if record.activity_current:
-                            item.mandays = round((item.percent_effort * record.activity_current.effort)/ 100, 2)
-                        else:
-                            item.mandays = 0
-                        final_manday += item.mandays 
-            record.effort = final_manday
-        
-        # compute summary module
-        module_summary = self.env['estimation.module.summary']
-        days_per_month = module_summary.search([('estimation_id', '=', self.id), ('type', '=', 'default_per_month')])
-        ls_module_summary = module_summary.search([('estimation_id', '=', self.id)])
-        for record in ls_module_summary:
-            if record.type == 'man_day':
-                record.value = self.total_manday
-            elif record.type =='man_month':
-                record.value = round(self.total_manday / days_per_month.value, 2)
-        return
 
     def _compute_total_cost(self):
         for se in self:
