@@ -5,8 +5,8 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <!-- <field name="check_generate_project" invisible="1"/>
-                    <button name="action_generate_project" type="object" string="Generate Project" attrs="{'invisible': ['|', ('stage', '!=', 'completed'), ('check_generate_project', '=', True)]}" class="oe_highlight" confirm="Generate Project Confirm"/> -->
+                    <field name="check_generate_project" invisible="1"/>
+                    <button name="action_generate_project" type="object" string="Generate Project" attrs="{'invisible': ['|', ('stage', '!=', 'completed'), ('check_generate_project', '=', True)]}" class="oe_highlight" confirm="Generate Project Confirm"/>
                 </header>
                 <sheet>
                     <group name="group_top">
@@ -113,14 +113,6 @@
                                     <field name="effort" />
                                     <field name="percent" />
                                 </tree>
-                                <form string="Effort distribution">
-                                    <group col="4">
-                                        <field name="sequence" string="No" />
-                                        <field name="activity" />
-                                        <field name="effort" />
-                                        <field name="percent" />
-                                    </group>
-                                </form>
                             </field>
                             <separator string='Work Breakdown Structure and Estimate' />
                             <field name="add_lines_module_activity">
@@ -135,7 +127,6 @@
                                         <field name="activity" />
                                         <field name="effort" />
                                         <field name="estimation_id" invisible="1"/>
-                                        <!-- <field name="estimation_id"/> -->
                                         <field name="activity_type" />
                                         <field name="activity_current" attrs="{'invisible': [('activity_type', '!=', 'type_1')], 'required' : [('activity_type', '=', 'type_1')]}" placeholder="Please select activity ..." />
                                     </group>
@@ -150,17 +141,14 @@
                                                     <field name="job_pos"/>
                                                     <field name="percent_effort" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_1')]}" />
                                                     <field name="mandays" attrs="{'readonly': [('parent.activity_type', '=', 'type_1'), ('type', '=', 'type_3')]}" />
-                                                    <!-- <field name="type" /> -->
                                                     <field name="type" invisible="1"/>
                                                 </tree>
                                             </field>
-                                            <!-- <button string="Compute" name="action_refresh" type="object" class="btn-primary" attrs="{'invisible': [ ('estimation_id', '=', False)]}"/> -->
                                         </page>
                                     </notebook>
                                 </form>
                             </field>
                             <group name="note_group" col="6" class="mt-2 mt-md-0">
-                                <button string="Compute" name="action_refresh_estimation" type="object" class="btn-primary"/>
                                 <group class="oe_subtotal_footer" colspan="2" name="sale_total">
                                     <field name="total_manday" readonly="1" />
                                 </group>
