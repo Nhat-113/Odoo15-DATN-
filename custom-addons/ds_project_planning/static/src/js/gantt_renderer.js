@@ -66,6 +66,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       const endDateEditor = { type: "date", map_to: "end_date" };
 
       gantt.config.drag_progress = false;
+      gantt.config.sort = true; 
       gantt.config.columns = [
         {
           name: "text",
