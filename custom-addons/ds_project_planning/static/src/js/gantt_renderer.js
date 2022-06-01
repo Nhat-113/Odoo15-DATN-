@@ -124,7 +124,10 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
             console.log("working_day", item.working_day);
             if (item.working_day) {
               return item.working_day;
-            }
+            }// duration auto = 1  for milestone
+              else if (item.type === "milestone") {
+                return 1  ;
+              }
             return 0;
           },
         },
@@ -135,6 +138,9 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
               return 0;
+            } // duration auto = 1  for milestone
+            else if (item.type === "milestone") {
+              return item.duration +1 ;
             }
             return item.duration;
           },
@@ -214,10 +220,14 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
             : task.type == "milestone"
             ? "Milestone"
             : "Task";
-
+        if (task.type == "milestone") {
+          task.duration =1
+        }
         return `<b>${type}:</b> ${task.text}<br/>
                 <b>Assignees:</b> ${assignees}<br/>
-                <b>Duration:</b> ${task.duration}<br/>
+                <b>Duration:</b> 
+                  ${task.duration}
+                <br/>
                 <b>Progress:</b> ${task.progress * 100}%<br/>
                 <b>Start date:</b> ${gantt.templates.tooltip_date_format(
                   start
