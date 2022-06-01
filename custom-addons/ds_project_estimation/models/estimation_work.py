@@ -16,7 +16,7 @@ class Estimation(models.Model):
     estimator_ids = fields.Many2one('res.users', string='Estimator')
     reviewer_ids = fields.Many2one('res.users', string='Reviewer')
     customer_ids = fields.Many2one("res.partner", string="Customer", required=True)
-    currency_id = fields.Many2one("estimation.currency", string="Currency",)
+    currency_id = fields.Many2one("estimation.currency", string="Currency", required=True)
     currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
 
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
@@ -125,13 +125,15 @@ class Estimation(models.Model):
                 'activity': record.activity,
                 'effort': 0.0,
                 'percent': 0.0,
-                'activity_type': record.activity_type
+                'activity_type': record.activity_type,
+                'check_default': True
             }
             line = (0, 0, content)
             activities_line.append(line)
             
             temp = content.copy()
             temp.pop('activity_type')
+            temp.pop('check_default')
             line_effort = (0, 0, temp)
             activities_effort_line.append(line_effort)
         
