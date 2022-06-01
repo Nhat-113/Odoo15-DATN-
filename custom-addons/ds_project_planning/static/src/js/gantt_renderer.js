@@ -462,7 +462,8 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       }
     },
     destroy: function () {
-      gantt.clearAll();
+      //gantt.clearAll();
+      gantt.refreshData();
       this._super.apply(this, arguments);
     },
   });
