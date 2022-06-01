@@ -39,8 +39,10 @@
                     <notebook>
                         <page string="Calendar Resources">
                             <field name="planning_calendar_resources" colspan="4" nolabel="1">
-                                <tree string="Assign Members">
+                                <tree string="Assign Members" >
                                     <field name="project_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
                                     <field name="effort_rate" string="Effort Rate (%)"/>
                                 </tree>
                             </field>
