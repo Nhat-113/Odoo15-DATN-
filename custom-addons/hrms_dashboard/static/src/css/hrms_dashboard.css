@@ -541,9 +541,9 @@ h4 .stat-count {
     background: #4CAF50;
     height: 100%;
 }
-.o_hr_attendance_sign_in_out_icon {
+/* .o_hr_attendance_sign_in_out_icon {
     z-index: 100000;
-}
+} */
 .hr_attendance_login .stat-widget-one {
     background: none;
     display: flex;
@@ -1141,6 +1141,7 @@ button:focus {
 .list_future_user {
     text-align: center;
     height: 20%;
+    margin-bottom:50% !important
 }
 
 .list_future_user button {
@@ -2164,3 +2165,6 @@ button:focus {
 .dashboard-not-employee_content {
     margin: 0;
 }
+
+
+
