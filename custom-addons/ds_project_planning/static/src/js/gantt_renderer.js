@@ -168,6 +168,9 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       ];
 
       gantt.templates.task_class = function (start, end, task) {
+        if (task.type == "phase") {
+          task.color = "#4CAF50";
+        }
         if (start - self.configStartDate === 0) {
           return "none";
         }
