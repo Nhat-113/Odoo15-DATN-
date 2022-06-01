@@ -140,7 +140,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
               return 0;
             } // duration auto = 1  for milestone
             else if (item.type === "milestone") {
-              return item.duration +1 ;
+              return 1 ;
             }
             return item.duration;
           },
