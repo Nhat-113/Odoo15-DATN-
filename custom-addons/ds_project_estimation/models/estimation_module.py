@@ -111,8 +111,24 @@ class EffortActivities(models.Model):
             
     @api.depends('effort', 'activity_id')
     def _compute_percentage(self):
-        if self.ids != []:
-            ls_effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', self.estimation_id.ids[0])])
+        rs_estimation_id = 0
+        check_estimation_id = True
+        for record in self:
+            if record.estimation_id.id:
+                rs_estimation_id = record.estimation_id.id
+                break
+            elif record.estimation_id.id == False:
+                check_estimation_id = False
+                break
+            elif record.estimation_id.id.origin:
+                rs_estimation_id = record.estimation_id.id.origin
+                break
+            else:
+                check_estimation_id = False
+                break
+            
+        if check_estimation_id:
+            ls_effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', rs_estimation_id)])
             total_effort = 0.0
             for record in ls_effort_distribute:
                 total_effort += record.effort
