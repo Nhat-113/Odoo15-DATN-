@@ -66,6 +66,7 @@ class ProjectTask(models.Model):
                 elapsed_seconds = (r.date_end - r.date_start + datetime.timedelta(days=1)).total_seconds()
                 seconds_in_day = 24 * 60 * 60
                 r.planned_duration = round(elapsed_seconds / seconds_in_day, 1)
+                r = r.with_context(ignore_onchange_planned_duration=True)
 
     @api.depends('date_start', 'date_end')
     def _compute_working_day(self):
