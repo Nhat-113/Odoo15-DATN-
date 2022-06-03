@@ -105,16 +105,16 @@
     />
 
     <!-- Action to open Currency Rate -->
-    <record id="action_config_currency_rate" model="ir.actions.act_window">
-        <field name="name">Currency Rate</field>
-        <field name="res_model">estimation.exchange.rate</field>
-        <field name="view_mode">tree,form</field>
-    </record>
+<!--    <record id="action_config_currency_rate" model="ir.actions.act_window">-->
+<!--        <field name="name">Currency Rate</field>-->
+<!--        <field name="res_model">estimation.exchange.rate</field>-->
+<!--        <field name="view_mode">tree,form</field>-->
+<!--    </record>-->
 
-    <menuitem id="menu_config_currency_rate"
-    name="Currency Rate"
-    parent="menu_config"
-    action="action_config_currency_rate"
-    />
+<!--    <menuitem id="menu_config_currency_rate"-->
+<!--    name="Currency Rate"-->
+<!--    parent="menu_config"-->
+<!--    action="action_config_currency_rate"-->
+<!--    />-->
 
 </odoo>
