@@ -94,12 +94,13 @@ class EffortActivities(models.Model):
     _name = "module.effort.activity"
     _description = "Module effort distribute activity"
     _rec_name = "activity"
+    _order = "sequence,id"
     
     estimation_id = fields.Many2one('estimation.work', string="Estimation")
     activity_id = fields.Many2one('config.activity', string="Activities Work Breakdown")
     
     sequence = fields.Integer(string="No", index=True, help='Use to arrange calculation sequence')
-    activity = fields.Char(string="Activity", related='activity_id.activity')
+    activity = fields.Char(string="Activity")
     effort = fields.Float(string='Effort', compute='_compute_effort', store=True)
     percent = fields.Float(string="Percentage (%)", default=0, store=True, compute='_compute_percentage')
     
@@ -111,8 +112,24 @@ class EffortActivities(models.Model):
             
     @api.depends('effort', 'activity_id')
     def _compute_percentage(self):
-        if self.ids != []:
-            ls_effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', self.estimation_id.ids[0])])
+        rs_estimation_id = 0
+        check_estimation_id = True
+        for record in self:
+            if record.estimation_id.id:
+                rs_estimation_id = record.estimation_id.id
+                break
+            elif record.estimation_id.id == False:
+                check_estimation_id = False
+                break
+            elif record.estimation_id.id.origin:
+                rs_estimation_id = record.estimation_id.id.origin
+                break
+            else:
+                check_estimation_id = False
+                break
+            
+        if check_estimation_id:
+            ls_effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', rs_estimation_id)])
             total_effort = 0.0
             for record in ls_effort_distribute:
                 total_effort += record.effort
@@ -125,16 +142,8 @@ class EffortActivities(models.Model):
     @api.model
     def create(self, vals):
         if vals:
-            check = False
-            for key in vals:
-                if key == 'activity_id':
-                    check = True
-                    break
-            if check == False:
-                activity_id = self.env['config.activity'].search([('estimation_id', '=', vals['estimation_id']), ('sequence', '=', vals['sequence'] )])
-                vals['activity_id'] = activity_id.id
+            if 'activity_id' in vals:
                 return super(EffortActivities, self).create(vals)
-            else:
-                return super(EffortActivities, self).create(vals)
-                
-
+            activity_id = self.env['config.activity'].search([('estimation_id', '=', vals['estimation_id']), ('sequence', '=', vals['sequence'] )])
+            vals['activity_id'] = activity_id.id
+            return super(EffortActivities, self).create(vals)

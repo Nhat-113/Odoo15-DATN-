@@ -66,6 +66,7 @@ class ProjectTask(models.Model):
                 elapsed_seconds = (r.date_end - r.date_start + datetime.timedelta(days=1)).total_seconds()
                 seconds_in_day = 24 * 60 * 60
                 r.planned_duration = round(elapsed_seconds / seconds_in_day, 1)
+                r = r.with_context(ignore_onchange_planned_duration=True)
 
     @api.depends('date_start', 'date_end')
     def _compute_working_day(self):
@@ -115,10 +116,10 @@ class ProjectTask(models.Model):
                 links.append(json_obj)
             r.links_serialized_json = json.dumps(links)
 
-    @api.constrains('date_start', 'date_end')
+    @api.onchange('date_start', 'date_end')
     def _check_start_end(self):
         for task in self:
-            if task.date_end and task.date_start > task.date_end:
+            if task.date_start and task.date_end and task.date_start > task.date_end:
                 raise ValidationError(_(
                     'Task "%(task)s": start date (%(start)s) must be earlier than end date (%(end)s).',
                     task=task.name, start=task.date_start, end=task.date_end,
