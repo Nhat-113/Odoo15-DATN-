@@ -8,6 +8,7 @@
     </t>
     
     <t t-name="LoginEmployeeDetails">
+       
         <!-- <link rel="stylesheet" href="/hrms_dashboard/static/src/css/hrms_dashboard.css"/>
         <script type="text/javascript" src="/hrms_dashboard/static/src/js/filename.js"/> -->
         <div class="row main-section"  style="height:100%;padding-left:1.4%" >
@@ -340,6 +341,11 @@
     </t>
 
     <t t-name="ManagerDashboard">
+        <head>
+            <meta charset="utf-8"/>
+            <meta name="viewport" content="initial-scale=1"/>
+            <title><t t-esc="title or 'Odoo Report'"/></title>
+        </head>
         <div class="row main-section"  style="height:100%;padding-left: 1.5%;">
             <div class="col-md-2 employee_infomation">
                 <div class="image-employee">
@@ -363,7 +369,7 @@
                 </div>
                 <hr></hr>
 
-                <div class= "list_future_user" style="margin-bottom:50% !important">
+                <div class= "list_future_user">
                     <button class="btn_leave_request  hr_leave_request_approve">
                         <h4><i class="fa fa-plus"></i></h4>
                         <h3 class="fearure_detail">Leave Request</h3>
