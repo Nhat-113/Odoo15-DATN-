@@ -23,6 +23,9 @@
             </div>
             <div class="o_dhx_gantt">
             </div>
+            <div id="gantt_dropdown">
+                <h2>Dropdown here</h2>
+            </div>
         </div>
     </t>
 </templates>

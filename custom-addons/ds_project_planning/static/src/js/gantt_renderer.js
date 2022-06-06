@@ -17,6 +17,10 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       "click a.o_dhx_create_phase": "_onBtnCreatePhase",
       "click a.o_dhx_create_milestone": "_onBtnCreateMilestone",
       "click button.o_dhx_calendar_resource": "_onBtnCalendarResource",
+      //"click div.gantt-dropdown": "_onBtnCalendarResource",
+
+      
+
     }),
     init: function (parent, state, params) {
       this._super.apply(this, arguments);
@@ -68,6 +72,86 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
 
       gantt.config.drag_progress = false;
       gantt.config.sort = true; 
+      //drop
+
+      function getDropdownNode(){
+        return document.querySelector("#gantt_dropdown");
+      }
+    
+      gantt.$showDropdown = function(node){
+        var position = node.getBoundingClientRect();
+        var dropDown = getDropdownNode();
+        dropDown.style.top = position.bottom + "px";
+        dropDown.style.left = position.left + "px";
+        dropDown.style.display = "block";
+        populateColumnsDropdown(dropDown);
+    
+        dropDown.onchange = function(){
+          var selection = getColumnsSelection(dropDown);
+          gantt.config.columns = createColumnsConfig(selection);
+          gantt.render();
+        }
+      
+        dropDown.keep = true;
+        setTimeout(function(){
+          dropDown.keep = false;
+        })
+      }
+      gantt.$hideDropdown = function(){
+        var dropDown = getDropdownNode();
+        dropDown.style.display = "none";
+    
+      }
+
+      window.addEventListener("click", function(event){
+        var dropDown = getDropdownNode();
+
+        if(!dropDown)
+          return
+        if(!event.target.closest("#gantt_dropdown") && !getDropdownNode().keep){
+          gantt.$hideDropdown();
+        }
+      });
+    
+      function populateColumnsDropdown(node){
+        var visibleColumns = {};
+        gantt.config.columns.forEach(function(col){
+          visibleColumns[col.name] = true;
+        });
+    
+        var lines = [];
+        allColumns.forEach(function(col){
+          var checked = visibleColumns[col.name] ? "checked" : "";
+          lines.push("<label><input type='checkbox' name='"+col.name+"' "+checked+">" + col.label + "</label>");
+        });
+        node.innerHTML = lines.join("<br>");
+      }
+    
+      function getColumnsSelection(node){
+        var selectedColumns = node.querySelectorAll(":checked");
+        var checkedColumns = {};
+        selectedColumns.forEach(function(node){
+          checkedColumns[node.name] = true;
+        });
+        return checkedColumns;
+      }
+    
+      function createColumnsConfig(selectedColumns){
+        var newColumns = [];
+    
+        allColumns.forEach(function(column){
+          if(selectedColumns[column.name]){
+            newColumns.push(column);
+          }
+        });
+    
+        newColumns.push(controlsColumn);
+        return newColumns;
+      }
+     
+    
+      var colHeader = '<div class="gantt-dropdown" onclick="gantt.$showDropdown(this)" style= "color:blue">&#9660;</div>';
+      var controlsColumn = {name: "buttons",label: colHeader,width: 75}
       gantt.config.columns = [
         {
           name: "text",
@@ -121,7 +205,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           align: "center",
           resize: true,
           template: function (item) {
-            console.log("working_day", item.working_day);
+            //console.log("working_day", item.working_day);
             if (item.working_day) {
               return item.working_day;
             }// duration auto = 1  for milestone
@@ -157,19 +241,95 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
 
             if (!assignees) return;
 
-            assignees.forEach(function (element) {
+            assignees.forEach(function (element) { 
+
               var assignee = byId(element);
               result += assignee;
             });
-
             return result;
           },
+
         },
+        {name: "buttons",label: colHeader,width: 75}
       ];
+
+      var allColumns = [ 
+        {
+          name: "text", 
+          tree: true,
+          resize: true,
+          label: "Task Name",
+          width: 180,},
+
+        { 
+          name: "start_date",
+          align: "center",
+          label: "Start Time",
+          resize: true,
+          editor: startDateEditor,
+          width: 120,
+        },
+        {
+          name: "end_date",
+          label: "End time",
+          align: "center",
+          resize: true,
+          editor: endDateEditor,
+          width: 120,
+        },
+        
+        {
+          name: "progress",
+          label: "Progress",
+          align: "center",
+          resize: true,
+        },
+
+        {name: "working_day",
+          label: "Working Day",
+          align: "center",
+          resize: true
+        },
+        {
+          name: "duration",
+          align: "center",
+          label: "Duration",
+          resize: true,
+        } ,
+        {
+          name: "assignees",
+          width: 80,
+          label: "Assignees",
+          align: "center",
+          resize: true,
+          template: function (task) {
+            var result = "";
+            var assignees = task.user_ids;
+
+            if (!assignees) return;
+
+            assignees.forEach(function (element) { 
+
+              var assignee = byId(element);
+              result += assignee;
+            });
+            return result;
+          },
+        }
+        
+      ]
+
+      gantt.config.columns = createColumnsConfig({
+        text :true,
+        start_date: true,
+        end_date: true,
+        duration:true,
+        assignees:true,
+      })
 
       gantt.templates.task_class = function (start, end, task) {
         if (task.type == "phase") {
-          task.color = "#4CAF50";
+          task.color = "#808080";
         }
         
         if (start - self.configStartDate === 0) {
@@ -432,6 +592,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         text: "Today", //the marker title
         title: date_to_str(new Date()), // the marker's tooltip
       });
+
       var rootHeight = this.$el.height();
       var headerHeight = this.$(".o_dhx_gantt_header").height();
       this.$(".o_dhx_gantt").height(rootHeight - headerHeight);
