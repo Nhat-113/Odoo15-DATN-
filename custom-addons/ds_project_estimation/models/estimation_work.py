@@ -17,7 +17,7 @@ class Estimation(models.Model):
     reviewer_ids = fields.Many2one('res.users', string='Reviewer')
     customer_ids = fields.Many2one("res.partner", string="Customer", required=True)
     currency_id = fields.Many2one("estimation.currency", string="Currency", required=True)
-    currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
+    # currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
     summary_currency_id = fields.Integer("Summarry Currency id", compute='_compute_summary_currency')
 
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
@@ -57,13 +57,13 @@ class Estimation(models.Model):
         for item in summary_cost_rate:
             item.currency_ids = self.summary_currency_id
 
-    @api.depends('currency_id')
-    def _compute_currency_id_domain(self):
-        currency_ids = [1, 22, 24]
-
-        self.currency_id_domain = json.dumps(
-                [('id', 'in', currency_ids)]
-            )
+    # @api.depends('currency_id')
+    # def _compute_currency_id_domain(self):
+    #     currency_ids = [1, 22, 24]
+    #
+    #     self.currency_id_domain = json.dumps(
+    #             [('id', 'in', currency_ids)]
+    #         )
 
     @api.model
     def create(self, vals):
