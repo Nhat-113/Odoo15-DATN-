@@ -159,6 +159,10 @@ class Task(models.Model):
     def _check_progress(self):
         if self.progress_input < 0 or self.progress_input > 100:
             raise UserError('Progress must be between 0 and 100%')
+        elif self.status.name == 'Done' or self.status.name == 'Closed' and self.issues_type.name == 'Task':
+            if self.progress_input != 100:
+                raise UserError(
+                    'Required when status Done or Closed, progress = 100%')
 
     @api.constrains('progress_input', 'timesheet_ids')
     def _check_timesheet_progress(self):

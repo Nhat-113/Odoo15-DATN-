@@ -30,7 +30,8 @@ class ProjectTask(models.Model):
         'project.depending.tasks', 'depending_task_id')
     links_serialized_json = fields.Char(
         'Serialized Links JSON', compute="compute_links_json")
-    date_start = fields.Datetime('Start Date')
+    date_start = fields.Date('Start Date')
+    date_end = fields.Date('End Date')
 
     recursive_dependency_task_ids = fields.Many2many(
         string='Recursive Dependencies',
@@ -63,11 +64,12 @@ class ProjectTask(models.Model):
     def _compute_planned_duration(self):
         for r in self:
             if r.date_start and r.date_end:
-                elapsed_seconds = (r.date_end - r.date_start + datetime.timedelta(days=1)).total_seconds()
-                seconds_in_day = 24 * 60 * 60
-                r.planned_duration = round(elapsed_seconds / seconds_in_day, 1)
+                # elapsed_seconds = (r.date_end - r.date_start + datetime.timedelta(days=1)).total_seconds()
+                # seconds_in_day = 24 * 60 * 60
+                # r.planned_duration = round(elapsed_seconds / seconds_in_day, 1)
+                r.planned_duration = (r.date_end - r.date_start).days + 1
                 r = r.with_context(ignore_onchange_planned_duration=True)
-
+            
     @api.depends('date_start', 'date_end')
     def _compute_working_day(self):
         for r in self:
@@ -77,12 +79,14 @@ class ProjectTask(models.Model):
                 elapsed_seconds = working_days * 24 * 60 * 60
                 seconds_in_day = 24 * 60 * 60
                 r.working_day = round(elapsed_seconds / seconds_in_day, 1)
+            elif not r.date_start or not r.date_end:
+                r.working_day = 0
 
 
     @api.onchange('planned_duration', 'date_start')
     def _inverse_planned_duration(self):
         for r in self:
-            if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', False):
+            if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', True):
                 r.date_end = r.date_start + timedelta(days=r.planned_duration)
 
     @api.depends('dependency_task_ids')
