@@ -10,3 +10,5 @@ from . import estimation_summary
 from . import estimation_resource_plan
 from . import estimation_activity
 from . import project_type
+from . import ir_act_window
+from . import ir_ui_view
