@@ -32,7 +32,7 @@ class ProjectTask(models.Model):
         'Serialized Links JSON', compute="compute_links_json")
     date_start = fields.Date('Start Date')
     date_end = fields.Date('End Date')
-
+    
     recursive_dependency_task_ids = fields.Many2many(
         string='Recursive Dependencies',
         comodel_name='project.task',
@@ -128,6 +128,9 @@ class ProjectTask(models.Model):
                     'Task "%(task)s": start date (%(start)s) must be earlier than end date (%(end)s).',
                     task=task.name, start=task.date_start, end=task.date_end,
                 ))
+
+    def update_date_end(self, stage_id):
+        return {}
 
 
 class DependingTasks(models.Model):
