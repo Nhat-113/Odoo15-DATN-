@@ -94,12 +94,13 @@ class EffortActivities(models.Model):
     _name = "module.effort.activity"
     _description = "Module effort distribute activity"
     _rec_name = "activity"
+    _order = "sequence,id"
     
     estimation_id = fields.Many2one('estimation.work', string="Estimation")
     activity_id = fields.Many2one('config.activity', string="Activities Work Breakdown")
     
     sequence = fields.Integer(string="No", index=True, help='Use to arrange calculation sequence')
-    activity = fields.Char(string="Activity", related='activity_id.activity')
+    activity = fields.Char(string="Activity")
     effort = fields.Float(string='Effort', compute='_compute_effort', store=True)
     percent = fields.Float(string="Percentage (%)", default=0, store=True, compute='_compute_percentage')
     
@@ -141,16 +142,8 @@ class EffortActivities(models.Model):
     @api.model
     def create(self, vals):
         if vals:
-            check = False
-            for key in vals:
-                if key == 'activity_id':
-                    check = True
-                    break
-            if check == False:
-                activity_id = self.env['config.activity'].search([('estimation_id', '=', vals['estimation_id']), ('sequence', '=', vals['sequence'] )])
-                vals['activity_id'] = activity_id.id
+            if 'activity_id' in vals:
                 return super(EffortActivities, self).create(vals)
-            else:
-                return super(EffortActivities, self).create(vals)
-                
-
+            activity_id = self.env['config.activity'].search([('estimation_id', '=', vals['estimation_id']), ('sequence', '=', vals['sequence'] )])
+            vals['activity_id'] = activity_id.id
+            return super(EffortActivities, self).create(vals)

@@ -30,12 +30,13 @@ class Activities(models.Model):
                                        domain="[('estimation_id', '=', estimation_id), ('sequence', '!=', sequence)]")
     
     add_lines_breakdown_activity = fields.One2many('module.breakdown.activity', 'activity_id', string="Breakdown Activity")
+    check_default = fields.Boolean(string="Check", default=False)
 
         
     @api.depends('add_lines_breakdown_activity.mandays', 'activity_current')
     def _compute_total_effort(self):
-        final_manday = 0.0
         for record in self:
+            final_manday = 0.0
             for item in record.add_lines_breakdown_activity:
                 final_manday += item.mandays 
             record.effort = final_manday
@@ -46,25 +47,13 @@ class Activities(models.Model):
             # load sequence
             ls_activity = self.env['config.activity'].search([('estimation_id', '=', vals['estimation_id'])])
             self.env['config.activity'].auto_increase_sequence(vals, ls_activity)
-            
-            # check if values is default data or new data
-            check = False
-            is_data_default = False
-            for key in vals:
-                if key == 'add_lines_breakdown_activity':
-                    check = True
-                    for item in vals[key]:
-                        if item[2] == 0:
-                            is_data_default = True
-                            break
-                    break
+            result = super(Activities, self).create(vals)
                 
-            #if values is default data    
-            if check == True and is_data_default == True:
-                return super(Activities, self).create(vals)
+            #if values is default data
+            if vals['check_default'] == True:
+                return result
             
             #if values is new data
-            result = super(Activities, self).create(vals)
             ctx = {
                 'sequence': vals['sequence'],
                 'activity': vals['activity'],

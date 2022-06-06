@@ -121,6 +121,7 @@
                                     <field name="sequence" />
                                     <field name="activity" />
                                     <field name="effort" />
+                                    <field name="check_default" invisible="1"/>
                                 </tree>
                                 <form>
                                     <group col="4">
@@ -130,6 +131,7 @@
                                         <field name="estimation_id" invisible="1"/>
                                         <field name="activity_type" />
                                         <field name="activity_current" attrs="{'invisible': [('activity_type', '!=', 'type_1')], 'required' : [('activity_type', '=', 'type_1')]}" placeholder="Please select activity ..." />
+                                        <field name="check_default" invisible="1"/>
                                     </group>
                                     <notebook>
                                         <page string="Breakdown Estimation">
