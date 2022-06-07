@@ -5,3 +5,7 @@
 div[name="add_lines_module_effort_distribute_activity"], div[name="add_lines_module_summary"] {
     pointer-events: none !important;
 }
+
+.o_field_widget.o_quick_editable {
+    word-break: break-all;
+}

@@ -159,6 +159,10 @@ class Task(models.Model):
     def _check_progress(self):
         if self.progress_input < 0 or self.progress_input > 100:
             raise UserError('Progress must be between 0 and 100%')
+        elif self.status.name == 'Done' or self.status.name == 'Closed' and self.issues_type.name == 'Task':
+            if self.progress_input != 100:
+                raise UserError(
+                    'Required when status Done or Closed, progress = 100%')
 
     @api.constrains('progress_input', 'timesheet_ids')
     def _check_timesheet_progress(self):
@@ -202,6 +206,11 @@ class Project(models.Model):
         ('on_hold', 'On Hold')
     ], default='on_track', compute='_compute_last_update_status', store=True)
     last_update_color = fields.Integer(compute='_compute_last_update_color')
+    employee_id_domain = fields.Char(
+        compute="_compute_employee_id_domain",
+        readonly=True,
+        store=False,
+    )
 
     @api.depends('last_update_status')
     def _compute_last_update_color(self):
@@ -231,19 +240,22 @@ class Project(models.Model):
     def update_status(self):
         projects = self.env['project.project'].search([('active', '=', True)])
         for project in projects:
-            calendars = self.env['planning.calendar.resource'].search(['&', ('project_id', '=', project.id), ('inactive', '=', True)])
-            task_no_assign = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1),('user_ids','=',False)])
-            if task_no_assign > 0:
-                for calendar in calendars:
-                    if calendar.inactive_date < date.today() and project.last_update_status not in ['off_track', 'on_hold']:
-                        project.write({'last_update_status': 'missing_resource'})
-
             task_all = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1)])
             task_out_of_date = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1),('status','not in',[6,7]),('date_end','<',date.today())])
             if task_all > 0 and task_out_of_date/task_all >= 0.1:
                 project.write({'last_update_status': 'at_risk'})
 
         return True
+
+    @api.depends('planning_calendar_resources')
+    def _compute_employee_id_domain(self):
+        for project in self:
+            user_ids = [
+                user.id for user in project.planning_calendar_resources.employee_id]
+            user_ids.append(self.env.user.employee_id.id)
+            project.employee_id_domain = json.dumps(
+                [('id', 'in', user_ids)]
+            )
 
     
 class ProjectUpdate(models.Model):
