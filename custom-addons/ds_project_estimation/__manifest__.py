@@ -17,7 +17,6 @@
         "views/job_position_view.xml",
         "views/cost_rate_view.xml",
         "views/activity_view.xml",
-        "views/description_view.xml",
         "views/project_type_view.xml",
         "views/currency_rate_view.xml",
         "security/estimation_security.xml",
