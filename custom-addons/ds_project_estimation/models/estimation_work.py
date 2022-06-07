@@ -17,13 +17,13 @@ class Estimation(models.Model):
     reviewer_ids = fields.Many2one('res.users', string='Reviewer')
     customer_ids = fields.Many2one("res.partner", string="Customer", required=True)
     currency_id = fields.Many2one("estimation.currency", string="Currency", required=True)
-    # currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
+    currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
     summary_currency_id = fields.Integer("Summarry Currency id", compute='_compute_summary_currency')
 
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
 
     expected_revenue = fields.Float(string="Expected Revenue")
-    total_cost = fields.Float(string="Total Cost", compute='_compute_total_cost')
+    total_cost = fields.Float(string="Total Cost", ) # compute='_compute_total_cost'
     total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays")
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
@@ -57,13 +57,17 @@ class Estimation(models.Model):
         for item in summary_cost_rate:
             item.currency_ids = self.summary_currency_id
 
-    # @api.depends('currency_id')
-    # def _compute_currency_id_domain(self):
-    #     currency_ids = [1, 22, 24]
-    #
-    #     self.currency_id_domain = json.dumps(
-    #             [('id', 'in', currency_ids)]
-    #         )
+    @api.depends('currency_id')
+    def _compute_currency_id_domain(self):
+        currency_name = ['VND', 'USD', 'JPY']
+        currency = self.env['estimation.currency'].search([('name', 'in', currency_name)])
+        currency_ids = []
+        for item in currency:
+            currency_ids.append(item.id)
+
+        self.currency_id_domain = json.dumps(
+                [('id', 'in', currency_ids)]
+            )
 
     @api.model
     def create(self, vals):
@@ -321,10 +325,10 @@ class Estimation(models.Model):
         value = dict(zip(vals_key, vals_values))
         return value
 
-    @api.depends('currency_id')
-    def _compute_total_cost(self):
-        for item in self:
-            item.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', item.id)]).cost
+    # @api.depends('currency_id')
+    # def _compute_total_cost(self):
+    #     for item in self:
+    #         item.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', item.id)]).cost
 
     def action_generate_project(self):
         for estimation in self:

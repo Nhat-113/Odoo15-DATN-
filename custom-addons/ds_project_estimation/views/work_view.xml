@@ -21,8 +21,8 @@
                             <field name="deadline" />
                             <field name="sale_date" />
                             <field name="stage" placeholder="Select current stage" />
-<!--                            <field name="currency_id_domain" invisible="1"/>-->
-                            <field name="currency_id" domain='[["id", "in", [1, 22, 24]]]' required="True"/>
+                            <field name="currency_id_domain" invisible="1"/>
+                            <field name="currency_id" domain='currency_id_domain' required="True"/>
                             <field name="customer_ids" />
                         </group>
                     </group>
