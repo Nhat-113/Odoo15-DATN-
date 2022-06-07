@@ -1,6 +1,8 @@
 from odoo import models, fields, api, _
 import json
 
+from odoo.exceptions import UserError
+
 
 class Estimation(models.Model):
     """
@@ -320,24 +322,27 @@ class Estimation(models.Model):
 
     def action_generate_project(self):
         for estimation in self:
-            project = self.env['project.project'].sudo().create({
-                'name': estimation.project_name,
-                'user_id':estimation.estimator_ids.id
-            })
-            activity = self.env['config.activity'].search([('estimation_id','=',estimation.id)])
-            for act in activity:
-                for breakdown in self.env['module.breakdown.activity'].search([('activity_id','=',act.id)]):
-                    self.env['project.task'].create({
-                        'project_id':project.id,
-                        'stage_id':self.env['project.task.type'].search([('name','=','Backlog')])[0].id,
-                        'name':breakdown.activity,
-                        'user_ids':[],
-                        'issues_type':1,
-                        'status':2,
-                        'planned_hours':breakdown.mandays * 8
-                    })
-            estimation.check_generate_project = True
-            return project
+            if not estimation.estimator_ids:
+               raise UserError('Please select estimator before generating project.')
+            else:
+                project = self.env['project.project'].sudo().create({
+                    'name': estimation.project_name,
+                    'user_id':estimation.estimator_ids.id
+                })
+                activity = self.env['config.activity'].search([('estimation_id','=',estimation.id)])
+                for act in activity:
+                    for breakdown in self.env['module.breakdown.activity'].search([('activity_id','=',act.id)]):
+                        self.env['project.task'].create({
+                            'project_id':project.id,
+                            'stage_id':self.env['project.task.type'].search([('name','=','Backlog')])[0].id,
+                            'name':breakdown.activity,
+                            'user_ids':[],
+                            'issues_type':1,
+                            'status':2,
+                            'planned_hours':breakdown.mandays * 8
+                        })
+                estimation.check_generate_project = True
+                return project
 
 
 class Lead(models.Model):
