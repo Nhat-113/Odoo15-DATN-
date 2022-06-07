@@ -206,6 +206,11 @@ class Project(models.Model):
         ('on_hold', 'On Hold')
     ], default='on_track', compute='_compute_last_update_status', store=True)
     last_update_color = fields.Integer(compute='_compute_last_update_color')
+    employee_id_domain = fields.Char(
+        compute="_compute_employee_id_domain",
+        readonly=True,
+        store=False,
+    )
 
     @api.depends('last_update_status')
     def _compute_last_update_color(self):
@@ -241,6 +246,16 @@ class Project(models.Model):
                 project.write({'last_update_status': 'at_risk'})
 
         return True
+
+    @api.depends('planning_calendar_resources')
+    def _compute_employee_id_domain(self):
+        for project in self:
+            user_ids = [
+                user.id for user in project.planning_calendar_resources.employee_id]
+            user_ids.append(self.env.user.employee_id.id)
+            project.employee_id_domain = json.dumps(
+                [('id', 'in', user_ids)]
+            )
 
     
 class ProjectUpdate(models.Model):
