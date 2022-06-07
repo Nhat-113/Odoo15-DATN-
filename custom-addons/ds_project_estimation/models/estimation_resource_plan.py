@@ -11,7 +11,7 @@ class EstimationResourcePlan(models.Model):
     sequence = fields.Integer(string="No", )
     name= fields.Char(string="Components", default="Module")    
     design_effort = fields.Float(string="Design",)
-    dev_effort = fields.Float(string="Dev",)
+    dev_effort = fields.Float(string="Developer",)
     tester_effort = fields.Float(string="Tester",)
     comtor_effort = fields.Float(string="Comtor",)
     brse_effort = fields.Float(string="Brse",)
@@ -108,6 +108,8 @@ class EstimationResourcePlan(models.Model):
                                     vals_gantt['start_date'] = result_day['start_date']
                                 else:
                                     vals_gantt['end_date'] = result_day['end_date']
+                           
+                            vals_gantt['duration'] = (vals_gantt['end_date'] - vals_gantt['start_date']).days + 1
                             self.env["gantt.resource.planning"].create(vals_gantt)
             
             return result
@@ -130,13 +132,15 @@ class EstimationResourcePlan(models.Model):
                                 for i in vals:
                                     vals_gantt['value_man_month'] = vals[i]
                                     
-                                yy_start =  22  #take the last 2 numbers of the year
+                                yy_start =  int(str(rec.create_date.year)[-2:])   #take the last 2 numbers of the year
                                 result_day = EstimationResourcePlan.compute_date_time(vals_gantt['value_man_month'], yy_start)
                                 for days in result_day:
                                     if days == 'start_date': 
                                         vals_gantt['start_date'] = result_day['start_date']
                                     else:
                                         vals_gantt['end_date'] = result_day['end_date']
+                               
+                                vals_gantt['duration'] = (vals_gantt['end_date'] - vals_gantt['start_date']).days + 1
                                 GanttResourcePlanning.write(gantt_item, vals_gantt)
                                 break
                     
@@ -252,9 +256,8 @@ class GanttResourcePlanning(models.Model):
     start_date = fields.Date(string="Start date")
     end_date = fields.Date(string="End date")
     value_man_month = fields.Float(string="Total (MM)")
-    planned_duration = fields.Integer(string="Duration", default= 100)
-    links_serialized_json = fields.Char(string="json", default="[]")
-
+    progress = fields.Integer(string="Progress", default= 100)
+    duration = fields.Integer(string="Duration")
 
 class EstimationResourcePlanningData(models.Model):
     _name = "estimation.resource.planning.data"
@@ -264,7 +267,7 @@ class EstimationResourcePlanningData(models.Model):
     sequence = fields.Integer(string="No")
     name= fields.Char(string="Components")    
     design_effort = fields.Float(string="Design")
-    dev_effort = fields.Float(string="Dev")
+    dev_effort = fields.Float(string="Developer")
     tester_effort = fields.Float(string="Tester")
     comtor_effort = fields.Float(string="Comtor")
     brse_effort = fields.Float(string="Brse")

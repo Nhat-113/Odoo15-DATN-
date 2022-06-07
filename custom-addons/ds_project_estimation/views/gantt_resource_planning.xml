@@ -1,49 +1,23 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
 
-    <!-- <record id="view_gantt_resource_planning_timeline" model="ir.ui.view">
+    <record id="view_gantt_resource_planning_rs_plan_gantt" model="ir.ui.view">
         <field name="model">gantt.resource.planning</field>
-        <field name="type">dhx_gantt</field>
+        <field name="type">rs_plan_gantt</field>
         <field name="arch" type="xml">
-            <dhx_gantt text="value_man_month" 
-                        date_start="start_date" 
-                        duration="planned_duration" 
-                        links_serialized_json="links_serialized_json" 
-                        date_deadline="end_date" 
-            />
-        </field>
-    </record> -->
-    <record id="view_gantt_resource_planning_tree" model="ir.ui.view">
-        <field name="name">gantt.resource.planning.tree</field>
-        <field name="model">gantt.resource.planning</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="estimation_id"/>
-                <field name="job_position_id"/>
-                <field name="start_date"/>
-                <field name="end_date"/>
-                <field name="value_man_month"/>
-                <!-- <field name="links_serialized_json"/>
-                <field name="planned_duration"/> -->
-            </tree>
+            <rs_plan_gantt id_field="id" text="job_position_id" date_start="start_date" 
+                    duration="duration"
+                    progress="progress" 
+                    user_ids = "value_man_month"
+                />
         </field>
     </record>
+
     <record id="action_view_gantt_resource_plan" model="ir.actions.act_window">
         <field name="name">Gantt Resource Planning</field>
         <field name="res_model">gantt.resource.planning</field>
         <field name="context">{}</field>
         <field name="domain">[('estimation_id', '=', active_id)]</field>
-        <field name="view_mode">tree</field>
-    </record>
-
-    <record id="gantt_resource_planning_disable_create_btn" model="ir.ui.view">
-        <field name="name">gantt.resource.planning.inherit</field>
-        <field name="model">gantt.resource.planning</field>
-        <field name="inherit_id" ref="ds_project_estimation.view_gantt_resource_planning_tree"/>
-        <field name="arch" type="xml">
-            <xpath expr="//tree" position="attributes">
-                <attribute name="create">false</attribute>
-            </xpath>
-        </field>
+        <field name="view_mode">rs_plan_gantt</field>
     </record>
 </odoo>
