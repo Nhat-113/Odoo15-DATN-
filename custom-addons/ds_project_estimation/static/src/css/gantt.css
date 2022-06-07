@@ -76,28 +76,9 @@
 .headerColor{
     color: #71639e!important;
 }
-.gantt-dropdown{
-    position:absolute;
-    top:0;
-    right:0;
-    width: 20px;
-    height:100%;
-    z-index:2;
-    border-left:1px solid #cecece
-  
-  }
-  
-  .gantt-dropdown:hover{
-    background: rgba(0,0,0, 0.1);
-  }
-  
-  #gantt_dropdown {
-    position: absolute;
-    display: none;
-    border: 1px solid #cecece;
-    background: #fff;
-    padding: 10px;
-    top: 92.813px !important;
-    left: 466px !important;
-    z-index: 10000;
+.gantt_link_control.task_right.task_end_date, .gantt_link_control.task_left.task_start_date {
+    display: none !important;
+}
+.gantt_link_point {
+    pointer-events: none !important;
 }
