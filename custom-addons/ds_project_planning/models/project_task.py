@@ -86,7 +86,7 @@ class ProjectTask(models.Model):
     @api.onchange('planned_duration', 'date_start')
     def _inverse_planned_duration(self):
         for r in self:
-            if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', True):
+            if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', False):
                 r.date_end = r.date_start + timedelta(days=r.planned_duration)
 
     @api.depends('dependency_task_ids')
