@@ -70,6 +70,10 @@ class Estimation(models.Model):
         vals_over["connect_overview"] = est_current_id.id
         vals_over["description"] = 'Create New Estimation'
         self.env["estimation.overview"].create(vals_over)
+        active_id = self._context.get('active_id')
+        if active_id:
+            estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
+            estimation_lead.estimation_count += 1
         return result
 
     # Automatically load 12 activities and module summary data when creating an estimation
