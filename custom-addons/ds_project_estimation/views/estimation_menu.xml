@@ -91,19 +91,6 @@
     action="action_data_project_type"
     />
 
-    <!-- Action to open Description -->
-    <record id="action_config_description" model="ir.actions.act_window">
-        <field name="name">Description</field>
-        <field name="res_model">config.description</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
-    <menuitem id="menu_config_description"
-    name="Description"
-    parent="menu_config"
-    action="action_config_description"
-    />
-
     <!-- Action to open Currency Rate -->
     <record id="action_config_currency_rate" model="ir.actions.act_window">
         <field name="name">Currency Rate</field>
