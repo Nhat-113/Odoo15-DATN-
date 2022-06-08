@@ -191,7 +191,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                 ],
             };
             gantt.ext.zoom.init(zoomConfig);
-            gantt.ext.zoom.setLevel("week");
+            gantt.ext.zoom.setLevel("month");
         },
        
         _onClickZoomIn: function() {
