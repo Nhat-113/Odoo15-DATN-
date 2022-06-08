@@ -1,6 +1,8 @@
 from odoo import models, fields, api, _
 import json
 
+from odoo.exceptions import UserError
+
 
 class Estimation(models.Model):
     """
@@ -324,6 +326,8 @@ class Estimation(models.Model):
 
     def action_generate_project(self):
         for estimation in self:
+            if not estimation.estimator_ids:
+               raise UserError('Please select an estimator before generating project.')
             project = self.env['project.project'].sudo().create({
                 'name': estimation.project_name,
                 'user_id':estimation.estimator_ids.id
