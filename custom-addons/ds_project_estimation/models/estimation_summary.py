@@ -78,36 +78,41 @@ class EstimationSummaryTotalCost(models.Model):
 
     @api.depends('connect_summary.total_manday')
     def _compute_total_effort(self):
+        check_connect_summary = True
         if self.connect_summary.id:
             connect_summary = self.connect_summary.id
         elif self.connect_summary._origin.id:
             connect_summary = self.connect_summary._origin.id
+        else:
+            check_connect_summary = False
 
-        total_cost = self.env['estimation.summary.totalcost'].search([('id', '=', connect_summary)])
+        if check_connect_summary:
+            total_cost = self.env['estimation.summary.totalcost'].search([('id', '=', connect_summary)])
+            for item in total_cost:
+                self.total_effort = item.design_effort + item.dev_effort + item.tester_effort + item.comtor_effort + \
+                                    item.pm_effort + item.brse_effort
 
-        for item in total_cost:
-            self.total_effort = item.design_effort + item.dev_effort + item.tester_effort + item.comtor_effort + \
-                                item.pm_effort + item.brse_effort
+                cost_designer = item.design_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Designer'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
 
-            cost_designer = item.design_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Designer'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
+                cost_dev = item.dev_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Developer'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
 
-            cost_dev = item.dev_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Developer'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
+                cost_tester = item.tester_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Tester'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
 
-            cost_tester = item.tester_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Tester'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
+                cost_comtor = item.comtor_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Comtor'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
 
-            cost_comtor = item.comtor_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Comtor'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
+                cost_brse = item.brse_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Brse'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
 
-            cost_brse = item.brse_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Brse'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
+                cost_pm = item.pm_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Project manager'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
 
-            cost_pm = item.pm_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Project manager'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
-
-            item.cost = cost_designer + cost_dev + cost_tester + cost_comtor + cost_brse + cost_pm
+                item.cost = cost_designer + cost_dev + cost_tester + cost_comtor + cost_brse + cost_pm
+        else:
+            self.cost = self.total_effort = 0
 
 
 class EstimationSummaryCostRate(models.Model):
