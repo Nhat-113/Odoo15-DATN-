@@ -60,11 +60,7 @@ class Estimation(models.Model):
     @api.depends('currency_id')
     def _compute_currency_id_domain(self):
         currency_name = ['VND', 'USD', 'JPY']
-        currency = self.env['estimation.currency'].search([('name', 'in', currency_name)])
-        currency_ids = []
-        for item in currency:
-            currency_ids.append(item.id)
-
+        currency_ids = self.env['estimation.currency'].search([('name', 'in', currency_name)]).ids
         self.currency_id_domain = json.dumps(
                 [('id', 'in', currency_ids)]
             )
