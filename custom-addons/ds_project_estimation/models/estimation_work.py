@@ -20,15 +20,16 @@ class Estimation(models.Model):
     customer_ids = fields.Many2one("res.partner", string="Customer", required=True)
     currency_id = fields.Many2one("estimation.currency", string="Currency", required=True)
     currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
+    summary_currency_id = fields.Integer("Summarry Currency id", compute='_compute_summary_currency')
 
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
 
     expected_revenue = fields.Float(string="Expected Revenue")
-    total_cost = fields.Float(string="Total Cost", compute='_compute_total_cost')
+    total_cost = fields.Float(string="Total Cost", ) # compute='_compute_total_cost'
     total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays")
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
-    project_code = fields.Char(string="Project Code", required=True)
+    project_code = fields.Char(string="Project Code", required=True,)
     description = fields.Text(string="Description", help="Description estimation")
     stage = fields.Selection([("new","New"), 
                               ("created","Created"),
@@ -49,15 +50,19 @@ class Estimation(models.Model):
     add_lines_module_summary = fields.One2many('estimation.module.summary', 'estimation_id', string='Module Summary')
     add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Activity")
     add_lines_module_effort_distribute_activity = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
-    check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
+    check_generate_project = fields.Boolean(default=False, compute='action_generate_project', store=True)
+
+    @api.depends('currency_id')
+    def _compute_summary_currency(self):
+        self.summary_currency_id = self.currency_id
+        summary_cost_rate = self.env['estimation.summary.costrate'].search([('connect_summary_costrate', '=', self.ids)])
+        for item in summary_cost_rate:
+            item.currency_ids = self.summary_currency_id
 
     @api.depends('currency_id')
     def _compute_currency_id_domain(self):
-        currencies = self.env['estimation.exchange.rate'].search([])
-        currency_ids = []
-        for currency in currencies:
-            currency_ids.append(currency.currency_id.id)
-
+        currency_name = ['VND', 'USD', 'JPY']
+        currency_ids = self.env['estimation.currency'].search([('name', 'in', currency_name)]).ids
         self.currency_id_domain = json.dumps(
                 [('id', 'in', currency_ids)]
             )
@@ -114,13 +119,15 @@ class Estimation(models.Model):
         summary_total_cost_line.append(line)
 
         for re in get_data_cost_rate:
+            cost_rate = self.env['cost.rate'].search([('job_type', '=', re.job_position)])
+            role_default = cost_rate[0]
             content = {
                 'sequence': re.sequence,
                 'types': re.job_position,
-                'role': '',
+                'role': role_default,
                 'yen_month': 0.0,
                 'yen_day': 0.0,
-                'vnd_day': 0.0
+
             }
             line = (0, 0, content)
             cost_rate_line.append(line)
@@ -320,9 +327,10 @@ class Estimation(models.Model):
         value = dict(zip(vals_key, vals_values))
         return value
 
-    def _compute_total_cost(self):
-        for item in self:
-            item.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', item.id)]).cost
+    # @api.depends('currency_id')
+    # def _compute_total_cost(self):
+    #     for item in self:
+    #         item.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', item.id)]).cost
 
     def action_generate_project(self):
         for estimation in self:
