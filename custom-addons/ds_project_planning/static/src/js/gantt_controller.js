@@ -105,7 +105,37 @@ var GanttController = AbstractController.extend({
             // console.log(data);
             return true;
         });
+        dp.attachEvent("onBeforeDataSending", function(id, state, data){
+            let date_start_convert = data.start_date.split('-');
+            date_start_convert.splice(0, 2, date_start_convert[1], date_start_convert[0]);
+            date_start_convert.join('-');
 
+            console.log('start', data.start_date);
+            console.log('date_start_convert af', date_start_convert);
+            let date_start = new Date(date_start_convert);
+            var datestring =
+              ("0" + (date_start.getDate() + 1)).slice(-2) +
+              "-" +
+              ("0" + (date_start.getMonth() + 1)).slice(-2) +
+              "-" +
+              date_start.getFullYear() +
+              " " +
+              ("0" + date_start.getHours()).slice(-2) +
+              ":" +
+              ("0" + date_start.getMinutes()).slice(-2);
+
+            data.start_date = datestring;
+            // console.log('data after ');
+            // console.log(data);
+            return true;
+        });
+        gantt.attachEvent("onTaskLoading", function(task) {
+            //console.log(`task`, task);
+            // if (task.custom_date) 
+            task.start_date = gantt.date.convert_to_utc(task.start_date);
+            task.end_date = gantt.date.convert_to_utc(task.end_date);
+            return true;
+        });
          //deny drag for director
         // session.user_has_group("project.group_project_manager").then(function(has_group) {
         //     console.log("a", has_group);

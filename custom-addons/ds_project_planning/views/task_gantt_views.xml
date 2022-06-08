@@ -12,6 +12,7 @@
                             <field name="date_start"/>
                             <field name="date_end" string="End date"/>
                             <field name="working_day"/>
+                            <field name="planned_duration"/>
                         </group>
                         <separator string="Predecessors"/>
                         <field name="dependency_task_ids">

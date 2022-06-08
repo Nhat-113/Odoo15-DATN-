@@ -418,7 +418,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.setWorkTime({ day: 5, hours: true });
       gantt.setWorkTime({ day: 6, hours: true });
       gantt.setWorkTime({ day: 0, hours: true });
-      gantt.setWorkTime({ hours: [0, 23] });
+      //gantt.setWorkTime({ hours: [0, 23] });
 
       var zoomConfig = {
         levels: [

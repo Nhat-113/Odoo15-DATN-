@@ -106,3 +106,10 @@
     text-align: center;
     font-weight: 100 !important;
 }
+.gantt_side_content {
+    margin-left: 4.5px;
+    width: 143px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
