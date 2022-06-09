@@ -1,5 +1,5 @@
 <odoo>
-    <menuitem id="ramp_up_menu" name="Resource Management" groups="ds_project_planning.group_project_pm,project.group_project_manager"/>
+    <menuitem id="ramp_up_menu" name="Management" groups="ds_project_planning.group_project_pm,project.group_project_manager"/>
 
     <record id="open_view_ramp_up_all" model="ir.actions.act_window">
         <field name="name">Resource Management</field>
@@ -22,6 +22,6 @@
         </field>
     </record>
 
-    <menuitem id="ramp_up_menu_child" name="Details" parent="ramp_up_menu" action="open_view_ramp_up_all" sequence="2" />
+    <menuitem id="ramp_up_menu_child" name="Details" parent="menu_ramp_up_report" action="open_view_ramp_up_all" sequence="1" />
 
 </odoo>
