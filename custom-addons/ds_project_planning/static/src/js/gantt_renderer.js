@@ -326,6 +326,14 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         duration:true,
         assignees:true,
       })
+      var gridDateToStr = gantt.date.date_to_str("%Y-%m-%d");
+      gantt.templates.grid_date_format = function(date, column){
+          if(column === "end_date"){
+              return gridDateToStr(new Date(date.valueOf() - 1)); 
+          }else{
+              return gridDateToStr(date); 
+          }
+      }
 
       gantt.templates.task_class = function (start, end, task) {
         if (task.type == "phase") {

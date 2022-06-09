@@ -91,7 +91,7 @@ var GanttController = AbstractController.extend({
             // console.log('BeforeUpdate. YAY!');
             data.csrf_token = core.csrf_token;
             data.model_name = self.modelName;
-            data.timezone_offset = (-self.date_object.getTimezoneOffset());
+            //data.timezone_offset = (-self.date_object.getTimezoneOffset());
             data.map_text = self.map_text;
             data.map_text = self.map_text;
             data.map_id_field = self.map_id_field;
@@ -162,7 +162,7 @@ var GanttController = AbstractController.extend({
                 var taskObj = gantt.getTask(id);
 
                 if (has_group || taskObj.type == "phase") {
-                    console.log(`taskObj.type`, taskObj.type);
+                    // console.log(`taskObj.type`, taskObj.type);
                   return false;
                 }
                 return true;
