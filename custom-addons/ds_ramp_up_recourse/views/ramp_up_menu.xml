@@ -1,8 +1,8 @@
 <odoo>
-    <menuitem id="ramp_up_menu" name="Ramp Up Resource" groups="ds_project_planning.group_project_pm,project.group_project_manager"/>
+    <menuitem id="ramp_up_menu" name="Resource Management" groups="ds_project_planning.group_project_pm,project.group_project_manager"/>
 
     <record id="open_view_ramp_up_all" model="ir.actions.act_window">
-        <field name="name">Ramp Up Resource</field>
+        <field name="name">Resource Management</field>
         <field name="res_model">hr.employee</field>
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
@@ -11,16 +11,17 @@
                          ]"/>
         <!-- <field name="search_view_id" ref="project.view_project_project_filter"/> -->
         <field name="target">main</field>
+        <field name="search_view_id" ref="ramp_up_detail_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                     No ramp up found. Let's create one!
             </p>
             <p>
-                    Ramp Up regroup tasks on the same topic, and each has its dashboard.
+                    Resource Management regroup tasks on the same topic, and each has its dashboard.
             </p>
         </field>
     </record>
 
-    <menuitem id="ramp_up_menu_child" name="Ramp Up Resource" parent="ramp_up_menu" action="open_view_ramp_up_all" sequence="1" />
+    <menuitem id="ramp_up_menu_child" name="Details" parent="ramp_up_menu" action="open_view_ramp_up_all" sequence="2" />
 
 </odoo>
