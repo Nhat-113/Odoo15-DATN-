@@ -152,16 +152,16 @@
     </record>
 
     <record id="view_tree_calendar_effort" model="ir.ui.view">
-        <field name="name">Calendar Resource</field>
+        <field name="name">Booking Resource</field>
         <field name="model">planning.calendar.resource</field>
         <field name="arch" type="xml">
-            <tree string="Calendar Resource Effort" decoration-warning="inactive == True" create="0" delete="0" multi_edit="1" sample="1">
+            <tree string="Booking Resource Effort" decoration-warning="inactive == True" create="0" delete="0" multi_edit="1" sample="1">
                 <field name="project_id" />
                 <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
                 <field name="start_date" />
                 <field name="end_date" />
                 <field name="duration" string="Duration (days)"/>
-                <field name="calendar_effort" digits="[12,1]" string="Calendar Effort (MM)"/>
+                <field name="calendar_effort" digits="[12,1]" string="Booking Effort (MM)"/>
                 <field name="effort_rate" digits="[12,1]" string="Effort Rate (%)"/>
                 <field name="member_type" string="Member Type"/>
                 <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
@@ -173,7 +173,7 @@
     </record>
 
     <record id="view_form_calendar_effort" model="ir.ui.view">
-        <field name="name">Calendar Resource Effort Form</field>
+        <field name="name">Booking Resource Effort Form</field>
         <field name="model">planning.calendar.resource</field>
         <field name="arch" type="xml">
             <form>
@@ -212,7 +212,7 @@
 
     <!-- Action to open the Calendar Effort list -->
     <record id="action_calendar_effort" model="ir.actions.act_window">
-        <field name="name">Calendar Resource Effort</field>
+        <field name="name">Booking Resource Effort</field>
         <field name="res_model">planning.calendar.resource</field>
         <field name="domain">[('project_id', '=', active_id)]</field>
         <field name="view_mode">tree,form</field>
@@ -329,11 +329,11 @@
     </record>
 
     <record id="view_form_calendar_resource" model="ir.ui.view">
-        <field name="name">Calendar Resource Form</field>
+        <field name="name">Booking Resource Form</field>
         <field name="model">project.project</field>
         <field name="priority">999</field>
         <field name="arch" type="xml">
-            <form string="Calendar Resources" class="o_form_project_project" edit="1" delete="0" create="0">
+            <form string="Booking Resources" class="o_form_project_project" edit="1" delete="0" create="0">
                 <sheet>
                     <div class="oe_button_box" name="button_box" groups="base.group_user">
                         <button name="%(ds_project_planning.project_planning_phase)d" class="oe_stat_button" style="width: 13.5%" type="action" icon="fa-check-square-o">
@@ -366,7 +366,7 @@
  MM
                                 </span>
                                 <span class="o_stat_text">
-                                    Calendar Effort
+                                    Booking Effort
                                 </span>
                             </div>
                         </button>
@@ -409,14 +409,14 @@
                     <label for="member_ids" style="min-width: 150px"/>
                     <field name="member_ids" widget="many2many_avatar_user" readonly="1" force_save="1"/>
                     <notebook>
-                        <page string="Calendar Resources">
+                        <page string="Booking Resources">
                             <field name="planning_calendar_resources" colspan="4" nolabel="1">
                                 <tree string="Assign Members" decoration-warning="inactive == True">
                                     <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
                                     <field name="start_date" />
                                     <field name="end_date" />
                                     <field name="duration" string="Duration (days)"/>
-                                    <field name="calendar_effort" digits="[12,1]" string="Calendar Effort (MM)"/>
+                                    <field name="calendar_effort" digits="[12,1]" string="Booking Effort (MM)"/>
                                     <field name="member_type" string="Member Type"/>
                                     <field name="effort_rate" digits="[12,1]" string="Effort Rate (%)"/>
                                     <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
@@ -470,7 +470,7 @@
     </record>
 
     <record id="view_tree_calendar_resource" model="ir.ui.view">
-        <field name="name">Calendar Resource List</field>
+        <field name="name">Booking Resource List</field>
         <field name="model">project.project</field>
         <field name="arch" type="xml">
             <tree decoration-muted="active == False" string="Projects" create="0" delete="0" multi_edit="1" sample="1">
@@ -484,7 +484,7 @@
                 <field name="analytic_account_id" optional="hide" groups="analytic.group_analytic_accounting"/>
                 <field name="date_start" string="Start Date" widget="daterange" options="{'related_end_date': 'date'}"/>
                 <field name="date" string="End Date" widget="daterange" options="{'related_start_date': 'date_start'}"/>
-                <field name="total_calendar_effort" string="Calendar Effort (MM)"/>
+                <field name="total_calendar_effort" string="Booking Effort (MM)"/>
                 <field name="total_estimate_effort" string="Estimate Effort (MM)"/>
                 <field name="user_id" optional="show" string="Project Manager" widget="many2one_avatar_user" options="{'no_open':True, 'no_create': True, 'no_create_edit': True}"/>
                 <field name="last_update_color" invisible="1"/>
@@ -497,7 +497,7 @@
 
     <!-- Action to open the Calendar Resource list -->
     <record id="action_calendar_resource" model="ir.actions.act_window">
-        <field name="name">Calendar Resource</field>
+        <field name="name">Booking Resource</field>
         <field name="res_model">project.project</field>
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="view_project_calendar_resource_search_form"/>
@@ -507,7 +507,7 @@
                          ]"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                    No projects found. Let's create one to add calendar resources!
+                    No projects found. Let's create one to add booking resources!
             </p>
             <p>
                     Projects regroup tasks on the same topic, and each has its dashboard.

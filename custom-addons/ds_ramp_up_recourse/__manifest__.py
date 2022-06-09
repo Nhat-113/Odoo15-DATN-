@@ -1,5 +1,5 @@
 {
-    'name': "Ramp Up Resource",
+    'name': "Resource Management",
     'version': '15.0.1.0.0',
     'summary': """""",
     'description': """""",
@@ -17,7 +17,8 @@
         'views/ramp_up.xml',
         'views/ramp_up_menu.xml',
         'views/report_rampup_recourse_view.xml',
-        'data/ramp_up_cron.xml'
+        'data/ramp_up_cron.xml',
+        'report/ramp_up_project.xml'
     ],
     'assets': {
         'web.assets_backend': [
