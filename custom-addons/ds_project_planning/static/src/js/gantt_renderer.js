@@ -164,7 +164,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           name: "start_date",
           align: "center",
           resize: true,
-          editor: startDateEditor,
+          // editor: startDateEditor,
           width: 120,
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
@@ -178,7 +178,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           label: "End time",
           align: "center",
           resize: true,
-          editor: endDateEditor,
+          // editor: endDateEditor,
           width: 120,
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
@@ -266,7 +266,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           align: "center",
           label: "Start Time",
           resize: true,
-          editor: startDateEditor,
+          //editor: startDateEditor,
           width: 120,
         },
         {
@@ -274,7 +274,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           label: "End time",
           align: "center",
           resize: true,
-          editor: endDateEditor,
+          //editor: endDateEditor,
           width: 120,
         },
         
