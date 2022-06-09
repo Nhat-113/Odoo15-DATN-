@@ -35,11 +35,4 @@
         <field name="search_view_id" ref="ramp_up_view_search"/>
         <field name="context">{'group_by': ['employee_id']}</field>
     </record>
-
-    <menuitem
-        id="menu_ramp_up_report"
-        name="Resource Management"
-        sequence="1"
-        parent="ds_ramp_up_recourse.ramp_up_menu"
-        action="ramp_up_report_action"/>
 </odoo>

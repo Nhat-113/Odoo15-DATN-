@@ -22,6 +22,13 @@
         </field>
     </record>
 
-    <menuitem id="ramp_up_menu_child" name="Details" parent="menu_ramp_up_report" action="open_view_ramp_up_all" sequence="1" />
+    <menuitem
+        id="menu_ramp_up_report"
+        name="Resource Management"
+        sequence="1"
+        parent="ds_ramp_up_recourse.ramp_up_menu"
+        action="ramp_up_report_action"/>
 
+    <menuitem id="ramp_up_menu_child" name="Details" parent="menu_ramp_up_report" action="open_view_ramp_up_all" sequence="1" />
+    
 </odoo>

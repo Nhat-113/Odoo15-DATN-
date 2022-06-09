@@ -12,9 +12,9 @@ class RampUp(models.Model):
 
     effort_rate_related = fields.Float(
         related='planning_calendar_resources.effort_rate')
-    start_date = fields.Date(
+    start_date_planning = fields.Date(
         related='planning_calendar_resources.start_date', store=True)
-    end_date = fields.Date(
+    end_date_planning = fields.Date(
         related='planning_calendar_resources.end_date', store=True)
     total_effort_rate = fields.Float(
         string='Total Effort Rate (%)', compute='get_effort_rate_total', store=True)

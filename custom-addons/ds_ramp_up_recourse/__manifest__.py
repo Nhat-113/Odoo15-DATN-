@@ -15,10 +15,10 @@
     },
     'data': [
         'views/ramp_up.xml',
+        'report/ramp_up_project.xml',
         'views/ramp_up_menu.xml',
         'views/report_rampup_recourse_view.xml',
-        'data/ramp_up_cron.xml',
-        'report/ramp_up_project.xml'
+        'data/ramp_up_cron.xml'
     ],
     'assets': {
         'web.assets_backend': [
