@@ -25,10 +25,23 @@ class EstimationSummaryTotalCost(models.Model):
     total_effort = fields.Float(string="Total Effort (MD)", readonly=True, compute='_compute_total_effort', store=True)
     cost = fields.Float(string="Cost", readonly=True, store=True, compute='_compute_total_effort')
 
-    @api.depends('estimation_id')
+    @api.depends('connect_summary.total_manday')
     def _compute_effort(self):
         for item in self:
-            estimation_id = item.connect_summary.id
+            if item.connect_summary.id:
+                estimation_id = item.connect_summary.id
+            elif item.connect_summary._origin.id:
+                estimation_id = item.connect_summary._origin.id
+            else:
+                design_total = 0.0
+                dev_total = 0.0
+                tester_total = 0.0
+                comtor_total = 0.0
+                pm_total = 0.0
+                brse_total = 0.0
+                self.design_effort = self.dev_effort = self.tester_effort = self.comtor_effort = self.pm_effort = self.brse_effort = 0.0
+                break
+
             activities = item.env['module.effort.activity'].search([('estimation_id', '=', estimation_id)])
             design_total = 0.0
             dev_total = 0.0
@@ -37,24 +50,24 @@ class EstimationSummaryTotalCost(models.Model):
             pm_total = 0.0
             brse_total = 0.0
 
-        for activity in activities:
-            breakdown_activity = self.env['module.breakdown.activity'].search(
-                [('activity_id', '=', activity.activity_id.id)])
-            for item in breakdown_activity:
-                if item.job_pos.job_position == 'Designer':
-                    design_total += item.mandays
-                elif item.job_pos.job_position == 'Developer':
-                    dev_total += item.mandays
-                elif item.job_pos.job_position == 'Tester':
-                    tester_total += item.mandays
-                elif item.job_pos.job_position == 'Comtor':
-                    comtor_total += item.mandays
-                elif item.job_pos.job_position == 'Brse':
-                    brse_total += item.mandays
-                elif item.job_pos.job_position == 'Project manager':
-                    pm_total += item.mandays
-                else:
-                    continue
+            for activity in activities:
+                breakdown_activity = self.env['module.breakdown.activity'].search(
+                    [('activity_id', '=', activity.activity_id.id)])
+                for item in breakdown_activity:
+                    if item.job_pos.job_position == 'Designer':
+                        design_total += item.mandays
+                    elif item.job_pos.job_position == 'Developer':
+                        dev_total += item.mandays
+                    elif item.job_pos.job_position == 'Tester':
+                        tester_total += item.mandays
+                    elif item.job_pos.job_position == 'Comtor':
+                        comtor_total += item.mandays
+                    elif item.job_pos.job_position == 'Brse':
+                        brse_total += item.mandays
+                    elif item.job_pos.job_position == 'Project manager':
+                        pm_total += item.mandays
+                    else:
+                        continue
 
         self.design_effort = design_total
         self.dev_effort = dev_total
@@ -63,32 +76,43 @@ class EstimationSummaryTotalCost(models.Model):
         self.pm_effort = pm_total
         self.brse_effort = brse_total
 
-    @api.depends('connect_summary.currency_id')
+    @api.depends('connect_summary.total_manday')
     def _compute_total_effort(self):
-        for item in self:
-            item.total_effort = item.design_effort + item.dev_effort + item.tester_effort + item.comtor_effort + \
-                                item.pm_effort + item.brse_effort
-            connect_summary = item.connect_summary.ids
+        check_connect_summary = True
+        if self.connect_summary.id:
+            connect_summary = self.connect_summary.id
+        elif self.connect_summary._origin.id:
+            connect_summary = self.connect_summary._origin.id
+        else:
+            check_connect_summary = False
 
-            cost_designer = item.design_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Designer'), ('connect_summary_costrate', 'in', connect_summary)]).yen_month
+        if check_connect_summary:
+            total_cost = self.env['estimation.summary.totalcost'].search([('id', '=', connect_summary)])
+            for item in total_cost:
+                self.total_effort = item.design_effort + item.dev_effort + item.tester_effort + item.comtor_effort + \
+                                    item.pm_effort + item.brse_effort
 
-            cost_dev = item.dev_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Developer'), ('connect_summary_costrate', 'in', connect_summary)]).yen_month
+                cost_designer = item.design_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Designer'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
 
-            cost_tester = item.tester_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Tester'), ('connect_summary_costrate', 'in', connect_summary)]).yen_month
+                cost_dev = item.dev_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Developer'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
 
-            cost_comtor = item.comtor_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Comtor'), ('connect_summary_costrate', 'in', connect_summary)]).yen_month
+                cost_tester = item.tester_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Tester'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
 
-            cost_brse = item.brse_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Brse'), ('connect_summary_costrate', 'in', connect_summary)]).yen_month
+                cost_comtor = item.comtor_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Comtor'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
 
-            cost_pm = item.pm_effort * self.env['estimation.summary.costrate'].search(
-                [('types', '=', 'Project manager'), ('connect_summary_costrate', 'in', connect_summary)]).yen_month
+                cost_brse = item.brse_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Brse'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
 
-            item.cost = cost_designer + cost_dev + cost_tester + cost_comtor + cost_brse + cost_pm
+                cost_pm = item.pm_effort * self.env['estimation.summary.costrate'].search(
+                    [('types', '=', 'Project manager'), ('connect_summary_costrate', '=', connect_summary)]).yen_month
+
+                item.cost = cost_designer + cost_dev + cost_tester + cost_comtor + cost_brse + cost_pm
+        else:
+            self.cost = self.total_effort = 0
 
 
 class EstimationSummaryCostRate(models.Model):

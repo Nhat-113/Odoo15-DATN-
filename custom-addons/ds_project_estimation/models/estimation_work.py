@@ -18,7 +18,7 @@ class Estimation(models.Model):
     estimator_ids = fields.Many2one('res.users', string='Estimator')
     reviewer_ids = fields.Many2one('res.users', string='Reviewer')
     customer_ids = fields.Many2one("res.partner", string="Customer", required=True)
-    currency_id = fields.Many2one("estimation.currency", string="Currency", required=True)
+    currency_id = fields.Many2one("estimation.currency", string="Currency", required=True, default=1)
     currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
     summary_currency_id = fields.Integer("Summarry Currency id", compute='_compute_summary_currency')
 

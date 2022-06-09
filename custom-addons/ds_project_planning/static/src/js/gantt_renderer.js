@@ -164,7 +164,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           name: "start_date",
           align: "center",
           resize: true,
-          editor: startDateEditor,
+          // editor: startDateEditor,
           width: 120,
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
@@ -178,7 +178,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           label: "End time",
           align: "center",
           resize: true,
-          editor: endDateEditor,
+          // editor: endDateEditor,
           width: 120,
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
@@ -266,7 +266,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           align: "center",
           label: "Start Time",
           resize: true,
-          editor: startDateEditor,
+          //editor: startDateEditor,
           width: 120,
         },
         {
@@ -274,7 +274,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           label: "End time",
           align: "center",
           resize: true,
-          editor: endDateEditor,
+          //editor: endDateEditor,
           width: 120,
         },
         
@@ -326,6 +326,14 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         duration:true,
         assignees:true,
       })
+      var gridDateToStr = gantt.date.date_to_str("%Y-%m-%d");
+      gantt.templates.grid_date_format = function(date, column){
+          if(column === "end_date"){
+              return gridDateToStr(new Date(date.valueOf() - 1)); 
+          }else{
+              return gridDateToStr(date); 
+          }
+      }
 
       gantt.templates.task_class = function (start, end, task) {
         if (task.type == "phase") {
@@ -418,7 +426,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.setWorkTime({ day: 5, hours: true });
       gantt.setWorkTime({ day: 6, hours: true });
       gantt.setWorkTime({ day: 0, hours: true });
-      gantt.setWorkTime({ hours: [0, 23] });
+      //gantt.setWorkTime({ hours: [0, 23] });
 
       var zoomConfig = {
         levels: [
