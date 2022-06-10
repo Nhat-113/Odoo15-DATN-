@@ -127,7 +127,7 @@ class EstimationSummaryCostRate(models.Model):
     yen_month = fields.Float(string="Unit (Currency/Month)", store=True, compute='_compute_yen_month', default=0.00)
     yen_day = fields.Float(string="Unit (Currency/Day)", store=True, compute='_compute_yen_month', default=0.00)
 
-    @api.depends('role', 'connect_summary_costrate.currency_id',)
+    @api.depends('role', 'connect_summary_costrate.currency_id', 'role.cost_usd', 'role.cost_yen', 'role.cost_vnd')
     def _compute_yen_month(self):
         if self.connect_summary_costrate.id:
             estimation_id = self.connect_summary_costrate.id
