@@ -9,13 +9,14 @@
     'company': 'Dsoft',
     'maintainer': '',
     'website': "",
-    'depends': ['hr', 'base', 'project', 'ds_project_planning'],
+    'depends': ['hr', 'base', 'project', 'ds_project_planning', 'project_updation'],
     'external_dependencies': {
         'python': ['pandas'],
     },
     'data': [
         'views/ramp_up.xml',
         'report/ramp_up_project.xml',
+        'views/task_score_view.xml',
         'views/ramp_up_menu.xml',
         'views/report_rampup_recourse_view.xml',
         'data/ramp_up_cron.xml'

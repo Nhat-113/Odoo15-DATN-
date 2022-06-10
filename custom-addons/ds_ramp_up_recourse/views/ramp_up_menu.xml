@@ -30,5 +30,7 @@
         action="ramp_up_report_action"/>
 
     <menuitem id="ramp_up_menu_child" name="Details" parent="menu_ramp_up_report" action="open_view_ramp_up_all" sequence="1" />
+    <menuitem id="hr_employee_task_score" name="Task Score" parent="ds_ramp_up_recourse.ramp_up_menu" action="open_view_employee_list_my1" sequence="1"/>
+    <menuitem id="history_task_score" name="History" action="open_view_history" parent="hr_employee_task_score" sequence="1"/>
     
 </odoo>
