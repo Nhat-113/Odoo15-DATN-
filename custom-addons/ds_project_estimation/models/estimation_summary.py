@@ -1,5 +1,3 @@
-from builtins import print
-
 from odoo import models, fields, api
 
 
@@ -133,13 +131,12 @@ class EstimationSummaryCostRate(models.Model):
     def _compute_yen_month(self):
         if self.connect_summary_costrate.id:
             estimation_id = self.connect_summary_costrate.id
-        elif self.connect_summary_costrate.id.origin:
+        elif self.connect_summary_costrate._origin.id:
             estimation_id = self.connect_summary_costrate.id.origin
         else:
             estimation_id = None
 
-        print(estimation_id, '============')
-        summary_total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', estimation_id)])
+        summary_total_costs = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', estimation_id)])
         total = 0
         for item in self:
             cost_rate = self.env['cost.rate'].search([('id', '=', item.role.id)])
@@ -168,17 +165,18 @@ class EstimationSummaryCostRate(models.Model):
                 item.yen_month = cost_rate.cost_yen
                 item.yen_day = cost_rate.cost_yen / 20
 
-            if item.types == 'Developer':
-                total += item.yen_month * summary_total_cost.dev_effort
-            elif item.types == 'Designer':
-                total += item.yen_month * summary_total_cost.design_effort
-            elif item.types == 'Tester':
-                total += item.yen_month * summary_total_cost.tester_effort
-            elif item.types == 'Comtor':
-                total += item.yen_month * summary_total_cost.comtor_effort
-            elif item.types == 'Brse':
-                total += item.yen_month * summary_total_cost.brse_effort
-            elif item.types == 'Project manager':
-                total += item.yen_month * summary_total_cost.pm_effort
+            for summary_total_cost in summary_total_costs:
+                if item.types == 'Developer':
+                    total += item.yen_month * summary_total_cost.dev_effort
+                elif item.types == 'Designer':
+                    total += item.yen_month * summary_total_cost.design_effort
+                elif item.types == 'Tester':
+                    total += item.yen_month * summary_total_cost.tester_effort
+                elif item.types == 'Comtor':
+                    total += item.yen_month * summary_total_cost.comtor_effort
+                elif item.types == 'Brse':
+                    total += item.yen_month * summary_total_cost.brse_effort
+                elif item.types == 'Project manager':
+                    total += item.yen_month * summary_total_cost.pm_effort
 
         summary_total_cost.cost = total
