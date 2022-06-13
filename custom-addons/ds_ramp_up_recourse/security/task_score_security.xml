@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_resource_management" model="ir.module.category">
+        <field name="name">Task Score</field>
+        <field name="description">Helps you manage your task score employee.</field>
+        <field name="sequence">9</field>
+    </record>
+
+    <record id="group_task_score_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="category_id" ref="module_category_resource_management"/>
+    </record>
+
+    <record id="group_task_score_pm" model="res.groups">
+        <field name="name">Officer (PM)</field>
+        <field name="category_id" ref="module_category_resource_management"/>
+        <field name="implied_ids" eval="[(4, ref('group_task_score_user'))]"/>
+    </record>
+
+    <record id="group_task_score_admin" model="res.groups">
+        <field name="name">Director</field>
+        <field name="implied_ids" eval="[(4, ref('group_task_score_user')), (4, ref('group_task_score_pm'))]"/>
+        <field name="category_id" ref="module_category_resource_management"/>
+    </record>
+
+
+    <!-- Project User: can see only projects assigned -->
+    <!-- <record model="ir.rule" id="project_project_user_rule">
+        <field name="name">Project: User rule: see only projects assigned</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">[('member_ids', 'in', user.id)]</field>
+        <field name="groups" eval="[(4,ref('project.group_project_user'))]"/>
+    </record> -->
+
+    <!-- Project Director: can see all projects -->
+    <!-- <record model="ir.rule" id="project_project_director_rule">
+        <field name="name">Project: Director rule: see all projects</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_director'))]"/>
+    </record> -->
+
+    <!-- Project Director: can see all tasks -->
+    <!-- <record model="ir.rule" id="project_task_director_rule">
+        <field name="name">Project: Director rule: see all tasks</field>
+        <field name="model_id" ref="model_project_task"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_director'))]"/>
+    </record> -->
+
+    <!-- Project Officer: can see only managed projects for PM and can see all projects assigned -->
+    <!-- <record model="ir.rule" id="project_project_pm_rule">
+        <field name="name">Project: Officer (PM) rule: see only projects assigned</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">['|',('user_id', '=', user.id), ('member_ids', 'in', user.id)]</field>
+        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_pm'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record> -->
+
+</odoo>

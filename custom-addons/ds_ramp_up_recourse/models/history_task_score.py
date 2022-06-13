@@ -8,6 +8,7 @@ class HistoryTaskScore(models.Model):
 
     employee_id = fields.Many2one(
         'hr.employee', string='Employee', readonly=True)
+    id_employee = fields.Integer(related='employee_id.employee_id', store=True)
     name = fields.Char(string='Employee', related='employee_id.name', store=True)
     department = fields.Many2one(related='employee_id.department_id', store=True)
     job = fields.Many2one(related='employee_id.job_id', store=True)
