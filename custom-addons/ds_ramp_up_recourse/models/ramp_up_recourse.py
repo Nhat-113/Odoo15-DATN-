@@ -22,9 +22,9 @@ class RampUp(models.Model):
     total_effort_rate = fields.Float(
         string='Total Effort Rate (%)', compute='get_effort_rate_total', store=True)
     task_score_avg = fields.Float(string='Task Score', digits=(
-        12, 1), compute="_compute_avg_task_score1", default=0)
+        12, 1), compute="_compute_avg_task_score", default=0)
 
-    def _compute_avg_task_score1(self):
+    def _compute_avg_task_score(self):
         for employee in self:
             tasks = self.env['project.task'].search(
                 ['&', '&', '&', '&', ('user_ids', 'in', employee.user_id.id), ('issues_type', '=', 1), 

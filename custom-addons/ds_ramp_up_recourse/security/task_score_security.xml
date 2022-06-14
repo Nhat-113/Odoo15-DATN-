@@ -24,40 +24,52 @@
     </record>
 
 
-    <!-- Project User: can see only projects assigned -->
-    <!-- <record model="ir.rule" id="project_project_user_rule">
-        <field name="name">Project: User rule: see only projects assigned</field>
-        <field name="model_id" ref="model_project_project"/>
-        <field name="domain_force">[('member_ids', 'in', user.id)]</field>
-        <field name="groups" eval="[(4,ref('project.group_project_user'))]"/>
-    </record> -->
+    <!-- Current Task Score PM: Only then can see the employees manage -->
+    <record model="ir.rule" id="current_task_score_pm">
+        <field name="name">Task Score Current PM: Only then can see the employees manage</field>
+        <field name="model_id" ref="model_current_task_score"/>
+        <field name="domain_force">[('parent_id', '=', user.employee_id.id)]</field>
+        <field name="groups" eval="[(4,ref('ds_ramp_up_recourse.group_task_score_pm'))]"/>
+    </record>
 
-    <!-- Project Director: can see all projects -->
-    <!-- <record model="ir.rule" id="project_project_director_rule">
-        <field name="name">Project: Director rule: see all projects</field>
-        <field name="model_id" ref="model_project_project"/>
+    <!-- Current Task Score User: Only then can see self-->
+    <record model="ir.rule" id="current_task_score_user">
+        <field name="name">Current Task Score User: Only then can see self</field>
+        <field name="model_id" ref="model_current_task_score"/>
+        <field name="domain_force">[('id', '=', user.employee_id.id)]</field>
+        <field name="groups" eval="[(4,ref('group_task_score_user'))]"/>
+    </record>
+
+    <!-- Current Task Score Director: can see all -->
+    <record model="ir.rule" id="current_task_score_director">
+        <field name="name">Current Task Score Director: can see all</field>
+        <field name="model_id" ref="model_current_task_score"/>
         <field name="domain_force">[(1, '=', 1)]</field>
-        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_director'))]"/>
-    </record> -->
+        <field name="groups" eval="[(4,ref('group_task_score_admin'))]"/>
+    </record>
 
-    <!-- Project Director: can see all tasks -->
-    <!-- <record model="ir.rule" id="project_task_director_rule">
-        <field name="name">Project: Director rule: see all tasks</field>
-        <field name="model_id" ref="model_project_task"/>
+    <!-- History Task Score PM: Only then can see the employees manage -->
+    <record model="ir.rule" id="history_task_score_pm">
+        <field name="name">Task Score History PM: Only then can see the employees manage</field>
+        <field name="model_id" ref="model_history_task_score"/>
+        <field name="domain_force">[('parent_id', '=', user.employee_id.id)]</field>
+        <field name="groups" eval="[(4,ref('ds_ramp_up_recourse.group_task_score_pm'))]"/>
+    </record>
+
+    <!-- History Task Score User: Only then can see self-->
+    <record model="ir.rule" id="history_task_score_user">
+        <field name="name">History Task Score User: Only then can see self</field>
+        <field name="model_id" ref="model_history_task_score"/>
+        <field name="domain_force">[('employee_id', '=', user.employee_id.id)]</field>
+        <field name="groups" eval="[(4,ref('group_task_score_user'))]"/>
+    </record>
+
+    <!-- History Task Score Director: can see all -->
+    <record model="ir.rule" id="history_task_score_director">
+        <field name="name">History Task Score Director: can see all</field>
+        <field name="model_id" ref="model_history_task_score"/>
         <field name="domain_force">[(1, '=', 1)]</field>
-        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_director'))]"/>
-    </record> -->
-
-    <!-- Project Officer: can see only managed projects for PM and can see all projects assigned -->
-    <!-- <record model="ir.rule" id="project_project_pm_rule">
-        <field name="name">Project: Officer (PM) rule: see only projects assigned</field>
-        <field name="model_id" ref="model_project_project"/>
-        <field name="domain_force">['|',('user_id', '=', user.id), ('member_ids', 'in', user.id)]</field>
-        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_pm'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_unlink" eval="True"/>
-    </record> -->
+        <field name="groups" eval="[(4,ref('group_task_score_admin'))]"/>
+    </record>
 
 </odoo>

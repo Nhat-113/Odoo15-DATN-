@@ -6,14 +6,13 @@ class HistoryTaskScore(models.Model):
     _name = "history.task.score"
     _description = "History Task Score"
 
-    employee_id = fields.Many2one(
-        'hr.employee', string='Employee', readonly=True)
-    id_employee = fields.Integer(related='employee_id.employee_id', store=True)
+    employee_id = fields.Many2one('hr.employee', string="Employee", readonly=True)
     name = fields.Char(string='Employee', related='employee_id.name', store=True)
-    department = fields.Many2one(related='employee_id.department_id', store=True)
-    job = fields.Many2one(related='employee_id.job_id', store=True)
-    year = fields.Integer(string="Year")
-    task_score_avg = fields.Float(string='Task Score')
+    department_id = fields.Many2one('hr.department', string="Department", readonly=True)
+    job_id = fields.Many2one('hr.job', string="Job Position", readonly=True)
+    parent_id = fields.Many2one('hr.employee', string="Parent ID", readonly=True)
+    year = fields.Integer(string="Year", readonly=True)
+    task_score_avg = fields.Float(string='Task Score', digits=(12, 1), readonly=True)
 
     def _get_project_task(self):
         for employee in self.employee_id:
@@ -39,8 +38,24 @@ class HistoryTaskScore(models.Model):
                 task_score_avg = 0
             self.create({
                 'employee_id': emp.id,
+
                 'year': date.today().year - 1,
                 'task_score_avg': task_score_avg
             })
 
         return
+
+    def history_task_score_action(self):
+        user_id = self.employee_id.user_id.id
+        name_view = self.name
+        action = {
+            "name": name_view,
+            "type": "ir.actions.act_window",
+            'search_view_id': [self.env.ref('ds_ramp_up_recourse.task_score_search').id, 'search'],
+            "res_model": "project.task",
+            "views": [[self.env.ref('ds_ramp_up_recourse.task_score_view_tree').id, "tree"]],
+            "domain": [('user_ids', 'in', user_id), ('issues_type', '=', 1), 
+                ('date_start', '>=', date(self.year, 1, 1)), 
+                ('date_end', '<=', date(self.year, 12, 31)), ('task_score', 'not in', ['0'])]
+        }
+        return action
