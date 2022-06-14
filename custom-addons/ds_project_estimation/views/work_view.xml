@@ -22,7 +22,8 @@
                             <field name="sale_date" />
                             <field name="stage" placeholder="Select current stage" />
                             <field name="currency_id_domain" invisible="1"/>
-                            <field name="currency_id" domain='currency_id_domain'/>                            <field name="customer_ids" />
+                            <field name="currency_id" domain='currency_id_domain'/>
+                            <field name="customer_ids" />
                         </group>
                     </group>
                     <separator string="Description" />
@@ -87,80 +88,24 @@
                                     <field name="total_effort" />
                                 </tree>
                             </field>
-                            <button string="View Gantts" name="%(ds_project_estimation.action_view_gantt_resource_plan)d" type="action" class="btn-primary"/>
+                            <button string="View Gantts" attrs="{'invisible': [('add_lines_resource_effort', '=', [])]}" name="%(ds_project_estimation.action_view_gantt_resource_plan)d" type="action" class="btn-primary"/>
                         </page>
                         <page string="Module">
-                            <separator string="Assumption" />
-                            <field name="add_lines_module_assumption">
-                                <tree editable="bottom">
-                                    <field name="assumption" />
-                                </tree>
-                            </field>
-                            <separator string="Summary" />
-                            <field name="add_lines_module_summary">
-                                <tree create="0" editable="0" delete="0">
-                                    <field name="summary_type"/>
-                                    <field name="description" />
-                                    <field name="value"/>
-                                    <field name="type" invisible="1"/>
-                                </tree>
-                            </field>
-                            <separator string="Effort distribution" />
-                            <field name="add_lines_module_effort_distribute_activity">
-                                <tree create="0" editable="0" delete="0">
-                                    <field name="sequence" />
-                                    <field name="activity" />
-                                    <field name="effort" />
-                                    <field name="percent" />
-                                </tree>
-                            </field>
-                            <separator string='Work Breakdown Structure and Estimate' />
-                            <field name="add_lines_module_activity">
+                            <separator string="Modules" />
+                            <field name="add_lines_module">
+                                <separator string="Assumption" />
                                 <tree>
                                     <field name="sequence" />
-                                    <field name="activity" />
-                                    <field name="effort" />
-                                    <field name="check_default" invisible="1"/>
-                                </tree>
-                                <form>
-                                    <group col="4">
-                                        <field name="sequence" />
-                                        <field name="activity" />
-                                        <field name="effort" />
-                                        <field name="estimation_id" invisible="1"/>
-                                        <field name="activity_type" />
-                                        <field name="activity_current" attrs="{'invisible': [('activity_type', '!=', 'type_1')], 'required' : [('activity_type', '=', 'type_1')]}" placeholder="Please select activity ..." />
-                                        <field name="check_default" invisible="1"/>
-                                    </group>
-                                    <notebook>
-                                        <page string="Breakdown Estimation">
-                                            <field name="add_lines_breakdown_activity">
-                                                <tree editable="bottom">
-                                                    <field name="sequence"/>
-                                                    <field name="activity"/>
-                                                    <field name="persons" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
-                                                    <field name="days" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
-                                                    <field name="job_pos"/>
-                                                    <field name="percent_effort" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_1')]}" />
-                                                    <field name="mandays" attrs="{'readonly': [('parent.activity_type', '=', 'type_1'), ('type', '=', 'type_3')]}" />
-                                                    <field name="type" invisible="1"/>
-                                                </tree>
-                                            </field>
-                                        </page>
-                                    </notebook>
-                                </form>
-                            </field>
-                            <group name="note_group" col="6" class="mt-2 mt-md-0">
-                                <group class="oe_subtotal_footer" colspan="2" name="sale_total">
+                                    <field name="component" />
                                     <field name="total_manday" readonly="1" />
-                                </group>
-                                <div class="oe_clear"/>
-                            </group>
+                                </tree>
+                            </field>
+                            <field name="sequence_module" readonly="1" invisible="1"/>
                         </page>
+
                     </notebook>
                 </sheet>
             </form>
-
         </field>
     </record>
 
@@ -173,7 +118,7 @@
                 <field name="estimator_ids" />
                 <field name="reviewer_ids" />
                 <field name="customer_ids" />
-                <field name="expected_revenue" widget="monetary" />
+                <field name="potential_budget" widget="monetary" />
                 <field name="total_cost" widget="monetary" />
                 <field name="deadline" />
                 <field name="stage" />
@@ -181,4 +126,90 @@
         </field>
     </record>
 
+    <record id="view_estimation_module_form" model="ir.ui.view">
+        <field name="name">estimation.module.form</field>
+        <field name="model">estimation.module</field>
+        <field name="arch" type="xml">
+            <form >
+                <sheet>
+                    <group name="group_top">
+                        <group name="group_left">
+                            <field name="sequence" />
+                        </group>
+                        <group name="group_right">
+                            <field name="component" />
+                            <field name="check_compute" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <separator string="Modules" />
+                    <field name="module_assumptions">
+                        <tree editable="bottom">
+                            <field name="assumption" />
+                        </tree>
+                    </field>
+                    <separator string="Summary" />
+                    <field name="module_summarys">
+                        <tree create="0" editable="0" delete="0">
+                            <field name="summary_type"/>
+                            <field name="description" />
+                            <field name="value"/>
+                            <field name="type" invisible="1"/>
+                        </tree>
+                    </field>
+                    <separator string="Effort distribution" />
+                    <field name="module_effort_activity">
+                        <tree create="0" editable="0" delete="0">
+                            <field name="sequence" />
+                            <field name="activity" />
+                            <field name="effort" />
+                            <field name="percent" />
+                        </tree>
+                    </field>
+                    <separator string='Work Breakdown Structure and Estimate' />
+                    <field name="module_config_activity">
+                        <tree>
+                            <field name="sequence" />
+                            <field name="activity" />
+                            <field name="effort" />
+                            <field name="check_default" invisible="1"/>
+                        </tree>
+                        <form>
+                            <group col="4">
+                                <field name="sequence" />
+                                <field name="activity" />
+                                <field name="effort" />
+                                <field name="module_id" invisible="1"/>
+                                <field name="activity_type" />
+                                <field name="activity_current" attrs="{'invisible': [('activity_type', '!=', 'type_1')], 'required' : [('activity_type', '=', 'type_1')]}" placeholder="Please select activity ..." />
+                                <field name="check_default" invisible="1"/>
+                            </group>
+                            <notebook>
+                                <page string="Breakdown Estimation">
+                                    <field name="add_lines_breakdown_activity">
+                                        <tree editable="bottom">
+                                            <field name="sequence"/>
+                                            <field name="activity"/>
+                                            <field name="persons" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
+                                            <field name="days" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
+                                            <field name="job_pos"/>
+                                            <field name="percent_effort" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_1')]}" />
+                                            <field name="mandays" attrs="{'readonly': [('parent.activity_type', '=', 'type_1'), ('type', '=', 'type_3')]}" />
+                                            <field name="type" invisible="1"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                            </notebook>
+                        </form>
+                    </field>
+                    <group name="note_group" col="6" class="mt-2 mt-md-0">
+                        <group class="oe_subtotal_footer" colspan="2" name="sale_total">
+                            <field name="total_manday" readonly="1" />
+                        </group>
+                        <div class="oe_clear"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
 </odoo>

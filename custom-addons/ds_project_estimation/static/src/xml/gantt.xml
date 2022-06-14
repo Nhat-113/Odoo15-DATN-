@@ -11,7 +11,7 @@
                     </div>
                     <button type="button" class="btn btn-secondary o_dhx_zoom_out o_dhx_button_right">Zoom Out</button>
                     <button type="button" class="btn btn-secondary o_dhx_zoom_in o_dhx_button_right">Zoom In</button>
-                    <button type="button" class="btn btn-secondary o_dhx_export_to_pdf o_dhx_button_right">Export to PDF</button>
+                    <!-- <button type="button" class="btn btn-secondary o_dhx_export_to_pdf o_dhx_button_right">Export to PDF</button> -->
                 </div>
             </div>
             <div class="o_dhx_gantt">

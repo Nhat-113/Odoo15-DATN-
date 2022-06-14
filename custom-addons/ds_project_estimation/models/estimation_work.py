@@ -1,7 +1,6 @@
 from odoo import models, fields, api, _
 import json
 
-
 class Estimation(models.Model):
     """
     Describes a work estimation.
@@ -18,12 +17,10 @@ class Estimation(models.Model):
     customer_ids = fields.Many2one("res.partner", string="Customer", required=True)
     currency_id = fields.Many2one("estimation.currency", string="Currency", required=True)
     currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
-
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
 
-    expected_revenue = fields.Float(string="Expected Revenue")
+    potential_budget = fields.Float(string="Potential Budget")
     total_cost = fields.Float(string="Total Cost", compute='_compute_total_cost')
-    total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays")
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
     project_code = fields.Char(string="Project Code", required=True)
@@ -39,14 +36,13 @@ class Estimation(models.Model):
                             string="Status", 
                             required=True)
     
+    sequence_module = fields.Integer(string="Sequence Module", store=True, default = 1, compute ='_compute_sequence_module') # for compute sequence module
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
     add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'connect_summary', string='Summary Total Cost')
     add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate', string='Summary Cost Rate')
     add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'estimation_id', string='Resource Planning Effort')
-    add_lines_module_assumption = fields.One2many('estimation.module.assumption', 'connect_module', string='Module Assumption')
-    add_lines_module_summary = fields.One2many('estimation.module.summary', 'estimation_id', string='Module Summary')
-    add_lines_module_activity = fields.One2many('config.activity', 'estimation_id', string="Activity")
-    add_lines_module_effort_distribute_activity = fields.One2many('module.effort.activity', 'estimation_id', string='Module Effort')
+    add_lines_module = fields.One2many('estimation.module', 'estimation_id', domain="[('estimation_id', '=', 4)]", string="Modules")
+   
     check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
 
     @api.depends('currency_id')
@@ -70,20 +66,19 @@ class Estimation(models.Model):
         vals_over["connect_overview"] = est_current_id.id
         vals_over["description"] = 'Create New Estimation'
         self.env["estimation.overview"].create(vals_over)
+        
+        #for CRM
+        active_id = self._context.get('active_id')
+        if active_id:
+            estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
+            estimation_lead.estimation_count += 1
         return result
 
     # Automatically load 12 activities and module summary data when creating an estimation
     @api.model
     def default_get(self, fields):
         res = super(Estimation, self).default_get(fields)
-        get_data_activities = self.env['data.activity'].search([])
         get_data_cost_rate = self.env['config.job.position'].search([])
-        data_summary = self.env['data.module.summary'].search([])
-        data_resource_plan = self.env['estimation.resource.planning.data'].search([])
-        activities_line = []
-        activities_effort_line = []
-        summary_line = []
-        resource_plan_line = []
         summary_total_cost_line = []
         cost_rate_line = []
 
@@ -100,7 +95,6 @@ class Estimation(models.Model):
             'comtor_effort': 0.0,
             'brse_effort': 0.0,
             'pm_effort': 0.0,
-
             'total_effort': 0.0,
             'cost': 0.0
         }
@@ -119,64 +113,11 @@ class Estimation(models.Model):
             line = (0, 0, content)
             cost_rate_line.append(line)
 
-        for record in get_data_activities:
-            content = {
-                'sequence': record.sequence, 
-                'activity': record.activity,
-                'effort': 0.0,
-                'percent': 0.0,
-                'activity_type': record.activity_type,
-                'check_default': True
-            }
-            line = (0, 0, content)
-            activities_line.append(line)
-            
-            temp = content.copy()
-            temp.pop('activity_type')
-            temp.pop('check_default')
-            line_effort = (0, 0, temp)
-            activities_effort_line.append(line_effort)
-        
-        for item in data_summary:
-            line = (0, 0, {
-                'summary_type': item.summary_type,
-                'description' : item.description,
-                'value': item.value,
-                'type': item.type
-            })
-            summary_line.append(line)
-        
-        for rec in data_resource_plan:
-            data = (0, 0, {
-                'sequence': rec.sequence,
-                'name': rec.name,
-                'design_effort': rec.design_effort,
-                'dev_effort': rec.dev_effort,
-                'tester_effort': rec.tester_effort,
-                'comtor_effort': rec.comtor_effort,
-                'brse_effort': rec.brse_effort,
-                'pm_effort': rec.pm_effort,
-                'total_effort': rec.total_effort
-            })
-            resource_plan_line.append(data)
-        
         res.update({
-            'add_lines_module_summary': summary_line,
-            'add_lines_module_activity': activities_line,
-            'add_lines_module_effort_distribute_activity': activities_effort_line,
-            'add_lines_resource_effort': resource_plan_line,
             'add_lines_summary_totalcost': summary_total_cost_line,
-            'add_lines_summary_costrate': cost_rate_line
+            'add_lines_summary_costrate': cost_rate_line,
         })
         return res
-    
-    @api.depends('add_lines_module_activity.effort')
-    def _compute_total_mandays(self):
-        total = 0.0
-        for record in self:
-            for item in record.add_lines_module_activity:
-                total += item.effort
-            record.total_manday = total
     
     def write(self, vals):
         vals_over = {'connect_overview': self.id, 'description': ''}
@@ -245,6 +186,7 @@ class Estimation(models.Model):
         mess_tab_list = {'add_lines_summary_totalcost': 'Total Cost',
                          'add_lines_summary_costrate': 'Cost Rate',
                          'add_lines_resource_effort': 'Total Effort', 
+                         'add_lines_module': 'Modules',
                          'add_lines_module_assumption': 'Assumption', 
                          'add_lines_module_summary': 'Summary', 
                          'add_lines_module_effort_distribute_activity': 'Effort Distribution',
@@ -279,7 +221,7 @@ class Estimation(models.Model):
         temp = {}
         mess_tab_list = ["add_lines_module_effort_distribute_activity", "add_lines_summary_totalcost", "add_lines_summary_costrate",
                          "add_lines_resource_effort", "add_lines_module_assumption", "add_lines_module_summary", "add_lines_module_activity", 
-                         "total_manday", "check_generate_project"] # add total_manday field as it is not needed to track changes
+                         "total_manday", "check_generate_project", 'add_lines_module'] # add total_manday field as it is not needed to track changes
         for i in mess_tab_list:
             for key in dic_temp:
                 if key == i:
@@ -340,6 +282,42 @@ class Estimation(models.Model):
             return project
 
 
+    @api.depends('add_lines_module')
+    def _compute_sequence_module(self):
+        max_sequence = 0
+        modules = self.env['estimation.module'].search([('estimation_id', '=', self.id or self.id.origin)])
+        #if there is data and a new record is created
+        if modules:
+            for item in modules:
+                if item.sequence > max_sequence:
+                    max_sequence = item.sequence
+            Estimation.content_compute(self, max_sequence)
+
+        #if no data exists and a new record is created
+        else:
+            max_sequence = 1
+            Estimation.content_compute(self, max_sequence)
+                    
+    def content_compute(self, max_sequence):
+        for record in self:
+            record.sequence_module = max_sequence   # This is required
+            # if a new record is created
+            if record.add_lines_module:
+                re_max_sequence = 0
+                for rec in record.add_lines_module: 
+                    if rec.sequence > re_max_sequence:
+                        re_max_sequence = rec.sequence
+                max_sequence = re_max_sequence + 1
+                record.sequence_module = max_sequence  # This is required
+     
+    def unlink(self):
+        for record in self:
+            record.add_lines_overview.unlink()
+            record.add_lines_summary_totalcost.unlink()
+            record.add_lines_summary_costrate.unlink()
+            record.add_lines_resource_effort.unlink()
+            record.add_lines_module.unlink()
+        return super(Estimation, self).unlink()  
 class Lead(models.Model):
     _inherit = ['crm.lead']
 

@@ -26,7 +26,8 @@ class EstimationSummaryTotalCost(models.Model):
     @api.depends('estimation_id')
     def _compute_effort(self):
         estimation_id = self.connect_summary.id
-        activities = self.env['module.effort.activity'].search([('estimation_id', '=', estimation_id)])
+        module_ids = self.env['estimation.module'].search([('estimation_id', '=', estimation_id)], limit=1)
+        activities = self.env['module.effort.activity'].search([('module_id', '=', module_ids.id)])
         design_total = 0.0
         dev_total = 0.0
         tester_total = 0.0
