@@ -239,11 +239,15 @@ class EstimationResourcePlan(models.Model):
     
     @api.depends('estimation_id.sequence_module')
     def compute_sequence(self):
+        max_sequence = 0
+        for record in self:
+            if record.name not in ['Total (MD)', 'Total (MM)'] and record.sequence > max_sequence:
+                max_sequence = record.sequence
         for record in self:
             if record.name == 'Total (MD)':
-                record.sequence = record.estimation_id.sequence_module
+                record.sequence = max_sequence + 1
             elif record.name == 'Total (MM)':
-                record.sequence = record.estimation_id.sequence_module + 1
+                record.sequence = max_sequence + 2
 
 class GanttResourcePlanning(models.Model):
     _name = "gantt.resource.planning"
