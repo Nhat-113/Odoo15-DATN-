@@ -3,7 +3,10 @@
 from asyncio import tasks
 from re import S
 from unicodedata import name
+import pandas as pd
+
 from numpy import require
+import pandas as pd
 from odoo import models, fields, api, _
 from datetime import date, datetime, time, timedelta
 from dateutil import relativedelta
@@ -34,12 +37,12 @@ class PlanningPhase(models.Model):
     type = fields.Char("Type", required=True, default="phase")
 
     phase_duration = fields.Float('Phase duration', compute='_compute_phase_duration', inverse='_inverse_phase_duration', store=True)
-
-    start_date = fields.Datetime(string='Date Start', readonly=False, required=True, help="Start date of the phase",
-                                 default=lambda self: fields.Datetime.to_string(
-                                     datetime.today().replace(day=1, hour=0, minute=0, second=0)))
-    end_date = fields.Datetime(
-        string='Date End', readonly=False, required=True, help="End date of the phase", default=str(datetime.now() + relativedelta.relativedelta(months=+1, day=31, hour=16, minute=59, second=59))[:19])
+    working_day = fields.Float('Working Day', default=0, compute='_compute_working_day', store=True, readonly=True)
+    
+    start_date = fields.Date(string='Date Start', readonly=False, required=True, help="Start date of the phase",
+                                 default=date.today())
+    end_date = fields.Date(
+        string='Date End', readonly=False, required=True, help="End date of the phase", default=(date.today() + timedelta(days=60)))
     description = fields.Html("Description")
     count_milestone = fields.Integer(
         string="Milestones", compute="_count_milestone_in_phase")
@@ -55,10 +58,22 @@ class PlanningPhase(models.Model):
         for r in self:
             if r.start_date and r.end_date:
                 elapsed_seconds = (r.end_date - r.start_date).total_seconds()
-                seconds_in_day = 24 * 60 * 60
-                r.phase_duration = round(elapsed_seconds / seconds_in_day, 1)
+                seconds_in_day = 24 * 60 *  60
+                r.phase_duration = round(elapsed_seconds / seconds_in_day, 1) + 1
                 r = r.with_context(ignore_onchange_phase_duration=True)
-    
+
+    @api.depends('start_date', 'end_date')
+    def _compute_working_day(self):
+        for r in self:
+            if r.start_date and r.end_date:
+                working_days = len(pd.bdate_range(r.start_date.strftime('%Y-%m-%d'),
+                                                  r.end_date.strftime('%Y-%m-%d')))
+                elapsed_seconds = working_days * 24 * 60 * 60
+                seconds_in_day = 24 * 60 * 60
+                r.working_day = round(elapsed_seconds / seconds_in_day, 1)
+            elif not r.start_date or not r.end_date:
+                r.working_day = 0
+
     @api.onchange('phase_duration', 'start_date')
     def _inverse_phase_duration(self):
         for r in self:
@@ -110,6 +125,21 @@ class PlanningPhase(models.Model):
             if considered_phases:
                 raise UserError(
                     _('Date Start & Date End of the current Phase is considered to be in "%(phase)s" phase!', phase=considered_phases[0].name))
+    #phase tu dong gom task sau khi chinh sua
+    def write(self, vals):
+        res = super(PlanningPhase, self).write(vals)
+        if 'start_date' in vals or 'end_date' in vals:
+             # tasks is valid if it ends between the given dates
+            clause_1 = ['&', ('date_start', '>=', self.start_date),
+                        ('date_end', '<=', self.end_date)]
+            # OR if it finish between the given dates
+            clause_2 = ['&', ('date_end', '>=', self.start_date),
+                        ('date_end', '<=', self.end_date)]
+            domain = [('project_id', '=', self.project_id.id),
+                      '|'] + clause_1 + clause_2
+            tasks = self.env['project.task'].search(domain)
+            # self.write({'project_tasks': [(3, task.id, 0) for task in self.project_tasks.ids]})
+            self.write({'project_tasks': [(6, 0, tasks.ids)]})
 
     def compute_tasks(self):
         if self.project_id and self.start_date and self.end_date:

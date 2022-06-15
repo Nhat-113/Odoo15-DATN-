@@ -10,19 +10,60 @@ class RampUp(models.Model):
     planning_calendar_resources = fields.One2many(
         'planning.calendar.resource', 'project_id', string='Planning Calendar Resources', readonly=True, compute='_get_calendar_resources')
 
+    # project_task_score = fields.One2many(
+    #     'project.task', 'project_id', string='Project Task', readonly=True, compute='_get_project_task')
+
     effort_rate_related = fields.Float(
         related='planning_calendar_resources.effort_rate')
-    start_date = fields.Date(
+    start_date_planning = fields.Date(
         related='planning_calendar_resources.start_date', store=True)
-    end_date = fields.Date(
+    end_date_planning = fields.Date(
         related='planning_calendar_resources.end_date', store=True)
     total_effort_rate = fields.Float(
         string='Total Effort Rate (%)', compute='get_effort_rate_total', store=True)
+    task_score_avg = fields.Float(string='Task Score', digits=(
+        12, 1), compute="_compute_avg_task_score", default=0)
+
+    def _compute_avg_task_score(self):
+        for employee in self:
+            tasks = self.env['project.task'].search(
+                ['&', '&', '&', '&', ('user_ids', 'in', employee.user_id.id), ('issues_type', '=', 1), 
+                ('date_start', '>=', date(date.today().year, 1, 1)), 
+                ('date_end', '<=', date(date.today().year, 12, 31)), ('task_score', 'not in', ['0'])])
+            list_score = []
+            for task in tasks:
+                list_score.append(int(task.task_score))
+            if len(list_score):
+                employee.task_score_avg = round(sum(list_score)/len(list_score), 1)
+            else:
+                employee.task_score_avg = 0
 
     def _get_calendar_resources(self):
         for employee in self:
             employee.planning_calendar_resources = self.env['planning.calendar.resource'].search(
                 [('employee_id', '=', employee.id)])
+
+    # def _get_project_task(self):
+    #     for employee in self:
+    #         employee.project_task_score = self.env['project.task'].search(
+    #             ['&', '&', '&', '&', ('user_ids', 'in', employee.user_id.id), ('issues_type', '=', 1), 
+    #             ('date_start', '>=', date(date.today().year, 1, 1)), 
+    #             ('date_end', '<=', date(date.today().year, 12, 31)), ('task_score', 'not in', ['0'])])
+
+    def task_score_action(self):
+        user_id = self.user_id.id
+        name_view = self.name
+        action = {
+            "name": name_view,
+            "type": "ir.actions.act_window",
+            'search_view_id': [self.env.ref('ds_ramp_up_recourse.task_score_search').id, 'search'],
+            "res_model": "project.task",
+            "views": [[self.env.ref('ds_ramp_up_recourse.task_score_view_tree').id, "tree"]],
+            "domain": [('user_ids', 'in', user_id), ('issues_type', '=', 1), 
+                ('date_start', '>=', date(date.today().year, 1, 1)), 
+                ('date_end', '<=', date(date.today().year, 12, 31)), ('task_score', 'not in', ['0'])]
+        }
+        return action
 
     @api.model
     @api.depends('effort_rate_related')

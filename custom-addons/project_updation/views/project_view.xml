@@ -113,7 +113,7 @@
                     </div>
                 </xpath>
                 <xpath expr="//div[hasclass('o_kanban_manage_reporting')]" position="replace">
-                    <div class="col-6 o_kanban_card_manage_section o_kanban_manage_reporting" groups="ds_project_planning.group_project_pm">
+                    <div class="col-6 o_kanban_card_manage_section o_kanban_manage_reporting" groups="ds_project_planning.group_project_pm,ds_project_planning.group_project_director">
                         <div role="menuitem" class="o_kanban_card_manage_title">
                             <span>Reporting</span>
                         </div>

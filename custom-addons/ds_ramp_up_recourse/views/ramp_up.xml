@@ -20,8 +20,8 @@
                 <field name="planning_calendar_resources" invisible="1"/>
                 <field name="name"/>
                 <group expand="0" string="Group By">
-                    <filter string="Start Date" name="groupby_start_date" context="{'group_by': 'start_date'}"/>
-                    <filter string="End Date" name="groupby_end_date" context="{'group_by': 'end_date'}"/>
+                    <filter string="Start Date" name="groupby_start_date" context="{'group_by': 'start_date_planning'}"/>
+                    <filter string="End Date" name="groupby_end_date" context="{'group_by': 'end_date_planning'}"/>
                     <filter string="Employee" name="groupby_employee" context="{'group_by': 'name'}"/>
                 </group>
             </search>

@@ -370,17 +370,6 @@
                                 </span>
                             </div>
                         </button>
-                        <button name="%(action_calendar_effort)d" class="oe_stat_button" style="width: 13.5%" type="action" icon="fa-clock-o">
-                            <div class="o_field_widget o_stat_info">
-                                <span class="o_stat_value">
-                                    <field name="total_estimate_effort" readonly="1" nolabel="1" help="Total estimate effort of project planning"/>
- MM
-                                </span>
-                                <span class="o_stat_text">
-                                    Estimate Effort
-                                </span>
-                            </div>
-                        </button>
                     </div>
                     <div class="oe_title" style="width: 800px">
                         <label for="name" class="oe_edit_only"/>
@@ -564,6 +553,7 @@
                     <group>
                         <field name="start_date" />
                         <field name="end_date" />
+                        <field name="working_day" />
                         <field name="description" placeholder="Add a description..."/>
                     </group>
                     <notebook>
@@ -601,7 +591,7 @@
     </record>
 
     <record id="view_tree_project_phase" model="ir.ui.view">
-        <field name="name">Project Phases</field>
+        <field name="name">Planning Phases</field>
         <field name="model">project.planning.phase</field>
         <field name="arch" type="xml">
             <tree>
@@ -617,7 +607,7 @@
 
     <!-- Planning Milestone -->
     <record id="view_form_project_milestone" model="ir.ui.view">
-        <field name="name">Project Milestone</field>
+        <field name="name">Planning Milestone</field>
         <field name="model">project.planning.milestone</field>
         <field name="arch" type="xml">
             <form duplicate="0">
@@ -664,7 +654,7 @@
     </record>
 
     <record id="view_tree_project_milestone" model="ir.ui.view">
-        <field name="name">Project Milestones</field>
+        <field name="name">Planning Milestones</field>
         <field name="model">project.planning.milestone</field>
         <field name="arch" type="xml">
             <tree>
