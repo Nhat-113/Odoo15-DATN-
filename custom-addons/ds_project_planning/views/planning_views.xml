@@ -553,6 +553,7 @@
                     <group>
                         <field name="start_date" />
                         <field name="end_date" />
+                        <field name="working_day" />
                         <field name="description" placeholder="Add a description..."/>
                     </group>
                     <notebook>

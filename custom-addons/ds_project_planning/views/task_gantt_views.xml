@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="project.view_task_form2"/>
             <field name="arch" type="xml">
 
-                <xpath expr="//page[@name='description_page']" position="after">
+                <xpath expr="//page[@name='description_page']" position="replace">
                     <page string="Dependencies">
                         <group string="Gantt Info">
                             <field name="date_start"/>
@@ -31,6 +31,10 @@
                             </tree>
                         </field>
                     </page>
+                </xpath>
+                <xpath expr="//notebook" position="before">
+                    <separator string="Description"/>
+                    <field name="description" type="html" options="{'collaborative': true}"/>
                 </xpath>
             </field>
         </record>

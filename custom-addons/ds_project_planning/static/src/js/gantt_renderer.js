@@ -170,6 +170,9 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
             if (item.start_date - self.configStartDate === 0) {
               return "";
             }
+            else if (item.working_day === 0) {
+              return "";
+            }
             return item.start_date;
           },
         },
@@ -182,6 +185,119 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           width: 120,
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
+              return "";
+            } else if (item.working_day === 0) {
+              return "";
+            }
+            return item.end_date;
+          },
+        },
+        {
+          name: "progress",
+          label: "Progress",
+          align: "center",
+          resize: true,
+          template: function (item) {
+            if (item.progress) {
+              return item.progress * 100 + "%";
+            }
+            return "";
+          },
+        },
+        {
+          name: "working_day",
+          label: "Working Day",
+          align: "center",
+          resize: true,
+          template: function (item) {
+            //console.log("working_day", item.working_day);
+            if (item.working_day) {
+              return item.working_day;
+            }
+            // duration auto = 1  for milestone
+              else if (item.type === "milestone") {
+                return 1  ;
+              }
+            return 0;
+          },
+        },
+        {
+          name: "duration",
+          align: "center",
+          resize: true,
+          template: function (item) {
+            if (item.start_date - self.configStartDate === 0) {
+              return 0;
+            } else if (item.working_day === 0) {
+              return 0;
+            }
+            // duration auto = 1  for milestone
+            else if (item.type === "milestone") {
+              return 1 ;
+            }
+            return item.duration;
+          },
+        },
+        {
+          name: "assignees",
+          width: 80,
+          label: "Assignees",
+          align: "center",
+          resize: true,
+          template: function (task) {
+            var result = "";
+            var assignees = task.user_ids;
+
+            if (!assignees) return;
+
+            assignees.forEach(function (element) { 
+
+              var assignee = byId(element);
+              result += assignee;
+            });
+            return result;
+          },
+
+        },
+        {name: "buttons",label: colHeader,width: 75}
+      ];
+
+      var allColumns = [ 
+        {
+          name: "text",
+          tree: true,
+          resize: true,
+          label: "Task Name",
+          width: 180,
+        },
+        {
+          name: "start_date",
+          align: "center",
+          resize: true,
+          // editor: startDateEditor,
+          width: 120,
+          template: function (item) {
+            if (item.start_date - self.configStartDate === 0) {
+              return "";
+            }
+            else if (item.working_day === 0) {
+              return "";
+            }
+            return item.start_date;
+          },
+        },
+        {
+          name: "end_date",
+          label: "End time",
+          align: "center",
+          resize: true,
+          // editor: endDateEditor,
+          width: 120,
+          template: function (item) {
+            if (item.start_date - self.configStartDate === 0) {
+              return "";
+            }
+            else if (item.working_day === 0) {
               return "";
             }
             return item.end_date;
@@ -222,7 +338,10 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
               return 0;
-            } // duration auto = 1  for milestone
+            } else if (item.working_day === 0) {
+              return 0;
+            }
+             // duration auto = 1  for milestone
             else if (item.type === "milestone") {
               return 1 ;
             }
@@ -250,72 +369,6 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           },
 
         },
-        {name: "buttons",label: colHeader,width: 75}
-      ];
-
-      var allColumns = [ 
-        {
-          name: "text", 
-          tree: true,
-          resize: true,
-          label: "Task Name",
-          width: 180,},
-
-        { 
-          name: "start_date",
-          align: "center",
-          label: "Start Time",
-          resize: true,
-          //editor: startDateEditor,
-          width: 120,
-        },
-        {
-          name: "end_date",
-          label: "End time",
-          align: "center",
-          resize: true,
-          //editor: endDateEditor,
-          width: 120,
-        },
-        
-        {
-          name: "progress",
-          label: "Progress",
-          align: "center",
-          resize: true,
-        },
-
-        {name: "working_day",
-          label: "Working Day",
-          align: "center",
-          resize: true
-        },
-        {
-          name: "duration",
-          align: "center",
-          label: "Duration",
-          resize: true,
-        } ,
-        {
-          name: "assignees",
-          width: 80,
-          label: "Assignees",
-          align: "center",
-          resize: true,
-          template: function (task) {
-            var result = "";
-            var assignees = task.user_ids;
-
-            if (!assignees) return;
-
-            assignees.forEach(function (element) { 
-
-              var assignee = byId(element);
-              result += assignee;
-            });
-            return result;
-          },
-        }
         
       ]
 
@@ -327,8 +380,8 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         assignees:true,
       })
       var gridDateToStr = gantt.date.date_to_str("%Y-%m-%d");
-      gantt.templates.grid_date_format = function(date, column){
-          if(column === "end_date"){
+      gantt.templates.date_grid  = function(date, task, column){
+          if(column === "end_date" && task.type !== "milestone"){
               return gridDateToStr(new Date(date.valueOf() - 1)); 
           }else{
               return gridDateToStr(date); 
