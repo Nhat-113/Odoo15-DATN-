@@ -1,5 +1,5 @@
 <odoo>
-    <menuitem id="ramp_up_menu" name="Management" groups="ds_project_planning.group_project_pm,project.group_project_manager"/>
+    <menuitem id="ramp_up_menu" name="Management" groups="group_task_score_user"/>
 
     <record id="open_view_ramp_up_all" model="ir.actions.act_window">
         <field name="name">Resource Management</field>
@@ -10,25 +10,22 @@
                           (0, 0, {'view_mode': 'form', 'view_id': ref('ds_ramp_up_recourse.ramp_up_view_form')})
                          ]"/>
         <!-- <field name="search_view_id" ref="project.view_project_project_filter"/> -->
+        <field name="groups_id" eval="[(4, ref('group_task_score_admin'))]"/>
         <field name="target">main</field>
         <field name="search_view_id" ref="ramp_up_detail_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                    No ramp up found. Let's create one!
-            </p>
-            <p>
-                    Resource Management regroup tasks on the same topic, and each has its dashboard.
-            </p>
-        </field>
     </record>
 
     <menuitem
         id="menu_ramp_up_report"
         name="Resource Management"
-        sequence="1"
-        parent="ds_ramp_up_recourse.ramp_up_menu"
-        action="ramp_up_report_action"/>
+        sequence="2"
+        parent="ds_ramp_up_recourse.ramp_up_menu" 
+        groups="group_task_score_pm"/>
 
-    <menuitem id="ramp_up_menu_child" name="Details" parent="menu_ramp_up_report" action="open_view_ramp_up_all" sequence="1" />
+    <menuitem id="ramp_up_menu_child" name="OverView" parent="menu_ramp_up_report" action="ramp_up_report_action" sequence="1" groups="group_task_score_pm"/>
+    <menuitem id="ramp_up_menu_detail" name="Details" parent="menu_ramp_up_report" action="open_view_ramp_up_all" sequence="2" groups="group_task_score_pm"/>
+    <menuitem id="hr_employee_task_score" name="Task Score" parent="ds_ramp_up_recourse.ramp_up_menu" sequence="1"/>
+    <menuitem id="current_task_score_" name="Current" parent="ds_ramp_up_recourse.hr_employee_task_score" action="open_view_employee_current_task_score" sequence="1"/>
+    <menuitem id="history_task_score" name="History" action="open_view_history" parent="ds_ramp_up_recourse.hr_employee_task_score" sequence="2" groups="group_task_score_user"/>
     
 </odoo>
