@@ -29,7 +29,7 @@ class PlanningCalendarResource(models.Model):
                               readonly=True, help="The duration of working time in the project", default=1)
     calendar_effort = fields.Float(string="Booking Effort", default=1.0)
     effort_rate = fields.Float(string="Effort Rate", compute='_compute_effort_rate',
-                               readonly=True, help="Effort Rate (%) = Calendar Effort * 20 / Duration", store=True)
+                               readonly=True, help="Effort Rate (%) = Calendar Effort * 20 / Duration", store=True, default=0)
     role_ids = fields.Many2many('planning.roles', string='Roles')
     note = fields.Text(string='Note')
     member_type = fields.Many2one(
@@ -62,7 +62,7 @@ class PlanningCalendarResource(models.Model):
         """ Calculates effort rate (%)"""
         for resource in self:
             if resource.duration != 0:
-                resource.effort_rate = resource.calendar_effort * 20 / resource.duration * 100
+                resource.effort_rate = resource.calendar_effort * 20 / resource.duration * 100       
 
     def _check_dates(self):
         for resource in self:

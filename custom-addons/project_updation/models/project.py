@@ -73,6 +73,8 @@ class Task(models.Model):
         ('medium', 'Medium'),
         ('low', 'Low'),
     ], string='Priority Type', index=True, copy=False, default='low', tracking=True)
+    create_date = fields.Datetime("Create Date", readonly=True, index=True)
+    write_date = fields.Datetime("Update Date", readonly=True, index=True)
 
     complex = fields.Selection([
         ('high', 'High'),
@@ -82,11 +84,11 @@ class Task(models.Model):
 
     task_score = fields.Selection([
         ('0', 'Nothing'),
-        ('1', '1 star (Failed to complete tasks and deadlines)'),
-        ('2', '2 stars (Not completing the task or deadline)'),
-        ('3', '3 stars (Complete tasks and deadlines according to the plan)'),
-        ('4', '4 stars (Complete the task ahead of time)'),
-        ('5', '5 stars (Completed ahead of time and very good code and bug quality)'),
+        ('1', '1 star (Cannot complete tasks and keep the deadlines)'),
+        ('2', '2 stars (Can complete tasks and keep the deadlines, but quality is not so good)'),
+        ('3', '3 stars (Can complete tasks and keep the deadlines, quality is pretty OK without any serious issues)'),
+        ('4', '4 stars (Can complete the tasks ahead of time with a good quality)'),
+        ('5', '5 stars (Can complete the tasks ahead of time with a very good quality, as well to support other members effectively)'),
     ], default='0', index=True, string="Task Score", tracking=True)
     status = fields.Many2one('project.task.status',
                              string="Status Task", tracking=True)
@@ -148,12 +150,23 @@ class Task(models.Model):
     @api.constrains('status', 'timesheet_ids')
     def _check_timesheet(self):
         if self.status.name == 'Done' or self.status.name == 'Closed' and self.issues_type.name == 'Task':
-            if len(self.timesheet_ids) == 0 or self.planned_hours == 0.0:
+            if len(self.timesheet_ids) == 0:
                 raise UserError(
-                    'Time Sheet field and Initially Planned Hours field cannot be left blank')
+                    'Time Sheet field cannot be left blank')
+            elif self.planned_hours == 0.0:
+                raise UserError(
+                    'Initially Planned Hours field cannot be left blank')
             if self.progress_input != 100:
                 raise UserError(
                     'Required when status Done or Closed, progress = 100%')
+
+    @api.constrains('status')
+    def _check_task_score(self):
+        if self.status.name == 'Done':
+            if self.task_score == '0':
+                raise UserError(
+                    'When the status is Done, you must score the task.')
+
 
     @api.constrains('progress_input')
     def _check_progress(self):

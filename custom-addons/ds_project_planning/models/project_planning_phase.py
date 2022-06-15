@@ -4,6 +4,7 @@ from asyncio import tasks
 from re import S
 from unicodedata import name
 from numpy import require
+import pandas as pd
 from odoo import models, fields, api, _
 from datetime import date, datetime, time, timedelta
 from dateutil import relativedelta
@@ -45,6 +46,7 @@ class PlanningPhase(models.Model):
         string="Milestones", compute="_count_milestone_in_phase")
     tasks_count = fields.Integer(
         string="Tasks", compute="_count_task_in_phase")
+    working_day = fields.Float('Working Day', default=0, compute='_compute_working_day', store=True, readonly=True)    
 
     _sql_constraints = [
         ('name_uniq', 'unique (project_id, name)', "Phase name already exists!"),
@@ -139,6 +141,18 @@ class PlanningPhase(models.Model):
             num_tasks = self.env['project.task'].search(
                 ['&', ('project_id', '=', phase.project_id.id), ('phase_id', '=', phase.id)])
             phase.tasks_count = len(num_tasks)
+
+    @api.depends('start_date', 'end_date')
+    def _compute_working_day(self):
+        for r in self:
+            if r.start_date and r.end_date:
+                working_days = len(pd.bdate_range(r.start_date.strftime('%Y-%m-%d'),
+                                                  r.end_date.strftime('%Y-%m-%d')))
+                elapsed_seconds = working_days * 24 * 60 * 60
+                seconds_in_day = 24 * 60 * 60
+                r.working_day = round(elapsed_seconds / seconds_in_day, 1)
+            elif not r.start_date or not r.end_date:
+                r.working_day = 0
 
     @api.model
     def open_create_phase(self, project_id):

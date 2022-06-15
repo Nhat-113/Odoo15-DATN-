@@ -10,4 +10,10 @@
     <!-- Planning menu config -->
     <menuitem id="project_planning_menu_config" name="Planning" action="ds_project_planning.open_view_planning_project_all" groups="ds_project_planning.group_project_pm" parent="project.menu_project_config" sequence="99"/>
 
+    <menuitem name="Project"
+            id="project.menu_main_pm"
+            groups="project.group_project_manager,project.group_project_user,group_project_director"
+            web_icon="project,static/description/icon.png"
+            sequence="70"/>
+
 </odoo>
