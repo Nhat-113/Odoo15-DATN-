@@ -31,7 +31,7 @@
 
     <!-- Action to open the configuration phases of project -->
     <record id="action_config_phase" model="ir.actions.act_window">
-        <field name="name">Project Phases</field>
+        <field name="name">Planning Phases</field>
         <field name="res_model">project.planning.phase</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
@@ -48,7 +48,7 @@
 
     <!-- Action to open the configuration phases of project -->
     <record id="action_config_milestone" model="ir.actions.act_window">
-        <field name="name">Project Milestone</field>
+        <field name="name">Planning Milestone</field>
         <field name="res_model">project.planning.milestone</field>
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="view_project_planning_milestone_search_form"/>

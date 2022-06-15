@@ -601,7 +601,7 @@
     </record>
 
     <record id="view_tree_project_phase" model="ir.ui.view">
-        <field name="name">Project Phases</field>
+        <field name="name">Planning Phases</field>
         <field name="model">project.planning.phase</field>
         <field name="arch" type="xml">
             <tree>
@@ -617,7 +617,7 @@
 
     <!-- Planning Milestone -->
     <record id="view_form_project_milestone" model="ir.ui.view">
-        <field name="name">Project Milestone</field>
+        <field name="name">Planning Milestone</field>
         <field name="model">project.planning.milestone</field>
         <field name="arch" type="xml">
             <form duplicate="0">
@@ -664,7 +664,7 @@
     </record>
 
     <record id="view_tree_project_milestone" model="ir.ui.view">
-        <field name="name">Project Milestones</field>
+        <field name="name">Planning Milestones</field>
         <field name="model">project.planning.milestone</field>
         <field name="arch" type="xml">
             <tree>
