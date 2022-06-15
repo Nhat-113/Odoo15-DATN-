@@ -2,7 +2,11 @@
     text-align: left !important;
 }
 
-div[name="add_lines_module_effort_distribute_activity"], div[name="add_lines_module_summary"] {
+div[name="add_lines_module_summary"],
+div[name="add_lines_resource_effort"],
+div[name="add_lines_summary_totalcost"],
+div[name="module_summarys"],
+div[name="module_effort_activity"] {
     pointer-events: none !important;
 }
 

@@ -62,9 +62,7 @@ class EstimationModule(models.Model):
             check_data_resource_plan = self.env['estimation.resource.effort'].search([('estimation_id', '=', record.estimation_id.id)])
             gantt_resource_plan = self.env['gantt.resource.planning'].search([('estimation_id', '=', record.estimation_id.id)])
             if check_data_resource_plan:
-                count = 0
-                for rec in check_data_resource_plan:
-                    count +=1
+                count = len(check_data_resource_plan)
                 if count == 3:  # there is 1 module and 2 record mm + md -> delete all record
                     check_data_resource_plan.unlink()  # delete all record
                     
