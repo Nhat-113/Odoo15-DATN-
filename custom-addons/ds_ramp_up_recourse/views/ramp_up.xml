@@ -7,11 +7,24 @@
                 <field name="name"/>
                 <field name="job_title" string="Position"/>
                 <field name="department_id"/>
-                <field name="total_calendar_effort_rate"/>
-                <field name="actual_effort_rate"/>
-                <field name="estimation_effort_rate"/>
                 <field name="total_effort_rate"/>
             </tree>
+        </field>
+    </record>
+
+    <record id="ramp_up_detail_search" model="ir.ui.view">
+        <field name="name">ramp.up.detail.search</field>
+        <field name="model">hr.employee</field>
+        <field name="arch" type="xml">
+            <search string="Ramp Up Detail Search">
+                <field name="planning_calendar_resources" invisible="1"/>
+                <field name="name"/>
+                <group expand="0" string="Group By">
+                    <filter string="Start Date" name="groupby_start_date" context="{'group_by': 'start_date_planning'}"/>
+                    <filter string="End Date" name="groupby_end_date" context="{'group_by': 'end_date_planning'}"/>
+                    <filter string="Employee" name="groupby_employee" context="{'group_by': 'name'}"/>
+                </group>
+            </search>
         </field>
     </record>
 
@@ -39,11 +52,14 @@
                     <notebook>
                         <page string="Calendar Resources">
                             <field name="planning_calendar_resources" colspan="4" nolabel="1">
-                                <tree string="Assign Members" >
+                                <tree string="Assign Members">
                                     <field name="project_id"/>
                                     <field name="start_date"/>
                                     <field name="end_date"/>
-                                    <field name="effort_rate" string="Effort Rate (%)"/>
+                                    <field name="calendar_effort" digits="[12,1]"/>
+                                    <field name="actual_effort_rate" digits="[12,1]"/>
+                                    <field name="estimation_effort_rate" digits="[12,1]"/>
+                                    <field name="effort_rate" string="Effort Rate (%)" digits="[12,1]"/>
                                 </tree>
                             </field>
                         </page>

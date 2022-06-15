@@ -91,7 +91,7 @@ var GanttController = AbstractController.extend({
             // console.log('BeforeUpdate. YAY!');
             data.csrf_token = core.csrf_token;
             data.model_name = self.modelName;
-            data.timezone_offset = (-self.date_object.getTimezoneOffset());
+            //data.timezone_offset = (-self.date_object.getTimezoneOffset());
             data.map_text = self.map_text;
             data.map_text = self.map_text;
             data.map_id_field = self.map_id_field;
@@ -102,6 +102,37 @@ var GanttController = AbstractController.extend({
             data.map_progress = self.map_progress;
             data.link_model = self.link_model;
             // console.log('data are ');
+            // console.log(data);
+            return true;
+        });
+        gantt.attachEvent("onTaskLoading", function(task) {
+            //console.log(`task`, task);
+            // if (task.custom_date) 
+            task.start_date = gantt.date.convert_to_utc(task.start_date);
+            task.end_date = gantt.date.convert_to_utc(task.end_date);
+            return true;
+        });
+        dp.attachEvent("onBeforeDataSending", function(id, state, data) {
+            let date_start_convert = data.start_date.split('-');
+            date_start_convert.splice(0, 2, date_start_convert[1], date_start_convert[0]);
+            date_start_convert.join('-');
+
+            // console.log('start', data.start_date);
+            // console.log('date_start_convert af', date_start_convert);
+            let date_start = new Date(date_start_convert);
+            var datestring =
+                ("0" + (date_start.getDate() + 1)).slice(-2) +
+                "-" +
+                ("0" + (date_start.getMonth() + 1)).slice(-2) +
+                "-" +
+                date_start.getFullYear() +
+                " " +
+                ("0" + date_start.getHours()).slice(-2) +
+                ":" +
+                ("0" + date_start.getMinutes()).slice(-2);
+
+            data.start_date = datestring;
+            // console.log('data after ');
             // console.log(data);
             return true;
         });

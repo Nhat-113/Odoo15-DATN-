@@ -1,5 +1,7 @@
 from odoo import models, fields, api, _
 import json
+from odoo.exceptions import UserError
+
 
 class Estimation(models.Model):
     """
@@ -15,15 +17,16 @@ class Estimation(models.Model):
     estimator_ids = fields.Many2one('res.users', string='Estimator')
     reviewer_ids = fields.Many2one('res.users', string='Reviewer')
     customer_ids = fields.Many2one("res.partner", string="Customer", required=True)
-    currency_id = fields.Many2one("estimation.currency", string="Currency", required=True)
+    currency_id = fields.Many2one("estimation.currency", string="Currency", required=True, default=1)
     currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
 
     potential_budget = fields.Float(string="Potential Budget")
     total_cost = fields.Float(string="Total Cost", compute='_compute_total_cost')
+    summary_currency_id = fields.Integer("Summarry Currency id", compute='_compute_summary_currency')
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
-    project_code = fields.Char(string="Project Code", required=True)
+    project_code = fields.Char(string="Project Code", required=True,)
     description = fields.Text(string="Description", help="Description estimation")
     stage = fields.Selection([("new","New"), 
                               ("created","Created"),
@@ -46,12 +49,16 @@ class Estimation(models.Model):
     check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
 
     @api.depends('currency_id')
-    def _compute_currency_id_domain(self):
-        currencies = self.env['estimation.exchange.rate'].search([])
-        currency_ids = []
-        for currency in currencies:
-            currency_ids.append(currency.currency_id.id)
+    def _compute_summary_currency(self):
+        self.summary_currency_id = self.currency_id
+        summary_cost_rate = self.env['estimation.summary.costrate'].search([('connect_summary_costrate', '=', self.ids)])
+        for item in summary_cost_rate:
+            item.currency_ids = self.summary_currency_id
 
+    @api.depends('currency_id')
+    def _compute_currency_id_domain(self):
+        currency_name = ['VND', 'USD', 'JPY']
+        currency_ids = self.env['estimation.currency'].search([('name', 'in', currency_name)]).ids
         self.currency_id_domain = json.dumps(
                 [('id', 'in', currency_ids)]
             )
@@ -102,13 +109,15 @@ class Estimation(models.Model):
         summary_total_cost_line.append(line)
 
         for re in get_data_cost_rate:
+            cost_rate = self.env['cost.rate'].search([('job_type', '=', re.job_position)])
+            role_default = cost_rate[0]
             content = {
                 'sequence': re.sequence,
                 'types': re.job_position,
-                'role': '',
+                'role': role_default,
                 'yen_month': 0.0,
                 'yen_day': 0.0,
-                'vnd_day': 0.0
+
             }
             line = (0, 0, content)
             cost_rate_line.append(line)
@@ -256,12 +265,15 @@ class Estimation(models.Model):
         value = dict(zip(vals_key, vals_values))
         return value
 
-    def _compute_total_cost(self):
-        for item in self:
-            item.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', item.id)]).cost
+    # @api.depends('currency_id')
+    # def _compute_total_cost(self):
+    #     for item in self:
+    #         item.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', item.id)]).cost
 
     def action_generate_project(self):
         for estimation in self:
+            if not estimation.estimator_ids:
+               raise UserError('Please select an estimator before generating project.')
             project = self.env['project.project'].sudo().create({
                 'name': estimation.project_name,
                 'user_id':estimation.estimator_ids.id
