@@ -370,17 +370,6 @@
                                 </span>
                             </div>
                         </button>
-                        <button name="%(action_calendar_effort)d" class="oe_stat_button" style="width: 13.5%" type="action" icon="fa-clock-o">
-                            <div class="o_field_widget o_stat_info">
-                                <span class="o_stat_value">
-                                    <field name="total_estimate_effort" readonly="1" nolabel="1" help="Total estimate effort of project planning"/>
- MM
-                                </span>
-                                <span class="o_stat_text">
-                                    Estimate Effort
-                                </span>
-                            </div>
-                        </button>
                     </div>
                     <div class="oe_title" style="width: 800px">
                         <label for="name" class="oe_edit_only"/>
