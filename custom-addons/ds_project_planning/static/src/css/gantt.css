@@ -101,3 +101,15 @@
     left: 466px !important;
     z-index: 10000;
 }
+.gantt_grid .gantt_grid_scale .gantt_grid_head_cell.gantt_grid_head_text 
+{
+    text-align: center;
+    font-weight: 100 !important;
+}
+.gantt_side_content {
+    margin-left: 4.5px;
+    width: 143px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

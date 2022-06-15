@@ -22,7 +22,7 @@
     <menuitem id="planning_menu_child" name="Planning" parent="planning_menu" action="open_view_planning_project_all" sequence="1" />
 
     <!-- Menu item to open the Calendar Resource list -->
-    <menuitem id="menu_calendar_resource" name="Calendar Resource" parent="planning_menu" action="action_calendar_resource" sequence="3" />
+    <menuitem id="menu_calendar_resource" name="Booking Resource" parent="planning_menu" action="action_calendar_resource" sequence="3" />
 
     <!-- Menu item to open the Configuration -->
     <menuitem id="planning_config_menu" name="Configuration" parent="planning_menu" groups="project.group_project_manager" sequence="4" />

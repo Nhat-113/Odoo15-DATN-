@@ -22,7 +22,7 @@
                             <field name="sale_date" />
                             <field name="stage" placeholder="Select current stage" />
                             <field name="currency_id_domain" invisible="1"/>
-                            <field name="currency_id" domain='currency_id_domain'/>
+                            <field name="currency_id" domain='currency_id_domain' required="True"/>
                             <field name="customer_ids" />
                         </group>
                     </group>
@@ -45,8 +45,8 @@
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="sequence" />
                                     <field name="module" />
-                                    <field name="design_effort" sum="Sum of Designer Effort"/>
                                     <field name="dev_effort" sum="Sum of Developer Effort"/>
+                                    <field name="design_effort" sum="Sum of Designer Effort"/>
                                     <field name="tester_effort" sum="Sum of Tester Effort"/>
                                     <field name="comtor_effort" sum="Sum of Comtor Effort"/>
                                     <field name="brse_effort" sum="Sum of Brse Effort"/>
@@ -55,12 +55,12 @@
                                     <field name="cost" sum="Total of Cost"/>
                                 </tree>
                             </field>
-                            <group name="note_group" col="6" class="mt-2 mt-md-0">
-                                <group class="oe_subtotal_footer" colspan="2" name="sale_total">
-                                    <field name="total_cost" readonly="1"/>
-                                </group>
-                                <div class="oe_clear"/>
-                            </group>
+<!--                            <group name="note_group" col="6" class="mt-2 mt-md-0">-->
+<!--                                <group class="oe_subtotal_footer" colspan="2" name="sale_total">-->
+<!--                                    <field name="total_cost" readonly="1"/>-->
+<!--                                </group>-->
+<!--                                <div class="oe_clear"/>-->
+<!--                            </group>-->
                             <separator string="Cost Rate" />
                             <field name="add_lines_summary_costrate">
                                 <tree editable="bottom" create="0" delete="0">
@@ -69,7 +69,7 @@
                                     <field name="role" domain="[('job_type.job_position', '=', types)]"/>
                                     <field name="yen_month" />
                                     <field name="yen_day" />
-                                    <field name="vnd_day" />
+<!--                                    <field name="vnd_day" />-->
                                 </tree>
                             </field>
                         </page>

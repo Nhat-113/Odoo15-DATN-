@@ -13,8 +13,8 @@
                 <field name="currency_yen_id" invisible="1" />
                 <field name="currency_vnd_id" invisible="1" />
                 <field name="cost_usd" />
-                <field name="cost_yen" readonly="1"/>
-                <field name="cost_vnd" readonly="1"/>
+                <field name="cost_yen" />
+                <field name="cost_vnd" />
                 <field name="create_date" string="Creation Date"/>
 
             </tree>

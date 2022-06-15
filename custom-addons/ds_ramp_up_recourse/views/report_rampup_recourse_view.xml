@@ -3,7 +3,7 @@
     <data>
         <!-- Export Ramp Up Recourse in action menu -->
         <record id="action_export_payslips" model="ir.actions.report">
-            <field name="name">Export RampUp Report</field>
+            <field name="name">Export Resource Management Report</field>
             <field name="model">hr.employee</field>
             <field name="report_type">xlsx</field>
             <field name="report_name">ds_export_excel.rampup_xlsx</field>
