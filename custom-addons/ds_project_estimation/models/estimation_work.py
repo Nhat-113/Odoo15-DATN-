@@ -22,7 +22,7 @@ class Estimation(models.Model):
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
 
     potential_budget = fields.Float(string="Potential Budget")
-    total_cost = fields.Float(string="Total Cost", compute='_compute_total_cost')
+    total_cost = fields.Float(string="Total Cost") #, compute='_compute_total_cost'
     summary_currency_id = fields.Integer("Summarry Currency id", compute='_compute_summary_currency')
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
