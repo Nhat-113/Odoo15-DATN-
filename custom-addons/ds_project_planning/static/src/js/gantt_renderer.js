@@ -214,9 +214,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
             if (item.working_day) {
               return item.working_day;
             }
-            else if (item.working_day === 0) {
-              return ;
-            }// duration auto = 1  for milestone
+            // duration auto = 1  for milestone
               else if (item.type === "milestone") {
                 return 1  ;
               }
@@ -230,7 +228,10 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
               return 0;
-            } // duration auto = 1  for milestone
+            } else if (item.working_day === 0) {
+              return 0;
+            }
+            // duration auto = 1  for milestone
             else if (item.type === "milestone") {
               return 1 ;
             }
