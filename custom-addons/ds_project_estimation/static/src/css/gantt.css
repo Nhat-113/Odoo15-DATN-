@@ -77,7 +77,7 @@
     color: #71639e!important;
 }
 .gantt_link_control.task_right.task_end_date, .gantt_link_control.task_left.task_start_date {
-    display: none !important;
+    /* display: none !important; */
 }
 .gantt_link_point {
     pointer-events: none !important;

@@ -1,6 +1,5 @@
 from odoo import models, fields, api, _
 
-
 class Activities(models.Model):
     """
     Describe activities in configuration.
@@ -11,7 +10,7 @@ class Activities(models.Model):
     _rec_name = "activity"
 
     sequence = fields.Integer(string="No", readonly=True, help='Use to arrange calculation sequence')
-    estimation_id = fields.Many2one('estimation.work', string="Estimation") #default=lambda self: self.env.context['params']['id'], 
+    module_id = fields.Many2one("estimation.module", string="Module")
 
     activity = fields.Char("Activity", required=True)
     effort = fields.Float(string="Effort", default=0, store=True, compute='_compute_total_effort')
@@ -26,8 +25,8 @@ class Activities(models.Model):
                                     )
     activity_current = fields.Many2one("config.activity", 
                                        string="Activities", 
-                                       default= 4, #4 is implementation
-                                       domain="[('estimation_id', '=', estimation_id), ('sequence', '!=', sequence)]")
+                                       store=True, 
+                                       domain="[('module_id', '=', module_id), ('sequence', '!=', sequence)]")
     
     add_lines_breakdown_activity = fields.One2many('module.breakdown.activity', 'activity_id', string="Breakdown Activity")
     check_default = fields.Boolean(string="Check", default=False)
@@ -45,7 +44,7 @@ class Activities(models.Model):
     def create(self, vals):
         if vals:
             # load sequence
-            ls_activity = self.env['config.activity'].search([('estimation_id', '=', vals['estimation_id'])])
+            ls_activity = self.env['config.activity'].search([('module_id', '=', vals['module_id'])])
             self.env['config.activity'].auto_increase_sequence(vals, ls_activity)
             result = super(Activities, self).create(vals)
                 
@@ -59,7 +58,7 @@ class Activities(models.Model):
                 'activity': vals['activity'],
                 'effort': 0,
                 'percent': 0,
-                'estimation_id': vals['estimation_id'],
+                'module_id': vals['module_id'],
                 'activity_id': result['id']
             }
             self.env['module.effort.activity'].create(ctx)
@@ -73,7 +72,7 @@ class Activities(models.Model):
                 if key == 'activity':
                     check = True
             if check == True:
-                ls_effort_acivity = self.env['module.effort.activity'].search([('estimation_id', '=', self.estimation_id.id), ('sequence', '=', self.sequence )])
+                ls_effort_acivity = self.env['module.effort.activity'].search([('module_id', '=', self.module_id.id), ('sequence', '=', self.sequence )])
                 effort_activity_vals['activity'] = vals['activity']
                 ls_effort_acivity.write(effort_activity_vals)
                 return super(Activities, self).write(vals)
@@ -82,7 +81,7 @@ class Activities(models.Model):
 
     def unlink(self):
         for item in self:
-            effort_distribute = self.env['module.effort.activity'].search([('estimation_id', '=', item.estimation_id.id), ('sequence', '=', item.sequence )])
+            effort_distribute = self.env['module.effort.activity'].search([('module_id', '=', item.module_id.id), ('sequence', '=', item.sequence )])
             breakdown_activity = self.env['module.breakdown.activity'].search([('activity_id','=', item.id)])
             if effort_distribute:
                 effort_distribute.unlink()
