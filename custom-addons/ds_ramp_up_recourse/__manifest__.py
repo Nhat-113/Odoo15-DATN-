@@ -10,9 +10,6 @@
     'maintainer': '',
     'website': "",
     'depends': ['hr', 'base', 'project', 'ds_project_planning', 'project_updation'],
-    'external_dependencies': {
-        'python': ['pandas'],
-    },
     'data': [
         'security/task_score_security.xml',
         'security/ir.model.access.csv',
