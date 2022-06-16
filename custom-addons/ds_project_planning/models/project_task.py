@@ -155,6 +155,25 @@ class DependingTasks(models.Model):
         ('task_relation_unique', 'unique(task_id, depending_task_id)',
          'Two tasks can have only one relation!'),
     ]
+    
+    @api.depends('task_id')
+    def _compute_task_id_domain(self):
+        for task in self:
+            if task.depending_task_id:
+                task.task_id_domain = json.dumps(
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.depending_task_id.ids[0]), ('parent_id', '=', False), ('issues_type', '=', 1)]
+                )
+            elif task.task_id:
+                task.task_id_domain = json.dumps(
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.task_id.ids[0]), ('parent_id', '=', False), ('issues_type', '=', 1)]
+                )
+
+    task_id_domain = fields.Char(
+        compute="_compute_task_id_domain",
+        readonly=True,
+        store=False,
+    )
+
 
     @api.onchange('task_id', 'depending_task_id')
     def _compute_project_id(self):

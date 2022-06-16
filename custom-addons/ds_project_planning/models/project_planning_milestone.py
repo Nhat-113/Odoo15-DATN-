@@ -43,8 +43,6 @@ class PlanningMilestone(models.Model):
 
     _sql_constraints = [
         ('name_uniq', 'unique (phase_id, name)', "Milestone name already exists!"),
-        ('milestone_date_uniq', 'unique (phase_id, milestone_date)',
-         'Milestone date must be unique per phase.'),
     ]
 
     def _check_date(self):
