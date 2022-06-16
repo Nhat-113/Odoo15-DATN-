@@ -1,4 +1,5 @@
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 class Activities(models.Model):
     """
@@ -37,7 +38,10 @@ class Activities(models.Model):
         for record in self:
             final_manday = 0.0
             for item in record.add_lines_breakdown_activity:
-                final_manday += item.mandays 
+                if item.mandays > 1000:
+                    raise UserError('Expected (man-days) must be less than 1000')
+                else:
+                    final_manday += item.mandays 
             record.effort = final_manday
 
     @api.model
