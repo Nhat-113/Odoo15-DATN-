@@ -133,6 +133,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 if(record.type) {
                     // Add serverId to get real id in edit mode
                     task.serverId = record.serverId;
+                    console.log(`datetime_milesone`, record.milestone_date + 1);
                     datetime = record.start_date ? formatFunc(record.start_date) : formatFunc(record.milestone_date);
                 } else {
                     // Show start time of task
@@ -169,9 +170,9 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 task.working_day = record[self.map_working_day];
                 task.project_name = record[self.map_parent] ? record[self.map_parent][1] : "";
                 task.type = record.type ? record.type : "";
-                if(task.type !== "milestone"){
+                // if(task.type !== "milestone"){
                     task.start_date =gantt.date.convert_to_utc(task.start_date);
-                }   
+                // }   
                 data.push(task);
                 //console.log(`task`, task.start_date);
                 if(!record.type) {
