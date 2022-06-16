@@ -479,7 +479,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
                 <b>Duration:</b> 
                   ${task.duration}
                 <br/>
-                <b>Progress:</b> ${task.progress * 100}%<br/>
+                <b>Progress:</b> 0 %<br/>
                 `;
         } else if(task.type === "milestone") {
             return `<b>${type}:</b> ${task.text}<br/>
