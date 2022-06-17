@@ -119,11 +119,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.gantt_task_line.gantt_milestone .gantt_task_content {
-    margin-left: 10px;
-}
-.gantt_task_line.gantt_milestone .gantt_link_control.task_left {
+/* .gantt_task_line.gantt_milestone {
+    margin-left: 40px
+} */
+/* .gantt_task_line.gantt_milestone .gantt_link_control.task_left {
         height: 21px;
         line-height: 21px;
         margin-left: 16.5px !important;
-}
+}  */

@@ -87,8 +87,13 @@ class ProjectTask(models.Model):
     @api.onchange('planned_duration', 'date_start')
     def _inverse_planned_duration(self):
         for r in self:            
-            if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', False):
+            if r.date_start and not r.env.context.get('ignore_onchange_planned_duration', False):
+                if r.planned_duration == 0.0:
+                    r.planned_duration = 1
                 r.date_end = r.date_start + timedelta(days=r.planned_duration - 1)
+                if r.working_day == 0:
+                    r.working_day = 1
+                    
 
     @api.depends('dependency_task_ids')
     def _compute_recursive_dependency_task_ids(self):
