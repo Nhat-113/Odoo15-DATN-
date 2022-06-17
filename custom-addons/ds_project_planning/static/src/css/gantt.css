@@ -119,9 +119,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.gantt_task_line.gantt_milestone {
+/* .gantt_task_line.gantt_milestone {
     margin-left: 40px
-}
+} */
 /* .gantt_task_line.gantt_milestone .gantt_link_control.task_left {
         height: 21px;
         line-height: 21px;

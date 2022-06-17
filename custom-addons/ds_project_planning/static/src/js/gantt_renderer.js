@@ -381,9 +381,12 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       })
       var gridDateToStr = gantt.date.date_to_str("%Y-%m-%d");
       gantt.templates.date_grid  = function(date, task, column){
-          if(column === "end_date" && task.type !== "milestone"){
+          if(column === "end_date"){
               return gridDateToStr(new Date(date.valueOf() - 1)); 
-          }else{
+          } else if(column === "start_date" && task.type ==="milestone") {
+            return gridDateToStr(new Date(date.valueOf() - 1)); 
+          }
+           else{
               return gridDateToStr(date); 
           }
       }

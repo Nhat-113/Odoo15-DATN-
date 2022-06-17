@@ -126,7 +126,7 @@ var GanttController = AbstractController.extend({
         // });
         dp.attachEvent("onBeforeDataSending", function(id, state, data) {
            console.log(`state`,state );
-            if(state!=="inserted" && state!=="deleted") {
+            if(state!=="inserted" && state!=="deleted" && data.type !=="milestone" ) {
                 let date_start_convert = data.start_date.split('-');
                 date_start_convert.splice(0, 2, date_start_convert[1], date_start_convert[0]);
                 date_start_convert.join('-');

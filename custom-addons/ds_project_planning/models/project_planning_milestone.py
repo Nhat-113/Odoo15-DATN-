@@ -7,6 +7,7 @@ from odoo import models, fields, api, _
 from datetime import date, datetime, time
 from odoo.exceptions import ValidationError, UserError
 
+from datetime import date, datetime, time, timedelta
 
 class PlanningMilestone(models.Model):
     """
@@ -39,6 +40,7 @@ class PlanningMilestone(models.Model):
     type = fields.Char("Type", required=True, default="milestone")
     milestone_date = fields.Date(string='Milestone Date', required=True, help="Date of the milestone",
                                      default=date.today())
+    milestone_end_date = fields.Date(string='Milestone End_Date',  compute='_compute_end_date');
     description = fields.Html("Description")
 
     _sql_constraints = [
@@ -46,6 +48,10 @@ class PlanningMilestone(models.Model):
         ('milestone_date_uniq', 'unique (phase_id, milestone_date)',
          'Milestone date must be unique per phase.'),
     ]
+    @api.depends('milestone_date', 'milestone_end_date')
+    def _compute_end_date(self):
+        for r in self:
+            r.milestone_end_date = r.milestone_date + timedelta(days=+1) 
 
     def _check_date(self):
         for milestone in self:
