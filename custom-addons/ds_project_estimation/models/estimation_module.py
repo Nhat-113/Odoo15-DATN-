@@ -233,7 +233,7 @@ class EffortActivities(models.Model):
     percent = fields.Float(string="Percentage (%)", default=0, store=True, compute='_compute_percentage')
     
     # compute_effort is required for the _compute_percentage method to work correctly
-    @api.depends('module_id.module_config_activity.effort')
+    @api.depends('module_id.module_config_activity.effort', 'module_id.module_config_activity.activity')
     def _compute_effort(self):
         for record in self:
             for rec in record.module_id.module_config_activity:
@@ -243,6 +243,7 @@ class EffortActivities(models.Model):
                     activity_id = rec.id.origin
                 if record.activity_id.id == activity_id:
                     record.effort = rec.effort
+                    record.activity = rec.activity
             
     @api.depends('effort')
     def _compute_percentage(self):

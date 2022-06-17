@@ -62,16 +62,16 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                     },
                 }
             ];
-            gantt.attachEvent("onTaskLoading", function(task) {
+            // gantt.attachEvent("onTaskLoading", function(task) {
 
-                //console.log(`task`, task);
-                // if (task.custom_date) 
-                task.start_date = gantt.date.convert_to_utc(task.start_date);
-                task.end_date = gantt.date.convert_to_utc(task.end_date);
+            //     //console.log(`task`, task);
+            //     // if (task.custom_date) 
+            //     task.start_date = gantt.date.convert_to_utc(task.start_date);
+            //     task.end_date = gantt.date.convert_to_utc(task.end_date);
 
-                // task.custom_date = gantt.date.parseDate(task.custom_date,"%m-%d-%y")
-                return true;
-            });
+            //     // task.custom_date = gantt.date.parseDate(task.custom_date,"%m-%d-%y")
+            //     return true;
+            // });
             gantt.templates.task_text = function (start, end, task) {
               return task.valueMM;
                 
