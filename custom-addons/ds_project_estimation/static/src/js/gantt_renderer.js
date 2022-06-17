@@ -31,7 +31,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
             gantt.config.grid_width = 180;
             gantt.config.work_time = true;
             gantt.config.skip_off_time = true;
-
+            gantt.config.drag_links = false;
             gantt.plugins({
                 tooltip: true,
             });
