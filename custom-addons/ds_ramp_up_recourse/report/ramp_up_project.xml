@@ -20,7 +20,7 @@
         <field name="name">ramp.up.report.view.pivot</field>
         <field name="model">planning.calendar.resource</field>
         <field name="arch" type="xml">
-            <pivot string="Ramp Up" disable_linking="1" default_order="effort_rate asc">
+            <pivot string="Ramp Up" disable_linking="0" default_order="effort_rate asc">
                 <field name="employee_id" type="row"/>
                 <field name="project_id" type="col"/>
                 <field name="effort_rate" type="measure"/>
