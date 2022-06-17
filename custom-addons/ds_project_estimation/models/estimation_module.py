@@ -36,7 +36,7 @@ class EstimationModule(models.Model):
             if check == False:
                 vals_md_mm = {
                     'estimation_id': result.estimation_id.id,
-                    'sequence': 2,
+                    'sequence': 0,
                     'name': 'Total (MD)',
                     'design_effort': 0,
                     'dev_effort': 0,
@@ -49,7 +49,6 @@ class EstimationModule(models.Model):
                 self.env['estimation.resource.effort'].create(vals_md_mm)
                 
                 vals_md_mm['name'] = 'Total (MM)'
-                vals_md_mm['sequence'] = 3
                 self.env['estimation.resource.effort'].create(vals_md_mm)
             return result 
     
