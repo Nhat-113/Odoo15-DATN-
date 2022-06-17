@@ -7,6 +7,7 @@ class CurrentTaskScore(models.Model):
     _description = "Current Task Score"
     _auto = False
 
+    id_current = fields.Many2one('hr.employee', string="ID", readonly=True)
     employee_id = fields.Many2one('hr.employee', string="Employee", readonly=True)
     name = fields.Char(string="Employee Name", readonly=True)
     department_id = fields.Many2one('hr.department', string="Department", readonly=True)
@@ -21,6 +22,7 @@ class CurrentTaskScore(models.Model):
                 (
                     SELECT
                         emp.id,
+                        emp.id as employee_id,
                         emp.name,
                         emp.department_id,
                         emp.job_id,

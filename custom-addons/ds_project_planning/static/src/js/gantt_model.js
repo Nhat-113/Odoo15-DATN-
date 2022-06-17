@@ -87,7 +87,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             return this._rpc({
                 model: 'project.planning.milestone',
                 method: 'search_read',
-                fields: ['name', 'milestone_date', 'type', 'phase_id'],
+                fields: ['name', 'milestone_date','milestone_end_date', 'type', 'phase_id'],
                 domain: [
                     ['project_id', '=', this.domain[1][2]]
                 ]
@@ -133,7 +133,8 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 if(record.type) {
                     // Add serverId to get real id in edit mode
                     task.serverId = record.serverId;
-                    datetime = record.start_date ? formatFunc(record.start_date) : formatFunc(record.milestone_date);
+                   // console.log(`datetime_milesone`, record.milestone_date + 1);
+                    datetime = record.start_date ? formatFunc(record.start_date) : formatFunc(record.milestone_end_date);
                 } else {
                     // Show start time of task
                     if (record[self.map_date_start]) {
@@ -169,9 +170,9 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 task.working_day = record[self.map_working_day];
                 task.project_name = record[self.map_parent] ? record[self.map_parent][1] : "";
                 task.type = record.type ? record.type : "";
-                if(task.type !== "milestone"){
+                // if(task.type !== "milestone"){
                     task.start_date =gantt.date.convert_to_utc(task.start_date);
-                }   
+                // }   
                 data.push(task);
                 //console.log(`task`, task.start_date);
                 if(!record.type) {
@@ -197,6 +198,9 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             switch (data.type) {
                 case "milestone":
                     values['milestone_date'] = datetime;
+                    values['milestone_end_date'] = datetime;
+
+
                     break;
                 case "phase":
                     values['start_date'] = datetime;

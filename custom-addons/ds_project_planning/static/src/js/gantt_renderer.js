@@ -381,9 +381,12 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       })
       var gridDateToStr = gantt.date.date_to_str("%Y-%m-%d");
       gantt.templates.date_grid  = function(date, task, column){
-          if(column === "end_date" && task.type !== "milestone"){
+          if(column === "end_date"){
               return gridDateToStr(new Date(date.valueOf() - 1)); 
-          }else{
+          } else if(column === "start_date" && task.type ==="milestone") {
+            return gridDateToStr(new Date(date.valueOf() - 1)); 
+          }
+           else{
               return gridDateToStr(date); 
           }
       }
@@ -441,8 +444,15 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       };
 
       const tooltips = gantt.ext.tooltips;
+      
       gantt.templates.tooltip_date_format = gantt.date.date_to_str("%F %j, %Y");
       gantt.templates.tooltip_text = function (start, end, task) {
+      var gridDateToStr = gantt.date.date_to_str("%Y-%m-%d");
+        if( end && task.type !== "milestone"){
+            end =  gridDateToStr(new Date(end.valueOf() - 1)); 
+            start =  gridDateToStr(new Date(start.valueOf() )); 
+        }
+      
         var assignees = getAssignees(task.user_ids);
         var type =
           task.type == "phase"
@@ -453,18 +463,53 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         if (task.type == "milestone") {
           task.duration =1
         }
+        if(task.working_day===0) {
+            task.duration =0
+        }
+        // let test = {
+        //     text:task.text,
+        //     Assignees:assignees,
+        //     Duration:task.duration,
+        //     Progress: task.progress * 100 ,
+        //     startdate : gantt.templates.tooltip_date_format(
+        //         start
+        //       ),
+        //     Enddate : "",
+
+        if (task.working_day === 0  ){
+            return `<b>${type}:</b> ${task.text}<br/>
+                <b>Assignees:</b> ${assignees}<br/>
+                <b>Duration:</b> 
+                  ${task.duration}
+                <br/>
+                <b>Progress:</b> 0 %<br/>
+                `;
+        } else if(task.type === "milestone") {
+            return `<b>${type}:</b> ${task.text}<br/>
+                    <b>Assignees:</b> ${assignees}<br/>
+                    <b>Duration:</b> 
+                      ${task.duration}
+                    <br/>
+                    <b>Progress:</b> ${task.progress * 100}%<br/>
+                    <b>Start date:</b> ${gantt.templates.tooltip_date_format(
+                      start
+                    )} 
+                    <br/><b>End date:</b> ${
+                        gantt.templates.tooltip_date_format(end)}`
+                    } 
+        else 
         return `<b>${type}:</b> ${task.text}<br/>
                 <b>Assignees:</b> ${assignees}<br/>
                 <b>Duration:</b> 
                   ${task.duration}
                 <br/>
                 <b>Progress:</b> ${task.progress * 100}%<br/>
-                <b>Start date:</b> ${gantt.templates.tooltip_date_format(
+                <b>Start date:</b> ${
                   start
-                )} 
-                <br/><b>End date:</b> ${gantt.templates.tooltip_date_format(
+                } 
+                <br/><b>End date:</b> ${
                   end
-                )}`;
+                }`;
       };
 
       if (this.is_total_float) {

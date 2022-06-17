@@ -1,6 +1,7 @@
 from odoo import models, fields, api, _
 import json
 from odoo.exceptions import UserError
+from odoo.modules import module
 
 
 class Estimation(models.Model):
@@ -81,53 +82,6 @@ class Estimation(models.Model):
             estimation_lead.estimation_count += 1
         return result
 
-    # Automatically load 12 activities and module summary data when creating an estimation
-    @api.model
-    def default_get(self, fields):
-        res = super(Estimation, self).default_get(fields)
-        get_data_cost_rate = self.env['config.job.position'].search([])
-        summary_total_cost_line = []
-        cost_rate_line = []
-
-        # TODO missing add many module
-        # get_data_summary_total_cost = self.env['estimation.summary.totalcost'].search([])
-        # for record in get_data_summary_total_cost:
-        content = {
-            'connect_summary': '',
-            'sequence': 1,
-            'module': 'Module 1',
-            'design_effort': 0.0,
-            'dev_effort': 0.0,
-            'tester_effort': 0.0,
-            'comtor_effort': 0.0,
-            'brse_effort': 0.0,
-            'pm_effort': 0.0,
-            'total_effort': 0.0,
-            'cost': 0.0
-        }
-        line = (0, 0, content)
-        summary_total_cost_line.append(line)
-
-        for re in get_data_cost_rate:
-            cost_rate = self.env['cost.rate'].search([('job_type', '=', re.job_position)])
-            role_default = cost_rate[0]
-            content = {
-                'sequence': re.sequence,
-                'types': re.job_position,
-                'role': role_default,
-                'yen_month': 0.0,
-                'yen_day': 0.0,
-
-            }
-            line = (0, 0, content)
-            cost_rate_line.append(line)
-
-        res.update({
-            'add_lines_summary_totalcost': summary_total_cost_line,
-            'add_lines_summary_costrate': cost_rate_line,
-        })
-        return res
-    
     def write(self, vals):
         vals_over = {'connect_overview': self.id, 'description': ''}
         if vals:
@@ -278,18 +232,20 @@ class Estimation(models.Model):
                 'name': estimation.project_name,
                 'user_id':estimation.estimator_ids.id
             })
-            activity = self.env['config.activity'].search([('estimation_id','=',estimation.id)])
-            for act in activity:
-                for breakdown in self.env['module.breakdown.activity'].search([('activity_id','=',act.id)]):
-                    self.env['project.task'].create({
-                        'project_id':project.id,
-                        'stage_id':self.env['project.task.type'].search([('name','=','Backlog')])[0].id,
-                        'name':breakdown.activity,
-                        'user_ids':[],
-                        'issues_type':1,
-                        'status':2,
-                        'planned_hours':breakdown.mandays * 8
-                    })
+            modules = self.env['estimation.module'].search([('estimation_id', '=', estimation.id)])
+            for module in modules:
+                activity = self.env['config.activity'].search([('module_id','=',module.id)])
+                for act in activity:
+                    for breakdown in self.env['module.breakdown.activity'].search([('activity_id','=',act.id)]):
+                        self.env['project.task'].create({
+                            'project_id':project.id,
+                            'stage_id':self.env['project.task.type'].search([('name','=','Backlog')])[0].id,
+                            'name':breakdown.activity,
+                            'user_ids':[],
+                            'issues_type':1,
+                            'status':2,
+                            'planned_hours':breakdown.mandays * 8
+                        })
             estimation.check_generate_project = True
             return project
 
