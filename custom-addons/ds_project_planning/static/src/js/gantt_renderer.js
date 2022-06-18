@@ -42,7 +42,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.config.grid_width = 660;
       gantt.config.work_time = true;
       gantt.config.skip_off_time = true;
-
+      gantt.config.root_id = "root"; 
       gantt.plugins({
         tooltip: true,
       });
