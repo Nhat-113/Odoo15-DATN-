@@ -41,8 +41,10 @@ class Estimation(models.Model):
     
     sequence_module = fields.Integer(string="Sequence Module", store=True, default = 1, compute ='_compute_sequence_module') # for compute sequence module
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
-    add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'connect_summary', string='Summary Total Cost')
-    add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate', string='Summary Cost Rate')
+    add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate',
+                                                 string='Summary Cost Rate')
+    add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'estimation_id', string='Summary Total Cost')
+
     add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'estimation_id', string='Resource Planning Effort')
     add_lines_module = fields.One2many('estimation.module', 'estimation_id', domain="[('estimation_id', '=', 4)]", string="Modules")
    
@@ -80,53 +82,6 @@ class Estimation(models.Model):
             estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
             estimation_lead.estimation_count += 1
         return result
-
-    # Automatically load 12 activities and module summary data when creating an estimation
-    @api.model
-    def default_get(self, fields):
-        res = super(Estimation, self).default_get(fields)
-        get_data_cost_rate = self.env['config.job.position'].search([])
-        summary_total_cost_line = []
-        cost_rate_line = []
-
-        # TODO missing add many module
-        # get_data_summary_total_cost = self.env['estimation.summary.totalcost'].search([])
-        # for record in get_data_summary_total_cost:
-        content = {
-            'connect_summary': '',
-            'sequence': 1,
-            'module': 'Module 1',
-            'design_effort': 0.0,
-            'dev_effort': 0.0,
-            'tester_effort': 0.0,
-            'comtor_effort': 0.0,
-            'brse_effort': 0.0,
-            'pm_effort': 0.0,
-            'total_effort': 0.0,
-            'cost': 0.0
-        }
-        line = (0, 0, content)
-        summary_total_cost_line.append(line)
-
-        for re in get_data_cost_rate:
-            cost_rate = self.env['cost.rate'].search([('job_type', '=', re.job_position)])
-            role_default = cost_rate[0]
-            content = {
-                'sequence': re.sequence,
-                'types': re.job_position,
-                'role': role_default,
-                'yen_month': 0.0,
-                'yen_day': 0.0,
-
-            }
-            line = (0, 0, content)
-            cost_rate_line.append(line)
-
-        res.update({
-            'add_lines_summary_totalcost': summary_total_cost_line,
-            'add_lines_summary_costrate': cost_rate_line,
-        })
-        return res
     
     def write(self, vals):
         vals_over = {'connect_overview': self.id, 'description': ''}

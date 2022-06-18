@@ -44,7 +44,7 @@
                             <field name="add_lines_summary_totalcost" create="0" editable="0" delete="0">
                                 <tree editable="bottom" create="0" delete="0">
                                     <field name="sequence" />
-                                    <field name="module" />
+                                    <field name="name" />
                                     <field name="dev_effort" sum="Sum of Developer Effort"/>
                                     <field name="design_effort" sum="Sum of Designer Effort"/>
                                     <field name="tester_effort" sum="Sum of Tester Effort"/>
@@ -63,8 +63,9 @@
 <!--                            </group>-->
                             <separator string="Cost Rate" />
                             <field name="add_lines_summary_costrate">
-                                <tree editable="bottom" create="0" delete="0">
+                                <tree editable="bottom" create="0" delete="0" order="module_id desc">
                                     <field name="sequence" />
+                                    <field name="name"/>
                                     <field name="types" />
                                     <field name="role" domain="[('job_type.job_position', '=', types)]"/>
                                     <field name="yen_month" />
@@ -77,7 +78,7 @@
                             <separator string="Total Effort" />
                             <field name="add_lines_resource_effort">
                                 <tree create="0" editable="0" delete="0">
-                                    <field name="sequence" />
+                                    <field name="sequence"/>
                                     <field name="name" />
                                     <field name="design_effort" />
                                     <field name="dev_effort" />
