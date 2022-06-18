@@ -1,0 +1,11 @@
+
+.o_form_project_tasks .o_form_sheet_bg .o_form_sheet  .oe_form_field .o_wysiwyg_wrapper .odoo-editor-editable {
+    height: auto !important;
+}
+.o_form_project_tasks .o_form_sheet_bg .o_form_sheet  .oe_form_field .o_wysiwyg_wrapper .odoo-editor-editable > p {
+    margin-bottom: 25px;
+}
+.o_priority > o_field_widget {
+    width: 40% !important;
+}
+
