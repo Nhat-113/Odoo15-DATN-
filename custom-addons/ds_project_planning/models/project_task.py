@@ -87,8 +87,13 @@ class ProjectTask(models.Model):
     @api.onchange('planned_duration', 'date_start')
     def _inverse_planned_duration(self):
         for r in self:            
-            if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', False):
+            if r.date_start and not r.env.context.get('ignore_onchange_planned_duration', False):
+                if r.planned_duration == 0.0:
+                    r.planned_duration = 1
                 r.date_end = r.date_start + timedelta(days=r.planned_duration - 1)
+                if r.working_day == 0:
+                    r.working_day = 1
+                    
 
     @api.depends('dependency_task_ids')
     def _compute_recursive_dependency_task_ids(self):
@@ -155,6 +160,25 @@ class DependingTasks(models.Model):
         ('task_relation_unique', 'unique(task_id, depending_task_id)',
          'Two tasks can have only one relation!'),
     ]
+    
+    @api.depends('task_id')
+    def _compute_task_id_domain(self):
+        for task in self:
+            if task.depending_task_id:
+                task.task_id_domain = json.dumps(
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.depending_task_id.ids[0]), ('parent_id', '=', False), ('issues_type', '=', 1)]
+                )
+            elif task.task_id:
+                task.task_id_domain = json.dumps(
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.task_id.ids[0]), ('parent_id', '=', False), ('issues_type', '=', 1)]
+                )
+
+    task_id_domain = fields.Char(
+        compute="_compute_task_id_domain",
+        readonly=True,
+        store=False,
+    )
+
 
     @api.onchange('task_id', 'depending_task_id')
     def _compute_project_id(self):

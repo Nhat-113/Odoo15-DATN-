@@ -76,9 +76,8 @@
 .headerColor{
     color: #71639e!important;
 }
-.gantt_link_control.task_right.task_end_date, .gantt_link_control.task_left.task_start_date {
-    /* display: none !important; */
-}
-.gantt_link_point {
-    pointer-events: none !important;
+.gantt_grid_head_text, .gantt_grid_head_valueMM, .gantt_tree_content {
+    padding: 0 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

@@ -10,6 +10,7 @@ class EstimationModule(models.Model):
     component = fields.Char(string="Components", readonly=True, store=True, compute='_compute_components')
     total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays") 
     check_compute = fields.Char(string="Check", compute='_compute_check', store=True, readonly=True)
+    # sequence_activities = fields.Integer(string="Sequence Activities", store=True, default = 1, compute ='_compute_sequence_activities')
     
     estimation_id = fields.Many2one('estimation.work', string="Estimation")
     module_assumptions = fields.One2many('estimation.module.assumption', 'module_id')
@@ -38,7 +39,7 @@ class EstimationModule(models.Model):
             if check == False:
                 vals_md_mm = {
                     'estimation_id': result.estimation_id.id,
-                    'sequence': 2,
+                    'sequence': 0,
                     'name': 'Total (MD)',
                     'design_effort': 0,
                     'dev_effort': 0,
@@ -51,7 +52,6 @@ class EstimationModule(models.Model):
                 self.env['estimation.resource.effort'].create(vals_md_mm)
                 
                 vals_md_mm['name'] = 'Total (MM)'
-                vals_md_mm['sequence'] = 3
                 self.env['estimation.resource.effort'].create(vals_md_mm)
 
             # Create summary tab
@@ -271,39 +271,28 @@ class EffortActivities(models.Model):
     percent = fields.Float(string="Percentage (%)", default=0, store=True, compute='_compute_percentage')
     
     # compute_effort is required for the _compute_percentage method to work correctly
-    @api.depends('activity_id.effort', 'module_id.total_manday', 'activity_id')
+    @api.depends('module_id.module_config_activity.effort', 'module_id.module_config_activity.activity')
     def _compute_effort(self):
-        for rec in self:
-            rec.effort = rec.activity_id.effort
-            
-    @api.depends('effort', 'activity_id')
-    def _compute_percentage(self):
-        rs_module_id = 0
-        check_module_id = True
         for record in self:
-            if record.module_id.id:
-                rs_module_id = record.module_id.id
-                break
-            elif record.module_id.id == False:
-                check_module_id = False
-                break
-            elif record.module_id.id.origin:
-                rs_module_id = record.module_id.id.origin
-                break
-            else:
-                check_module_id = False
-                break
-            
-        if check_module_id:
-            ls_effort_distribute = self.env['module.effort.activity'].search([('module_id', '=', rs_module_id)])
-            total_effort = 0.0
-            for record in ls_effort_distribute:
-                total_effort += record.effort
-            for record in ls_effort_distribute:
-                if total_effort != 0.0:
-                    record.percent = round((record.effort / total_effort ) * 100, 2 )
+            for rec in record.module_id.module_config_activity:
+                if rec.id:
+                    activity_id = rec.id
                 else:
-                    record.percent = total_effort
+                    activity_id = rec.id.origin
+                if record.activity_id.id == activity_id:
+                    record.effort = rec.effort
+                    record.activity = rec.activity
+            
+    @api.depends('effort')
+    def _compute_percentage(self):
+        total_effort = 0.0
+        for record in self:
+            total_effort += record.effort
+        for rec in self:
+            if total_effort != 0.0:
+                rec.percent = round((rec.effort / total_effort ) * 100, 2)
+            else:
+                rec.percent = total_effort
     
     @api.model
     def create(self, vals):
