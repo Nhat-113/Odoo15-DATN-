@@ -11,6 +11,7 @@ class HistoryTaskScore(models.Model):
     department_id = fields.Many2one('hr.department',related='employee_id.department_id', string="Department", readonly=True)
     job_id = fields.Many2one('hr.job',related='employee_id.job_id', string="Job Position", readonly=True)
     parent_id = fields.Many2one('hr.employee',related='employee_id.parent_id', string="Parent ID", readonly=True)
+    company_id = fields.Many2one('res.company',related='employee_id.company_id', string="Company ID", readonly=True)
     year = fields.Integer(string="Year", readonly=True)
     task_score_avg = fields.Float(string='Task Score', digits=(12, 1), readonly=True)
 

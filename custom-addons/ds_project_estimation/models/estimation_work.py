@@ -42,8 +42,10 @@ class Estimation(models.Model):
     
     sequence_module = fields.Integer(string="Sequence Module", store=True, default = 1, compute ='_compute_sequence_module') # for compute sequence module
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
-    add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'connect_summary', string='Summary Total Cost')
-    add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate', string='Summary Cost Rate')
+    add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate',
+                                                 string='Summary Cost Rate')
+    add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'estimation_id', string='Summary Total Cost')
+
     add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'estimation_id', string='Resource Planning Effort')
     add_lines_module = fields.One2many('estimation.module', 'estimation_id', domain="[('estimation_id', '=', 4)]", string="Modules")
    
