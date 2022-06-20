@@ -23,7 +23,7 @@ class ProjectTask(models.Model):
         'project.planning.milestone', string='Milestone', required=False, domain=[('phase_id', '=', phase_id)], help="Project Milestone")
 
     planned_duration = fields.Float('Duration', default=0, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True, readonly=True)
-    working_day = fields.Float('Working Day', default=0, compute='_compute_working_day', store=True, readonly=True)
+    working_day = fields.Float('Working Day',compute='_compute_working_day', store=True, readonly=True)
     lag_time = fields.Integer('Lag Time')
     depending_task_ids = fields.One2many('project.depending.tasks', 'task_id')
     dependency_task_ids = fields.One2many(
@@ -84,16 +84,18 @@ class ProjectTask(models.Model):
                 r.working_day = 0
 
 
-    @api.onchange('planned_duration', 'date_start')
+    @api.onchange('planned_duration', 'date_start','date_end')
     def _inverse_planned_duration(self):
         for r in self:            
-            if r.date_start and not r.env.context.get('ignore_onchange_planned_duration', False):
+            if r.date_start  and not r.env.context.get('ignore_onchange_planned_duration', False):
+                if r.date_start > r.date_end and r.working_day==0 and r.planned_duration == 0 :
+                        r.date_start = r.date_end 
+                        r.planned_duration = 1
                 if r.planned_duration == 0.0:
                     r.planned_duration = 1
                 r.date_end = r.date_start + timedelta(days=r.planned_duration - 1)
                 if r.working_day == 0:
-                    r.working_day = 1
-                    
+                    r.working_day = 1                   
 
     @api.depends('dependency_task_ids')
     def _compute_recursive_dependency_task_ids(self):
