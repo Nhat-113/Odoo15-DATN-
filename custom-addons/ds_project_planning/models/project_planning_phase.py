@@ -73,12 +73,12 @@ class PlanningPhase(models.Model):
                 r.working_day = round(elapsed_seconds / seconds_in_day, 1)
             elif not r.start_date or not r.end_date:
                 r.working_day = 0
-
-    @api.onchange('phase_duration', 'start_date')
-    def _inverse_phase_duration(self):
-        for r in self:
-            if r.start_date and r.phase_duration and not r.env.context.get('ignore_onchange_phase_duration', False):
-                r.end_date = r.start_date + timedelta(days=r.phase_duration)
+    #comment code to don't compute end_date when change start_date
+    # @api.onchange('phase_duration', 'start_date')
+    # def _inverse_phase_duration(self):
+    #     for r in self:
+    #         if r.start_date and r.phase_duration and not r.env.context.get('ignore_onchange_phase_duration', False):
+    #             r.end_date = r.start_date + timedelta(days=r.phase_duration)
 
 
     def _check_dates(self):
