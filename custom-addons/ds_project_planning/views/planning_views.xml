@@ -9,12 +9,34 @@
         </field>
     </record>
 
+    <record id="planning_view_task_search_form" model="ir.ui.view">
+            <field name="name">planning.project.task.search.form</field>
+            <field name="model">project.task</field>
+            <field name="arch" type="xml">
+               <search string="Tasks">
+                    <field name="name" string="Task"/>
+                    <field name="tag_ids"/>
+                    <field name="user_ids" context="{'active_test': False}"/>
+                    <field string="Project" name="display_project_id"/>
+                    <field name="stage_id"/>
+                    <field name="partner_id" operator="child_of"/>
+                    <field name="parent_id"/>
+                    <filter string="My Tasks" name="my_tasks" domain="[('user_ids', 'in', uid)]"/>
+                    <filter string="Unassigned" name="unassigned" domain="[('user_ids', '=', False)]"/>
+                    <separator/>
+                    <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                    <separator/>
+                </search>
+            </field>
+        </record>
+
     <record id="open_planning_task_all_on_gantt" model="ir.actions.act_window">
         <field name="name">Tasks</field>
         <field name="res_model">project.task</field>
         <field name="view_mode">dhx_gantt</field>
         <field name="view_id" ref="ds_project_planning.task_gantt_view"/>
         <field name="domain">[('display_project_id', '=', active_id), ('issues_type', '=', 1)]</field>
+        <field name="search_view_id" ref="planning_view_task_search_form"/>
         <field name="context">{
             'pivot_row_groupby': ['user_ids'],
             'default_project_id': active_id,
@@ -161,8 +183,8 @@
                 <field name="start_date" />
                 <field name="end_date" />
                 <field name="duration" string="Duration (days)"/>
-                <field name="calendar_effort" digits="[12,1]" string="Booking Effort (MM)"/>
-                <field name="effort_rate" digits="[12,1]" string="Effort Rate (%)"/>
+                <field name="calendar_effort" digits="[12,2]" string="Booking Effort (MM)"/>
+                <field name="effort_rate" digits="[12,2]" string="Effort Rate (%)"/>
                 <field name="member_type" string="Member Type"/>
                 <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 <field name="inactive" invisible="1"/>
@@ -187,17 +209,17 @@
                         <field name="start_date" />
                         <field name="end_date" />
                         <field name="duration" />
-                        <field name="calendar_effort" digits="[12,1]"/>
+                        <field name="calendar_effort" digits="[12,2]"/>
                         <label for="member_type"/>
                         <div class="o_row" name="member_type">
                             <field name="member_type" nolabel="1"/>
                             <span>
-                                <field name="member_type_rate" digits="[12,1]" nolabel="1"/>
+                                <field name="member_type_rate" digits="[12,2]" nolabel="1"/>
                             </span> %
                         </div>
                         <label for="effort_rate"/>
                         <div class="o_row" name="effort_rate">
-                            <field name="effort_rate" digits="[12,1]" nolabel="1"/>
+                            <field name="effort_rate" digits="[12,2]" nolabel="1"/>
                             <span> % </span>
                         </div>
                         <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
@@ -405,9 +427,9 @@
                                     <field name="start_date" />
                                     <field name="end_date" />
                                     <field name="duration" string="Duration (days)"/>
-                                    <field name="calendar_effort" digits="[12,1]" string="Booking Effort (MM)"/>
+                                    <field name="calendar_effort" digits="[12,2]" string="Booking Effort (MM)"/>
                                     <field name="member_type" string="Member Type"/>
-                                    <field name="effort_rate" digits="[12,1]" string="Effort Rate (%)"/>
+                                    <field name="effort_rate" digits="[12,2]" string="Effort Rate (%)"/>
                                     <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                     <field name="inactive" invisible="1"/>
                                     <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)]}" />
@@ -424,17 +446,17 @@
                                             <field name="start_date" />
                                             <field name="end_date" />
                                             <field name="duration" />
-                                            <field name="calendar_effort" digits="[12,1]"/>
+                                            <field name="calendar_effort" digits="[12,2]"/>
                                             <label for="member_type"/>
                                             <div class="o_row" name="member_type">
                                                 <field name="member_type" nolabel="1"/>
                                                 <span>
-                                                    <field name="member_type_rate" digits="[12,1]" nolabel="1"/>
+                                                    <field name="member_type_rate" digits="[12,2]" nolabel="1"/>
                                                 </span> %
                                             </div>
                                             <label for="effort_rate"/>
                                             <div class="o_row" name="effort_rate">
-                                                <field name="effort_rate" digits="[12,1]" nolabel="1"/>
+                                                <field name="effort_rate" digits="[12,2]" nolabel="1"/>
                                                 <span> % </span>
                                             </div>
                                             <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
