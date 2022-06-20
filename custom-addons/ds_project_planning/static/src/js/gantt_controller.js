@@ -125,7 +125,7 @@ var GanttController = AbstractController.extend({
         //     if(!start_date.split) return
         // });
         dp.attachEvent("onBeforeDataSending", function(id, state, data) {
-           console.log(`state`,state );
+           //console.log(`state`,state );
             if(state!=="inserted" && state!=="deleted" && data.type !=="milestone" ) {
                 let date_start_convert = data.start_date.split('-');
                 date_start_convert.splice(0, 2, date_start_convert[1], date_start_convert[0]);
@@ -153,17 +153,17 @@ var GanttController = AbstractController.extend({
             var showTask = gantt.showTask;
             var taskObj = gantt.getTask(id);
             var id_before =   taskObj.id
-            console.log(`id before`, id_before);
+            //console.log(`id before`, id_before);
 
             gantt.showTask = function(aa){
                 aa=  id_before
-                console.log('id after1',aa); 
+                //console.log('id after1',aa); 
                 showTask.apply(this, [aa]);
                 var attr = gantt.config.task_attribute;
-                console.log(`attr`, attr);
-                console.log('id after',aa); 
+                //console.log(`attr`, attr);
+               // console.log('id after',aa); 
                 var timelineElement = document.querySelector(".gantt_task_line["+attr+"='"+aa+"']");
-                console.log('timelineElement',timelineElement);
+                // console.log('timelineElement',timelineElement);
                 if(timelineElement)
                     timelineElement.scrollIntoView();
             };
@@ -204,7 +204,7 @@ var GanttController = AbstractController.extend({
             });
         });
         gantt.attachEvent("onBeforeTaskMove", function(id, parent, tindex){
-            //console.log('tindex',parent);
+            console.log('tindex',parent);
             var task = gantt.getTask(id);
             if(task.parent != parent)
             {
