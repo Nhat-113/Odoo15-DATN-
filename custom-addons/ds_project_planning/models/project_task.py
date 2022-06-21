@@ -84,11 +84,11 @@ class ProjectTask(models.Model):
                 r.working_day = 0
 
 
-    @api.onchange('planned_duration', 'date_start','date_end')
+    @api.onchange('planned_duration', 'date_start')
     def _inverse_planned_duration(self):
         for r in self:            
             if r.date_start  and not r.env.context.get('ignore_onchange_planned_duration', False):
-                if r.date_start > r.date_end and r.working_day==0 and r.planned_duration == 0 :
+                if  r.date_start and r.date_end and r.date_start > r.date_end  and r.working_day==0 and r.planned_duration == 0 :
                         r.date_start = r.date_end 
                         r.planned_duration = 1
                 if r.planned_duration == 0.0:
