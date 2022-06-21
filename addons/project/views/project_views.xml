@@ -274,7 +274,7 @@
                 <sheet string="Project">
                     <div class="oe_button_box" name="button_box" groups="base.group_user">
                         <field name="currency_id" invisible="1"/>
-                        <button class="oe_stat_button" type="action"
+                        <button class="oe_stat_button edit_project_inherit" type="action"
                             name="%(act_project_project_2_project_task_all)d" icon="fa-tasks">
                             <field string="Tasks In Progress" name="task_count" widget="statinfo" options="{'label_field': 'label_tasks'}"/>
                         </button>
