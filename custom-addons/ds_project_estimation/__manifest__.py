@@ -30,6 +30,7 @@
         "data/resource_planing_data.xml",
         "data/cost_rate_data.xml",
         "views/crm_lead_views.xml",
+        "wizard/message_wizard_views.xml"
 
     ],
     'assets': {

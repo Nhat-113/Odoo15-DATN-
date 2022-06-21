@@ -2,6 +2,7 @@ from odoo import models, fields, api, _
 import json
 from odoo.exceptions import UserError
 from odoo.modules import module
+import time
 
 
 class Estimation(models.Model):
@@ -248,8 +249,20 @@ class Estimation(models.Model):
                             'status':2,
                             'planned_hours':breakdown.mandays * 8
                         })
+            time.sleep(1)
+            message_id = self.env['estimation.message.wizard'].create(
+                {'message': _("In the next few minutes, project will be create.")})
+            
             estimation.check_generate_project = True
-            return project
+
+            return {
+                'name': 'Message',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+                'res_model': 'estimation.message.wizard',
+                'res_id': message_id.id,
+                'target': 'new'
+            }
 
 
     @api.depends('add_lines_module')

@@ -62,7 +62,7 @@
 <!--                                <div class="oe_clear"/>-->
 <!--                            </group>-->
                             <separator string="Cost Rate" />
-                            <field name="add_lines_summary_costrate">
+                            <field name="add_lines_summary_costrate" required="True">
                                 <tree editable="bottom" create="0" delete="0" order="module_id desc">
                                     <field name="sequence" />
                                     <field name="name"/>
