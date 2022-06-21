@@ -409,6 +409,11 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
             return "warning";
         }
       };
+      
+      gantt.templates.task_class = function(start, end, task){
+        if(task.type == "milestone" || task.type =="phase") return "custom_task";
+        return "";
+      };
       gantt.templates.task_text = function(start, end, task){
         if(task.deadline == 2)
           return "<span style='color:black'>"+task.text+"</span>";
