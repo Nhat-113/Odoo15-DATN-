@@ -1,5 +1,4 @@
 from odoo import models, fields, api
-from odoo.addons.test_convert.tests.test_env import record
 
 
 class EstimationSummaryTotalCost(models.Model):
