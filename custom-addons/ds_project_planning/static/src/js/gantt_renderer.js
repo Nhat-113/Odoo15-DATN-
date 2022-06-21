@@ -43,6 +43,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.config.work_time = true;
       gantt.config.skip_off_time = true;
       gantt.config.root_id = "root"; 
+      gantt.config.autosize = "x";
       gantt.plugins({
         tooltip: true,
       });

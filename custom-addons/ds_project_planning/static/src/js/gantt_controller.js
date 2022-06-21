@@ -165,7 +165,7 @@ var GanttController = AbstractController.extend({
 
                 console.log('timelineElement',timelineElement);
                 if(timelineElement)
-                    timelineElement.scrollIntoView();
+                    timelineElement.scrollIntoView({block:"center"});
                    
            };
             return true; 
