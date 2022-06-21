@@ -166,11 +166,11 @@ class DependingTasks(models.Model):
         for task in self:
             if task.depending_task_id:
                 task.task_id_domain = json.dumps(
-                    [('project_id', '=', task.project_id.id), ('id', '!=', task.depending_task_id.ids[0]), ('parent_id', '=', False), ('issues_type', '=', 1)]
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.depending_task_id.ids[0]), ('issues_type', '=', 1)]
                 )
             elif task.task_id:
                 task.task_id_domain = json.dumps(
-                    [('project_id', '=', task.project_id.id), ('id', '!=', task.task_id.ids[0]), ('parent_id', '=', False), ('issues_type', '=', 1)]
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.task_id.ids[0]), ('issues_type', '=', 1)]
                 )
 
     task_id_domain = fields.Char(

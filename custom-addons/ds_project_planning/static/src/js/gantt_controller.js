@@ -181,7 +181,25 @@ var GanttController = AbstractController.extend({
                 return true;
             });
         });
-         
+        // deny drag if task have progress === 100%
+        gantt.attachEvent("onBeforeTaskDrag", function (id, mode, e) {
+            var taskObj = gantt.getTask(id);
+            if( taskObj.progress === 1) {
+                return false;
+            }
+            return true;
+        
+        });
+        
+        gantt.attachEvent("onBeforeTaskMove", function(id, parent, tindex){
+            //console.log('tindex',parent);
+            var task = gantt.getTask(id);
+            if(task.parent != parent)
+            {
+                return false;
+            }
+            return true;
+        });
 
         //deny drag phase 
         // gantt.attachEvent("onBeforeTaskDrag", function(id, mode, e){

@@ -2,6 +2,7 @@ from odoo import models, fields, api, _
 import json
 from odoo.exceptions import UserError
 from odoo.modules import module
+import time
 
 
 class Estimation(models.Model):
@@ -42,8 +43,10 @@ class Estimation(models.Model):
     
     sequence_module = fields.Integer(string="Sequence Module", store=True, default = 1, compute ='_compute_sequence_module') # for compute sequence module
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
-    add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'connect_summary', string='Summary Total Cost')
-    add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate', string='Summary Cost Rate')
+    add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate',
+                                                 string='Summary Cost Rate')
+    add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'estimation_id', string='Summary Total Cost')
+
     add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'estimation_id', string='Resource Planning Effort')
     add_lines_module = fields.One2many('estimation.module', 'estimation_id', domain="[('estimation_id', '=', 4)]", string="Modules")
    
@@ -246,8 +249,20 @@ class Estimation(models.Model):
                             'status':2,
                             'planned_hours':breakdown.mandays * 8
                         })
+            time.sleep(1)
+            message_id = self.env['estimation.message.wizard'].create(
+                {'message': _("In the next few minutes, project will be create.")})
+            
             estimation.check_generate_project = True
-            return project
+
+            return {
+                'name': 'Message',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+                'res_model': 'estimation.message.wizard',
+                'res_id': message_id.id,
+                'target': 'new'
+            }
 
 
     @api.depends('add_lines_module')

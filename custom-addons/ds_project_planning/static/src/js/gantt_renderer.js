@@ -42,7 +42,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.config.grid_width = 660;
       gantt.config.work_time = true;
       gantt.config.skip_off_time = true;
-
+      gantt.config.root_id = "root"; 
       gantt.plugins({
         tooltip: true,
       });
@@ -162,6 +162,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         },
         {
           name: "start_date",
+          label: "Start Time",
           align: "center",
           resize: true,
           // editor: startDateEditor,
@@ -178,7 +179,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         },
         {
           name: "end_date",
-          label: "End time",
+          label: "End Time",
           align: "center",
           resize: true,
           // editor: endDateEditor,
@@ -223,6 +224,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         },
         {
           name: "duration",
+          label: "Duration",
           align: "center",
           resize: true,
           template: function (item) {
@@ -273,6 +275,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         {
           name: "start_date",
           align: "center",
+          label: "Start time",
           resize: true,
           // editor: startDateEditor,
           width: 120,
@@ -334,6 +337,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         {
           name: "duration",
           align: "center",
+          label: "Duration",
           resize: true,
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
@@ -369,7 +373,6 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           },
 
         },
-        
       ]
 
       gantt.config.columns = createColumnsConfig({
@@ -483,6 +486,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
                   ${task.duration}
                 <br/>
                 <b>Progress:</b> 0 %<br/>
+                <b>Working Day:</b> 0 <br/>
                 `;
         } else if(task.type === "milestone") {
             return `<b>${type}:</b> ${task.text}<br/>
@@ -490,6 +494,8 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
                     <b>Duration:</b> 
                       ${task.duration}
                     <br/>
+                    <b>Working Day: 1</b> 
+                  <br/>
                     <b>Progress:</b> ${task.progress * 100}%<br/>
                     <b>Start date:</b> ${gantt.templates.tooltip_date_format(
                       start
@@ -502,6 +508,9 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
                 <b>Assignees:</b> ${assignees}<br/>
                 <b>Duration:</b> 
                   ${task.duration}
+                <br/>
+                <b>Working:</b> 
+                ${task.working_day}
                 <br/>
                 <b>Progress:</b> ${task.progress * 100}%<br/>
                 <b>Start date:</b> ${
