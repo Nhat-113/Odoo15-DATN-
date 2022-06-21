@@ -456,10 +456,10 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.templates.tooltip_date_format = gantt.date.date_to_str("%F %j, %Y");
       gantt.templates.tooltip_text = function (start, end, task) {
       var gridDateToStr = gantt.date.date_to_str("%Y-%m-%d");
-        if( end && task.type !== "milestone"){
+        // if( end && task.type !== "milestone"){
             end =  gridDateToStr(new Date(end.valueOf() - 1)); 
             start =  gridDateToStr(new Date(start.valueOf() )); 
-        }
+        // }
       
         var assignees = getAssignees(task.user_ids);
         var type =
@@ -502,11 +502,11 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
                     <b>Working Day: 1</b> 
                   <br/>
                     <b>Progress:</b> ${task.progress * 100}%<br/>
-                    <b>Start date:</b> ${gantt.templates.tooltip_date_format(
-                      start
-                    )} 
+                    <b>Start date:</b> ${
+                      end
+                    } 
                     <br/><b>End date:</b> ${
-                        gantt.templates.tooltip_date_format(end)}`
+                        end}`
                     } 
         else 
         return `<b>${type}:</b> ${task.text}<br/>
