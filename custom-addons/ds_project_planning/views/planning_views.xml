@@ -10,25 +10,25 @@
     </record>
 
     <record id="planning_view_task_search_form" model="ir.ui.view">
-            <field name="name">planning.project.task.search.form</field>
-            <field name="model">project.task</field>
-            <field name="arch" type="xml">
-               <search string="Tasks">
-                    <field name="name" string="Task"/>
-                    <field name="tag_ids"/>
-                    <field name="user_ids" context="{'active_test': False}"/>
-                    <field string="Project" name="display_project_id"/>
-                    <field name="stage_id"/>
-                    <field name="partner_id" operator="child_of"/>
-                    <field name="parent_id"/>
-                    <filter string="My Tasks" name="my_tasks" domain="[('user_ids', 'in', uid)]"/>
-                    <filter string="Unassigned" name="unassigned" domain="[('user_ids', '=', False)]"/>
-                    <separator/>
-                    <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
-                    <separator/>
-                </search>
-            </field>
-        </record>
+        <field name="name">planning.project.task.search.form</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <search string="Tasks">
+                <field name="name" string="Task"/>
+                <field name="tag_ids"/>
+                <field name="user_ids" context="{'active_test': False}"/>
+                <field string="Project" name="display_project_id"/>
+                <field name="stage_id"/>
+                <field name="partner_id" operator="child_of"/>
+                <field name="parent_id"/>
+                <filter string="My Tasks" name="my_tasks" domain="[('user_ids', 'in', uid)]"/>
+                <filter string="Unassigned" name="unassigned" domain="[('user_ids', '=', False)]"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
 
     <record id="open_planning_task_all_on_gantt" model="ir.actions.act_window">
         <field name="name">Tasks</field>
@@ -78,7 +78,7 @@
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.edit_project"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@name='button_box']/button[1]" position="replace">
+            <xpath expr="//button[hasclass('edit_project_inherit')]" position="replace">
                 <button class="oe_stat_button" type="action" name="194" icon="fa-tasks">
                     <field string="Tasks In Progress" name="task_total" widget="statinfo" options="{'label_field': 'label_tasks'}"/>
                 </button>
