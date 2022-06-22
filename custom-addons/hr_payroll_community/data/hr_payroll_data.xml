@@ -453,7 +453,7 @@
         </record>
 
         <record id="hr_rule_otct" model="hr.salary.rule">
-            <field name="name">Lương OT chịu thuế (VND) = (11)/8*(1.5-1)*(6) + (12)/8*(2-1)*(6) + (13)/8*(3-1)*(6)</field>
+            <field name="name">Lương OT miễn thuế (VND) = (11)/8*(1.5-1)*(6) + (12)/8*(2-1)*(6) + (13)/8*(3-1)*(6)</field>
             <field name="sequence" eval="18"/>
             <field name="code">OTCT</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -535,23 +535,23 @@
         </record>
 
         <record id="hr_rule_tnc_gross1" model="hr.salary.rule">
-            <field name="name">Thu nhập chịu thuế theo lương (VND) = (18) + (19) - (2) - (14) - (20) - (21)</field>
+            <field name="name">Thu nhập chịu thuế theo lương (VND) = (19) - (18) - (2) - (20) - (21)</field>
             <field name="sequence" eval="23"/>
             <field name="code">TNC1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field> 
-            <field name="condition_python">result = (TTNTT - GTGC - PCK - OT - BH + OTCT) &gt; 0</field> 
+            <field name="condition_python">result = (TTNTT - GTGC - PCK - BH - OTCT) &gt; 0</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = (TTNTT - GTGC - PCK - OT - BH + OTCT)</field>
+            <field name="amount_python_compute">result = (TTNTT - GTGC - PCK - BH - OTCT)</field>
         </record>
 
         <record id="hr_rule_tnc_gross2" model="hr.salary.rule">
-            <field name="name">Thu nhập chịu thuế theo lương (VND) = (18) + (19) - (2) - (14) - (20) - (21)</field>
+            <field name="name">Thu nhập chịu thuế theo lương (VND) = (19) - (18) - (2) - (20) - (21)</field>
             <field name="sequence" eval="23"/>
             <field name="code">TNC1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field> 
-            <field name="condition_python">result = (TTNTT - GTGC - PCK - OT - BH + OTCT) &lt;= 0</field> 
+            <field name="condition_python">result = (TTNTT - GTGC - PCK - BH - OTCT) &lt;= 0</field> 
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = 0</field>
         </record>
