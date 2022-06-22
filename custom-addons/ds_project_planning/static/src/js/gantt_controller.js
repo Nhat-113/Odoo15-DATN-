@@ -152,18 +152,19 @@ var GanttController = AbstractController.extend({
             var showTask = gantt.showTask;
             var taskObj = gantt.getTask(id);
             var id_before =   taskObj.id
-            console.log(`id before`, id_before);
+            //console.log(`id before`, id_before);
 
             gantt.showTask = function(id_drag){
+                console.log(`mode`, mode);
                 id_drag = id_before
-                console.log('id after1',id_drag); 
+                // console.log('id after1',id_drag); 
                 showTask.apply(this, [id_drag]);
                 var attr = gantt.config.task_attribute;
-                console.log(`attr`, attr);
-                console.log('id after',id_drag); 
+                // console.log(`attr`, attr);
+                // console.log('id after',id_drag); 
                 var timelineElement = document.querySelector(".gantt_task_line["+attr+"='"+id_drag+"']");
 
-                console.log('timelineElement',timelineElement);
+                // console.log('timelineElement',timelineElement);
                 if(timelineElement)
                     timelineElement.scrollIntoView({block:"center"});
                    

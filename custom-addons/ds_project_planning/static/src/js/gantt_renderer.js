@@ -43,7 +43,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.config.work_time = true;
       gantt.config.skip_off_time = true;
       gantt.config.root_id = "root"; 
-      gantt.config.autosize = "x";
+      gantt.config.autosize = "xy";
       gantt.plugins({
         tooltip: true,
       });
@@ -542,6 +542,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
             name: "day",
             scale_height: 27,
             min_column_width: 80,
+            column_width:250,
             scales: [{ unit: "day", step: 1, format: "%d %M" }],
           },
           {
@@ -572,7 +573,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           {
             name: "month",
             scale_height: 50,
-            min_column_width: 120,
+            min_column_width: 250,
             scales: [
               { unit: "month", format: "%F, %Y" },
               { unit: "week", format: "Week #%W" },
@@ -581,7 +582,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           {
             name: "quarter",
             height: 50,
-            min_column_width: 90,
+            min_column_width: 350,
             scales: [
               { unit: "month", step: 1, format: "%M" },
               {
@@ -602,7 +603,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           {
             name: "year",
             scale_height: 50,
-            min_column_width: 30,
+            min_column_width: 350,
             scales: [{ unit: "year", step: 1, format: "%Y" }],
           },
         ],
