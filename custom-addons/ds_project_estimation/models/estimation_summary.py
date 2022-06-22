@@ -10,6 +10,7 @@ class EstimationSummaryTotalCost(models.Model):
 
     sequence = fields.Integer(string="No", index=True, readonly=True, help='Use to arrange calculation sequence',
                               default=1)
+    check_activate = fields.Boolean(string='Activate', default=False)
     module_id = fields.Many2one("estimation.module", string="Module")
     name = fields.Char(string="Components", default="Module")
     design_effort = fields.Float(string="Design",  compute='_compute_effort')
