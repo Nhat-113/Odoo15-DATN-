@@ -15,21 +15,16 @@ class Project(models.Model):
 
     privacy_visibility = fields.Selection(default='followers')
     planning_calendar_resources = fields.One2many(
-        'planning.calendar.resource', 'project_id', string='Planning Calendar Resources', readonly=False)
+        'planning.calendar.resource', 'project_id', string='Planning Booking Resources', readonly=False)
     user_id_domain = fields.Char(
         compute="_compute_user_id_domain",
-        readonly=True,
-        store=False,
-    )
-    employee_id_domain = fields.Char(
-        compute="_compute_employee_id_domain",
         readonly=True,
         store=False,
     )
     member_ids = fields.Many2many('res.users', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
     total_calendar_effort = fields.Float(
-        string="Calendar Effort", compute="_compute_total_calendar_effort")
+        string="Booking Effort", compute="_compute_total_calendar_effort")
     total_estimate_effort = fields.Float(string="Estimate Effort")
     total_phase = fields.Integer(
         string="Total phases", compute="_count_phase_milestone")
@@ -64,15 +59,6 @@ class Project(models.Model):
                 [('id', 'in', user_ids)]
             )
 
-    @api.depends('planning_calendar_resources')
-    def _compute_employee_id_domain(self):
-        for project in self:
-            user_ids = [
-                user.id for user in project.planning_calendar_resources.employee_id]
-            user_ids.append(self.env.user.employee_id.id)
-            project.employee_id_domain = json.dumps(
-                [('id', 'in', user_ids)]
-            )
 
     @api.onchange('planning_calendar_resources')
     def _onchange_calendar_resources(self):

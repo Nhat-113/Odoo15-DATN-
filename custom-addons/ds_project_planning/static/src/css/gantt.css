@@ -76,3 +76,54 @@
 .headerColor{
     color: #71639e!important;
 }
+.gantt-dropdown{
+    position:absolute;
+    top:0;
+    right:0;
+    width: 20px;
+    height:100%;
+    z-index:2;
+    border-left:1px solid #cecece
+  
+  }
+  
+  .gantt-dropdown:hover{
+    background: rgba(0,0,0, 0.1);
+  }
+  
+  #gantt_dropdown {
+    position: absolute;
+    display: none;
+    border: 1px solid #cecece;
+    background: #fff;
+    padding: 10px;
+    top: 92.813px !important;
+    left: 28.8% !important;
+    z-index: 10000;
+}
+.gantt_grid .gantt_grid_scale .gantt_grid_head_cell.gantt_grid_head_text 
+{
+    text-align: center;
+    font-weight: 100 !important;
+}
+.gantt_side_content {
+    margin-left: 4.5px;
+    width: 143px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.gantt_grid_head_working_day {
+    white-space: nowrap;
+    width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* .gantt_task_line.gantt_milestone {
+    margin-left: 40px
+} */
+/* .gantt_task_line.gantt_milestone .gantt_link_control.task_left {
+        height: 21px;
+        line-height: 21px;
+        margin-left: 16.5px !important;
+}  */

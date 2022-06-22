@@ -13,7 +13,7 @@ from odoo.exceptions import UserError, ValidationError
 
 class PlanningCalendarResource(models.Model):
     _name = "planning.calendar.resource"
-    _description = "Planning Calendar Resource Of Project"
+    _description = "Planning Booking Resource Of Project"
     _order = "start_date"
     _rec_name = "employee_id"
 
@@ -27,9 +27,9 @@ class PlanningCalendarResource(models.Model):
                            help="Date on which the member finished working on project")
     duration = fields.Integer(compute='_compute_duration', string="Duration",
                               readonly=True, help="The duration of working time in the project", default=1)
-    calendar_effort = fields.Float(string="Calendar Effort", default=1.0)
+    calendar_effort = fields.Float(string="Booking Effort", default=1.0)
     effort_rate = fields.Float(string="Effort Rate", compute='_compute_effort_rate',
-                               readonly=True, help="Effort Rate (%) = Calendar Effort * 20 / Duration")
+                               readonly=True, help="Effort Rate (%) = Calendar Effort * 20 / Duration", store=True, default=0)
     role_ids = fields.Many2many('planning.roles', string='Roles')
     note = fields.Text(string='Note')
     member_type = fields.Many2one(
@@ -62,7 +62,7 @@ class PlanningCalendarResource(models.Model):
         """ Calculates effort rate (%)"""
         for resource in self:
             if resource.duration != 0:
-                resource.effort_rate = resource.calendar_effort * 20 / resource.duration * 100
+                resource.effort_rate = resource.calendar_effort * 20 / resource.duration * 100       
 
     def _check_dates(self):
         for resource in self:
@@ -90,12 +90,20 @@ class PlanningCalendarResource(models.Model):
                                 resource.employee_id.user_id.id]
                     task.write({'user_ids': [(6, 0, user_ids)]})
 
+        for project in resource.project_id:
+            calendars = self.env['planning.calendar.resource'].search(['&', ('project_id', '=', project.id), ('inactive', '=', True)])
+            task_no_assign = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1),('user_ids','=',False)])
+            if task_no_assign > 0:
+                for calendar in calendars:
+                    if calendar.inactive_date > date.today() and project.last_update_status not in ['off_track', 'on_hold']:
+                        project.write({'last_update_status': 'missing_resource'})
+
     @api.model
     def open_calendar_resource(self, project_id):
         target_project = self.env['project.project'].browse(project_id)
 
         return {
-            "name": _("Calendar Resource (%s)", target_project.name),
+            "name": _("Booking Resource (%s)", target_project.name),
             "type": "ir.actions.act_window",
             "res_model": "project.project",
             "views": [[self.env.ref('ds_project_planning.view_form_calendar_resource').id, "form"]],

@@ -73,6 +73,8 @@ class Task(models.Model):
         ('medium', 'Medium'),
         ('low', 'Low'),
     ], string='Priority Type', index=True, copy=False, default='low', tracking=True)
+    create_date = fields.Datetime("Create Date", readonly=True, index=True)
+    write_date = fields.Datetime("Update Date", readonly=True, index=True)
 
     complex = fields.Selection([
         ('high', 'High'),
@@ -82,11 +84,11 @@ class Task(models.Model):
 
     task_score = fields.Selection([
         ('0', 'Nothing'),
-        ('1', '1 star (Failed to complete tasks and deadlines)'),
-        ('2', '2 stars (Not completing the task or deadline)'),
-        ('3', '3 stars (Complete tasks and deadlines according to the plan)'),
-        ('4', '4 stars (Complete the task ahead of time)'),
-        ('5', '5 stars (Completed ahead of time and very good code and bug quality)'),
+        ('1', '1 star (Cannot complete tasks and keep the deadlines)'),
+        ('2', '2 stars (Can complete tasks and keep the deadlines, but quality is not so good)'),
+        ('3', '3 stars (Can complete tasks and keep the deadlines, quality is pretty OK without any serious issues)'),
+        ('4', '4 stars (Can complete the tasks ahead of time with a good quality)'),
+        ('5', '5 stars (Can complete the tasks ahead of time with a very good quality, as well to support other members effectively)'),
     ], default='0', index=True, string="Task Score", tracking=True)
     status = fields.Many2one('project.task.status',
                              string="Status Task", tracking=True)
@@ -122,7 +124,7 @@ class Task(models.Model):
 
     def _check_user_readonly(self):
         if self.env.user.has_group('project.group_project_manager') == True or\
-                self.env.user.id == self.project_id.user_id.id or self.create_uid.id != self.project_id.user_id.id:
+                self.env.user.id == self.project_id.user_id.id or self.create_uid.id == self.env.user.id:
             self.is_readonly = False
         else:
             self.is_readonly = True
@@ -148,17 +150,32 @@ class Task(models.Model):
     @api.constrains('status', 'timesheet_ids')
     def _check_timesheet(self):
         if self.status.name == 'Done' or self.status.name == 'Closed' and self.issues_type.name == 'Task':
-            if len(self.timesheet_ids) == 0 or self.planned_hours == 0.0:
+            if len(self.timesheet_ids) == 0:
                 raise UserError(
-                    'Time Sheet field and Initially Planned Hours field cannot be left blank')
+                    'Time Sheet field cannot be left blank')
+            elif self.planned_hours == 0.0:
+                raise UserError(
+                    'Initially Planned Hours field cannot be left blank')
             if self.progress_input != 100:
                 raise UserError(
                     'Required when status Done or Closed, progress = 100%')
+
+    @api.constrains('status')
+    def _check_task_score(self):
+        if self.status.name == 'Done':
+            if self.task_score == '0':
+                raise UserError(
+                    'When the status is Done, you must score the task.')
+
 
     @api.constrains('progress_input')
     def _check_progress(self):
         if self.progress_input < 0 or self.progress_input > 100:
             raise UserError('Progress must be between 0 and 100%')
+        elif self.status.name == 'Done' or self.status.name == 'Closed' and self.issues_type.name == 'Task':
+            if self.progress_input != 100:
+                raise UserError(
+                    'Required when status Done or Closed, progress = 100%')
 
     @api.constrains('progress_input', 'timesheet_ids')
     def _check_timesheet_progress(self):
@@ -202,6 +219,11 @@ class Project(models.Model):
         ('on_hold', 'On Hold')
     ], default='on_track', compute='_compute_last_update_status', store=True)
     last_update_color = fields.Integer(compute='_compute_last_update_color')
+    employee_id_domain = fields.Char(
+        compute="_compute_employee_id_domain",
+        readonly=True,
+        store=False,
+    )
 
     @api.depends('last_update_status')
     def _compute_last_update_color(self):
@@ -231,19 +253,22 @@ class Project(models.Model):
     def update_status(self):
         projects = self.env['project.project'].search([('active', '=', True)])
         for project in projects:
-            calendars = self.env['planning.calendar.resource'].search(['&', ('project_id', '=', project.id), ('inactive', '=', True)])
-            task_no_assign = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1),('user_ids','=',False)])
-            if task_no_assign > 0:
-                for calendar in calendars:
-                    if calendar.inactive_date < date.today() and project.last_update_status not in ['off_track', 'on_hold']:
-                        project.write({'last_update_status': 'missing_resource'})
-
             task_all = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1)])
             task_out_of_date = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1),('status','not in',[6,7]),('date_end','<',date.today())])
             if task_all > 0 and task_out_of_date/task_all >= 0.1:
                 project.write({'last_update_status': 'at_risk'})
 
         return True
+
+    @api.depends('planning_calendar_resources')
+    def _compute_employee_id_domain(self):
+        for project in self:
+            user_ids = [
+                user.id for user in project.planning_calendar_resources.employee_id]
+            user_ids.append(self.env.user.employee_id.id)
+            project.employee_id_domain = json.dumps(
+                [('id', 'in', user_ids)]
+            )
 
     
 class ProjectUpdate(models.Model):

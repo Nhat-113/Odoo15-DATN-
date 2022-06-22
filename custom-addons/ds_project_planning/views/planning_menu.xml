@@ -22,7 +22,7 @@
     <menuitem id="planning_menu_child" name="Planning" parent="planning_menu" action="open_view_planning_project_all" sequence="1" />
 
     <!-- Menu item to open the Calendar Resource list -->
-    <menuitem id="menu_calendar_resource" name="Calendar Resource" parent="planning_menu" action="action_calendar_resource" sequence="3" />
+    <menuitem id="menu_calendar_resource" name="Booking Resource" parent="planning_menu" action="action_calendar_resource" sequence="3" />
 
     <!-- Menu item to open the Configuration -->
     <menuitem id="planning_config_menu" name="Configuration" parent="planning_menu" groups="project.group_project_manager" sequence="4" />
@@ -31,7 +31,7 @@
 
     <!-- Action to open the configuration phases of project -->
     <record id="action_config_phase" model="ir.actions.act_window">
-        <field name="name">Project Phases</field>
+        <field name="name">Planning Phases</field>
         <field name="res_model">project.planning.phase</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
@@ -48,7 +48,7 @@
 
     <!-- Action to open the configuration phases of project -->
     <record id="action_config_milestone" model="ir.actions.act_window">
-        <field name="name">Project Milestone</field>
+        <field name="name">Planning Milestone</field>
         <field name="res_model">project.planning.milestone</field>
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="view_project_planning_milestone_search_form"/>

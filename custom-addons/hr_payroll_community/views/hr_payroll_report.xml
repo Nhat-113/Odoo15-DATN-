@@ -14,6 +14,7 @@
             <field name="name">Payslip</field>
             <field name="model">hr.payslip</field>
             <field name="report_type">qweb-pdf</field>
+            <field name="groups_id" eval="[(4,ref('hr_payroll_community.group_hr_payroll_community_manager')), (4, ref('hr_payroll_community.group_hr_payroll_community_user'))]"/>
             <field name="report_name">hr_payroll_community.report_payslip</field>
             <field name="report_file">hr_payroll_community.report_payslip</field>
             <field name="binding_model_id" ref="model_hr_payslip"/>

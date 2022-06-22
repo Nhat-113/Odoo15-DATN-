@@ -24,11 +24,3 @@ class EstimationOverview(models.Model):
         if vals.get("revision", 0) == 0:
             vals["revision"] = (revision_value + 0.1)
         return super(EstimationOverview, self).create(vals)
-
-    @api.model
-    def default_get(self, field):
-        res = super(EstimationOverview, self).default_get(field)
-        active_id = self._context.get('active_id')
-        estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
-        estimation_lead.estimation_count += 1
-        return res
