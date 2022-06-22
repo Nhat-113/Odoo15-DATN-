@@ -103,10 +103,12 @@ class PlanningCalendarResource(models.Model):
         target_project = self.env['project.project'].browse(project_id)
 
         return {
-            "name": _("Booking Resource (%s)", target_project.name),
+            "title": _("Booking Resource (%s)", target_project.name),
+            # "name": _("Booking Resource (%s)", target_project.name),
             "type": "ir.actions.act_window",
             "res_model": "project.project",
-            "views": [[self.env.ref('ds_project_planning.view_form_calendar_resource').id, "form"]],
+            "view_id": self.env.ref('ds_project_planning.view_form_calendar_resource').id,
+            # "views": [[self.env.ref('ds_project_planning.view_form_calendar_resource').id, "form"]],
             "target": "new",
             "res_id": project_id
         }
