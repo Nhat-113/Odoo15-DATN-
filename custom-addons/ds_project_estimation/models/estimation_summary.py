@@ -123,13 +123,13 @@ class EstimationSummaryCostRate(models.Model):
 
     connect_summary_costrate = fields.Many2one('estimation.work', string="Connect Summary Cost Rate")
     module_id = fields.Many2one("estimation.module", string="Module")
-    name = fields.Char(string="Components", default="Module")
+    name = fields.Char(string="Components", default="Module", readonly=True)
 
-    sequence = fields.Integer(string="No", )
-    types = fields.Char(string="Type", )
+    sequence = fields.Integer(string="No", readonly=True)
+    types = fields.Char(string="Type", readonly=True)
     role = fields.Many2one('cost.rate', string='Role')
-    yen_month = fields.Float(string="Unit (Currency/Month)", store=True, default=0.00)
-    yen_day = fields.Float(string="Unit (Currency/Day)", store=True, compute='_compute_yen_month', default=0.00)
+    yen_month = fields.Float(string="Unit (Currency/Month)", store=True, default=0.00, readonly=True)
+    yen_day = fields.Float(string="Unit (Currency/Day)", store=True, compute='_compute_yen_month', default=0.00, readonly=True)
 
     @api.depends('role', 'connect_summary_costrate.currency_id', 'role.cost_usd', 'role.cost_yen', 'role.cost_vnd')
     def _compute_yen_month(self):
