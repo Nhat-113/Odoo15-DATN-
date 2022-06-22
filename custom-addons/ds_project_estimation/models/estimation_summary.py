@@ -26,11 +26,12 @@ class EstimationSummaryTotalCost(models.Model):
     @api.depends('estimation_id.add_lines_summary_costrate.yen_month', 'estimation_id.add_lines_summary_costrate.role', 'total_effort')
     def _compute_cost(self):
         for record in self:
-            total_cost_id = record.module_id.id
-            cost_rate = record.estimation_id.add_lines_summary_costrate
+            module_id = record.module_id.id
+            cost_rate = self.env['estimation.summary.costrate'].search([('module_id', '=', module_id)])
+
             cost = 0
             for item_cost_rate in cost_rate:
-                if item_cost_rate.module_id.id == total_cost_id:
+                if item_cost_rate.module_id.id == module_id:
                     types = item_cost_rate.types
                     if types == 'Developer':
                         cost += record.dev_effort * item_cost_rate.yen_month
