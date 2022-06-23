@@ -6,6 +6,8 @@ from dateutil.relativedelta import relativedelta
 import pandas as pd
 from pytz import utc
 from soupsieve import select
+from datetime import datetime
+
 from odoo import models, fields, api, _
 from odoo.http import request
 from odoo.tools import float_utils
@@ -53,24 +55,36 @@ class Employee(models.Model):
     @api.model
     def get_user_employee_details(self):
         uid = request.session.uid
-        company_ids = self.env.user.company_ids.ids
-        employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
+        company_ids = self.env.user.company_ids
+        # employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
         company_id = self.env.company.ids
         leave_manager_id = self.env['hr.employee'].search([('leave_manager_id', '=' ,uid)])
+        #all request
         if  self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
             leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),('employee_company_id','in' , company_id )])
         else:
             leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),('employee_company_id','in' , company_id ), ('employee_id', 'in',leave_manager_id.ids)])
+        #today request
+        today = datetime.strftime(datetime.today(), '%Y-%m-%d')
+        today_timestamp = datetime.today()
+        if  self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
+            leaves_today = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),\
+            ('create_date','>=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 0, 0, 0)),\
+            ('create_date','<=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 23, 59, 59)),\
+            ('employee_company_id','in' , company_id )])
+        else:
+            leaves_today = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),\
+            ('create_date','>=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 0, 0, 0)),\
+            ('create_date','<=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 23, 59, 59)),
+            ('employee_id', 'in',leave_manager_id.ids)])    
 
-
-        recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ]),('company_id','in' , company_ids )])
+        recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ]),('company_id','in' , company_id)])
 
         # user_id = self.env['res.users'].search([('id', '=', uid)])
         # company_id = self.env.user.company_ids.ids
         #meeting  =  select calendar_event.start from calendar_event
 
 
-        today = datetime.strftime(datetime.today(), '%Y-%m-%d')
         query = """
         select count(id)
         from calendar_event where DATE(calendar_event.start)  = '%s' and  calendar_event.user_id = '%s' """ % (today, uid)
@@ -79,24 +93,27 @@ class Employee(models.Model):
         today_meeting = cr.fetchall()
         
 
-        query = """
-        select count(id)
-        from hr_leave
-        where  DATE(hr_leave.create_date) = '%s' and state= 'confirm' """ %  (today)
-        cr = self._cr
-        cr.execute(query)
-        leaves_today = cr.fetchall()
+        # query = """
+        # select count(id)
+        # from hr_leave
+        # where  DATE(hr_leave.create_date) = '%s' and state= 'confirm' """ %  (today)
+        # cr = self._cr
+        # cr.execute(query)
+        # leaves_today = cr.fetchall()
 
-        first_day = date.today().replace(day=1)
-        last_day = (date.today() + relativedelta(months=1, day=1)) - timedelta(1)
-        query = """
-                select count(id)
-                from hr_leave
-                WHERE (hr_leave.date_from::DATE,hr_leave.date_to::DATE) OVERLAPS ('%s', '%s')
-                and  state='confirm'""" % (first_day, last_day)
-        cr = self._cr
-        cr.execute(query)
-        leaves_this_month = cr.fetchall()
+        first_day = datetime.today().replace(day=1)
+        last_day = (datetime.today() + relativedelta(months=1, day=1)) - timedelta(1)
+
+        if  self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
+            leaves_this_month = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),\
+            ('create_date','>=',datetime(first_day.year, first_day.month, first_day.day, 0, 0, 0)),\
+            ('create_date','<=',datetime(last_day.year, last_day.month, last_day.day, 23, 59, 59)),\
+            ('employee_company_id','in' , company_id )])
+        else:
+            leaves_this_month = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),\
+            ('create_date','>=',datetime(first_day.year, first_day.month, first_day.day, 0, 0, 0)),\
+            ('create_date','<=',datetime(last_day.year, last_day.month, last_day.day, 23, 59, 59)),\
+            ('employee_id', 'in',leave_manager_id.ids)])    
         leaves_alloc_req = self.env['hr.leave'].sudo().search_count(
             [('state', 'in', ['validate'])])
         timesheet_count = self.env['account.analytic.line'].sudo().search_count(
