@@ -13,15 +13,15 @@ class EstimationSummaryTotalCost(models.Model):
     check_activate = fields.Boolean(string='Activate', default=False)
     module_id = fields.Many2one("estimation.module", string="Module")
     name = fields.Char(string="Components", default="Module")
-    design_effort = fields.Float(string="Design",  compute='_compute_effort')
-    dev_effort = fields.Float(string="Developer",)
-    tester_effort = fields.Float(string="Tester", )
-    comtor_effort = fields.Float(string="Comtor",)
-    brse_effort = fields.Float(string="Brse", )
-    pm_effort = fields.Float(string="PM",)
+    design_effort = fields.Float(string="Design",  compute='_compute_effort', store=True)
+    dev_effort = fields.Float(string="Developer", store=True)
+    tester_effort = fields.Float(string="Tester", store=True)
+    comtor_effort = fields.Float(string="Comtor", store=True)
+    brse_effort = fields.Float(string="Brse", store=True)
+    pm_effort = fields.Float(string="PM", store=True)
 
-    total_effort = fields.Float(string="Total Effort (MD)", readonly=True, compute='_compute_total_effort')
-    cost = fields.Float(string="Cost", readonly=True, compute='_compute_cost')
+    total_effort = fields.Float(string="Total Effort (MD)", readonly=True, compute='_compute_total_effort', store=True)
+    cost = fields.Float(string="Cost", readonly=True, compute='_compute_cost', store=True)
 
     @api.depends('estimation_id.add_lines_summary_costrate.yen_month', 'estimation_id.add_lines_summary_costrate.role', 'total_effort')
     def _compute_cost(self):
