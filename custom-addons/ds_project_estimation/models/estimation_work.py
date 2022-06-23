@@ -1,3 +1,5 @@
+from ast import literal_eval
+import time
 from odoo import models, fields, api, _
 import json
 from odoo.exceptions import UserError
@@ -36,20 +38,47 @@ class Estimation(models.Model):
                               ("updated","Updated"),
                               ("in_progress","In Progress"), 
                               ("completed","Completed"),
-                              ("pending","Pending")], 
-                            string="Status", 
+                              ("pending","Pending")],
+                            string="Status",
                             required=True)
+    module_activate = fields.Integer('Module Activate', default=0)
     
     sequence_module = fields.Integer(string="Sequence Module", store=True, default = 1, compute ='_compute_sequence_module') # for compute sequence module
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
     add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate',
-                                                 string='Summary Cost Rate')
+                                                 string='Summary Cost Rate', domain=lambda self: self._domain_cost_rate())  # domain=[('module_id', 'in', [9])]
     add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'estimation_id', string='Summary Total Cost')
 
     add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'estimation_id', string='Resource Planning Effort')
-    add_lines_module = fields.One2many('estimation.module', 'estimation_id', domain="[('estimation_id', '=', 4)]", string="Modules")
+    add_lines_module = fields.One2many('estimation.module', 'estimation_id', string="Modules")
    
-    check_generate_project= fields.Boolean(default=False, compute='action_generate_project', store=True)
+    check_generate_project = fields.Boolean(default=False, compute='action_generate_project', store=True)
+
+    @api.depends('add_lines_summary_totalcost.check_activate')
+    def _domain_cost_rate(self):
+        module_ids = self.add_lines_module.ids
+        total_cost = self.env['estimation.summary.totalcost'].search([('module_id', 'in', module_ids)])
+        if not self.module_activate:
+            try:
+                self.module_activate = module_ids[0]
+            except:
+                self.module_activate = 0
+        activate = []
+        for item in total_cost:
+            if item.check_activate:
+                activate.append(item.module_id.id)
+                self.module_activate = item.module_id.id
+        if len(activate):
+            # đưa tất cả về False
+            for item in total_cost:
+                item.check_activate = False
+            return [('module_id', 'in', activate)]
+        else:
+            try:
+                temp = self.module_activate
+                return [('module_id', 'in', [temp])]
+            except:
+                return [('module_id', 'in', [module_ids[0]])]
 
     @api.depends('currency_id')
     def _compute_summary_currency(self):
@@ -98,7 +127,8 @@ class Estimation(models.Model):
                 vals_over["description"] += key + ' : ' + est_desc_content_convert[key]
             
             result = super(Estimation, self).write(vals)
-            self.env["estimation.overview"].create(vals_over)
+            if vals_over["description"] != '':
+                self.env["estimation.overview"].create(vals_over)
             return result 
 
     def convert_field_to_field_desc(self, dic):
@@ -226,10 +256,11 @@ class Estimation(models.Model):
     #     for item in self:
     #         item.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', item.id)]).cost
 
-    def action_generate_project(self):
-        for estimation in self:
-            if not estimation.estimator_ids:
-               raise UserError('Please select an estimator before generating project.')
+    def generate_project_cron(self):
+        estimation_ids = self.env['ir.config_parameter'].sudo(
+            ).get_param('gen_project_cron.records')
+        estimations = self.env['estimation.work'].browse(literal_eval(estimation_ids))
+        for estimation in estimations:
             project = self.env['project.project'].sudo().create({
                 'name': estimation.project_name,
                 'user_id':estimation.estimator_ids.id
@@ -248,8 +279,35 @@ class Estimation(models.Model):
                             'status':2,
                             'planned_hours':breakdown.mandays * 8
                         })
+        self.env['ir.config_parameter'].sudo().set_param(
+            'gen_project_cron.records', [])
+
+        return {}
+
+    def action_generate_project(self):
+        for estimation in self:
+            if not estimation.estimator_ids:
+               raise UserError('Please select an estimator before generating project.')
+
+            # set global variable for self' records
+            self.env['ir.config_parameter'].sudo().set_param(
+                'gen_project_cron.records', self.ids)
+            ir_cron = self.env.ref('ds_project_estimation.gen_project_cron')
+            ir_cron.write(
+                {'active': True, 'nextcall': fields.datetime.now()})
+            message_id = self.env['estimation.message.wizard'].create(
+                {'message': _("Successfully generated project.")})
+                
             estimation.check_generate_project = True
-            return project
+            time.sleep(1)
+            return {
+                'name': 'Message',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+                'res_model': 'estimation.message.wizard',
+                'res_id': message_id.id,
+                'target': 'new'
+            }
 
 
     @api.depends('add_lines_module')

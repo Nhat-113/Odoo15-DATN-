@@ -23,7 +23,7 @@ class ProjectTask(models.Model):
         'project.planning.milestone', string='Milestone', required=False, domain=[('phase_id', '=', phase_id)], help="Project Milestone")
 
     planned_duration = fields.Float('Duration', default=0, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True, readonly=True)
-    working_day = fields.Float('Working Day', default=0, compute='_compute_working_day', store=True, readonly=True)
+    working_day = fields.Float('Working Day', default=0,compute='_compute_working_day', store=True, readonly=True)
     lag_time = fields.Integer('Lag Time')
     depending_task_ids = fields.One2many('project.depending.tasks', 'task_id')
     dependency_task_ids = fields.One2many(
@@ -171,11 +171,11 @@ class DependingTasks(models.Model):
         for task in self:
             if task.depending_task_id:
                 task.task_id_domain = json.dumps(
-                    [('project_id', '=', task.project_id.id), ('id', '!=', task.depending_task_id.ids[0]), ('parent_id', '=', False), ('issues_type', '=', 1)]
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.depending_task_id.ids[0]), ('issues_type', '=', 1)]
                 )
             elif task.task_id:
                 task.task_id_domain = json.dumps(
-                    [('project_id', '=', task.project_id.id), ('id', '!=', task.task_id.ids[0]), ('parent_id', '=', False), ('issues_type', '=', 1)]
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.task_id.ids[0]), ('issues_type', '=', 1)]
                 )
 
     task_id_domain = fields.Char(
