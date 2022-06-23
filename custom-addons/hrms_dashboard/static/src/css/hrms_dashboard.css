@@ -65,15 +65,16 @@
 .stat-widget-one .stat-icon {
     vertical-align: top;
     margin: auto;
-    width: 100%;
+    /* width: 100%; */
     color: #01c490;
 }
 
 .stat-widget-one .stat-icon i {
-    font-size: 30px;
+    font-size: 25px;
     font-weight: 900;
     display: inline-block;
-    color: #01c490;
+    color: #fff;
+    margin-left: -70px;
 }
 
 .stat-widget-one .stat-text {
@@ -544,6 +545,9 @@ h4 .stat-count {
 /* .o_hr_attendance_sign_in_out_icon {
     z-index: 100000;
 } */
+/* .hr_attendance_login .o_hr_attendance_sign_in_out_icon:active {
+    background-color: red;
+}
 .hr_attendance_login .stat-widget-one {
     background: none;
     display: flex;
@@ -584,7 +588,7 @@ h4 .stat-count {
     margin-top: 5%;
     height: 5.5%;
     z-index: 1000;
-}
+} */
 
 .monthly_leave_graph_view .oh-card {
     background: #fff;
@@ -1587,8 +1591,13 @@ button:focus {
     align-content: flex-end;
     align-items: flex-end;
     justify-content: center;
-    margin-top: 5px;
+    margin-top: 22px;
 }
+.leave_graph > svg:nth-child(2)  {
+    background: #fafafa !important;
+    border-radius: 50% !important;
+}
+
 
 .list-employee .leave_graph .legend {
     margin-top: 27px;
@@ -1792,7 +1801,40 @@ button:focus {
     flex-grow: 0;
     margin: 3.2% 0% 2.3% 0%;
 }
-
+.button-checkin {
+    background-color: #4CAF50;
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    /* height: 41%; */
+    border-radius: 9px !important;
+    margin-top: 5px  !important; 
+}
+.button-checkin .stat-content .stat-text {
+    font-size: 14px;
+    color: white;
+    margin-top: 14px;
+    margin-bottom: 14px;
+    margin-left: 55px;
+}
+.button-checkout {
+    background-color: #d99200;
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    /* height: 41%; */
+    border-radius: 9px !important;
+    margin-top: 2px  !important; 
+}
+.button-checkout .stat-content .stat-text {
+    font-size: 14px;
+    color: white;
+    margin-top: 14px;
+    margin-bottom: 14px;
+    margin-left: 55px;
+}
 .announcements_detail_user h3 {
     display: flex;
     justify-content: center;

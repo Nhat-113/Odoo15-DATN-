@@ -81,26 +81,30 @@
                     <div class="oh-card">
                         <div class="oh-card-body">
                             <div class="stat-widget-one">
-                                <t t-if="widget.login_employee['attendance_state'] =='checked_out'">
-                                    <div class="stat-icon hr_attendance_btn">
-                                        <i class="fa fa-sign-in o_hr_attendance_sign_in_out_icon"/>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-text">Check In</div>
-                                    </div>
-                                </t>
-                                <t t-if="widget.login_employee['attendance_state'] =='checked_in'">
-                                    <div class="stat-icon hr_attendance_btn">
-                                        <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon"/>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-text">Check out</div>
-                                    </div>
-                                </t>
+                                <div  class="button-checkin">
+                                    <t t-if="widget.login_employee['attendance_state'] =='checked_out'">
+                                        <div class="stat-icon hr_attendance_btn">
+                                            <i class="fa fa-sign-in o_hr_attendance_sign_in_out_icon"/>
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-text">Check In</div>
+                                        </div>
+                                    </t>
+                                 </div>
+                                <div class="button-checkout">
+                                    <t t-if="widget.login_employee['attendance_state'] =='checked_in'">
+                                        <div class="stat-icon hr_attendance_btn">
+                                            <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon"/>
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-text">Check out</div>
+                                        </div>
+                                    </t>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    </div>
+                </div>
             </div>
             <div class="col-md-10 col-sm-12 employee-right"> 
                 <div class="employee_dashboard_detail tabcontent" style="" id="employee_dashboard_detail"  >
@@ -174,7 +178,7 @@
                     </div>
                     <div class="Leave-Request">
                         <h3>
-                            <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon" style="margin-right:5px"></i>
+                            <i class="fa fa-sign-out" style="margin-right:5px"></i>
                             Leave Request
                         </h3>
         
@@ -407,22 +411,26 @@
                     <div class="oh-card">
                         <div class="oh-card-body">
                             <div class="stat-widget-one">
-                                <t t-if="widget.login_employee['attendance_state'] =='checked_out'">
-                                    <div class="stat-icon hr_attendance_btn">
-                                        <i class="fa fa-sign-in o_hr_attendance_sign_in_out_icon"/>
-                                    </div>
-                                    <div class="stat-content">
-                                        <p class="stat-text">Check In</p>
-                                    </div>
-                                </t>
-                                <t t-if="widget.login_employee['attendance_state'] =='checked_in'">
-                                    <div class="stat-icon hr_attendance_btn">
-                                        <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon"/>
-                                    </div>
-                                    <div class="stat-content">
-                                        <p class="stat-text">Check out</p>
-                                    </div>
-                                </t>
+                                <div  class="button-checkin">
+                                    <t t-if="widget.login_employee['attendance_state'] =='checked_out'">
+                                        <div class="stat-icon hr_attendance_btn">
+                                            <i class="fa fa-sign-in o_hr_attendance_sign_in_out_icon"/>
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-text">Check In</div>
+                                        </div>
+                                    </t>
+                                 </div>
+                                <div class="button-checkout">
+                                    <t t-if="widget.login_employee['attendance_state'] =='checked_in'">
+                                        <div class="stat-icon hr_attendance_btn">
+                                            <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon"/>
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-text">Check out</div>
+                                        </div>
+                                    </t>
+                                </div>
                             </div>
                         </div>
                     </div>

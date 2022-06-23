@@ -10,6 +10,19 @@
     .list_menu .btn_annalys .text_btn_annalys{
         margin-left: 4px;
     }
+    .list_menu .active {
+        margin-top: 6px;
+    }
+    .list_future button {
+        width: 90%;
+        background: white;
+        border: 0.01px solid #F0F0FF;
+        height: 26%;
+        margin: 0 auto;
+        border-radius: 5px;
+        margin-top: 6%;
+    }
+    
     .join_resign_trend>svg {
         height: 245px !important;
     }
@@ -23,6 +36,19 @@
     .monthly_join_resign_trend {
         margin-top: 0;
         margin-bottom: 1%;
+    }
+    .time {
+        height: 5.4%;
+    }
+    .employee_infomation > hr{
+        margin: 0;
+    }
+    .button-checkout .stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 55px;
     }
     /* .emp_graph >svg {
         height: 280px;
@@ -48,6 +74,9 @@
     }
     .list-employee .leave_graph .legend {
         margin-top:0;
+    }
+    .list-employee .leave_graph {
+        margin-top: 24px;
     }
     .emp_graph .legend>tbody>tr {
         width: 50%;
@@ -79,6 +108,21 @@
         /* padding-left: 7px; */
         /* font-weight: 700; */
     }
+    .stat-widget-one .stat-icon i {
+        font-size: 14px;
+        font-weight: 900;
+        display: inline-block;
+        color: #fff;
+        margin-left: -36px;
+    }
+    .button-checkout .stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 14px;
+        margin-bottom: 14px;
+        margin-left: 55px;
+    }
+
     .department .detail {
         margin-top: 25px;
     }

@@ -56,7 +56,7 @@ class Employee(models.Model):
     def get_user_employee_details(self):
         uid = request.session.uid
         company_ids = self.env.user.company_ids
-        # employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
+        employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
         company_id = self.env.company.ids
         leave_manager_id = self.env['hr.employee'].search([('leave_manager_id', '=' ,uid)])
         #all request
