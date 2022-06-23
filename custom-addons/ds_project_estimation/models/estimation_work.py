@@ -1,4 +1,5 @@
 from ast import literal_eval
+import time
 from odoo import models, fields, api, _
 import json
 from odoo.exceptions import UserError
@@ -271,7 +272,7 @@ class Estimation(models.Model):
                 {'message': _("Successfully generated project.")})
                 
             estimation.check_generate_project = True
-
+            time.sleep(1)
             return {
                 'name': 'Message',
                 'type': 'ir.actions.act_window',
