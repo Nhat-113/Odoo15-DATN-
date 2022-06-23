@@ -104,11 +104,11 @@ class Estimation(models.Model):
         self.env["estimation.overview"].create(vals_over)
         
         # for CRM
-        # active_id = self._context.get('active_id')
-        # if active_id:
-        #     estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
-        #     estimation_lead.estimation_count += 1
-        # return result
+        active_id = self._context.get('active_id')
+        if active_id:
+            estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
+            estimation_lead.estimation_count += 1
+        return result
     
     def write(self, vals):
         vals_over = {'connect_overview': self.id, 'description': ''}
