@@ -1,8 +1,9 @@
+from ast import literal_eval
+import time
 from odoo import models, fields, api, _
 import json
 from odoo.exceptions import UserError
 from odoo.modules import module
-import time
 
 
 class Estimation(models.Model):
@@ -126,7 +127,8 @@ class Estimation(models.Model):
                 vals_over["description"] += key + ' : ' + est_desc_content_convert[key]
             
             result = super(Estimation, self).write(vals)
-            self.env["estimation.overview"].create(vals_over)
+            if vals_over["description"] != '':
+                self.env["estimation.overview"].create(vals_over)
             return result 
 
     def convert_field_to_field_desc(self, dic):
@@ -254,10 +256,11 @@ class Estimation(models.Model):
     #     for item in self:
     #         item.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', item.id)]).cost
 
-    def action_generate_project(self):
-        for estimation in self:
-            if not estimation.estimator_ids:
-               raise UserError('Please select an estimator before generating project.')
+    def generate_project_cron(self):
+        estimation_ids = self.env['ir.config_parameter'].sudo(
+            ).get_param('gen_project_cron.records')
+        estimations = self.env['estimation.work'].browse(literal_eval(estimation_ids))
+        for estimation in estimations:
             project = self.env['project.project'].sudo().create({
                 'name': estimation.project_name,
                 'user_id':estimation.estimator_ids.id
@@ -276,12 +279,27 @@ class Estimation(models.Model):
                             'status':2,
                             'planned_hours':breakdown.mandays * 8
                         })
-            time.sleep(1)
-            message_id = self.env['estimation.message.wizard'].create(
-                {'message': _("In the next few minutes, project will be create.")})
-            
-            estimation.check_generate_project = True
+        self.env['ir.config_parameter'].sudo().set_param(
+            'gen_project_cron.records', [])
 
+        return {}
+
+    def action_generate_project(self):
+        for estimation in self:
+            if not estimation.estimator_ids:
+               raise UserError('Please select an estimator before generating project.')
+
+            # set global variable for self' records
+            self.env['ir.config_parameter'].sudo().set_param(
+                'gen_project_cron.records', self.ids)
+            ir_cron = self.env.ref('ds_project_estimation.gen_project_cron')
+            ir_cron.write(
+                {'active': True, 'nextcall': fields.datetime.now()})
+            message_id = self.env['estimation.message.wizard'].create(
+                {'message': _("Successfully generated project.")})
+                
+            estimation.check_generate_project = True
+            time.sleep(1)
             return {
                 'name': 'Message',
                 'type': 'ir.actions.act_window',
