@@ -88,7 +88,7 @@ class ProjectTask(models.Model):
     def _inverse_planned_duration(self):
         for r in self:            
             if r.date_start and not r.env.context.get('ignore_onchange_planned_duration', False):
-                if r.date_end < r.date_start  and  r.planned_duration <= 0.0:
+                if r.date_start and r.date_end and r.date_end < r.date_start  and  r.planned_duration <= 0.0:
                     r.date_start = r.date_end
                 if r.planned_duration == 0.0:
                     r.planned_duration = 1
