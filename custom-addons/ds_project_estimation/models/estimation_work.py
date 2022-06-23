@@ -103,12 +103,12 @@ class Estimation(models.Model):
         vals_over["description"] = 'Create New Estimation'
         self.env["estimation.overview"].create(vals_over)
         
-        #for CRM
-        active_id = self._context.get('active_id')
-        if active_id:
-            estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
-            estimation_lead.estimation_count += 1
-        return result
+        # for CRM
+        # active_id = self._context.get('active_id')
+        # if active_id:
+        #     estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
+        #     estimation_lead.estimation_count += 1
+        # return result
     
     def write(self, vals):
         vals_over = {'connect_overview': self.id, 'description': ''}
@@ -311,7 +311,9 @@ class Estimation(models.Model):
             record.add_lines_summary_costrate.unlink()
             record.add_lines_resource_effort.unlink()
             record.add_lines_module.unlink()
-        return super(Estimation, self).unlink()  
+        return super(Estimation, self).unlink()
+
+
 class Lead(models.Model):
     _inherit = ['crm.lead']
 
