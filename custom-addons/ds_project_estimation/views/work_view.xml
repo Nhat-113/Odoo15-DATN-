@@ -53,6 +53,7 @@
                                     <field name="pm_effort" sum="Sum of Project Manager Effort"/>
                                     <field name="total_effort" sum="Sum of All Efforts"/>
                                     <field name="cost" sum="Total of Cost"/>
+                                    <field name="check_activate" widget="boolean_toggle"/>
                                 </tree>
                             </field>
 <!--                            <group name="note_group" col="6" class="mt-2 mt-md-0">-->
