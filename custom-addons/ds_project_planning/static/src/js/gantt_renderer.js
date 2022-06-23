@@ -541,7 +541,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           {
             name: "day",
             scale_height: 27,
-            min_column_width: 80,
+            min_column_width: 120,
             column_width:250,
             scales: [{ unit: "day", step: 1, format: "%d %M" }],
           },
@@ -579,33 +579,33 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
               { unit: "week", format: "Week #%W" },
             ],
           },
-          {
-            name: "quarter",
-            height: 50,
-            min_column_width: 350,
-            scales: [
-              { unit: "month", step: 1, format: "%M" },
-              {
-                unit: "quarter",
-                step: 1,
-                format: function (date) {
-                  var dateToStr = gantt.date.date_to_str("%M");
-                  var endDate = gantt.date.add(
-                    gantt.date.add(date, 3, "month"),
-                    -1,
-                    "day"
-                  );
-                  return dateToStr(date) + " - " + dateToStr(endDate);
-                },
-              },
-            ],
-          },
-          {
-            name: "year",
-            scale_height: 50,
-            min_column_width: 350,
-            scales: [{ unit: "year", step: 1, format: "%Y" }],
-          },
+          // {
+          //   name: "quarter",
+          //   height: 50,
+          //   min_column_width: 350,
+          //   scales: [
+          //     { unit: "month", step: 1, format: "%M" },
+          //     {
+          //       unit: "quarter",
+          //       step: 1,
+          //       format: function (date) {
+          //         var dateToStr = gantt.date.date_to_str("%M");
+          //         var endDate = gantt.date.add(
+          //           gantt.date.add(date, 3, "month"),
+          //           -1,
+          //           "day"
+          //         );
+          //         return dateToStr(date) + " - " + dateToStr(endDate);
+          //       },
+          //     },
+          //   ],
+          // },
+          // {
+          //   name: "year",
+          //   scale_height: 50,
+          //   min_column_width: 350,
+          //   scales: [{ unit: "year", step: 1, format: "%Y" }],
+          // },
         ],
       };
       gantt.ext.zoom.init(zoomConfig);
