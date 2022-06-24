@@ -396,9 +396,11 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           }
       }
 
+
       gantt.templates.task_class = function (start, end, task) {
         if (task.type == "phase") {
           task.color = "#808080";
+          return "custom_task"
         }
         
         if (start - self.configStartDate === 0) {
@@ -410,12 +412,12 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           case 2:
             return "warning";
         }
+        if(task.type == "milestone") return "custom_task";
       };
       
-      gantt.templates.task_class = function(start, end, task){
-        if(task.type == "milestone" || task.type =="phase") return "custom_task";
-        return "";
-      };
+      // gantt.templates.task_class = function(start, end, task){
+      //   if(task.type == "milestone") return "custom_task";
+      // };
       gantt.templates.task_text = function(start, end, task){
         if(task.deadline == 2)
           return "<span style='color:black'>"+task.text+"</span>";
