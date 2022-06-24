@@ -10,7 +10,7 @@
                 <button name="%(action_estimation_work)d" type="action" class="oe_stat_button" icon="fa-ticket">
                     <div class="o_stat_info">
                         <span>
-                            <field name="estimation_count"/>
+<!--                            <field name="estimation_count"/>-->
                         </span>
                         <span class="o_stat_text"> Estimation</span>
                     </div>

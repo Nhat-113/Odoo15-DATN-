@@ -25,7 +25,7 @@ class Estimation(models.Model):
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
 
     potential_budget = fields.Float(string="Potential Budget")
-    total_cost = fields.Float(string="Total Cost") #, compute='_compute_total_cost'
+    total_cost = fields.Float(string="Total Cost", compute='_compute_total_cost')
     summary_currency_id = fields.Integer("Summarry Currency id", compute='_compute_summary_currency')
     sale_date = fields.Date("Sale Date", required=True)
     deadline = fields.Date("Deadline", required=True)
@@ -106,7 +106,7 @@ class Estimation(models.Model):
         vals_over["description"] = 'Create New Estimation'
         self.env["estimation.overview"].create(vals_over)
         
-        #for CRM
+        # for CRM
         active_id = self._context.get('active_id')
         if active_id:
             estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
@@ -251,10 +251,14 @@ class Estimation(models.Model):
         value = dict(zip(vals_key, vals_values))
         return value
 
-    # @api.depends('currency_id')
-    # def _compute_total_cost(self):
-    #     for item in self:
-    #         item.total_cost = self.env['estimation.summary.totalcost'].search([('connect_summary', '=', item.id)]).cost
+    @api.depends('add_lines_summary_totalcost.cost')
+    def _compute_total_cost(self):
+        for item in self:
+            total = 0
+            estimation_module = self.env['estimation.summary.totalcost'].search([('estimation_id', '=', item.id)])
+            for record in estimation_module:
+                total += record.cost
+            item.total_cost = total
 
     def generate_project_cron(self):
         estimation_ids = self.env['ir.config_parameter'].sudo(
@@ -345,7 +349,9 @@ class Estimation(models.Model):
             record.add_lines_summary_costrate.unlink()
             record.add_lines_resource_effort.unlink()
             record.add_lines_module.unlink()
-        return super(Estimation, self).unlink()  
+        return super(Estimation, self).unlink()
+
+
 class Lead(models.Model):
     _inherit = ['crm.lead']
 
