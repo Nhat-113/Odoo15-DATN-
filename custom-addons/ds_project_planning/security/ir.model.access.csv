@@ -17,3 +17,8 @@ access_sale_order_line_pm,sale.order.line.pm,sale.model_sale_order_line,ds_proje
 access_project_task_type_delete_wizard_pm,project.task.type.delete.wizard.pm,project.model_project_task_type_delete_wizard,ds_project_planning.group_project_pm,1,1,1,1
 ds_project_planning.access_project_task_director,access_project_project_director,project.model_project_task,ds_project_planning.group_project_director,1,0,0,0
 access_report_project_task_director,report.project.task.director,project.model_report_project_task_user,ds_project_planning.group_project_director,1,0,0,0
+access_report_project_task_user_pm,report.project.task.user.pm,project.model_report_project_task_user,ds_project_planning.group_project_pm,1,0,0,0
+access_task_burndown_chart_report_pm,project.task.burndown.chart.report.pm,project.model_project_task_burndown_chart_report,ds_project_planning.group_project_pm,1,0,0,0
+access_task_burndown_chart_report_director,project.task.burndown.chart.report.director,project.model_project_task_burndown_chart_report,ds_project_planning.group_project_director,1,0,0,0
+access_project_share_pm,project.share.wizard.pm,project.model_project_share_wizard,ds_project_planning.group_project_pm,1,1,1,0
+access_project_share_director,project.share.wizard.director,project.model_project_share_wizard,ds_project_planning.group_project_director,1,1,1,0
