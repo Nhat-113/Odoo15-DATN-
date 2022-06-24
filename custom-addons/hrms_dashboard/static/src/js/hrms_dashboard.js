@@ -673,8 +673,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             var self = this;
             const mediaQuery = window.matchMedia('(max-width: 1700px)')
             if (mediaQuery.matches) {
-                var w = 265;
-                var h = 265;
+                var w = 230;
+                var h = 230;
             } else {
                 var w = 402;
                 var h = 402;
@@ -746,16 +746,31 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         .append("tr");
 
                     // create the first column for each segment.
-                    tr.append("td")
-                        .append("svg")
-                        .attr("width", "16")
-                        .attr("height", "16")
-                        .append("rect")
-                        .attr("width", "16")
-                        .attr("height", "16")
-                        .attr("fill", function(d, i) {
-                            return color(i);
-                        });
+                    const mediaQuery = window.matchMedia('(max-width: 1700px)')
+                    if (mediaQuery.matches) {
+                        tr.append("td")
+                            .append("svg")
+                            .attr("width", "8")
+                            .attr("height", "8")
+                            .append("rect")
+                            .attr("width", "8")
+                            .attr("height", "8")
+                            .attr("fill", function(d, i) {
+                                return color(i);
+                            });
+                    } else {
+                        tr.append("td")
+                            .append("svg")
+                            .attr("width", "16")
+                            .attr("height", "16")
+                            .append("rect")
+                            .attr("width", "16")
+                            .attr("height", "16")
+                            .attr("fill", function(d, i) {
+                                return color(i);
+                            });
+                    }
+
 
                     // create the second column for each segment.
                     tr.append("td").text(function(d) {
@@ -840,10 +855,19 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                             d.count = +d.count;
                         });
                     });
-                    var margin = { top: 30, right: 30, bottom: 30, left: 20 },
+                    const mediaQuery = window.matchMedia('(max-width: 1700px)')
+                    if (mediaQuery.matches) {
+                        var margin = { top: 30, right: 30, bottom: 30, left: 20 },
 
-                        width = 800 - margin.left - margin.right,
-                        height = 250 - margin.top - margin.bottom;
+                            width = 800 - margin.left - margin.right,
+                            height = 190 - margin.top - margin.bottom;
+                    } else {
+                        var margin = { top: 30, right: 30, bottom: 30, left: 20 },
+
+                            width = 800 - margin.left - margin.right,
+                            height = 250 - margin.top - margin.bottom;
+                    }
+
 
                     // Set the ranges
                     var x = d3.scale.ordinal().rangeRoundBands([-(margin.right + 20), width], 1);
@@ -1103,10 +1127,17 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 })
                 .then(function(data) {
                     var elem = self.$(".leave_trend");
-                    var margin = { top: 30, right: 20, bottom: 30, left: 45 },
-                        width = 800 - margin.left - margin.right,
-                        height = 250 - margin.top - margin.bottom;
+                    const mediaQuery = window.matchMedia('(max-width: 1700px)')
 
+                    if (mediaQuery.matches) {
+                        var margin = { top: 30, right: 20, bottom: 30, left: 45 },
+                            width = 800 - margin.left - margin.right,
+                            height = 190 - margin.top - margin.bottom;
+                    } else {
+                        var margin = { top: 30, right: 20, bottom: 30, left: 45 },
+                            width = 800 - margin.left - margin.right,
+                            height = 250 - margin.top - margin.bottom;
+                    }
 
                     // Set the ranges
                     var x = d3.scale.ordinal().rangeRoundBands([-(margin.right + margin.left + 45), width], 1);
@@ -1411,7 +1442,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         const mediaQuery = window.matchMedia('(max-width: 1700px)')
                         if (mediaQuery.matches) {
                             var pC = {},
-                                pieDim = { w: 265.2, h: 265.2 };
+                                pieDim = { w: 230, h: 230 };
                         } else {
                             var pC = {},
                                 pieDim = { w: 402, h: 402 };
@@ -1520,16 +1551,31 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                             .append("tr");
 
                         // create the first column for each segment.
-                        tr.append("td")
-                            .append("svg")
-                            .attr("width", "16")
-                            .attr("height", "16")
-                            .append("rect")
-                            .attr("width", "16")
-                            .attr("height", "16")
-                            .attr("fill", function(d, i) {
-                                return color(i);
-                            });
+                        const mediaQuery = window.matchMedia('(max-width: 1700px)')
+                        if (mediaQuery.matches) {
+                            tr.append("td")
+                                .append("svg")
+                                .attr("width", "8")
+                                .attr("height", "8")
+                                .append("rect")
+                                .attr("width", "8")
+                                .attr("height", "8")
+                                .attr("fill", function(d, i) {
+                                    return color(i);
+                                });
+                        } else {
+                            tr.append("td")
+                                .append("svg")
+                                .attr("width", "16")
+                                .attr("height", "16")
+                                .append("rect")
+                                .attr("width", "16")
+                                .attr("height", "16")
+                                .attr("fill", function(d, i) {
+                                    return color(i);
+                                });
+                        }
+
 
                         // create the second column for each segment.
                         tr.append("td").text(function(d) {

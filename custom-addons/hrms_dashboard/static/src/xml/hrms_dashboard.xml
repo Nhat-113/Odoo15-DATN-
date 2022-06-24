@@ -380,14 +380,14 @@
                         <h4><i class="fa fa-plus"></i></h4>
                         <h3 class="fearure_detail">Leave Request</h3>
                     </button>
-                    <button class="btn_payslip hr_payslip">
+                    <!-- <button class="btn_payslip hr_payslip">
                         <h4>  
                             <i class="fa fa-money"/>
                         </h4>
                         <h3 class="fearure_detail_user">
                              Payslip <t t-esc="widget.login_employee['payslip_count']"/>
                         </h3>
-                    </button>
+                    </button> -->
                     <!-- <button class="btn_expried hr_contract">
                         <h4><i class="fa fa-fw fa-book"></i></h4>
                         <h4 class="fearure_detail">
