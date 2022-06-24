@@ -11,6 +11,8 @@ class EstimationSummaryTotalCost(models.Model):
     sequence = fields.Integer(string="No", index=True, readonly=True, help='Use to arrange calculation sequence',
                               default=1)
     check_activate = fields.Boolean(string='Activate', default=False)
+    check_generate_project = fields.Boolean(string="Check Generate Project", default=False,
+                                            compute='_compute_module_generate_project')
     module_id = fields.Many2one("estimation.module", string="Module")
     name = fields.Char(string="Components", default="Module")
     design_effort = fields.Float(string="Design",  compute='_compute_effort', store=True)
@@ -23,14 +25,47 @@ class EstimationSummaryTotalCost(models.Model):
     total_effort = fields.Float(string="Total Effort (MD)", readonly=True, compute='_compute_total_effort', store=True)
     cost = fields.Float(string="Cost", readonly=True, compute='_compute_cost', store=True)
 
+    @api.depends('estimation_id.check_generate_project')
+    def _compute_module_generate_project(self):
+        pass
+
     @api.depends('estimation_id.add_lines_summary_costrate.yen_month', 'estimation_id.add_lines_summary_costrate.role', 'total_effort')
     def _compute_cost(self):
         for record in self:
             module_id = record.module_id.id
-            cost_rate = self.env['estimation.summary.costrate'].search([('module_id', '=', module_id)])
+            module_active = record.estimation_id.module_activate
+            cost_rate_old = record.estimation_id.add_lines_summary_costrate
+            if module_id != module_active:
+                cost_rate_old = self.env['estimation.summary.costrate'].search([('module_id', '=', module_id)])
+                for item in cost_rate_old:
+                    cost_rate = self.env['cost.rate'].search([('id', '=', item.role.id)])
+
+                    if record.estimation_id.currency_id.id:
+                        currency_id = record.estimation_id.currency_id.id
+
+                    elif record.estimation_id.currency_id.id == False:
+                        currency_id = record.estimation_id.currency_id.id
+
+                    elif record.estimation_id.currency_id.id.origin:
+                        currency_id = record.estimation_id.currency_id.id
+
+                    else:
+                        currency_id = record.estimation_id.currency_id.id
+                        if currency_id == False:
+                            currency_id = 1
+
+                    if currency_id == 1:
+                        item.yen_month = cost_rate.cost_usd
+                        item.yen_day = cost_rate.cost_usd / 20
+                    elif currency_id == 22:
+                        item.yen_month = cost_rate.cost_vnd
+                        item.yen_day = cost_rate.cost_vnd / 20
+                    else:
+                        item.yen_month = cost_rate.cost_yen
+                        item.yen_day = cost_rate.cost_yen / 20
 
             cost = 0
-            for item_cost_rate in cost_rate:
+            for item_cost_rate in cost_rate_old:
                 if item_cost_rate.module_id.id == module_id:
                     types = item_cost_rate.types
                     if types == 'Developer':
