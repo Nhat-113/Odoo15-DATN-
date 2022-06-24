@@ -117,6 +117,8 @@ class EstimationSummaryTotalCost(models.Model):
                         activity_module_id = item.module_id.id
                     elif item.module_id.id.origin:
                         activity_module_id = item.module_id.id.origin
+                    else:
+                        activity_module_id = 0
 
                     if activity_module_id == module_id:
                         for i in item.add_lines_breakdown_activity:
