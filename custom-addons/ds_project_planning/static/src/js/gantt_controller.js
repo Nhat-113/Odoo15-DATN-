@@ -153,24 +153,24 @@ var GanttController = AbstractController.extend({
             var taskObj = gantt.getTask(id);
             var id_before =   taskObj.id
             //console.log(`id before`, id_before);
+            if(taskObj.type !== "milestone"){
+                gantt.showTask = function(id_drag){
+                    // console.log(`mode`, mode);
+                    id_drag = id_before
+                    // console.log('id after1',id_drag); 
+                    showTask.apply(this, [id_drag]);
+                    var attr = gantt.config.task_attribute;
+                    // console.log(`attr`, attr);
+                    // console.log('id after',id_drag); 
+                    var timelineElement = document.querySelector(".gantt_task_line["+attr+"='"+id_drag+"']");
 
-            gantt.showTask = function(id_drag){
-                console.log(`mode`, mode);
-                id_drag = id_before
-                // console.log('id after1',id_drag); 
-                showTask.apply(this, [id_drag]);
-                var attr = gantt.config.task_attribute;
-                // console.log(`attr`, attr);
-                // console.log('id after',id_drag); 
-                var timelineElement = document.querySelector(".gantt_task_line["+attr+"='"+id_drag+"']");
-
-                // console.log('timelineElement',timelineElement);
-                if(timelineElement)
-                    timelineElement.scrollIntoView({block:"center"});
-                   
-           };
-            return true; 
-        });
+                    // console.log('timelineElement',timelineElement);
+                    if(timelineElement)
+                        timelineElement.scrollIntoView({block:"center"}); 
+            };
+        }
+        return true; 
+    });
 
 
          //deny drag for director
