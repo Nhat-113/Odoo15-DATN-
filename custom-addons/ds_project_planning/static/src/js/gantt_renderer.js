@@ -4,6 +4,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
   var AbstractRenderer = require("web.AbstractRenderer");
   var FormRenderer = require("web.FormRenderer");
   var session = require("web.session");
+  var dialogs = require('web.view_dialogs');
   var GanttRenderer = AbstractRenderer.extend({
     template: "dhx_gantt.gantt_view",
     ganttApiUrl: "/gantt_api",
@@ -43,6 +44,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.config.work_time = true;
       gantt.config.skip_off_time = true;
       gantt.config.root_id = "root"; 
+      gantt.config.autosize = "xy";
       gantt.plugins({
         tooltip: true,
       });
@@ -409,6 +411,11 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
             return "warning";
         }
       };
+      
+      gantt.templates.task_class = function(start, end, task){
+        if(task.type == "milestone" || task.type =="phase") return "custom_task";
+        return "";
+      };
       gantt.templates.task_text = function(start, end, task){
         if(task.deadline == 2)
           return "<span style='color:black'>"+task.text+"</span>";
@@ -451,10 +458,10 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.templates.tooltip_date_format = gantt.date.date_to_str("%F %j, %Y");
       gantt.templates.tooltip_text = function (start, end, task) {
       var gridDateToStr = gantt.date.date_to_str("%Y-%m-%d");
-        if( end && task.type !== "milestone"){
+        // if( end && task.type !== "milestone"){
             end =  gridDateToStr(new Date(end.valueOf() - 1)); 
             start =  gridDateToStr(new Date(start.valueOf() )); 
-        }
+        // }
       
         var assignees = getAssignees(task.user_ids);
         var type =
@@ -497,11 +504,11 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
                     <b>Working Day: 1</b> 
                   <br/>
                     <b>Progress:</b> ${task.progress * 100}%<br/>
-                    <b>Start date:</b> ${gantt.templates.tooltip_date_format(
-                      start
-                    )} 
+                    <b>Start date:</b> ${
+                      end
+                    } 
                     <br/><b>End date:</b> ${
-                        gantt.templates.tooltip_date_format(end)}`
+                        end}`
                     } 
         else 
         return `<b>${type}:</b> ${task.text}<br/>
@@ -540,7 +547,8 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           {
             name: "day",
             scale_height: 27,
-            min_column_width: 80,
+            min_column_width: 120,
+            column_width:250,
             scales: [{ unit: "day", step: 1, format: "%d %M" }],
           },
           {
@@ -571,39 +579,39 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           {
             name: "month",
             scale_height: 50,
-            min_column_width: 120,
+            min_column_width: 250,
             scales: [
               { unit: "month", format: "%F, %Y" },
               { unit: "week", format: "Week #%W" },
             ],
           },
-          {
-            name: "quarter",
-            height: 50,
-            min_column_width: 90,
-            scales: [
-              { unit: "month", step: 1, format: "%M" },
-              {
-                unit: "quarter",
-                step: 1,
-                format: function (date) {
-                  var dateToStr = gantt.date.date_to_str("%M");
-                  var endDate = gantt.date.add(
-                    gantt.date.add(date, 3, "month"),
-                    -1,
-                    "day"
-                  );
-                  return dateToStr(date) + " - " + dateToStr(endDate);
-                },
-              },
-            ],
-          },
-          {
-            name: "year",
-            scale_height: 50,
-            min_column_width: 30,
-            scales: [{ unit: "year", step: 1, format: "%Y" }],
-          },
+          // {
+          //   name: "quarter",
+          //   height: 50,
+          //   min_column_width: 350,
+          //   scales: [
+          //     { unit: "month", step: 1, format: "%M" },
+          //     {
+          //       unit: "quarter",
+          //       step: 1,
+          //       format: function (date) {
+          //         var dateToStr = gantt.date.date_to_str("%M");
+          //         var endDate = gantt.date.add(
+          //           gantt.date.add(date, 3, "month"),
+          //           -1,
+          //           "day"
+          //         );
+          //         return dateToStr(date) + " - " + dateToStr(endDate);
+          //       },
+          //     },
+          //   ],
+          // },
+          // {
+          //   name: "year",
+          //   scale_height: 50,
+          //   min_column_width: 350,
+          //   scales: [{ unit: "year", step: 1, format: "%Y" }],
+          // },
         ],
       };
       gantt.ext.zoom.init(zoomConfig);
@@ -676,7 +684,9 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         method: "open_calendar_resource",
         args: [project_id],
       }).then(function (result) {
-        self.do_action(result);
+        self.bookingResource = new dialogs.FormViewDialog(self, result);
+        self.bookingResource.open();
+        // self.do_action(result);
       });
     },
     on_attach_callback: function () {

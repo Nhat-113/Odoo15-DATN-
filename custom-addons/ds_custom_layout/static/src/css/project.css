@@ -1,11 +1,8 @@
-
 .o_form_project_tasks .o_form_sheet_bg .o_form_sheet  .oe_form_field .o_wysiwyg_wrapper .odoo-editor-editable {
     height: auto !important;
     border: 1px solid black;
     border-bottom: 1px solid black !important;
+    border: 0.5px solid   #cccccc;
+    border-bottom: 0.5px solid #cccccc !important;
     margin-bottom: 40px;
 }
-.o_form_project_tasks .o_form_sheet_bg .o_form_sheet  .oe_form_field .o_wysiwyg_wrapper .odoo-editor-editable > p :last-child{
-    margin-bottom: 25px;
-}
-

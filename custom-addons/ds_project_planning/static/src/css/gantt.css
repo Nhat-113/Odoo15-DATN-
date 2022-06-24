@@ -119,6 +119,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.custom_task .gantt_link_control{
+    display:none;
+  }
 /* .gantt_task_line.gantt_milestone {
     margin-left: 40px
 } */

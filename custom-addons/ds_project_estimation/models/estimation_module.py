@@ -96,6 +96,8 @@ class EstimationModule(models.Model):
             record.module_summarys.unlink()
             record.module_effort_activity.unlink()
             record.module_config_activity.unlink()
+            record.summary_total_cost.unlink()
+            record.summary_cost_rate.unlink()
             
             check_data_resource_plan = self.env['estimation.resource.effort'].search([('estimation_id', '=', record.estimation_id.id)])
             gantt_resource_plan = self.env['gantt.resource.planning'].search([('estimation_id', '=', record.estimation_id.id)])

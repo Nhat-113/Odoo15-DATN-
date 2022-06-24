@@ -10,26 +10,28 @@ class EstimationSummaryTotalCost(models.Model):
 
     sequence = fields.Integer(string="No", index=True, readonly=True, help='Use to arrange calculation sequence',
                               default=1)
+    check_activate = fields.Boolean(string='Activate', default=False)
     module_id = fields.Many2one("estimation.module", string="Module")
     name = fields.Char(string="Components", default="Module")
-    design_effort = fields.Float(string="Design",  compute='_compute_effort')
-    dev_effort = fields.Float(string="Developer",)
-    tester_effort = fields.Float(string="Tester", )
-    comtor_effort = fields.Float(string="Comtor",)
-    brse_effort = fields.Float(string="Brse", )
-    pm_effort = fields.Float(string="PM",)
+    design_effort = fields.Float(string="Design",  compute='_compute_effort', store=True)
+    dev_effort = fields.Float(string="Developer", store=True)
+    tester_effort = fields.Float(string="Tester", store=True)
+    comtor_effort = fields.Float(string="Comtor", store=True)
+    brse_effort = fields.Float(string="Brse", store=True)
+    pm_effort = fields.Float(string="PM", store=True)
 
-    total_effort = fields.Float(string="Total Effort (MD)", readonly=True, compute='_compute_total_effort')
-    cost = fields.Float(string="Cost", readonly=True, compute='_compute_cost')
+    total_effort = fields.Float(string="Total Effort (MD)", readonly=True, compute='_compute_total_effort', store=True)
+    cost = fields.Float(string="Cost", readonly=True, compute='_compute_cost', store=True)
 
     @api.depends('estimation_id.add_lines_summary_costrate.yen_month', 'estimation_id.add_lines_summary_costrate.role', 'total_effort')
     def _compute_cost(self):
         for record in self:
-            total_cost_id = record.module_id.id
-            cost_rate = record.estimation_id.add_lines_summary_costrate
+            module_id = record.module_id.id
+            cost_rate = self.env['estimation.summary.costrate'].search([('module_id', '=', module_id)])
+
             cost = 0
             for item_cost_rate in cost_rate:
-                if item_cost_rate.module_id.id == total_cost_id:
+                if item_cost_rate.module_id.id == module_id:
                     types = item_cost_rate.types
                     if types == 'Developer':
                         cost += record.dev_effort * item_cost_rate.yen_month
@@ -121,13 +123,13 @@ class EstimationSummaryCostRate(models.Model):
 
     connect_summary_costrate = fields.Many2one('estimation.work', string="Connect Summary Cost Rate")
     module_id = fields.Many2one("estimation.module", string="Module")
-    name = fields.Char(string="Components", default="Module")
+    name = fields.Char(string="Components", default="Module", readonly=True)
 
-    sequence = fields.Integer(string="No", )
-    types = fields.Char(string="Type", )
+    sequence = fields.Integer(string="No", readonly=True)
+    types = fields.Char(string="Type", readonly=True)
     role = fields.Many2one('cost.rate', string='Role')
-    yen_month = fields.Float(string="Unit (Currency/Month)", store=True, default=0.00)
-    yen_day = fields.Float(string="Unit (Currency/Day)", store=True, compute='_compute_yen_month', default=0.00)
+    yen_month = fields.Float(string="Unit (Currency/Month)", store=True, default=0.00, readonly=True)
+    yen_day = fields.Float(string="Unit (Currency/Day)", store=True, compute='_compute_yen_month', default=0.00, readonly=True)
 
     @api.depends('role', 'connect_summary_costrate.currency_id', 'role.cost_usd', 'role.cost_yen', 'role.cost_vnd')
     def _compute_yen_month(self):
