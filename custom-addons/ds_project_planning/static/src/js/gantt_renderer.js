@@ -4,6 +4,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
   var AbstractRenderer = require("web.AbstractRenderer");
   var FormRenderer = require("web.FormRenderer");
   var session = require("web.session");
+  var dialogs = require('web.view_dialogs');
   var GanttRenderer = AbstractRenderer.extend({
     template: "dhx_gantt.gantt_view",
     ganttApiUrl: "/gantt_api",
@@ -681,7 +682,9 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         method: "open_calendar_resource",
         args: [project_id],
       }).then(function (result) {
-        self.do_action(result);
+        self.bookingResource = new dialogs.FormViewDialog(self, result);
+        self.bookingResource.open();
+        // self.do_action(result);
       });
     },
     on_attach_callback: function () {
