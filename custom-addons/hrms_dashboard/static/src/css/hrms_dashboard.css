@@ -1744,10 +1744,9 @@ button:focus {
     overflow-y: scroll;
 }
 
-.list_news::-webkit-scrollbar {
-    /* This is the magic bit for WebKit */
+/* .list_news::-webkit-scrollbar {
     display: none;
-  }
+  } */
 .Event_user {
     flex: none;
     margin-right: 1.5rem;
@@ -2046,18 +2045,18 @@ button:focus {
 }
 
 .list-birthday {
-    margin-top: 1%;
-    height: 88%;
+    width: 90%;
+    margin-top: 7% !important;
+    height: 81%;
     overflow-y: scroll;
-    
+    margin: auto;
 }
-.list-birthday::-webkit-scrollbar {
-    /* This is the magic bit for WebKit */
+/* .list-birthday::-webkit-scrollbar {
     display: none;
   }
 #list-birthday ::-webkit-scrollbar {
     display: none;
-}
+} */
 
 
 .name {
