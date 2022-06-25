@@ -386,7 +386,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     [false, "form"],
                 ],
                 domain: [
-                    ["state", "in", ["confirm", "validate1"]]
+                    ["state", "in", ["draft","confirm", "validate1","refuse"]]
                 ],
                 target: "current",
             }, );
@@ -565,7 +565,6 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             // };
             const start = new Date();
             start.setHours(0, 0, 0, 0);
-
             const end = new Date();
             end.setHours(23, 59, 59, 999);
             this.do_action({
@@ -580,7 +579,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 domain: [
                     ["create_date", "<=", end],
                     ["create_date", ">=", start],
-                    ["state", "=", "confirm"],
+                    ["state", "in", ["draft","confirm", "validate1","refuse"]]
 
                 ],
                 target: "current",
@@ -611,9 +610,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     [false, "form"],
                 ],
                 domain: [
-                    ["date_from", ">", fday],
-                    ["state", "=", "confirm"],
-                    ["date_from", "<=", lday],
+                    ["create_date", ">", fday],
+                    ["state", "in", ["draft","confirm", "validate1","refuse"]],
+                    ["create_date", "<=", lday],
                 ],
                 target: "current",
             }, );
