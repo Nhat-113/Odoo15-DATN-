@@ -59,14 +59,30 @@ class Employee(models.Model):
         employee = self.env['hr.employee'].sudo().search_read([('user_id', '=', uid)], limit=1)
         company_id = self.env.company.ids
         leave_manager_id = self.env['hr.employee'].search([('leave_manager_id', '=' ,uid)])
+
         #all request
         if  self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
-            leaves_to_approve = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),('employee_company_id','in' , company_ids )])
-        else:
-            leaves_to_approve = self.env['hr.leave'].sudo().search_count(['|', ('user_id', '=',uid), '&', '&', ('state', 'in', ['confirm', 'validate1']),('employee_company_id','in' , company_ids ),('employee_id', 'in',leave_manager_id.ids)])
+            leaves_to_approve = self.env['hr.leave'].sudo().search_count([
+                ('state', 'in', ['confirm', 'validate1']),
+                ('employee_company_id','in' , company_ids )
+                ])
+        else: 
+            my_leave_to_app = self.env['hr.leave'].sudo().search_count([
+                ('user_id', '=',uid), 
+                ('state', 'in', ['confirm', 'validate1']),
+                # ('employee_company_id','in' , company_ids )
+                ])
+            my_staff_leave_to_app =  self.env['hr.leave'].sudo().search_count([
+                #('user_id', '=',uid), 
+                ('state', 'in', ['confirm', 'validate1']),
+                #('employee_company_id','in' , company_ids ),
+                ('employee_id', 'in',leave_manager_id.ids)
+                ])
+            leaves_to_approve = my_leave_to_app +  my_staff_leave_to_app
         #today request
         today = datetime.strftime(datetime.today(), '%Y-%m-%d')
         today_timestamp = datetime.today()
+        
         if  self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
             leaves_today = self.env['hr.leave'].sudo().search_count([
             ('state', 'in', ['confirm', 'validate1']),\
@@ -74,13 +90,79 @@ class Employee(models.Model):
             ('create_date','<=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 23, 59, 59)),\
             ('employee_company_id','in' , company_ids )])
         else:
-            leaves_today = self.env['hr.leave'].sudo().search_count([
-            '|', ('user_id', '=',uid), '&', '&', '&',
+            my_leave_to_app_today =  self.env['hr.leave'].sudo().search_count([
+            ('user_id', '=',uid), 
             ('state', 'in', ['confirm', 'validate1']),\
             ('create_date','>=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 0, 0, 0)),\
             ('create_date','<=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 23, 59, 59)),
-            ('employee_id', 'in',leave_manager_id.ids)])    
+            #('employee_id', 'in',leave_manager_id.ids)
+            ])    
+            my_staff_leave_to_app_today = self.env['hr.leave'].sudo().search_count([
+            ('employee_id', 'in',leave_manager_id.ids),
+            ('state', 'in', ['confirm', 'validate1']),\
+            ('create_date','>=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 0, 0, 0)),\
+            ('create_date','<=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 23, 59, 59)),
+            
+            ])
+            leaves_today =  my_leave_to_app_today +  my_staff_leave_to_app_today
 
+
+        # leave this month
+        first_day = datetime.today().replace(day=1)
+        last_day = (datetime.today() + relativedelta(months=1, day=1)) - timedelta(1)
+
+        if  self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
+            leaves_this_month = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),\
+            ('create_date','>=',datetime(first_day.year, first_day.month, first_day.day, 0, 0, 0)),\
+            ('create_date','<=',datetime(last_day.year, last_day.month, last_day.day, 23, 59, 59)),\
+            ('employee_company_id','in' , company_ids )])
+        else:
+            my_leave_to_app_this_mon =  self.env['hr.leave'].sudo().search_count([
+            ('user_id', '=',uid), 
+            ('state', 'in', ['confirm', 'validate1']),
+            ('create_date','>=',datetime(first_day.year, first_day.month, first_day.day, 0, 0, 0)),
+            ('create_date','<=',datetime(last_day.year, last_day.month, last_day.day, 23, 59, 59)),
+            #('employee_id', 'in',leave_manager_id.ids)
+            ])    
+            my_staff_leave_to_this_mon = self.env['hr.leave'].sudo().search_count([
+            ('employee_id', 'in',leave_manager_id.ids),
+            ('state', 'in', ['confirm', 'validate1']),
+            ('create_date','>=',datetime(first_day.year, first_day.month, first_day.day, 0, 0, 0)),\
+            ('create_date','<=',datetime(last_day.year, last_day.month, last_day.day, 23, 59, 59)),
+            
+            ])
+            leaves_this_month = my_leave_to_app_this_mon + my_staff_leave_to_this_mon
+        
+            # leaves_this_month = self.env['hr.leave'].sudo().search_count([
+            # '|', ('user_id', '=',uid), '&', '&', '&',
+            # ('state', 'in', ['confirm', 'validate1']),\
+            # ('create_date','>=',datetime(first_day.year, first_day.month, first_day.day, 0, 0, 0)),\
+            # ('create_date','<=',datetime(last_day.year, last_day.month, last_day.day, 23, 59, 59)),\
+            # ('employee_id', 'in',leave_manager_id.ids)])   
+        if  self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
+            leaves_alloc_req = self.env['hr.leave'].sudo().search_count([
+            ('state', 'in', ['validate']),
+            ('employee_company_id','in' , company_ids)
+            ])
+            
+        else:
+            my_leaves_alloc_req = self.env['hr.leave'].sudo().search_count([
+            ('user_id', '=',uid),
+            ('state', 'in', ['validate']),
+            ('state', 'in', ['validate']),
+            #('employee_id', 'in',leave_manager_id.ids)
+            ])  
+            my_staff__leaves_alloc_req = self.env['hr.leave'].sudo().search_count([
+            #('user_id', '=',uid),
+            ('state', 'in', ['validate']), 
+            ('state', 'in', ['validate']),
+            ('employee_id', 'in',leave_manager_id.ids)])  
+            leaves_alloc_req = my_leaves_alloc_req + my_staff__leaves_alloc_req
+            # leaves_alloc_req = self.env['hr.leave'].sudo().search_count([
+            # ('user_id', '=',uid),
+            # ('state', 'in', ['validate']), '&',
+            # ('state', 'in', ['validate']),
+            # ('employee_id', 'in',leave_manager_id.ids)])  
         recruitment = self.env['hr.job'].sudo().search_count([('state', 'in', ['recruit', ]),('company_id','in' ,company_ids)])
 
         # user_id = self.env['res.users'].search([('id', '=', uid)])
@@ -99,31 +181,6 @@ class Employee(models.Model):
         # cr = self._cr
         # cr.execute(query)
         # leaves_today = cr.fetchall()
-
-        first_day = datetime.today().replace(day=1)
-        last_day = (datetime.today() + relativedelta(months=1, day=1)) - timedelta(1)
-
-        if  self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
-            leaves_this_month = self.env['hr.leave'].sudo().search_count([('state', 'in', ['confirm', 'validate1']),\
-            ('create_date','>=',datetime(first_day.year, first_day.month, first_day.day, 0, 0, 0)),\
-            ('create_date','<=',datetime(last_day.year, last_day.month, last_day.day, 23, 59, 59)),\
-            ('employee_company_id','in' , company_id )])
-        else:
-            leaves_this_month = self.env['hr.leave'].sudo().search_count([
-            '|', ('user_id', '=',uid), '&', '&', '&',
-            ('state', 'in', ['confirm', 'validate1']),\
-            ('create_date','>=',datetime(first_day.year, first_day.month, first_day.day, 0, 0, 0)),\
-            ('create_date','<=',datetime(last_day.year, last_day.month, last_day.day, 23, 59, 59)),\
-            ('employee_id', 'in',leave_manager_id.ids)])   
-
-        if  self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
-            leaves_alloc_req = self.env['hr.leave'].sudo().search_count(
-            [('state', 'in', ['validate'])])
-        else:
-            leaves_alloc_req = self.env['hr.leave'].sudo().search_count(['&', '|', ('user_id', '=',uid),
-            ('state', 'in', ['validate']), '&',
-            ('state', 'in', ['validate']),
-            ('employee_id', 'in',leave_manager_id.ids)])  
        
         timesheet_count = self.env['account.analytic.line'].sudo().search_count(
             [('project_id', '!=', False), ('user_id', '=', uid)])
@@ -142,7 +199,7 @@ class Employee(models.Model):
         # cr.execute(query)
         # job_applications_all = cr.fetchall()
 
-        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False),('company_id','in' , company_id )])
+        job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False),('company_id','in' , company_ids )])
         
         if employee:
             sql = """select broad_factor from hr_employee_broad_factor where id =%s"""
