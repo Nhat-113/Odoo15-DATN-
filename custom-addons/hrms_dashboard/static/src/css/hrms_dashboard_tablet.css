@@ -15,6 +15,27 @@
         margin-bottom: 9px;
         margin-left: 34px;
     }
+    .button-checkout-user .stat-content .stat-text {
+        font-size: 9px;
+        color: white;
+        margin-top: 9px;
+        margin-bottom: 9px;
+        margin-left: 34px;
+    }
+    .button-checkin .stat-content .stat-text {
+        font-size: 9px;
+        color: white;
+        margin-top: 9px;
+        margin-bottom: 9px;
+        margin-left: 34px;
+    }
+    .button-checkin-user .stat-content .stat-text {
+        font-size: 9px;
+        color: white;
+        margin-top: 9px;
+        margin-bottom: 9px;
+        margin-left: 34px;
+    }
     .stat-widget-one .stat-icon i {
         font-size: 10px;
         font-weight: 900;

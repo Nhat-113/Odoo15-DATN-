@@ -50,6 +50,27 @@
         margin-bottom: 10px;
         margin-left: 55px;
     }
+    .button-checkout-user.stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 55px;
+    }
+    .button-checkin .stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 55px;
+    }
+    .button-checkin-user .stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 55px;
+    }
     /* .emp_graph >svg {
         height: 280px;
         width: 280px;
@@ -217,11 +238,14 @@
         font-size: 10px;
     }
     .fearure_detail_user {
-        font-size: 1rem;
+        font-size: 12px;
         padding-left: 0;
     }
     .list_future_user button h4 {
-        font-size: 1rem;
+        font-size: 12px;
+        margin-bottom: 0 !important;
+        float: left;
+        padding-left: 7px;
     }
     .btn_dashboard_detail_user .text_btn_dashboard_detail{
         margin-left: 18px;

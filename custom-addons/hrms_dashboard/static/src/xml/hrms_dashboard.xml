@@ -262,8 +262,23 @@
                             </t>
                         </div>
                     </div>
-
-                    <div class="Birthday">
+                    <div class="announcements_detail" style=" margin-right: 0;">
+                        <h3>
+                            <i class="'fa fa-birthday-cake" style="margin-right:8px"></i>
+                            Birthday 
+                        </h3>
+                        <div class="col-xs-12 text-align list_news">
+                            <t t-foreach="widget.employee_birthday" t-as="employee">
+                                <div class="birthday-detail">
+                                    <img class="align-self-center rounded-circle mr-3" alt=""
+                                    t-att-src="widget.get_emp_image_url(employee[0])"/>
+                                    <p class="name"><t t-esc="employee[1]"/></p>
+                                    <p  class="days" ><t t-esc="employee[2]"/></p>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                    <!-- <div class="Birthday">
                         <div class="list">
                             <div class="text-birthday" style="height: 2%;">
                                 <h3>
@@ -271,19 +286,16 @@
                                     Birthday
                                 </h3>
                             </div>
-                            <div class="list-birthday" id = "list-birthday">
+                            <div class="list-birthday">
                                 <t t-foreach="widget.employee_birthday" t-as="employee">
                                     <div class="birthday-detail" >
-                                            <img class="align-self-center rounded-circle mr-3" alt=""
-                                            t-att-src="widget.get_emp_image_url(employee[0])"/>
-                                            <p class="name"><t t-esc="employee[1]"/></p>
-                                            <p  class="days" ><t t-esc="employee[2]"/></p>
+                                            
                                     </div>
                                 </t>
                             </div>
                         </div>
 
-                    </div>
+                    </div> -->
 
                     <div class="announcements_detail" style="margin-left: 1%;margin-right: 0 !important;">
                         <h3>
@@ -411,7 +423,7 @@
                     <div class="oh-card">
                         <div class="oh-card-body">
                             <div class="stat-widget-one">
-                                <div  class="button-checkin">
+                                <div  class="button-checkin-user">
                                     <t t-if="widget.login_employee['attendance_state'] =='checked_out'">
                                         <div class="stat-icon hr_attendance_btn">
                                             <i class="fa fa-sign-in o_hr_attendance_sign_in_out_icon"/>
@@ -421,7 +433,7 @@
                                         </div>
                                     </t>
                                  </div>
-                                <div class="button-checkout">
+                                <div class="button-checkout-user">
                                     <t t-if="widget.login_employee['attendance_state'] =='checked_in'">
                                         <div class="stat-icon hr_attendance_btn">
                                             <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon"/>
@@ -453,8 +465,24 @@
                                 </t>
                             </div>
                         </div>
+                        <div class="announcements_detail_user">
+                            <h3 style="margin-top: 6px;">
+                                <i class="fa fa-flag"  style="
+                                margin-right: 2%;"></i>
+                                EVENT 
+                            </h3>
+                            <div class="col-xs-12 text-align list_event_user" >
+                                <t t-foreach="widget.upcoming_events" t-as="event">
+                                    <div class="text_detail_user">
+                                        <h2 class="text_news_user" style="font-size: 15px;word-break:break-word"><t t-esc="event[0]"/> <t></t></h2>
+                                        <h6 class="new_code_user"><t t-esc="event[1]"/> - <t t-esc="event[2]"/></h6>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
     
-                        <div class="Event_user">
+    
+                        <!-- <div class="Event_user">
                             <h3 style="margin-top: 6px; ">
                                 <i class="fa fa-bell" style="
                                 margin-right: 2%;"></i>
@@ -468,7 +496,7 @@
                                     </div>    
                                 </t>   
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- <div class="Event_user">
                             <h3 style="margin-top: 6px; ">
