@@ -98,7 +98,7 @@
     background: #fff;
     padding: 10px;
     top: 92.813px !important;
-    left: 466px !important;
+    left: 28.8% !important;
     z-index: 10000;
 }
 .gantt_grid .gantt_grid_scale .gantt_grid_head_cell.gantt_grid_head_text 
@@ -113,3 +113,21 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.gantt_grid_head_working_day {
+    white-space: nowrap;
+    width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.custom_task .gantt_link_control{
+    display:none;
+  }
+/* .gantt_task_line.gantt_milestone {
+    margin-left: 40px
+} */
+/* .gantt_task_line.gantt_milestone .gantt_link_control.task_left {
+        height: 21px;
+        line-height: 21px;
+        margin-left: 16.5px !important;
+}  */

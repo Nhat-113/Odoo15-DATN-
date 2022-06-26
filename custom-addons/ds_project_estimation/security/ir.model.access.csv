@@ -25,4 +25,5 @@ ds_project_estimation.access_gantt_resource_planning,access_gantt_resource_plann
 base.access_ir_model_fields,access_ir_model_fields,base.model_ir_model_fields,,1,0,0,0
 
 ds_project_estimation.access_estimation_currency,access_estimation_currency,ds_project_estimation.model_estimation_currency,base.group_user,1,1,1,1
+ds_project_estimation_message_wizard,Generate Project Message Wizard,ds_project_estimation.model_estimation_message_wizard,,1,1,1,1
 

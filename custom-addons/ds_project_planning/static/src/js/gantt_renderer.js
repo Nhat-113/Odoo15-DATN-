@@ -4,6 +4,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
   var AbstractRenderer = require("web.AbstractRenderer");
   var FormRenderer = require("web.FormRenderer");
   var session = require("web.session");
+  var dialogs = require('web.view_dialogs');
   var GanttRenderer = AbstractRenderer.extend({
     template: "dhx_gantt.gantt_view",
     ganttApiUrl: "/gantt_api",
@@ -42,7 +43,8 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.config.grid_width = 660;
       gantt.config.work_time = true;
       gantt.config.skip_off_time = true;
-
+      gantt.config.root_id = "root"; 
+      gantt.config.autosize = "xy";
       gantt.plugins({
         tooltip: true,
       });
@@ -162,12 +164,128 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         },
         {
           name: "start_date",
+          label: "Start Time",
           align: "center",
           resize: true,
           // editor: startDateEditor,
           width: 120,
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
+              return "";
+            }
+            else if (item.working_day === 0) {
+              return "";
+            }
+            return item.start_date;
+          },
+        },
+        {
+          name: "end_date",
+          label: "End Time",
+          align: "center",
+          resize: true,
+          // editor: endDateEditor,
+          width: 120,
+          template: function (item) {
+            if (item.start_date - self.configStartDate === 0) {
+              return "";
+            } else if (item.working_day === 0) {
+              return "";
+            }
+            return item.end_date;
+          },
+        },
+        {
+          name: "progress",
+          label: "Progress",
+          align: "center",
+          resize: true,
+          template: function (item) {
+            if (item.progress) {
+              return item.progress * 100 + "%";
+            }
+            return "";
+          },
+        },
+        {
+          name: "working_day",
+          label: "Working Day",
+          align: "center",
+          resize: true,
+          template: function (item) {
+            //console.log("working_day", item.working_day);
+            if (item.working_day) {
+              return item.working_day;
+            }
+            // duration auto = 1  for milestone
+              else if (item.type === "milestone") {
+                return 1  ;
+              }
+            return 0;
+          },
+        },
+        {
+          name: "duration",
+          label: "Duration",
+          align: "center",
+          resize: true,
+          template: function (item) {
+            if (item.start_date - self.configStartDate === 0) {
+              return 0;
+            } else if (item.working_day === 0) {
+              return 0;
+            }
+            // duration auto = 1  for milestone
+            else if (item.type === "milestone") {
+              return 1 ;
+            }
+            return item.duration;
+          },
+        },
+        {
+          name: "assignees",
+          width: 80,
+          label: "Assignees",
+          align: "center",
+          resize: true,
+          template: function (task) {
+            var result = "";
+            var assignees = task.user_ids;
+
+            if (!assignees) return;
+
+            assignees.forEach(function (element) { 
+
+              var assignee = byId(element);
+              result += assignee;
+            });
+            return result;
+          },
+
+        },
+        {name: "buttons",label: colHeader,width: 75}
+      ];
+
+      var allColumns = [ 
+        {
+          name: "text",
+          tree: true,
+          resize: true,
+          label: "Task Name",
+          width: 180,
+        },
+        {
+          name: "start_date",
+          align: "center",
+          label: "Start time",
+          resize: true,
+          // editor: startDateEditor,
+          width: 120,
+          template: function (item) {
+            if (item.start_date - self.configStartDate === 0) {
+              return "";
+            }
+            else if (item.working_day === 0) {
               return "";
             }
             return item.start_date;
@@ -182,6 +300,9 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           width: 120,
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
+              return "";
+            }
+            else if (item.working_day === 0) {
               return "";
             }
             return item.end_date;
@@ -218,11 +339,15 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         {
           name: "duration",
           align: "center",
+          label: "Duration",
           resize: true,
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
               return 0;
-            } // duration auto = 1  for milestone
+            } else if (item.working_day === 0) {
+              return 0;
+            }
+             // duration auto = 1  for milestone
             else if (item.type === "milestone") {
               return 1 ;
             }
@@ -250,73 +375,6 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           },
 
         },
-        {name: "buttons",label: colHeader,width: 75}
-      ];
-
-      var allColumns = [ 
-        {
-          name: "text", 
-          tree: true,
-          resize: true,
-          label: "Task Name",
-          width: 180,},
-
-        { 
-          name: "start_date",
-          align: "center",
-          label: "Start Time",
-          resize: true,
-          //editor: startDateEditor,
-          width: 120,
-        },
-        {
-          name: "end_date",
-          label: "End time",
-          align: "center",
-          resize: true,
-          //editor: endDateEditor,
-          width: 120,
-        },
-        
-        {
-          name: "progress",
-          label: "Progress",
-          align: "center",
-          resize: true,
-        },
-
-        {name: "working_day",
-          label: "Working Day",
-          align: "center",
-          resize: true
-        },
-        {
-          name: "duration",
-          align: "center",
-          label: "Duration",
-          resize: true,
-        } ,
-        {
-          name: "assignees",
-          width: 80,
-          label: "Assignees",
-          align: "center",
-          resize: true,
-          template: function (task) {
-            var result = "";
-            var assignees = task.user_ids;
-
-            if (!assignees) return;
-
-            assignees.forEach(function (element) { 
-
-              var assignee = byId(element);
-              result += assignee;
-            });
-            return result;
-          },
-        }
-        
       ]
 
       gantt.config.columns = createColumnsConfig({
@@ -327,17 +385,22 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         assignees:true,
       })
       var gridDateToStr = gantt.date.date_to_str("%Y-%m-%d");
-      gantt.templates.grid_date_format = function(date, column){
+      gantt.templates.date_grid  = function(date, task, column){
           if(column === "end_date"){
               return gridDateToStr(new Date(date.valueOf() - 1)); 
-          }else{
+          } else if(column === "start_date" && task.type ==="milestone") {
+            return gridDateToStr(new Date(date.valueOf() - 1)); 
+          }
+           else{
               return gridDateToStr(date); 
           }
       }
 
+
       gantt.templates.task_class = function (start, end, task) {
         if (task.type == "phase") {
           task.color = "#808080";
+          return "custom_task"
         }
         
         if (start - self.configStartDate === 0) {
@@ -349,7 +412,12 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           case 2:
             return "warning";
         }
+        if(task.type == "milestone") return "custom_task";
       };
+      
+      // gantt.templates.task_class = function(start, end, task){
+      //   if(task.type == "milestone") return "custom_task";
+      // };
       gantt.templates.task_text = function(start, end, task){
         if(task.deadline == 2)
           return "<span style='color:black'>"+task.text+"</span>";
@@ -388,8 +456,15 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       };
 
       const tooltips = gantt.ext.tooltips;
+      
       gantt.templates.tooltip_date_format = gantt.date.date_to_str("%F %j, %Y");
       gantt.templates.tooltip_text = function (start, end, task) {
+      var gridDateToStr = gantt.date.date_to_str("%Y-%m-%d");
+        // if( end && task.type !== "milestone"){
+            end =  gridDateToStr(new Date(end.valueOf() - 1)); 
+            start =  gridDateToStr(new Date(start.valueOf() )); 
+        // }
+      
         var assignees = getAssignees(task.user_ids);
         var type =
           task.type == "phase"
@@ -400,18 +475,59 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         if (task.type == "milestone") {
           task.duration =1
         }
+        if(task.working_day===0) {
+            task.duration =0
+        }
+        // let test = {
+        //     text:task.text,
+        //     Assignees:assignees,
+        //     Duration:task.duration,
+        //     Progress: task.progress * 100 ,
+        //     startdate : gantt.templates.tooltip_date_format(
+        //         start
+        //       ),
+        //     Enddate : "",
+
+        if (task.working_day === 0  ){
+            return `<b>${type}:</b> ${task.text}<br/>
+                <b>Assignees:</b> ${assignees}<br/>
+                <b>Duration:</b> 
+                  ${task.duration}
+                <br/>
+                <b>Progress:</b> 0 %<br/>
+                <b>Working Day:</b> 0 <br/>
+                `;
+        } else if(task.type === "milestone") {
+            return `<b>${type}:</b> ${task.text}<br/>
+                    <b>Assignees:</b> ${assignees}<br/>
+                    <b>Duration:</b> 
+                      ${task.duration}
+                    <br/>
+                    <b>Working Day: 1</b> 
+                  <br/>
+                    <b>Progress:</b> ${task.progress * 100}%<br/>
+                    <b>Start date:</b> ${
+                      end
+                    } 
+                    <br/><b>End date:</b> ${
+                        end}`
+                    } 
+        else 
         return `<b>${type}:</b> ${task.text}<br/>
                 <b>Assignees:</b> ${assignees}<br/>
                 <b>Duration:</b> 
                   ${task.duration}
                 <br/>
+                <b>Working:</b> 
+                ${task.working_day}
+                <br/>
                 <b>Progress:</b> ${task.progress * 100}%<br/>
-                <b>Start date:</b> ${gantt.templates.tooltip_date_format(
+                <b>Start date:</b> ${
                   start
-                )} 
-                <br/><b>End date:</b> ${gantt.templates.tooltip_date_format(
+                } 
+                <br/><b>End date:</b> ${
                   end
-                )}`;
+                }`;
       };
 
       if (this.is_total_float) {
@@ -433,7 +549,8 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           {
             name: "day",
             scale_height: 27,
-            min_column_width: 80,
+            min_column_width: 120,
+            column_width:250,
             scales: [{ unit: "day", step: 1, format: "%d %M" }],
           },
           {
@@ -464,39 +581,39 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           {
             name: "month",
             scale_height: 50,
-            min_column_width: 120,
+            min_column_width: 250,
             scales: [
               { unit: "month", format: "%F, %Y" },
               { unit: "week", format: "Week #%W" },
             ],
           },
-          {
-            name: "quarter",
-            height: 50,
-            min_column_width: 90,
-            scales: [
-              { unit: "month", step: 1, format: "%M" },
-              {
-                unit: "quarter",
-                step: 1,
-                format: function (date) {
-                  var dateToStr = gantt.date.date_to_str("%M");
-                  var endDate = gantt.date.add(
-                    gantt.date.add(date, 3, "month"),
-                    -1,
-                    "day"
-                  );
-                  return dateToStr(date) + " - " + dateToStr(endDate);
-                },
-              },
-            ],
-          },
-          {
-            name: "year",
-            scale_height: 50,
-            min_column_width: 30,
-            scales: [{ unit: "year", step: 1, format: "%Y" }],
-          },
+          // {
+          //   name: "quarter",
+          //   height: 50,
+          //   min_column_width: 350,
+          //   scales: [
+          //     { unit: "month", step: 1, format: "%M" },
+          //     {
+          //       unit: "quarter",
+          //       step: 1,
+          //       format: function (date) {
+          //         var dateToStr = gantt.date.date_to_str("%M");
+          //         var endDate = gantt.date.add(
+          //           gantt.date.add(date, 3, "month"),
+          //           -1,
+          //           "day"
+          //         );
+          //         return dateToStr(date) + " - " + dateToStr(endDate);
+          //       },
+          //     },
+          //   ],
+          // },
+          // {
+          //   name: "year",
+          //   scale_height: 50,
+          //   min_column_width: 350,
+          //   scales: [{ unit: "year", step: 1, format: "%Y" }],
+          // },
         ],
       };
       gantt.ext.zoom.init(zoomConfig);
@@ -569,7 +686,9 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         method: "open_calendar_resource",
         args: [project_id],
       }).then(function (result) {
-        self.do_action(result);
+        self.bookingResource = new dialogs.FormViewDialog(self, result);
+        self.bookingResource.open();
+        // self.do_action(result);
       });
     },
     on_attach_callback: function () {
