@@ -10,6 +10,7 @@ var ResourcePlanGanttController = AbstractController.extend({
         // gantt_data_updated: '_onGanttUpdated',
         gantt_create_dp: '_onGanttCreateDataProcessor',
         gantt_config: '_onGanttConfig',
+        gantt_schedule: '_onGanttSchedule',
     }),
     date_object: new Date(),
     init: function (parent, model, renderer, params) {
@@ -83,7 +84,7 @@ var ResourcePlanGanttController = AbstractController.extend({
         dp.attachEvent("onBeforeUpdate", function(id, state, data){
             data.csrf_token = core.csrf_token;
             data.model_name = self.modelName;
-            data.timezone_offset = (-self.date_object.getTimezoneOffset());
+            data.timezone_offset = (self.date_object.getTimezoneOffset());
             data.map_text = self.map_text;
             data.map_id_field = self.map_id_field;
             data.map_date_start = self.map_date_start;
@@ -91,6 +92,11 @@ var ResourcePlanGanttController = AbstractController.extend({
             data.map_working_day = self.map_working_day;
             data.map_open = self.map_open;
             data.map_progress = self.map_progress;
+            return true;
+        });
+        gantt.attachEvent("onTaskLoading", function(task) {
+            task.start_date = gantt.date.convert_to_utc(task.start_date);
+            task.end_date = gantt.date.convert_to_utc(task.end_date);
             return true;
         });
 
@@ -118,11 +124,18 @@ var ResourcePlanGanttController = AbstractController.extend({
             this.update(params);
         }
     },
-    _disableAllButtons: function () {
-        this.renderer.disableAllButtons();
-    },
-    _enableAllButtons: function () {
-        this.renderer.enableAllButtons();
+    // _disableAllButtons: function () {
+    //     this.renderer.disableAllButtons();
+    // },
+    // _enableAllButtons: function () {
+    //     this.renderer.enableAllButtons();
+    // },
+    _onGanttSchedule: function(){
+        var self = this;
+        this.model.schedule().then(function () {
+            self.update({reload: true});
+            self.renderer.renderGantt();
+        });
     },
 
 });

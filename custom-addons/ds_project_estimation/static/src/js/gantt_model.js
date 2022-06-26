@@ -68,7 +68,6 @@ odoo.define('rs_plan_gantt.ResourcePlanGanttModel', function(require) {
             const formatFunc = gantt.date.str_to_date("%Y-%m-%d %h:%i:%s", true);
             records.forEach(function(record) {
                 self.res_ids.push(record[self.map_id]);
-
                 var datetime;
                 const task = {};
 
@@ -77,11 +76,11 @@ odoo.define('rs_plan_gantt.ResourcePlanGanttModel', function(require) {
                 task.duration = record[self.map_duration];
                 task.progress = typeof record[self.map_progress] === 'undefined' ? 0 : record[self.map_progress] / 100;
 
-                if (record.type) {
-                    // Add serverId to get real id in edit mode
-                    task.serverId = record.serverId;
-                    datetime = record.start_date ? formatFunc(record.start_date) : formatFunc(record.milestone_date);
-                } else {
+                // if (record.type) {
+                //     // Add serverId to get real id in edit mode
+                //     task.serverId = record.serverId;
+                //     datetime = record.start_date ? formatFunc(record.start_date) : formatFunc(record.milestone_date);
+                // } else {
                     // Show start time of task
                     if (record[self.map_date_start]) {
                         datetime = formatFunc(record[self.map_date_start]);
@@ -104,7 +103,7 @@ odoo.define('rs_plan_gantt.ResourcePlanGanttModel', function(require) {
                             }
                         }
                     }
-                }
+                // }
 
                 task.start_date = datetime;
                 task.open = record[self.map_open] ? record[self.map_open] : 'true';
@@ -187,14 +186,14 @@ odoo.define('rs_plan_gantt.ResourcePlanGanttModel', function(require) {
         //         args: [this.res_ids],
         //     });
         // },
-        // schedule: function () {
-        //     var self = this;
-        //     return this._rpc({
-        //         model: this.modelName,
-        //         method: 'bf_traversal_schedule',
-        //         args: [this.res_ids],
-        //     });
-        // },
+        schedule: function () {
+            var self = this;
+            return this._rpc({
+                model: this.modelName,
+                method: 'bf_traversal_schedule',
+                args: [this.res_ids],
+            });
+        },
     });
     return ResourcePlanGanttModel;
 });
