@@ -66,29 +66,30 @@ class Estimation(models.Model):
 
     @api.depends('add_lines_summary_totalcost.check_activate')
     def _domain_cost_rate(self):
-        module_ids = self.add_lines_module.ids
-        total_cost = self.env['estimation.summary.totalcost'].search([('module_id', 'in', module_ids)])
-        if not self.module_activate:
-            try:
-                self.module_activate = module_ids[0]
-            except:
-                self.module_activate = 0
-        activate = []
-        for item in total_cost:
-            if item.check_activate:
-                activate.append(item.module_id.id)
-                self.module_activate = item.module_id.id
-        if len(activate):
-            # đưa tất cả về False
+        for record in self:
+            module_ids = record.add_lines_module.ids
+            total_cost = record.env['estimation.summary.totalcost'].search([('module_id', 'in', module_ids)])
+            if not record.module_activate:
+                try:
+                    record.module_activate = module_ids[0]
+                except:
+                    record.module_activate = 0
+            activate = []
             for item in total_cost:
-                item.check_activate = False
-            return [('module_id', 'in', activate)]
-        else:
-            try:
-                temp = self.module_activate
-                return [('module_id', 'in', [temp])]
-            except:
-                return [('module_id', 'in', [module_ids[0]])]
+                if item.check_activate:
+                    activate.append(item.module_id.id)
+                    record.module_activate = item.module_id.id
+            if len(activate):
+                # đưa tất cả về False
+                for item in total_cost:
+                    item.check_activate = False
+                return [('module_id', 'in', activate)]
+            else:
+                try:
+                    temp = self.module_activate
+                    return [('module_id', 'in', [temp])]
+                except:
+                    return [('module_id', 'in', [module_ids[0]])]
 
 
     @api.depends('currency_id')
