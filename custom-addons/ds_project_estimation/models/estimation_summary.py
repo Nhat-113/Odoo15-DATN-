@@ -6,13 +6,12 @@ class EstimationSummaryTotalCost(models.Model):
     _description = "Summary of each estimation"
     _order = "sequence,id"
 
-    estimation_id = fields.Many2one('estimation.work', string="Estimation")
+    estimion_id = fields.Many2one('estimation.work', string="Estimation")
 
     sequence = fields.Integer(string="No", index=True, readonly=True, help='Use to arrange calculation sequence',
                               default=1)
     check_activate = fields.Boolean(string='Activate', default=False)
-    check_generate_project = fields.Boolean(string="Check Generate Project", default=False,
-                                            compute='_compute_module_generate_project')
+    check_generate_project = fields.Boolean(string="Check Generate Project", default=False,)
     module_id = fields.Many2one("estimation.module", string="Module")
     name = fields.Char(string="Components", default="Module")
     design_effort = fields.Float(string="Design",  compute='_compute_effort', store=True)
@@ -24,10 +23,6 @@ class EstimationSummaryTotalCost(models.Model):
 
     total_effort = fields.Float(string="Total Effort (MD)", readonly=True, compute='_compute_total_effort', store=True)
     cost = fields.Float(string="Cost", readonly=True, compute='_compute_cost', store=True)
-
-    @api.depends('estimation_id.check_generate_project')
-    def _compute_module_generate_project(self):
-        pass
 
     @api.depends('estimation_id.add_lines_summary_costrate.yen_month', 'estimation_id.add_lines_summary_costrate.role', 'total_effort')
     def _compute_cost(self):
