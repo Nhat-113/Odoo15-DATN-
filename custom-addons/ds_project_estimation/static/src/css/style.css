@@ -17,6 +17,30 @@ div[name="module_effort_activity"] {
     content: " *";
 }
 
+
+button[name="compute_load_activities"] {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    right: 16px;
+}
+
+.o_field_x2many_list[name="module_summarys"] .o_data_row:nth-child(1) td:nth-child(1),
+.o_field_x2many_list[name="module_summarys"] .o_data_row:nth-child(3) td:nth-child(1){
+    position: absolute;
+    display: block;
+    height: 56px;
+    background-color: white;
+    width: 29.6%;
+    padding: 20px;
+    border: 1px solid #efeeee;
+    border-top: none;
+    border-bottom: none;
+}
+.o_field_x2many_list[name="module_summarys"] .o_data_row:nth-child(3) td:nth-child(1) {
+    border-top: 1px solid #efeeee
+}
+
 div[name="check_activate"] {
     position: absolute;
     width: 100%;
