@@ -56,7 +56,7 @@
             <field name="cost_usd">0</field>
         </record>
         <record id="cost_rate_data_brsei" model="cost.rate">
-            <field name="role">Tes I</field>
+            <field name="role">Brse I</field>
             <field name="description">Senior Brse</field>
             <field name="job_type">5</field>
             <field name="currency_usd_id">1</field>

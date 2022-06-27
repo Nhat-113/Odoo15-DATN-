@@ -21,31 +21,6 @@ class CostRate(models.Model):
     cost_yen = fields.Float("Cost (JPY)", store=True,)
     cost_vnd = fields.Float("Cost (VND)", store=True,)
 
-
-class EstimationExchangeRate(models.Model):
-    _name = "estimation.exchange.rate"
-    _rec_name = "name"
-
-    name = fields.Char(string="Name", store=True, compute="compute_name")
-    usd_number = fields.Integer(string="USD", default=1, readonly=True, help="Number of USD")
-    currency_id = fields.Many2one('estimation.currency',
-                                  string="Currency",
-                                  # domain="[('name', '!=', 'USD')]",
-                                  help="Choosea Currency",
-                                  required=True)
-    value = fields.Float(string="Exchange Rate", required=True, digits=(12, 2))
-
-    _sql_constraints = [
-        ('unique_name', 'unique (currency_id)', 'Currency rates already exist!')
-    ]
-
-    @api.depends('currency_id')
-    def compute_name(self):
-        for record in self:
-            if record.currency_id:
-                record.name = "USD" + " --> " + record.currency_id.name
-
-
 class EstimationExchangeRate(models.Model):
     _name = "estimation.currency"
     _description = "Estimation Currency"

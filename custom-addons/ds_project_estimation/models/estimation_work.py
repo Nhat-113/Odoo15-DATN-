@@ -14,8 +14,27 @@ class Estimation(models.Model):
     _description = "Estimation"
     _rec_name = "number"
 
+    def _get_stage_selection(self):
+        stage = [("new","New"),("completed","Completed"),("pending","Pending")]
+        if self.user_has_groups('ds_project_estimation.estimation_access_administrator'):
+            options = [("created","Created"), ("approved","Approved"), 
+                       ("reject","Reject"),("updated","Updated"),
+                       ("in_progress","In Progress")]
+            stage += options
+        elif self.user_has_groups('ds_project_estimation.estimation_access_director') \
+            or self.user_has_groups('ds_project_estimation.estimation_access_sale_leader'):
+                options = [("approved","Approved"), ("reject","Reject")]
+                stage += options
+                if ("new","New") in stage:
+                    stage.remove(("new","New"))
+        elif self.user_has_groups('ds_project_estimation.estimation_access_officer'):
+            options = [("created","Created"),("updated","Updated"),("in_progress","In Progress")]
+            stage.clear()
+            stage += options
+        return stage
+
     project_name = fields.Char("Project Name", required=True)
-    number = fields.Char("No", readonly=True, required=True, copy=False, index=False, default="New")
+    number = fields.Char("No", readonly=True, required=True, copy=False, index=True, default=lambda self: _('New'))
 
     estimator_ids = fields.Many2one('res.users', string='Estimator')
     reviewer_ids = fields.Many2one('res.users', string='Reviewer')
@@ -31,26 +50,17 @@ class Estimation(models.Model):
     deadline = fields.Date("Deadline", required=True)
     project_code = fields.Char(string="Project Code", required=True,)
     description = fields.Text(string="Description", help="Description estimation")
-    stage = fields.Selection([("new","New"), 
-                              ("created","Created"),
-                              ("approved","Approved"),
-                              ("reject","Reject"),
-                              ("updated","Updated"),
-                              ("in_progress","In Progress"), 
-                              ("completed","Completed"),
-                              ("pending","Pending")],
-                            string="Status",
-                            required=True)
+    stage = fields.Selection(_get_stage_selection, string="Status", required=True)
     module_activate = fields.Integer('Module Activate', default=0)
-    
-    sequence_module = fields.Integer(string="Sequence Module", store=True, default = 1, compute ='_compute_sequence_module') # for compute sequence module
+    sequence_module = fields.Integer(string="Sequence Module", store=True, default=1, compute ='_compute_sequence_module') # for compute sequence module
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
     add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate',
                                                  string='Summary Cost Rate', domain=lambda self: self._domain_cost_rate())  # domain=[('module_id', 'in', [9])]
     add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'estimation_id', string='Summary Total Cost')
 
     add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'estimation_id', string='Resource Planning Effort')
-    add_lines_module = fields.One2many('estimation.module', 'estimation_id', string="Modules")
+    add_lines_module = fields.One2many('estimation.module', 'estimation_id', string="Modules") # domain="[('estimation_id', '=', 4)]",
+    gantt_view_line = fields.One2many('gantt.resource.planning', 'estimation_id', string="Gantt")
    
     check_generate_project = fields.Boolean(default=False, compute='action_generate_project', store=True)
 
@@ -80,6 +90,7 @@ class Estimation(models.Model):
             except:
                 return [('module_id', 'in', [module_ids[0]])]
 
+
     @api.depends('currency_id')
     def _compute_summary_currency(self):
         self.summary_currency_id = self.currency_id
@@ -98,19 +109,20 @@ class Estimation(models.Model):
     @api.model
     def create(self, vals):
         vals_over = {'connect_overview': '', 'description': ''}
-        if vals.get("number", "New") == "New":
-            vals["number"] = self.env["ir.sequence"].next_by_code("estimation.work") or "New"
+        if vals.get("number", _('New')) == _('New'):
+            vals["number"] = self.env["ir.sequence"].next_by_code("estimation.work") or _('New')
         result = super(Estimation, self).create(vals)
         est_current_id = self.env['estimation.work'].search([('number','=', vals["number"])])
         vals_over["connect_overview"] = est_current_id.id
         vals_over["description"] = 'Create New Estimation'
         self.env["estimation.overview"].create(vals_over)
-        
-        # for CRM
-        active_id = self._context.get('active_id')
-        if active_id:
-            estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
-            estimation_lead.estimation_count += 1
+
+        # #for CRM
+        # active_id = self._context.get('active_id')
+        # if active_id:
+        #     estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
+        #     estimation_lead.estimation_count += 1
+
         return result
 
     def write(self, vals):
@@ -127,8 +139,13 @@ class Estimation(models.Model):
                 vals_over["description"] += key + ' : ' + est_desc_content_convert[key]
             
             result = super(Estimation, self).write(vals)
+            # self.env["estimation.overview"].create(vals_over)
+            
             if vals_over["description"] != '':
                 self.env["estimation.overview"].create(vals_over)
+
+            #delete module failed
+            self._delete_module_failed()
             return result 
 
     def convert_field_to_field_desc(self, dic):
@@ -313,35 +330,94 @@ class Estimation(models.Model):
                 'target': 'new'
             }
 
-
     @api.depends('add_lines_module')
     def _compute_sequence_module(self):
+        model = 'estimation.module'
+        domain = [('estimation_id', '=', self.id or self.id.origin)]
+        sequence_field = 'sequence_module'
+        ls_data_fields = 'add_lines_module'
+        temp = {}
+        Estimation._compute_sequence_all(temp, self, model, domain, sequence_field, ls_data_fields)
+        
+        # change value of field get_estimation_id from estimation.module model
+        for record in self:
+            for rec in record.add_lines_module:
+                if rec.get_estimation_id == 999999:
+                    rec.get_estimation_id = record.id or record.id.origin
+           
+    def _compute_sequence_all(temp, self_temp, model, domain, sequence_field, ls_data_fields):
         max_sequence = 0
-        modules = self.env['estimation.module'].search([('estimation_id', '=', self.id or self.id.origin)])
+        ls_data = self_temp.env[model].search(domain)
         #if there is data and a new record is created
-        if modules:
-            for item in modules:
-                if item.sequence > max_sequence:
-                    max_sequence = item.sequence
-            Estimation.content_compute(self, max_sequence)
+        if ls_data:
+            max_sequence = max(item.sequence for item in ls_data)        
+            Estimation.content_compute(self_temp, max_sequence, sequence_field, ls_data_fields)
 
         #if no data exists and a new record is created
         else:
             max_sequence = 1
-            Estimation.content_compute(self, max_sequence)
+            Estimation.content_compute(self_temp, max_sequence, sequence_field, ls_data_fields)
                     
-    def content_compute(self, max_sequence):
-        for record in self:
-            record.sequence_module = max_sequence   # This is required
+    def content_compute(self_temp, max_sequence, sequence_field, ls_data_fields):
+        for record in self_temp:
+            record[sequence_field] = max_sequence   # This is required
             # if a new record is created
-            if record.add_lines_module:
+            if record[ls_data_fields]:
                 re_max_sequence = 0
-                for rec in record.add_lines_module: 
-                    if rec.sequence > re_max_sequence:
-                        re_max_sequence = rec.sequence
+                re_max_sequence = max(rec.sequence for rec in record[ls_data_fields])
                 max_sequence = re_max_sequence + 1
-                record.sequence_module = max_sequence  # This is required
-     
+                record[sequence_field] = max_sequence  # This is required
+
+    @api.onchange('add_lines_module')
+    def _compute_check_module(self):
+        for record in self:
+            resource_line = []
+            #if resource planning haven't record and create new a module
+            if len(record.add_lines_resource_effort) == 0 and len(record.add_lines_module) != 0:
+                for rec in record.add_lines_module:
+                    lines = (0, 0, {
+                        'sequence': rec.sequence, 
+                        'name': rec.component
+                    })
+                    resource_line.append(lines)
+                    
+                lines_md = (0, 0, {
+                    'sequence': 0, 
+                    'name': 'Total (MD)'
+                })
+                lines_mm = (0, 0, {
+                    'sequence': 0, 
+                    'name': 'Total (MM)'
+                })
+                resource_line.append(lines_md)
+                resource_line.append(lines_mm)
+                record.update({
+                    'add_lines_resource_effort': resource_line
+                })
+            else:
+                check_component_resource = []
+                check_component_resource.append(resource.name for resource in record.add_lines_resource_effort)
+                for module in record.add_lines_module:
+                    if module.component not in (resource.name for resource in record.add_lines_resource_effort):
+                        lines = (0, 0, {
+                            'sequence': module.sequence, 
+                            'name': module.component
+                        })
+                        resource_line.append(lines)
+                record.update({
+                    'add_lines_resource_effort': resource_line
+                })
+            #case: Delete module using write method
+            Estimation._delete_modules(record.add_lines_module, record.add_lines_resource_effort)
+                   
+    def _delete_modules(ls_module, ls_resource_plan):
+        for record in ls_resource_plan:
+            domain = [(2, record.estimation_id.id or record.estimation_id.id.origin)]
+            if len(ls_module) == 0:
+                record.write({'estimation_id': domain})
+            elif record.name not in ['Total (MD)', 'Total (MM)'] and record.name not in [rec.component for rec in ls_module]:
+                record.write({'estimation_id': domain})
+                    
     def unlink(self):
         for record in self:
             record.add_lines_overview.unlink()
@@ -349,10 +425,16 @@ class Estimation(models.Model):
             record.add_lines_summary_costrate.unlink()
             record.add_lines_resource_effort.unlink()
             record.add_lines_module.unlink()
-        return super(Estimation, self).unlink()
+        return super(Estimation, self).unlink()  
+    
+    def _delete_module_failed(self):
+        #case: delete modules from db with estimation_id = False
+        for record in self:
+            module_in_db = self.env['estimation.module'].search([('estimation_id', '=', False)])    #,('component', 'not in', [module.component for module in record.add_lines_module])
+            module_in_db.unlink()
+    
+    
+# class Lead(models.Model):
+#     _inherit = ['crm.lead']
 
-
-class Lead(models.Model):
-    _inherit = ['crm.lead']
-
-    estimation_count = fields.Integer(string='# Registrations')
+#     estimation_count = fields.Integer(string='# Registrations')

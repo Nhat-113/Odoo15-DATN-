@@ -1,20 +1,62 @@
 <odoo>
     <data>
-        <!-- Estimation User Group -->
-        <record id="estimation_group_user" model="res.groups">
+        <!-- Estimation Group Access Right-->
+        <record id="estimation_access" model="ir.module.category">
             <field name="name">Estimation</field>
-            <field name="category_id" ref="base.module_category_services_estimation"/>
-            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         </record>
+        
+        <!-- Option Role: Sale -->
+        <record id="estimation_access_sale" model="res.groups">
+            <field name="name">Sale</field>
+            <field name="category_id" ref="ds_project_estimation.estimation_access"/>
+        </record>
+        
+        <!-- Option Role: Officer -->
+        <record id="estimation_access_officer" model="res.groups">
+            <field name="name">Officer</field>
+            <field name="category_id" ref="ds_project_estimation.estimation_access"/>
+            <field name="implied_ids" eval="[(4, ref('ds_project_estimation.estimation_access_sale'))]"/>
+        </record>
+
+        <!-- Option Role: Sale Leader-->
+        <record id="estimation_access_sale_leader" model="res.groups">
+            <field name="name">Sale Leader</field>
+            <field name="category_id" ref="ds_project_estimation.estimation_access"/>
+            <field name="implied_ids" eval="[(4, ref('ds_project_estimation.estimation_access_officer'))]"/>
+        </record>
+
+        <!-- Option Role: Director -->
+        <record id="estimation_access_director" model="res.groups">
+            <field name="name">Director</field>
+            <field name="category_id" ref="ds_project_estimation.estimation_access"/>
+            <field name="implied_ids" eval="[(4, ref('ds_project_estimation.estimation_access_sale_leader'))]"/>
+        </record>
+
+        <!-- Option Role: Administrator -->
+        <record id="estimation_access_administrator" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="ds_project_estimation.estimation_access"/>
+            <field name="implied_ids" eval="[(4, ref('ds_project_estimation.estimation_access_director'))]"/>
+        </record>
+
+        <!-- Estimation Record Rules: Officer, Sale: can see only estimation assigned  -->
+        <record model="ir.rule" id="estimation_list_stage_officer_role">
+            <field name="name">Estimation: Officer, Sale rule: see only estimation assigned</field>
+            <field name="model_id" ref="model_estimation_work"/>
+            <field name="domain_force">['|','|',
+                                    ('estimator_ids', '=', user.id), 
+                                    ('reviewer_ids', '=', user.id),
+                                    ('create_uid', '=', user.id)]</field>
+            <field name="groups" eval="[(4,ref('ds_project_estimation.estimation_access_officer')),(4,ref('ds_project_estimation.estimation_access_sale'))]"/>
+        </record>
+
+        <!-- Estimation Record Rules: Director, Sale Leader: Can see all estimation -->
+        <record model="ir.rule" id="estimation_list_stage_sale_leader_role">
+            <field name="name">Estimation: Director, Sale rule: see all estimation</field>
+            <field name="model_id" ref="model_estimation_work"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4,ref('ds_project_estimation.estimation_access_sale_leader')),(4,ref('ds_project_estimation.estimation_access_director'))]"/>
+        </record>
+
     </data>
-
-    <!-- Estimation Manager Group -->
-    <record id="estimation_group_manager" model="res.groups">
-        <field name="name">Manager</field>
-        <field name="category_id" ref="base.module_category_services_estimation"/>
-        <field name="implied_ids" eval="[(4, ref('estimation_group_user'))]"/>
-        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
-    </record>
-
-    
 </odoo>

@@ -1,6 +1,8 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+import json
 
+sequence_activity_global = 0
 class Activities(models.Model):
     """
     Describe activities in configuration.
@@ -10,8 +12,10 @@ class Activities(models.Model):
     _order = "sequence,id"
     _rec_name = "activity"
 
-    sequence = fields.Integer(string="No", readonly=True, help='Use to arrange calculation sequence')
+    sequence = fields.Integer(string="No", readonly=True, store=True, compute='_compute_sequence')
     module_id = fields.Many2one("estimation.module", string="Module")
+    sequence_breakdown = fields.Integer(string="Sequence Activities Breakdown", store=True, default=1, compute ='_compute_sequence_breakdown')
+    check_compute = fields.Char(string="Check compute", readonly=True)
 
     activity = fields.Char("Activity", required=True)
     effort = fields.Float(string="Effort", default=0, store=True, compute='_compute_total_effort')
@@ -30,62 +34,45 @@ class Activities(models.Model):
                                        domain="[('module_id', '=', module_id), ('sequence', '!=', sequence)]")
     
     add_lines_breakdown_activity = fields.One2many('module.breakdown.activity', 'activity_id', string="Breakdown Activity")
-    check_default = fields.Boolean(string="Check", default=False)
+    check_default = fields.Boolean(string="Check default", default=False)
+    # domain_module_id = fields.Char(string="domain module id", readonly=True, store=True, compute='_compute_domain_module_id')
 
-        
+   
+    # @api.depends('activity_type')
+    # def _compute_domain_module_id(self):
+    #     for record in self:
+    #         record.domain_module_id = json.dumps(
+    #             [('id', '=', record.module_id.id or record.module_id.id.origin)]
+    #         )
+    
+    @api.onchange('activity_type')
+    def _get_module_id(self):
+        module = self.env['estimation.module'].search([('id', '=', self.module_id.id or self.module_id.id.origin)])
+        self.module_id = module
+            
     @api.depends('add_lines_breakdown_activity.mandays', 'activity_current')
     def _compute_total_effort(self):
         for record in self:
             final_manday = 0.0
             for item in record.add_lines_breakdown_activity:
                 if item.mandays > 1000:
-                    raise UserError('Expected (man-days) must be less than 1000')
+                    raise UserError('Expected (man-days) must be less than 1000 !')
                 else:
                     final_manday += item.mandays 
             record.effort = final_manday
 
     @api.model
-    def create(self, vals):
-        if vals:
-            # load sequence
-            ls_activity = self.env['config.activity'].search([('module_id', '=', vals['module_id'])])
-            self.env['config.activity'].auto_increase_sequence(vals, ls_activity)
-            result = super(Activities, self).create(vals)
-                
-            #if values is default data
-            if vals['check_default'] == True:
-                return result
-            
-            #if values is new data
-            ctx = {
-                'sequence': vals['sequence'],
-                'activity': vals['activity'],
-                'effort': 0,
-                'percent': 0,
-                'module_id': vals['module_id'],
-                'activity_id': result['id']
-            }
-            self.env['module.effort.activity'].create(ctx)
-            return result
+    def default_get(self, fields):
+        result = super(Activities, self).default_get(fields)
+        result.update({
+            'check_compute': 'OK' #is required for compute sequence
+        })
+        return result
 
-    def write(self, vals):
-        if vals:
-            effort_activity_vals = {}
-            check = False
-            for key in vals:
-                if key == 'activity':
-                    check = True
-            if check == True:
-                ls_effort_acivity = self.env['module.effort.activity'].search([('module_id', '=', self.module_id.id), ('sequence', '=', self.sequence )])
-                effort_activity_vals['activity'] = vals['activity']
-                ls_effort_acivity.write(effort_activity_vals)
-                return super(Activities, self).write(vals)
-            else:
-                return super(Activities, self).write(vals)
 
     def unlink(self):
         for item in self:
-            effort_distribute = self.env['module.effort.activity'].search([('module_id', '=', item.module_id.id), ('sequence', '=', item.sequence )])
+            effort_distribute = self.env['module.effort.activity'].search([('module_id', 'in', [item.module_id.id, False]), ('activity', '=', item.activity)])
             breakdown_activity = self.env['module.breakdown.activity'].search([('activity_id','=', item.id)])
             if effort_distribute:
                 effort_distribute.unlink()
@@ -93,12 +80,70 @@ class Activities(models.Model):
                 breakdown_activity.unlink()
         return super(Activities, self).unlink()
 
-    def auto_increase_sequence(self, vals, ls_data):
-        sequence_max = 0
-        for record in ls_data:
-            if record.sequence > sequence_max:
-                sequence_max = record.sequence
-        vals['sequence'] = sequence_max + 1
+    
+    # @api.depends('check_compute')
+    # def _compute_sequence(self):
+    #     max_sequence = self.module_id.sequence_activities
+    #     global sequence_activity_global
+    #     for rec in self:
+    #         # if save activities mode
+    #         if rec.id:
+    #             sequence_activity_global = 0
+    #             for item in self.module_id.module_effort_activity:
+    #                 if item.activity == rec.activity:
+    #                     item.sequence = max_sequence
+    #                     rec.sequence = max_sequence
+    #                     max_sequence += 1
+    #         else: #if this is create new activity
+    #             # max = record.sequence_activities
+    #             # for rec in self:
+    #             if max_sequence == 1 and sequence_activity_global <= 1:
+    #                 max_sequence = max(item.sequence for item in rec.module_id.module_config_activity)
+    #                 sequence_activity_global = max_sequence
+    #             rec.sequence = sequence_activity_global + 1
+    #             if rec.id or rec.id.origin == False:
+    #                 sequence_activity_global += 1
+    
+    @api.depends('check_compute')
+    def _compute_sequence(self):
+        for record in self.module_id:
+            # if save module mode
+            if record.id:
+                max = record.sequence_activities
+                for rec in self:
+                    if rec.id:
+                        break
+                    else:
+                        rec.sequence = max
+                        for item in record.module_effort_activity:
+                            if rec.module_id.id == record.id and item.activity == rec.activity:
+                                item.sequence = rec.sequence
+                        max += 1
+            else: #if this is create new activity
+                max = record.sequence_activities
+                for rec in self:
+                    rec.sequence = max
+                    if rec.id or rec.id.origin == False:
+                        max += 1
+    
+    @api.depends('add_lines_breakdown_activity')
+    def _compute_sequence_breakdown(self):
+        model = 'module.breakdown.activity'
+        sequence_field = 'sequence_breakdown'
+        ls_data_fields = 'add_lines_breakdown_activity'
+        for record in self:
+            domain = [('activity_id', '=', record.id or record.id.origin)]
+            self.env['estimation.work']._compute_sequence_all(record, model, domain, sequence_field, ls_data_fields)
+
+    @api.onchange('add_lines_breakdown_activity')
+    def check_duplicate_breakdowns(self):
+        break_names = []
+        for record in self.add_lines_breakdown_activity:
+            break_names.append(record.activity)
+        
+        if len(break_names) != len(set(break_names)): # check duplicate
+            raise UserError('Breadown Activity name already exists!')
+        
 class DataActivity(models.Model):
     """
     Describe Data Activity
@@ -130,17 +175,15 @@ class DataActivity(models.Model):
             # if vals is not the default data
             if check == False:
                 ls_data = self.env['data.activity'].search([])
-                self.env['config.activity'].auto_increase_sequence(vals, ls_data)
+                self.auto_increase_sequence(vals, ls_data)
                 return super(DataActivity, self).create(vals)
             else:
                 return super(DataActivity, self).create(vals) 
         
-    # def refresh_sequence(self):
-    #     ls_data = self.env['data.activity'].search([])
-    #     count = self.env['data.activity'].search_count([])
-    #     index = 1
-    #     for record in ls_data:
-    #         if index < count:
-    #             ls_data[index].sequence = record.sequence + 1
-    #             index += 1
-    #     return
+
+    def auto_increase_sequence(self, vals, ls_data):
+        sequence_max = 0
+        for record in ls_data:
+            if record.sequence > sequence_max:
+                sequence_max = record.sequence
+        vals['sequence'] = sequence_max + 1
