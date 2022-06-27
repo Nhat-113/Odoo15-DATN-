@@ -7,11 +7,13 @@ class CurrentTaskScore(models.Model):
     _description = "Current Task Score"
     _auto = False
 
+    id = fields.Many2one('hr.employee', string="ID", readonly=True)
     employee_id = fields.Many2one('hr.employee', string="Employee", readonly=True)
     name = fields.Char(string="Employee Name", readonly=True)
     department_id = fields.Many2one('hr.department', string="Department", readonly=True)
     job_id = fields.Many2one('hr.job', string="Job Position", readonly=True)
     parent_id = fields.Many2one('hr.employee', string="Parent ID", readonly=True)
+    company_id = fields.Many2one('res.company', string="Company ID", readonly=True)
     task_score_avg = fields.Float(string='Task Score', digits=(12, 1), readonly=True)
 
 
@@ -21,10 +23,12 @@ class CurrentTaskScore(models.Model):
                 (
                     SELECT
                         emp.id,
+                        emp.id as employee_id,
                         emp.name,
                         emp.department_id,
                         emp.job_id,
                         emp.parent_id,
+                        emp.company_id,
 						SUM(project_task.task_score::decimal)/COUNT(project_task.task_score) as task_score_avg
 						
                     FROM (
@@ -34,6 +38,7 @@ class CurrentTaskScore(models.Model):
                             department_id,
                             job_id,
                             parent_id,
+                            company_id,
 							user_id
                         FROM
                             hr_employee
@@ -54,7 +59,8 @@ class CurrentTaskScore(models.Model):
                         emp.name,
                         emp.department_id,
                         emp.job_id,
-                        emp.parent_id
+                        emp.parent_id,
+                        emp.company_id
                 )
             )
         """ % (self._table))

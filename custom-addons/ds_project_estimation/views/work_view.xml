@@ -14,7 +14,7 @@
                             <field name="project_name" />
                             <field name="project_code" />
                             <field name="project_type_id" placeholder="Select project type ..."/>
-                            <field name="estimator_ids" placeholder="Please select estimator ..."/>
+                            <field name="estimator_ids" placeholder="Please select estimator ..." attrs="{'required': [('stage', '==', 'completed')]}"/>
                             <field name="reviewer_ids" placeholder="Please select reviewer ..."/>
                         </group>
                         <group name="group_right">
@@ -87,10 +87,10 @@
                                     <field name="comtor_effort" />
                                     <field name="brse_effort" />
                                     <field name="pm_effort" />
-                                    <field name="total_effort" />
+                                    <field name="total_effort" decoration-bf="1"/>
                                 </tree>
                             </field>
-                            <button string="View Gantts" attrs="{'invisible': [('add_lines_resource_effort', '=', [])]}" name="%(ds_project_estimation.action_view_gantt_resource_plan)d" type="action" class="btn-primary"/>
+                            <button string="View Gantt" attrs="{'invisible': [('add_lines_resource_effort', '=', [])]}" name="%(ds_project_estimation.action_view_gantt_resource_plan)d" type="action" class="btn-primary"/>
                         </page>
                         <page string="Module">
                             <separator string="Modules" />

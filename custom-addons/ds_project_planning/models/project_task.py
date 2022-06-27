@@ -23,7 +23,7 @@ class ProjectTask(models.Model):
         'project.planning.milestone', string='Milestone', required=False, domain=[('phase_id', '=', phase_id)], help="Project Milestone")
 
     planned_duration = fields.Float('Duration', default=0, compute='_compute_planned_duration', inverse='_inverse_planned_duration', store=True, readonly=True)
-    working_day = fields.Float('Working Day', default=0, compute='_compute_working_day', store=True, readonly=True)
+    working_day = fields.Float('Working Day', default=0,compute='_compute_working_day', store=True, readonly=True)
     lag_time = fields.Integer('Lag Time')
     depending_task_ids = fields.One2many('project.depending.tasks', 'task_id')
     dependency_task_ids = fields.One2many(
@@ -84,11 +84,18 @@ class ProjectTask(models.Model):
                 r.working_day = 0
 
 
-    @api.onchange('planned_duration', 'date_start')
+    @api.onchange('planned_duration', 'date_start', 'date_end')
     def _inverse_planned_duration(self):
         for r in self:            
-            if r.date_start and r.planned_duration and not r.env.context.get('ignore_onchange_planned_duration', False):
+            if r.date_start and not r.env.context.get('ignore_onchange_planned_duration', False):
+                if r.date_start and r.date_end and r.date_end < r.date_start  and  r.planned_duration <= 0.0:
+                    r.date_start = r.date_end
+                if r.planned_duration == 0.0:
+                    r.planned_duration = 1
                 r.date_end = r.date_start + timedelta(days=r.planned_duration - 1)
+                # if r.working_day == 0:
+                #     r.working_day = 1
+                    
 
     @api.depends('dependency_task_ids')
     def _compute_recursive_dependency_task_ids(self):
@@ -121,14 +128,17 @@ class ProjectTask(models.Model):
                 links.append(json_obj)
             r.links_serialized_json = json.dumps(links)
 
-    @api.onchange('date_start', 'date_end')
+    @api.constrains('date_start', 'date_end')
     def _check_start_end(self):
         for task in self:
-            if task.date_start and task.date_end and task.date_start > task.date_end:
-                raise ValidationError(_(
-                    'Task "%(task)s": start date (%(start)s) must be earlier than end date (%(end)s).',
-                    task=task.name, start=task.date_start, end=task.date_end,
-                ))
+            if task.date_start and task.date_end and task.date_start > task.date_end and task.planned_duration == 0:
+                if (task.date_start - task.date_end).days > 1:
+                    raise ValidationError(_(
+                        'Task "%(task)s": start date (%(start)s) must be earlier than end date (%(end)s).',
+                        task=task.name, start=task.date_start, end=task.date_end,
+                    ))
+                else:
+                    task.planned_duration == 1
 
     def update_date_end(self, stage_id):
         return {}
@@ -155,6 +165,25 @@ class DependingTasks(models.Model):
         ('task_relation_unique', 'unique(task_id, depending_task_id)',
          'Two tasks can have only one relation!'),
     ]
+    
+    @api.depends('task_id')
+    def _compute_task_id_domain(self):
+        for task in self:
+            if task.depending_task_id:
+                task.task_id_domain = json.dumps(
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.depending_task_id.ids[0]), ('issues_type', '=', 1)]
+                )
+            elif task.task_id:
+                task.task_id_domain = json.dumps(
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.task_id.ids[0]), ('issues_type', '=', 1)]
+                )
+
+    task_id_domain = fields.Char(
+        compute="_compute_task_id_domain",
+        readonly=True,
+        store=False,
+    )
+
 
     @api.onchange('task_id', 'depending_task_id')
     def _compute_project_id(self):

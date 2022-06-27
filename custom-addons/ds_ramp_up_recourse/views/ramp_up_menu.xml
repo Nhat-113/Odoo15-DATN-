@@ -20,10 +20,9 @@
         name="Resource Management"
         sequence="2"
         parent="ds_ramp_up_recourse.ramp_up_menu" 
-        groups="group_task_score_admin"/>
+        groups="group_task_score_admin"
+        action="ramp_up_report_action"/>
 
-    <menuitem id="ramp_up_menu_child" name="OverView" parent="menu_ramp_up_report" action="ramp_up_report_action" sequence="1" groups="group_task_score_admin"/>
-    <menuitem id="ramp_up_menu_detail" name="Details" parent="menu_ramp_up_report" action="open_view_ramp_up_all" sequence="2" groups="group_task_score_admin"/>
     <menuitem id="hr_employee_task_score" name="Task Score" parent="ds_ramp_up_recourse.ramp_up_menu" sequence="1"/>
     <menuitem id="current_task_score_" name="Current" parent="ds_ramp_up_recourse.hr_employee_task_score" action="open_view_employee_current_task_score" sequence="1"/>
     <menuitem id="history_task_score" name="History" action="open_view_history" parent="ds_ramp_up_recourse.hr_employee_task_score" sequence="2" groups="group_task_score_user"/>

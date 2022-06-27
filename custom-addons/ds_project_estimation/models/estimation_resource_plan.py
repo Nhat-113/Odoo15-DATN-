@@ -2,6 +2,7 @@ from odoo import models, fields, api
 import math
 from datetime import datetime
 
+Index_year = 0  #This is for compute_year function
 class EstimationResourcePlan(models.Model):
     _name = "estimation.resource.effort"
     _description = "Resource planning of each estimation"
@@ -19,7 +20,6 @@ class EstimationResourcePlan(models.Model):
     pm_effort = fields.Float(string="PM",)
     total_effort = fields.Float(string="Total Effort (MD)", store=True, compute="compute_effort") 
    
-    
     def total_efforts_func(self, vars):
         ls_activities = self.env['config.activity'].search([('module_id', '=', self.module_id.id)]).ids
         result_total_effort = 0
@@ -149,9 +149,9 @@ class EstimationResourcePlan(models.Model):
                 return item.id
             
     def compute_date_time(vals_effort_mm, mm_start, yy_start):
-        dd_start = 1
-        dd_end = yy_end = 1
+        dd_start = dd_end = 1
         mm_end = mm_start
+        yy_end = yy_start
         surplus = 0
         if vals_effort_mm < 1:
             mm_end = mm_start 
@@ -161,7 +161,9 @@ class EstimationResourcePlan(models.Model):
                 dd_end = 1
             else:
                 dd_end = EstimationResourcePlan.compute_days(mm_end, surplus, dd_end)
-            yy_end = yy_start
+            if dd_end == 0:
+                dd_end = 1
+            # yy_end = yy_start
             result_end_day = EstimationResourcePlan.convert_to_datetime(dd_end, mm_end, yy_end)
         elif vals_effort_mm >= 1:
             if mm_start + vals_effort_mm < 13:
@@ -170,9 +172,7 @@ class EstimationResourcePlan(models.Model):
                 if mm_end == 12:
                     mm_end = 1
                     yy_end = yy_start + 1
-                else:
-                    # mm_end = mm_end + 1
-                    yy_end = yy_start
+
                 result_dd_end = EstimationResourcePlan.compute_days(mm_end, surplus, dd_end)
                 if result_dd_end == 0:
                     dd_end = 1
@@ -181,6 +181,8 @@ class EstimationResourcePlan(models.Model):
                 result_end_day = EstimationResourcePlan.convert_to_datetime(dd_end, mm_end, yy_end)
             elif mm_start + vals_effort_mm >= 13:
                 datetime_end = EstimationResourcePlan.compute_year(vals_effort_mm, mm_start, yy_start, dd_end, mm_end, yy_end)
+                global Index_year
+                Index_year = 0
                 for item in datetime_end:
                     if item == 'dd_end':
                         dd_end = datetime_end[item]
@@ -196,20 +198,19 @@ class EstimationResourcePlan(models.Model):
         }
         
     def compute_year(vals_effort_mm, mm_start, yy_start, dd_end, mm_end, yy_end):
-        index = 1
+        global Index_year
         check_vals = (mm_start + vals_effort_mm) - 12        #12 is 12 month/year
         if check_vals > 12:
-            index += 1 
-            EstimationResourcePlan.compute_year(check_vals, mm_start, yy_start, dd_end, mm_end, yy_end)
+            Index_year += 1
+            return EstimationResourcePlan.compute_year(check_vals, mm_start, yy_start, dd_end, mm_end, yy_end)
         elif check_vals <= 12:
             mm_end = math.floor(check_vals)
             surplus = check_vals - mm_end
             if mm_end == 12:
                 mm_end = 1
-                yy_end = yy_start + index + 1
+                yy_end = yy_start + Index_year + 1
             else:
-                # mm_end = mm_end + 1
-                yy_end = yy_start + index
+                yy_end = yy_start + Index_year
             dd_end = EstimationResourcePlan.compute_days(mm_end, surplus, dd_end)
         return {'dd_end': dd_end, 'mm_end': mm_end, 'yy_end': yy_end}
         
@@ -239,11 +240,15 @@ class EstimationResourcePlan(models.Model):
     
     @api.depends('estimation_id.sequence_module')
     def compute_sequence(self):
+        max_sequence = 0
+        for record in self:
+            if record.name not in ['Total (MD)', 'Total (MM)'] and record.sequence > max_sequence:
+                max_sequence = record.sequence
         for record in self:
             if record.name == 'Total (MD)':
-                record.sequence = record.estimation_id.sequence_module
+                record.sequence = max_sequence + 1
             elif record.name == 'Total (MM)':
-                record.sequence = record.estimation_id.sequence_module + 1
+                record.sequence = max_sequence + 2
 
 class GanttResourcePlanning(models.Model):
     _name = "gantt.resource.planning"

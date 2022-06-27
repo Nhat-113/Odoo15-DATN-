@@ -1,6 +1,9 @@
+from ast import literal_eval
+import time
 from odoo import models, fields, api, _
 import json
 from odoo.exceptions import UserError
+from odoo.modules import module
 
 
 class Estimation(models.Model):
@@ -110,7 +113,7 @@ class Estimation(models.Model):
             estimation_lead = self.env['crm.lead'].search([('id', '=', active_id)])
             estimation_lead.estimation_count += 1
         return result
-    
+
     def write(self, vals):
         vals_over = {'connect_overview': self.id, 'description': ''}
         if vals:
@@ -125,7 +128,8 @@ class Estimation(models.Model):
                 vals_over["description"] += key + ' : ' + est_desc_content_convert[key]
             
             result = super(Estimation, self).write(vals)
-            self.env["estimation.overview"].create(vals_over)
+            if vals_over["description"] != '':
+                self.env["estimation.overview"].create(vals_over)
             return result 
 
     def convert_field_to_field_desc(self, dic):
@@ -257,28 +261,58 @@ class Estimation(models.Model):
                 total += record.cost
             item.total_cost = total
 
-    def action_generate_project(self):
-        for estimation in self:
-            if not estimation.estimator_ids:
-               raise UserError('Please select an estimator before generating project.')
+    def generate_project_cron(self):
+        estimation_ids = self.env['ir.config_parameter'].sudo(
+            ).get_param('gen_project_cron.records')
+        estimations = self.env['estimation.work'].browse(literal_eval(estimation_ids))
+        for estimation in estimations:
             project = self.env['project.project'].sudo().create({
                 'name': estimation.project_name,
                 'user_id':estimation.estimator_ids.id
             })
-            activity = self.env['config.activity'].search([('estimation_id','=',estimation.id)])
-            for act in activity:
-                for breakdown in self.env['module.breakdown.activity'].search([('activity_id','=',act.id)]):
-                    self.env['project.task'].create({
-                        'project_id':project.id,
-                        'stage_id':self.env['project.task.type'].search([('name','=','Backlog')])[0].id,
-                        'name':breakdown.activity,
-                        'user_ids':[],
-                        'issues_type':1,
-                        'status':2,
-                        'planned_hours':breakdown.mandays * 8
-                    })
+            modules = self.env['estimation.module'].search([('estimation_id', '=', estimation.id)])
+            for module in modules:
+                activity = self.env['config.activity'].search([('module_id','=',module.id)])
+                for act in activity:
+                    for breakdown in self.env['module.breakdown.activity'].search([('activity_id','=',act.id)]):
+                        self.env['project.task'].create({
+                            'project_id':project.id,
+                            'stage_id':self.env['project.task.type'].search([('name','=','Backlog')])[0].id,
+                            'name':breakdown.activity,
+                            'user_ids':[],
+                            'issues_type':1,
+                            'status':2,
+                            'planned_hours':breakdown.mandays * 8
+                        })
+        self.env['ir.config_parameter'].sudo().set_param(
+            'gen_project_cron.records', [])
+
+        return {}
+
+    def action_generate_project(self):
+        for estimation in self:
+            if not estimation.estimator_ids:
+               raise UserError('Please select an estimator before generating project.')
+
+            # set global variable for self' records
+            self.env['ir.config_parameter'].sudo().set_param(
+                'gen_project_cron.records', self.ids)
+            ir_cron = self.env.ref('ds_project_estimation.gen_project_cron')
+            ir_cron.write(
+                {'active': True, 'nextcall': fields.datetime.now()})
+            message_id = self.env['estimation.message.wizard'].create(
+                {'message': _("Successfully generated project.")})
+                
             estimation.check_generate_project = True
-            return project
+            time.sleep(1)
+            return {
+                'name': 'Message',
+                'type': 'ir.actions.act_window',
+                'view_mode': 'form',
+                'res_model': 'estimation.message.wizard',
+                'res_id': message_id.id,
+                'target': 'new'
+            }
 
 
     @api.depends('add_lines_module')
