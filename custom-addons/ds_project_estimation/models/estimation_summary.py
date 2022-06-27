@@ -6,7 +6,7 @@ class EstimationSummaryTotalCost(models.Model):
     _description = "Summary of each estimation"
     _order = "sequence,id"
 
-    estimion_id = fields.Many2one('estimation.work', string="Estimation")
+    estimation_id = fields.Many2one('estimation.work', string="Estimation")
 
     sequence = fields.Integer(string="No", index=True, readonly=True, help='Use to arrange calculation sequence',
                               default=1)
