@@ -172,8 +172,8 @@ var GanttController = AbstractController.extend({
         return true; 
     });
     gantt.attachEvent("onBeforeLinkAdd", function(id, link){
-        console.log(`id`, id);
-        console.log(`link`, link);
+        // console.log(`id`, id);
+        // console.log(`link`, link);
         var sourceTask = gantt.getTask(link.source);
         var targetTask = gantt.getTask(link.target);
         if (targetTask.type == "milestone" || targetTask.type =="phase"){
