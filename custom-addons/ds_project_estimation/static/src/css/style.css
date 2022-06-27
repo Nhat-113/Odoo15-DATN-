@@ -16,3 +16,16 @@ div[name="module_effort_activity"] {
 .o_form_sheet_bg .o_form_label.o_required_modifier:after {
     content: " *";
 }
+
+div[name="check_activate"] {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    z-index: 999;
+}
+div[name="check_activate"] .custom-control-label, div[name="check_activate"] i {
+    display: none;
+}
+th[data-name="check_activate"] {
+    width: 0 !important;
+}
