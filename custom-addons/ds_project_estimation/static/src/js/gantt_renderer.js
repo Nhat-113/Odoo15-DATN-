@@ -12,6 +12,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
         events: _.extend({}, AbstractRenderer.prototype.events, {
             "click button.o_dhx_zoom_in": "_onClickZoomIn",
             "click button.o_dhx_zoom_out": "_onClickZoomOut",
+            "click button.o_dhx_reschedule": "_onClickReschedule",
             "click button.o_dhx_export_to_pdf": "_exportToPDF"
         }),
         init: function(parent, state, params) {
@@ -31,16 +32,22 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
             gantt.config.grid_width = 180;
             gantt.config.work_time = true;
             gantt.config.skip_off_time = true;
+            gantt.config.autoscroll = true;
+            gantt.config.autoscroll_speed = 0;
             gantt.config.drag_links = false;
+            gantt.config.drag_progress = false;
+            gantt.config.min_duration = 24 * 60 * 60 * 1000; //Set min duration = 1 day
             gantt.plugins({
                 tooltip: true,
+                auto_scheduling: true
             });
+            gantt.config.auto_scheduling = true;
+        
 
             const startDateEditor = { type: "date", map_to: "start_date" };
             const endDateEditor = { type: "date", map_to: "end_date" };
 
             // config left column
-            gantt.config.drag_progress = false;
             gantt.config.columns = [{
                     name: "text",
                     tree: true,
@@ -62,19 +69,10 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                     },
                 }
             ];
-            // gantt.attachEvent("onTaskLoading", function(task) {
+           
+            gantt.templates.task_text = function(start, end, task) {
+                return task.valueMM;
 
-            //     //console.log(`task`, task);
-            //     // if (task.custom_date) 
-            //     task.start_date = gantt.date.convert_to_utc(task.start_date);
-            //     task.end_date = gantt.date.convert_to_utc(task.end_date);
-
-            //     // task.custom_date = gantt.date.parseDate(task.custom_date,"%m-%d-%y")
-            //     return true;
-            // });
-            gantt.templates.task_text = function (start, end, task) {
-              return task.valueMM;
-                
             };
             gantt.templates.task_class = function(start, end, task) {
                 if (start - self.configStartDate === 0) {
@@ -135,13 +133,16 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
             var zoomConfig = {
                 levels: [{
                         name: "day",
-                        scale_height: 27,
-                        min_column_width: 80,
-                        scales: [{ unit: "day", step: 1, format: "%d %M" }],
+                        scale_height: 60,
+                        min_column_width: 50,
+                        scales: [{ unit: "day", step: 1, format: "%d" },
+                                { unit: "month", format: "%F, %Y" },
+                                { unit: "year", step: 1, format: "%Y" }
+                                ],
                     },
                     {
                         name: "week",
-                        scale_height: 50,
+                        scale_height: 60,
                         min_column_width: 50,
                         scales: [{
                                 unit: "week",
@@ -151,7 +152,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                                     var endDate = gantt.date.add(date, +6, "day");
                                     var weekNum = gantt.date.date_to_str("%W")(date);
                                     return (
-                                        "#" +
+                                        "Week " +
                                         weekNum +
                                         ", " +
                                         dateToStr(date) +
@@ -161,6 +162,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                                 },
                             },
                             { unit: "day", step: 1, format: "%j %D" },
+                            { unit: "year", step: 1, format: "%Y" }
                         ],
                     },
                     {
@@ -169,7 +171,8 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                         min_column_width: 120,
                         scales: [
                             { unit: "month", format: "%F, %Y" },
-                            { unit: "week", format: "Week #%W" },
+                            { unit: "week", format: "Week %W" },
+                            { unit: "year", step: 1, format: "%Y" }
                         ],
                     },
                     {
@@ -190,6 +193,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                                     return dateToStr(date) + " - " + dateToStr(endDate);
                                 },
                             },
+                            { unit: "year", step: 1, format: "%Y" }
                         ],
                     },
                     {
@@ -203,7 +207,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
             gantt.ext.zoom.init(zoomConfig);
             gantt.ext.zoom.setLevel("quarter");
         },
-       
+
         _onClickZoomIn: function() {
             gantt.ext.zoom.zoomIn();
         },
@@ -234,65 +238,70 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                 this.events_set = true;
             }
             gantt.clearAll();
-            var date_to_str = gantt.date.date_to_str(gantt.config.task_date);
-            gantt.addMarker({
-                start_date: new Date(), //a Date object that sets the marker's date
-                css: "today", //a CSS class applied to the marker
-                text: "Today", //the marker title
-                title: date_to_str(new Date()), // the marker's tooltip
-            });
+            // var date_to_str = gantt.date.date_to_str(gantt.config.task_date);
+            // gantt.addMarker({
+            //     start_date: new Date(), //a Date object that sets the marker's date
+            //     css: "today", //a CSS class applied to the marker
+            //     text: "Today", //the marker title
+            //     title: date_to_str(new Date()), // the marker's tooltip
+            // });
             var rootHeight = this.$el.height();
             var headerHeight = this.$(".o_dhx_gantt_header").height();
             this.$(".o_dhx_gantt").height(rootHeight - headerHeight);
             gantt.parse(this.state.records);
         },
-        _onUpdate: function() {},
-        updateState: function(state, params) {
-            // this method is called by the controller when the search view is changed. we should
-            // clear the gantt chart, and add the new tasks resulting from the search
-            var res = this._super.apply(this, arguments);
-            gantt.clearAll();
-            this.renderGantt();
-            return res;
-        },
-        disableAllButtons: function() {
-            // console.log('disableAllButtons:: Renderer');
-            this.$(".o_dhx_gantt_header").find("button").prop("disabled", true);
-        },
-        enableAllButtons: function() {
-            // console.log('enableAllButtons:: Renderer');
-            this.$(".o_dhx_gantt_header").find("button").prop("disabled", false);
-        },
-        undoRenderCriticalTasks: function (data) {
-          gantt.eachTask(function (item) {
-            item.color = "";
-          });
-          gantt.getLinks().forEach(function (item) {
-            item.color = "";
-          });
-          gantt.render();
-        },
-        renderCriticalTasks: function (data) {
-          data.tasks.forEach(function (item) {
-            var task = gantt.getTask(item);
-            if (task) {
-              task.color = "red";
-            }
-          });
-          data.links.forEach(function (item) {
-            var link = gantt.getLink(item);
-            if (link) {
-              link.color = "red";
-            }
-          });
-          if (data.tasks.length > 0) {
-            gantt.render();
-          }
-        },
-        destroy: function() {
-            gantt.clearAll();
-            this._super.apply(this, arguments);
-        },
+        _onClickReschedule: function () {
+            // console.log('_onClickReschedule');
+            this.trigger_up("gantt_schedule");
+          },
+        // _onUpdate: function() {},
+        // updateState: function(state, params) {
+        //     // this method is called by the controller when the search view is changed. we should
+        //     // clear the gantt chart, and add the new tasks resulting from the search
+        //     var res = this._super.apply(this, arguments);
+        //     gantt.clearAll();
+        //     this.renderGantt();
+        //     return res;
+        // },
+
+        // disableAllButtons: function() {
+        //     // console.log('disableAllButtons:: Renderer');
+        //     this.$(".o_dhx_gantt_header").find("button").prop("disabled", true);
+        // },
+        // enableAllButtons: function() {
+        //     // console.log('enableAllButtons:: Renderer');
+        //     this.$(".o_dhx_gantt_header").find("button").prop("disabled", false);
+        // },
+        // undoRenderCriticalTasks: function(data) {
+        //     gantt.eachTask(function(item) {
+        //         item.color = "";
+        //     });
+        //     gantt.getLinks().forEach(function(item) {
+        //         item.color = "";
+        //     });
+        //     gantt.render();
+        // },
+        // renderCriticalTasks: function(data) {
+        //     data.tasks.forEach(function(item) {
+        //         var task = gantt.getTask(item);
+        //         if (task) {
+        //             task.color = "red";
+        //         }
+        //     });
+        //     data.links.forEach(function(item) {
+        //         var link = gantt.getLink(item);
+        //         if (link) {
+        //             link.color = "red";
+        //         }
+        //     });
+        //     if (data.tasks.length > 0) {
+        //         gantt.render();
+        //     }
+        // },
+        // destroy: function() {
+        //     gantt.clearAll();
+        //     this._super.apply(this, arguments);
+        // },
     });
     return ResourcePlanGanttRenderer;
 });

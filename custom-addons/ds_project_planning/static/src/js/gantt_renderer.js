@@ -41,6 +41,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
 
       var self = this;
       gantt.config.grid_width = 660;
+      gantt.config.autosize_min_width = 1600;
       gantt.config.work_time = true;
       gantt.config.skip_off_time = true;
       gantt.config.root_id = "root"; 

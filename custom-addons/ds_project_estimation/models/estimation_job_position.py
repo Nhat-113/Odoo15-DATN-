@@ -10,6 +10,6 @@ class JobPosition(models.Model):
     _order = "sequence,id"
     _rec_name = "job_position"
 
-    sequence = fields.Integer()
+    sequence = fields.Integer(string="No")
     job_position = fields.Char("Job Position", required=True)
     description = fields.Char("Description", required=True)

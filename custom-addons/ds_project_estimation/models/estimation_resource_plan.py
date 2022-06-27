@@ -1,77 +1,69 @@
 from odoo import models, fields, api
 import math
-from datetime import datetime
+from datetime import datetime, timedelta
 
 Index_year = 0  #This is for compute_year function
 class EstimationResourcePlan(models.Model):
     _name = "estimation.resource.effort"
     _description = "Resource planning of each estimation"
-    _order = "sequence,id"
+    _order = "sequence"
     
     estimation_id = fields.Many2one('estimation.work', string="Connect Estimation")
-    module_id = fields.Many2one("estimation.module", string="Module")
+    # module_id = fields.Many2one("estimation.module", string="Module")
     sequence = fields.Integer(string="No", store=True, compute='compute_sequence')
     name= fields.Char(string="Components", default="Module")    
-    design_effort = fields.Float(string="Design",)
-    dev_effort = fields.Float(string="Developer",)
-    tester_effort = fields.Float(string="Tester",)
-    comtor_effort = fields.Float(string="Comtor",)
-    brse_effort = fields.Float(string="Brse",)
-    pm_effort = fields.Float(string="PM",)
+    design_effort = fields.Float(string="Design")
+    dev_effort = fields.Float(string="Developer")
+    tester_effort = fields.Float(string="Tester")
+    comtor_effort = fields.Float(string="Comtor")
+    brse_effort = fields.Float(string="Brse")
+    pm_effort = fields.Float(string="PM")
     total_effort = fields.Float(string="Total Effort (MD)", store=True, compute="compute_effort") 
    
-    def total_efforts_func(self, vars):
-        ls_activities = self.env['config.activity'].search([('module_id', '=', self.module_id.id)]).ids
+   
+    def total_efforts_job_position(self, job_position):
         result_total_effort = 0
-        for item in ls_activities:
-            ls_breakdowns = self.env['module.breakdown.activity'].search([('activity_id', '=', item)])
-            for rec in ls_breakdowns:
-                if rec.job_pos and rec.job_pos.job_position == vars:
-                    result_total_effort += rec.mandays
+        for record in self.estimation_id.add_lines_module:
+            if record.component == self.name:
+                for activity in record.module_config_activity:
+                    for breakdown in activity.add_lines_breakdown_activity: # compute effort for each job position
+                        if breakdown.job_pos.job_position == job_position:
+                            #if this is save mode
+                            if breakdown.id:
+                                result_total_effort += breakdown.mandays
+                            else:
+                                #compute breakdown is new
+                                result_total_effort += breakdown.mandays
+                                
+                                #compute effort from database because self has no effort data
+                                ls_breakdowns = self.env['module.breakdown.activity'].search([('activity_id', '=', activity.id or activity.id.origin), ('job_pos', '=', breakdown.job_pos.id)])
+                                total = sum(breakdb.mandays for breakdb in ls_breakdowns)
+                                result_total_effort += total
         return result_total_effort
-    
-    # def total_efforts_func(self, vars):
-    #     result_total_effort = 0
-    #     for record in self.estimation_id.add_lines_module:
-    #         record_module_id = 0
-    #         if record.id: 
-    #             record_module_id = record.id
-    #         else:
-    #             record_module_id = record.id.origin
-    #         if self.module_id.id == record_module_id:
-    #             for rec in record.module_config_activity:
-    #                 for item in rec.add_lines_breakdown_activity:
-    #                     if item.job_pos and item.job_pos.job_position == vars:
-    #                         result_total_effort += item.mandays
-    #     return result_total_effort
     
     @api.depends('estimation_id.add_lines_module.total_manday')
     def compute_effort(self):
         ls_key = {'dev_effort': 'Developer', 'design_effort': 'Designer', 'tester_effort': 'Tester', 
                   'comtor_effort': 'Comtor', 'pm_effort': 'Project manager', 'brse_effort': 'Brse'}
-        module_name = "Module"
         for key in ls_key:
             final_effort = final_total_effort = 0
             for record in self:     # compute total effort for each module
-                result_total_efforts = EstimationResourcePlan.total_efforts_func(record, ls_key[key])
-                if record.name.find(module_name) != -1:
+                if record.name not in ['Total (MD)', 'Total (MM)']:
+                    result_total_efforts = EstimationResourcePlan.total_efforts_job_position(record, ls_key[key])
                     record[key] = result_total_efforts
                     final_effort += result_total_efforts
                     
-                    for item in record.estimation_id.add_lines_module:
-                        if item.id: #if for save mode
-                            if item.id == record.module_id.id:
-                                record.total_effort = item.total_manday
-                                final_total_effort += item.total_manday
-                        elif item.id.origin and item.id.origin == record.module_id.id: #if for edit mode
-                            record.total_effort = item.total_manday
-                            final_total_effort += item.total_manday
-            for record in self: #compute effort for MD & MM
+                    #get total manday from module = total_effort field
+                    for module in record.estimation_id.add_lines_module:
+                        if module.component == record.name:
+                            record.total_effort = module.total_manday
+                            final_total_effort += module.total_manday
+            #compute effort for MD & MM record
+            for record in self: 
                 if record.name == 'Total (MD)':
                     record[key] = final_effort
                     record.total_effort = final_total_effort
                 elif record.name =='Total (MM)':
-                    # man_month = self.env['estimation.module.summary'].search([('estimation_id', '=', record.estimation_id.id), ('type', '=', 'default_per_month')])
                     man_month = 20  # 20 is working days per month
                     if man_month != 0:
                         record[key] = round (final_effort / man_month, 2)
@@ -97,12 +89,8 @@ class EstimationResourcePlan(models.Model):
                             yy_start =  int(str(result.create_date.year)[-2:])  #take the last 2 numbers of the year
                             mm_start =  result.create_date.month
                             result_day = EstimationResourcePlan.compute_date_time(vals[key], mm_start, yy_start)
-                            for days in result_day:
-                                if days == 'start_date': 
-                                    vals_gantt['start_date'] = result_day['start_date']
-                                else:
-                                    vals_gantt['end_date'] = result_day['end_date']
-                           
+                            vals_gantt['end_date'] = result_day['end_date']
+                            vals_gantt['start_date'] = result_day['start_date']
                             vals_gantt['duration'] = (vals_gantt['end_date'] - vals_gantt['start_date']).days + 1
                             vals_gantt.pop("end_date")
                             self.env["gantt.resource.planning"].create(vals_gantt)
@@ -129,14 +117,7 @@ class EstimationResourcePlan(models.Model):
                                 yy_start =  int(str(rec.create_date.year)[-2:])   #take the last 2 numbers of the year
                                 mm_start =  rec.create_date.month
                                 result_day = EstimationResourcePlan.compute_date_time(vals_gantt['value_man_month'], mm_start, yy_start)
-                                for days in result_day:
-                                    if days == 'start_date': 
-                                        vals_gantt['start_date'] = result_day['start_date']
-                                    else:
-                                        vals_gantt['end_date'] = result_day['end_date']
-                               
-                                vals_gantt['duration'] = (vals_gantt['end_date'] - vals_gantt['start_date']).days + 1
-                                vals_gantt.pop("end_date")
+                                vals_gantt['duration'] = (result_day['end_date'] - result_day['start_date']).days + 1
                                 GanttResourcePlanning.write(gantt_item, vals_gantt)
                                 break
                     
@@ -212,6 +193,8 @@ class EstimationResourcePlan(models.Model):
             else:
                 yy_end = yy_start + Index_year
             dd_end = EstimationResourcePlan.compute_days(mm_end, surplus, dd_end)
+            if dd_end == 0:
+                dd_end = 1
         return {'dd_end': dd_end, 'mm_end': mm_end, 'yy_end': yy_end}
         
     def compute_days(mm_end, surplus, dd_end):
@@ -242,8 +225,14 @@ class EstimationResourcePlan(models.Model):
     def compute_sequence(self):
         max_sequence = 0
         for record in self:
-            if record.name not in ['Total (MD)', 'Total (MM)'] and record.sequence > max_sequence:
-                max_sequence = record.sequence
+            if record.name not in ['Total (MD)', 'Total (MM)']:
+                if record.id:
+                    max_sequence += 1
+                    record.sequence = max_sequence 
+                elif record.sequence > max_sequence:
+                    # elif record.id.origin and record.sequence > max_sequence:
+                    max_sequence = record.sequence
+               
         for record in self:
             if record.name == 'Total (MD)':
                 record.sequence = max_sequence + 1
@@ -262,24 +251,11 @@ class GanttResourcePlanning(models.Model):
     progress = fields.Integer(string="Progress", default= 100)
     duration = fields.Integer(string="Duration", store=True, compute='_compute_check_duration')
     
-    @api.depends('duration')
+    @api.depends('duration', 'start_date', 'end_date')
     def _compute_check_duration(self):
         for rec in self:
-            if rec.duration < 0:
+            if rec.duration <= 0:
                 rec.duration = 1
-
-class EstimationResourcePlanningData(models.Model):
-    _name = "estimation.resource.planning.data"
-    _description = "Resource planning data default of each estimation"
-    _order = "sequence,id"
-     
-    sequence = fields.Integer(string="No")
-    name= fields.Char(string="Components")    
-    design_effort = fields.Float(string="Design")
-    dev_effort = fields.Float(string="Developer")
-    tester_effort = fields.Float(string="Tester")
-    comtor_effort = fields.Float(string="Comtor")
-    brse_effort = fields.Float(string="Brse")
-    pm_effort = fields.Float(string="PM")
-    total_effort = fields.Float(string="Total Effort (MD)")
-    
+                # rec.start_date -= timedelta(days=1)
+            else:
+                rec.start_date += timedelta(days=1)
