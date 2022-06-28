@@ -1,6 +1,4 @@
-from re import L
 from odoo import models, fields, api
-from odoo import http
 
 
 class EstimationSummaryTotalCost(models.Model):
@@ -10,11 +8,11 @@ class EstimationSummaryTotalCost(models.Model):
 
     estimation_id = fields.Many2one('estimation.work', string="Estimation")
 
-    sequence = fields.Integer(string="No", index=True, readonly=True, help='Use to arrange calculation sequence',
-                              default=1)
+    sequence = fields.Integer(string="No", index=True, help='Use to arrange calculation sequence', default=1)
     check_activate = fields.Boolean(string='Activate', default=False)
     check_generate_project = fields.Boolean(string="Check Generate Project", default=False,)
     name = fields.Char(string="Components", default="Module")
+    key_primary = fields.Char(string="Key unique module")
     design_effort = fields.Float(string="Designer",  compute='_compute_effort', store=True)
     dev_effort = fields.Float(string="Developer", store=True)
     tester_effort = fields.Float(string="Tester", store=True)
@@ -24,6 +22,13 @@ class EstimationSummaryTotalCost(models.Model):
 
     total_effort = fields.Float(string="Total Effort (MD)", readonly=True, compute='_compute_total_effort', store=True)
     cost = fields.Float(string="Cost", readonly=True, compute='_compute_cost', store=True)
+    get_name_avtivate = fields.Char(string="Module activate", store=True, compute='_compute_check_activate_name')
+    
+    
+    @api.depends('check_activate')
+    def _compute_check_activate_name(self):
+        for record in self:
+            record.estimation_id.module_activate = record.name
 
     @api.depends('estimation_id.add_lines_summary_costrate.yen_month', 'estimation_id.add_lines_summary_costrate.role', 'total_effort')
     def _compute_cost(self):
@@ -98,50 +103,16 @@ class EstimationSummaryCostRate(models.Model):
 
     connect_summary_costrate = fields.Many2one('estimation.work', string="Connect Summary Cost Rate", store=True)
     name = fields.Char(string="Components", store=True)
+    key_primary = fields.Char(string="Key unique module")
 
     sequence = fields.Integer(string="No", store=True)
     types = fields.Char(string="Type", store=True)
     role = fields.Many2one('cost.rate', string='Role', store=True)
-    yen_month = fields.Float(string="Unit (Currency/Month)", store=True, compute='_compute_yen_month')
-    yen_day = fields.Float(string="Unit (Currency/Day)", store=True, compute="_compute_yen_day")
+    yen_day = fields.Float(string="Unit (Currency/Day)", store=True, compute='_compute_yen_month')
+    yen_month = fields.Float(string="Unit (Currency/Month)")
     check_load_default = fields.Boolean('Check load default cost', default=True)
 
-    @api.depends('connect_summary_costrate.currency_id', 'role.cost_usd', 'role.cost_yen', 'role.cost_vnd')
+    @api.depends('yen_month')
     def _compute_yen_month(self):
-        
         for item in self:
-            if item.check_load_default:
-                cost_rate = self.env['cost.rate'].search([('job_type', '=', item.types)])
-
-                if item.connect_summary_costrate.id:
-                    currency_id = item.connect_summary_costrate.currency_id.id
-
-                elif item.connect_summary_costrate.id == False:
-                    currency_id = item.connect_summary_costrate.currency_id.id
-
-                elif item.connect_summary_costrate.id.origin:
-                    currency_id = item.connect_summary_costrate.currency_id.id
-
-                else:
-                    currency_id = item.connect_summary_costrate.currency_id.id
-                    if currency_id == False:
-                        currency_id = 1
-
-                if currency_id == 1:
-                    item.yen_month = cost_rate.cost_usd
-                elif currency_id == 22:
-                    item.yen_month = cost_rate.cost_vnd
-                else:
-                    item.yen_month = cost_rate.cost_yen
-                item.check_load_default = False
-
-
-    @api.depends("yen_month")
-    def _compute_yen_day(self):
-        for record in self:
-            record.yen_day = record.yen_month/20
-
-
-    # @api.model
-    # def create(self, vals):
-    #     print(vals)
+            item.yen_day = item.yen_month/20 

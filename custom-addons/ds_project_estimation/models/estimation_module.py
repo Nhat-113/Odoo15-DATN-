@@ -24,6 +24,7 @@ class EstimationModule(models.Model):
 
     get_estimation_id = fields.Integer(string="Estimation Id")
 
+
     def unlink(self):
         for record in self:
             record.module_assumptions.unlink()
