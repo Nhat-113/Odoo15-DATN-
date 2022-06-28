@@ -24,44 +24,6 @@ class EstimationModule(models.Model):
     summary_total_cost = fields.One2many('estimation.summary.totalcost', 'module_id')
     summary_cost_rate = fields.One2many('estimation.summary.costrate', 'module_id')
     
-    @api.model
-    def create(self, vals):
-        if vals:
-            result = super(EstimationModule, self).create(vals)
-            # Create summary tab
-            vars_summary_total_cost = {'module_id': result.id,
-                                       'estimation_id': result.estimation_id.id,
-                                       'sequence': result.sequence,
-                                       'name': result.component}
-            self.env['estimation.summary.totalcost'].create(vars_summary_total_cost)
-            vals_total_cost = {
-                'design_effort': 0,
-                'dev_effort': 0,
-                'tester_effort': 0,
-                'comtor_effort': 0,
-                'brse_effort': 0,
-                'pm_effort': 0,
-                'total_effort': 0,
-                'cost': 0
-            }
-            self.env['estimation.summary.totalcost'].create(vals_total_cost)
-
-            # Create Cost Rate
-            line_cost_rate = self.env['config.job.position'].search([])
-            for index, val in enumerate(line_cost_rate):
-                cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)])
-                role_default = cost_rate[0]
-                vals_cost_rate = {'module_id': result.id,
-                                  'connect_summary_costrate': result.estimation_id.id,
-                                  'sequence': index+1,
-                                  'name': result.component,
-                                  'types': val.job_position,
-                                  'role': role_default.id,
-                                  'yen_month': 0.0,
-                                  'yen_day': 0.0,
-                                  }
-                self.env['estimation.summary.costrate'].create(vals_cost_rate)
-            return result 
 
     def unlink(self):
         for record in self:

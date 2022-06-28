@@ -107,7 +107,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                 var type = "Job Positions"
 
                 return `<b>${type}:</b> ${task.text[1]}<br/>
-                <b>Value (MM):</b> ${task.valueMM}<br/>
+                <b>Total (MM):</b> ${task.valueMM}<br/>
                 <b>Start date:</b> ${gantt.templates.tooltip_date_format(
                   start
                 )} 
