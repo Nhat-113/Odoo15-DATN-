@@ -26,6 +26,7 @@
         "views/cost_rate_view.xml",
         "views/activity_view.xml",
         "views/project_type_view.xml",
+        "views/crm_lead_views.xml",
         "data/gen_project_cron.xml",
         "wizard/message_wizard_views.xml"
 
