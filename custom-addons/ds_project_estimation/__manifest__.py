@@ -27,7 +27,8 @@
         "views/activity_view.xml",
         "views/project_type_view.xml",
         "data/gen_project_cron.xml",
-        "wizard/message_wizard_views.xml"
+        "wizard/message_wizard_views.xml",
+        "views/export_estimation_view.xml"
 
     ],
     'assets': {
