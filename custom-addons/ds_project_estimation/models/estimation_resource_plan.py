@@ -11,7 +11,7 @@ class EstimationResourcePlan(models.Model):
     estimation_id = fields.Many2one('estimation.work', string="Connect Estimation")
     # module_id = fields.Many2one("estimation.module", string="Module")
     sequence = fields.Integer(string="No", store=True, compute='compute_sequence')
-    name= fields.Char(string="Components", default="Module")    
+    name= fields.Char(string="Components")
     design_effort = fields.Float(string="Design")
     dev_effort = fields.Float(string="Developer")
     tester_effort = fields.Float(string="Tester")
