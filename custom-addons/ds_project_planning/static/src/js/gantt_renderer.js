@@ -45,7 +45,8 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.config.work_time = true;
       gantt.config.skip_off_time = true;
       gantt.config.root_id = "root"; 
-      gantt.config.autosize = "xy";
+      gantt.config.min_duration = 24 *60 *60 *1000;
+      // gantt.config.autosize = "xy";
       gantt.plugins({
         tooltip: true,
       });
@@ -154,7 +155,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
      
     
       var colHeader = '<div class="gantt-dropdown" onclick="gantt.$showDropdown(this)" style= "color:blue">&#9660;</div>';
-      var controlsColumn = {name: "buttons",label: colHeader,width: 75}
+      var controlsColumn = {name: "buttons",label: colHeader,width: 13}
       gantt.config.columns = [
         {
           name: "text",
@@ -264,7 +265,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           },
 
         },
-        {name: "buttons",label: colHeader,width: 75}
+        {name: "buttons",label: colHeader,width: 13}
       ];
 
       var allColumns = [ 
