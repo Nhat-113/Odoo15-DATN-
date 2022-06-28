@@ -88,7 +88,7 @@ class Employee(models.Model):
             ('state', 'in', ['validate']),
             ('employee_company_id','in' , company_ids)
             ])
-        # time off none
+        # time off
         else: 
             #leave to approve
             my_leave_to_app = self.env['hr.leave'].sudo().search_count([
@@ -100,12 +100,12 @@ class Employee(models.Model):
                 ('state', 'in',  ['confirm','draft','refuse', 'validate1']),
                 ('employee_id', 'in',leave_manager_id.ids)
                 ])
-            leaves_to_approve = self.env['hr.leave'].sudo().search_count([
-                ('user_id', '=',uid), 
-                ('state', 'in',  ['confirm','draft','refuse', 'validate1']),
+            # leaves_to_approve = self.env['hr.leave'].sudo().search_count([
+            #     ('user_id', '=',uid), 
+            #     ('state', 'in',  ['confirm','draft','refuse', 'validate1']),
 
-                ])
-            #leaves_to_approve = my_leave_to_app +  my_staff_leave_to_app
+            #     ])
+            leaves_to_approve = my_leave_to_app +  my_staff_leave_to_app
 
             #leave today
             my_leave_to_app_today =  self.env['hr.leave'].sudo().search_count([
