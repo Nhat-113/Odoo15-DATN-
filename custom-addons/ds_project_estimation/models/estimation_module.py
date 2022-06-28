@@ -19,49 +19,8 @@ class EstimationModule(models.Model):
     module_config_activity = fields.One2many('config.activity', 'module_id')
     module_effort_activity = fields.One2many('module.effort.activity', 'module_id')
     # estimation_resource_plan = fields.One2many('estimation.resource.effort', 'module_id')
-    
-    get_estimation_id = fields.Integer(string="Estimation Id")
-    summary_total_cost = fields.One2many('estimation.summary.totalcost', 'module_id')
-    summary_cost_rate = fields.One2many('estimation.summary.costrate', 'module_id')
-    
-    @api.model
-    def create(self, vals):
-        if vals:
-            result = super(EstimationModule, self).create(vals)
-            # Create summary tab
-            vars_summary_total_cost = {'module_id': result.id,
-                                       'estimation_id': result.estimation_id.id,
-                                       'sequence': result.sequence,
-                                       'name': result.component}
-            self.env['estimation.summary.totalcost'].create(vars_summary_total_cost)
-            vals_total_cost = {
-                'design_effort': 0,
-                'dev_effort': 0,
-                'tester_effort': 0,
-                'comtor_effort': 0,
-                'brse_effort': 0,
-                'pm_effort': 0,
-                'total_effort': 0,
-                'cost': 0
-            }
-            self.env['estimation.summary.totalcost'].create(vals_total_cost)
 
-            # Create Cost Rate
-            line_cost_rate = self.env['config.job.position'].search([])
-            for index, val in enumerate(line_cost_rate):
-                cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)])
-                role_default = cost_rate[0]
-                vals_cost_rate = {'module_id': result.id,
-                                  'connect_summary_costrate': result.estimation_id.id,
-                                  'sequence': index+1,
-                                  'name': result.component,
-                                  'types': val.job_position,
-                                  'role': role_default.id,
-                                  'yen_month': 0.0,
-                                  'yen_day': 0.0,
-                                  }
-                self.env['estimation.summary.costrate'].create(vals_cost_rate)
-            return result 
+    get_estimation_id = fields.Integer(string="Estimation Id")
 
     def unlink(self):
         for record in self:
@@ -69,8 +28,8 @@ class EstimationModule(models.Model):
             record.module_summarys.unlink()
             record.module_effort_activity.unlink()
             record.module_config_activity.unlink()
-            record.summary_total_cost.unlink()
-            record.summary_cost_rate.unlink()
+            # record.summary_total_cost.unlink()
+            # record.summary_cost_rate.unlink()
             
             # check_data_resource_plan = self.env['estimation.resource.effort'].search([('estimation_id', '=', record.estimation_id.id)])
             # gantt_resource_plan = self.env['gantt.resource.planning'].search([('estimation_id', '=', record.estimation_id.id)])
