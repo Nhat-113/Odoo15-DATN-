@@ -148,12 +148,10 @@ class Employee(models.Model):
             my_leaves_alloc_req = self.env['hr.leave'].sudo().search_count([
             ('user_id', '=',uid),
             ('state', 'in', ['validate']),
-            ('state', 'in', ['validate']),
             #('employee_id', 'in',leave_manager_id.ids)
             ])  
             my_staff__leaves_alloc_req = self.env['hr.leave'].sudo().search_count([
             #('user_id', '=',uid),
-            ('state', 'in', ['validate']), 
             ('state', 'in', ['validate']),
             ('employee_id', 'in',leave_manager_id.ids)])  
             leaves_alloc_req = my_leaves_alloc_req + my_staff__leaves_alloc_req
