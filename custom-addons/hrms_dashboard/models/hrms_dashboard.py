@@ -88,7 +88,7 @@ class Employee(models.Model):
             ('state', 'in', ['validate']),
             ('employee_company_id','in' , company_ids)
             ])
-
+        # time off none
         else: 
             #leave to approve
             my_leave_to_app = self.env['hr.leave'].sudo().search_count([
@@ -100,7 +100,12 @@ class Employee(models.Model):
                 ('state', 'in',  ['confirm','draft','refuse', 'validate1']),
                 ('employee_id', 'in',leave_manager_id.ids)
                 ])
-            leaves_to_approve = my_leave_to_app +  my_staff_leave_to_app
+            leaves_to_approve = self.env['hr.leave'].sudo().search_count([
+                ('user_id', '=',uid), 
+                ('state', 'in',  ['confirm','draft','refuse', 'validate1']),
+
+                ])
+            #leaves_to_approve = my_leave_to_app +  my_staff_leave_to_app
 
             #leave today
             my_leave_to_app_today =  self.env['hr.leave'].sudo().search_count([
@@ -123,7 +128,6 @@ class Employee(models.Model):
             ('state', 'in',  ['confirm','draft','refuse', 'validate1']),
             ('create_date','>=',datetime(first_day.year, first_day.month, first_day.day, 0, 0, 0)),
             ('create_date','<=',datetime(last_day.year, last_day.month, last_day.day, 23, 59, 59)),
-            #('employee_id', 'in',leave_manager_id.ids)
             ])    
             my_staff_leave_to_this_mon = self.env['hr.leave'].sudo().search_count([
             ('employee_id', 'in',leave_manager_id.ids),
@@ -133,7 +137,8 @@ class Employee(models.Model):
             
             ])
             leaves_this_month = my_leave_to_app_this_mon + my_staff_leave_to_this_mon
-            # leave to approve
+
+            # leave  approved
             my_leaves_alloc_req = self.env['hr.leave'].sudo().search_count([
             ('user_id', '=',uid),
             ('state', 'in', ['validate']),
