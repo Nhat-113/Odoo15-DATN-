@@ -265,7 +265,9 @@ class EstimationXlsx(models.AbstractModel):
         sheet_resource.set_column(1, 1, 10)
         sheet_resource.set_column(2, 4, 20)
         sheet_resource.set_column(5, 8, 20)
-        sheet_resource.set_column(9, 400, 0.3)
+        sheet_resource.set_column(11, 13, 20)
+
+        sheet_resource.set_column(14, 140, 2)
 
         col_names_sheet_resource = [
             "Designer",
@@ -308,11 +310,13 @@ class EstimationXlsx(models.AbstractModel):
                     resource.pm_effort
                 ]
 
+        row_data_chartt , col_data_chartt = 12, 11
+
         sheet_resource.merge_range(
-            row_data_total_effort + 3, 6, row_data_total_effort + 3, 7, 'Resource Plan', format['merge_header'])
-        sheet_resource.write(row_data_total_effort + 4, 6, 'Resource', format['merge_header'])
-        sheet_resource.write(row_data_total_effort + 4, 7, 'Resource Count', format['merge_header'])
-        sheet_resource.write(row_data_total_effort + 4, 8, 'Duration (Month)', format['merge_header'])
+            row_data_chartt, col_data_chartt, row_data_chartt, col_data_chartt + 1, 'Resource Plan', format['merge_header'])
+        sheet_resource.write(row_data_chartt + 1, col_data_chartt, 'Resource', format['merge_header'])
+        sheet_resource.write(row_data_chartt + 1, col_data_chartt + 1, 'Resource Count', format['merge_header'])
+        sheet_resource.write(row_data_chartt + 1, col_data_chartt + 2, 'Duration (Month)', format['merge_header'])
 
         job_position = [
             'Designer',
@@ -322,19 +326,19 @@ class EstimationXlsx(models.AbstractModel):
             'PM'
         ]
         for i, value in enumerate(job_position):
-            sheet_resource.write(row_data_total_effort + 5 + i, 6, value, format['border'])
-            sheet_resource.write(row_data_total_effort + 5 + i, 8, duration[i], format['border'])
+            sheet_resource.write(row_data_chartt + 2 + i, col_data_chartt, value, format['border'])
+            sheet_resource.write(row_data_chartt + 2 + i, col_data_chartt + 2, duration[i], format['border'])
             if (int(str(round(duration[i], 1)).split('.')[1])) >= 5:
-                sheet_resource.write(row_data_total_effort + 5 + i, 7, math.ceil(duration[i]), format['border'])
+                sheet_resource.write(row_data_chartt + 2 + i, col_data_chartt + 1, math.ceil(duration[i]), format['border'])
             else:
-                sheet_resource.write(row_data_total_effort + 5 + i, 7, round(duration[i]), format['border'])
+                sheet_resource.write(row_data_chartt + 2 + i, col_data_chartt + 1, round(duration[i]), format['border'])
         
         month = math.ceil(max(duration))
         col = 0
-        num_days = 30 
+        num_days = 10
         for i in range(1, month+1):                       
             sheet_resource.merge_range(
-                row_data_total_effort + 4, 9 + col, row_data_total_effort + 4, 8 + col + num_days, 'Month - '+str(i), format['merge_header'])
+                row_data_chartt + 1, 14 + col, row_data_chartt + 1, 13 + col + num_days, 'Month - '+str(i), format['merge_header'])
             col += num_days
 
         gantt_format = workbook.add_format({
@@ -343,7 +347,7 @@ class EstimationXlsx(models.AbstractModel):
 
         for i in range(len(duration)):
             sheet_resource.merge_range(
-                row_data_total_effort + 5 + i, 9, row_data_total_effort + 5 + i, 9 + math.ceil(duration[i]*30), '', gantt_format)
+                row_data_chartt + 2 + i, 14, row_data_chartt + 2 + i, 13 + math.ceil(duration[i]*10), '', gantt_format)
 
         sheet_resource.hide_gridlines(2)
             
@@ -352,6 +356,37 @@ class EstimationXlsx(models.AbstractModel):
 
         merge_value = workbook.add_format({
                 'border': 1
+                })
+
+        border_right = workbook.add_format({
+                'border': 0,
+                'right': 1,
+                })
+        border_left = workbook.add_format({
+                'border': 0,
+                'left': 1,
+                'bottom':1
+                })
+
+        border_bottom = workbook.add_format({
+                'border': 0,
+                'right': 1,
+                'bottom': 1
+                })
+
+        format_icon = workbook.add_format({
+                'border': 0,
+                'font_name' : 'Wingdings 2',
+                'align':'right',
+                'left': 1
+                })
+        
+        format_icon_border_bottom = workbook.add_format({
+                'border': 0,
+                'font_name' : 'Wingdings 2',
+                'align':'right',
+                'left': 1,
+                'bottom': 1
                 })
         
         merge_breakdown = workbook.add_format({
@@ -381,17 +416,34 @@ class EstimationXlsx(models.AbstractModel):
                 'valign': 'vcenter',
                 'fg_color': '#E0E3E3'})
 
+        merge_row_rotate = workbook.add_format({
+                'bold': 1,
+                'border': 1,
+                'align': 'center',
+                'valign': 'vcenter',
+                'rotation': 90,
+                'fg_color': '#E0E3E3'})
+
         merge_activity = workbook.add_format({
                 'bold': 1,
                 'border': 1,
                 'fg_color': '#75FCC1'})
 
+        merge_row_value = workbook.add_format({
+                'border': 1,
+                'align':'right',
+                'fg_color': '#E0E3E3'})
+
+        merge_row_value_bold = workbook.add_format({
+                'bold': 1,
+                'border': 1,
+                'fg_color': '#E0E3E3'})
+
         for module in modules:
             sheet_module = workbook.add_worksheet(module.component)
             # Set Column Ranges in Summarize
             sheet_module.set_column(0, 0, 1.5)
-            sheet_module.set_column(1, 1, 3.5)
-            sheet_module.set_column(2, 2, 10)
+            sheet_module.set_column(1, 2, 3.5)
             sheet_module.set_column(3, 3, 23)
             sheet_module.set_column(4, 5, 10)
             sheet_module.set_column(6, 6, 16)
@@ -406,15 +458,23 @@ class EstimationXlsx(models.AbstractModel):
             'B13:K13', 'Assumption', merge_header)
             row_assumption = 13
             assumptions = self.env['estimation.module.assumption'].search([('module_id', '=', module.id)])
-            for ass in assumptions:
+            for ass in assumptions[:-1]:
+                sheet_module.merge_range(row_assumption, 1, row_assumption, 2, 'Å', format_icon)
                 sheet_module.merge_range(
-                    row_assumption , 1, row_assumption, 10, ass.assumption, merge_value)
+                    row_assumption , 3, row_assumption, 10, ass.assumption, border_right)
                 row_assumption += 1
+            sheet_module.merge_range(row_assumption, 1, row_assumption, 2, 'Å', format_icon_border_bottom)
+            sheet_module.merge_range(
+                    row_assumption , 3, row_assumption, 10, assumptions[-1].assumption, border_bottom)
 
             row_summary = row_assumption + 2
             sheet_module.merge_range(row_summary, 1, row_summary, 10, 'Summary', merge_header)
-            sheet_module.merge_range(row_summary + 1, 2, row_summary + 2, 2, 'Standard', merge_row)
-            sheet_module.merge_range(row_summary + 3, 2, row_summary + 4, 2, 'Project', merge_row)
+            sheet_module.merge_range(row_summary + 1, 2, row_summary + 2, 2, 'Standard', merge_row_rotate)
+            sheet_module.set_row(row_summary + 1, 27)
+            sheet_module.set_row(row_summary + 2, 27)
+            sheet_module.merge_range(row_summary + 3, 2, row_summary + 4, 2, 'Project', merge_row_rotate)
+            sheet_module.set_row(row_summary + 3, 21)
+            sheet_module.set_row(row_summary + 4, 21)
             sheet_module.merge_range(row_summary + 1, 3, row_summary + 1, 9, 'Working hours per day', merge_value)
             sheet_module.merge_range(row_summary + 2, 3, row_summary + 2, 9, 'Working days per month', merge_value)
             sheet_module.merge_range(row_summary + 3, 3, row_summary + 3, 9, 'Total efforts in man-day unit', merge_value)
@@ -422,11 +482,13 @@ class EstimationXlsx(models.AbstractModel):
 
             modules_summary = self.env['estimation.module.summary'].search([('module_id', '=', module.id)])
             row_summary_value = row_summary + 1
-            for summary in modules_summary:
+            for summary in modules_summary[:-2]:
                 sheet_module.write(row_summary_value, 10, summary.value, merge_value)
                 row_summary_value += 1
+            sheet_module.write(row_summary_value, 10, modules_summary[-2].value, merge_row_value)
+            sheet_module.write(row_summary_value + 1, 10, modules_summary[-1].value, merge_row_value_bold)
 
-            row_effort_dis = row_summary_value + 2
+            row_effort_dis = row_summary_value + 3
             sheet_module.merge_range(row_effort_dis, 1, row_effort_dis, 10, 'Effort distribution', merge_header)
             sheet_module.merge_range(row_effort_dis + 1, 2, row_effort_dis + 1, 8, 'Item', merge_row)
             sheet_module.write(row_effort_dis + 1, 9, 'Effort', merge_row)
@@ -440,10 +502,10 @@ class EstimationXlsx(models.AbstractModel):
                 sheet_module.merge_range(row_effort_value, 3, row_effort_value, 8, effort.activity, merge_value)
                 col_effort_dis_value = [
                     effort.effort,
-                    effort.percent
+                    str(effort.percent)+'%'
                 ]
                 for i, value in enumerate(col_effort_dis_value):
-                    sheet_module.write(row_effort_value, 9 + i, value, format['border'])
+                    sheet_module.write(row_effort_value, 9 + i, value, merge_row_value)
 
             row_breakdown = row_effort_value + 3
             sheet_module.merge_range(row_breakdown, 1, row_breakdown, 10, 'Work Breakdown Structure & Estimate', merge_header)
@@ -457,13 +519,16 @@ class EstimationXlsx(models.AbstractModel):
                 sheet_module.write(row_breakdown_value, 1, breakdown.sequence, merge_breakdown)
                 sheet_module.merge_range(row_breakdown_value, 2, row_breakdown_value, 8, breakdown.activity, merge_breakdown)
                 sheet_module.write(row_breakdown_value, 9, breakdown.effort, merge_breakdown)
+                sheet_module.write(row_breakdown_value, 10, '', border_right)
                 activitys = self.env['module.breakdown.activity'].search([('activity_id', '=', breakdown.id)])
                 for activity in activitys:
+                    sheet_module.write(row_breakdown_value + 1, 1, '', border_left)
                     sheet_module.write(row_breakdown_value + 1, 2, str(breakdown.sequence)+'.'+str(activity.sequence), merge_value)
                     sheet_module.merge_range(row_breakdown_value + 1, 3, row_breakdown_value + 1, 9, activity.activity, merge_value)
                     sheet_module.write(row_breakdown_value + 1, 10, activity.mandays, merge_value)
                     row_breakdown_value += 1
             sheet_module.merge_range(row_breakdown_value + 1, 3, row_breakdown_value + 1, 9, 'Total (man-day)', merge_total)
+            sheet_module.merge_range(row_breakdown_value + 1, 1, row_breakdown_value + 1, 2, '', border_left)
             sheet_module.write(row_breakdown_value + 1, 10, module.total_manday, merge_total)
             sheet_module.hide_gridlines(2)
 
