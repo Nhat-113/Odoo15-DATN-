@@ -373,9 +373,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             e.stopPropagation();
             e.preventDefault();
 
-            // var options = {
-            //     on_reverse_breadcrumb: this.on_reverse_breadcrumb,
-            // };
+            var options = {
+                on_reverse_breadcrumb: this.on_reverse_breadcrumb,
+            };
             this.do_action({
                 name: _t("Leave Request"),
                 type: "ir.actions.act_window",
