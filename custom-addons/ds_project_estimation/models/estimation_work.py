@@ -321,7 +321,6 @@ class Estimation(models.Model):
                 {'message': _("Successfully generated project.")})
                 
             estimation.check_generate_project = True
-            time.sleep(1)
             return {
                 'name': 'Message',
                 'type': 'ir.actions.act_window',
