@@ -148,29 +148,29 @@ var GanttController = AbstractController.extend({
            
             return true;
         });
-        gantt.attachEvent("onAfterTaskDrag", function (id, mode, e){
-            var showTask = gantt.showTask;
-            var taskObj = gantt.getTask(id);
-            var id_before =   taskObj.id
-            //console.log(`id before`, id_before);
-            if(taskObj.type !== "milestone"){
-                gantt.showTask = function(id_drag){
-                    // console.log(`mode`, mode);
-                    id_drag = id_before
-                    // console.log('id after1',id_drag); 
-                    showTask.apply(this, [id_drag]);
-                    var attr = gantt.config.task_attribute;
-                    // console.log(`attr`, attr);
-                    // console.log('id after',id_drag); 
-                    var timelineElement = document.querySelector(".gantt_task_line["+attr+"='"+id_drag+"']");
+    //     gantt.attachEvent("onAfterTaskDrag", function (id, mode, e){
+    //         let showTask = gantt.showTask;
+    //         let taskObj = gantt.getTask(id);
+    //         let id_before =   taskObj.id
+    //         //console.log(`id before`, id_before);
+    //         if(taskObj.type !== "milestone"){
+    //             gantt.showTask = function(id_drag){
+    //                 // console.log(`mode`, mode);
+    //                 id_drag = id_before
+    //                 // console.log('id after1',id_drag); 
+    //                 showTask.apply(this, [id_drag]);
+    //                 let attr = gantt.config.task_attribute;
+    //                 // console.log(`attr`, attr);
+    //                 // console.log('id after',id_drag); 
+    //                 let timelineElement = document.querySelector(".gantt_task_line["+attr+"='"+id_drag+"']");
 
-                    // console.log('timelineElement',timelineElement);
-                    if(timelineElement)
-                        timelineElement.scrollIntoView({block:"center"}); 
-            };
-        }
-        return true; 
-    });
+    //                 // console.log('timelineElement',timelineElement);
+    //                 if(timelineElement)
+    //                     timelineElement.scrollIntoView({block:"center"}); 
+    //         };
+    //     }
+    //     return true; 
+    // });
     gantt.attachEvent("onBeforeLinkAdd", function(id, link){
         // console.log(`id`, id);
         // console.log(`link`, link);
