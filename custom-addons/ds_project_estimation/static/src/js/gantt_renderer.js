@@ -168,7 +168,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                     // },
                     {
                         name: "month",
-                        scale_height: 50,
+                        scale_height: 60,
                         min_column_width: 120,
                         scales: [
                             { unit: "month", format: "%F, %Y" },
@@ -178,7 +178,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                     },
                     {
                         name: "quarter",
-                        height: 50,
+                        height: 60,
                         min_column_width: 90,
                         scales: [
                             { unit: "month", step: 1, format: "%M" },
@@ -206,7 +206,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                 ],
             };
             gantt.ext.zoom.init(zoomConfig);
-            gantt.ext.zoom.setLevel("month");
+            gantt.ext.zoom.setLevel("quarter");
         },
 
         _onClickZoomIn: function() {
