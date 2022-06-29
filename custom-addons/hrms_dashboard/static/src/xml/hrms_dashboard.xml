@@ -217,13 +217,13 @@
                             Job Application
                         </h3>
                         <div class="request_detail_job">
-                            <div class="job-request hr_job_application_approve" id="hide-application">
+                            <div class="job-request hr_job_application_approve" id="hide-application" style="display:none">
                                 <p>All Application</p>
                                 <button>
                                     <p class="stat-count"><t t-esc="widget.login_employee.job_applications"/></p>
                                 </button>
                             </div>
-                            <div class="job-request dashboard_in_recruiment" id="hide-recruitment"  >
+                            <div class="job-request dashboard_in_recruiment" id="hide-recruitment"  style="display:none">
                                 <p>In Recruiment</p>
                                 <button>
                                     <p class="stat-count"><t t-esc="widget.login_employee.recruitment"/></p>
@@ -264,7 +264,7 @@
                     </div>
                     <div class="announcements_detail" style=" margin-right: 0;">
                         <h3>
-                            <i class="'fa fa-birthday-cake" style="margin-right:8px"></i>
+                            <i class="fa fa-birthday-cake" style="margin-right:8px"></i>
                             Birthday 
                         </h3>
                         <div class="col-xs-12 text-align list_news">

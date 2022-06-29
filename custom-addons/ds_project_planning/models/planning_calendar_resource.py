@@ -91,12 +91,12 @@ class PlanningCalendarResource(models.Model):
                     task.write({'user_ids': [(6, 0, user_ids)]})
 
         for project in resource.project_id:
-            calendars = self.env['planning.calendar.resource'].search(['&', ('project_id', '=', project.id), ('inactive', '=', True)])
+            # calendars = self.env['planning.calendar.resource'].search(['&', ('project_id', '=', project.id), ('inactive', '=', True)])
             task_no_assign = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1),('user_ids','=',False)])
             if task_no_assign > 0:
-                for calendar in calendars:
-                    if calendar.inactive_date > date.today() and project.last_update_status not in ['off_track', 'on_hold']:
-                        project.write({'last_update_status': 'missing_resource'})
+                # for calendar in calendars:
+                if project.last_update_status not in ['off_track', 'on_hold']:
+                    project.write({'last_update_status': 'missing_resource'})
 
     @api.model
     def open_calendar_resource(self, project_id):

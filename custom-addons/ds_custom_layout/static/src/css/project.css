@@ -6,3 +6,24 @@
     border-bottom: 0.5px solid #cccccc !important;
     margin-bottom: 40px;
 }
+div[name="task_score"] {
+    width: 28.5%!important;
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+@media only screen and (max-width: 1600px) {
+    div[name="task_score"] {
+        width: 29%!important;
+    }
+}
+@media only screen and (max-width: 1400px) {
+    div[name="task_score"] {
+        width: 21%!important;
+    }
+}
+@media only screen and (max-width: 1200px) {
+    div[name="task_score"] {
+        width: 20%!important;
+    }
+}
