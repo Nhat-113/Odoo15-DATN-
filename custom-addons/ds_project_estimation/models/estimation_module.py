@@ -150,36 +150,36 @@ class EstimationModule(models.Model):
             if record.id or record.id.origin == False :
                 max += 1
 
-    @api.onchange('component')
-    def _compute_components(self):
-        # count = 0
-        # for record in self:
-        #     for rec in self.estimation_id.add_lines_module:
-        #         if record.component == rec.component:
-        #             if rec.id.ref != None:
-        #                 count += 1
-        #     if count > 1:
-        #         record.component = False
-        #         return {
-        #             'warning': {
-        #                 'title': 'Warning!',
-        #                 'message': 'Module components already exists!'
-        #             }
-        #         } 
-        components = []
-        for record in self.estimation_id.add_lines_module:
-            if record.id.origin != False :
-                components.append(record.component)
+    # @api.onchange('component')
+    # def _compute_components(self):
+    #     # count = 0
+    #     # for record in self:
+    #     #     for rec in self.estimation_id.add_lines_module:
+    #     #         if record.component == rec.component:
+    #     #             if rec.id.ref != None:
+    #     #                 count += 1
+    #     #     if count > 1:
+    #     #         record.component = False
+    #     #         return {
+    #     #             'warning': {
+    #     #                 'title': 'Warning!',
+    #     #                 'message': 'Module components already exists!'
+    #     #             }
+    #     #         } 
+    #     components = []
+    #     for record in self.estimation_id.add_lines_module:
+    #         if record.id.origin != False :
+    #             components.append(record.component)
             
-        if len(components) != len(set(components)):
-            # self.component = False
-            # raise UserError('Breadown Activity name already exists!')
-            return {
-                'warning': {
-                    'title': 'Warning!',
-                    'message': 'Module components already exists!'
-                }
-            } 
+    #     if len(components) != len(set(components)):
+    #         # self.component = False
+    #         # raise UserError('Breadown Activity name already exists!')
+    #         return {
+    #             'warning': {
+    #                 'title': 'Warning!',
+    #                 'message': 'Module components already exists!'
+    #             }
+    #         } 
 
     @api.depends('module_config_activity')
     def _compute_sequence_activities(self):

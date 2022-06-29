@@ -2,7 +2,7 @@ from ast import literal_eval
 import time
 from odoo import models, fields, api, _
 import json
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class Estimation(models.Model):
@@ -332,18 +332,27 @@ class Estimation(models.Model):
 
     @api.depends('add_lines_module')
     def _compute_sequence_module(self):
-        model = 'estimation.module'
-        domain = [('estimation_id', '=', self.id or self.id.origin)]
-        sequence_field = 'sequence_module'
-        ls_data_fields = 'add_lines_module'
-        temp = {}
-        Estimation._compute_sequence_all(temp, self, model, domain, sequence_field, ls_data_fields)
+        # model = 'estimation.module'
+        # domain = [('estimation_id', '=', self.id or self.id.origin)]
+        # sequence_field = 'sequence_module'
+        # ls_data_fields = 'add_lines_module'
+        # temp = {}
+        # Estimation._compute_sequence_all(temp, self, model, domain, sequence_field, ls_data_fields)
         
-        # change value of field get_estimation_id from estimation.module model
-        for record in self:
-            for rec in record.add_lines_module:
-                if rec.get_estimation_id == 999999:
-                    rec.get_estimation_id = record.id or record.id.origin
+        # # change value of field get_estimation_id from estimation.module model
+        # for record in self:
+        #     for rec in record.add_lines_module:
+        #         if rec.get_estimation_id == 999999:
+        #             rec.get_estimation_id = record.id or record.id.origin
+        for record in self.add_lines_resource_effort:
+            for module in self.add_lines_module:
+                if record.name == module.component :
+                    module.sequence = record.sequence
+                    break
+            for total_cost in self.add_lines_summary_totalcost:
+                if record.name == total_cost.name:
+                    total_cost.sequence = record.sequence
+                    break
            
     def _compute_sequence_all(temp, self_temp, model, domain, sequence_field, ls_data_fields):
         max_sequence = 0
@@ -371,92 +380,91 @@ class Estimation(models.Model):
     @api.onchange('add_lines_module')
     def _compute_check_module(self):
         for record in self:
+            #check duplicate components module
+            self.check_duplicate_components(record.add_lines_module)
+            
             resource_line = []
             total_cost_line = []
             vals_cost_rate = []
-            # if resource planning haven't record and create new a module
-            if len(record.add_lines_resource_effort) == 0 and len(record.add_lines_module) != 0:
-                for rec in record.add_lines_module:
+            for module in record.add_lines_module:
+                if module.component not in (resource.name for resource in record.add_lines_resource_effort):
+                    for resource in record.add_lines_resource_effort:
+                        if resource.name in ['Total (MD)', 'Total (MM)']:
+                            resource.write({'estimation_id': (2, record.id or record.id.origin)})
+                        
                     lines = (0, 0, {
-                        'sequence': rec.sequence, 
-                        'name': rec.component
+                        'sequence': module.sequence, 
+                        'name': module.component
                     })
-                    lines_1 = (0, 0, {
-                        # 'module_id': module_id,
-                        'sequence': 0,
-                        'name': rec.component
-                    })
-                    total_cost_line.append(lines_1)
                     resource_line.append(lines)
+                    self.add_record_md_mm_resource_plan(resource_line)
+                    self.add_module_in_summary_tab(module, total_cost_line, vals_cost_rate)
 
-                    # Create Cost Rate
-                    cost_rate_line = self.env['config.job.position'].search([])
-                    for index, val in enumerate(cost_rate_line):
-                        cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)])
-                        role_default = cost_rate[0]
-                        lines_2 = (0, 0, {
-                            'sequence': index + 1,
-                            'name': rec.component,
-                            'types': val.job_position,
-                            'role': role_default.id,
-                            'yen_month': 0.0,
-                            'yen_day': 0.0,
-                        })
-                        vals_cost_rate.append(lines_2)
-                    
-                lines_md = (0, 0, {
-                    'sequence': 0, 
-                    'name': 'Total (MD)'
-                })
-                lines_mm = (0, 0, {
-                    'sequence': 0, 
-                    'name': 'Total (MM)'
-                })
-                resource_line.append(lines_md)
-                resource_line.append(lines_mm)
-                record.update({
-                    'add_lines_resource_effort': resource_line,
-                    'add_lines_summary_totalcost': total_cost_line,
-                    'add_lines_summary_costrate': vals_cost_rate
-                })
-            else:
-                check_component_resource = []
-                check_component_resource.append(resource.name for resource in record.add_lines_resource_effort)
-                for module in record.add_lines_module:
-                    if module.component not in (resource.name for resource in record.add_lines_resource_effort):
-                        lines = (0, 0, {
-                            'sequence': module.sequence, 
-                            'name': module.component
-                        })
-                        lines_1 = (0, 0, {
-                            'sequence': 0,
-                            'name': module.component
-                        })
-                        total_cost_line.append(lines_1)
-                        resource_line.append(lines)
-                        # Create Cost Rate
-                        cost_rate_line = self.env['config.job.position'].search([])
-                        for index, val in enumerate(cost_rate_line):
-                            cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)])
-                            role_default = cost_rate[0]
-                            lines_2 = (0, 0, {
-                                'sequence': index + 1,
-                                'name': module.component,
-                                'types': val.job_position,
-                                'role': role_default.id,
-                                'yen_month': 0.0,
-                                'yen_day': 0.0,
-                            })
-                            vals_cost_rate.append(lines_2)
-
-                record.update({
-                    'add_lines_resource_effort': resource_line,
-                    'add_lines_summary_totalcost': total_cost_line,
-                    'add_lines_summary_costrate': vals_cost_rate
-                })
+            record.update({
+                'add_lines_resource_effort': resource_line,
+                'add_lines_summary_totalcost': total_cost_line,
+                'add_lines_summary_costrate': vals_cost_rate
+            })
             #case: Delete module using write method
             Estimation._delete_modules(record.add_lines_module, record.add_lines_resource_effort,
                                        record.add_lines_summary_totalcost, record.add_lines_summary_costrate)
+
+    def check_duplicate_components(self, ls_modules):
+        components = []
+        # new_list = []
+        # dup_list = []
+        for record in ls_modules:
+            components.append(record.component)
+            
+        if len(components) != len(set(components)):
+            raise ValidationError('Component name already exists!')
+        
+        # for item in components:
+        #     if item not in new_list:
+        #         new_list.append(item)
+        #     else:
+        #         dup_list.append(item)
+        # for record in ls_modules:
+        #     if record.component in dup_list:
+        #         record.component == False
+        #         raise ValidationError('Component name already exists!')
+                
+        
+        
+
+    def add_record_md_mm_resource_plan(self, resource_line):
+        lines_md = (0, 0, {
+            'sequence': 0, 
+            'name': 'Total (MD)'
+        })
+        lines_mm = (0, 0, {
+            'sequence': 0, 
+            'name': 'Total (MM)'
+        })
+        resource_line.append(lines_md)
+        resource_line.append(lines_mm)
+        
+    def add_module_in_summary_tab(self, module, total_cost_line, vals_cost_rate):
+        # Create Cost Rate
+        lines_1 = (0, 0, {
+                'sequence': 0,
+                'name': module.component
+            })
+        total_cost_line.append(lines_1)
+        
+        cost_rate_line = self.env['config.job.position'].search([])
+        for index, val in enumerate(cost_rate_line):
+            cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)])
+            role_default = cost_rate[0]
+            lines_2 = (0, 0, {
+                'sequence': index + 1,
+                'name': module.component,
+                'types': val.job_position,
+                'role': role_default.id,
+                'yen_month': 0.0,
+                'yen_day': 0.0,
+            })
+            vals_cost_rate.append(lines_2)    
 
     def _delete_modules(ls_module, ls_resource_plan, ls_total_cost, ls_costrate):
         for record in ls_resource_plan:
