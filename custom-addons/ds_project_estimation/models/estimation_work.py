@@ -46,6 +46,7 @@ class Estimation(models.Model):
    
     check_generate_project = fields.Boolean(default=False, compute='action_generate_project', store=True)
 
+
     @api.onchange('currency_id')
     def _compute_domain_stage(self):
         for record in self:
