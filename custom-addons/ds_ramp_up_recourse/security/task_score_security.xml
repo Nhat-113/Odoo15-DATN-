@@ -28,7 +28,7 @@
     <record model="ir.rule" id="current_task_score_pm">
         <field name="name">Task Score Current PM: Only then can see the employees manage</field>
         <field name="model_id" ref="model_current_task_score"/>
-        <field name="domain_force">[('parent_id', '=', user.employee_id.id), ('company_id', '=', user.company_id.id)]</field>
+        <field name="domain_force">[('parent_id', '=', user.employee_id.id), ('parent_id', '!=', False), ('company_id', 'in', user.company_ids.ids)]</field>
         <field name="groups" eval="[(4,ref('ds_ramp_up_recourse.group_task_score_pm'))]"/>
     </record>
 
@@ -44,7 +44,7 @@
     <record model="ir.rule" id="current_task_score_director">
         <field name="name">Current Task Score Director: can see all</field>
         <field name="model_id" ref="model_current_task_score"/>
-        <field name="domain_force">[('company_id', '=', user.company_id.id)]</field>
+        <field name="domain_force">[('company_id', 'in', user.company_ids.ids)]</field>
         <field name="groups" eval="[(4,ref('group_task_score_admin'))]"/>
     </record>
 
@@ -52,7 +52,7 @@
     <record model="ir.rule" id="history_task_score_pm">
         <field name="name">Task Score History PM: Only then can see the employees manage</field>
         <field name="model_id" ref="model_history_task_score"/>
-        <field name="domain_force">[('parent_id', '=', user.employee_id.id), ('company_id', '=', user.company_id.id), ('task_score_avg','>', 0)]</field>
+        <field name="domain_force">[('parent_id', '=', user.employee_id.id), ('parent_id', '!=', False), ('company_id', 'in', user.company_ids.ids), ('task_score_avg','>', 0)]</field>
         <field name="groups" eval="[(4,ref('ds_ramp_up_recourse.group_task_score_pm'))]"/>
     </record>
 
@@ -68,7 +68,7 @@
     <record model="ir.rule" id="history_task_score_director">
         <field name="name">History Task Score Director: can see all</field>
         <field name="model_id" ref="model_history_task_score"/>
-        <field name="domain_force">[('company_id', '=', user.company_id.id), ('task_score_avg','>', 0)]</field>
+        <field name="domain_force">[('company_id', 'in', user.company_ids.ids), ('task_score_avg','>', 0)]</field>
         <field name="groups" eval="[(4,ref('group_task_score_admin'))]"/>
     </record>
 

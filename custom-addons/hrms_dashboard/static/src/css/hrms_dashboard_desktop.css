@@ -10,6 +10,19 @@
     .list_menu .btn_annalys .text_btn_annalys{
         margin-left: 4px;
     }
+    .list_menu .active {
+        margin-top: 6px;
+    }
+    .list_future button {
+        width: 90%;
+        background: white;
+        border: 0.01px solid #F0F0FF;
+        height: 26%;
+        margin: 0 auto;
+        border-radius: 5px;
+        margin-top: 6%;
+    }
+    
     .join_resign_trend>svg {
         height: 245px !important;
     }
@@ -24,6 +37,40 @@
         margin-top: 0;
         margin-bottom: 1%;
     }
+    .time {
+        height: 5.4%;
+    }
+    .employee_infomation > hr{
+        margin: 0;
+    }
+    .button-checkout .stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 55px;
+    }
+    .button-checkout-user.stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 55px;
+    }
+    .button-checkin .stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 55px;
+    }
+    .button-checkin-user .stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 55px;
+    }
     /* .emp_graph >svg {
         height: 280px;
         width: 280px;
@@ -34,9 +81,7 @@
     .list_future button h4 {
         font-size: 1rem;
     }
-    .list_menu button h5 {
-        font-size: 1rem;
-    }
+
     .o_clock {
         font-size: 1rem;
     }
@@ -47,7 +92,10 @@
         margin-left: 0px;
     }
     .list-employee .leave_graph .legend {
-        margin-top:0;
+        margin-top:8px;
+    }
+    .list-employee .leave_graph {
+        margin-top: 24px;
     }
     .emp_graph .legend>tbody>tr {
         width: 50%;
@@ -71,6 +119,7 @@
     }
     .list_menu button h5 {
         color: #BDBDBD;
+        font-size: 1rem;
         padding: 0;
         margin: 0;
         padding-right: 17px;
@@ -79,17 +128,24 @@
         /* padding-left: 7px; */
         /* font-weight: 700; */
     }
+    .stat-widget-one .stat-icon i {
+        font-size: 14px;
+        font-weight: 900;
+        display: inline-block;
+        color: #fff;
+        margin-left: -36px;
+    }
     .department .detail {
         margin-top: 25px;
     }
     .list_future > button > h3 {
-        margin-left: 22px;
+        margin-left: 20px;
     }
     .hr_payslip > h3 {
         margin-left: 16px !important;
     }
     .hr_contract > h3 {
-        margin-left: 17px !important;
+        margin-left: 15px !important;
     }
     .emp_graph {
         margin-top: -42px;
@@ -182,21 +238,17 @@
         font-size: 10px;
     }
     .fearure_detail_user {
-        font-size: 1rem;
+        font-size: 12px;
         padding-left: 0;
     }
     .list_future_user button h4 {
-        font-size: 1rem;
+        font-size: 12px;
+        margin-bottom: 0 !important;
+        float: left;
+        padding-left: 7px;
     }
     .btn_dashboard_detail_user .text_btn_dashboard_detail{
         margin-left: 18px;
-    }
-    .list_menu button h5 {
-        color: #BDBDBD;
-        padding: 0;
-        /* margin: 0; */
-        /* padding-right: 17px; */
-        margin-left: 19px;
     }
     /* .emp_graph svg { 
         margin-top: 11.5px;

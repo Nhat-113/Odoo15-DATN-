@@ -48,7 +48,7 @@
                             <separator string="Total cost" />
                             <field name="add_lines_summary_totalcost" create="0" editable="0" delete="0">
                                 <tree editable="bottom" create="0" delete="0">
-                                    <field name="sequence" />
+<!--                                    <field name="sequence" />-->
                                     <field name="name" />
                                     <field name="dev_effort" sum="Sum of Developer Effort"/>
                                     <field name="design_effort" sum="Sum of Designer Effort"/>
