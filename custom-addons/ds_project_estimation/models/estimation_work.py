@@ -13,25 +13,6 @@ class Estimation(models.Model):
     _description = "Estimation"
     _rec_name = "number"
 
-    def _get_stage_selection(self):
-        stage = [("new","New"),("completed","Completed"),("pending","Pending")]
-        if self.user_has_groups('ds_project_estimation.estimation_access_administrator'):
-            options = [("created","Created"), ("approved","Approved"), 
-                       ("reject","Reject"),("updated","Updated"),
-                       ("in_progress","In Progress")]
-            stage += options
-        elif self.user_has_groups('ds_project_estimation.estimation_access_director') \
-            or self.user_has_groups('ds_project_estimation.estimation_access_sale_leader'):
-                options = [("approved","Approved"), ("reject","Reject")]
-                stage += options
-                if ("new","New") in stage:
-                    stage.remove(("new","New"))
-        elif self.user_has_groups('ds_project_estimation.estimation_access_officer'):
-            options = [("created","Created"),("updated","Updated"),("in_progress","In Progress")]
-            stage.clear()
-            stage += options
-        return stage
-
     project_name = fields.Char("Project Name", required=True)
     number = fields.Char("No", readonly=True, required=True, copy=False, index=True, default=lambda self: _('New'))
 
@@ -49,8 +30,9 @@ class Estimation(models.Model):
     deadline = fields.Date("Deadline", required=True)
     project_code = fields.Char(string="Project Code", required=True,)
     description = fields.Text(string="Description", help="Description estimation")
-    stage = fields.Selection(_get_stage_selection, string="Status", required=True)
-    module_activate = fields.Char('Module Activate', default=0)
+    stage = fields.Many2one('estimation.status', string="Status", required=True)
+    domain_stage = fields.Char(string="Stage domain", readonly=True, store=False, compute='_compute_domain_stage')
+    module_activate = fields.Integer('Module Activate', default=0)
     sequence_module = fields.Integer(string="Sequence Module", store=True, default=1, compute ='_compute_sequence_module') # for compute sequence module
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
     add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate',
@@ -63,6 +45,20 @@ class Estimation(models.Model):
     gantt_view_line = fields.One2many('gantt.resource.planning', 'estimation_id', string="Gantt")
    
     check_generate_project = fields.Boolean(default=False, compute='action_generate_project', store=True)
+
+
+    @api.onchange('currency_id')
+    def _compute_domain_stage(self):
+        for record in self:
+            if self.user_has_groups('ds_project_estimation.estimation_access_administrator'):
+                record.domain_stage = json.dumps([('type', '!=', False)])
+            elif self.user_has_groups('ds_project_estimation.estimation_access_director') \
+                or self.user_has_groups('ds_project_estimation.estimation_access_sale_leader'):
+                    record.domain_stage = json.dumps([('type', 'in', ['completed', 'pending', 'approved', 'reject'])])
+            elif self.user_has_groups('ds_project_estimation.estimation_access_officer'):
+                record.domain_stage = json.dumps([('type', 'in', ['created', 'updated', 'in_progress'])])
+            else:
+                record.domain_stage = json.dumps([('type', 'in', ['new', 'completed', 'pending'])])
 
     @api.depends('add_lines_module')
     def _domain_cost_rate(self):
@@ -183,6 +179,8 @@ class Estimation(models.Model):
                 vals[item] = self.env['res.users'].search([('id','=',vals[item])]).name
             elif item == "project_type_id" and vals[item] != '':
                 vals[item] = self.env['project.type'].search([('id','=',vals[item])]).name
+            elif item == "stage" and vals[item] != '':
+                vals[item] = self.env['estimation.status'].search([('id','=',vals[item])]).status
         return vals
         
     def merge_dict_vals(self, a, b, vals_tab_module) :
@@ -248,8 +246,8 @@ class Estimation(models.Model):
     
     def get_values(self, est):
         vals_values = []
-        mess_field = ["project_name",  "stage", "project_code", "description"] # List type String
-        mess_field_obj = ["estimator_ids", "reviewer_ids", "customer_ids", "currency_id", "project_type_id"] # List type Int (id)
+        mess_field = ["project_name", "project_code", "description"] # List type String
+        mess_field_obj = ["estimator_ids", "reviewer_ids", "customer_ids",  "stage", "currency_id", "project_type_id"] # List type Int (id)
         mess_field_date = ["sale_date", "deadline"] #List type Date
        
         for item in est:
@@ -490,3 +488,13 @@ class Estimation(models.Model):
 #     _inherit = ['crm.lead']
 
 #     estimation_count = fields.Integer(string='# Registrations')
+
+
+
+class EstimationStatus(models.Model):
+    _name = "estimation.status"
+    _description = "Estimation Status"
+    _rec_name = "status"
+    
+    status = fields.Char('Status')
+    type = fields.Char('Type')

@@ -18,6 +18,7 @@
         "data/job_position_data.xml",
         "data/module_summary_data.xml",
         "data/cost_rate_data.xml",
+        "data/estimation_status_data.xml",
         "views/estimation_menu.xml",
         "views/gantt_resource_planning.xml",
         "views/work_view.xml",
