@@ -318,10 +318,9 @@ class Estimation(models.Model):
             ir_cron.write(
                 {'active': True, 'nextcall': fields.datetime.now()})
             message_id = self.env['estimation.message.wizard'].create(
-                {'message': _("Successfully generated project.")})
+                {'message': _("In the next few minutes, project will be generate.")})
                 
             estimation.check_generate_project = True
-            time.sleep(1)
             return {
                 'name': 'Message',
                 'type': 'ir.actions.act_window',
