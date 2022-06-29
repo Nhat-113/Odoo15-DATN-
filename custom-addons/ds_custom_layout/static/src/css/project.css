@@ -6,3 +6,7 @@
     border-bottom: 0.5px solid #cccccc !important;
     margin-bottom: 40px;
 }
+div[name="task_score"] {
+    width: 103px !important;
+}
+    
