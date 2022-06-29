@@ -1578,7 +1578,7 @@ button:focus {
     align-content: flex-end;
     align-items: flex-end;
     justify-content: center;
-    margin-top: 22px;
+    margin-top: 14px;
 }
 .leave_graph > svg:nth-child(2)  {
     background: #fafafa !important;
@@ -1587,7 +1587,7 @@ button:focus {
 
 
 .list-employee .leave_graph .legend {
-    margin-top: 27px;
+    margin-top: 34px;
 }
 
 .leave_graph .legend>tbody {

@@ -95,10 +95,10 @@
         margin-left: 0px;
     }
     .list-employee .leave_graph .legend {
-        margin-top:8px;
+        margin-top:9px;
     }
     .list-employee .leave_graph {
-        margin-top: 20px;
+        margin-top: 17px;
     }
     .emp_graph .legend>tbody>tr {
         width: 50%;
@@ -292,5 +292,20 @@
         right: 0;
         padding-right: 2rem;
     }
-    
+    .department > div .emp_graph .legend > tbody > tr > td > svg {
+        margin-bottom :5px
+    }
+    .department .detail h3 {
+        color: #6869AC;
+        padding: 0;
+        margin-bottom: 67px;
+        font-size: 1rem;
+    }
+    .list-employee .text-employee {
+        font-size: 1rem;
+    }
+    .employee_dashboard_detail>div>h3 {
+        font-size: 1rem;
+        margin-top: 17.5px;
+    }
 }
