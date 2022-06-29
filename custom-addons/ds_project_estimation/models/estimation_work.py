@@ -146,8 +146,6 @@ class Estimation(models.Model):
             if vals_over["description"] != '':
                 self.env["estimation.overview"].create(vals_over)
 
-            #delete module failed
-            self._delete_module_failed()
             return result 
 
     def convert_field_to_field_desc(self, dic):
@@ -475,13 +473,15 @@ class Estimation(models.Model):
             record.add_lines_summary_costrate.unlink()
             record.add_lines_resource_effort.unlink()
             record.add_lines_module.unlink()
+        
+        #delete module failed
+        self._delete_module_failed()
         return super(Estimation, self).unlink()  
     
     def _delete_module_failed(self):
         #case: delete modules from db with estimation_id = False
-        for record in self:
-            module_in_db = self.env['estimation.module'].search([('estimation_id', '=', False)])    #,('component', 'not in', [module.component for module in record.add_lines_module])
-            module_in_db.unlink()
+        module_in_db = self.env['estimation.module'].search([('estimation_id', '=', False)])    #,('component', 'not in', [module.component for module in record.add_lines_module])
+        module_in_db.unlink()
     
     
 # class Lead(models.Model):

@@ -239,6 +239,14 @@ class EstimationResourcePlan(models.Model):
             elif record.name == 'Total (MM)':
                 record.sequence = max_sequence + 2
 
+    def unlink(self):
+        for record in self:
+            if record.name == 'Total (MM)':
+                gantt_resource_plan = self.env['gantt.resource.planning'].search([('estimation_id', '=', record.estimation_id.id)])
+                gantt_resource_plan.unlink()
+
+        return super(EstimationResourcePlan, self).unlink()
+
 class GanttResourcePlanning(models.Model):
     _name = "gantt.resource.planning"
     _description = "Gantt resource planning"
