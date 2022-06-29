@@ -14,7 +14,7 @@ class Estimation(models.Model):
     _rec_name = "number"
 
     project_name = fields.Char("Project Name", required=True)
-    number = fields.Char("No", readonly=True, required=True, copy=False, index=True, default=lambda self: _('New'))
+    number = fields.Char("No", readonly=True, required=True, copy=False, index=True, default='New')
 
     estimator_ids = fields.Many2one('res.users', string='Estimator')
     reviewer_ids = fields.Many2one('res.users', string='Reviewer')
@@ -111,11 +111,10 @@ class Estimation(models.Model):
     @api.model
     def create(self, vals):
         vals_over = {'connect_overview': '', 'description': ''}
-        if vals.get("number", _('New')) == _('New'):
-            vals["number"] = self.env["ir.sequence"].next_by_code("estimation.work") or _('New')
+        if vals.get("number", 'New') == 'New':
+            vals["number"] = self.env["ir.sequence"].next_by_code("estimation.work") or 'New'
         result = super(Estimation, self).create(vals)
-        est_current_id = self.env['estimation.work'].search([('number','=', vals["number"])])
-        vals_over["connect_overview"] = est_current_id.id
+        vals_over["connect_overview"] = result.id
         vals_over["description"] = 'Create New Estimation'
         self.env["estimation.overview"].create(vals_over)
 
