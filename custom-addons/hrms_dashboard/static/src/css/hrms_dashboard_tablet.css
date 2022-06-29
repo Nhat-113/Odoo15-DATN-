@@ -231,5 +231,29 @@
         height: 201px !important;
         display: flex !important;
     }
+    .birthday-detail {
+        display: flex;
+        align-items: center;
+        padding: 0 !important;
+        margin: 0 auto;
+        margin-top: 4%;
+        background: #FAFAFA;
+        width: 90%;
+        border-radius: 16px;
+        position: relative;
+        height: 7%;
+    }
+    .birthday-detail img {
+        position: static;
+        width: 15px;
+        height: 15px;
+        left: 0px;
+        top: 0px;
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+        margin: 0px 10px;
+        border-radius: 45%;
+    }
         
 }
