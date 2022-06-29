@@ -35,7 +35,7 @@ class Activities(models.Model):
     add_lines_breakdown_activity = fields.One2many('module.breakdown.activity', 'activity_id', string="Breakdown Activity")
     check_default = fields.Boolean(string="Check default", default=False)
     # domain_module_id = fields.Char(string="domain module id", readonly=True, store=True, compute='_compute_domain_module_id')
-    domain_select_activities = fields.Char(string="Domain activities", readonly=True, store=True, compute='_compute_domain_activities')
+    # domain_select_activities = fields.Char(string="Domain activities", readonly=True, store=True, compute='_compute_domain_activities')
 
    
     # @api.depends('activity_type')

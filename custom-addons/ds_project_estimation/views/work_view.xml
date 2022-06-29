@@ -176,7 +176,7 @@
                             string="Load Activities" class="btn btn-primary"/>
                     <separator string='Work Breakdown Structure and Estimate' />
                     <field name="module_config_activity">
-                        <tree>
+                        <tree create="0" >
                             <field name="sequence" />
                             <field name="activity" />
                             <field name="effort" />

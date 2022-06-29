@@ -239,13 +239,13 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                 this.events_set = true;
             }
             gantt.clearAll();
-            // var date_to_str = gantt.date.date_to_str(gantt.config.task_date);
-            // gantt.addMarker({
-            //     start_date: new Date(), //a Date object that sets the marker's date
-            //     css: "today", //a CSS class applied to the marker
-            //     text: "Today", //the marker title
-            //     title: date_to_str(new Date()), // the marker's tooltip
-            // });
+            var date_to_str = gantt.date.date_to_str(gantt.config.task_date);
+            gantt.addMarker({
+                start_date: new Date(), //a Date object that sets the marker's date
+                css: "today", //a CSS class applied to the marker
+                text: "Today", //the marker title
+                title: date_to_str(new Date()), // the marker's tooltip
+            });
             var rootHeight = this.$el.height();
             var headerHeight = this.$(".o_dhx_gantt_header").height();
             this.$(".o_dhx_gantt").height(rootHeight - headerHeight);
@@ -256,14 +256,14 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
             this.trigger_up("gantt_schedule");
           },
         // _onUpdate: function() {},
-        // updateState: function(state, params) {
-        //     // this method is called by the controller when the search view is changed. we should
-        //     // clear the gantt chart, and add the new tasks resulting from the search
-        //     var res = this._super.apply(this, arguments);
-        //     gantt.clearAll();
-        //     this.renderGantt();
-        //     return res;
-        // },
+        updateState: function(state, params) {
+            // this method is called by the controller when the search view is changed. we should
+            // clear the gantt chart, and add the new tasks resulting from the search
+            var res = this._super.apply(this, arguments);
+            gantt.clearAll();
+            this.renderGantt();
+            return res;
+        },
 
         // disableAllButtons: function() {
         //     // console.log('disableAllButtons:: Renderer');
