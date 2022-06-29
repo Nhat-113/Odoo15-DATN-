@@ -12,7 +12,6 @@ class EstimationSummaryTotalCost(models.Model):
                               default=1)
     check_activate = fields.Boolean(string='Activate', default=False)
     check_generate_project = fields.Boolean(string="Check Generate Project", default=False,)
-    module_id = fields.Many2one("estimation.module", string="Module")
     name = fields.Char(string="Components", default="Module")
     design_effort = fields.Float(string="Design",  compute='_compute_effort', store=True)
     dev_effort = fields.Float(string="Developer", store=True)
@@ -27,11 +26,11 @@ class EstimationSummaryTotalCost(models.Model):
     @api.depends('estimation_id.add_lines_summary_costrate.yen_month', 'estimation_id.add_lines_summary_costrate.role', 'total_effort')
     def _compute_cost(self):
         for record in self:
-            module_id = record.module_id.id
+            component = record.name
             module_active = record.estimation_id.module_activate
             cost_rate_old = record.estimation_id.add_lines_summary_costrate
-            if module_id != module_active:
-                cost_rate_old = self.env['estimation.summary.costrate'].search([('module_id', '=', module_id)])
+            if component != module_active:
+                cost_rate_old = self.env['estimation.summary.costrate'].search([('name', '=', component)])
                 for item in cost_rate_old:
                     cost_rate = self.env['cost.rate'].search([('id', '=', item.role.id)])
 
@@ -61,7 +60,7 @@ class EstimationSummaryTotalCost(models.Model):
 
             cost = 0
             for item_cost_rate in cost_rate_old:
-                if item_cost_rate.module_id.id == module_id:
+                if item_cost_rate.name == component:
                     types = item_cost_rate.types
                     if types == 'Developer':
                         cost += record.dev_effort * item_cost_rate.yen_month
@@ -85,83 +84,59 @@ class EstimationSummaryTotalCost(models.Model):
             record.total_effort = record.design_effort + record.dev_effort + record.tester_effort + record.comtor_effort + record. \
                 pm_effort + record.brse_effort
 
+    def total_efforts_job_position(self, job_position):
+        result_total_effort = 0
+        for record in self.estimation_id.add_lines_module:
+            if record.component == self.name:
+                for activity in record.module_config_activity:
+                    for breakdown in activity.add_lines_breakdown_activity:  # compute effort for each job position
+                        if breakdown.job_pos.job_position == job_position:
+                            # if this is save mode
+                            if breakdown.id:
+                                result_total_effort += breakdown.mandays
+                            else:
+                                # compute breakdown is new
+                                result_total_effort += breakdown.mandays
+
+                                # compute effort from database because self has no effort data
+                                ls_breakdowns = self.env['module.breakdown.activity'].search(
+                                    [('activity_id', '=', activity.id or activity.id.origin),
+                                     ('job_pos', '=', breakdown.job_pos.id)])
+                                total = sum(breakdb.mandays for breakdb in ls_breakdowns)
+                                result_total_effort += total
+        return result_total_effort
+
     @api.depends('estimation_id.add_lines_module.total_manday')
     def _compute_effort(self):
-        for record in self:
-            module_id = record.module_id.id
-            if record.id:
-                check_origin = False
-            elif record.id == False:
-                check_origin = False
-            elif record.id.origin:
-                check_origin = True
-            else:
-                check_origin = False
+        ls_key = {'dev_effort': 'Developer', 'design_effort': 'Designer', 'tester_effort': 'Tester',
+                  'comtor_effort': 'Comtor', 'pm_effort': 'Project manager', 'brse_effort': 'Brse'}
+        for key in ls_key:
+            final_effort = 0
+            for record in self:  # compute total effort for each module
+                if record.name not in ['Total (MD)', 'Total (MM)']:
+                    result_total_efforts = EstimationSummaryTotalCost.total_efforts_job_position(record, ls_key[key])
+                    record[key] = result_total_efforts
+                    final_effort += result_total_efforts
 
-            design_total = 0.0
-            dev_total = 0.0
-            tester_total = 0.0
-            comtor_total = 0.0
-            pm_total = 0.0
-            brse_total = 0.0
-
-            for rec in record.estimation_id.add_lines_module:
-                for item in rec.module_config_activity:
-
-                    if item.module_id.id:
-                        activity_module_id = item.module_id.id
-                    elif item.module_id.id.origin:
-                        activity_module_id = item.module_id.id.origin
-                    else:
-                        activity_module_id = 0
-
-                    if activity_module_id == module_id:
-                        for i in item.add_lines_breakdown_activity:
-                            if i.job_pos.job_position == 'Designer':
-                                design_total += i.mandays
-                            elif i.job_pos.job_position == 'Developer':
-                                dev_total += i.mandays
-                            elif i.job_pos.job_position == 'Tester':
-                                tester_total += i.mandays
-                            elif i.job_pos.job_position == 'Comtor':
-                                comtor_total += i.mandays
-                            elif i.job_pos.job_position == 'Brse':
-                                brse_total += i.mandays
-                            elif i.job_pos.job_position == 'Project manager':
-                                pm_total += i.mandays
-                    else:
-                        continue
-
-            if not check_origin:
-                record.design_effort = design_total
-                record.dev_effort = dev_total
-                record.tester_effort = tester_total
-                record.comtor_effort = comtor_total
-                record.pm_effort = pm_total
-                record.brse_effort = brse_total
-            else:
-                record.design_effort += design_total
-                record.dev_effort += dev_total
-                record.tester_effort += tester_total
-                record.comtor_effort += comtor_total
-                record.pm_effort += pm_total
-                record.brse_effort += brse_total
+                    # get total manday from module = total_effort field
+                    for module in record.estimation_id.add_lines_module:
+                        if module.component == record.name:
+                            record.total_effort = module.total_manday
 
 
 class EstimationSummaryCostRate(models.Model):
     _name = "estimation.summary.costrate"
     _description = "Summary of cost rate in each estimation"
-    _order = "sequence,module_id"
+    _order = "sequence"
 
-    connect_summary_costrate = fields.Many2one('estimation.work', string="Connect Summary Cost Rate")
-    module_id = fields.Many2one("estimation.module", string="Module")
-    name = fields.Char(string="Components", default="Module", readonly=True)
+    connect_summary_costrate = fields.Many2one('estimation.work', string="Connect Summary Cost Rate", store=True)
+    name = fields.Char(string="Components", store=True)
 
-    sequence = fields.Integer(string="No", readonly=True)
-    types = fields.Char(string="Type", readonly=True)
-    role = fields.Many2one('cost.rate', string='Role')
-    yen_month = fields.Float(string="Unit (Currency/Month)", store=True, default=0.00, readonly=True)
-    yen_day = fields.Float(string="Unit (Currency/Day)", store=True, compute='_compute_yen_month', default=0.00, readonly=True)
+    sequence = fields.Integer(string="No", store=True)
+    types = fields.Char(string="Type", store=True)
+    role = fields.Many2one('cost.rate', string='Role', store=True)
+    yen_month = fields.Float(string="Unit (Currency/Month)", store=True, default=0.00, compute='_compute_yen_month', readonly=True)
+    yen_day = fields.Float(string="Unit (Currency/Day)", store=True, default=0.00, readonly=True)
 
     @api.depends('role', 'connect_summary_costrate.currency_id', 'role.cost_usd', 'role.cost_yen', 'role.cost_vnd')
     def _compute_yen_month(self):
@@ -191,4 +166,3 @@ class EstimationSummaryCostRate(models.Model):
             else:
                 item.yen_month = cost_rate.cost_yen
                 item.yen_day = cost_rate.cost_yen / 20
-

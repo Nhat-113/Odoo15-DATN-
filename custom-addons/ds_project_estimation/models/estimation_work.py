@@ -36,7 +36,8 @@ class Estimation(models.Model):
     sequence_module = fields.Integer(string="Sequence Module", store=True, default=1, compute ='_compute_sequence_module') # for compute sequence module
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
     add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate',
-                                                 string='Summary Cost Rate', domain=lambda self: self._domain_cost_rate())  # domain=[('module_id', 'in', [9])]
+                                                 string='Summary Cost Rate', domain=lambda self: self._domain_cost_rate())
+
     add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'estimation_id', string='Summary Total Cost')
 
     add_lines_resource_effort = fields.One2many('estimation.resource.effort', 'estimation_id', string='Resource Planning Effort')
@@ -44,6 +45,7 @@ class Estimation(models.Model):
     gantt_view_line = fields.One2many('gantt.resource.planning', 'estimation_id', string="Gantt")
    
     check_generate_project = fields.Boolean(default=False, compute='action_generate_project', store=True)
+
 
     @api.onchange('currency_id')
     def _compute_domain_stage(self):
@@ -58,33 +60,38 @@ class Estimation(models.Model):
             else:
                 record.domain_stage = json.dumps([('type', 'in', ['new', 'completed', 'pending'])])
 
-    @api.depends('add_lines_summary_totalcost.check_activate')
+    @api.depends('add_lines_module')
     def _domain_cost_rate(self):
         for record in self:
-            module_ids = record.add_lines_module.ids
-            total_cost = record.env['estimation.summary.totalcost'].search([('module_id', 'in', module_ids)])
-            if not record.module_activate:
-                try:
-                    record.module_activate = module_ids[0]
-                except:
-                    record.module_activate = 0
-            activate = []
-            for item in total_cost:
-                if item.check_activate:
-                    activate.append(item.module_id.id)
-                    record.module_activate = item.module_id.id
-            if len(activate):
-                # đưa tất cả về False
-                for item in total_cost:
-                    item.check_activate = False
-                return [('module_id', 'in', activate)]
+            if not (record.id or record.id.origin):
+                return [('name', 'in', [record.add_lines_module[-1].component])]
             else:
-                try:
-                    temp = self.module_activate
-                    return [('module_id', 'in', [temp])]
-                except:
-                    return [('module_id', 'in', [module_ids[0]])]
-
+                module_ids = record.add_lines_module.ids
+                component_ids = []
+                for item in record.add_lines_module:
+                    component_ids.append(item.component)
+                total_cost = record.env['estimation.summary.totalcost'].search([('name', 'in', component_ids)])
+                if not record.module_activate:
+                    try:
+                        record.module_activate = module_ids[0]
+                    except:
+                        record.module_activate = 0
+                activate = []
+                for item in total_cost:
+                    if item.check_activate:
+                        activate.append(item.name)
+                        record.module_activate = item.name
+                if len(activate):
+                    # đưa tất cả về False
+                    for item in total_cost:
+                        item.check_activate = False
+                    return [('name', 'in', activate)]
+                else:
+                    try:
+                        temp = self.module_activate
+                        return [('name', 'in', [temp])]
+                    except:
+                        return [('name', 'in', [component_ids[0]])]
 
     @api.depends('currency_id')
     def _compute_summary_currency(self):
@@ -314,10 +321,9 @@ class Estimation(models.Model):
             ir_cron.write(
                 {'active': True, 'nextcall': fields.datetime.now()})
             message_id = self.env['estimation.message.wizard'].create(
-                {'message': _("Successfully generated project.")})
+                {'message': _("In the next few minutes, project will be generate.")})
                 
             estimation.check_generate_project = True
-            time.sleep(1)
             return {
                 'name': 'Message',
                 'type': 'ir.actions.act_window',
@@ -369,14 +375,37 @@ class Estimation(models.Model):
     def _compute_check_module(self):
         for record in self:
             resource_line = []
-            #if resource planning haven't record and create new a module
+            total_cost_line = []
+            vals_cost_rate = []
+            # if resource planning haven't record and create new a module
             if len(record.add_lines_resource_effort) == 0 and len(record.add_lines_module) != 0:
                 for rec in record.add_lines_module:
                     lines = (0, 0, {
                         'sequence': rec.sequence, 
                         'name': rec.component
                     })
+                    lines_1 = (0, 0, {
+                        # 'module_id': module_id,
+                        'sequence': 0,
+                        'name': rec.component
+                    })
+                    total_cost_line.append(lines_1)
                     resource_line.append(lines)
+
+                    # Create Cost Rate
+                    cost_rate_line = self.env['config.job.position'].search([])
+                    for index, val in enumerate(cost_rate_line):
+                        cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)])
+                        role_default = cost_rate[0]
+                        lines_2 = (0, 0, {
+                            'sequence': index + 1,
+                            'name': rec.component,
+                            'types': val.job_position,
+                            'role': role_default.id,
+                            'yen_month': 0.0,
+                            'yen_day': 0.0,
+                        })
+                        vals_cost_rate.append(lines_2)
                     
                 lines_md = (0, 0, {
                     'sequence': 0, 
@@ -389,7 +418,9 @@ class Estimation(models.Model):
                 resource_line.append(lines_md)
                 resource_line.append(lines_mm)
                 record.update({
-                    'add_lines_resource_effort': resource_line
+                    'add_lines_resource_effort': resource_line,
+                    'add_lines_summary_totalcost': total_cost_line,
+                    'add_lines_summary_costrate': vals_cost_rate
                 })
             else:
                 check_component_resource = []
@@ -400,9 +431,31 @@ class Estimation(models.Model):
                             'sequence': module.sequence, 
                             'name': module.component
                         })
+                        lines_1 = (0, 0, {
+                            'sequence': 0,
+                            'name': module.component
+                        })
+                        total_cost_line.append(lines_1)
                         resource_line.append(lines)
+                        # Create Cost Rate
+                        cost_rate_line = self.env['config.job.position'].search([])
+                        for index, val in enumerate(cost_rate_line):
+                            cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)])
+                            role_default = cost_rate[0]
+                            lines_2 = (0, 0, {
+                                'sequence': index + 1,
+                                'name': module.component,
+                                'types': val.job_position,
+                                'role': role_default.id,
+                                'yen_month': 0.0,
+                                'yen_day': 0.0,
+                            })
+                            vals_cost_rate.append(lines_2)
+
                 record.update({
-                    'add_lines_resource_effort': resource_line
+                    'add_lines_resource_effort': resource_line,
+                    'add_lines_summary_totalcost': total_cost_line,
+                    'add_lines_summary_costrate': vals_cost_rate
                 })
             #case: Delete module using write method
             Estimation._delete_modules(record.add_lines_module, record.add_lines_resource_effort)
