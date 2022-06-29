@@ -263,6 +263,6 @@ class GanttResourcePlanning(models.Model):
     def _compute_check_duration(self):
         for rec in self:
             if rec.duration <= 0:
-                rec.duration = 7
+                rec.duration = 7   # 7 is 1 week
             else:
                 rec.start_date += timedelta(days=1)
