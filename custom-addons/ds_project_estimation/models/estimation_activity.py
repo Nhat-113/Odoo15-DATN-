@@ -2,7 +2,6 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import json
 
-sequence_activity_global = 0
 class Activities(models.Model):
     """
     Describe activities in configuration.
@@ -12,7 +11,7 @@ class Activities(models.Model):
     _order = "sequence,id"
     _rec_name = "activity"
 
-    sequence = fields.Integer(string="No", readonly=True, store=True, compute='_compute_sequence')
+    sequence = fields.Integer(string="No") #, readonly=True, store=True, compute='_compute_sequence'
     module_id = fields.Many2one("estimation.module", string="Module")
     sequence_breakdown = fields.Integer(string="Sequence Activities Breakdown", store=True, default=1, compute ='_compute_sequence_breakdown')
     check_compute = fields.Char(string="Check compute", readonly=True)
@@ -31,11 +30,12 @@ class Activities(models.Model):
     activity_current = fields.Many2one("config.activity", 
                                        string="Activities", 
                                        store=True, 
-                                       domain="[('module_id', '=', module_id), ('sequence', '!=', sequence)]")
+                                       domain="[('module_id', '=', module_id), ('activity', '!=', activity)]" )
     
     add_lines_breakdown_activity = fields.One2many('module.breakdown.activity', 'activity_id', string="Breakdown Activity")
     check_default = fields.Boolean(string="Check default", default=False)
     # domain_module_id = fields.Char(string="domain module id", readonly=True, store=True, compute='_compute_domain_module_id')
+    # domain_select_activities = fields.Char(string="Domain activities", readonly=True, store=True, compute='_compute_domain_activities')
 
    
     # @api.depends('activity_type')
@@ -49,7 +49,9 @@ class Activities(models.Model):
     def _get_module_id(self):
         module = self.env['estimation.module'].search([('id', '=', self.module_id.id or self.module_id.id.origin)])
         self.module_id = module
+        # self.activity_current = self.module_id.module_config_activity
             
+    
     @api.depends('add_lines_breakdown_activity.mandays', 'activity_current')
     def _compute_total_effort(self):
         for record in self:
@@ -79,52 +81,6 @@ class Activities(models.Model):
             if breakdown_activity:
                 breakdown_activity.unlink()
         return super(Activities, self).unlink()
-
-    
-    # @api.depends('check_compute')
-    # def _compute_sequence(self):
-    #     max_sequence = self.module_id.sequence_activities
-    #     global sequence_activity_global
-    #     for rec in self:
-    #         # if save activities mode
-    #         if rec.id:
-    #             sequence_activity_global = 0
-    #             for item in self.module_id.module_effort_activity:
-    #                 if item.activity == rec.activity:
-    #                     item.sequence = max_sequence
-    #                     rec.sequence = max_sequence
-    #                     max_sequence += 1
-    #         else: #if this is create new activity
-    #             # max = record.sequence_activities
-    #             # for rec in self:
-    #             if max_sequence == 1 and sequence_activity_global <= 1:
-    #                 max_sequence = max(item.sequence for item in rec.module_id.module_config_activity)
-    #                 sequence_activity_global = max_sequence
-    #             rec.sequence = sequence_activity_global + 1
-    #             if rec.id or rec.id.origin == False:
-    #                 sequence_activity_global += 1
-    
-    @api.depends('check_compute')
-    def _compute_sequence(self):
-        for record in self.module_id:
-            # if save module mode
-            if record.id:
-                max = record.sequence_activities
-                for rec in self:
-                    if rec.id:
-                        break
-                    else:
-                        rec.sequence = max
-                        for item in record.module_effort_activity:
-                            if rec.module_id.id == record.id and item.activity == rec.activity:
-                                item.sequence = rec.sequence
-                        max += 1
-            else: #if this is create new activity
-                max = record.sequence_activities
-                for rec in self:
-                    rec.sequence = max
-                    if rec.id or rec.id.origin == False:
-                        max += 1
     
     @api.depends('add_lines_breakdown_activity')
     def _compute_sequence_breakdown(self):

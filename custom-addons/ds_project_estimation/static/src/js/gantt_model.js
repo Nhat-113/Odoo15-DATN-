@@ -76,36 +76,30 @@ odoo.define('rs_plan_gantt.ResourcePlanGanttModel', function(require) {
                 task.duration = record[self.map_duration];
                 task.progress = typeof record[self.map_progress] === 'undefined' ? 0 : record[self.map_progress] / 100;
 
-                // if (record.type) {
-                //     // Add serverId to get real id in edit mode
-                //     task.serverId = record.serverId;
-                //     datetime = record.start_date ? formatFunc(record.start_date) : formatFunc(record.milestone_date);
-                // } else {
                     // Show start time of task
-                    if (record[self.map_date_start]) {
-                        datetime = formatFunc(record[self.map_date_start]);
-                    } else {
-                        datetime = self.configStartDate;
-                    }
+                if (record[self.map_date_start]) {
+                    datetime = formatFunc(record[self.map_date_start]);
+                } else {
+                    datetime = self.configStartDate;
+                }
 
-                    // Handle warning or danger of task
-                    // Convert to days
-                    const currentDuration = (new Date() - datetime) / 1000 / 86400;
+                // Handle warning or danger of task
+                // Convert to days
+                const currentDuration = (new Date() - datetime) / 1000 / 86400;
 
-                    // if Danger else if warning
-                    if (currentDuration > record[self.map_duration] && task.progress != 1) {
-                        task.deadline = 1;
-                    } else if (currentDuration > 0 && currentDuration < record[self.map_duration]) {
-                        if (record[self.map_duration]) {
-                            let progress = (currentDuration) * (1 / record[self.map_duration]);
-                            if (progress > task.progress) {
-                                task.deadline = 2;
-                            }
+                // if Danger else if warning
+                if (currentDuration > record[self.map_duration] && task.progress != 1) {
+                    task.deadline = 1;
+                } else if (currentDuration > 0 && currentDuration < record[self.map_duration]) {
+                    if (record[self.map_duration]) {
+                        let progress = (currentDuration) * (1 / record[self.map_duration]);
+                        if (progress > task.progress) {
+                            task.deadline = 2;
                         }
                     }
-                // }
+                }
 
-                task.start_date = datetime;
+                task.start_date = gantt.date.convert_to_utc(datetime);
                 task.open = record[self.map_open] ? record[self.map_open] : 'true';
                 task.total_float = record[self.map_total_float];
                 task.type = record.type ? record.type : "";

@@ -65,14 +65,7 @@
 .stat-widget-one .stat-icon {
     vertical-align: top;
     margin: auto;
-    width: 100%;
-    color: #01c490;
-}
-
-.stat-widget-one .stat-icon i {
-    font-size: 30px;
-    font-weight: 900;
-    display: inline-block;
+    /* width: 100%; */
     color: #01c490;
 }
 
@@ -403,12 +396,7 @@ path:hover {
     padding-left: 26px;
 }
 
-.stat-widget-one .stat-icon i {
-    font-size: 25px;
-    font-weight: 900;
-    display: inline-block;
-    color: #fff;
-}
+
 
 .stat-widget-one {
     background-color: white;
@@ -544,6 +532,9 @@ h4 .stat-count {
 /* .o_hr_attendance_sign_in_out_icon {
     z-index: 100000;
 } */
+/* .hr_attendance_login .o_hr_attendance_sign_in_out_icon:active {
+    background-color: red;
+}
 .hr_attendance_login .stat-widget-one {
     background: none;
     display: flex;
@@ -584,7 +575,7 @@ h4 .stat-count {
     margin-top: 5%;
     height: 5.5%;
     z-index: 1000;
-}
+} */
 
 .monthly_leave_graph_view .oh-card {
     background: #fff;
@@ -1587,8 +1578,13 @@ button:focus {
     align-content: flex-end;
     align-items: flex-end;
     justify-content: center;
-    margin-top: 5px;
+    margin-top: 22px;
 }
+.leave_graph > svg:nth-child(2)  {
+    background: #fafafa !important;
+    border-radius: 50% !important;
+}
+
 
 .list-employee .leave_graph .legend {
     margin-top: 27px;
@@ -1734,11 +1730,42 @@ button:focus {
     height: 80%;
     overflow-y: scroll;
 }
-
 .list_news::-webkit-scrollbar {
-    /* This is the magic bit for WebKit */
-    display: none;
+    background-color: white;
   }
+.list_news::-webkit-scrollbar-thumb {
+    background-color: rgb(175, 156, 156);
+    border-radius: 5px;
+    width: 2px;
+  }
+.list_event_user::-webkit-scrollbar {
+    background-color: white;
+  }
+.list_event_user::-webkit-scrollbar-thumb {
+    background-color: rgb(175, 156, 156);
+    border-radius: 5px;
+    width: 2px;
+  }
+  
+  
+  @-moz-document url-prefix() {
+    .list_news::-webkit-scrollbar {
+        background-color: white;
+      }
+    .list_news::-webkit-scrollbar-thumb {
+        background-color: gray;
+        border-radius: 5px;
+        width: 5px;
+      }
+}
+  
+  /* .list_news ::-webkit-scrollbar-thumb {
+    background-color: rgba(90, 90, 90);
+  }
+  
+  .list_news ::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.2);
+  } */
 .Event_user {
     flex: none;
     margin-right: 1.5rem;
@@ -1792,7 +1819,96 @@ button:focus {
     flex-grow: 0;
     margin: 3.2% 0% 2.3% 0%;
 }
+.button-checkin {
+    background-color: #4CAF50;
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    /* height: 41%; */
+    border-radius: 9px !important;
+    margin-top: 5px  !important; 
+}
+.button-checkin-user {
+    background-color: #4CAF50;
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    /* height: 41%; */
+    border-radius: 9px !important;
+    margin-top: 5px  !important; 
+}
+.stat-widget-one .stat-icon i {
+    font-size: 25px;
+    font-weight: 900;
+    display: inline-block;
+    color: #fff;
+    margin-left: -48px;
 
+}
+.button-checkout-user .hr_attendance_btn > i {
+    font-size: 25px;
+    font-weight: 900;
+    display: inline-block;
+    color: #fff;
+    margin-left: -50px;
+}
+.button-checkin-user .hr_attendance_btn > i {
+    font-size: 25px;
+    font-weight: 900;
+    display: inline-block;
+    color: #fff;
+    margin-left: -50px;
+}
+.button-checkin .stat-content .stat-text {
+    font-size: 14px;
+    color: white;
+    margin-top: 14px;
+    margin-bottom: 14px;
+    margin-left: 76px;
+}
+.button-checkin-user .stat-content .stat-text {
+    font-size: 14px;
+    color: white;
+    margin-top: 14px;
+    margin-bottom: 14px;
+    margin-left: 80px;
+}
+.button-checkout {
+    background-color: #d99200;
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    /* height: 41%; */
+    border-radius: 9px !important;
+    margin-top: 2px  !important; 
+}
+.button-checkout-user {
+    background-color: #d99200;
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    /* height: 41%; */
+    border-radius: 9px !important;
+    margin-top: 2px  !important; 
+}
+.button-checkout .stat-content .stat-text {
+    font-size: 14px;
+    color: white;
+    margin-top: 14px;
+    margin-bottom: 14px;
+    margin-left: 80px;
+}
+.button-checkout-user .stat-content .stat-text {
+    font-size: 14px;
+    color: white;
+    margin-top: 14px;
+    margin-bottom: 14px;
+    margin-left: 80px;
+}
 .announcements_detail_user h3 {
     display: flex;
     justify-content: center;
@@ -1842,7 +1958,7 @@ button:focus {
 .text_news {
     color: #000;
     margin-bottom: 0;
-    width: 70%;
+    width: 66%;
     margin-bottom: 0;
     /* width: 80%; */
     /* width: 206px; */
@@ -1860,7 +1976,7 @@ button:focus {
 
 .text_detail .new_code {
     padding-right: 4%;
-    width: 29%;
+    width: 34%;
     /* margin-bottom: 0; */
     font-family: 'Inter';
     font-style: normal;
@@ -2002,22 +2118,9 @@ button:focus {
 .birthday-detail p {
     font-weight: bold;
 }
-
-.list-birthday {
-    margin-top: 1%;
-    height: 88%;
-    overflow-y: scroll;
-    
+.birthday-detail:first-child {
+    margin-top:  0;
 }
-.list-birthday::-webkit-scrollbar {
-    /* This is the magic bit for WebKit */
-    display: none;
-  }
-#list-birthday ::-webkit-scrollbar {
-    display: none;
-}
-
-
 .name {
     display: inline;
     font-weight: 400;

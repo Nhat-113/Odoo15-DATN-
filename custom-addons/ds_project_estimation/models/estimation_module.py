@@ -1,5 +1,5 @@
 from odoo import models, fields, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 class EstimationModule(models.Model):
     _name = "estimation.module"
@@ -19,11 +19,8 @@ class EstimationModule(models.Model):
     module_config_activity = fields.One2many('config.activity', 'module_id')
     module_effort_activity = fields.One2many('module.effort.activity', 'module_id')
     # estimation_resource_plan = fields.One2many('estimation.resource.effort', 'module_id')
-    
+
     get_estimation_id = fields.Integer(string="Estimation Id")
-    summary_total_cost = fields.One2many('estimation.summary.totalcost', 'module_id')
-    summary_cost_rate = fields.One2many('estimation.summary.costrate', 'module_id')
-    
 
     def unlink(self):
         for record in self:
@@ -31,8 +28,8 @@ class EstimationModule(models.Model):
             record.module_summarys.unlink()
             record.module_effort_activity.unlink()
             record.module_config_activity.unlink()
-            record.summary_total_cost.unlink()
-            record.summary_cost_rate.unlink()
+            # record.summary_total_cost.unlink()
+            # record.summary_cost_rate.unlink()
             
             # check_data_resource_plan = self.env['estimation.resource.effort'].search([('estimation_id', '=', record.estimation_id.id)])
             # gantt_resource_plan = self.env['gantt.resource.planning'].search([('estimation_id', '=', record.estimation_id.id)])
@@ -155,19 +152,34 @@ class EstimationModule(models.Model):
 
     @api.onchange('component')
     def _compute_components(self):
-        count = 0
-        for record in self:
-            for rec in self.estimation_id.add_lines_module:
-                if record.component == rec.component:
-                    count += 1
-            if count > 1:
-                record.component = False
-                return {
-                    'warning': {
-                        'title': 'Warning!',
-                        'message': 'Module components already exists!'
-                    }
-                } 
+        # count = 0
+        # for record in self:
+        #     for rec in self.estimation_id.add_lines_module:
+        #         if record.component == rec.component:
+        #             if rec.id.ref != None:
+        #                 count += 1
+        #     if count > 1:
+        #         record.component = False
+        #         return {
+        #             'warning': {
+        #                 'title': 'Warning!',
+        #                 'message': 'Module components already exists!'
+        #             }
+        #         } 
+        components = []
+        for record in self.estimation_id.add_lines_module:
+            if record.id.origin != False :
+                components.append(record.component)
+            
+        if len(components) != len(set(components)):
+            # self.component = False
+            # raise UserError('Breadown Activity name already exists!')
+            return {
+                'warning': {
+                    'title': 'Warning!',
+                    'message': 'Module components already exists!'
+                }
+            } 
 
     @api.depends('module_config_activity')
     def _compute_sequence_activities(self):
@@ -220,17 +232,17 @@ class EstimationModule(models.Model):
             # Case: delete record
             EstimationModule._delete_activities(record.module_effort_activity, record.module_config_activity)
             
-    def _get_activities(ls_config_activities, record):
+    def _get_activities(rec_activity, record_module):
         line = []
-        for rec in ls_config_activities:
-            effort_line = (0, 0, {
-                    'sequence': rec.sequence,
-                    'activity': rec.activity,
-                    'effort': rec.effort,
-                    'module_id': record.id or record.id.origin,
-            })
-            line.append(effort_line)
-        record.update({
+        rec_activity.sequence = record_module.sequence_activities
+        effort_line = (0, 0, {
+                'sequence': rec_activity.sequence,
+                'activity': rec_activity.activity,
+                'effort': rec_activity.effort,
+                'module_id': record_module.id or record_module.id.origin,
+        })
+        line.append(effort_line)
+        record_module.update({
             'module_effort_activity': line
         })
 
