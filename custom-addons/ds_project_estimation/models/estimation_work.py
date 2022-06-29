@@ -14,7 +14,7 @@ class Estimation(models.Model):
     _rec_name = "number"
 
     project_name = fields.Char("Project Name", required=True)
-    number = fields.Char("No", readonly=True, required=True, copy=False, index=True, default=lambda self: _('New'))
+    number = fields.Char("No", readonly=True, required=True, copy=False, index=True, default='New')
 
     estimator_ids = fields.Many2one('res.users', string='Estimator')
     reviewer_ids = fields.Many2one('res.users', string='Reviewer')
@@ -32,7 +32,7 @@ class Estimation(models.Model):
     description = fields.Text(string="Description", help="Description estimation")
     stage = fields.Many2one('estimation.status', string="Status", required=True)
     domain_stage = fields.Char(string="Stage domain", readonly=True, store=False, compute='_compute_domain_stage')
-    module_activate = fields.Integer('Module Activate', default=0)
+    module_activate = fields.Char('Module Activate', default=0)
     sequence_module = fields.Integer(string="Sequence Module", store=True, default=1, compute ='_compute_sequence_module') # for compute sequence module
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
     add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate',
@@ -91,7 +91,7 @@ class Estimation(models.Model):
                         temp = self.module_activate
                         return [('name', 'in', [temp])]
                     except:
-                        return [('name', 'in', [component_ids[0]])]
+                        return [('name', 'in', [])]
 
     @api.depends('currency_id')
     def _compute_summary_currency(self):
@@ -111,11 +111,10 @@ class Estimation(models.Model):
     @api.model
     def create(self, vals):
         vals_over = {'connect_overview': '', 'description': ''}
-        if vals.get("number", _('New')) == _('New'):
-            vals["number"] = self.env["ir.sequence"].next_by_code("estimation.work") or _('New')
+        if vals.get("number", 'New') == 'New':
+            vals["number"] = self.env["ir.sequence"].next_by_code("estimation.work") or 'New'
         result = super(Estimation, self).create(vals)
-        est_current_id = self.env['estimation.work'].search([('number','=', vals["number"])])
-        vals_over["connect_overview"] = est_current_id.id
+        vals_over["connect_overview"] = result.id
         vals_over["description"] = 'Create New Estimation'
         self.env["estimation.overview"].create(vals_over)
 
@@ -456,14 +455,24 @@ class Estimation(models.Model):
                     'add_lines_summary_costrate': vals_cost_rate
                 })
             #case: Delete module using write method
-            Estimation._delete_modules(record.add_lines_module, record.add_lines_resource_effort)
-                   
-    def _delete_modules(ls_module, ls_resource_plan):
+            Estimation._delete_modules(record.add_lines_module, record.add_lines_resource_effort,
+                                       record.add_lines_summary_totalcost, record.add_lines_summary_costrate)
+
+    def _delete_modules(ls_module, ls_resource_plan, ls_total_cost, ls_costrate):
         for record in ls_resource_plan:
             domain = [(2, record.estimation_id.id or record.estimation_id.id.origin)]
             if len(ls_module) == 0:
                 record.write({'estimation_id': domain})
-            elif record.name not in ['Total (MD)', 'Total (MM)'] and record.name not in [rec.component for rec in ls_module]:
+            elif record.name not in ['Total (MD)', 'Total (MM)'] and record.name not in [rec.component for rec in
+                                                                                         ls_module]:
+                record.write({'estimation_id': domain})
+
+        for record in ls_total_cost:
+            domain = [(2, record.estimation_id.id or record.estimation_id.id.origin)]
+            if record.name not in [rec.component for rec in ls_module]:
+                for costrate in ls_costrate:
+                    if costrate.name == record.name:
+                        costrate.write({'connect_summary_costrate': domain})
                 record.write({'estimation_id': domain})
                     
     def unlink(self):

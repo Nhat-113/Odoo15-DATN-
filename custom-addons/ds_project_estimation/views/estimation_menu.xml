@@ -26,7 +26,8 @@
     <menuitem id="menu_cost_rate"
             name="Cost Rate"
             parent="menu_estimation"
-            action="action_cost_rate" />
+            action="action_cost_rate"
+            groups="ds_project_estimation.estimation_access_administrator,ds_project_estimation.estimation_access_director" />
 
 
     <!-- Menu item to open the Configuration -->
