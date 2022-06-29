@@ -46,15 +46,15 @@ class EstimationXlsx(models.AbstractModel):
                                 "border": border
                             })
 
-            # # sheet Summarize
-            # self.sheetSummarize(workbook, estimation,
-            #                 {
-            #                     "merge": merge_format,
-            #                     "merge_header": merge_format_header,
-            #                     "bold": bold,
-            #                     "bold_center": bold_center,
-            #                     "border": border
-            #                 })
+            # sheet Summarize
+            self.sheetSummarize(workbook, estimation,
+                            {
+                                "merge": merge_format,
+                                "merge_header": merge_format_header,
+                                "bold": bold,
+                                "bold_center": bold_center,
+                                "border": border
+                            })
 
             # sheet Resource Plan
             self.sheetResourcePlan(workbook, estimation,
@@ -104,7 +104,7 @@ class EstimationXlsx(models.AbstractModel):
         for obj in estimation:
             overviews = obj.env['estimation.overview'].search(
                 [('connect_overview', '=', obj.id)])
-            for overview in overviews:
+            for overview in overviews[-1]:
                 row += 1
                 revision = overview.revision
                 description = overview.description
@@ -167,7 +167,8 @@ class EstimationXlsx(models.AbstractModel):
 
         row_data_summarize, col_data_summarize = 14, 1
         totalcosts = estimation.env['estimation.summary.totalcost'].search(
-            [('connect_summary', '=', estimation.id)])
+            [('estimation_id', '=', estimation.id)])
+        no = 1
         total_effort = 0
         design_effort = 0
         dev_effort = 0
@@ -179,8 +180,8 @@ class EstimationXlsx(models.AbstractModel):
         for total in totalcosts:
             row_data_summarize += 1
             col_values_summarize = [
-                total.sequence,
-                total.module,
+                no,
+                total.name,
                 total.total_effort,
                 total.design_effort,
                 total.dev_effort,
@@ -198,6 +199,7 @@ class EstimationXlsx(models.AbstractModel):
             brse_effort += total.brse_effort
             pm_effort += total.pm_effort
             cost += total.cost
+            no += 1
             for i, value in enumerate(col_values_summarize):
                 sheet_summarize.write(
                     row_data_summarize, col_data_summarize + i, value, format['border'])
@@ -226,8 +228,10 @@ class EstimationXlsx(models.AbstractModel):
             row_data_summarize + 5, 4, 'Unit ('+estimation.currency_id.name+'/Day)', format['merge_header'])
 
         row_cost_rate, col_cost_rate = row_data_summarize + 5, 1
+
+        modules = estimation.env['estimation.module'].search([('estimation_id','=',estimation.id)])
         costrates = estimation.env['estimation.summary.costrate'].search(
-            [('connect_summary_costrate', '=', estimation.id)])
+            [('connect_summary_costrate', '=', estimation.id), ('name', '=', modules[-1].component)])
         for costrate in costrates:
             row_cost_rate += 1
             col_value_cost_rate = [
@@ -402,13 +406,6 @@ class EstimationXlsx(models.AbstractModel):
                 'valign': 'vcenter',
                 'fg_color': '#86F5F0'})
 
-        merge_total = workbook.add_format({
-                'bold': 1,
-                'border': 1,
-                'align': 'center',
-                'valign': 'vcenter',
-                'fg_color': '#E0E3E3'})
-
         merge_row = workbook.add_format({
                 'bold': 1,
                 'border': 1,
@@ -458,14 +455,15 @@ class EstimationXlsx(models.AbstractModel):
             'B13:K13', 'Assumption', merge_header)
             row_assumption = 13
             assumptions = self.env['estimation.module.assumption'].search([('module_id', '=', module.id)])
-            for ass in assumptions[:-1]:
-                sheet_module.merge_range(row_assumption, 1, row_assumption, 2, 'Å', format_icon)
+            if assumptions:
+                for ass in assumptions[:-1]:
+                    sheet_module.merge_range(row_assumption, 1, row_assumption, 2, 'Å', format_icon)
+                    sheet_module.merge_range(
+                        row_assumption , 3, row_assumption, 10, ass.assumption, border_right)
+                    row_assumption += 1
+                sheet_module.merge_range(row_assumption, 1, row_assumption, 2, 'Å', format_icon_border_bottom)
                 sheet_module.merge_range(
-                    row_assumption , 3, row_assumption, 10, ass.assumption, border_right)
-                row_assumption += 1
-            sheet_module.merge_range(row_assumption, 1, row_assumption, 2, 'Å', format_icon_border_bottom)
-            sheet_module.merge_range(
-                    row_assumption , 3, row_assumption, 10, assumptions[-1].assumption, border_bottom)
+                        row_assumption , 3, row_assumption, 10, assumptions[-1].assumption, border_bottom)
 
             row_summary = row_assumption + 2
             sheet_module.merge_range(row_summary, 1, row_summary, 10, 'Summary', merge_header)
@@ -527,8 +525,8 @@ class EstimationXlsx(models.AbstractModel):
                     sheet_module.merge_range(row_breakdown_value + 1, 3, row_breakdown_value + 1, 9, activity.activity, merge_value)
                     sheet_module.write(row_breakdown_value + 1, 10, activity.mandays, merge_value)
                     row_breakdown_value += 1
-            sheet_module.merge_range(row_breakdown_value + 1, 3, row_breakdown_value + 1, 9, 'Total (man-day)', merge_total)
+            sheet_module.merge_range(row_breakdown_value + 1, 3, row_breakdown_value + 1, 9, 'Total (man-day)', merge_row)
             sheet_module.merge_range(row_breakdown_value + 1, 1, row_breakdown_value + 1, 2, '', border_left)
-            sheet_module.write(row_breakdown_value + 1, 10, module.total_manday, merge_total)
+            sheet_module.write(row_breakdown_value + 1, 10, module.total_manday, merge_row)
             sheet_module.hide_gridlines(2)
 

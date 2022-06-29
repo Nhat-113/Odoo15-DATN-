@@ -32,7 +32,7 @@ class Estimation(models.Model):
     description = fields.Text(string="Description", help="Description estimation")
     stage = fields.Many2one('estimation.status', string="Status", required=True)
     domain_stage = fields.Char(string="Stage domain", readonly=True, store=False, compute='_compute_domain_stage')
-    module_activate = fields.Integer('Module Activate', default=0)
+    module_activate = fields.Char('Module Activate', default=0)
     sequence_module = fields.Integer(string="Sequence Module", store=True, default=1, compute ='_compute_sequence_module') # for compute sequence module
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
     add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate',
