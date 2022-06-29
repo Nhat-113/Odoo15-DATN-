@@ -129,13 +129,13 @@
 .gantt_grid_head_buttons  .gantt_sort {
     display: none;
 }
-input[name="text"] {
+#gantt_dropdown> label > input[name="text"] {
     display: none !important;
 }
-input[name="start_date"] {
+#gantt_dropdown> label > input[name="start_date"] {
     display: none !important;
 }
-input[name="end_date"] {
+#gantt_dropdown> label > input[name="end_date"] {
     display: none !important;
 }
 /* .gantt_task_line.gantt_milestone {
