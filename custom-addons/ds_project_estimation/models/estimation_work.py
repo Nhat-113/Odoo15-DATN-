@@ -91,7 +91,7 @@ class Estimation(models.Model):
                         temp = self.module_activate
                         return [('name', 'in', [temp])]
                     except:
-                        return [('name', 'in', [component_ids[0]])]
+                        return [('name', 'in', [])]
 
     @api.depends('currency_id')
     def _compute_summary_currency(self):
@@ -455,14 +455,24 @@ class Estimation(models.Model):
                     'add_lines_summary_costrate': vals_cost_rate
                 })
             #case: Delete module using write method
-            Estimation._delete_modules(record.add_lines_module, record.add_lines_resource_effort)
-                   
-    def _delete_modules(ls_module, ls_resource_plan):
+            Estimation._delete_modules(record.add_lines_module, record.add_lines_resource_effort,
+                                       record.add_lines_summary_totalcost, record.add_lines_summary_costrate)
+
+    def _delete_modules(ls_module, ls_resource_plan, ls_total_cost, ls_costrate):
         for record in ls_resource_plan:
             domain = [(2, record.estimation_id.id or record.estimation_id.id.origin)]
             if len(ls_module) == 0:
                 record.write({'estimation_id': domain})
-            elif record.name not in ['Total (MD)', 'Total (MM)'] and record.name not in [rec.component for rec in ls_module]:
+            elif record.name not in ['Total (MD)', 'Total (MM)'] and record.name not in [rec.component for rec in
+                                                                                         ls_module]:
+                record.write({'estimation_id': domain})
+
+        for record in ls_total_cost:
+            domain = [(2, record.estimation_id.id or record.estimation_id.id.origin)]
+            if record.name not in [rec.component for rec in ls_module]:
+                for costrate in ls_costrate:
+                    if costrate.name == record.name:
+                        costrate.write({'connect_summary_costrate': domain})
                 record.write({'estimation_id': domain})
                     
     def unlink(self):
