@@ -94,11 +94,6 @@ var ResourcePlanGanttController = AbstractController.extend({
             data.map_progress = self.map_progress;
             return true;
         });
-        gantt.attachEvent("onTaskLoading", function(task) {
-            task.start_date = gantt.date.convert_to_utc(task.start_date);
-            task.end_date = gantt.date.convert_to_utc(task.end_date);
-            return true;
-        });
 
     },
 

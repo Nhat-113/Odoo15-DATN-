@@ -45,7 +45,8 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.config.work_time = true;
       gantt.config.skip_off_time = true;
       gantt.config.root_id = "root"; 
-      gantt.config.autosize = "xy";
+      gantt.config.min_duration = 24 *60 *60 *1000;
+      // gantt.config.autosize = "xy";
       gantt.plugins({
         tooltip: true,
       });
@@ -154,7 +155,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
      
     
       var colHeader = '<div class="gantt-dropdown" onclick="gantt.$showDropdown(this)" style= "color:blue">&#9660;</div>';
-      var controlsColumn = {name: "buttons",label: colHeader,width: 75}
+      var controlsColumn = {name: "buttons",label: colHeader,width: 18}
       gantt.config.columns = [
         {
           name: "text",
@@ -264,7 +265,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           },
 
         },
-        {name: "buttons",label: colHeader,width: 75}
+        {name: "buttons",label: colHeader,width: 18}
       ];
 
       var allColumns = [ 
@@ -277,8 +278,8 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         },
         {
           name: "start_date",
+          label: "Start Time",
           align: "center",
-          label: "Start time",
           resize: true,
           // editor: startDateEditor,
           width: 120,
@@ -294,7 +295,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         },
         {
           name: "end_date",
-          label: "End time",
+          label: "End Time",
           align: "center",
           resize: true,
           // editor: endDateEditor,
@@ -302,8 +303,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
               return "";
-            }
-            else if (item.working_day === 0) {
+            } else if (item.working_day === 0) {
               return "";
             }
             return item.end_date;
@@ -330,7 +330,8 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
             //console.log("working_day", item.working_day);
             if (item.working_day) {
               return item.working_day;
-            }// duration auto = 1  for milestone
+            }
+            // duration auto = 1  for milestone
               else if (item.type === "milestone") {
                 return 1  ;
               }
@@ -339,8 +340,8 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
         },
         {
           name: "duration",
-          align: "center",
           label: "Duration",
+          align: "center",
           resize: true,
           template: function (item) {
             if (item.start_date - self.configStartDate === 0) {
@@ -348,7 +349,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
             } else if (item.working_day === 0) {
               return 0;
             }
-             // duration auto = 1  for milestone
+            // duration auto = 1  for milestone
             else if (item.type === "milestone") {
               return 1 ;
             }

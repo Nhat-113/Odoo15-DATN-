@@ -36,7 +36,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
             gantt.config.autoscroll_speed = 0;
             gantt.config.drag_links = false;
             gantt.config.drag_progress = false;
-            gantt.config.min_duration = 24 * 60 * 60 * 1000; //Set min duration = 1 day
+            gantt.config.min_duration = 24 * 60 * 60 * 1000 * 7; //Set min duration = 1 day
             gantt.plugins({
                 tooltip: true,
                 auto_scheduling: true
@@ -104,16 +104,16 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
             const tooltips = gantt.ext.tooltips;
             gantt.templates.tooltip_date_format = gantt.date.date_to_str("%F %j, %Y");
             gantt.templates.tooltip_text = function(start, end, task) {
-                var type = "Job Positions"
-
-                return `<b>${type}:</b> ${task.text[1]}<br/>
-                <b>Value (MM):</b> ${task.valueMM}<br/>
-                <b>Start date:</b> ${gantt.templates.tooltip_date_format(
-                  start
-                )} 
-                <br/><b>End date:</b> ${gantt.templates.tooltip_date_format(
-                  end
-                )}`;
+                // var type = "Job Positions";
+                // return `<b>${type}:</b> ${task.text[1]}<br/>
+                // <b>Total (MM):</b> ${task.valueMM}<br/>
+                // <b>Start date:</b> ${gantt.templates.tooltip_date_format(
+                //   start
+                // )} 
+                // <br/><b>End date:</b> ${gantt.templates.tooltip_date_format(
+                //   end
+                // )}`;
+                return false;
             };
 
             if (this.is_total_float) {
@@ -131,40 +131,41 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
             //gantt.setWorkTime({ hours: [0, 23] });
 
             var zoomConfig = {
-                levels: [{
-                        name: "day",
-                        scale_height: 60,
-                        min_column_width: 50,
-                        scales: [{ unit: "day", step: 1, format: "%d" },
-                                { unit: "month", format: "%F, %Y" },
-                                { unit: "year", step: 1, format: "%Y" }
-                                ],
-                    },
-                    {
-                        name: "week",
-                        scale_height: 60,
-                        min_column_width: 50,
-                        scales: [{
-                                unit: "week",
-                                step: 1,
-                                format: function(date) {
-                                    var dateToStr = gantt.date.date_to_str("%d %M");
-                                    var endDate = gantt.date.add(date, +6, "day");
-                                    var weekNum = gantt.date.date_to_str("%W")(date);
-                                    return (
-                                        "Week " +
-                                        weekNum +
-                                        ", " +
-                                        dateToStr(date) +
-                                        " - " +
-                                        dateToStr(endDate)
-                                    );
-                                },
-                            },
-                            { unit: "day", step: 1, format: "%j %D" },
-                            { unit: "year", step: 1, format: "%Y" }
-                        ],
-                    },
+                levels: [
+                    // {
+                    //     name: "day",
+                    //     scale_height: 60,
+                    //     min_column_width: 50,
+                    //     scales: [{ unit: "day", step: 1, format: "%d" },
+                    //             { unit: "month", format: "%F, %Y" },
+                    //             { unit: "year", step: 1, format: "%Y" }
+                    //             ],
+                    // },
+                    // {
+                    //     name: "week",
+                    //     scale_height: 60,
+                    //     min_column_width: 50,
+                    //     scales: [{
+                    //             unit: "week",
+                    //             step: 1,
+                    //             format: function(date) {
+                    //                 var dateToStr = gantt.date.date_to_str("%d %M");
+                    //                 var endDate = gantt.date.add(date, +6, "day");
+                    //                 var weekNum = gantt.date.date_to_str("%W")(date);
+                    //                 return (
+                    //                     "Week " +
+                    //                     weekNum +
+                    //                     ", " +
+                    //                     dateToStr(date) +
+                    //                     " - " +
+                    //                     dateToStr(endDate)
+                    //                 );
+                    //             },
+                    //         },
+                    //         { unit: "day", step: 1, format: "%j %D" },
+                    //         { unit: "year", step: 1, format: "%Y" }
+                    //     ],
+                    // },
                     {
                         name: "month",
                         scale_height: 50,
@@ -205,7 +206,7 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                 ],
             };
             gantt.ext.zoom.init(zoomConfig);
-            gantt.ext.zoom.setLevel("quarter");
+            gantt.ext.zoom.setLevel("month");
         },
 
         _onClickZoomIn: function() {
@@ -238,13 +239,13 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
                 this.events_set = true;
             }
             gantt.clearAll();
-            // var date_to_str = gantt.date.date_to_str(gantt.config.task_date);
-            // gantt.addMarker({
-            //     start_date: new Date(), //a Date object that sets the marker's date
-            //     css: "today", //a CSS class applied to the marker
-            //     text: "Today", //the marker title
-            //     title: date_to_str(new Date()), // the marker's tooltip
-            // });
+            var date_to_str = gantt.date.date_to_str(gantt.config.task_date);
+            gantt.addMarker({
+                start_date: new Date(), //a Date object that sets the marker's date
+                css: "today", //a CSS class applied to the marker
+                text: "Today", //the marker title
+                title: date_to_str(new Date()), // the marker's tooltip
+            });
             var rootHeight = this.$el.height();
             var headerHeight = this.$(".o_dhx_gantt_header").height();
             this.$(".o_dhx_gantt").height(rootHeight - headerHeight);
@@ -255,14 +256,14 @@ odoo.define("rs_plan_gantt.ResourcePlanGanttRenderer", function(require) {
             this.trigger_up("gantt_schedule");
           },
         // _onUpdate: function() {},
-        // updateState: function(state, params) {
-        //     // this method is called by the controller when the search view is changed. we should
-        //     // clear the gantt chart, and add the new tasks resulting from the search
-        //     var res = this._super.apply(this, arguments);
-        //     gantt.clearAll();
-        //     this.renderGantt();
-        //     return res;
-        // },
+        updateState: function(state, params) {
+            // this method is called by the controller when the search view is changed. we should
+            // clear the gantt chart, and add the new tasks resulting from the search
+            var res = this._super.apply(this, arguments);
+            gantt.clearAll();
+            this.renderGantt();
+            return res;
+        },
 
         // disableAllButtons: function() {
         //     // console.log('disableAllButtons:: Renderer');

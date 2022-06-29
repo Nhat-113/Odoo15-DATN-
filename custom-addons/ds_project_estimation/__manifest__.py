@@ -7,7 +7,7 @@
     'category': 'Services/Estimation',
     "version": "15.0.1.0.0",
     "license": "AGPL-3",
-    'depends': ['base', 'crm'], #, 'web_domain_field'
+    'depends': ['base', 'crm', 'web_domain_field'],
     "application": True,
     'data': [
         "security/estimation_security.xml",
@@ -18,6 +18,7 @@
         "data/job_position_data.xml",
         "data/module_summary_data.xml",
         "data/cost_rate_data.xml",
+        "data/estimation_status_data.xml",
         "views/estimation_menu.xml",
         "views/gantt_resource_planning.xml",
         "views/work_view.xml",
@@ -26,6 +27,7 @@
         "views/cost_rate_view.xml",
         "views/activity_view.xml",
         "views/project_type_view.xml",
+        "views/crm_lead_views.xml",
         "data/gen_project_cron.xml",
         "wizard/message_wizard_views.xml",
         "views/export_estimation_view.xml"

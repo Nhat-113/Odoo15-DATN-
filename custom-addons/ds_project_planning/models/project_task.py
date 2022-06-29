@@ -92,6 +92,13 @@ class ProjectTask(models.Model):
                     r.date_start = r.date_end
                 if r.planned_duration == 0.0:
                     r.planned_duration = 1
+                # drag in mode zoom out follow week
+                if r.date_start and r.date_end and  r.date_start == r.date_end and r.planned_duration <= 0 :
+                    r.planned_duration = 1
+                    r.date_end = r.date_start + timedelta(days=r.planned_duration - 1)
+                if r.date_start and r.date_end and  r.date_start < r.date_end and r.planned_duration <= 0 :
+                    r.planned_duration = 1
+                    r.date_end = r.date_start + timedelta(days=r.planned_duration - 1)   
                 r.date_end = r.date_start + timedelta(days=r.planned_duration - 1)
                 # if r.working_day == 0:
                 #     r.working_day = 1
