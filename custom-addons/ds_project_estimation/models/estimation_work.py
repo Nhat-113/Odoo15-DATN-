@@ -78,13 +78,13 @@ class Estimation(models.Model):
                 if not len(cost_rate):
                     cost_rate_line = self.env['config.job.position'].search([])
                     for index, val in enumerate(cost_rate_line):
-                        cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)])
-                        role_default = cost_rate[0]
+                        cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)], limit=1)
+                        # role_default = cost_rate[0]
                         val_cost_rate = {
                             'sequence': index + 1,
                             'name': component_ids[-1],
                             'types': val.job_position,
-                            'role': role_default.id,
+                            'role': cost_rate.id,
                             'yen_month': 0.0,
                             'yen_day': 0.0,
                         }
@@ -150,8 +150,8 @@ class Estimation(models.Model):
     def write(self, vals):
         vals_over = {'connect_overview': self.id, 'description': ''}
         if vals:
-            if 'module_activate' in vals:
-                vals.pop('module_activate')
+            # if 'module_activate' in vals:
+            #     vals.pop('module_activate')
             est_new_vals = vals.copy()
             ls_message_values = self.env['estimation.work'].search([('id','=',self.id)])
             est_old_vals = self.get_values(ls_message_values)
@@ -256,7 +256,7 @@ class Estimation(models.Model):
         temp = {}
         mess_tab_list = ["add_lines_module_effort_distribute_activity", "add_lines_summary_totalcost", "add_lines_summary_costrate",
                          "add_lines_resource_effort", "add_lines_module_assumption", "add_lines_module_summary", "add_lines_module_activity", 
-                         "total_manday", "check_generate_project", 'add_lines_module'] # add total_manday field as it is not needed to track changes
+                         "total_manday", "check_generate_project", 'add_lines_module', 'module_activate'] # add total_manday field as it is not needed to track changes
         for i in mess_tab_list:
             for key in dic_temp:
                 if key == i:
@@ -476,13 +476,14 @@ class Estimation(models.Model):
         
         cost_rate_line = self.env['config.job.position'].search([])
         for index, val in enumerate(cost_rate_line):
-            cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)])
-            role_default = cost_rate[0]
+            cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)], limit=1)
+            # if cost_rate:
+                # role_default = cost_rate[0]
             lines_2 = (0, 0, {
                 'sequence': index + 1,
                 'name': module.component,
                 'types': val.job_position,
-                'role': role_default.id,
+                'role': cost_rate.id,
                 'yen_month': 0.0,
                 'yen_day': 0.0,
             })

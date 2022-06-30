@@ -335,12 +335,13 @@ class BreakdownActivities(models.Model):
             elif record.type == 'type_1':
                 if record.activity_id.activity_current:
                     #because only the parent element can get the changed value of the child element => get value effort of activity_curent from module parent
-                    effort_activity_current = BreakdownActivities._find_effort_activity_current(record.activity_id.module_id.module_config_activity, record.activity_id.activity_current)
+                    effort_activity_current = self._find_effort_activity_current(record.activity_id.module_id.module_config_activity, record.activity_id.activity_current)
+                    # record.mandays = round((record.percent_effort * record.activity_id.activity_current.effort)/ 100, 2)
                     record.mandays = round((record.percent_effort * effort_activity_current)/ 100, 2)
                 else:
                     record.mandays = 0
                     
-    def _find_effort_activity_current(ls_activity, activity_current):
+    def _find_effort_activity_current(self, ls_activity, activity_current):
         result_effort = 0
         for record in ls_activity:
             if record.activity == activity_current.activity:
