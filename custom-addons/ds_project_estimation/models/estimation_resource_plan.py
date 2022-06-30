@@ -12,14 +12,13 @@ class EstimationResourcePlan(models.Model):
     # module_id = fields.Many2one("estimation.module", string="Module")
     sequence = fields.Integer(string="No", store=True, compute='compute_sequence')
     name= fields.Char(string="Components")
-    temp_field = fields.Float(string="temp", store=True, compute="compute_effort")
+    total_effort = fields.Float(string="Total Effort (MD)", store=True, compute="compute_effort") 
     design_effort = fields.Float(string="Designer")
     dev_effort = fields.Float(string="Developer")
     tester_effort = fields.Float(string="Tester")
     comtor_effort = fields.Float(string="Comtor")
     brse_effort = fields.Float(string="Brse")
     pm_effort = fields.Float(string="PM")
-    total_effort = fields.Float(string="Total Effort (MD)", store=True, compute="compute_effort") 
    
    
     def total_efforts_job_position(self, job_position):
@@ -34,12 +33,13 @@ class EstimationResourcePlan(models.Model):
                                 result_total_effort += breakdown.mandays
                             else:
                                 #compute breakdown is new
-                                result_total_effort += breakdown.mandays
-                                
+                                if breakdown.id.origin is None:
+                                    result_total_effort += breakdown.mandays
+                                else:
                                 #compute effort from database because self has no effort data
-                                ls_breakdowns = self.env['module.breakdown.activity'].search([('activity_id', '=', activity.id or activity.id.origin), ('job_pos', '=', breakdown.job_pos.id)])
-                                total = sum(breakdb.mandays for breakdb in ls_breakdowns)
-                                result_total_effort += total
+                                    ls_breakdowns = self.env['module.breakdown.activity'].search([('id', '=', breakdown.id.origin), ('job_pos', '=', breakdown.job_pos.id)])
+                                    # total = sum(breakdb.mandays for breakdb in ls_breakdowns)
+                                    result_total_effort += ls_breakdowns.mandays
         return result_total_effort
     
     @api.depends('estimation_id.add_lines_module.total_manday')

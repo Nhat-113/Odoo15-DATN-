@@ -352,7 +352,7 @@ class BreakdownActivities(models.Model):
     def _compute_sequence(self):
         for record in self.activity_id:
             # if save module mode
-            if record.id or record.id.origin:
+            if record.id: # or record.id.origin
                 max = record.sequence_breakdown
                 for rec in self:
                    if rec.activity_id.id == record.id:
