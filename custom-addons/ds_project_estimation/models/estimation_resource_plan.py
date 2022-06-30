@@ -9,9 +9,9 @@ class EstimationResourcePlan(models.Model):
     _order = "sequence"
     
     estimation_id = fields.Many2one('estimation.work', string="Connect Estimation")
-    # module_id = fields.Many2one("estimation.module", string="Module")
-    sequence = fields.Integer(string="No", store=True, compute='compute_sequence')
+    sequence = fields.Integer(string="No", store=True)
     name= fields.Char(string="Components")
+    key_primary = fields.Char(string="Key unique module")
     total_effort = fields.Float(string="Total Effort (MD)", store=True, compute="compute_effort") 
     design_effort = fields.Float(string="Designer")
     dev_effort = fields.Float(string="Developer")
@@ -19,8 +19,8 @@ class EstimationResourcePlan(models.Model):
     comtor_effort = fields.Float(string="Comtor")
     brse_effort = fields.Float(string="Brse")
     pm_effort = fields.Float(string="PM")
-   
-   
+
+
     def total_efforts_job_position(self, job_position):
         result_total_effort = 0
         for record in self.estimation_id.add_lines_module:
@@ -211,23 +211,6 @@ class EstimationResourcePlan(models.Model):
         date_string = str(dd) + '/' + str(mm) + '/' + str(yy)
         return datetime.strptime(date_string, '%d/%m/%y').date()
     
-    @api.depends('estimation_id.sequence_module')
-    def compute_sequence(self):
-        max_sequence = 0
-        for record in self:
-            if record.name not in ['Total (MD)', 'Total (MM)']:
-                if record.id:
-                    max_sequence += 1
-                    record.sequence = max_sequence 
-                elif record.sequence > max_sequence:
-                    # elif record.id.origin and record.sequence > max_sequence:
-                    max_sequence = record.sequence
-               
-        for record in self:
-            if record.name == 'Total (MD)':
-                record.sequence = max_sequence + 1
-            elif record.name == 'Total (MM)':
-                record.sequence = max_sequence + 2
 
     def unlink(self):
         for record in self:
