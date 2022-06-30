@@ -95,7 +95,7 @@
         margin-left: 0px;
     }
     .list-employee .leave_graph .legend {
-        margin-top:9px;
+        margin-top:11px;
     }
     .list-employee .leave_graph {
         margin-top: 17px;
@@ -169,7 +169,7 @@
         margin: 0 auto;
     }
     .list_menu .btn_announcements .text_btn_announcements {
-        margin-left: 2px;
+        margin-left: -17px;
     }
     .all-request p {
         font-weight: 700;

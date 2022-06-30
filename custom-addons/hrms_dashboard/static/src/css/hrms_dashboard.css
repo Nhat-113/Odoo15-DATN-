@@ -1024,6 +1024,7 @@ h4 .stat-count {
     z-index: 999999;
     display: flex;
     width: 90%;
+    max-width: 90%;
     margin-left: 2%;
     background: none;
     border: none;
@@ -1072,7 +1073,7 @@ button:focus {
 }
 
 .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
-    margin-left: 3px;
+    margin-left: 2px;
 }
 
 .leave_trend_border {
@@ -1089,7 +1090,11 @@ button:focus {
 }
 
 .list_menu .btn_announcements .text_btn_announcements {
-    margin-left: 2px;
+    margin-left: 5px;
+    position: absolute;
+    width: 90%;
+    height: 50px;
+    line-height: 50px;
 }
 
 .list_menu .btn_annalys {

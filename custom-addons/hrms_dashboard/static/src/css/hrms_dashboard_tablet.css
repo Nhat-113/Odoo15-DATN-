@@ -99,7 +99,7 @@
         font-size: 9px;
     }
     .list_menu .btn_announcements .text_btn_announcements {
-        margin-left: 17px;
+        margin-left: -4px;
         font-size: 9px;
     }
     .fearure_detail{
@@ -144,7 +144,7 @@
         font-size: 9px;
     }
     .list-employee .leave_graph {
-        margin-top: 7px;
+        margin-top: 5px;
     }
     .emp_graph {
         margin-top: -54px;
@@ -256,4 +256,20 @@
         border-radius: 45%;
     }
         
+}
+@media only screen and (max-width: 1400px) {
+    .fearure_detail{
+        margin-left: 15px !important;
+    }
+    .list_menu .btn_annalys .text_btn_annalys {
+        margin-left: 18px;
+        font-size: 9px;
+    }
+    .list_menu .btn_announcements .text_btn_announcements {
+        margin-left: -25px;
+        font-size: 9px;
+    }
+    .btn_leave_request   .fearure_detail{
+        margin-left: 19px !important;
+    }
 }
