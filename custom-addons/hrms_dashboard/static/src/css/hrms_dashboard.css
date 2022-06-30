@@ -1578,7 +1578,7 @@ button:focus {
     align-content: flex-end;
     align-items: flex-end;
     justify-content: center;
-    margin-top: 22px;
+    margin-top: 14px;
 }
 .leave_graph > svg:nth-child(2)  {
     background: #fafafa !important;
@@ -1587,7 +1587,7 @@ button:focus {
 
 
 .list-employee .leave_graph .legend {
-    margin-top: 27px;
+    margin-top: 34px;
 }
 
 .leave_graph .legend>tbody {
@@ -1948,7 +1948,6 @@ button:focus {
     border-radius: 15px;
     align-content: space-around;
     flex-wrap: nowrap;
-    padding-left: 4%;
     align-items: center;
     justify-content: space-between;
     min-height: 7.6%;
@@ -1958,7 +1957,7 @@ button:focus {
 .text_news {
     color: #000;
     margin-bottom: 0;
-    width: 63%;
+    width: 60%;
     margin-bottom: 0;
     /* width: 80%; */
     /* width: 206px; */
@@ -1976,7 +1975,7 @@ button:focus {
 
 .text_detail .new_code {
     padding-right: 4%;
-    width: 37%;
+    width: 35%;
     /* margin-bottom: 0; */
     font-family: 'Inter';
     font-style: normal;
@@ -1997,10 +1996,11 @@ button:focus {
     margin-bottom: 1.6%;
     border-radius: 25px;
     align-content: space-around;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     padding-left: 4%;
     align-items: center;
     justify-content: space-between;
+    flex-direction: row;
 }
 .text_detail_user .text_news_user  {
     font-size: 15px;
@@ -2008,6 +2008,7 @@ button:focus {
     width: 80%;
     padding: 10px 0px 10px 0px;
     margin: 0; 
+    margin-right: 18px;
 }
 
 
