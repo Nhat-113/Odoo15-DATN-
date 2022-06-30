@@ -13,7 +13,7 @@ class EstimationSummaryTotalCost(models.Model):
     check_activate = fields.Boolean(string='Activate', default=False)
     check_generate_project = fields.Boolean(string="Check Generate Project", default=False,)
     name = fields.Char(string="Components", default="Module")
-    design_effort = fields.Float(string="Design",  compute='_compute_effort', store=True)
+    design_effort = fields.Float(string="Designer",  compute='_compute_effort', store=True)
     dev_effort = fields.Float(string="Developer", store=True)
     tester_effort = fields.Float(string="Tester", store=True)
     comtor_effort = fields.Float(string="Comtor", store=True)

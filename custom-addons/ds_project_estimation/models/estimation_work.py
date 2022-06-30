@@ -78,13 +78,13 @@ class Estimation(models.Model):
                 if not len(cost_rate):
                     cost_rate_line = self.env['config.job.position'].search([])
                     for index, val in enumerate(cost_rate_line):
-                        cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)])
-                        role_default = cost_rate[0]
+                        cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)], limit=1)
+                        # role_default = cost_rate[0]
                         val_cost_rate = {
                             'sequence': index + 1,
                             'name': component_ids[-1],
                             'types': val.job_position,
-                            'role': role_default.id,
+                            'role': cost_rate.id,
                             'yen_month': 0.0,
                             'yen_day': 0.0,
                         }
@@ -439,7 +439,7 @@ class Estimation(models.Model):
             components.append(record.component)
             
         if len(components) != len(set(components)):
-            raise ValidationError('Component name already exists!')
+            raise UserError('Component name already exists!')
         
         # for item in components:
         #     if item not in new_list:
@@ -476,13 +476,14 @@ class Estimation(models.Model):
         
         cost_rate_line = self.env['config.job.position'].search([])
         for index, val in enumerate(cost_rate_line):
-            cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)])
-            role_default = cost_rate[0]
+            cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)], limit=1)
+            # if cost_rate:
+                # role_default = cost_rate[0]
             lines_2 = (0, 0, {
                 'sequence': index + 1,
                 'name': module.component,
                 'types': val.job_position,
-                'role': role_default.id,
+                'role': cost_rate.id,
                 'yen_month': 0.0,
                 'yen_day': 0.0,
             })
