@@ -439,7 +439,7 @@ class Estimation(models.Model):
             components.append(record.component)
             
         if len(components) != len(set(components)):
-            raise ValidationError('Component name already exists!')
+            raise UserError('Component name already exists!')
         
         # for item in components:
         #     if item not in new_list:
