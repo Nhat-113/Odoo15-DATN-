@@ -45,10 +45,10 @@
                             </field>
                         </page>
                         <page string="Summary">
-                            <separator string="Total cost" />
+                            <separator string="Total Cost" />
                             <field name="add_lines_summary_totalcost" create="0" editable="0" delete="0">
                                 <tree editable="bottom" create="0" delete="0">
-<!--                                    <field name="sequence" />-->
+                                   <field name="sequence" invisible="1"/>
                                     <field name="name" />
                                     <field name="dev_effort" sum="Sum of Developer Effort"/>
                                     <field name="design_effort" sum="Sum of Designer Effort"/>

@@ -47,6 +47,7 @@ div[name="check_activate"] {
     width: 100%;
     left: 0;
     z-index: 999;
+    cursor: pointer !important;
 }
 div[name="check_activate"] .custom-control-label, div[name="check_activate"] i {
     display: none;
