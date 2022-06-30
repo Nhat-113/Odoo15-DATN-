@@ -64,7 +64,7 @@ class EstimationSummaryTotalCost(models.Model):
 
             cost = 0
             for item_cost_rate in cost_rate_old:
-                if item_cost_rate.name == component:
+                if (item_cost_rate.name == component)and(item_cost_rate.connect_summary_costrate):
                     types = item_cost_rate.types
                     if types == 'Developer':
                         cost += record.dev_effort * item_cost_rate.yen_month
