@@ -129,6 +129,8 @@ class Estimation(models.Model):
     def write(self, vals):
         vals_over = {'connect_overview': self.id, 'description': ''}
         if vals:
+            if 'module_activate' in vals:
+                vals.pop('module_activate')
             est_new_vals = vals.copy()
             ls_message_values = self.env['estimation.work'].search([('id','=',self.id)])
             est_old_vals = self.get_values(ls_message_values)
@@ -140,7 +142,6 @@ class Estimation(models.Model):
                 vals_over["description"] += key + ' : ' + est_desc_content_convert[key]
             
             result = super(Estimation, self).write(vals)
-            # self.env["estimation.overview"].create(vals_over)
             
             if vals_over["description"] != '':
                 self.env["estimation.overview"].create(vals_over)
