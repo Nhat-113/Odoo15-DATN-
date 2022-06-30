@@ -32,31 +32,35 @@ class EstimationSummaryTotalCost(models.Model):
             if component != module_active:
                 cost_rate_old = self.env['estimation.summary.costrate'].search([('name', '=', component)])
                 for item in cost_rate_old:
-                    cost_rate = self.env['cost.rate'].search([('id', '=', item.role.id)])
+                    if item.connect_summary_costrate:
+                        cost_rate = self.env['cost.rate'].search([('id', '=', item.role.id)])
 
-                    if record.estimation_id.currency_id.id:
-                        currency_id = record.estimation_id.currency_id.id
+                        if record.estimation_id.currency_id.id:
+                            currency_id = record.estimation_id.currency_id.id
 
-                    elif record.estimation_id.currency_id.id == False:
-                        currency_id = record.estimation_id.currency_id.id
+                        elif record.estimation_id.currency_id.id == False:
+                            currency_id = record.estimation_id.currency_id.id
 
-                    elif record.estimation_id.currency_id.id.origin:
-                        currency_id = record.estimation_id.currency_id.id
+                        elif record.estimation_id.currency_id.id.origin:
+                            currency_id = record.estimation_id.currency_id.id
 
-                    else:
-                        currency_id = record.estimation_id.currency_id.id
-                        if currency_id == False:
-                            currency_id = 1
+                        else:
+                            currency_id = record.estimation_id.currency_id.id
+                            if currency_id == False:
+                                currency_id = 1
 
-                    if currency_id == 1:
-                        item.yen_month = cost_rate.cost_usd
-                        item.yen_day = cost_rate.cost_usd / 20
-                    elif currency_id == 22:
-                        item.yen_month = cost_rate.cost_vnd
-                        item.yen_day = cost_rate.cost_vnd / 20
-                    else:
-                        item.yen_month = cost_rate.cost_yen
-                        item.yen_day = cost_rate.cost_yen / 20
+                        if currency_id == 1:
+                            item.yen_month = cost_rate.cost_usd
+                            item.yen_day = cost_rate.cost_usd / 20
+                        elif currency_id == 22:
+                            item.yen_month = cost_rate.cost_vnd
+                            item.yen_day = cost_rate.cost_vnd / 20
+                        else:
+                            item.yen_month = cost_rate.cost_yen
+                            item.yen_day = cost_rate.cost_yen / 20
+
+            if not len(cost_rate_old):
+                cost_rate_old = record.estimation_id.add_lines_summary_costrate
 
             cost = 0
             for item_cost_rate in cost_rate_old:
