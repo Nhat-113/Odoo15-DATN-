@@ -28,18 +28,7 @@ class EstimationResourcePlan(models.Model):
                 for activity in record.module_config_activity:
                     for breakdown in activity.add_lines_breakdown_activity: # compute effort for each job position
                         if breakdown.job_pos.job_position == job_position:
-                            #if this is save mode
-                            if breakdown.id:
-                                result_total_effort += breakdown.mandays
-                            else:
-                                #compute breakdown is new
-                                if breakdown.id.origin is None:
-                                    result_total_effort += breakdown.mandays
-                                else:
-                                #compute effort from database because self has no effort data
-                                    ls_breakdowns = self.env['module.breakdown.activity'].search([('id', '=', breakdown.id.origin), ('job_pos', '=', breakdown.job_pos.id)])
-                                    # total = sum(breakdb.mandays for breakdb in ls_breakdowns)
-                                    result_total_effort += ls_breakdowns.mandays
+                            result_total_effort += breakdown.mandays
         return result_total_effort
     
     @api.depends('estimation_id.add_lines_module.total_manday')
