@@ -1,5 +1,5 @@
 
-@media only screen and (max-width: 1280px) {
+@media only screen and (max-width: 1200px) {
     .list-employee {
         margin: 0 !important;
     }
@@ -89,7 +89,7 @@
         font-size: 9px;
     }
     .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
-        margin-left: 18px;
+        margin-left: 17px;
         font-size: 9px;
     }
     .list_menu button h5 {
@@ -99,7 +99,7 @@
         font-size: 9px;
     }
     .list_menu .btn_announcements .text_btn_announcements {
-        margin-left: -4px;
+        margin-left: 0px;
         font-size: 9px;
         padding-left: 20% !important;
     }
@@ -263,37 +263,40 @@
         margin-left: 15px !important;
     }
     .list_menu .btn_annalys .text_btn_annalys {
-        margin-left: 18px;
-        font-size: 9px;
+        margin-left: 2px;
+        font-size: 11px;
     }
     .list_menu .btn_announcements .text_btn_announcements {
-        margin-left: -8px;
-        font-size: 12px;
+        margin-left: 36px;
+        padding: 0;
+        font-size: 11px;
     }
     .btn_leave_request   .fearure_detail{
         margin-left: 19px !important;
     }
     .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
-        margin-left: -1px;
-        font-size: 12px;
+        margin-left: 0px;
+        font-size: 11px;
         width: 90%;
         padding: 0;
     }
-    .list_menu .btn_annalys .text_btn_annalys {
-        margin-left: 1px;
-        font-size: 12px;
-    }
-
 }
 @media screen and (min-width: 1400px) and (max-width: 1600px) { 
     .list_menu .btn_announcements .text_btn_announcements {
-        margin-left: -15.1px;
-        padding-left: 23%;
+        margin-left: 39px;
+        /* padding-left: 20%; */
+        padding: 0;
+    }
+    .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
+        padding-left: 30px !important;
+        width: 90%;
+        position: absolute;
+        padding: 0;
     }
 }
 @media screen and (min-width: 1600px) and (max-width: 1800px) { 
     .list_menu .btn_announcements .text_btn_announcements {
-        margin-left: -19px;
+        margin-left: -15px;
         padding-left: 20%;
     }
 }
@@ -313,3 +316,27 @@
     .btn_leave_request   .fearure_detail{
         margin-left: 19px !important;
     } */
+    @media only screen and (max-width: 1000px) {
+        .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
+            padding-left: 14px !important;
+            width: 90%;
+            position: absolute;
+            padding: 0;
+        }
+        .list_menu .btn_announcements .text_btn_announcements {
+            margin-left: 2px;
+            padding: 0;
+            /* font-size: 9px; */
+            /* padding-left: 20% !important; */
+        }
+        .list_menu .btn_annalys .text_btn_annalys {
+            margin-left: 15px;
+            font-size: 9px;
+        }
+        .btn_payslip .fearure_detail {
+            margin-left: 13px !important;
+        } 
+        .btn_expried  .fearure_detail  {
+            margin-left: 12px !important;
+        }
+    }
