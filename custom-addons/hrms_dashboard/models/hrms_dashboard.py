@@ -320,8 +320,8 @@ class Employee(models.Model):
         birthday = cr.fetchall()
         # e.is_online # was there below
         #        where e.state ='confirm' on line 118/9 #change
-        cr.execute("""select event_event.name , event_event.date_begin,  event_event.date_end from event_event  
-         where event_event.stage_id = '1' or  event_event.stage_id = '2' or  event_event.stage_id = '3'""")
+        cr.execute("""select event_event.name , event_event.date_begin  + interval '7' hour ,event_event.date_end  + interval '7' hour  from event_event  
+         where event_event.stage_id = '1' or  event_event.stage_id = '2' or  event_event.stage_id = '3' """)
         event = cr.fetchall()
         announcement = []
         user_id = request.session.uid
