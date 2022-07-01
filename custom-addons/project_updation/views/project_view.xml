@@ -135,7 +135,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//div[hasclass('o_kanban_manage_view')]/div[position()=last()]" position="replace">
                     <div role="menuitem" groups="ds_project_planning.group_project_pm">
-                        <a name="189" type="action" t-attf-context="{'active_id': #{record.id.raw_value}}">Project Updates</a>
+                        <a name="%(project.project_update_all_action)d" type="action" t-attf-context="{'active_id': #{record.id.raw_value}}">Project Updates</a>
                     </div>
                 </xpath>
             </field>
@@ -455,52 +455,6 @@
                     To get things done, use activities and status on tasks.<br/>
                     Chat in real-time or by email to collaborate efficiently.
                 </p>
-            </field>
-        </record>
-
-        <record id="project_update_view_kanban" model="ir.ui.view">
-            <field name="name">project.update.view.kanban</field>
-            <field name="model">project.update</field>
-            <field name="arch" type="xml">
-                <kanban class="o_pupdate_kanban" sample="1" js_class="project_update_kanban">
-                    <field name="color"/>
-                    <templates>
-                        <t t-name="kanban-box">
-                            <div t-attf-class="{{!selection_mode ? 'oe_kanban_color_' + record.color.raw_value : ''}} oe_kanban_global_click o_pupdate_kanban_card">
-                                <!-- Project Update Kanban View is always ungrouped - see js_class -->
-                                <div class="o_kanban_detail_ungrouped row">
-                                    <div class="col-lg-4 o_pupdate_name">
-                                        <b>
-                                            <field name="name_cropped"/>
-                                        </b>
-                                        <div>
-                                            <field name="user_id" widget="many2one_avatar_user"/>
-                                            <t t-esc="record.user_id.value"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <field name="color" invisible="1"/>
-                                        <b>
-                                            <field name="status" widget="status_with_color" options="{'color_field': 'color'}"/>
-                                        </b>
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <b>
-                                            <field name="progress_percentage" widget="percentage"/>
-                                        </b>
-                                        <div>Progress</div>
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <b>
-                                            <field name="date"/>
-                                        </b>
-                                        <div>Date</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </t>
-                    </templates>
-                </kanban>
             </field>
         </record>
 
