@@ -2,6 +2,12 @@
     .fearure_detail{
         padding-left: 0;
     }
+    .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
+        padding-left: 11% !important;
+        width: 90%;
+        position: absolute;
+        padding: 0;
+    }
 
     .join_resign_trend {
         height: 250px !important;
