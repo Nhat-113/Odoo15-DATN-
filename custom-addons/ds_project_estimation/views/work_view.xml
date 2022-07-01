@@ -93,7 +93,6 @@
                                     <field name="brse_effort" />
                                     <field name="pm_effort" />
                                     <field name="total_effort" decoration-bf="1" width="125px"/>
-                                    <field name="temp_field" invisible="1"/>
                                 </tree>
                             </field>
                             <button string="View Gantt" attrs="{'invisible': [('add_lines_resource_effort', '=', [])]}" name="%(ds_project_estimation.action_view_gantt_resource_plan)d" type="action" class="btn-primary"/>
@@ -177,7 +176,7 @@
                             string="Load Activities" class="btn btn-primary"/>
                     <separator string='Work Breakdown Structure and Estimate' />
                     <field name="module_config_activity">
-                        <tree create="0" >
+                        <tree create="0" delete="0">
                             <field name="sequence" />
                             <field name="activity" />
                             <field name="effort" />
@@ -210,8 +209,9 @@
                                             <field name="persons" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
                                             <field name="days" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
                                             <field name="percent_effort" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_1')]}"  width="140px"/>
-                                            <field name="mandays" attrs="{'readonly': [('type', '!=', 'type_2')]}"  width="155px"/>
+                                            <field name="mandays_input"  attrs="{'readonly': [('type', '!=', 'type_2')]}"  width="155px"/>
                                             <field name="type" invisible="1"/>
+                                            <field name="mandays" invisible="1"/>
                                             <field name="check_compute" invisible="1"/>
                                         </tree>
                                     </field>
