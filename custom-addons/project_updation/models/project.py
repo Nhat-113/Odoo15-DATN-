@@ -253,7 +253,7 @@ class Project(models.Model):
     def update_status(self):
         projects = self.env['project.project'].search([('active', '=', True)])
         for project in projects:
-            task_all = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1)])
+            task_all = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1), ('status','!=',7)])
             task_out_of_date = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1),('status','not in',[6,7]),('date_end','<',date.today())])
             if task_all > 0 and task_out_of_date/task_all >= 0.1 and project.last_update_status not in ['off_track', 'on_hold']:
                 project.write({'last_update_status': 'at_risk'})
