@@ -226,7 +226,7 @@ var GanttController = AbstractController.extend({
         });
         
         gantt.attachEvent("onBeforeTaskMove", function(id, parent, tindex){
-            console.log('tindex',parent);
+            // console.log('tindex',parent);
             var task = gantt.getTask(id);
             if(task.parent != parent)
             {
