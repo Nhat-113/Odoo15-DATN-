@@ -44,7 +44,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.config.autosize_min_width = 1600;
       gantt.config.work_time = true;
       gantt.config.skip_off_time = true;
-      //gantt.config.root_id = "root"; 
+      gantt.config.root_id = "root"; 
       gantt.config.min_duration = 24 *60 *60 *1000;
       // gantt.config.autosize = "xy";
       gantt.plugins({
