@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record model="ir.ui.menu" id="mail.menu_root_discuss">
+        <field name='name'>Chat</field>
+    </record>
+</odoo>
