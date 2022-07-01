@@ -1044,6 +1044,7 @@ h4 .stat-count {
     font-size: 1.4rem;
     margin-left: 20px;
     font-weight: 700;
+    text-align: left;
 }
 
 button:hover,
@@ -1074,6 +1075,8 @@ button:focus {
 
 .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
     margin-left: 2px;
+    width: 90%;
+    padding: 0;
 }
 
 .leave_trend_border {
@@ -1090,11 +1093,12 @@ button:focus {
 }
 
 .list_menu .btn_announcements .text_btn_announcements {
-    margin-left: 5px;
+    /* margin-left: 5px; */
     position: absolute;
-    width: 90%;
-    height: 50px;
-    line-height: 50px;
+    width: 80%;
+    padding-left: 14%;
+    /* height: 50px;
+    line-height: 50px; */
 }
 
 .list_menu .btn_annalys {
@@ -1103,6 +1107,7 @@ button:focus {
 
 .list_menu .btn_annalys .text_btn_annalys {
     margin-left: 3px;
+    width: 90%;
 }
 
 .list_menu {
@@ -1583,7 +1588,7 @@ button:focus {
     align-content: flex-end;
     align-items: flex-end;
     justify-content: center;
-    margin-top: 14px;
+    margin-top: 22px;
 }
 .leave_graph > svg:nth-child(2)  {
     background: #fafafa !important;
