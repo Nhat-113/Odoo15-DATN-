@@ -35,7 +35,7 @@
         <field name="res_model">project.task</field>
         <field name="view_mode">dhx_gantt</field>
         <field name="view_id" ref="ds_project_planning.task_gantt_view"/>
-        <field name="domain">[('display_project_id', '=', active_id), ('issues_type', '=', 1)]</field>
+        <field name="domain">[('display_project_id', '=', active_id), ('issues_type', '=', 1), ('status', '!=', 7)]</field>
         <field name="search_view_id" ref="planning_view_task_search_form"/>
         <field name="context">{
             'pivot_row_groupby': ['user_ids'],

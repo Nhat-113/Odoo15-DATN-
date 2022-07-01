@@ -52,7 +52,7 @@ class Activities(models.Model):
         # self.activity_current = self.module_id.module_config_activity
             
     
-    @api.depends('add_lines_breakdown_activity.mandays', 'activity_current')
+    @api.depends('add_lines_breakdown_activity.mandays')
     def _compute_total_effort(self):
         for record in self:
             final_manday = 0.0
@@ -60,6 +60,11 @@ class Activities(models.Model):
                 if item.mandays > 1000:
                     raise UserError('Expected (man-days) must be less than 1000 !')
                 else:
+                    if item.type == 'type_1':
+                        effort_activity_current = self.env['module.breakdown.activity']._find_effort_activity_current(record.module_id.module_config_activity, record.activity_current)
+                        item.mandays = round((effort_activity_current * item.percent_effort)/ 100, 2)
+                    elif item.type == 'type_3':
+                        item.mandays = item.persons * item.days
                     final_manday += item.mandays 
             record.effort = final_manday
 

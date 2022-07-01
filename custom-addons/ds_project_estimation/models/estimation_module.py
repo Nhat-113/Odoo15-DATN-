@@ -119,12 +119,6 @@ class EstimationModule(models.Model):
                 'module_effort_activity': activities_effort_line
                 })
     
-    def check_unique_components(ls_datas, record):
-        count_db = 0
-        for item in ls_datas:
-            if record.component == item.component:
-                count_db += 1
-        return count_db
 
     @api.depends('module_config_activity.effort')
     def _compute_total_mandays(self):
@@ -221,10 +215,10 @@ class EstimationModule(models.Model):
                 check_exist_in_self = False
                 check_exist_in_data = False
                 for item in record.module_effort_activity:
-                    if rec.activity == item.activity:
+                    if rec.sequence == item.sequence:
                         check_exist_in_self = True
                 for act in ls_data_effort_activity:
-                    if rec.activity == act.activity:
+                    if rec.sequence == act.sequence:
                         check_exist_in_data = True
                 if check_exist_in_self == False and check_exist_in_data == False:
                     EstimationModule._get_activities(rec, record)
@@ -248,7 +242,7 @@ class EstimationModule(models.Model):
 
     def _delete_activities(ls_effort_activity, ls_config_activities):
         for record in ls_effort_activity:
-            if record.activity not in [rec.activity for rec in ls_config_activities]:
+            if record.sequence not in [rec.sequence for rec in ls_config_activities]:
                 record.write({'module_id': [(2, record.module_id.id or record.module_id.id.origin)]})
                 
 
@@ -308,12 +302,13 @@ class BreakdownActivities(models.Model):
     sequence = fields.Integer(string="No", readonly=True, store=True, compute='_compute_sequence')
     activity = fields.Char("Activity", required=True)
     job_pos = fields.Many2one('config.job.position', string="Job Position", required=True)
-    mandays = fields.Float(string="Expected (man-days)", readonly=True, store=True, compute='_compute_mandays')
+    mandays = fields.Float(string="Expected result (man-days)", readonly=True, store=True, compute='_compute_mandays')
     persons = fields.Integer(string="Persons", default=0)
     days = fields.Float(string="Days", default=0)
     percent_effort = fields.Float(string="Percent Effort (%)", default=0.0)
     type = fields.Selection(string="Type", store=True, related='activity_id.activity_type')
     
+    mandays_input = fields.Float(string="Expected (man-days)") #, store=True, related='mandays' , readonly=True, store=True, compute='_get_mandays'
     check_compute = fields.Char(string="Check", readonly=True)
 
     @api.model
@@ -322,7 +317,7 @@ class BreakdownActivities(models.Model):
         result.update({'check_compute': 'OK'})
         return result
 
-    @api.depends('activity_id.activity_type', 'activity_id.activity_current', 'persons', 'days', 'percent_effort')
+    @api.depends('activity_id.activity_type', 'activity_id.activity_current', 'persons', 'days', 'percent_effort', 'mandays_input')
     def _compute_mandays(self):
         for record in self:
             if record.activity == False:
@@ -332,15 +327,21 @@ class BreakdownActivities(models.Model):
                 record.job_pos = job_pos_id.id
             if record.type == 'type_3':
                 record.mandays = record.persons * record.days
+                record.mandays_input = record.mandays
             elif record.type == 'type_1':
                 if record.activity_id.activity_current:
                     #because only the parent element can get the changed value of the child element => get value effort of activity_curent from module parent
-                    effort_activity_current = BreakdownActivities._find_effort_activity_current(record.activity_id.module_id.module_config_activity, record.activity_id.activity_current)
+                    effort_activity_current = self._find_effort_activity_current(record.activity_id.module_id.module_config_activity, record.activity_id.activity_current)
+                    # record.mandays = round((record.percent_effort * record.activity_id.activity_current.effort)/ 100, 2)
                     record.mandays = round((record.percent_effort * effort_activity_current)/ 100, 2)
+                    record.mandays_input = record.mandays
                 else:
                     record.mandays = 0
+                    record.mandays_input = record.mandays
+            else:
+                record.mandays = record.mandays_input
                     
-    def _find_effort_activity_current(ls_activity, activity_current):
+    def _find_effort_activity_current(self, ls_activity, activity_current):
         result_effort = 0
         for record in ls_activity:
             if record.activity == activity_current.activity:
@@ -351,7 +352,7 @@ class BreakdownActivities(models.Model):
     def _compute_sequence(self):
         for record in self.activity_id:
             # if save module mode
-            if record.id or record.id.origin:
+            if record.id: # or record.id.origin
                 max = record.sequence_breakdown
                 for rec in self:
                    if rec.activity_id.id == record.id:
@@ -383,7 +384,8 @@ class EffortActivities(models.Model):
     def _compute_effort(self):
         for record in self:
             for rec in record.module_id.module_config_activity:
-                if record.activity == rec.activity:
+                if record.sequence == rec.sequence:
+                # if record.activity == rec.activity:
                     record.effort = rec.effort
                     record.activity = rec.activity
             
