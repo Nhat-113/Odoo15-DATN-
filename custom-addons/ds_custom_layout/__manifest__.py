@@ -8,12 +8,14 @@
         'hr',
     ],
     'summary': 'Custom Layout',
+    "data": [
+        'views/custom_discuss_menu.xml'
+    ],
     'assets': {
         'web.assets_backend': [
             'ds_custom_layout/static/src/css/employee.css',
             'ds_custom_layout/static/src/css/project.css',
-            'ds_custom_layout/static/src/css/recruitment.css',
-            'ds_custom_layout/views/custom_discuss_menu.xml'
+            'ds_custom_layout/static/src/css/recruitment.css'
         ],
     },
     'installable': True,
