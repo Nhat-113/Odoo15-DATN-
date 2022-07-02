@@ -268,7 +268,39 @@
         
 }
 @media screen and (min-width: 1200px) and (max-width: 1400px) { 
-    .fearure_detail{
+    .leave_graph .legend>tbody {
+        display: flex;
+        width: 90%;
+        margin: 0;
+        margin-left: 8%;
+    }
+    .button-checkin .stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 34px;
+    }
+    .list-employee .leave_graph {
+        margin-top: 19px;
+    }
+    .list-employee .leave_graph .legend {
+        margin-top: 10px;
+    }
+    .legend td, .legend .legend_col {
+        padding: 4px 1px 4px 5px;
+        vertical-align: bottom;
+        color: #343A40;
+        font-weight: 700;
+    }
+    .button-checkout .stat-content .stat-text {
+        font-size: 9px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 42px;
+    }
+    .fearure_detail {
         margin-left: 15px !important;
     }
     .list_menu .btn_annalys .text_btn_annalys {     
@@ -291,6 +323,12 @@
     }
 }
 @media screen and (min-width: 1400px) and (max-width: 1600px) { 
+    .list-employee .leave_graph {
+        margin-top: 19px;
+    }
+    .list-employee .leave_graph .legend {
+        margin-top: 11px;
+    }
     .list_menu .btn_announcements .text_btn_announcements {
         margin-left: 39px;
         /* padding-left: 20%; */
@@ -307,6 +345,12 @@
     .list_menu .btn_announcements .text_btn_announcements {
         margin-left: -15px;
         padding-left: 20%;
+    }
+    .list-employee .leave_graph {
+        margin-top: 19px;
+    }
+    .list-employee .leave_graph .legend {
+        margin-top: 16px;
     }
 }
     
@@ -327,10 +371,11 @@
     } */
     @media only screen and (max-width: 1000px) {
         .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
-            padding-left: 14px !important;
+            padding-left: 23px !important;
             width: 90%;
             position: absolute;
             padding: 0;
+            font-size: 9px;
         }
         .list_menu .btn_announcements .text_btn_announcements {
             margin-left: 2px;

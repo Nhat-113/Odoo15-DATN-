@@ -65,6 +65,8 @@ class Activities(models.Model):
                         item.mandays = round((effort_activity_current * item.percent_effort)/ 100, 2)
                     elif item.type == 'type_3':
                         item.mandays = item.persons * item.days
+                    else:
+                        item.mandays = item.mandays_input
                     final_manday += item.mandays 
             record.effort = final_manday
 
@@ -114,7 +116,7 @@ class DataActivity(models.Model):
     _order = "sequence,id"
     _rec_name = "activity"  
 
-    sequence = fields.Integer(string="No", index=True, readonly=True, help='Use to arrange calculation sequence')
+    sequence = fields.Integer(string="No", index=True, help='Use to arrange calculation sequence')
     activity = fields.Char("Activity", required=True)
     description = fields.Char("Description")
     activity_type = fields.Selection([('type_1', 'Type 1'),
@@ -125,26 +127,17 @@ class DataActivity(models.Model):
                                     default='type_2',
                                     help='Please select activity type'
                                     )
+    
+    _sql_constraints = [
+            ('activity_uniq', 'unique (activity)', "Activity name already exists!"),
+            ('sequence_uniq', 'unique (sequence)', "No. already exists!")
+        ]
 
     @api.model
     def create(self, vals):
-        if vals:
-            check = False
-            for key in vals:
-                if key == 'sequence':
-                    check = True
-            # if vals is not the default data
-            if check == False:
-                ls_data = self.env['data.activity'].search([])
-                self.auto_increase_sequence(vals, ls_data)
-                return super(DataActivity, self).create(vals)
-            else:
-                return super(DataActivity, self).create(vals) 
-        
-
-    def auto_increase_sequence(self, vals, ls_data):
-        sequence_max = 0
-        for record in ls_data:
-            if record.sequence > sequence_max:
-                sequence_max = record.sequence
-        vals['sequence'] = sequence_max + 1
+        if 'sequence' in vals:
+            ls_data = self.env['data.activity'].search([])
+            if ls_data:
+                sequence_max = max(record.sequence for record in ls_data)
+                vals['sequence'] = sequence_max + 1
+        return super(DataActivity, self).create(vals)

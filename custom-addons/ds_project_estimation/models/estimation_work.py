@@ -161,13 +161,57 @@ class Estimation(models.Model):
             self.convert_field_to_field_desc(est_desc_content_convert)
             for key in est_desc_content_convert:
                 vals_over["description"] += key + ' : ' + est_desc_content_convert[key]
-            
+
+            # Delete cost rate when delete module
+            module_delete = []
+            for key in vals:
+                if key == 'add_lines_module':
+                    for item in vals['add_lines_module']:
+                        if item[0] == 2:
+                            module_delete.append(item[1])
+
+                    component_delete = []
+                    for rec in self.env["estimation.module"].search([('id', 'in', module_delete)]):
+                        component_delete.append(rec.component)
+                    self.env["estimation.summary.costrate"].search([('name', 'in', component_delete)]).unlink()
+                    self.env["estimation.summary.costrate"].search([('connect_summary_costrate', '=', False)]).unlink()
+
+            # check miss cost rate
+            component_module = self.check_miss_cost_rate(vals, 'add_lines_module', 'component')
+            component_costrate = self.check_miss_cost_rate(vals, 'add_lines_summary_costrate', 'name')
+
+            for module in component_module:
+                if module not in component_costrate:
+                    # create new costrate
+                    cost_rate_line = self.env['config.job.position'].search([])
+                    for index, val in enumerate(cost_rate_line):
+                        cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)], limit=1)
+                        # role_default = cost_rate[0]
+                        val_cost_rate = {
+                            'connect_summary_costrate': self.id,
+                            'sequence': index + 1,
+                            'name': module,
+                            'types': val.job_position,
+                            'role': cost_rate.id,
+                            'yen_month': 0.0,
+                            'yen_day': 0.0,
+                        }
+                        self.env["estimation.summary.costrate"].create(val_cost_rate)
+
             result = super(Estimation, self).write(vals)
             
             if vals_over["description"] != '':
                 self.env["estimation.overview"].create(vals_over)
 
-            return result 
+            return result
+
+    def check_miss_cost_rate(self, vals, field_one2many, component):
+        component_ativate = []
+        if field_one2many in vals:
+            for item in vals[field_one2many]:
+                if item[2]:
+                    component_ativate.append(item[2][component])
+        return component_ativate
 
     def convert_field_to_field_desc(self, dic):
         result = dic.copy()
@@ -402,6 +446,11 @@ class Estimation(models.Model):
     @api.onchange('add_lines_module')
     def _compute_check_module(self):
         for record in self:
+            #check data no activity
+            for module in record.add_lines_module:
+                if len(module.module_config_activity) == 0:
+                   raise UserError(_('The Load Activities button must be clicked before saving the "%(component)s" module!', component = module.component))
+
             #check duplicate components module
             self.check_duplicate_components(record.add_lines_module)
             
@@ -428,7 +477,7 @@ class Estimation(models.Model):
                 'add_lines_summary_costrate': vals_cost_rate
             })
             #case: Delete module using write method
-            Estimation._delete_modules(record.add_lines_module, record.add_lines_resource_effort,
+            self._delete_modules(record.add_lines_module, record.add_lines_resource_effort,
                                        record.add_lines_summary_totalcost, record.add_lines_summary_costrate)
 
     def check_duplicate_components(self, ls_modules):
@@ -489,7 +538,7 @@ class Estimation(models.Model):
             })
             vals_cost_rate.append(lines_2)    
 
-    def _delete_modules(ls_module, ls_resource_plan, ls_total_cost, ls_costrate):
+    def _delete_modules(self, ls_module, ls_resource_plan, ls_total_cost, ls_costrate):
         for record in ls_resource_plan:
             domain = [(2, record.estimation_id.id or record.estimation_id.id.origin)]
             if len(ls_module) == 0:
@@ -501,7 +550,10 @@ class Estimation(models.Model):
         for record in ls_total_cost:
             domain = [(2, record.estimation_id.id or record.estimation_id.id.origin)]
             if record.name not in [rec.component for rec in ls_module]:
-                for costrate in ls_costrate:
+                # if len(ls_costrate)
+                db_cost_rate = self.env['estimation.summary.costrate'].search([('name', '=', record.name)])
+                
+                for costrate in db_cost_rate:
                     if costrate.name == record.name:
                         costrate.write({'connect_summary_costrate': domain})
                 record.write({'estimation_id': domain})
@@ -521,8 +573,9 @@ class Estimation(models.Model):
     def _delete_module_failed(self):
         #case: delete modules from db with estimation_id = False
         module_in_db = self.env['estimation.module'].search([('estimation_id', '=', False)])    #,('component', 'not in', [module.component for module in record.add_lines_module])
+        cost_rate_db = self.env['estimation.summary.costrate'].search([('connect_summary_costrate', '=', False)])
         module_in_db.unlink()
-    
+        cost_rate_db.unlink()
     
 # class Lead(models.Model):
 #     _inherit = ['crm.lead']

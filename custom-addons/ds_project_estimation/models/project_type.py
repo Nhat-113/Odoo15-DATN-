@@ -9,25 +9,20 @@ class ProjectType(models.Model):
     _description = "Projet type estimation"
     _rec_name= "name"
     
-    sequence = fields.Integer(string="No", readonly=True, index=True)
+    sequence = fields.Integer(string="No", index=True)
     name = fields.Char(string="Type name", required=True)
     description = fields.Char(string="Description")
     
+    _sql_constraints = [
+            ('name_uniq', 'unique (name)', "Project type name already exists!"),
+            ('sequence_uniq', 'unique (sequence)', "No already exists!")
+        ]
+    
     @api.model
     def create(self, vals):
-        if vals:
-            check = False
-            for key in vals:
-                if key == 'sequence':
-                    check = True
-            if check == False:
-                ls_data = self.env['project.type'].search([])
-                sequence_max = 0
-                for record in ls_data:
-                    if record.sequence > sequence_max:
-                        sequence_max = record.sequence
-                
+        if 'sequence' in vals:
+            ls_data = self.env['project.type'].search([])
+            if ls_data:
+                sequence_max = max(record.sequence for record in ls_data)
                 vals['sequence'] = sequence_max + 1
-                return super(ProjectType, self).create(vals)
-            else:
-                return super(ProjectType, self).create(vals) 
+        return super(ProjectType, self).create(vals)
