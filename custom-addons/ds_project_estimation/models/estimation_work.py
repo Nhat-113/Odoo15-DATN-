@@ -209,7 +209,7 @@ class Estimation(models.Model):
         component_ativate = []
         if field_one2many in vals:
             for item in vals[field_one2many]:
-                if item[2]:
+                if item[2] and component in item[2]:
                     component_ativate.append(item[2][component])
         return component_ativate
 
