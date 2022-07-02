@@ -145,7 +145,13 @@
                         <field name="get_estimation_id" invisible="1"/>
                         <field name="check_compute" invisible="1"/>
                     </group>
-
+                    <group attrs="{'invisible': [('module_config_activity', '!=', [])]}" class="box_compute_load_activities" id="activity_disable_click">
+                        <label class="o_form_label label_button_compute_load_activities" for="compute_load_activities">Activity</label>
+                        <button name='compute_load_activities' id="compute_load_activities"
+                                type="object" 
+                                attrs="{'invisible': [('module_config_activity', '!=', [])]}" 
+                                string="Load Activities" class="btn btn-primary"/>
+                    </group>
                     <separator string="Modules" />
                     <field name="module_assumptions">
                         <tree editable="bottom">
@@ -170,10 +176,6 @@
                             <field name="percent" />
                         </tree>
                     </field>
-                    <button name='compute_load_activities' 
-                            type="object" 
-                            attrs="{'invisible': [('module_config_activity', '!=', [])]}" 
-                            string="Load Activities" class="btn btn-primary"/>
                     <separator string='Work Breakdown Structure and Estimate' />
                     <field name="module_config_activity">
                         <tree create="0" delete="0">
