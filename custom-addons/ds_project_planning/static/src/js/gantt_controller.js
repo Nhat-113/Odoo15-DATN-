@@ -202,23 +202,24 @@ var GanttController = AbstractController.extend({
         //     });
             
         // });
-        session.user_has_group("ds_project_planning.group_project_director").then(function(has_group) {
-            console.log("a", has_group);
+        // session.user_has_group("ds_project_planning.group_project_director").then(function(has_group) {
+        //     console.log("a", has_group);
 
-            gantt.attachEvent("onBeforeTaskDrag", function (id, mode, e) {
-                var taskObj = gantt.getTask(id);
+            // gantt.attachEvent("onBeforeTaskDrag", function (id, mode, e) {
+            //     var taskObj = gantt.getTask(id);
 
-                if (has_group || taskObj.type == "phase") {
-                    console.log(`taskObj.type`, taskObj.type);
-                  return false;
-                }
-                return true;
-            });
-        });
+            //     if (taskObj.type == "phase") {
+            //         console.log(`taskObj.type`, taskObj.type);
+            //       return false;
+            //     }
+            //     return true;
+            // });
+        // });
         // deny drag if task have progress === 100%
         gantt.attachEvent("onBeforeTaskDrag", function (id, mode, e) {
             var taskObj = gantt.getTask(id);
-            if( taskObj.progress === 1) {
+            console.log(`taskObj`,taskObj );
+            if( taskObj.progress === 1 || taskObj.type == "phase" ) {
                 return false;
             }
             return true;
