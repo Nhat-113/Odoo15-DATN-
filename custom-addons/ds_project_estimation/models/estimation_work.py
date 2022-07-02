@@ -161,7 +161,22 @@ class Estimation(models.Model):
             self.convert_field_to_field_desc(est_desc_content_convert)
             for key in est_desc_content_convert:
                 vals_over["description"] += key + ' : ' + est_desc_content_convert[key]
-            
+
+            module_delete = []
+            for key in vals:
+                if key=='add_lines_module':
+                    for item in vals['add_lines_module']:
+                        if item[0] == 2:
+                            module_delete.append(item[1])
+
+                    component_delete = []
+                    for rec in self.env["estimation.module"].search([('id', 'in', module_delete)]):
+                        component_delete.append(rec.component)
+                    self.env["estimation.summary.costrate"].search([('name', 'in', component_delete)]).unlink()
+                    self.env["estimation.summary.costrate"].search([('connect_summary_costrate', '=', False)]).unlink()
+
+
+
             result = super(Estimation, self).write(vals)
             
             if vals_over["description"] != '':

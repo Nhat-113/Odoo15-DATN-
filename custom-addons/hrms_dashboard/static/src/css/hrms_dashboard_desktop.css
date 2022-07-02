@@ -2,6 +2,12 @@
     .fearure_detail{
         padding-left: 0;
     }
+    .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
+        padding-left: 11% !important;
+        width: 90%;
+        position: absolute;
+        padding: 0;
+    }
 
     .join_resign_trend {
         height: 250px !important;
@@ -95,7 +101,7 @@
         margin-left: 0px;
     }
     .list-employee .leave_graph .legend {
-        margin-top:12px;
+        margin-top: 19px;
     }
     .list-employee .leave_graph {
         margin-top: 10px;
@@ -114,7 +120,10 @@
         width: 50%;
         font-size: 10px;
     }
-
+    .request_detail {
+        height: 40%;
+        margin-bottom: 10%;
+    }   
     .list_future button h4 {
         margin-bottom: 0 !important;
         float: left;

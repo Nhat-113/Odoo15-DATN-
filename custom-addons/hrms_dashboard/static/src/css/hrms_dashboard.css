@@ -1074,8 +1074,9 @@ button:focus {
 }
 
 .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
-    margin-left: 2px;
+    padding-left: 14% !important;
     width: 90%;
+    position: absolute;
     padding: 0;
 }
 
@@ -1967,7 +1968,7 @@ button:focus {
 .text_news {
     color: #000;
     margin-bottom: 0;
-    width: 60%;
+    width: 67%;
     margin-bottom: 0;
     /* width: 80%; */
     /* width: 206px; */
@@ -1980,12 +1981,13 @@ button:focus {
     color: #343A40;
     flex: none;
     order: 0;
+    margin-left: 11px;
     flex-grow: 0;
 }
 
 .text_detail .new_code {
     padding-right: 4%;
-    width: 35%;
+    width: 21%;
     /* margin-bottom: 0; */
     font-family: 'Inter';
     font-style: normal;

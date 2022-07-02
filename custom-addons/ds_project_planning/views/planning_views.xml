@@ -35,7 +35,7 @@
         <field name="res_model">project.task</field>
         <field name="view_mode">dhx_gantt</field>
         <field name="view_id" ref="ds_project_planning.task_gantt_view"/>
-        <field name="domain">[('display_project_id', '=', active_id), ('issues_type', '=', 1), ('status', '!=', 7)]</field>
+        <field name="domain">[('display_project_id', '=', active_id),('issues_type', '=', 1)]</field>
         <field name="search_view_id" ref="planning_view_task_search_form"/>
         <field name="context">{
             'pivot_row_groupby': ['user_ids'],
@@ -79,7 +79,7 @@
         <field name="inherit_id" ref="project.edit_project"/>
         <field name="arch" type="xml">
             <xpath expr="//button[hasclass('edit_project_inherit')]" position="replace">
-                <button class="oe_stat_button" type="action" name="194" icon="fa-tasks">
+                <button class="oe_stat_button" type="action" name="%(project.act_project_project_2_project_task_all)d" icon="fa-tasks">
                     <field string="Tasks In Progress" name="task_total" widget="statinfo" options="{'label_field': 'label_tasks'}"/>
                 </button>
             </xpath>

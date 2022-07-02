@@ -1,5 +1,6 @@
 
-@media only screen and (max-width: 1280px) {
+@media only screen and (max-width: 1200px) {
+
     .list-employee {
         margin: 0 !important;
     }
@@ -75,7 +76,7 @@
         font-size: 9px;
     }
     .list_menu .btn_annalys .text_btn_annalys {
-        margin-left: 21px;
+        margin-left: 16px;
         font-size: 9px;
     }
     .list_menu .active>h5 {
@@ -89,8 +90,10 @@
         font-size: 9px;
     }
     .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
-        margin-left: 18px;
-        font-size: 9px;
+        padding-left: 33px!important;
+        font-size: 12px;
+        width: 90%;
+        padding: 0;
     }
     .list_menu button h5 {
         color: #BDBDBD;
@@ -99,13 +102,19 @@
         font-size: 9px;
     }
     .list_menu .btn_announcements .text_btn_announcements {
-        margin-left: -4px;
+        margin-left: 0px;
         font-size: 9px;
-        padding-left: 20% !important;
+        padding-left: 31px !important;
     }
     .fearure_detail{
         margin-left: 15px !important;
 
+    }
+    .hr_contract .fearure_detail{
+        margin-left: 11px !important;
+    }
+    .hr_payslip .fearure_detail{
+        margin-left: 13px !important;
     }
     .o_clock {
         font-size: 9px;
@@ -259,42 +268,89 @@
         
 }
 @media screen and (min-width: 1200px) and (max-width: 1400px) { 
-    .fearure_detail{
+    .leave_graph .legend>tbody {
+        display: flex;
+        width: 90%;
+        margin: 0;
+        margin-left: 8%;
+    }
+    .button-checkin .stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 34px;
+    }
+    .list-employee .leave_graph {
+        margin-top: 19px;
+    }
+    .list-employee .leave_graph .legend {
+        margin-top: 10px;
+    }
+    .legend td, .legend .legend_col {
+        padding: 4px 1px 4px 5px;
+        vertical-align: bottom;
+        color: #343A40;
+        font-weight: 700;
+    }
+    .button-checkout .stat-content .stat-text {
+        font-size: 9px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 42px;
+    }
+    .fearure_detail {
         margin-left: 15px !important;
     }
-    .list_menu .btn_annalys .text_btn_annalys {
-        margin-left: 18px;
-        font-size: 9px;
+    .list_menu .btn_annalys .text_btn_annalys {     
+        margin-left: 2px;
+        font-size: 12px;
     }
     .list_menu .btn_announcements .text_btn_announcements {
-        margin-left: -8px;
+        padding-left: 54px !important;
+        padding: 0;
         font-size: 12px;
     }
     .btn_leave_request   .fearure_detail{
         margin-left: 19px !important;
     }
     .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
-        margin-left: -1px;
+        padding-left: 27px!important;
         font-size: 12px;
         width: 90%;
         padding: 0;
     }
-    .list_menu .btn_annalys .text_btn_annalys {
-        margin-left: 1px;
-        font-size: 12px;
-    }
-
 }
 @media screen and (min-width: 1400px) and (max-width: 1600px) { 
+    .list-employee .leave_graph {
+        margin-top: 19px;
+    }
+    .list-employee .leave_graph .legend {
+        margin-top: 11px;
+    }
     .list_menu .btn_announcements .text_btn_announcements {
-        margin-left: -15.1px;
-        padding-left: 23%;
+        margin-left: 39px;
+        /* padding-left: 20%; */
+        padding: 0;
+    }
+    .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
+        padding-left: 30px !important;
+        width: 90%;
+        position: absolute;
+        padding: 0;
     }
 }
 @media screen and (min-width: 1600px) and (max-width: 1800px) { 
     .list_menu .btn_announcements .text_btn_announcements {
-        margin-left: -19px;
+        margin-left: -15px;
         padding-left: 20%;
+    }
+    .list-employee .leave_graph {
+        margin-top: 19px;
+    }
+    .list-employee .leave_graph .legend {
+        margin-top: 16px;
     }
 }
     
@@ -313,3 +369,28 @@
     .btn_leave_request   .fearure_detail{
         margin-left: 19px !important;
     } */
+    @media only screen and (max-width: 1000px) {
+        .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
+            padding-left: 23px !important;
+            width: 90%;
+            position: absolute;
+            padding: 0;
+            font-size: 9px;
+        }
+        .list_menu .btn_announcements .text_btn_announcements {
+            margin-left: 2px;
+            padding: 0;
+            /* font-size: 9px; */
+            /* padding-left: 20% !important; */
+        }
+        .list_menu .btn_annalys .text_btn_annalys {
+            margin-left: 15px;
+            font-size: 9px;
+        }
+        .btn_payslip .fearure_detail {
+            margin-left: 13px !important;
+        } 
+        .btn_expried  .fearure_detail  {
+            margin-left: 12px !important;
+        }
+    }
