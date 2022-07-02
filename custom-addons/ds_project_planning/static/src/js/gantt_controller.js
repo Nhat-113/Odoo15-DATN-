@@ -181,59 +181,26 @@ var GanttController = AbstractController.extend({
             return false;
         }
     });
-
-
-         //deny drag for director
-        // session.user_has_group("project.group_project_manager").then(function(has_group) {
-        //     console.log("a", has_group);
-
-        //     gantt.attachEvent("onBeforeTaskDrag", function(id, mode, e) {
-        //         var taskObj = gantt.getTask(id);
-
-        //         if (has_group) {
-        //             if (taskObj.type === "phase") {
-        //                 console.log("phase");
-        //                 return false;
-        //             }
-        //         }
-    
-        //         console.log("taskObj", taskObj);
-        //         return true;
-        //     });
-            
-        // });
-        session.user_has_group("ds_project_planning.group_project_director").then(function(has_group) {
-            console.log("a", has_group);
-
-            gantt.attachEvent("onBeforeTaskDrag", function (id, mode, e) {
-                var taskObj = gantt.getTask(id);
-
-                if (has_group || taskObj.type == "phase") {
-                    console.log(`taskObj.type`, taskObj.type);
-                  return false;
-                }
-                return true;
-            });
-        });
         // deny drag if task have progress === 100%
-        gantt.attachEvent("onBeforeTaskDrag", function (id, mode, e) {
-            var taskObj = gantt.getTask(id);
-            if( taskObj.progress === 1) {
-                return false;
-            }
-            return true;
-        
-        });
-        
-        gantt.attachEvent("onBeforeTaskMove", function(id, parent, tindex){
-            // console.log('tindex',parent);
-            var task = gantt.getTask(id);
-            if(task.parent != parent)
-            {
-                return false;
-            }
-            return true;
-        });
+    gantt.attachEvent("onBeforeTaskDrag", function (id, mode, e) {
+        var taskObj = gantt.getTask(id);
+        // console.log(`taskObj`,taskObj );
+        if( taskObj.progress === 1 || taskObj.type == "phase" ) {
+            return false;
+        }
+        return true;
+    
+    });
+    
+    gantt.attachEvent("onBeforeTaskMove", function(id, parent, tindex){
+        // console.log('tindex',parent);
+        var task = gantt.getTask(id);
+        if(task.parent != parent)
+        {
+            return false;
+        }
+        return true;
+    });
 
         //deny drag phase 
         // gantt.attachEvent("onBeforeTaskDrag", function(id, mode, e){
