@@ -197,8 +197,8 @@ class EstimationModule(models.Model):
                     if record.activity_current.id == activity_current_id:
                         effort_activity_current = activity_current.effort
                 for breakdown in record.add_lines_breakdown_activity:
-                    breakdown.mandays = round((breakdown.percent_effort * effort_activity_current)/ 100, 2)
-                    breakdown.mandays_input = breakdown.mandays
+                    breakdown.mandays_input = round((breakdown.percent_effort * effort_activity_current)/ 100, 2)
+                    breakdown.mandays = breakdown.mandays_input
       
     @api.onchange('module_config_activity')
     def add_a_line_effort_distribute(self):
