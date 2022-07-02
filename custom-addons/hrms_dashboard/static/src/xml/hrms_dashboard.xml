@@ -257,7 +257,7 @@
                             <t t-foreach="widget.announcements" t-as="announcement">
                                 <div class="text_detail">
                                     <div class="text_news" style="font-size: 15px;word-break:break-word"><t t-esc="announcement[2]"/> </div>
-                                    <div class="new_code"><t t-esc="announcement[0]"/> ~ <t t-esc="announcement[1]"/></div>
+                                    <div class="new_code"><t t-esc="announcement[1]"/> ~ <t t-esc="announcement[0]"/></div>
                                 </div>
                             </t>
                         </div>
@@ -460,7 +460,7 @@
                                 <t t-foreach="widget.announcements" t-as="announcement">
                                     <div class="text_detail_user">
                                         <h2 class="text_news_user" style="font-size: 15px;word-break:break-word"><t t-esc="announcement[2]"/> <t></t></h2>
-                                        <h6 class="new_code_user"><t t-esc="announcement[0]"/> ~ <t t-esc="announcement[1]"/></h6>
+                                        <h6 class="new_code_user"><t t-esc="announcement[1]"/> ~ <t t-esc="announcement[0]"/></h6>
                                     </div>
                                 </t>
                             </div>
