@@ -162,9 +162,10 @@ class Estimation(models.Model):
             for key in est_desc_content_convert:
                 vals_over["description"] += key + ' : ' + est_desc_content_convert[key]
 
+            # Delete cost rate when delete module
             module_delete = []
             for key in vals:
-                if key=='add_lines_module':
+                if key == 'add_lines_module':
                     for item in vals['add_lines_module']:
                         if item[0] == 2:
                             module_delete.append(item[1])
@@ -175,14 +176,42 @@ class Estimation(models.Model):
                     self.env["estimation.summary.costrate"].search([('name', 'in', component_delete)]).unlink()
                     self.env["estimation.summary.costrate"].search([('connect_summary_costrate', '=', False)]).unlink()
 
+            # check miss cost rate
+            component_module = self.check_miss_cost_rate(vals, 'add_lines_module', 'component')
+            component_costrate = self.check_miss_cost_rate(vals, 'add_lines_summary_costrate', 'name')
 
+            for module in component_module:
+                if module not in component_costrate:
+                    # create new costrate
+                    cost_rate_line = self.env['config.job.position'].search([])
+                    for index, val in enumerate(cost_rate_line):
+                        cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)], limit=1)
+                        # role_default = cost_rate[0]
+                        val_cost_rate = {
+                            'connect_summary_costrate': self.id,
+                            'sequence': index + 1,
+                            'name': module,
+                            'types': val.job_position,
+                            'role': cost_rate.id,
+                            'yen_month': 0.0,
+                            'yen_day': 0.0,
+                        }
+                        self.env["estimation.summary.costrate"].create(val_cost_rate)
 
             result = super(Estimation, self).write(vals)
             
             if vals_over["description"] != '':
                 self.env["estimation.overview"].create(vals_over)
 
-            return result 
+            return result
+
+    def check_miss_cost_rate(self, vals, field_one2many, component):
+        component_ativate = []
+        if field_one2many in vals:
+            for item in vals[field_one2many]:
+                if item[2]:
+                    component_ativate.append(item[2][component])
+        return component_ativate
 
     def convert_field_to_field_desc(self, dic):
         result = dic.copy()
