@@ -13,17 +13,13 @@ div[name="module_effort_activity"] {
 .o_field_widget.o_quick_editable {
     word-break: break-all;
 }
-.o_form_sheet_bg .o_form_label.o_required_modifier:after {
+.o_form_sheet_bg .o_form_label.o_required_modifier:after, .label_button_compute_load_activities::after {
     content: " *";
     color: red;
 }
 
-
-button[name="compute_load_activities"] {
-    display: block;
-    position: absolute;
-    z-index: 1;
-    right: 16px;
+.label_button_compute_load_activities {
+    line-height: 30px !important;
 }
 
 .o_field_x2many_list[name="module_summarys"] .o_data_row:nth-child(1) td:nth-child(1),
