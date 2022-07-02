@@ -65,6 +65,8 @@ class Activities(models.Model):
                         item.mandays = round((effort_activity_current * item.percent_effort)/ 100, 2)
                     elif item.type == 'type_3':
                         item.mandays = item.persons * item.days
+                    else:
+                        item.mandays = item.mandays_input
                     final_manday += item.mandays 
             record.effort = final_manday
 
