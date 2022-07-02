@@ -15,7 +15,7 @@ class Project(models.Model):
 
     privacy_visibility = fields.Selection(default='followers')
     planning_calendar_resources = fields.One2many(
-        'planning.calendar.resource', 'project_id', string='Planning Calendar Resources', readonly=False)
+        'planning.calendar.resource', 'project_id', string='Planning Booking Resources', readonly=False)
     user_id_domain = fields.Char(
         compute="_compute_user_id_domain",
         readonly=True,
@@ -24,12 +24,18 @@ class Project(models.Model):
     member_ids = fields.Many2many('res.users', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
     total_calendar_effort = fields.Float(
-        string="Calendar Effort", compute="_compute_total_calendar_effort")
+        string="Booking Effort", compute="_compute_total_calendar_effort")
     total_estimate_effort = fields.Float(string="Estimate Effort")
     total_phase = fields.Integer(
         string="Total phases", compute="_count_phase_milestone")
     total_milestone = fields.Integer(
         string="Total milestones", compute="_count_phase_milestone")
+
+    def _compute_task_total(self):
+        for project in self:
+            project.task_total = self.env['project.task'].search_count(['&',('issues_type','=',1),('project_id','=',project.id),('display_project_id','=',project.id),('active','=',True)])
+
+    task_total = fields.Integer(compute='_compute_task_total')
 
     def _compute_total_calendar_effort(self):
         for project in self:
@@ -53,12 +59,13 @@ class Project(models.Model):
                 [('id', 'in', user_ids)]
             )
 
+
     @api.onchange('planning_calendar_resources')
     def _onchange_calendar_resources(self):
         # check the current user is the PM of this project
-        if self.user_id != self.env.user and not self.env.user.has_group('project.group_project_manager'):
-            raise UserError(
-                _('You are not the manager of this project, so you cannot assign members to it.'))
+        # if self.user_id != self.env.user and not self.env.user.has_group('project.group_project_manager'):
+        #     raise UserError(
+        #         _('You are not the manager of this project, so you cannot assign members to it.'))
 
         # validate calendar resource duplicate
         if len(self.planning_calendar_resources) > 0:
@@ -69,13 +76,14 @@ class Project(models.Model):
                 calendar_duplicate = list(filter(
                     lambda member: member.employee_id['id'] == new_calendar_resource.employee_id.id and
                     member.start_date <= new_calendar_resource.start_date and
-                    member.end_date >= new_calendar_resource.start_date, self.planning_calendar_resources[:-1]))[0]
+                    member.end_date >= new_calendar_resource.start_date, self.planning_calendar_resources[:-1]))
 
                 if len(calendar_duplicate) > 0:
-                    # if new_calendar_resource.start_date >= calendar_duplicate.start_date and new_calendar_resource.start_date <= calendar_duplicate.end_date:
-                    raise ValidationError(
-                        _('The project has duplicate members assigned in the range (%(start)s) to (%(end)s)!',
-                          start=calendar_duplicate.start_date, end=calendar_duplicate.end_date))
+                    for i in range(len(calendar_duplicate)):
+                        if new_calendar_resource.start_date >= calendar_duplicate[i].start_date and new_calendar_resource.start_date <= calendar_duplicate[i].end_date:
+                            raise ValidationError(
+                                _('The project has duplicate members assigned in the range (%(start)s) to (%(end)s)!',
+                                start=calendar_duplicate[i].start_date, end=calendar_duplicate[i].end_date))
 
         # update member_ids list
         user_ids = [
@@ -93,9 +101,17 @@ class Project(models.Model):
             project.total_phase = len(num_phase)
             project.total_milestone = len(num_milestone)
 
+    @api.constrains('planning_calendar_resources')
+    def _onchange_calendar(self):
+        # check the current user is the PM of this project
+        for project in self:
+            if project.user_id != project.env.user and not project.env.user.has_group('project.group_project_manager'):
+                raise UserError(
+                    _('You are not the manager of this project, so you cannot assign members to it.'))
+
     def open_planning_task_all(self):
         for project in self:
-            if self.env['project.task'].search_count([('project_id','=',project.id)]) == 0:
+            if self.env['project.task'].search_count(['&',('project_id','=',project.id),('issues_type','=',1)]) == 0:
                 raise UserError(
                      _("No tasks found. Let's create one!"))
             else:

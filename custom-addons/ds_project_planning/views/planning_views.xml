@@ -5,7 +5,28 @@
         <field name="priority">10</field>
         <field name="type">dhx_gantt</field>
         <field name="arch" type="xml">
-            <dhx_gantt id_field="id" text="name" date_start="date_start" duration="planned_duration" links_serialized_json="links_serialized_json" link_model="project.depending.tasks" progress="progress_input" start_date_phase="start_date_phase" user_ids="user_ids" portal_user_names="portal_user_names" date_deadline="date_deadline" />
+            <dhx_gantt id_field="id" text="name" date_start="date_start" duration="planned_duration" working_day="working_day" links_serialized_json="links_serialized_json" link_model="project.depending.tasks" progress="progress_input" start_date_phase="start_date_phase" user_ids="user_ids" portal_user_names="portal_user_names" date_deadline="date_deadline" />
+        </field>
+    </record>
+
+    <record id="planning_view_task_search_form" model="ir.ui.view">
+        <field name="name">planning.project.task.search.form</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <search string="Tasks">
+                <field name="name" string="Task"/>
+                <field name="tag_ids"/>
+                <field name="user_ids" context="{'active_test': False}"/>
+                <field string="Project" name="display_project_id"/>
+                <field name="stage_id"/>
+                <field name="partner_id" operator="child_of"/>
+                <field name="parent_id"/>
+                <filter string="My Tasks" name="my_tasks" domain="[('user_ids', 'in', uid)]"/>
+                <filter string="Unassigned" name="unassigned" domain="[('user_ids', '=', False)]"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+            </search>
         </field>
     </record>
 
@@ -14,7 +35,8 @@
         <field name="res_model">project.task</field>
         <field name="view_mode">dhx_gantt</field>
         <field name="view_id" ref="ds_project_planning.task_gantt_view"/>
-        <field name="domain">[('display_project_id', '=', active_id), ('issues_type', '=', 1)]</field>
+        <field name="domain">[('display_project_id', '=', active_id),('issues_type', '=', 1)]</field>
+        <field name="search_view_id" ref="planning_view_task_search_form"/>
         <field name="context">{
             'pivot_row_groupby': ['user_ids'],
             'default_project_id': active_id,
@@ -32,35 +54,117 @@
         </field>
     </record>
 
+    <record model="ir.ui.view" id="project_view_kanban_inherit">
+        <field name="name">project.view.kanban.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='last_update_status']" position="after">
+                <field name="task_total"/>
+            </xpath>
+            <xpath expr="//a[hasclass('o_project_kanban_box')]/div" position="replace">
+                <div>
+                    <span class="o_value">
+                        <t t-esc="record.task_total.value"/>
+                    </span>
+                    <span class="o_label">Task</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="edit_project_inherit">
+        <field name="name">edit.project.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[hasclass('edit_project_inherit')]" position="replace">
+                <button class="oe_stat_button" type="action" name="%(project.act_project_project_2_project_task_all)d" icon="fa-tasks">
+                    <field string="Tasks In Progress" name="task_total" widget="statinfo" options="{'label_field': 'label_tasks'}"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
     <record id="project_planning_view_kanban" model="ir.ui.view">
         <field name="name">project.planning.kanban</field>
         <field name="model">project.project</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile" create="0" js_class="project_project_kanban">
-                <field name="user_id" string="Project Manager"/>
+            <kanban class="o_kanban_mobile oe_background_grey o_kanban_dashboard o_project_kanban o_emphasize_colors" create="0" js_class="project_project_kanban">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="commercial_partner_id"/>
+                <field name="color"/>
+                <field name="alias_id"/>
+                <field name="alias_name"/>
+                <field name="alias_domain"/>
+                <field name="rating_percentage_satisfaction"/>
+                <field name="rating_active" />
+                <field name="analytic_account_id"/>
+                <field name="date"/>
+                <field name="privacy_visibility"/>
+                <field name="last_update_color"/>
+                <field name="tag_ids"/>
+                <field name="last_update_status"/>
+                <field name="task_total"/>
+                <progressbar field="last_update_status" colors='{"on_track": "success", "at_risk": "warning", "off_track": "danger", "on_hold": "info", "missing_resource":"primary"}'/>
                 <templates>
                     <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_content oe_kanban_global_click o_kanban_get_form">
-                            <div class="row">
-                                <div class="col-12">
-                                    <strong>
-                                        <field name="name" string="Project Name"/>
-                                    </strong>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-8">
-                                    <field name="partner_id" string="Contact"/>
-                                </div>
-                                <div class="col-4">
-                                    <div class="oe_kanban_bottom_right float-right">
-                                        <field name="user_id" widget="many2one_avatar_user"/>
+                        <div t-attf-class="#{kanban_color(record.color.raw_value)} oe_kanban_global_click o_has_icon oe_kanban_content oe_kanban_card">
+                            <div class="o_project_kanban_main ">
+                                <div class="o_kanban_card_content mw-100">
+                                    <div class="o_kanban_primary_left">
+                                        <div class="o_primary">
+                                            <span class="o_text_overflow">
+                                                <t t-esc="record.name.value"/>
+                                            </span>
+                                            <span class="o_text_overflow text-muted" t-if="record.partner_id.value">
+                                                <span class="fa fa-user mr-2" aria-label="Partner" title="Partner"></span>
+                                                <t t-esc="record.partner_id.value"/>
+                                            </span>
+                                            <div t-if="record.date.raw_value or record.date_start.raw_value" class="text-muted o_row">
+                                                <span class="fa fa-clock-o mr-2" title="Dates"></span>
+                                                <field name="date_start"/>
+                                                <i t-if="record.date.raw_value and record.date_start.raw_value" class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow"/>
+                                                <field name="date"/>
+                                            </div>
+                                            <div t-if="record.alias_name.value and record.alias_domain.value" class="text-muted">
+                                                <span class="fa fa-envelope-o mr-2" aria-label="Domain Alias" title="Domain Alias"></span>
+                                                <t t-esc="record.alias_id.value"/>
+                                            </div>
+                                            <div t-if="record.rating_active.raw_value" class="text-muted" title="Percentage of happy ratings over the past 30 days." groups="project.group_project_rating">
+                                                <b>
+                                                    <t t-if="record.rating_percentage_satisfaction.value != -1">
+                                                        <i class="fa fa-smile-o" role="img" aria-label="Percentage of satisfaction" title="Percentage of satisfaction"/>
+                                                        <t t-esc="record.rating_percentage_satisfaction.value"/>
+%
+                                                    </t>
+                                                </b>
+                                            </div>
+                                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                        </div>
                                     </div>
                                 </div>
+
                             </div>
-                            <div class="o_project_kanban_boxes">
-                                <a class="o_project_kanban_box" name="open_planning_task_all" type="object">
-                                </a>
+                            <div class="o_kanban_record_bottom mt-3">
+                                <div class="oe_kanban_bottom_left">
+                                    <div class="o_project_kanban_boxes">
+                                        <a class="o_project_kanban_box" name="open_planning_task_all" type="object">
+                                            <div>
+                                                <span class="o_value">
+                                                    <t t-esc="record.task_total.value"/>
+                                                </span>
+                                                <span class="o_label">Task</span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="last_update_status" widget="badge" decoration-success="last_update_status == 'on_track'" decoration-warning="last_update_status == 'at_risk'" decoration-danger="last_update_status == 'off_track'" decoration-info="last_update_status == 'on_hold'" decoration-primary="last_update_status == 'missing_resource'"/>
+                                    <span t-att-class="'o_status_bubble mx-0 o_color_bubble_' + record.last_update_color.value" t-att-title="record.last_update_status.value"></span>
+                                    <field name="user_id" widget="many2one_avatar_user" t-if="record.user_id.raw_value"/>
+                                </div>
                             </div>
                         </div>
                     </t>
@@ -70,17 +174,17 @@
     </record>
 
     <record id="view_tree_calendar_effort" model="ir.ui.view">
-        <field name="name">Calendar Resource</field>
+        <field name="name">Booking Resource</field>
         <field name="model">planning.calendar.resource</field>
         <field name="arch" type="xml">
-            <tree string="Calendar Resource Effort" decoration-warning="inactive == True" create="0" delete="0" multi_edit="1" sample="1">
+            <tree string="Booking Resource Effort" decoration-warning="inactive == True" create="0" delete="0" multi_edit="1" sample="1">
                 <field name="project_id" />
                 <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
                 <field name="start_date" />
                 <field name="end_date" />
                 <field name="duration" string="Duration (days)"/>
-                <field name="calendar_effort" digits="[12,1]" string="Calendar Effort (MM)"/>
-                <field name="effort_rate" digits="[12,1]" string="Effort Rate (%)"/>
+                <field name="calendar_effort" digits="[12,2]" string="Booking Effort (MM)"/>
+                <field name="effort_rate" digits="[12,2]" string="Effort Rate (%)"/>
                 <field name="member_type" string="Member Type"/>
                 <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 <field name="inactive" invisible="1"/>
@@ -91,7 +195,7 @@
     </record>
 
     <record id="view_form_calendar_effort" model="ir.ui.view">
-        <field name="name">Calendar Resource Effort Form</field>
+        <field name="name">Booking Resource Effort Form</field>
         <field name="model">planning.calendar.resource</field>
         <field name="arch" type="xml">
             <form>
@@ -105,17 +209,17 @@
                         <field name="start_date" />
                         <field name="end_date" />
                         <field name="duration" />
-                        <field name="calendar_effort" digits="[12,1]"/>
+                        <field name="calendar_effort" digits="[12,2]"/>
                         <label for="member_type"/>
                         <div class="o_row" name="member_type">
                             <field name="member_type" nolabel="1"/>
                             <span>
-                                <field name="member_type_rate" digits="[12,1]" nolabel="1"/>
+                                <field name="member_type_rate" digits="[12,2]" nolabel="1"/>
                             </span> %
                         </div>
                         <label for="effort_rate"/>
                         <div class="o_row" name="effort_rate">
-                            <field name="effort_rate" digits="[12,1]" nolabel="1"/>
+                            <field name="effort_rate" digits="[12,2]" nolabel="1"/>
                             <span> % </span>
                         </div>
                         <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
@@ -130,7 +234,7 @@
 
     <!-- Action to open the Calendar Effort list -->
     <record id="action_calendar_effort" model="ir.actions.act_window">
-        <field name="name">Calendar Resource Effort</field>
+        <field name="name">Booking Resource Effort</field>
         <field name="res_model">planning.calendar.resource</field>
         <field name="domain">[('project_id', '=', active_id)]</field>
         <field name="view_mode">tree,form</field>
@@ -247,11 +351,11 @@
     </record>
 
     <record id="view_form_calendar_resource" model="ir.ui.view">
-        <field name="name">Calendar Resource Form</field>
+        <field name="name">Booking Resource Form</field>
         <field name="model">project.project</field>
         <field name="priority">999</field>
         <field name="arch" type="xml">
-            <form string="Calendar Resources" class="o_form_project_project" edit="1" delete="0" create="0">
+            <form string="Booking Resources" class="o_form_project_project" edit="1" delete="0" create="0">
                 <sheet>
                     <div class="oe_button_box" name="button_box" groups="base.group_user">
                         <button name="%(ds_project_planning.project_planning_phase)d" class="oe_stat_button" style="width: 13.5%" type="action" icon="fa-check-square-o">
@@ -274,8 +378,8 @@
                                 </span>
                             </div>
                         </button>
-                        <button class="oe_stat_button" type="action" name="%(project.dblc_proj)d" attrs="{'invisible': [('task_count_with_subtasks', '=', 0)]}" icon="fa-tasks">
-                            <field string="Tasks" name="task_count_with_subtasks" widget="statinfo"/>
+                        <button class="oe_stat_button" type="action" name="%(project.dblc_proj)d" attrs="{'invisible': [('task_total', '=', 0)]}" icon="fa-tasks">
+                            <field string="Tasks" name="task_total" widget="statinfo"/>
                         </button>
                         <button name="%(action_calendar_effort)d" class="oe_stat_button" style="width: 13.5%" type="action" icon="fa-clock-o">
                             <div class="o_field_widget o_stat_info">
@@ -284,18 +388,7 @@
  MM
                                 </span>
                                 <span class="o_stat_text">
-                                    Calendar Effort
-                                </span>
-                            </div>
-                        </button>
-                        <button name="%(action_calendar_effort)d" class="oe_stat_button" style="width: 13.5%" type="action" icon="fa-clock-o">
-                            <div class="o_field_widget o_stat_info">
-                                <span class="o_stat_value">
-                                    <field name="total_estimate_effort" readonly="1" nolabel="1" help="Total estimate effort of project planning"/>
- MM
-                                </span>
-                                <span class="o_stat_text">
-                                    Estimate Effort
+                                    Booking Effort
                                 </span>
                             </div>
                         </button>
@@ -327,16 +420,16 @@
                     <label for="member_ids" style="min-width: 150px"/>
                     <field name="member_ids" widget="many2many_avatar_user" readonly="1" force_save="1"/>
                     <notebook>
-                        <page string="Calendar Resources">
+                        <page string="Booking Resources">
                             <field name="planning_calendar_resources" colspan="4" nolabel="1">
                                 <tree string="Assign Members" decoration-warning="inactive == True">
                                     <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
                                     <field name="start_date" />
                                     <field name="end_date" />
                                     <field name="duration" string="Duration (days)"/>
-                                    <field name="calendar_effort" digits="[12,1]" string="Calendar Effort (MM)"/>
+                                    <field name="calendar_effort" digits="[12,2]" string="Booking Effort (MM)"/>
                                     <field name="member_type" string="Member Type"/>
-                                    <field name="effort_rate" digits="[12,1]" string="Effort Rate (%)"/>
+                                    <field name="effort_rate" digits="[12,2]" string="Effort Rate (%)"/>
                                     <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                     <field name="inactive" invisible="1"/>
                                     <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)]}" />
@@ -353,17 +446,17 @@
                                             <field name="start_date" />
                                             <field name="end_date" />
                                             <field name="duration" />
-                                            <field name="calendar_effort" digits="[12,1]"/>
+                                            <field name="calendar_effort" digits="[12,2]"/>
                                             <label for="member_type"/>
                                             <div class="o_row" name="member_type">
                                                 <field name="member_type" nolabel="1"/>
                                                 <span>
-                                                    <field name="member_type_rate" digits="[12,1]" nolabel="1"/>
+                                                    <field name="member_type_rate" digits="[12,2]" nolabel="1"/>
                                                 </span> %
                                             </div>
                                             <label for="effort_rate"/>
                                             <div class="o_row" name="effort_rate">
-                                                <field name="effort_rate" digits="[12,1]" nolabel="1"/>
+                                                <field name="effort_rate" digits="[12,2]" nolabel="1"/>
                                                 <span> % </span>
                                             </div>
                                             <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
@@ -388,7 +481,7 @@
     </record>
 
     <record id="view_tree_calendar_resource" model="ir.ui.view">
-        <field name="name">Calendar Resource List</field>
+        <field name="name">Booking Resource List</field>
         <field name="model">project.project</field>
         <field name="arch" type="xml">
             <tree decoration-muted="active == False" string="Projects" create="0" delete="0" multi_edit="1" sample="1">
@@ -402,7 +495,7 @@
                 <field name="analytic_account_id" optional="hide" groups="analytic.group_analytic_accounting"/>
                 <field name="date_start" string="Start Date" widget="daterange" options="{'related_end_date': 'date'}"/>
                 <field name="date" string="End Date" widget="daterange" options="{'related_start_date': 'date_start'}"/>
-                <field name="total_calendar_effort" string="Calendar Effort (MM)"/>
+                <field name="total_calendar_effort" string="Booking Effort (MM)"/>
                 <field name="total_estimate_effort" string="Estimate Effort (MM)"/>
                 <field name="user_id" optional="show" string="Project Manager" widget="many2one_avatar_user" options="{'no_open':True, 'no_create': True, 'no_create_edit': True}"/>
                 <field name="last_update_color" invisible="1"/>
@@ -415,7 +508,7 @@
 
     <!-- Action to open the Calendar Resource list -->
     <record id="action_calendar_resource" model="ir.actions.act_window">
-        <field name="name">Calendar Resource</field>
+        <field name="name">Booking Resource</field>
         <field name="res_model">project.project</field>
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="view_project_calendar_resource_search_form"/>
@@ -425,7 +518,7 @@
                          ]"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                    No projects found. Let's create one to add calendar resources!
+                    No projects found. Let's create one to add booking resources!
             </p>
             <p>
                     Projects regroup tasks on the same topic, and each has its dashboard.
@@ -448,7 +541,7 @@
         <field name="name">Project Phase</field>
         <field name="model">project.planning.phase</field>
         <field name="arch" type="xml">
-            <form>
+            <form duplicate="0">
                 <header>
                     <button string="Compute Tasks" name="compute_tasks" type="object" class="oe_highlight"/>
                     <button string="Create Milestone" name="open_create_milestone_form" type="object" class="btn btn-secondary"/>
@@ -482,6 +575,7 @@
                     <group>
                         <field name="start_date" />
                         <field name="end_date" />
+                        <field name="working_day" />
                         <field name="description" placeholder="Add a description..."/>
                     </group>
                     <notebook>
@@ -519,7 +613,7 @@
     </record>
 
     <record id="view_tree_project_phase" model="ir.ui.view">
-        <field name="name">Project Phases</field>
+        <field name="name">Planning Phases</field>
         <field name="model">project.planning.phase</field>
         <field name="arch" type="xml">
             <tree>
@@ -535,10 +629,10 @@
 
     <!-- Planning Milestone -->
     <record id="view_form_project_milestone" model="ir.ui.view">
-        <field name="name">Project Milestone</field>
+        <field name="name">Planning Milestone</field>
         <field name="model">project.planning.milestone</field>
         <field name="arch" type="xml">
-            <form>
+            <form duplicate="0">
                 <sheet>
                     <div class="oe_title" style="width: 800px">
                         <label for="name" class="oe_edit_only"/>
@@ -582,7 +676,7 @@
     </record>
 
     <record id="view_tree_project_milestone" model="ir.ui.view">
-        <field name="name">Project Milestones</field>
+        <field name="name">Planning Milestones</field>
         <field name="model">project.planning.milestone</field>
         <field name="arch" type="xml">
             <tree>

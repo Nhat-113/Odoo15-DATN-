@@ -24,6 +24,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_duration = params.duration;
             this.map_progress = params.progress;
             this.map_user_ids = params.user_ids;
+            this.map_working_day = params.working_day;
             this.map_portal_user_names = params.portal_user_names;
 
 
@@ -53,7 +54,8 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_progress && fieldNames.push(this.map_progress);
             this.map_portal_user_names && fieldNames.push(this.map_portal_user_names);
             this.map_user_ids && fieldNames.push(this.map_user_ids);
-            this.map_child_ids && fieldNames.push(this.map_child_ids)
+            this.map_working_day && fieldNames.push(this.map_working_day);
+            this.map_child_ids && fieldNames.push(this.map_child_ids);
             this.map_total_float && fieldNames.push(this.map_total_float);
             this.map_parent && fieldNames.push(this.map_parent);
             this.map_phase && fieldNames.push(this.map_phase);
@@ -74,7 +76,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             return this._rpc({
                 model: 'project.planning.phase',
                 method: 'search_read',
-                fields: ['name', 'start_date', 'phase_duration', 'type'],
+                fields: ['name', 'start_date', 'phase_duration', 'type', 'working_day'],
                 domain: [['project_id', '=', this.domain[1][2]]]
             }).then(function (data) {
                 return data;
@@ -85,7 +87,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             return this._rpc({
                 model: 'project.planning.milestone',
                 method: 'search_read',
-                fields: ['name', 'milestone_date', 'type', 'phase_id'],
+                fields: ['name', 'milestone_date','milestone_end_date', 'type', 'phase_id'],
                 domain: [
                     ['project_id', '=', this.domain[1][2]]
                 ]
@@ -131,7 +133,8 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 if(record.type) {
                     // Add serverId to get real id in edit mode
                     task.serverId = record.serverId;
-                    datetime = record.start_date ? formatFunc(record.start_date) : formatFunc(record.milestone_date);
+                   // console.log(`datetime_milesone`, record.milestone_date + 1);
+                    datetime = record.start_date ? formatFunc(record.start_date) : formatFunc(record.milestone_end_date);
                 } else {
                     // Show start time of task
                     if (record[self.map_date_start]) {
@@ -158,14 +161,20 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 }
 
                 task.start_date = datetime;
+                //datetime= gantt.date.convert_to_utc(datetime);
+                //console.log(`datetime_utc`, datetime);
                 task.open = record[self.map_open] ? record[self.map_open] : 'true';
                 task.links_serialized_json = record[self.map_links_serialized_json];
                 task.total_float = record[self.map_total_float];
                 task.user_ids = record[self.map_user_ids];
+                task.working_day = record[self.map_working_day];
                 task.project_name = record[self.map_parent] ? record[self.map_parent][1] : "";
                 task.type = record.type ? record.type : "";
-
+                // if(task.type !== "milestone"){
+                    task.start_date =gantt.date.convert_to_utc(task.start_date);
+                // }   
                 data.push(task);
+                //console.log(`task`, task.start_date);
                 if(!record.type) {
                     links.push.apply(links, JSON.parse(record.links_serialized_json))
                 }
@@ -185,14 +194,18 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 name:  data.text,
             }
             const datetime = time.datetime_to_str(formatFunc(data.start_date));
-
+            //datetime = gantt.date.convert_to_utc(datetime)
             switch (data.type) {
                 case "milestone":
                     values['milestone_date'] = datetime;
+                    values['milestone_end_date'] = datetime;
+
+
                     break;
                 case "phase":
                     values['start_date'] = datetime;
                     values['phase_duration'] = data.duration;
+                    values['working_day'] = data.duration;
                     values['end_date'] = time.datetime_to_str(formatFunc(data.end_date));
                     break;
                 default:

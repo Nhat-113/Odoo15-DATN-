@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="view_gantt_resource_planning_rs_plan_gantt" model="ir.ui.view">
+        <field name="model">gantt.resource.planning</field>
+        <field name="type">rs_plan_gantt</field>
+        <field name="arch" type="xml">
+            <rs_plan_gantt id_field="id" text="job_position_id" date_start="start_date" 
+                    duration="duration"
+                    progress="progress" 
+                    user_ids = "value_man_month"
+                />
+        </field>
+    </record>
+
+    <record id="action_view_gantt_resource_plan" model="ir.actions.act_window">
+        <field name="name">Gantt Resource Planning</field>
+        <field name="res_model">gantt.resource.planning</field>
+        <field name="context">{}</field>
+        <field name="domain">[('estimation_id', '=', active_id)]</field>
+        <field name="view_mode">rs_plan_gantt</field>
+    </record>
+</odoo>

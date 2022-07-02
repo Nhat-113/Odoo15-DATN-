@@ -148,11 +148,14 @@ var FieldOrgChart = AbstractField.extend({
         var self = this;
         event.preventDefault();
         var employee_id = parseInt($(event.currentTarget).data('employee-id'));
+        var model = window.location.href.split('&').find(x => x.includes('model')).split('=').pop();
         return this._rpc({
             model: 'hr.employee',
             method: 'get_formview_action',
             args: [employee_id],
         }).then(function(action) {
+            if (model === 'hr.employee.public')
+                action['res_model'] = model;
             return self.do_action(action); 
         });
     },

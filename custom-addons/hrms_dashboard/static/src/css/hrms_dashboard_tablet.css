@@ -1,0 +1,396 @@
+
+@media only screen and (max-width: 1200px) {
+
+    .list-employee {
+        margin: 0 !important;
+    }
+    .information h2 {
+        margin-top: 3%;
+        color: #6869AC;
+        font-size: 11px;
+    }
+    .button-checkout .stat-content .stat-text {
+        font-size: 9px;
+        color: white;
+        margin-top: 9px;
+        margin-bottom: 9px;
+        margin-left: 34px;
+    }
+    .button-checkout-user .stat-content .stat-text {
+        font-size: 9px;
+        color: white;
+        margin-top: 9px;
+        margin-bottom: 9px;
+        margin-left: 34px;
+    }
+    .button-checkin .stat-content .stat-text {
+        font-size: 9px;
+        color: white;
+        margin-top: 9px;
+        margin-bottom: 9px;
+        margin-left: 34px;
+    }
+    .button-checkin-user .stat-content .stat-text {
+        font-size: 9px;
+        color: white;
+        margin-top: 9px;
+        margin-bottom: 9px;
+        margin-left: 34px;
+    }
+    .stat-widget-one .stat-icon i {
+        font-size: 10px;
+        font-weight: 900;
+        display: inline-block;
+        color: #fff;
+        margin-left: -21px;
+        margin-bottom: 8px;
+    }
+    .job-request button {
+        display: inline-block;
+        flex: 20%;
+        background: #6869AC;
+        border-radius: 12px;
+        border: 1px solid #6869AC;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: 8px 16px;
+        position: static;
+        width: 15%;
+        height: auto;
+        left: 380px;
+        top: 0px;
+        background: #6869AC;
+        border-radius: 14px;
+        flex: none;
+        order: 1;
+        align-self: stretch;
+        flex-grow: 0;
+    }
+    .list_future > button > h3 {
+        margin-left: 20px;
+        font-size: 9px;
+    }
+    .tablinks > h5 {
+        font-size: 9px;
+    }
+    .list_menu .btn_annalys .text_btn_annalys {
+        margin-left: 16px;
+        font-size: 9px;
+    }
+    .list_menu .active>h5 {
+        color: #6869AC;
+        font-size: 9px;
+    }
+    .list_future button h4 {
+        margin-bottom: 0 !important;
+        float: left;
+        padding-left: 7px;
+        font-size: 9px;
+    }
+    .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
+        padding-left: 33px!important;
+        font-size: 12px;
+        width: 90%;
+        padding: 0;
+    }
+    .list_menu button h5 {
+        color: #BDBDBD;
+        padding: 0;
+        margin-left: 8px;
+        font-size: 9px;
+    }
+    .list_menu .btn_announcements .text_btn_announcements {
+        margin-left: 0px;
+        font-size: 9px;
+        padding-left: 31px !important;
+    }
+    .fearure_detail{
+        margin-left: 15px !important;
+
+    }
+    .hr_contract .fearure_detail{
+        margin-left: 11px !important;
+    }
+    .hr_payslip .fearure_detail{
+        margin-left: 13px !important;
+    }
+    .o_clock {
+        font-size: 9px;
+    }
+    /* chart */
+    .department .detail h3 {
+        color: #6869AC;
+        padding: 0;
+        margin-bottom: 67px;
+        font-size: 11px;
+    }
+    .list-employee .text-employee{
+        background: #FFFFFF;
+        color: #6869AC;
+        font-size: 11px;
+    }
+    .employee_dashboard_detail>div>h3 {
+        font-size: 11px;
+        margin-top: 17.5px;
+    }
+    .all-request p {
+        font-weight: 700;
+        display: flex;
+        margin: 0;
+        padding: 0;
+        align-items: center;
+        color: #343A40;
+        font-size: 9px;
+    }
+    .job-request p {
+        font-weight: 700;
+        display: flex;
+        margin: 0;
+        padding: 0;
+        align-items: center;
+        color: #343A40;
+        font-size: 9px;
+    }
+    .list-employee .leave_graph {
+        margin-top: 5px;
+    }
+    .emp_graph {
+        margin-top: -54px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        align-content: center;
+        justify-content: space-around;
+    }
+    .leave_graph .legend>tbody {
+        display: flex;
+        width: 90%;
+        margin: 0;
+        margin-left: 9%;
+    }
+    .emp_graph .legend>tbody>tr {
+        width: 50%;
+        font-size: 7px;
+    }
+    .leave_graph .legend>tbody>tr {
+        width: 50%;
+        font-size: 7px;
+    }
+    .legend td, .legend .legend_col {
+        padding: 4px 5px;
+        vertical-align: bottom;
+        color: #343A40;
+        font-weight: 200;
+    }
+    .text_welcome {
+        font-size: 14px;
+        margin: 0 auto;
+        text-align: center;
+        align-items: center;
+        color: #6869AC;
+        display: flex;
+        align-content: space-between;
+    }
+    .legend td, .legend .legend_col {
+        padding: 4px 5px;
+        vertical-align: bottom;
+        color: #343A40;
+        font-weight: 200;
+        padding: 1px 4px 3px 4px;
+    }
+    /* USER */
+    .list_future_user .hr_leave_request_approve>h3 {
+        margin-left: 17px;
+        font-size: 8px;
+    }
+    .announcements_detail_user h3 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 5%;
+        color: #4D4E8B;
+        background: #FFFFFF;
+        border-radius: 24px;
+        flex: none;
+        order: 0;
+        align-self: stretch;
+        flex-grow: 0;
+        margin-top: 4% !important;
+        margin-bottom: 3%;
+        font-size: 13px;
+    }
+    .Event_user h3 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 5%;
+        color: #4D4E8B;
+        background: #FFFFFF;
+        border-radius: 24px;
+        flex: none;
+        order: 0;
+        align-self: stretch;
+        flex-grow: 0;
+        margin-top: 4% !important;
+        margin-bottom: 1.5%;
+        font-size: 13px;
+    }
+    .join_resign_trend {
+        height: 201px !important;
+        display: flex !important;
+    }
+    .birthday-detail {
+        display: flex;
+        align-items: center;
+        padding: 0 !important;
+        margin: 0 auto;
+        margin-top: 4%;
+        background: #FAFAFA;
+        width: 90%;
+        border-radius: 16px;
+        position: relative;
+        height: 7%;
+    }
+    .birthday-detail img {
+        position: static;
+        width: 15px;
+        height: 15px;
+        left: 0px;
+        top: 0px;
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+        margin: 0px 10px;
+        border-radius: 45%;
+    }
+        
+}
+@media screen and (min-width: 1200px) and (max-width: 1400px) { 
+    .leave_graph .legend>tbody {
+        display: flex;
+        width: 90%;
+        margin: 0;
+        margin-left: 8%;
+    }
+    .button-checkin .stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 34px;
+    }
+    .list-employee .leave_graph {
+        margin-top: 19px;
+    }
+    .list-employee .leave_graph .legend {
+        margin-top: 10px;
+    }
+    .legend td, .legend .legend_col {
+        padding: 4px 1px 4px 5px;
+        vertical-align: bottom;
+        color: #343A40;
+        font-weight: 700;
+    }
+    .button-checkout .stat-content .stat-text {
+        font-size: 9px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 42px;
+    }
+    .fearure_detail {
+        margin-left: 15px !important;
+    }
+    .list_menu .btn_annalys .text_btn_annalys {     
+        margin-left: 2px;
+        font-size: 12px;
+    }
+    .list_menu .btn_announcements .text_btn_announcements {
+        padding-left: 54px !important;
+        padding: 0;
+        font-size: 12px;
+    }
+    .btn_leave_request   .fearure_detail{
+        margin-left: 19px !important;
+    }
+    .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
+        padding-left: 27px!important;
+        font-size: 12px;
+        width: 90%;
+        padding: 0;
+    }
+}
+@media screen and (min-width: 1400px) and (max-width: 1600px) { 
+    .list-employee .leave_graph {
+        margin-top: 19px;
+    }
+    .list-employee .leave_graph .legend {
+        margin-top: 11px;
+    }
+    .list_menu .btn_announcements .text_btn_announcements {
+        margin-left: 39px;
+        /* padding-left: 20%; */
+        padding: 0;
+    }
+    .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
+        padding-left: 30px !important;
+        width: 90%;
+        position: absolute;
+        padding: 0;
+    }
+}
+@media screen and (min-width: 1600px) and (max-width: 1800px) { 
+    .list_menu .btn_announcements .text_btn_announcements {
+        margin-left: -15px;
+        padding-left: 20%;
+    }
+    .list-employee .leave_graph {
+        margin-top: 19px;
+    }
+    .list-employee .leave_graph .legend {
+        margin-top: 16px;
+    }
+}
+    
+    /* .fearure_detail{
+        margin-left: 15px !important;
+    }
+    .list_menu .btn_annalys .text_btn_annalys {
+        margin-left: 18px;
+        font-size: 9px;
+    }
+    .list_menu .btn_announcements .text_btn_announcements {
+        margin-left: -25px;
+        font-size: 9px;
+        padding-left: 29%;
+    }
+    .btn_leave_request   .fearure_detail{
+        margin-left: 19px !important;
+    } */
+    @media only screen and (max-width: 1000px) {
+        .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
+            padding-left: 23px !important;
+            width: 90%;
+            position: absolute;
+            padding: 0;
+            font-size: 9px;
+        }
+        .list_menu .btn_announcements .text_btn_announcements {
+            margin-left: 2px;
+            padding: 0;
+            /* font-size: 9px; */
+            /* padding-left: 20% !important; */
+        }
+        .list_menu .btn_annalys .text_btn_annalys {
+            margin-left: 15px;
+            font-size: 9px;
+        }
+        .btn_payslip .fearure_detail {
+            margin-left: 13px !important;
+        } 
+        .btn_expried  .fearure_detail  {
+            margin-left: 12px !important;
+        }
+    }

@@ -8,6 +8,9 @@
     </t>
     
     <t t-name="LoginEmployeeDetails">
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="initial-scale=1"/>
+
         <!-- <link rel="stylesheet" href="/hrms_dashboard/static/src/css/hrms_dashboard.css"/>
         <script type="text/javascript" src="/hrms_dashboard/static/src/js/filename.js"/> -->
         <div class="row main-section"  style="height:100%;padding-left:1.4%" >
@@ -44,23 +47,23 @@
                 <div class= "list_future">
                     <button class="btn_leave_request  hr_leave_request_approve">
                         <h4><i class="fa fa-plus"></i></h4>
-                        <h4  class="fearure_detail">    
+                        <h3  class="fearure_detail">   
                             Leave Request <t t-esc="widget.login_employee.leaves_to_approve"/>
-                        </h4>
+                        </h3>
                     </button>
-                    <button class="btn_payslip hr_payslip">
+                    <button id= "btn-payslip" class="btn_payslip hr_payslip" style="display: none">
                         <h4>  
                             <i class="fa fa-money"/>
                         </h4>
-                        <h4  class="fearure_detail" >
+                        <h3  class="fearure_detail" >
                              Payslip <t t-esc="widget.login_employee['payslip_count']"/>
-                        </h4>
+                        </h3>
                     </button>
-                    <button class="btn_expried hr_contract">
-                        <h4><i class="fa fa-fw fa-book"></i></h4>
-                        <h4  class="fearure_detail">
+                    <button id="btn-contract" class="btn_expried hr_contract" style="display: none">
+                        <h4><i class="fa fa-fw fa-book" style="margin-left: -1px;"></i></h4>
+                        <h3  class="fearure_detail">
                             Contract <t t-esc="widget.login_employee['contracts_count']"/>
-                        </h4>
+                        </h3>
                     </button>
                 </div>
                 <div class="time">
@@ -71,6 +74,35 @@
                         <span>:</span>
                         <span id="seconds">00</span>
                         <span id="session">AM</span>
+                    </div>
+                </div>
+
+                <div class="hr_attendance_login o_hr_attendance_sign_in_out_icon">
+                    <div class="oh-card">
+                        <div class="oh-card-body">
+                            <div class="stat-widget-one">
+                                <div  class="button-checkin">
+                                    <t t-if="widget.login_employee['attendance_state'] =='checked_out'">
+                                        <div class="stat-icon hr_attendance_btn">
+                                            <i class="fa fa-sign-in o_hr_attendance_sign_in_out_icon"/>
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-text">Check In</div>
+                                        </div>
+                                    </t>
+                                 </div>
+                                <div class="button-checkout">
+                                    <t t-if="widget.login_employee['attendance_state'] =='checked_in'">
+                                        <div class="stat-icon hr_attendance_btn">
+                                            <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon"/>
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-text">Check out</div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -146,7 +178,7 @@
                     </div>
                     <div class="Leave-Request">
                         <h3>
-                            <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon" style="margin-right:5px"></i>
+                            <i class="fa fa-sign-out" style="margin-right:5px"></i>
                             Leave Request
                         </h3>
         
@@ -185,13 +217,13 @@
                             Job Application
                         </h3>
                         <div class="request_detail_job">
-                            <div class="job-request hr_job_application_approve" >
+                            <div class="job-request hr_job_application_approve" id="hide-application" style="display:none">
                                 <p>All Application</p>
                                 <button>
                                     <p class="stat-count"><t t-esc="widget.login_employee.job_applications"/></p>
                                 </button>
                             </div>
-                            <div class="job-request dashboard_in_recruiment">
+                            <div class="job-request dashboard_in_recruiment" id="hide-recruitment"  style="display:none">
                                 <p>In Recruiment</p>
                                 <button>
                                     <p class="stat-count"><t t-esc="widget.login_employee.recruitment"/></p>
@@ -200,7 +232,7 @@
                             <div class="job-request dashboard_today_meeting" >
                                 <p>Today Meeting</p>
                                 <button>
-                                <p class="stat-count"><t t-esc="widget.login_employee.total_len"/></p>
+                                <p class="stat-count"><t t-esc="widget.login_employee.today_meeting"/></p>
                                 </button>
                             </div>
                         </div>
@@ -221,20 +253,32 @@
                             <i class="fa fa-bell" style="margin-right:8px"></i>
                             NEWS 
                         </h3>
-                        <div class="col-xs-12 text-align" style="width: 90%;
-                                                                margin: 0 auto;
-                                                                border-radius: 26px;
-                                                                height:80%">
+                        <div class="col-xs-12 text-align list_news">
                             <t t-foreach="widget.announcements" t-as="announcement">
-                                    <div class="text_detail">
-                                        <h2 class="text_news" style="font-size: 15px;"><t t-esc="announcement[0]"/> </h2>
-                                        <h6 class="new_code"><t t-esc="announcement[1]"/></h6>
-                                    </div>
+                                <div class="text_detail">
+                                    <div class="text_news" style="font-size: 15px;word-break:break-word"><t t-esc="announcement[2]"/> </div>
+                                    <div class="new_code"><t t-esc="announcement[1]"/> ~ <t t-esc="announcement[0]"/></div>
+                                </div>
                             </t>
                         </div>
                     </div>
-
-                    <div class="Birthday">
+                    <div class="announcements_detail" style=" margin-right: 0;">
+                        <h3>
+                            <i class="fa fa-birthday-cake" style="margin-right:8px"></i>
+                            BIRTHDAY 
+                        </h3>
+                        <div class="col-xs-12 text-align list_news">
+                            <t t-foreach="widget.employee_birthday" t-as="employee">
+                                <div class="birthday-detail">
+                                    <img class="align-self-center rounded-circle mr-3" alt=""
+                                    t-att-src="widget.get_emp_image_url(employee[0])"/>
+                                    <p class="name"><t t-esc="employee[1]"/></p>
+                                    <p  class="days" ><t t-esc="employee[2]"/></p>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                    <!-- <div class="Birthday">
                         <div class="list">
                             <div class="text-birthday" style="height: 2%;">
                                 <h3>
@@ -245,22 +289,36 @@
                             <div class="list-birthday">
                                 <t t-foreach="widget.employee_birthday" t-as="employee">
                                     <div class="birthday-detail" >
-                                            <img class="align-self-center rounded-circle mr-3" alt=""
-                                            t-att-src="widget.get_emp_image_url(employee[0])"/>
-                                            <p class="name"><t t-esc="employee[1]"/></p>
-                                            <p  class="days" ><t t-esc="employee[2]"/></p>
+                                            
                                     </div>
                                 </t>
                             </div>
                         </div>
 
+                    </div> -->
+
+                    <div class="announcements_detail" style="margin-left: 1%;margin-right: 0 !important;">
+                        <h3>
+                            <i class="fa fa-flag" style="margin-right:8px"></i>
+                            EVENT 
+                        </h3>
+                        <div class="col-xs-12 text-align list_news">
+                            <t t-foreach="widget.upcoming_events" t-as="event">
+                                    <div class="text_detail">
+                                        <div class="text_news" style="font-size: 15px;word-break:break-word"><t t-esc="event[0]"/> <t></t> </div>
+                                        <div class="new_code"><t t-esc="event[1]"/> ~ <t t-esc="event[2]"/></div>
+                                    </div>
+                            </t>
+                        </div>
                     </div>
                     
-                    <div class="Event">
-                        <h3>                              
-                            <i class='fa fa-flag' style="margin-right:8px"></i>
-                             Event
-                        </h3>
+                    <!-- <div class="Event">
+                        <div class="text-birthday" style="height: 2%;">
+                            <h3>                              
+                                <i class='fa fa-flag' style="margin-right:8px"></i>
+                                Event
+                            </h3>
+                        </div>
                         <div class="list-event">
                             <t t-foreach="widget.upcoming_events" t-as="event">
                                 <div class="event-detail" >         
@@ -269,14 +327,14 @@
                                 </div>    
                             </t>                  
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="annalys tabcontent" style="display: none;" id="annalys">
                     <div class="monthly_join_resign_trend">
                         <div class="oh-card text-color" style="border-radius: 24px;">
                             <div class="oh-card-body pb-0">
-                                <h4 class="mb-0">
-                                </h4>
+                                <!-- <h4 class="mb-0">
+                                </h4> -->
                                 <i class="fa-solid fa-chart-pie-simple"></i>
                                 <p class="stat-head" style="padding : 0px;">Monthly Join/ Resign Analysis</p>
     
@@ -301,6 +359,11 @@
     </t>
 
     <t t-name="ManagerDashboard">
+        <head>
+            <meta charset="utf-8"/>
+            <meta name="viewport" content="initial-scale=1"/>
+            <title><t t-esc="title or 'Odoo Report'"/></title>
+        </head>
         <div class="row main-section"  style="height:100%;padding-left: 1.5%;">
             <div class="col-md-2 employee_infomation">
                 <div class="image-employee">
@@ -324,19 +387,19 @@
                 </div>
                 <hr></hr>
 
-                <div class= "list_future" style="margin-bottom:50% !important">
+                <div class= "list_future_user">
                     <button class="btn_leave_request  hr_leave_request_approve">
                         <h4><i class="fa fa-plus"></i></h4>
-                        <h4 class="fearure_detail">Leave Request</h4>
+                        <h3 class="fearure_detail">Leave Request</h3>
                     </button>
-                    <button class="btn_payslip hr_payslip">
+                    <!-- <button class="btn_payslip hr_payslip">
                         <h4>  
                             <i class="fa fa-money"/>
                         </h4>
-                        <h4 class="fearure_detail">
+                        <h3 class="fearure_detail_user">
                              Payslip <t t-esc="widget.login_employee['payslip_count']"/>
-                        </h4>
-                    </button>
+                        </h3>
+                    </button> -->
                     <!-- <button class="btn_expried hr_contract">
                         <h4><i class="fa fa-fw fa-book"></i></h4>
                         <h4 class="fearure_detail">
@@ -352,6 +415,36 @@
                         <span id="minutes">00</span>
                         <span>:</span>
                         <span id="seconds">00</span>
+                        <span id="session">AM</span>
+                    </div>
+                </div>
+
+                <div class="hr_attendance_login o_hr_attendance_sign_in_out_icon">
+                    <div class="oh-card">
+                        <div class="oh-card-body">
+                            <div class="stat-widget-one">
+                                <div  class="button-checkin-user">
+                                    <t t-if="widget.login_employee['attendance_state'] =='checked_out'">
+                                        <div class="stat-icon hr_attendance_btn">
+                                            <i class="fa fa-sign-in o_hr_attendance_sign_in_out_icon"/>
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-text">Check In</div>
+                                        </div>
+                                    </t>
+                                 </div>
+                                <div class="button-checkout-user">
+                                    <t t-if="widget.login_employee['attendance_state'] =='checked_in'">
+                                        <div class="stat-icon hr_attendance_btn">
+                                            <i class="fa fa-sign-out o_hr_attendance_sign_in_out_icon"/>
+                                        </div>
+                                        <div class="stat-content">
+                                            <div class="stat-text">Check out</div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -363,20 +456,33 @@
                                 margin-right: 2%;"></i>
                                 NEWS 
                             </h3>
-                            <div class="col-xs-12 text-align" style="width: 90%;
-                                                                margin: 0 auto;
-                                                                border-radius: 26px;
-                                                                height:80%">
-                            <t t-foreach="widget.announcements" t-as="announcement">
-                            <div class="text_detail_user">
-                                <h2 class="text_news_user" style="font-size: 15px;"><t t-esc="announcement[1]"/> </h2>
-                                <h6 class="new_code_user"><t t-esc="announcement[0]"/></h6>
+                            <div class="col-xs-12 text-align list_event_user" >
+                                <t t-foreach="widget.announcements" t-as="announcement">
+                                    <div class="text_detail_user">
+                                        <h2 class="text_news_user" style="font-size: 15px;word-break:break-word"><t t-esc="announcement[2]"/> <t></t></h2>
+                                        <h6 class="new_code_user"><t t-esc="announcement[1]"/> ~ <t t-esc="announcement[0]"/></h6>
+                                    </div>
+                                </t>
                             </div>
-                            </t>
+                        </div>
+                        <div class="announcements_detail_user">
+                            <h3 style="margin-top: 6px;">
+                                <i class="fa fa-flag"  style="
+                                margin-right: 2%;"></i>
+                                EVENT 
+                            </h3>
+                            <div class="col-xs-12 text-align list_event_user" >
+                                <t t-foreach="widget.upcoming_events" t-as="event">
+                                    <div class="text_detail_user">
+                                        <h2 class="text_news_user" style="font-size: 15px;word-break:break-word"><t t-esc="event[0]"/> <t></t></h2>
+                                        <h6 class="new_code_user"><t t-esc="event[1]"/> ~ <t t-esc="event[2]"/></h6>
+                                    </div>
+                                </t>
                             </div>
                         </div>
     
-                        <div class="Event_user">
+    
+                        <!-- <div class="Event_user">
                             <h3 style="margin-top: 6px; ">
                                 <i class="fa fa-bell" style="
                                 margin-right: 2%;"></i>
@@ -384,15 +490,15 @@
                             </h3>
                             <div class="col-xs-12 text-align list_event_user" >
                                 <t t-foreach="widget.upcoming_events" t-as="event">
-                                    <div class="event-detail" >         
-                                        <p><t t-esc="event[0]"/></p>
-                                        <p style="float: right;margin-top: 6px;" ><t t-esc="event[1]"/> - <t t-esc="event[2]"/></p>
+                                    <div class="text_detail">
+                                        <div class="text_news" style="font-size: 15px;    word-wrap: break-word; "><t t-esc="event[0]"/> <t></t> </div>
+                                        <div class="new_code"><t t-esc="event[1]"/> - <t t-esc="event[2]"/></div>
                                     </div>    
                                 </t>   
                             </div>
-                        </div>
+                        </div> -->
 
-                        <div class="Event_user">
+                        <!-- <div class="Event_user">
                             <h3 style="margin-top: 6px; ">
                                 <i class="fa fa-bell" style="
                                 margin-right: 2%;"></i>
@@ -402,11 +508,11 @@
                                 <t t-foreach="widget.task_for_day" t-as="task_for_day">
                                     <div class="event-detail" >         
                                         <p><t t-esc="task_for_day[2]"/></p>
-                                        <p style="float: right;margin-top: 6px;" ><t t-esc="task_for_day[1]"/> --------------<t t-esc="task_for_day[0]"/> </p>
+                                        <p style="float: right;margin-top: 6px;" ><t t-esc="task_for_day[1]"/><t t-esc="task_for_day[0]"/> </p>
                                     </div>    
                                 </t>   
                             </div>
-                        </div>
+                        </div> -->
 
                 </div>
                 <div class="col-xs-12 monthly_leave_trend" style="padding:0px;margin-top:20px,border-radius:32px">

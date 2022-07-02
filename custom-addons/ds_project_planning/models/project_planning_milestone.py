@@ -7,6 +7,7 @@ from odoo import models, fields, api, _
 from datetime import date, datetime, time
 from odoo.exceptions import ValidationError, UserError
 
+from datetime import date, datetime, time, timedelta
 
 class PlanningMilestone(models.Model):
     """
@@ -31,22 +32,24 @@ class PlanningMilestone(models.Model):
         related='project_id.user_id', readonly=True, store=True)
     phase_id = fields.Many2one(
         'project.planning.phase', string='Phase', required=True, ondelete="cascade", help="Project Phase", default=_get_default_phase_id)
-    start_date_phase = fields.Datetime(
+    start_date_phase = fields.Date(
         readonly=True, related='phase_id.start_date')
-    end_date_phase = fields.Datetime(
+    end_date_phase = fields.Date(
         readonly=True, related='phase_id.end_date')
     name = fields.Char("Milestone name", required=True)
     type = fields.Char("Type", required=True, default="milestone")
-    milestone_date = fields.Datetime(string='Milestone Date', required=True, help="Date of the milestone",
-                                     default=lambda self: fields.Datetime.to_string(
-                                         datetime.today().replace(day=1, hour=0, minute=0, second=0)))
+    milestone_date = fields.Date(string='Milestone Date', required=True, help="Date of the milestone",
+                                     default=date.today())
+    milestone_end_date = fields.Date(string='Milestone End_Date',  compute='_compute_end_date');
     description = fields.Html("Description")
 
     _sql_constraints = [
         ('name_uniq', 'unique (phase_id, name)', "Milestone name already exists!"),
-        ('milestone_date_uniq', 'unique (phase_id, milestone_date)',
-         'Milestone date must be unique per phase.'),
     ]
+    @api.depends('milestone_date', 'milestone_end_date')
+    def _compute_end_date(self):
+        for r in self:
+            r.milestone_end_date = r.milestone_date + timedelta(days=+1) 
 
     def _check_date(self):
         for milestone in self:

@@ -1,0 +1,1175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Currencies -->
+        <record id="USD" model="estimation.currency">
+            <field name="name">USD</field>
+            <field name="full_name">United States dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="VEF" model="estimation.currency">
+            <field name="name">VEF</field>
+            <field name="full_name">Venezuelan bolívar fuerte</field>
+            <field name="symbol">Bs.F</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="CAD" model="estimation.currency">
+            <field name="name">CAD</field>
+            <field name="full_name">Canadian dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="CHF" model="estimation.currency">
+            <field name="name">CHF</field>
+            <field name="full_name">Swiss franc</field>
+            <field name="symbol">CHF</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BRL" model="estimation.currency">
+            <field name="name">BRL</field>
+            <field name="full_name">Brazilian real</field>
+            <field name="symbol">R$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="CNY" model="estimation.currency">
+            <field name="name">CNY</field>
+            <field name="full_name">Chinese yuan</field>
+            <field name="symbol">¥</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="COP" model="estimation.currency">
+            <field name="name">COP</field>
+            <field name="full_name">Colombian peso</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="CZK" model="estimation.currency">
+            <field name="name">CZK</field>
+            <field name="full_name">Czech koruna</field>
+            <field name="symbol">Kč</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="DKK" model="estimation.currency">
+            <field name="name">DKK</field>
+            <field name="full_name">Danish krone</field>
+            <field name="symbol">kr</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="HUF" model="estimation.currency">
+            <field name="name">HUF</field>
+            <field name="full_name">Hungarian forint</field>
+            <field name="symbol">Ft</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="IDR" model="estimation.currency">
+            <field name="name">IDR</field>
+            <field name="full_name">Indonesian rupiah</field>
+            <field name="symbol">Rp</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="LVL" model="estimation.currency">
+            <field name="name">LVL</field>
+            <field name="full_name">Latvian lats</field>
+            <field name="symbol">Ls</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="NOK" model="estimation.currency">
+            <field name="name">NOK</field>
+            <field name="full_name">Norwegian krone</field>
+            <field name="symbol">kr</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="XPF" model="estimation.currency">
+            <field name="name">XPF</field>
+            <field name="full_name">CFP franc</field>
+            <field name="symbol">XPF</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="PAB" model="estimation.currency">
+            <field name="name">PAB</field>
+            <field name="full_name">Panamanian balboa</field>
+            <field name="symbol">B/.</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="PLN" model="estimation.currency">
+            <field name="name">PLN</field>
+            <field name="full_name">Polish złoty</field>
+            <field name="symbol">zł</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SEK" model="estimation.currency">
+            <field name="name">SEK</field>
+            <field name="full_name">Swedish krona</field>
+            <field name="symbol">kr</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="ARS" model="estimation.currency">
+            <field name="name">ARS</field>
+            <field name="full_name">Argentine peso</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="INR" model="estimation.currency">
+            <field name="name">INR</field>
+            <field name="full_name">Indian rupee</field>
+            <field name="symbol">₹</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="AUD" model="estimation.currency">
+            <field name="name">AUD</field>
+            <field name="full_name">Australian dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="UAH" model="estimation.currency">
+            <field name="name">UAH</field>
+            <field name="full_name">Ukraine Hryvnia</field>
+            <field name="symbol">₴</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="VND" model="estimation.currency">
+            <field name="name">VND</field>
+            <field name="full_name">Vietnamese đồng</field>
+            <field name="symbol">₫</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="HKD" model="estimation.currency">
+            <field name="name">HKD</field>
+            <field name="full_name">Hong Kong dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="JPY" model="estimation.currency">
+            <field name="name">JPY</field>
+            <field name="full_name">Japanese yen</field>
+            <field name="symbol">¥</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BGN" model="estimation.currency">
+            <field name="name">BGN</field>
+            <field name="full_name">Bulgarian lev</field>
+            <field name="symbol">лв</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="LTL" model="estimation.currency">
+            <field name="name">LTL</field>
+            <field name="full_name">Lithuanian litas</field>
+            <field name="symbol">Lt</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="RON" model="estimation.currency">
+            <field name="name">RON</field>
+            <field name="full_name">Romanian leu</field>
+            <field name="symbol">lei</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="HRK" model="estimation.currency">
+            <field name="name">HRK</field>
+            <field name="full_name">Croatian kuna</field>
+            <field name="symbol">kn</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="RUB" model="estimation.currency">
+            <field name="name">RUB</field>
+            <field name="full_name">Russian ruble</field>
+            <field name="symbol">руб</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="TRY" model="estimation.currency">
+            <field name="name">TRY</field>
+            <field name="full_name">Turkish lira</field>
+            <field name="symbol">₺</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="KRW" model="estimation.currency">
+            <field name="name">KRW</field>
+            <field name="full_name">South Korean won</field>
+            <field name="symbol">₩</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MXN" model="estimation.currency">
+            <field name="name">MXN</field>
+            <field name="full_name">Mexican peso</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MYR" model="estimation.currency">
+            <field name="name">MYR</field>
+            <field name="full_name">Malaysian ringgit</field>
+            <field name="symbol">RM</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="NZD" model="estimation.currency">
+            <field name="name">NZD</field>
+            <field name="full_name">New Zealand dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="PHP" model="estimation.currency">
+            <field name="name">PHP</field>
+            <field name="full_name">Philippine peso</field>
+            <field name="symbol">₱</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SGD" model="estimation.currency">
+            <field name="name">SGD</field>
+            <field name="full_name">Singapore dollar</field>
+            <field name="symbol">S$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="ZAR" model="estimation.currency">
+            <field name="name">ZAR</field>
+            <field name="full_name">South African rand</field>
+            <field name="symbol">R</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="CRC" model="estimation.currency">
+            <field name="name">CRC</field>
+            <field name="full_name">Costa Rican colón</field>
+            <field name="symbol">₡</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MUR" model="estimation.currency">
+            <field name="name">MUR</field>
+            <field name="full_name">Mauritian rupee</field>
+            <field name="symbol">Rs</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="XOF" model="estimation.currency">
+            <field name="name">XOF</field>
+            <field name="full_name">CFA franc BCEAO</field>
+            <field name="symbol">CFA</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="XAF" model="estimation.currency">
+            <field name="name">XAF</field>
+            <field name="full_name">CFA franc BEAC</field>
+            <field name="symbol">FCFA</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="UGX" model="estimation.currency">
+            <field name="name">UGX</field>
+            <field name="full_name">Ugandan shilling</field>
+            <field name="symbol">USh</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="HNL" model="estimation.currency">
+            <field name="name">HNL</field>
+            <field name="full_name">Honduran lempira</field>
+            <field name="symbol">L</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="CLP" model="estimation.currency">
+            <field name="name">CLP</field>
+            <field name="full_name">Chilean peso</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="UYU" model="estimation.currency">
+            <field name="name">UYU</field>
+            <field name="full_name">Uruguayan peso</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="AFN" model="estimation.currency">
+            <field name="name">AFN</field>
+            <field name="full_name">Afghan afghani</field>
+            <field name="symbol">Afs</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="AOA" model="estimation.currency">
+            <field name="name">AOA</field>
+            <field name="full_name">Angolan kwanza</field>
+            <field name="symbol">Kz</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="XCD" model="estimation.currency">
+            <field name="name">XCD</field>
+            <field name="full_name">East Caribbean dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="AMD" model="estimation.currency">
+            <field name="name">AMD</field>
+            <field name="full_name">Armenian dram</field>
+            <field name="symbol">դր.</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="AWG" model="estimation.currency">
+            <field name="name">AWG</field>
+            <field name="full_name">Aruban florin</field>
+            <field name="symbol">Afl.</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="AZN" model="estimation.currency">
+            <field name="name">AZN</field>
+            <field name="full_name">Azerbaijani manat</field>
+            <field name="symbol">m</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BSD" model="estimation.currency">
+            <field name="name">BSD</field>
+            <field name="full_name">Bahamian dollar</field>
+            <field name="symbol">B$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BHD" model="estimation.currency">
+            <field name="name">BHD</field>
+            <field name="full_name">Bahraini dinar</field>
+            <field name="symbol">BD</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BDT" model="estimation.currency">
+            <field name="name">BDT</field>
+            <field name="full_name">Bangladeshi taka</field>
+            <field name="symbol">৳</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BBD" model="estimation.currency">
+            <field name="name">BBD</field>
+            <field name="full_name">Barbados dollar</field>
+            <field name="symbol">Bds$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BYR" model="estimation.currency">
+            <field name="name">BYR</field>
+            <field name="full_name">Belarusian ruble</field>
+            <field name="symbol">BR</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BYN" model="estimation.currency">
+            <field name="name">BYN</field>
+            <field name="full_name">Belarusian ruble</field>
+            <field name="symbol">Br</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BZD" model="estimation.currency">
+            <field name="name">BZD</field>
+            <field name="full_name">Belize dollar</field>
+            <field name="symbol">BZ$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BMD" model="estimation.currency">
+            <field name="name">BMD</field>
+            <field name="full_name">Bermudian dollar</field>
+            <field name="symbol">BD$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BTN" model="estimation.currency">
+            <field name="name">BTN</field>
+            <field name="full_name">Bhutanese ngultrum</field>
+            <field name="symbol">Nu.</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BOB" model="estimation.currency">
+            <field name="name">BOB</field>
+            <field name="full_name">Boliviano</field>
+            <field name="symbol">Bs.</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BAM" model="estimation.currency">
+            <field name="name">BAM</field>
+            <field name="full_name">Bosnia and Herzegovina convertible mark</field>
+            <field name="symbol">KM</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BWP" model="estimation.currency">
+            <field name="name">BWP</field>
+            <field name="full_name">Botswana pula</field>
+            <field name="symbol">P</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BIF" model="estimation.currency">
+            <field name="name">BIF</field>
+            <field name="full_name">Burundian franc</field>
+            <field name="symbol">FBu</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="KHR" model="estimation.currency">
+            <field name="name">KHR</field>
+            <field name="full_name">Cambodian riel</field>
+            <field name="symbol">៛</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="KYD" model="estimation.currency">
+            <field name="name">KYD</field>
+            <field name="full_name">Cayman Islands dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="KMF" model="estimation.currency">
+            <field name="name">KMF</field>
+            <field name="full_name">Comorian franc</field>
+            <field name="symbol">CF</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="CDF" model="estimation.currency">
+            <field name="name">CDF</field>
+            <field name="full_name">Congolese franc</field>
+            <field name="symbol">Fr</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="CUP" model="estimation.currency">
+            <field name="name">CUP</field>
+            <field name="full_name">Cuban peso</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="ANG" model="estimation.currency">
+            <field name="name">ANG</field>
+            <field name="full_name">Netherlands Antillean guilder</field>
+            <field name="symbol">ƒ</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="DJF" model="estimation.currency">
+            <field name="name">DJF</field>
+            <field name="full_name">Djiboutian franc</field>
+            <field name="symbol">Fdj</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="DOP" model="estimation.currency">
+            <field name="name">DOP</field>
+            <field name="full_name">Dominican peso</field>
+            <field name="symbol">RD$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="EGP" model="estimation.currency">
+            <field name="name">EGP</field>
+            <field name="full_name">Egyptian pound</field>
+            <field name="symbol">E£</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SVC" model="estimation.currency">
+            <field name="name">SVC</field>
+            <field name="full_name">Salvadoran Colon</field>
+            <field name="symbol">¢</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="ERN" model="estimation.currency">
+            <field name="name">ERN</field>
+            <field name="full_name">Eritrean nakfa</field>
+            <field name="symbol">Nfk</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="ETB" model="estimation.currency">
+            <field name="name">ETB</field>
+            <field name="full_name">Ethiopian birr</field>
+            <field name="symbol">Br</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="FKP" model="estimation.currency">
+            <field name="name">FKP</field>
+            <field name="full_name">Falkland Islands pound</field>
+            <field name="symbol">£</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="FJD" model="estimation.currency">
+            <field name="name">FJD</field>
+            <field name="full_name">Fiji dollar</field>
+            <field name="symbol">FJ$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="GEL" model="estimation.currency">
+            <field name="name">GEL</field>
+            <field name="full_name">Georgian lari</field>
+            <field name="symbol">ლ</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="GIP" model="estimation.currency">
+            <field name="name">GIP</field>
+            <field name="full_name">Gibraltar pound</field>
+            <field name="symbol">£</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="GNF" model="estimation.currency">
+            <field name="name">GNF</field>
+            <field name="full_name">Guinean franc</field>
+            <field name="symbol">FG</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="GYD" model="estimation.currency">
+            <field name="name">GYD</field>
+            <field name="full_name">Guyanese dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="HTG" model="estimation.currency">
+            <field name="name">HTG</field>
+            <field name="full_name">Haitian gourde</field>
+            <field name="symbol">G</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="ISK" model="estimation.currency">
+            <field name="name">ISK</field>
+            <field name="full_name">Icelandic króna</field>
+            <field name="symbol">kr</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="IRR" model="estimation.currency">
+            <field name="name">IRR</field>
+            <field name="full_name">Iranian rial</field>
+            <field name="symbol">﷼</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="IQD" model="estimation.currency">
+            <field name="name">IQD</field>
+            <field name="full_name">Iraqi dinar</field>
+            <field name="symbol"> ع.د</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="ILS" model="estimation.currency">
+            <field name="name">ILS</field>
+            <field name="full_name">Israeli new shekel</field>
+            <field name="symbol">₪</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="JMD" model="estimation.currency">
+            <field name="name">JMD</field>
+            <field name="full_name">Jamaican dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="JOD" model="estimation.currency">
+            <field name="name">JOD</field>
+            <field name="full_name">Jordanian dinar</field>
+            <field name="symbol"> د.ا </field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="KZT" model="estimation.currency">
+            <field name="name">KZT</field>
+            <field name="full_name">Kazakhstani tenge</field>
+            <field name="symbol">лв</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="KES" model="estimation.currency">
+            <field name="name">KES</field>
+            <field name="full_name">Kenyan shilling</field>
+            <field name="symbol">KSh</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="KWD" model="estimation.currency">
+            <field name="name">KWD</field>
+            <field name="full_name">Kuwaiti dinar</field>
+            <field name="symbol"> د.ك </field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="KGS" model="estimation.currency">
+            <field name="name">KGS</field>
+            <field name="full_name">Kyrgyzstani som</field>
+            <field name="symbol">лв</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="LAK" model="estimation.currency">
+            <field name="name">LAK</field>
+            <field name="full_name">Lao kip</field>
+            <field name="symbol">₭</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="LBP" model="estimation.currency">
+            <field name="name">LBP</field>
+            <field name="full_name">Lebanese pound</field>
+            <field name="symbol">ل.ل</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="LSL" model="estimation.currency">
+            <field name="name">LSL</field>
+            <field name="full_name">Lesotho loti</field>
+            <field name="symbol">M</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="LRD" model="estimation.currency">
+            <field name="name">LRD</field>
+            <field name="full_name">Liberian dollar</field>
+            <field name="symbol">L$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="LYD" model="estimation.currency">
+            <field name="name">LYD</field>
+            <field name="full_name">Libyan dinar</field>
+            <field name="symbol"> ل.د </field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MOP" model="estimation.currency">
+            <field name="name">MOP</field>
+            <field name="full_name">Macanese pataca</field>
+            <field name="symbol">MOP$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MKD" model="estimation.currency">
+            <field name="name">MKD</field>
+            <field name="full_name">Macedonian denar</field>
+            <field name="symbol">ден</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MGA" model="estimation.currency">
+            <field name="name">MGA</field>
+            <field name="full_name">Malagasy ariary</field>
+            <field name="symbol">Ar</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MWK" model="estimation.currency">
+            <field name="name">MWK</field>
+            <field name="full_name">Malawian kwacha</field>
+            <field name="symbol">MK</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MVR" model="estimation.currency">
+            <field name="name">MVR</field>
+            <field name="full_name">Maldivian rufiyaa</field>
+            <field name="symbol">.ރ</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MRO" model="estimation.currency">
+            <field name="name">MRO</field>
+            <field name="full_name">Mauritanian ouguiya (old)</field>
+            <field name="symbol">UM</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MRU" model="estimation.currency">
+            <field name="name">MRU</field>
+            <field name="full_name">Mauritanian ouguiya</field>
+            <field name="symbol">UM</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MDL" model="estimation.currency">
+            <field name="name">MDL</field>
+            <field name="full_name">Moldovan leu</field>
+            <field name="symbol">L</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MNT" model="estimation.currency">
+            <field name="name">MNT</field>
+            <field name="full_name">Mongolian tögrög</field>
+            <field name="symbol">₮</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MAD" model="estimation.currency">
+            <field name="name">MAD</field>
+            <field name="full_name">Moroccan dirham</field>
+            <field name="symbol">DH</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="BND" model="estimation.currency">
+            <field name="name">BND</field>
+            <field name="full_name">Brunei dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="DZD" model="estimation.currency">
+            <field name="name">DZD</field>
+            <field name="full_name">Algerian dinar</field>
+            <field name="symbol">DA</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="GHS" model="estimation.currency">
+            <field name="name">GHS</field>
+            <field name="full_name">Ghanaian cedi</field>
+            <field name="symbol">GH¢</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="GMD" model="estimation.currency">
+            <field name="name">GMD</field>
+            <field name="full_name">Gambian dalasi</field>
+            <field name="symbol">D</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MZN" model="estimation.currency">
+            <field name="name">MZN</field>
+            <field name="full_name">Mozambican metical</field>
+            <field name="symbol">MT</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="MMK" model="estimation.currency">
+            <field name="name">MMK</field>
+            <field name="full_name">Myanmar kyat</field>
+            <field name="symbol">K</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="NAD" model="estimation.currency">
+            <field name="name">NAD</field>
+            <field name="full_name">Namibian dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="NPR" model="estimation.currency">
+            <field name="name">NPR</field>
+            <field name="full_name">Nepalese rupee</field>
+            <field name="symbol">₨</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="ALL" model="estimation.currency">
+            <field name="name">ALL</field>
+            <field name="full_name">Albanian lek</field>
+            <field name="symbol">L</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="NIO" model="estimation.currency">
+            <field name="name">NIO</field>
+            <field name="full_name">Nicaraguan córdoba</field>
+            <field name="symbol">C$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="NGN" model="estimation.currency">
+            <field name="name">NGN</field>
+            <field name="full_name">Nigerian naira</field>
+            <field name="symbol">₦</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="KPW" model="estimation.currency">
+            <field name="name">KPW</field>
+            <field name="full_name">North Korean won</field>
+            <field name="symbol">₩</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="ZWL" model="estimation.currency">
+            <field name="name">ZWL</field>
+            <field name="full_name">Zimbabwean dollar</field>
+            <field name="symbol">Z$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="ZMW" model="estimation.currency">
+            <field name="name">ZMW</field>
+            <field name="full_name">Zambian kwacha</field>
+            <field name="symbol">ZK</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="YER" model="estimation.currency">
+            <field name="name">YER</field>
+            <field name="full_name">Yemeni rial</field>
+            <field name="symbol">﷼</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="EUR" model="estimation.currency">
+            <field name="name">EUR</field>
+            <field name="full_name">Euro</field>
+            <field name="symbol">€</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="VUV" model="estimation.currency">
+            <field name="name">VUV</field>
+            <field name="full_name">Vanuatu vatu</field>
+            <field name="symbol">VT</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="UZS" model="estimation.currency">
+            <field name="name">UZS</field>
+            <field name="full_name">Uzbekistan som</field>
+            <field name="symbol">лв</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="AED" model="estimation.currency">
+            <field name="name">AED</field>
+            <field name="full_name">United Arab Emirates dirham</field>
+            <field name="symbol">د.إ</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="TMT" model="estimation.currency">
+            <field name="name">TMT</field>
+            <field name="full_name">Turkmenistan manat</field>
+            <field name="symbol">T</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="TND" model="estimation.currency">
+            <field name="name">TND</field>
+            <field name="full_name">Tunisian dinar</field>
+            <field name="symbol">DT</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="TTD" model="estimation.currency">
+            <field name="name">TTD</field>
+            <field name="full_name">Trinidad and Tobago dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="TOP" model="estimation.currency">
+            <field name="name">TOP</field>
+            <field name="full_name">Tongan paʻanga</field>
+            <field name="symbol">T$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="THB" model="estimation.currency">
+            <field name="name">THB</field>
+            <field name="full_name">Thai baht</field>
+            <field name="symbol">฿</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="TZS" model="estimation.currency">
+            <field name="name">TZS</field>
+            <field name="full_name">Tanzanian shilling</field>
+            <field name="symbol">TSh</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="TJS" model="estimation.currency">
+            <field name="name">TJS</field>
+            <field name="full_name">Tajikistani somoni</field>
+            <field name="symbol">TJS</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="TWD" model="estimation.currency">
+            <field name="name">TWD</field>
+            <field name="full_name">New Taiwan dollar</field>
+            <field name="symbol">NT$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SYP" model="estimation.currency">
+            <field name="name">SYP</field>
+            <field name="full_name">Syrian pound</field>
+            <field name="symbol">£</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SZL" model="estimation.currency">
+            <field name="name">SZL</field>
+            <field name="full_name">Swazi lilangeni</field>
+            <field name="symbol">E</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SRD" model="estimation.currency">
+            <field name="name">SRD</field>
+            <field name="full_name">Surinamese dollar</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SDG" model="estimation.currency">
+            <field name="name">SDG</field>
+            <field name="full_name">Sudanese pound</field>
+            <field name="symbol">ج.س.</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="LKR" model="estimation.currency">
+            <field name="name">LKR</field>
+            <field name="full_name">Sri Lankan rupee</field>
+            <field name="symbol">Rs</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SSP" model="estimation.currency">
+            <field name="name">SSP</field>
+            <field name="full_name">South Sudanese pound</field>
+            <field name="symbol">£</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="GBP" model="estimation.currency">
+            <field name="name">GBP</field>
+            <field name="full_name">Pound sterling</field>
+            <field name="symbol">£</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SOS" model="estimation.currency">
+            <field name="name">SOS</field>
+            <field name="full_name">Somali shilling</field>
+            <field name="symbol">Sh.</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SBD" model="estimation.currency">
+            <field name="name">SBD</field>
+            <field name="full_name">Solomon Islands dollar</field>
+            <field name="symbol">SI$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SLL" model="estimation.currency">
+            <field name="name">SLL</field>
+            <field name="full_name">Sierra Leonean leone</field>
+            <field name="symbol">Le</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SCR" model="estimation.currency">
+            <field name="name">SCR</field>
+            <field name="full_name">Seychellois rupee</field>
+            <field name="symbol">SR</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="RSD" model="estimation.currency">
+            <field name="name">RSD</field>
+            <field name="full_name">Serbian dinar</field>
+            <field name="symbol">din.</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SAR" model="estimation.currency">
+            <field name="name">SAR</field>
+            <field name="full_name">Saudi riyal</field>
+            <field name="symbol">SR</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="STD" model="estimation.currency">
+            <field name="name">STD</field>
+            <field name="full_name">São Tomé and Príncipe dobra</field>
+            <field name="symbol">Db</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="WST" model="estimation.currency">
+            <field name="name">WST</field>
+            <field name="full_name">Samoan tālā</field>
+            <field name="symbol">WS$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="SHP" model="estimation.currency">
+            <field name="name">SHP</field>
+            <field name="full_name">Saint Helena pound</field>
+            <field name="symbol">£</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="RWF" model="estimation.currency">
+            <field name="name">RWF</field>
+            <field name="full_name">Rwandan franc</field>
+            <field name="symbol">RF</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="QAR" model="estimation.currency">
+            <field name="name">QAR</field>
+            <field name="full_name">Qatari riyal</field>
+            <field name="symbol">QR</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="PEN" model="estimation.currency">
+            <field name="name">PEN</field>
+            <field name="full_name">Peruvian sol</field>
+            <field name="symbol">S/</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="PYG" model="estimation.currency">
+            <field name="name">PYG</field>
+            <field name="full_name">Paraguayan guaraní</field>
+            <field name="symbol">₲</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="PGK" model="estimation.currency">
+            <field name="name">PGK</field>
+            <field name="full_name">Papua New Guinean kina</field>
+            <field name="symbol">K</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="PKR" model="estimation.currency">
+            <field name="name">PKR</field>
+            <field name="full_name">Pakistani rupee</field>
+            <field name="symbol">Rs.</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="OMR" model="estimation.currency">
+            <field name="name">OMR</field>
+            <field name="full_name">Omani rial</field>
+            <field name="symbol">ر.ع.</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="CVE" model="estimation.currency">
+            <field name="name">CVE</field>
+            <field name="full_name">Cape Verdean escudo</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="COU" model="estimation.currency">
+            <field name="name">COU</field>
+            <field name="full_name">Unidad de Valor Real</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="CLF" model="estimation.currency">
+            <field name="name">CLF</field>
+            <field name="full_name">Unidad de Fomento</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="CUC" model="estimation.currency">
+            <field name="name">CUC</field>
+            <field name="full_name">Cuban convertible peso</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="GTQ" model="estimation.currency">
+            <field name="name">GTQ</field>
+            <field name="full_name">Guatemalan Quetzal</field>
+            <field name="symbol">Q</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="VES" model="estimation.currency">
+            <field name="name">VES</field>
+            <field name="full_name">Venezuelan bolívar soberano</field>
+            <field name="symbol">Bs</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="UYW" model="estimation.currency">
+            <field name="name">UYW</field>
+            <field name="full_name">Unidad previsional</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="UYI" model="estimation.currency">
+            <field name="name">UYI</field>
+            <field name="full_name">Uruguay Peso en Unidades Indexadas</field>
+            <field name="symbol">$</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+        <record id="STN" model="estimation.currency">
+            <field name="name">STN</field>
+            <field name="full_name">São Tomé and Príncipe dobra</field>
+            <field name="symbol">Db</field>
+            <field name="rounding">0.01</field>
+        </record>
+
+    </data>
+</odoo>

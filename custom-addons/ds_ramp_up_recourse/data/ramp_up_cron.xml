@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="ir_cron_display_rampup_everyday" model="ir.cron">
+            <field name="name">Ramp Up: Display Rampup Everyday</field>
+            <field name="model_id" ref="model_hr_employee"/>
+            <field name="type">ir.actions.server</field>
+            <field name="state">code</field>
+            <field name="code">model.get_effort_rate_total()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 17:00:01')" />
+        </record>
+
+        <record id="ir_cron_history_task_score_everyyear" model="ir.cron">
+            <field name="name">Task Score: History Task Score</field>
+            <field name="model_id" ref="model_history_task_score"/>
+            <field name="type">ir.actions.server</field>
+            <field name="state">code</field>
+            <field name="code">model.get_history_task_score()</field>
+            <field name="interval_number">12</field>
+            <field name="interval_type">months</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="(datetime(year = DateTime.now().year + 1, month = 1, day = 1, hour = 0, minute = 0, second = 0)).strftime('%Y-%m-%d 17:00:01')" />
+        </record>
+
+    </data>
+</odoo>

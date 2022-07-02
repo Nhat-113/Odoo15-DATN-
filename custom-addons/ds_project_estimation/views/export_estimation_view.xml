@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Export Payslips in action menu -->
+        <record id="action_export_payslips" model="ir.actions.report">
+            <field name="name">Export Estimation</field>
+            <field name="model">estimation.work</field>
+            <field name="report_type">xlsx</field>
+            <field name="report_name">ds_project_estimation.estimation_xlsx</field>
+            <field name="report_file">ds_project_estimation.estimation_xlsx</field>
+            <field name="print_report_name">'Estimation Report - %s' % (object.number)</field>
+            <field name="binding_model_id" ref="model_estimation_work"/>
+        </record>
+    </data>
+</odoo>

@@ -3,6 +3,7 @@ odoo.define('dhx_gantt.GanttController', function (require) {
 var AbstractController = require('web.AbstractController');
 var core = require('web.core');
 var dialogs = require('web.view_dialogs');
+var session = require("web.session");
 // var BasicController = require('web.BasicController');
 var GanttController = AbstractController.extend({
     custom_events: _.extend({}, AbstractController.prototype.custom_events, {
@@ -90,12 +91,13 @@ var GanttController = AbstractController.extend({
             // console.log('BeforeUpdate. YAY!');
             data.csrf_token = core.csrf_token;
             data.model_name = self.modelName;
-            data.timezone_offset = (-self.date_object.getTimezoneOffset());
+            //data.timezone_offset = (-self.date_object.getTimezoneOffset());
             data.map_text = self.map_text;
             data.map_text = self.map_text;
             data.map_id_field = self.map_id_field;
             data.map_date_start = self.map_date_start;
             data.map_duration = self.map_duration;
+            data.map_working_day = self.map_working_day;
             data.map_open = self.map_open;
             data.map_progress = self.map_progress;
             data.link_model = self.link_model;
@@ -103,6 +105,111 @@ var GanttController = AbstractController.extend({
             // console.log(data);
             return true;
         });
+        gantt.attachEvent("onTaskLoading", function(task) {
+            //console.log(`task`, task);
+            // if (task.custom_date) 
+            if (task.working_day===0 && task.type !== "milestone" ) {
+                task.unscheduled = true;
+                // console.log('123');
+            }
+            // if(task.type !== "milestone") {
+            //     task.start_date = gantt.date.convert_to_utc(task.start_date);
+            //     task.end_date = gantt.date.convert_to_utc(task.end_date);    
+            // }
+           //console.log(`task`, task);
+            return true;
+        });
+        // dp.attachEvent("onBeforeLinkAdd", function(id, link){
+        //     let date_start_convert = data.start_date.split('-');
+
+        //     if(!start_date.split) return
+        // });
+        dp.attachEvent("onBeforeDataSending", function(id, state, data) {
+           //console.log(`state`,state );
+            if(state!=="inserted" && state!=="deleted" && data.type !=="milestone" ) {
+                let date_start_convert = data.start_date.split('-');
+                date_start_convert.splice(0, 2, date_start_convert[1], date_start_convert[0]);
+                date_start_convert.join('-');
+                let date_start = new Date(date_start_convert);
+                
+                var datestring =
+                    ("0" + (date_start.getDate() + 1)).slice(-2) +
+                    "-" +
+                    ("0" + (date_start.getMonth() + 1)).slice(-2) +
+                    "-" +
+                    date_start.getFullYear() +
+                    " " +
+                    ("0" + date_start.getHours()).slice(-2) +
+                    ":" +
+                    ("0" + date_start.getMinutes()).slice(-2);
+    
+                data.start_date = datestring;
+            }
+           
+            return true;
+        });
+    //     gantt.attachEvent("onAfterTaskDrag", function (id, mode, e){
+    //         let showTask = gantt.showTask;
+    //         let taskObj = gantt.getTask(id);
+    //         let id_before =   taskObj.id
+    //         //console.log(`id before`, id_before);
+    //         if(taskObj.type !== "milestone"){
+    //             gantt.showTask = function(id_drag){
+    //                 // console.log(`mode`, mode);
+    //                 id_drag = id_before
+    //                 // console.log('id after1',id_drag); 
+    //                 showTask.apply(this, [id_drag]);
+    //                 let attr = gantt.config.task_attribute;
+    //                 // console.log(`attr`, attr);
+    //                 // console.log('id after',id_drag); 
+    //                 let timelineElement = document.querySelector(".gantt_task_line["+attr+"='"+id_drag+"']");
+
+    //                 // console.log('timelineElement',timelineElement);
+    //                 if(timelineElement)
+    //                     timelineElement.scrollIntoView({block:"center"}); 
+    //         };
+    //     }
+    //     return true; 
+    // });
+    gantt.attachEvent("onBeforeLinkAdd", function(id, link){
+        // console.log(`id`, id);
+        // console.log(`link`, link);
+        var sourceTask = gantt.getTask(link.source);
+        var targetTask = gantt.getTask(link.target);
+        if (targetTask.type == "milestone" || targetTask.type =="phase"){
+            gantt.alert("This link is illegal for milestone and phase");
+            return false;
+        }
+    });
+        // deny drag if task have progress === 100%
+    gantt.attachEvent("onBeforeTaskDrag", function (id, mode, e) {
+        var taskObj = gantt.getTask(id);
+        // console.log(`taskObj`,taskObj );
+        if( taskObj.progress === 1 || taskObj.type == "phase" ) {
+            return false;
+        }
+        return true;
+    
+    });
+    
+    gantt.attachEvent("onBeforeTaskMove", function(id, parent, tindex){
+        // console.log('tindex',parent);
+        var task = gantt.getTask(id);
+        if(task.parent != parent)
+        {
+            return false;
+        }
+        return true;
+    });
+
+        //deny drag phase 
+        // gantt.attachEvent("onBeforeTaskDrag", function(id, mode, e){
+        //     var taskObj = gantt.getTask(id);
+        //     if (taskObj.type == "phase") {
+        //         return false;
+        //     }
+        //     return true;
+        // });
     },
 
     _onGanttConfig: function(){

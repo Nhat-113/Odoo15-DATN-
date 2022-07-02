@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_employee_current_task_score_filter" model="ir.ui.view">
+            <field name="name">current.task.score.filter</field>
+            <field name="model">current.task.score</field>
+            <field name="arch" type="xml">
+                <search string="Employees">
+                    <field name="name" string="Employee"/>
+                    <field name="department_id" groups="hr.group_hr_user"/>
+                    <field name="job_id"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_department" string="Department" domain="[]" context="{'group_by': 'department_id'}"/>
+                        <filter name="group_job" string="Job" domain="[]" context="{'group_by': 'job_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_current_task_score" model="ir.ui.view">
+            <field name="name">view.current.task.score</field>
+            <field name="model">current.task.score</field>
+            <field name="arch" type="xml">
+                <tree string="Employees" multi_edit="1" sample="1" js_class="hr_employee_list">
+                    <field name="name" readonly="1"/>
+                    <field name="department_id"/>
+                    <field name="job_id"/>
+                    <field name="task_score_avg"/>
+                    <button name="current_task_score_action" type="object" string="Detail" class="oe_highlight" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="task_score_view_tree" model="ir.ui.view">
+            <field name="name">project.task.tree.activity1</field>
+            <field name="model">project.task</field>
+            <field name="arch" type="xml">
+                <tree create="0">
+                    <field name="project_id"/>
+                    <field name="name" string="Task Name"/>
+                    <field name="task_score" widget="priority" readonly="1" type="int" avg="A"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="task_score_search" model="ir.ui.view">
+            <field name="name">project.task.score.filter</field>
+            <field name="model">project.task</field>
+            <field name="arch" type="xml">
+                <search string="Search Task Score">
+                    <field name="project_id"/>
+                    <field name="name"/>
+                    <field name="task_score"/>
+                    <field name="effective_hours"/>
+                    <filter string="Task Star" name="filter_star" domain="[('task_score', '>', '0')]"/>
+                    <filter string="Task not Star" name="filter_not_star" domain="[('task_score', '=', '0')]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Project" name="groupby_project" domain="[]" context="{'group_by': 'project_id'}"/>
+                        <filter string="Task Type" name="task_score" context="{'group_by':'task_score'}"/>
+                        <filter string="Create in" name="filter_month" context="{'group_by': 'create_date:month'}" help="Task create by Month"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="open_view_employee_current_task_score" model="ir.actions.act_window">
+            <field name="name">Employees</field>
+            <field name="res_model">current.task.score</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[]</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('view_current_task_score')})
+                         ]"/>
+            <field name="search_view_id" ref="view_employee_current_task_score_filter"/>
+        </record>
+
+        <record id="view_history_tree" model="ir.ui.view">
+            <field name="name">hr.history.tree</field>
+            <field name="model">history.task.score</field>
+            <field name="arch" type="xml">
+                <tree string="History" multi_edit="1" sample="1" js_class="hr_employee_list">
+                    <field name="name" readonly="1"/>
+                    <field name="department_id"/>
+                    <field name="job_id"/>
+                    <field name="task_score_avg"/>     
+                    <button name="history_task_score_action" type="object" string="Detail" class="oe_highlight" />              
+                </tree>
+            </field>
+        </record>
+
+        <record id="open_view_history" model="ir.actions.act_window">
+            <field name="name">History</field>
+            <field name="res_model">history.task.score</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[]</field>
+            <field name="context">{'group_by':'year'}</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('view_history_tree')})
+                         ]"/>
+        </record>
+
+        
+
+    </data>
+</odoo>

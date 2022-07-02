@@ -9,9 +9,10 @@
     'company': 'Dsoft',
     'maintainer': '',
     'website': "",
-    'depends': ['hr', 'base', 'project', 'web_domain_field'],
+    'depends': ['hr', 'base', 'project', 'web_domain_field', 'ds_project_planning'],
     'data': [
         'views/project_view.xml',
+        'views/report_timesheet_templates_update.xml',
         'security/ir.model.access.csv',
         'data/type_default.xml',
     ],
