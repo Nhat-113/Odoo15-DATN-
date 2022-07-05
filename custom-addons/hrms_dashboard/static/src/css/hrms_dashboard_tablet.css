@@ -268,6 +268,13 @@
         
 }
 @media screen and (min-width: 1200px) and (max-width: 1400px) { 
+    .button-checkout-user .stat-content .stat-text {
+        font-size: 10px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 34px;
+    }
     .leave_graph .legend>tbody {
         display: flex;
         width: 90%;
@@ -323,6 +330,16 @@
     }
 }
 @media screen and (min-width: 1400px) and (max-width: 1600px) { 
+    .button-checkout-user .stat-content .stat-text {
+        font-size: 11px;
+        color: white;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        margin-left: 43px;
+    }
+    .list_future_user .hr_leave_request_approve>h3 {
+        margin-left: 37px;
+    }
     .list-employee .leave_graph {
         margin-top: 19px;
     }
@@ -342,6 +359,16 @@
     }
 }
 @media screen and (min-width: 1600px) and (max-width: 1800px) { 
+    button-checkout-user .stat-content .stat-text {
+        font-size: 12px;
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 53px;
+    }
+    .list_future_user .hr_leave_request_approve>h3 {
+        margin-left: 35px;
+    }
     .list_menu .btn_announcements .text_btn_announcements {
         margin-left: -15px;
         padding-left: 20%;
