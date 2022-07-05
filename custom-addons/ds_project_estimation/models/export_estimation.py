@@ -269,6 +269,10 @@ class EstimationXlsx(models.AbstractModel):
         format_center = workbook.add_format(
                 {'align': 'center', 'border': 1})
 
+        merge_total = workbook.add_format({
+                'bold': 1,
+                'border': 1})
+
         sheet_resource.set_column(0, 0, 1)
         sheet_resource.set_column(1, 1, 10)
         sheet_resource.set_column(2, 4, 20)
@@ -325,7 +329,7 @@ class EstimationXlsx(models.AbstractModel):
             ]
             for i, value in enumerate(col_values):
                 sheet_resource.write(
-                    row_data_total_effort, col_data_total_effort + i, value, format['merge_header'])
+                    row_data_total_effort, col_data_total_effort + i, value, merge_total)
 
             if resource.name == 'Total (MM)':
                 duration = [
@@ -365,7 +369,7 @@ class EstimationXlsx(models.AbstractModel):
                     sheet_resource.write(row_data_chartt + 2 + i, col_data_chartt + 1, round(duration[i]), format_center)
                     count += round(duration[i])
             
-            sheet_resource.write(row_data_chartt + 7, col_data_chartt + 2, count, format['bold_center'])
+            sheet_resource.write(row_data_chartt + 8, col_data_chartt + 1, count, format['bold_center'])
             month = math.ceil(max(duration))
             col = 0
             num_days = 10
