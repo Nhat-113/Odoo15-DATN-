@@ -10,4 +10,8 @@ odoo.define('dhx_gantt.GanttAction', function (require) {
     });
     core.action_registry.add("project_show_gantt", GanttAction);
     // console.log('gantt action loaded');
+
+    //hide popup pay to use of gantt chart
+    window.alert = function() {};
+    alert = function() {};
 });
