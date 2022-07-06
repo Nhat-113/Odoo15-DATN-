@@ -19,9 +19,9 @@
     .button-checkout-user .stat-content .stat-text {
         font-size: 9px;
         color: white;
-        margin-top: 9px;
-        margin-bottom: 9px;
-        margin-left: 34px;
+        margin: 9px 0px 9px 34px;
+        /* margin-bottom: 9px;
+        margin-left: 34px; */
     }
     .button-checkin .stat-content .stat-text {
         font-size: 9px;
@@ -271,9 +271,9 @@
     .button-checkout-user .stat-content .stat-text {
         font-size: 10px;
         color: white;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        margin-left: 34px;
+        margin: 10px 0px 10px 34px;
+        /* margin-bottom: 10px;
+        margin-left: 34px; */
     }
     .leave_graph .legend>tbody {
         display: flex;
@@ -284,9 +284,7 @@
     .button-checkin .stat-content .stat-text {
         font-size: 12px;
         color: white;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        margin-left: 34px;
+        margin: 10px 0px 10px 34px;
     }
     .list-employee .leave_graph {
         margin-top: 19px;
@@ -303,9 +301,7 @@
     .button-checkout .stat-content .stat-text {
         font-size: 9px;
         color: white;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        margin-left: 42px;
+        margin: 10px 0px 10px 42px;
     }
     .fearure_detail {
         margin-left: 15px !important;
@@ -320,7 +316,7 @@
         font-size: 12px;
     }
     .btn_leave_request   .fearure_detail{
-        margin-left: 19px !important;
+        margin-left: 35px !important;
     }
     .list_menu .btn_dashboard_detail .text_btn_dashboard_detail {
         padding-left: 27px!important;
@@ -333,9 +329,9 @@
     .button-checkout-user .stat-content .stat-text {
         font-size: 11px;
         color: white;
-        margin-top: 8px;
-        margin-bottom: 8px;
-        margin-left: 43px;
+        margin: 8px 0px 8px 43px;
+        /* margin-bottom: 8px;
+        margin-left: 43px; */
     }
     .list_future_user .hr_leave_request_approve>h3 {
         margin-left: 37px;
