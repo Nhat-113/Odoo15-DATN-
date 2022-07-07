@@ -18,7 +18,7 @@
             <field name="name">My Tasks</field>
             <field name="res_model">project.task</field>
             <field name="view_mode">kanban,tree,form,calendar,pivot,graph,activity</field>
-            <field name="domain">[('user_ids', 'in', uid), ('issues_type','=',1)]</field>
+            <field name="domain">[('user_ids', 'in', uid)]</field>
         </record>
 
 </odoo>
