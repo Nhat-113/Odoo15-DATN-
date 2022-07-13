@@ -101,6 +101,20 @@ class Task(models.Model):
     progress_input = fields.Integer(string='Progress (%)', tracking=True)
     status_color = fields.Char(compute='_get_status_color', store=True)
 
+    @api.onchange('status')
+    def set_progerss(self):
+        for task in self:
+            if task.status.name == 'Done':
+                task.progress_input = 100
+                task.date_deadline = date.today()
+
+    def unlink(self):
+        for task in self:
+            if self.env.user.id not in task.user_ids.ids and self.env.user.has_group('ds_project_planning.group_project_pm') == False\
+                and self.env.user.has_group('project.group_project_manager') == False:
+               raise UserError('test')
+        return super().unlink()
+
     @api.depends('status')
     def _get_status_color(self):
         for color in self:

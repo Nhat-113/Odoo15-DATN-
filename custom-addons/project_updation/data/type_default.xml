@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
         
         <record id="status_new" model="project.task.status">
             <field name="name">New</field>
@@ -82,9 +82,6 @@
                 ref('status_closed'), ref('status_reopen'),ref('status_pending'),
                 ref('status_cancel')])]" name="status"/>
         </record>
-
-
-
 
     </data>
 </odoo>
