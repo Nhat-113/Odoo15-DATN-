@@ -379,7 +379,7 @@
                     </t>
                 </div>
                 <hr></hr>
-                <div class= "list_menu" style="height:5%">
+                <div class= "list_menu_user" style="height:7%">
                     <button class="btn_dashboard_detail_user" style="height:100% !important">
                         <h5><i class='fa fa-home '></i></h5>
                         <h5 class="text_btn_dashboard_detail">Overview</h5>
