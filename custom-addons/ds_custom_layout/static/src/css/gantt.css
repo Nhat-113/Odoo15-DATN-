@@ -1,0 +1,7 @@
+.gantt_message_area{
+    /* position:fixed;
+    right:5px;
+    width:250px;
+    z-index:1000; */
+    display:none !important
+}
