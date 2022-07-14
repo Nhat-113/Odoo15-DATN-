@@ -15,7 +15,7 @@
         'web.assets_backend': [
             'ds_custom_layout/static/src/css/employee.css',
             'ds_custom_layout/static/src/css/project.css',
-            'ds_custom_layout/static/src/css/recruitment.css'
+            'ds_custom_layout/static/src/css/recruitment.css',
             'ds_custom_layout/static/src/css/gantt.css'
         ],
     },
