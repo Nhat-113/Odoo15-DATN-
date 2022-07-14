@@ -355,10 +355,11 @@
     }
 }
 @media screen and (min-width: 1600px) and (max-width: 1800px) { 
-    button-checkout-user .stat-content .stat-text {
+
+    .button-checkout-user .stat-content .stat-text {
         font-size: 12px;
         color: white;
-        margin: 10px 0px 10px 53px;
+        margin: 10px 0px 10px 55px;
     }
     .list_future_user .hr_leave_request_approve>h3 {
         margin-left: 35px;
