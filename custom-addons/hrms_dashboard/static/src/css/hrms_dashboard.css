@@ -2158,16 +2158,14 @@ button:focus {
     display: flex;
     width: 100% !important;
     /* max-width: 90%; */
-    margin-left: 2%;
+    margin-left: 0px 0px 28px 2% ;
     background: none;
     border: none;
     height: 23% !important;
-    margin: 0 auto;
     flex-direction: row;
     align-items: center;
     height: 107% !important;
     border-radius: 8px;
-    margin-bottom: 28px !important;
 }
 .btn_dashboard_detail_user .text_btn_dashboard_detail {
     margin-left: 17px;
