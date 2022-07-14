@@ -978,6 +978,7 @@ h4 .stat-count {
     height: 100%;
     display: flex;
     margin: 0 auto;
+    object-fit: cover;
 }
 
 .information {
