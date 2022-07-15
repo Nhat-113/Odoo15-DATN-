@@ -87,7 +87,7 @@
 
         <record id="holiday_status_kh" model="hr.leave.type">
             <field name="name">Kết hôn</field>
-            <field name="requires_allocation">no</field>
+            <field name="requires_allocation">yes</field>
             <field name="leave_validation_type">hr</field>
             <field name="allocation_validation_type">officer</field>
             <field name="code">NKH</field>
@@ -101,7 +101,7 @@
 
         <record id="holiday_status_ckh" model="hr.leave.type">
             <field name="name">Con đẻ, con nuôi kết hôn</field>
-            <field name="requires_allocation">no</field>
+            <field name="requires_allocation">yes</field>
             <field name="leave_validation_type">hr</field>
             <field name="allocation_validation_type">officer</field>
             <field name="code">CKH</field>
