@@ -36,7 +36,7 @@ class Estimation(models.Model):
     sequence_module = fields.Integer(string="Sequence Module", store=True, default=1, compute ='_compute_sequence_module') # for compute sequence module
     add_lines_overview = fields.One2many('estimation.overview', 'connect_overview', string='Overview')
     add_lines_summary_costrate = fields.One2many('estimation.summary.costrate', 'connect_summary_costrate',
-                                                 string='Summary Cost Rate', domain=lambda self: self._domain_cost_rate())
+                                                 string='Summary Cost Rate', domain=lambda self: self._domain_cost_rate()) # 
 
     add_lines_summary_totalcost = fields.One2many('estimation.summary.totalcost', 'estimation_id', string='Summary Total Cost')
 
@@ -88,7 +88,7 @@ class Estimation(models.Model):
                             'yen_month': 0.0,
                             'yen_day': 0.0,
                         }
-                        self.env["estimation.summary.costrate"].create(val_cost_rate)
+                        # self.env["estimation.summary.costrate"].create(val_cost_rate)
                     record.module_activate = component_ids[-1]
                     return [('name', 'in', [record.module_activate])]
 
@@ -551,9 +551,9 @@ class Estimation(models.Model):
             domain = [(2, record.estimation_id.id or record.estimation_id.id.origin)]
             if record.name not in [rec.component for rec in ls_module]:
                 # if len(ls_costrate)
-                db_cost_rate = self.env['estimation.summary.costrate'].search([('name', '=', record.name)])
+                # db_cost_rate = self.env['estimation.summary.costrate'].search([('name', '=', record.name)])
                 
-                for costrate in db_cost_rate:
+                for costrate in ls_costrate:
                     if costrate.name == record.name:
                         costrate.write({'connect_summary_costrate': domain})
                 record.write({'estimation_id': domain})
@@ -565,6 +565,8 @@ class Estimation(models.Model):
             record.add_lines_summary_costrate.unlink()
             record.add_lines_resource_effort.unlink()
             record.add_lines_module.unlink()
+            #delete costrate no active
+            self.env['estimation.summary.costrate'].search([('connect_summary_costrate', 'in', [record.id, False])]).unlink()
         
         #delete module failed
         self._delete_module_failed()

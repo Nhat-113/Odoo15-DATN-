@@ -140,3 +140,8 @@ class EstimationSummaryCostRate(models.Model):
     def _compute_yen_day(self):
         for record in self:
             record.yen_day = record.yen_month/20
+
+
+    # @api.model
+    # def create(self, vals):
+    #     print(vals)
