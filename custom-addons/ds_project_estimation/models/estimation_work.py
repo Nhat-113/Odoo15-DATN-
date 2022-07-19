@@ -153,7 +153,7 @@ class Estimation(models.Model):
             # if 'module_activate' in vals:
             #     vals.pop('module_activate')
             est_new_vals = vals.copy()
-            ls_message_values = self.env['estimation.work'].search([('id','=',self.id)])
+            ls_message_values = self.env['estimation.work'].search([('id','=',self.id or self.id.origin)])
             est_old_vals = self.get_values(ls_message_values)
             vals_tab_module = self.convert_new_dict(est_new_vals)
             est_desc_content = self.merge_dict_vals(est_old_vals, est_new_vals, vals_tab_module)
@@ -459,6 +459,7 @@ class Estimation(models.Model):
             resource_line = []
             total_cost_line = []
             vals_cost_rate = []
+            module_active_late = []
             for module in record.add_lines_module:
                 if module.component not in (resource.name for resource in record.add_lines_resource_effort):
                     for resource in record.add_lines_resource_effort:
@@ -469,15 +470,23 @@ class Estimation(models.Model):
                         'sequence': module.sequence, 
                         'name': module.component
                     })
+                    module_active_late.append(module.component)
                     resource_line.append(lines)
                     self.add_record_md_mm_resource_plan(resource_line)
                     self.add_module_in_summary_tab(module, total_cost_line, vals_cost_rate)
-
+            try:
+                self.module_activate = module_active_late[-1]
+            except:
+                self.module_activate = None    
+                
             record.update({
                 'add_lines_resource_effort': resource_line,
                 'add_lines_summary_totalcost': total_cost_line,
                 'add_lines_summary_costrate': vals_cost_rate
             })
+            # if module.component not in [item.name for item in record.add_lines_summary_costrate]:
+            #     record.write({'add_lines_summary_costrate': vals_cost_rate})
+                  
             #case: Delete module using write method
             self._delete_modules(record.add_lines_module, record.add_lines_resource_effort,
                                        record.add_lines_summary_totalcost, record.add_lines_summary_costrate)
