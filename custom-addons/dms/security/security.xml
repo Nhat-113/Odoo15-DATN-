@@ -25,6 +25,9 @@
             eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
         />
     </record>
+    <record id="base.group_user" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('dms.group_dms_user'))]"/>
+    </record>
     <record id="rule_multi_company_storage" model="ir.rule">
         <field name="name">DMS Storage multi-company</field>
         <field name="model_id" ref="model_dms_storage" />
