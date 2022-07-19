@@ -131,6 +131,7 @@
                                                 name="lock"
                                                 type="object"
                                                 class="dropdown-item"
+                                                groups="dms.group_dms_manager"
                                             >
                                                 <i class="fa fa-lock" />
                                                 Lock
@@ -141,6 +142,7 @@
                                                 name="unlock"
                                                 type="object"
                                                 class="dropdown-item"
+                                                groups="dms.group_dms_manager"
                                             >
                                                 <i class="fa fa-unlock-alt" />
                                                 Unlock
@@ -151,6 +153,7 @@
                                                 name="toggle_active"
                                                 type="object"
                                                 class="dropdown-item"
+                                                groups="dms.group_dms_manager"
                                             >
                                                 <i class="fa fa-archive" />
                                                 Archive
@@ -161,6 +164,7 @@
                                                 name="toggle_active"
                                                 type="object"
                                                 class="dropdown-item"
+                                                groups="dms.group_dms_manager"
                                             >
                                                 <i class="fa fa-archive" />
                                                 Unarchive
@@ -193,6 +197,7 @@
                                                 role="menuitem"
                                                 type="edit"
                                                 class="dropdown-item"
+                                                groups="dms.group_dms_manager"
                                             >
                                                 <i class="fa fa-pencil-square-o" />
                                                 Edit
@@ -202,6 +207,7 @@
                                                 role="menuitem"
                                                 type="delete"
                                                 class="dropdown-item"
+                                                groups="dms.group_dms_manager"
                                             >
                                                 <i class="fa fa-trash-o" />
                                                 Delete
