@@ -250,7 +250,7 @@
                 <div class="announcements tabcontent" style="display: none;" id ="announcements_id">
                     <div class="announcements_detail" id="announcements_detail" >
                         <div class="header">
-                            <h3 >
+                            <h3 id="title_anoucement" >
                                 <i class="fa fa-bell" style="margin-right:8px;"></i>
                                 NEWS 
                             </h3>
@@ -268,7 +268,7 @@
                     </div>
                     <div class="announcements_detail"  id="birthday_detail" >
                         <div class="header">
-                            <h3 >
+                            <h3 id="title_birthday">
                                 <i class="fa fa-birthday-cake" style="margin-right:8px"></i>
                                 BIRTHDAY 
                             </h3>
@@ -289,7 +289,7 @@
 
                     <div class="announcements_detail" id="event_detail" >
                         <div class="header">
-                            <h3 >
+                            <h3 id="title_event">
                                 <i class="fa fa-flag" style="margin-right:8px"></i>
                                 EVENT 
                             </h3>
@@ -430,7 +430,7 @@
                     <div class="employee_dashboard_detail_user">
                             <div class="announcements_detail_user" id="announcements_detail_user">
                                 <div class="header_news">
-                                    <h3>
+                                    <h3 id="title_anoucement">
                                         <i class="fa fa-bell"  style="margin-right: 5%;"></i>
                                         NEWS 
                                     </h3>
@@ -449,7 +449,7 @@
 
                             <div class="announcements_detail_user" id="event_detail_user" >
                                 <div class="header_event">
-                                    <h3>
+                                    <h3 id="title_event">
                                         <i class="fa fa-flag"  style="margin-right: 5%;"></i>
                                         EVENT 
                                     </h3>

@@ -503,7 +503,7 @@ h4 .stat-count {
 }
 
 .emp_graph .legend>tbody>tr {
-    width: 50%;
+    width: 70%;
 }
 
 .leave-manager {
@@ -1797,7 +1797,16 @@ button:focus {
     background: #FFFFFF;
     border-radius: 24px;
 }
-
+#title_anoucement {
+    color: #4DA5CC;
+}
+#title_birthday {
+    color: #CE5D73
+    ;
+}
+#title_event {
+    color: #FFAC00;
+}
 #announcements_detail {
     background: linear-gradient(180deg, #EFF9FD 0%, #DAEAF1 100%);
 }
@@ -2175,15 +2184,14 @@ button:focus {
 .button-checkout .stat-content .stat-text {
     font-size: 14px;
     color: white;
-    margin-top: 14px 0 14px 80px;
-    margin-bottom: 14px;
+    margin: 14px 0 14px 80px;
     /* margin-left: 80px; */
 }
 
 .button-checkout-user .stat-content .stat-text {
     font-size: 14px;
     color: white;
-    margin-top: 14px 0 14px 65px;
+    margin: 14px 0 14px 65px;
     /* margin-bottom: 14px;
     margin-left: 65px; */
 }
@@ -2571,7 +2579,7 @@ button:focus {
     height: auto;
     position: relative;
     justify-content: center;
-    margin: 20% 0 0 0 ;
+    margin: 20% 38%;
     text-align: center;
     border-radius: 4px;
     padding: 2%!important;
