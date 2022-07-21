@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="company_management_menu" name="Company Management" groups="group_company_management_div"/>
+
+    <menuitem
+        id="human_resource_management"
+        name="Human Resource Management"
+        sequence="1"
+        parent="ds_company_management.company_management_menu" 
+        action="human_resource_management_action"/>
+
+</odoo>

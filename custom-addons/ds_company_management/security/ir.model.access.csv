@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+ds_company_management.access_human_resource_management,access_human_resource_management,ds_company_management.model_human_resource_management,,1,0,0,0

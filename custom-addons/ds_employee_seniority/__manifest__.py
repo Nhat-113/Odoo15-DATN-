@@ -13,6 +13,7 @@
     ],
     'data': [
         'views/employee_views.xml',
+        'data/employee_seniority_cron.xml'
     ],
     'installable': True,
     'auto_install': False,
