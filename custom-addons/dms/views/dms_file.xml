@@ -467,7 +467,8 @@
                                 <group>
                                     <field name="is_lock_editor" invisible="1" />
                                     <field name="is_locked" invisible="1" />
-                                    <field name="locked_by" />
+                                    <field name="locked_by_domain" invisible="1"/>
+                                    <field name="locked_by" domain="locked_by_domain"/>
                                 </group>
                             </group>
                         </page>

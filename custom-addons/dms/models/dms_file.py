@@ -552,6 +552,13 @@ class File(models.Model):
     # ----------------------------------------------------------
     # Locking fields and functions
     # ----------------------------------------------------------
+    
+
+    locked_by_domain = fields.Char(
+        compute='_get_locked_by_domain',
+        readonly=True,
+        store=False
+    )
 
     locked_by = fields.Many2one(comodel_name="res.users")
 
@@ -562,6 +569,15 @@ class File(models.Model):
     # ----------------------------------------------------------
     # Locking
     # ----------------------------------------------------------
+    @api.onchange('content', 'directory_id', 'name')
+    def _get_locked_by_domain(self):
+        list_users = []
+        for user in self.env['res.users'].search([]):
+            if user.has_group('dms.group_dms_manager') == True:
+                list_users.append(user.id)
+        self.locked_by_domain = json.dumps(
+                [('id', 'in', list_users)]
+            )
 
     def lock(self):
         self.write({"locked_by": self.env.uid})
