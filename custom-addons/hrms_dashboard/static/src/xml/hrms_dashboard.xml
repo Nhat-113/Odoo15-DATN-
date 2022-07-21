@@ -127,53 +127,6 @@
                                     Monthly Leave Analysis
                             </div>
                             <div class="leave_graph" />
-                            <!-- <div class="show_employee_new">
-                                <div class="employee-new">
-                                    <img  alt="" src="https://bizweb.dktcdn.net/100/392/388/products/z2805461259109-3040f96e1a6423f176aca350875cf765.jpg?v=1634188061233"/>
-                                    <p class="name_employee">Lê Văn Thuận</p>
-                                    <p>Web Developer</p>
-                                </div>
-                                <div class="employee-new">
-                                    <img  alt="" src="https://bizweb.dktcdn.net/100/392/388/products/z2805461259109-3040f96e1a6423f176aca350875cf765.jpg?v=1634188061233"/>
-                                    <p class="name_employee">Lê Văn Thuận</p>
-                                    <p>Web Developer</p>
-                                </div>
-                                <div class="employee-new">
-                                    <img  alt="" src="https://bizweb.dktcdn.net/100/392/388/products/z2805461259109-3040f96e1a6423f176aca350875cf765.jpg?v=1634188061233"/>
-                                    <p class="name_employee">Lê Văn Thuận</p>
-                                    <p>Web Developer</p>
-                                </div>
-                                <div class="employee-new">
-                                    <img  alt="" src="https://bizweb.dktcdn.net/100/392/388/products/z2805461259109-3040f96e1a6423f176aca350875cf765.jpg?v=1634188061233"/>
-                                    <p class="name_employee">Lê Văn Thuận</p>
-                                    <p>Web Developer</p>
-                                </div>
-                                <div class="employee-new">
-                                    <img  alt="" src="https://bizweb.dktcdn.net/100/392/388/products/z2805461259109-3040f96e1a6423f176aca350875cf765.jpg?v=1634188061233"/>
-                                    <p class="name_employee">Lê Văn Thuận</p>
-                                    <p>Web Developer</p>
-                                </div>
-                                <div class="employee-new">
-                                    <img  alt="" src="https://bizweb.dktcdn.net/100/392/388/products/z2805461259109-3040f96e1a6423f176aca350875cf765.jpg?v=1634188061233"/>
-                                    <p class="name_employee">Lê Văn Thuận</p>
-                                    <p>Web Developer</p>
-                                </div>
-                                <div class="employee-new">
-                                    <img  alt="" src="https://bizweb.dktcdn.net/100/392/388/products/z2805461259109-3040f96e1a6423f176aca350875cf765.jpg?v=1634188061233"/>
-                                    <p class="name_employee">Lê Văn Thuận</p>
-                                    <p>Web Developer</p>
-                                </div>
-                                <div class="employee-new">
-                                    <img  alt="" src="https://bizweb.dktcdn.net/100/392/388/products/z2805461259109-3040f96e1a6423f176aca350875cf765.jpg?v=1634188061233"/>
-                                    <p class="name_employee">Lê Văn Thuận</p>
-                                    <p>Web Developer</p>
-                                </div>
-                                <div class="employee-new">
-                                    <img  alt="" src="https://bizweb.dktcdn.net/100/392/388/products/z2805461259109-3040f96e1a6423f176aca350875cf765.jpg?v=1634188061233"/>
-                                    <p class="name_employee">Lê Văn Thuận</p>
-                                    <p>Web Developer</p>
-                                </div>
-                            </div> -->
                         </div>
                     </div>
                     <div class="Leave-Request">
@@ -325,9 +278,10 @@
                                 <h4 class="mb-0">
                                 </h4>
                                 <p class="start-head" style="padding : 0px;">My Leave Analysis</p>
-    
+                                
                             </div>
                             <div class="leave_trend" />
+                            <!-- <canvas id="myChart" width="10px" height="5px" class="payroll_analytic_admin"></canvas> -->
                         </div>
                     </div>
                 </div>
@@ -359,14 +313,14 @@
                 <hr></hr>
                 <div class= "list_menu_user" >
                     <button class="tablinks_2 btn_dashboard_detail_user  active"    id="btn_dashboard_detail_user">
-                        <h5><i class='fa fa-home btn_dashboard_detail_user'></i></h5>
+                        <h5 class="icon_menu"><i class='fa fa-home btn_dashboard_detail_user'></i></h5>
                         <h5 class="text_btn_dashboard_detail btn_dashboard_detail_user">Overview</h5>
                     </button >
 
-                    <!-- <button class="tablinks_2 btn_dashboard_payroll_user" id="btn_dashboard_payroll_user">
-                        <h5><i class='fa fa-money btn_dashboard_payroll_user '></i></h5>
+                    <button class="tablinks_2 btn_dashboard_payroll_user" id="btn_dashboard_payroll_user">
+                        <h5 class="icon_menu"> <i class='fa fa-money btn_dashboard_payroll_user '></i></h5>
                         <h5 class="text_btn_dashboard_detail btn_dashboard_payroll_user">Payroll Analytics</h5>
-                    </button > -->
+                    </button >
                 </div>
                 <hr></hr>
 
@@ -477,6 +431,9 @@
                         </div>
                     </div>
                 </div>
+                <div class = "payroll tabcontent_2"  style="display:none">
+                    <canvas id="myChart" width="10px" height="5px" ></canvas>
+                </div>   
                 
             </div>
         </div>
