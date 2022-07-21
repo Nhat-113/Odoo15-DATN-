@@ -503,7 +503,7 @@ h4 .stat-count {
 }
 
 .emp_graph .legend>tbody>tr {
-    width: 70%;
+    width: 50%;
 }
 
 .leave-manager {
@@ -1466,7 +1466,7 @@ button:focus {
     align-items: flex-start;
     justify-content: center;
     flex-direction: row;
-    width: 55%;
+    width: 70%;
     margin: 0 auto;
 }
 
@@ -1685,7 +1685,9 @@ button:focus {
     margin: 0 0 0 18%;
     /* margin-left: 18%; */
 }
-
+.leave_graph .legend >tbody > tr>td{
+    padding: 4px 6px 4px 1px !important;
+}
 .leave_graph .legend>tbody>tr {
     width: 50%;
 }
