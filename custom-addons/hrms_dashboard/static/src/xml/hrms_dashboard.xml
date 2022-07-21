@@ -194,7 +194,7 @@
                     
                     <div class="welcome_employee" >
                         <div class="detail_welcome">
-                            <img src="https://cdn-icons-png.flaticon.com/512/890/890347.png"></img>
+                            <img src="/hrms_dashboard/static/src/img/news.png"></img>
                             <h2 class="text_welcome">Welcome  <t t-esc="widget.login_employee['name']"/> </h2>
                         </div>
                     </div>
@@ -207,7 +207,7 @@
                                 <i class="fa fa-bell" style="margin-right:8px;"></i>
                                 NEWS 
                             </h3>
-                            <img src="https://cdn-icons-png.flaticon.com/512/1074/1074208.png" class="image_news"></img>
+                            <img src="/hrms_dashboard/static/src/img/news.png" class="image_news"></img>
                         </div>
                             
                         <div class="col-xs-12 text-align list_news " id="list_anoucement">
@@ -225,7 +225,7 @@
                                 <i class="fa fa-birthday-cake" style="margin-right:8px"></i>
                                 BIRTHDAY 
                             </h3>
-                            <img src="https://cdn-icons.flaticon.com/png/512/4114/premium/4114367.png?token=exp=1657856045~hmac=e38cb202c10bf3acc2cbf6fc272e4ccf" class="image_bitrh" ></img>
+                            <img src="/hrms_dashboard/static/src/img/birthday.png" class="image_bitrh" ></img>
                         </div>
                         
                         <div class="col-xs-12 text-align list_news " id="list_birthday">
@@ -388,7 +388,7 @@
                                         <i class="fa fa-bell"  style="margin-right: 5%;"></i>
                                         NEWS 
                                     </h3>
-                                    <img src="https://cdn-icons-png.flaticon.com/512/1074/1074208.png" class="image_user_news"></img>
+                                    <img src="/hrms_dashboard/static/src/img/news.png" class="image_user_news"></img>
                                 </div>
 
                                 <div class="col-xs-12 text-align list_event_user"  id="thumb_news_bar_user">
@@ -407,7 +407,7 @@
                                         <i class="fa fa-flag"  style="margin-right: 5%;"></i>
                                         EVENT 
                                     </h3>
-                                    <img src="https://cdn-icons.flaticon.com/png/512/3920/premium/3920768.png?token=exp=1657856143~hmac=3f5f528a9b0854545e6692592c7eedf7" class= "image_event_news" ></img>
+                                    <img src="/hrms_dashboard/static/src/img/event.png" class= "image_event_news" ></img>
                                 </div>
                                 <div class="col-xs-12 text-align list_event_user"  id="thumb_event_bar_user">
                                     <t t-foreach="widget.upcoming_events" t-as="event">
