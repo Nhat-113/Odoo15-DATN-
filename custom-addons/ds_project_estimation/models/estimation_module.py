@@ -8,7 +8,7 @@ class EstimationModule(models.Model):
     _rec_name = "component"
     _order = "sequence"
     
-    sequence = fields.Integer(string="No", index=True) #, store=True, compute='_compute_sequence'
+    sequence = fields.Integer(string="No", index=True)
     component = fields.Char(string="Components", required=True)
     total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays") 
     check_compute = fields.Char(string="Check", readonly=True)
@@ -48,12 +48,6 @@ class EstimationModule(models.Model):
         result = super(EstimationModule, self).write(vals)
         if 'estimation_id' in vals:
             modules = self.env['estimation.module'].search([('estimation_id', '=', vals['estimation_id'])])
-            # if len(modules) != 0:
-            #     for index, module in enumerate(self):
-            #         module.sequence = len(modules) - len(self) + index + 1
-            # else:
-            #     for index, module in enumerate(self):
-            #         module.sequence = index + 1
             for module in self.estimation_id.add_lines_summary_totalcost:
                 for module_tab in modules:
                     if module.key_primary == module_tab.key_primary:
@@ -77,20 +71,6 @@ class EstimationModule(models.Model):
             record.module_config_activity.unlink()
             # record.summary_total_cost.unlink()
             # record.summary_cost_rate.unlink()
-            
-            # check_data_resource_plan = self.env['estimation.resource.effort'].search([('estimation_id', '=', record.estimation_id.id)])
-            # gantt_resource_plan = self.env['gantt.resource.planning'].search([('estimation_id', '=', record.estimation_id.id)])
-            # if check_data_resource_plan:
-            #     count = len(check_data_resource_plan)
-            #     if count == 3:  # there is 1 module and 2 record mm + md -> delete all record
-            #         check_data_resource_plan.unlink()  # delete all record
-                    
-            #         if gantt_resource_plan:  # remove gantt
-            #             gantt_resource_plan.unlink()
-            #     elif count > 3: # there are many modules -> delete 1 record
-            #         for item in check_data_resource_plan:
-            #             if item.module_id.id == record.id:
-            #                 item.unlink()
         return super(EstimationModule, self).unlink()
                 
     @api.model
@@ -162,11 +142,6 @@ class EstimationModule(models.Model):
                 'module_config_activity': activities_line,
                 'module_effort_activity': activities_effort_line
                 })
-
-    @api.depends('check_compute')
-    def _compute_sequence(self):
-        for record in self:
-            record.sequence = len(self.estimation_id.add_lines_module)
 
     @api.depends('module_config_activity.effort')
     def _compute_total_mandays(self):
@@ -309,7 +284,7 @@ class BreakdownActivities(models.Model):
     percent_effort = fields.Float(string="Percent Effort (%)", default=0.0)
     type = fields.Selection(string="Type", store=True, related='activity_id.activity_type')
     
-    mandays_input = fields.Float(string="Expected (man-days)") #, store=True, related='mandays' , readonly=True, store=True, compute='_get_mandays'
+    mandays_input = fields.Float(string="Expected (man-days)")
     check_compute = fields.Char(string="Check", readonly=True)
 
     @api.model
@@ -361,7 +336,6 @@ class EffortActivities(models.Model):
     _order = "sequence,id"
     
     module_id = fields.Many2one("estimation.module", string="Module")
-    # activity_id = fields.Many2one('config.activity', string="Activities Work Breakdown")
     
     sequence = fields.Integer(string="No", index=True, store=True)
     activity = fields.Char(string="Activity")
@@ -375,7 +349,6 @@ class EffortActivities(models.Model):
         for record in self:
             for rec in record.module_id.module_config_activity:
                 if record.key_primary == rec.key_primary:
-                # if record.activity == rec.activity:
                     record.effort = rec.effort
                     record.activity = rec.activity
                     record.sequence = rec.sequence
