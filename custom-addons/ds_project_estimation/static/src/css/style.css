@@ -10,6 +10,31 @@ div[name="module_effort_activity"] {
     pointer-events: none !important;
 }
 
+div[name="add_lines_resource_effort"] table tbody tr:nth-last-child(3) {
+    visibility: collapse;
+    user-select: none;
+    display: none;
+}
+
+div[name="add_lines_resource_effort"] table tbody tr:nth-last-child(2),
+div[name="add_lines_resource_effort"] table tbody tr:last-child {
+    background-color: #EEEEEE;
+    font-weight: bold !important;
+}
+
+div[name="add_lines_resource_effort"] table tbody tr:nth-last-child(2) td:first-child,
+div[name="add_lines_resource_effort"] table tbody tr:last-child td:first-child {
+    color: #EEEEEE;
+    user-select: none;
+}
+div[name="add_lines_resource_effort"] table tfoot {
+    background-color: #FFFFFF !important;
+}
+
+div[name="add_lines_summary_totalcost"] table tfoot .name::before {
+    content: "Total"
+}
+
 .o_field_widget.o_quick_editable {
     word-break: break-all;
 }
@@ -50,4 +75,79 @@ div[name="check_activate"] .custom-control-label, div[name="check_activate"] i {
 }
 th[data-name="check_activate"] {
     width: 0 !important;
+}
+
+.btn_add_a_line {
+    color: #5b3eb5;
+    border: none;
+}
+
+.suggest_icon {
+    width: 20px !important;
+    height: 20px;
+    position: absolute;
+    top: 9%;
+    right: 30px;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+.suggest_icon::before {
+    content: '?';
+    position: absolute;
+    left: 6px;
+    animation-name: suggest_icon_keyframe;
+    animation-duration: 2500ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    color: #000;
+    font-weight: bold;
+}
+
+@keyframes suggest_icon_keyframe {
+    from {
+        transform: rotateX(-20deg) rotateY(0deg);
+    }
+    to {
+        transform: rotateX(-20deg) rotateY(360deg);
+    }
+}
+
+.type_tooltip_hover {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+    display: none !important;
+    padding: 16px;
+    position: absolute;
+    right: 0;
+    font-size: 10px;
+    width: 330px !important;
+    z-index: 100;
+    top: 18%;
+}
+.type_tooltip_hover ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.suggest_icon:hover + .type_tooltip_hover {
+    display: block !important;
+}
+
+.type_tooltip_hover::after {
+    cursor: pointer;
+    content: "";
+    position: absolute;
+    right: 28px;
+    top: -20px;
+    border-width: 10px 10px;
+    border-style: solid;
+    border-color: transparent transparent #ccc transparent;
 }

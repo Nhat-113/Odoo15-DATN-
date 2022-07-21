@@ -1,6 +1,6 @@
-from email.policy import default
 from odoo import models, fields, api
 from odoo.exceptions import UserError, ValidationError
+import json, string, uuid
 
 class EstimationModule(models.Model):
     _name = "estimation.module"
@@ -8,7 +8,7 @@ class EstimationModule(models.Model):
     _rec_name = "component"
     _order = "sequence"
     
-    sequence = fields.Integer(string="No", index=True, readonly=True, store=True, compute='_compute_sequence')
+    sequence = fields.Integer(string="No", index=True) #, store=True, compute='_compute_sequence'
     component = fields.Char(string="Components", required=True)
     total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays") 
     check_compute = fields.Char(string="Check", readonly=True)
@@ -19,10 +19,54 @@ class EstimationModule(models.Model):
     module_summarys = fields.One2many('estimation.module.summary', 'module_id')
     module_config_activity = fields.One2many('config.activity', 'module_id')
     module_effort_activity = fields.One2many('module.effort.activity', 'module_id')
-    check_load_default = fields.Boolean('Check load default cost', default=True)
-    # estimation_resource_plan = fields.One2many('estimation.resource.effort', 'module_id')
+    project_activity_type = fields.Selection([
+                            ('base', 'Project Base'), 
+                            ('odc', 'ODC')],
+                            default='base',
+                            required=True,
+                            string="Project Type")
 
     get_estimation_id = fields.Integer(string="Estimation Id")
+    key_primary = fields.Char(string="Key unique module")
+    get_module_activate = fields.Char(string="Module activate", compute='_compute_get_modules', store=True)
+    check_save_estimation = fields.Boolean(string="Check save estimation", default=False)
+    
+    @api.depends('component')
+    def _compute_get_modules(self):
+        for record in self:
+            record.estimation_id.module_activate = record.component
+            record.get_module_activate = record.component
+            
+            #check modified components name
+            if record.check_save_estimation == False:
+                modules = self.env['estimation.module'].search([('key_primary', '=', record.key_primary)])
+                if modules.component != record.component:
+                    modules.write({'component': record.component})
+            
+            
+    def write(self, vals):
+        result = super(EstimationModule, self).write(vals)
+        if 'estimation_id' in vals:
+            modules = self.env['estimation.module'].search([('estimation_id', '=', vals['estimation_id'])])
+            # if len(modules) != 0:
+            #     for index, module in enumerate(self):
+            #         module.sequence = len(modules) - len(self) + index + 1
+            # else:
+            #     for index, module in enumerate(self):
+            #         module.sequence = index + 1
+            for module in self.estimation_id.add_lines_summary_totalcost:
+                for module_tab in modules:
+                    if module.key_primary == module_tab.key_primary:
+                        module_tab.sequence = module.sequence
+                        
+        #delete cosrate when modified module name
+        if 'component' in vals:
+            for module in self:
+                cost_rate_db = self.env["estimation.summary.costrate"].search([('key_primary', '=', module.key_primary)])
+                for costrate in cost_rate_db:
+                    if costrate.name != vals['component']:
+                        costrate.unlink()
+        return result
 
 
     def unlink(self):
@@ -70,58 +114,59 @@ class EstimationModule(models.Model):
         })
         return res
     
-    def compute_load_activities(self):
-        get_data_activities = self.env['data.activity'].search([])
-        activities_line = []
-        activities_effort_line = []
+    def _random_key_connect_activity(self):
+        key = str(uuid.uuid4())
+        return key
+
+    
+    def get_activities_project_type(self, get_data_activities, activities_line, activities_effort_line):
+        if self.project_activity_type == 'base': 
+            if len(self.module_config_activity) == 0:
+                get_data_activities = get_data_activities.search([('project_type', '=', 'base')])
+            else:
+                get_data_activities = get_data_activities.search([('project_type', '=', 'base')], limit=1)
+        else:
+            get_data_activities = get_data_activities.search([('project_type', '=', 'odc')])
         for record in get_data_activities:
-            content = {
+            activities = {
                 'sequence': record.sequence, 
-                # 'sequence': 0, 
                 'activity': record.activity,
                 'effort': 0.0,
                 'percent': 0.0,
                 'activity_type': record.activity_type,
-                'check_default': True
+                'check_default': True,
+                'key_primary': self._random_key_connect_activity() + str(record.sequence)
             }
-            line = (0, 0, content)
-            activities_line.append(line)
+            if self.project_activity_type != 'base':
+                activities['sequence'] = len(self.module_config_activity) + 1
+                activities['activity'] += str(len(self.module_config_activity) + 1)
+            elif self.project_activity_type == 'base' and len(self.module_config_activity) != 0:
+                activities['sequence'] = len(self.module_config_activity) + 1
+                activities['activity'] = 'Activity ' + str(len(self.module_config_activity) + 1)
+            activities_line.append((0, 0, activities))
             
-            temp = content.copy()
+            temp = activities.copy()
             temp.pop('activity_type')
             temp.pop('check_default')
-            line_effort = (0, 0, temp)
-            activities_effort_line.append(line_effort)
+            activities_effort_line.append((0, 0, temp))
+    
+    def compute_load_activities(self):
+        get_data_activities = self.env['data.activity']
+        activities_line = []
+        activities_effort_line = []
+        self.key_primary = self._random_key_connect_activity()
+        self.get_activities_project_type(get_data_activities, activities_line, activities_effort_line)                    
             
         for record in self:
-            if record.estimation_id:    # nếu module đã được lưu trước đó với 1 estimation đã tồn tại
-                for rec in record.estimation_id.add_lines_module:
-                    if rec.id == record.id:
-                        record.sequence = rec.sequence
-                        record.component = rec.component
-            else:   # nếu module chưa được lưu
-                module_db = self.env['estimation.module']
-                max_sequence = max_exist_data = max_not_data = 0
-                # kiểm tra xem đã tồn tại module nào trong estimation chưa hoặc estimation đã tồn tại chưa
-                ls_exist_datas = module_db.search([('estimation_id', '=', record.get_estimation_id)])
-                if ls_exist_datas:
-                    max_exist_data = max(item.sequence for item in ls_exist_datas)
-                
-                # kiểm tra xem đã có module nào vừa được thêm nhưng chưa save(chưa có estimation_id)
-                ls_not_datas = module_db.search([('estimation_id', '=', False),\
-                                                                    ('get_estimation_id', '=', record.get_estimation_id)
-                                                                ])
-                if ls_not_datas:
-                    max_not_data = max(rec.sequence for rec in ls_not_datas)
-                   
-                max_sequence =  max(max_exist_data, max_not_data)
-                record.sequence = max_sequence + 1
-                # record.component = 'Module ' + str(record.sequence)
             record.update({
                 'module_config_activity': activities_line,
                 'module_effort_activity': activities_effort_line
                 })
-    
+
+    @api.depends('check_compute')
+    def _compute_sequence(self):
+        for record in self:
+            record.sequence = len(self.estimation_id.add_lines_module)
 
     @api.depends('module_config_activity.effort')
     def _compute_total_mandays(self):
@@ -129,64 +174,10 @@ class EstimationModule(models.Model):
             total = sum( item.effort for item in record.module_config_activity)
             record.total_manday = total
     
-    @api.depends('check_compute')
-    def _compute_sequence(self):
-        max = self.estimation_id.sequence_module
-        for record in self:
-            #if click load activities mode
-            if record.get_estimation_id == 0:
-                if record.estimation_id.id:
-                    record.get_estimation_id = record.estimation_id.id
-                #if edit mode
-                elif record.estimation_id.id.origin:
-                    record.get_estimation_id =record.estimation_id.id.origin
-                else:
-                    record.get_estimation_id = 999999
-            record.sequence = max
-            # record.component = 'Module ' + str(max)
-            if record.id or record.id.origin == False :
-                max += 1
-
-    # @api.onchange('component')
-    # def _compute_components(self):
-    #     # count = 0
-    #     # for record in self:
-    #     #     for rec in self.estimation_id.add_lines_module:
-    #     #         if record.component == rec.component:
-    #     #             if rec.id.ref != None:
-    #     #                 count += 1
-    #     #     if count > 1:
-    #     #         record.component = False
-    #     #         return {
-    #     #             'warning': {
-    #     #                 'title': 'Warning!',
-    #     #                 'message': 'Module components already exists!'
-    #     #             }
-    #     #         } 
-    #     components = []
-    #     for record in self.estimation_id.add_lines_module:
-    #         if record.id.origin != False :
-    #             components.append(record.component)
-            
-    #     if len(components) != len(set(components)):
-    #         # self.component = False
-    #         # raise UserError('Breadown Activity name already exists!')
-    #         return {
-    #             'warning': {
-    #                 'title': 'Warning!',
-    #                 'message': 'Module components already exists!'
-    #             }
-    #         } 
 
     @api.depends('module_config_activity')
     def _compute_sequence_activities(self):
-        model = 'config.activity'
-        sequence_field = 'sequence_activities'
-        ls_data_fields = 'module_config_activity'
-        for record in self:
-            domain = [('module_id', '=', record.id or record.id.origin)]
-            self.env['estimation.work']._compute_sequence_all(record, model, domain, sequence_field, ls_data_fields)
-            
+       
         #re-compute mandays for module breakdown activities
         for record in self.module_config_activity:
             if record.activity_current and record.activity_type == 'type_1':
@@ -228,7 +219,9 @@ class EstimationModule(models.Model):
                     EstimationModule._get_activities(rec, record)
                 
             # Case: delete record
-            EstimationModule._delete_activities(record.module_effort_activity, record.module_config_activity)
+            self._delete_activities(record.module_effort_activity, record.module_config_activity)
+            self._reset_sequence(record.module_effort_activity)
+            self._reset_sequence(record.module_config_activity)
             
     def _get_activities(rec_activity, record_module):
         line = []
@@ -244,11 +237,15 @@ class EstimationModule(models.Model):
             'module_effort_activity': line
         })
 
-    def _delete_activities(ls_effort_activity, ls_config_activities):
+    def _delete_activities(self, ls_effort_activity, ls_config_activities):
         for record in ls_effort_activity:
-            if record.sequence not in [rec.sequence for rec in ls_config_activities]:
+            if record.key_primary not in [rec.key_primary for rec in ls_config_activities]:
                 record.write({'module_id': [(2, record.module_id.id or record.module_id.id.origin)]})
+        
                 
+    def _reset_sequence(self, ls_data):
+        for index, item in enumerate(ls_data):
+            item.sequence = index + 1
 
 class EstimationModuleAssumption(models.Model):
     _name = "estimation.module.assumption"
@@ -354,20 +351,8 @@ class BreakdownActivities(models.Model):
 
     @api.depends('check_compute')
     def _compute_sequence(self):
-        for record in self.activity_id:
-            # if save module mode
-            if record.id: # or record.id.origin
-                max = record.sequence_breakdown
-                for rec in self:
-                   if rec.activity_id.id == record.id:
-                        rec.sequence = max
-                        max += 1
-            else: #if this is create new activity
-                max = record.sequence_breakdown
-                for rec in self:
-                    rec.sequence = max
-                    if rec.id or rec.id.origin == False:
-                        max += 1
+        for index, breakdown in enumerate(self.activity_id.add_lines_breakdown_activity):
+            breakdown.sequence = index + 1
                         
 class EffortActivities(models.Model):
     _name = "module.effort.activity"
@@ -382,16 +367,18 @@ class EffortActivities(models.Model):
     activity = fields.Char(string="Activity")
     effort = fields.Float(string='Effort', compute='_compute_effort', store=True)
     percent = fields.Float(string="Percentage (%)", default=0, store=True, compute='_compute_percentage')
+    key_primary = fields.Char(string="Key Connect activity effort")
     
     # compute_effort is required for the _compute_percentage method to work correctly
     @api.depends('module_id.module_config_activity.effort', 'module_id.module_config_activity.activity')
     def _compute_effort(self):
         for record in self:
             for rec in record.module_id.module_config_activity:
-                if record.sequence == rec.sequence:
+                if record.key_primary == rec.key_primary:
                 # if record.activity == rec.activity:
                     record.effort = rec.effort
                     record.activity = rec.activity
+                    record.sequence = rec.sequence
             
     @api.depends('effort', 'module_id.module_config_activity')
     def _compute_percentage(self):

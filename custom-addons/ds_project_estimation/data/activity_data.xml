@@ -6,6 +6,7 @@
             <field name="activity">Preparation</field>
             <field name="description">Preparation</field>
             <field name="activity_type">type_2</field>
+            <field name="project_type">base</field>
         </record>
 
         <record id="act_req_default" model="data.activity">
@@ -13,6 +14,7 @@
             <field name="activity">Requirement</field>
             <field name="description">Requirement</field>
             <field name="activity_type">type_2</field>
+            <field name="project_type">base</field>
         </record>
 
         <record id="act_des_default" model="data.activity">
@@ -20,6 +22,7 @@
             <field name="activity">Design</field>
             <field name="description">Design</field>
             <field name="activity_type">type_2</field>
+            <field name="project_type">base</field>
         </record>
 
         <record id="act_implement_default" model="data.activity">
@@ -27,6 +30,7 @@
             <field name="activity">Implementation</field>
             <field name="description">Implementation</field>
             <field name="activity_type">type_2</field>
+            <field name="project_type">base</field>
         </record>
 
         <record id="act_review_default" model="data.activity">
@@ -34,6 +38,7 @@
             <field name="activity">Review</field>
             <field name="description">Review</field>
             <field name="activity_type">type_2</field>
+            <field name="project_type">base</field>
         </record>
 
         <record id="act_test_default" model="data.activity">
@@ -41,6 +46,7 @@
             <field name="activity">Test</field>
             <field name="description">Test</field>
             <field name="activity_type">type_2</field>
+            <field name="project_type">base</field>
         </record>
 
         <record id="act_trans_default" model="data.activity">
@@ -48,6 +54,7 @@
             <field name="activity">Translation</field>
             <field name="description">Translation</field>
             <field name="activity_type">type_2</field>
+            <field name="project_type">base</field>
         </record>
 
         <record id="act_build_default" model="data.activity">
@@ -55,6 +62,7 @@
             <field name="activity">Build and Release</field>
             <field name="description">Build and Release</field>
             <field name="activity_type">type_2</field>
+            <field name="project_type">base</field>
         </record>
 
         <record id="act_risk_default" model="data.activity">
@@ -62,6 +70,7 @@
             <field name="activity">Risk Management</field>
             <field name="description">Risk Management</field>
             <field name="activity_type">type_1</field>
+            <field name="project_type">base</field>
         </record>
 
         <record id="act_accept_default" model="data.activity">
@@ -69,6 +78,7 @@
             <field name="activity">Acceptance test support</field>
             <field name="description">Acceptance test support</field>
             <field name="activity_type">type_3</field>
+            <field name="project_type">base</field>
         </record>
 
         <record id="act_warranty_default" model="data.activity">
@@ -76,6 +86,7 @@
             <field name="activity">Warranty</field>
             <field name="description">Warranty</field>
             <field name="activity_type">type_2</field>
+            <field name="project_type">base</field>
         </record>
 
         <record id="act_pm_default" model="data.activity">
@@ -83,6 +94,15 @@
             <field name="activity">Project Management</field>
             <field name="description">Project Management</field>
             <field name="activity_type">type_1</field>
+            <field name="project_type">base</field>
+        </record>
+
+        <record id="activity_odc" model="data.activity">
+            <field name="sequence" eval="13" />
+            <field name="activity">Activity ODC</field>
+            <field name="description">Activity ODC</field>
+            <field name="activity_type">type_3</field>
+            <field name="project_type">odc</field>
         </record>
     </data>
 </odoo>

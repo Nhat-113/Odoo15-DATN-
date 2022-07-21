@@ -7,7 +7,7 @@
     'category': 'Services/Estimation',
     "version": "15.0.1.0.0",
     "license": "AGPL-3",
-    'depends': ['base', 'crm', 'web_domain_field', 'report_xlsx'],
+    'depends': ['base', 'crm', 'web_domain_field', 'report_xlsx', 'project'],
     "application": True,
     'data': [
         "security/estimation_security.xml",
@@ -30,7 +30,8 @@
         "views/crm_lead_views.xml",
         "data/gen_project_cron.xml",
         "wizard/message_wizard_views.xml",
-        "views/export_estimation_view.xml"
+        "views/export_estimation_view.xml",
+        "views/project_views.xml"
 
     ],
     'assets': {
