@@ -40,8 +40,9 @@ class EstimationModule(models.Model):
             #check modified components name
             if record.check_save_estimation == False:
                 modules = self.env['estimation.module'].search([('key_primary', '=', record.key_primary)])
-                if modules.component != record.component:
-                    modules.write({'component': record.component})
+                for item in modules:
+                    if item.component != record.component:
+                        item.write({'component': record.component})
             
             
     def write(self, vals):
