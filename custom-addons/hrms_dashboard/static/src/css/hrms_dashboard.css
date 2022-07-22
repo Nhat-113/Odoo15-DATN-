@@ -2593,3 +2593,23 @@ button:focus {
 .dashboard-not-employee_content {
     margin: 0;
 }
+@-webkit-keyframes round_image {
+    from{
+        -webkit-transform: rotate(0deg);
+    }
+    to{
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+.round_image {
+    -webkit-animation: round_image 5s linear infinite;
+}
+
+/* .round_image {
+    -webkit-transform: rotate(360deg);
+    -webkit-transition-duration: 1s;
+    -webkit-transition-delay: now;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+} */

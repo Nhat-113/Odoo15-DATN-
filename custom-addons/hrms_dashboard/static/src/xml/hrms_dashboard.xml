@@ -194,7 +194,7 @@
                     
                     <div class="welcome_employee" >
                         <div class="detail_welcome">
-                            <img src="/hrms_dashboard/static/src/img/news.png"></img>
+                            <img src="/hrms_dashboard/static/src/img/sun.png" class="round_image"></img>
                             <h2 class="text_welcome">Welcome  <t t-esc="widget.login_employee['name']"/> </h2>
                         </div>
                     </div>
