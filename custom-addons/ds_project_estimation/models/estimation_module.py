@@ -41,7 +41,9 @@ class EstimationModule(models.Model):
             if record.check_save_estimation == False:
                 modules = self.env['estimation.module'].search([('key_primary', '=', record.key_primary)])
                 for item in modules:
-                    if item.component != record.component:
+                    if record.component == '':
+                        record.component = item.component
+                    elif item.component != record.component:
                         item.write({'component': record.component})
             
             
