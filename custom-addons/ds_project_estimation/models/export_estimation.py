@@ -297,7 +297,7 @@ class EstimationXlsx(models.AbstractModel):
 
         row_data_total_effort, col_data_total_effort = 14, 1
         resources = estimation.env['estimation.resource.effort'].search([('estimation_id','=',estimation.id)])
-        for resource in resources[:-2]:
+        for resource in resources[:-3]:
             row_data_total_effort += 1
             col_values = [
                 resource.sequence,
