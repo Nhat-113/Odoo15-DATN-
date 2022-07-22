@@ -260,6 +260,7 @@
                                                 role="menuitem"
                                                 type="edit"
                                                 class="dropdown-item"
+                                                groups="dms.group_dms_manager"
                                             >
                                                 <i class="fa fa-pencil-square-o" />
                                                 Edit
@@ -269,6 +270,7 @@
                                                 role="menuitem"
                                                 type="delete"
                                                 class="dropdown-item"
+                                                groups="dms.group_dms_manager"
                                             >
                                                 <i class="fa fa-trash-o" />
                                                 Delete
@@ -552,7 +554,7 @@
                                 </group>
                             </group>
                         </page>
-                        <page
+                        <!-- <page
                             string="Groups"
                             attrs="{'invisible':[('storage_id_inherit_access_from_parent_record', '=', True)]}"
                         >
@@ -609,7 +611,7 @@
                                     />
                                 </group>
                             </group>
-                        </page>
+                        </page> -->
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
@@ -630,7 +632,7 @@
                 <attribute name="invisible">0</attribute>
             </field>
             <field name="storage_id" position="attributes">
-                <attribute name="options">{}</attribute>
+                <attribute name="options">{'no_quick_create': True, 'no_create': True, 'no_create_edit':True, 'no_open': True}</attribute>
             </field>
         </field>
     </record>
@@ -680,7 +682,7 @@
                         <field name="is_root_directory" readonly="1" />
                         <field
                             name="storage_id"
-                            options="{'no_quick_create': True}"
+                            options="{'no_quick_create': True, 'no_create': True, 'no_create_edit':True, 'no_open': True}"
                             attrs="{'readonly':[('is_root_directory','=',False)], 'required':[('is_root_directory','=',True)]}"
                             force_save="1"
                         />
