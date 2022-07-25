@@ -173,8 +173,13 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 // if(task.type !== "milestone"){
                     task.start_date =gantt.date.convert_to_utc(task.start_date);
                 // }   
+                // console.log(`data`, data);
+                data.sort( function (start_1,start_2) {
+                    // console.log(`data2`,data );
+                    return start_1.start_date - start_2.start_date
+                }
+                ),
                 data.push(task);
-                //console.log(`task`, task.start_date);
                 if(!record.type) {
                     links.push.apply(links, JSON.parse(record.links_serialized_json))
                 }
