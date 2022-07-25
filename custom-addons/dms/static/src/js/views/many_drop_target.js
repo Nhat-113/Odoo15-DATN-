@@ -62,7 +62,7 @@ odoo.define("dms.DragDrop", function (require) {
                 kwargs: {
                     context: ctx,
                 },
-            }).then(() => location.reload());
+            }).then(() => this.reload());
         },
 
         /**
