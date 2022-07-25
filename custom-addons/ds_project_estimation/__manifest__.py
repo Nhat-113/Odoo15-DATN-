@@ -47,7 +47,8 @@
             '/ds_project_estimation/static/src/js/gantt_controller.js',
             '/ds_project_estimation/static/src/js/gantt_view.js',
             '/ds_project_estimation/static/src/js/gantt_action.js',
-            '/ds_project_estimation/static/src/css/gantt.css'
+            '/ds_project_estimation/static/src/css/gantt.css',
+            '/ds_project_estimation/static/src/scss/custom_view_cost_rate.scss'
         ],
         'web.assets_qweb': [
             'ds_project_estimation/static/src/xml/gantt.xml'

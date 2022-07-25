@@ -1,0 +1,11 @@
+
+// custom view cost rate in summary tab
+div[name="add_lines_summary_costrate"] {
+    tbody {
+        @for $i from 1 through 6 {
+            tr:nth-last-child(#{$i}) {
+                display: table-row !important;
+            }
+        }
+    }
+}

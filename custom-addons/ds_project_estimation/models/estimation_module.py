@@ -29,7 +29,7 @@ class EstimationModule(models.Model):
     get_estimation_id = fields.Integer(string="Estimation Id")
     key_primary = fields.Char(string="Key unique module")
     get_module_activate = fields.Char(string="Module activate", compute='_compute_get_modules', store=True)
-    check_save_estimation = fields.Boolean(string="Check save estimation", default=False)
+    check_save_estimation = fields.Boolean(string="Check save estimation", default=False, store=True)
     
     @api.depends('component')
     def _compute_get_modules(self):
@@ -38,18 +38,20 @@ class EstimationModule(models.Model):
             record.get_module_activate = record.component
             
             #check modified components name
-            if record.check_save_estimation == False:
-                modules = self.env['estimation.module'].search([('key_primary', '=', record.key_primary)])
-                for item in modules:
-                    if record.component == '':
-                        record.component = item.component
-                    elif item.component != record.component:
-                        item.write({'component': record.component})
+            modules = self.env['estimation.module'].search([('key_primary', '=', record.key_primary)])
+            for item in modules:
+                if record.component == '':
+                    record.component = item.component
+                elif item.component != record.component and record.check_save_estimation == False:
+                    item.write({'component': record.component})
             
             
     def write(self, vals):
         result = super(EstimationModule, self).write(vals)
         if 'estimation_id' in vals:
+            for item in self:
+                item.check_save_estimation = True
+
             modules = self.env['estimation.module'].search([('estimation_id', '=', vals['estimation_id'])])
             for module in self.estimation_id.add_lines_summary_totalcost:
                 for module_tab in modules:

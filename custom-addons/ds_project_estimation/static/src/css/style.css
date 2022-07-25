@@ -41,6 +41,10 @@ div[name="add_lines_summary_totalcost"] table tfoot td:nth-child(2)::before {
     font-weight: bold;
 }
 
+div[name="add_lines_summary_costrate"] table tbody tr {
+    display: none;
+}
+
 .o_field_widget.o_quick_editable {
     word-break: break-all;
 }
