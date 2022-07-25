@@ -124,16 +124,29 @@ class EstimationModule(models.Model):
             }
             if self.project_activity_type != 'base':
                 activities['sequence'] = len(self.module_config_activity) + 1
-                activities['activity'] += str(len(self.module_config_activity) + 1)
+                if len(self.module_config_activity) != 0:
+                    activity_name = self.check_load_duplicate_activity(activities['activity'])
+                    activities['activity'] = activity_name
+                
             elif self.project_activity_type == 'base' and len(self.module_config_activity) != 0:
                 activities['sequence'] = len(self.module_config_activity) + 1
-                activities['activity'] = 'Activity ' + str(len(self.module_config_activity) + 1)
+                activity_name = self.check_load_duplicate_activity('Activity ')
+                
+                activities['activity'] = activity_name
             activities_line.append((0, 0, activities))
             
             temp = activities.copy()
             temp.pop('activity_type')
             temp.pop('check_default')
             activities_effort_line.append((0, 0, temp))
+            
+    def check_load_duplicate_activity(self, activity_name):
+        for index in range(len(self.module_config_activity)):
+            activity_name_rs = activity_name + str(len(self.module_config_activity) + index + 1)
+            if activity_name_rs not in (act.activity for act in self.module_config_activity):
+                return activity_name_rs
+            else:
+                index += 1
     
     def compute_load_activities(self):
         get_data_activities = self.env['data.activity']
