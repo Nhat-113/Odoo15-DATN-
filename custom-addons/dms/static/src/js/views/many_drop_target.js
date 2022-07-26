@@ -47,7 +47,8 @@ odoo.define("dms.DragDrop", function (require) {
             }
             console.log(ctx);
             if (typeof ctx.default_directory_id === "undefined") {
-                return this.do_warn(_t("You must select a directory first"));
+                return this.displayNotification({ message: _.str.sprintf(
+                    _t("You must select a directory first"))});
             }
             return this._rpc({
                 model: res_model,
