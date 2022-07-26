@@ -5,6 +5,7 @@
 import logging
 
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -83,6 +84,8 @@ class ResCompany(models.Model):
 
     @api.model
     def action_open_documents_onboarding_directory(self):
+        if len(self.env['dms.storage'].search([])) == 0:
+           raise UserError("Let's create storage.")
         storage = self.env["dms.storage"].search([], order="create_date desc", limit=1)
         action = self.env.ref("dms.action_dms_directory_new").read()[0]
         action["context"] = {
@@ -96,6 +99,8 @@ class ResCompany(models.Model):
 
     @api.model
     def action_open_documents_onboarding_file(self):
+        if len(self.env['dms.directory'].search([])) == 0:
+           raise UserError("Let's create directory.")
         directory = self.env["dms.directory"].search(
             [], order="create_date desc", limit=1
         )
