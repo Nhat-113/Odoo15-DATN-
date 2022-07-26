@@ -440,7 +440,7 @@
                             <field name="is_root_directory" invisible="1" />
                             <field
                                 name="storage_id"
-                                options="{'no_open': True}"
+                                options="{'no_quick_create': True, 'no_create': True, 'no_create_edit':True, 'no_open': True}"
                                 attrs="{'readonly':[('is_root_directory','=',False)], 'required':[('is_root_directory','=',True)]}"
                                 force_save="1"
                             />
@@ -449,7 +449,7 @@
                             <field name="inherit_group_ids" />
                             <field
                                 name="parent_id"
-                                options="{'no_quick_create': True}"
+                                options="{'no_quick_create': True, 'no_create': True, 'no_create_edit':True}"
                                 attrs="{'invisible':[('is_root_directory','=',True)], 'required':[('is_root_directory','=',False)]}"
                             />
                         </group>
@@ -463,13 +463,13 @@
                             <field
                                 name="category_id"
                                 placeholder="Internal / Human Resource"
-                                options="{'no_open': True, 'no_create': True}"
+                                options="{'no_open': True, 'no_create': True, 'no_create_edit':True}"
                             />
                             <field
                                 name="tag_ids"
                                 widget="many2many_tags"
                                 placeholder="Tags..."
-                                options="{'color_field': 'color', 'no_create_edit': True}"
+                                options="{'color_field': 'color', 'no_create_edit': True, 'no_create': True, 'no_create_edit':True}"
                             />
                             <field name="starred" widget="boolean_favorite" />
                         </group>

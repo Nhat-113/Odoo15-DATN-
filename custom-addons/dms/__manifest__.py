@@ -15,6 +15,7 @@
         "http_routing",
         "portal",
         "mail_preview_base",
+        "web_domain_field",
     ],
     "data": [
         "security/security.xml",
