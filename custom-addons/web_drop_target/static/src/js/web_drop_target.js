@@ -162,6 +162,10 @@ odoo.define("web_drop_target", function (require) {
                 (controller == undefined || controller.jsID === this.controllerID)
             ) {
                 const drop_zone_offset = this.$drop_zone.offset();
+                if(!drop_zone_offset) 
+                    {
+                        return 
+                    }
                 const overlay_css = {
                     top: drop_zone_offset.top,
                     left: drop_zone_offset.left,
