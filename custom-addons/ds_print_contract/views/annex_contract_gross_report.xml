@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="annex_contract_gross_qweb_report" name="annex_contract_gross_qweb_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="e">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <link rel='stylesheet' href='/ds_print_contract/static/src/css/report.css'/>
+                        <div class="container contract-report">
+                            <div class="row">
+                                <div class="col-4 text-center">
+                                    <tr>
+                                        <th>
+<!--                                            <img src="/ds_print_contract/static/description/img/d-soft.jpg" style="width:100%;"/>-->
+                                            <b>
+                                                <t t-if='e.company_id.display_name'>
+                                                    <span t-field="e.company_id.display_name"/>
+                                                </t>
+                                                <t t-if="not e.company_id.display_name">CÔNG TY CỔ PHẦN D-SOFT
+                                                </t>
+                                            </b>
+                                        </th>
+                                    </tr>
+                                </div>
+                                <div class="col-8 text-center">
+                                    <div class="text-center">
+                                        <tr>
+                                            <th>
+                                                <b>
+                                                    <span>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</span>
+                                                </b>
+                                            </th>
+                                        </tr>
+                                        <br/>
+                                        <tr>
+                                            <th>
+                                                <em>Độc lập - Tự do - Hạnh phúc</em>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <span style="margin-top: -10px; display: block;">________________________</span>
+                                            </th>
+                                        </tr>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 contract-plhd">
+                                    <b>
+                                        <span>PHỤ LỤC HỢP ĐỒNG</span>
+                                    </b>
+                                    <p class="font-italic" style="font-size: 16px;">
+                        (Kèm theo hợp đồng số …………………)
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row contract-signature">
+                                <div class="col-6 text-center">
+                                </div>
+                                <div class="col-6 text-center">
+                                    <p class="font-italic" style="font-size: 16px;">Đà Nẵng, ngày
+                                        <span t-esc="e.date_start.strftime('%d')"/>
+                        tháng
+                                        <span t-esc="e.date_start.strftime('%m')"/>
+                        năm
+                                        <span t-esc="e.date_start.strftime('%Y')"/>
+                                    </p>
+                                </div>
+                            </div>
+                            <table style="width:100%">
+                                <tr>
+                                    <th>Chúng tôi, một bên là</th>
+                                    <td>
+                                        <span>:  </span>
+                                        <b>
+                                            <t t-if='e.company_id.display_name'>
+                                                <span t-field="e.company_id.display_name"/>
+                                            </t>
+                                            <t t-if="not e.company_id.display_name">Công ty CỔ PHẦN D-SOFT
+                                            </t>
+                                        </b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Địa chỉ</th>
+                                    <td>
+                                        <span>:  </span>
+                                        <span>
+                                            <t t-if='e.company_id.street'>
+                                                <span t-field="e.company_id.street"/>
+                                            </t>
+                                            <t t-if="not e.company_id.street">Số 10 Hải Phòng - P.Thạch Thang - Q.Hải Châu - TP.Đà Nẵng</t>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Số điện thoại</th>
+                                    <td>
+                                        <span>:  </span>
+                                        <t t-if='e.company_id.phone'>
+                                            <span t-field="e.company_id.phone"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Người đại diện</th>
+                                    <td>
+                                        <span>:  </span>Ông
+                                        <b>
+                                            <t t-if='e.company_id.representative'>
+                                                <span t-field="e.company_id.representative"/>
+                                            </t>
+                                        </b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Chức vụ</th>
+                                    <td>
+                                        <span>:  </span>
+                                            <t t-if='e.company_id.position'>
+                                                <span t-field="e.company_id.position"/>
+                                            </t>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Và một bên là </th>
+                                    <td>
+                                        <span>:  </span>
+                                        <t1 t-if='e.employee_id.gender'>
+                                            <t t-if="e.employee_id.gender == 'male'">
+                                                <span>Ông</span>
+                                            </t>
+                                            <t t-if="e.employee_id.gender == 'female'">
+                                                <span>Bà</span>
+                                            </t>
+                                        </t1>
+                                        <b>
+                                            <span style="text-transform: uppercase;">
+                                                <t t-if='e.employee_id.name'>
+                                                    <span t-field="e.employee_id.name"/>
+                                                </t>
+                                            </span>
+                                        </b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Sinh ngày</th>
+                                    <td style="border: none; border-bottom: none;">
+                                        <span>:  </span>
+                                        <span>
+                                            <t t-if='e.employee_id.birthday'>
+                                                <span t-esc="e.employee_id.birthday.strftime('%d/%m/%Y')"/>
+                                            </t>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Địa chỉ thường trú</th>
+                                    <td style="border: none; border-top: none;">
+                                        <span>:  </span>
+                                        <span>
+                                            <t t-if='e.employee_id.address'>
+                                                <span t-field="e.employee_id.address"/>
+                                            </t>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2">CMND số :
+                                        <span>
+                                            <t t-if='e.employee_id.identification_id'>
+                                                <span t-field="e.employee_id.identification_id"/>
+                                            </t>
+                                            <t t-if="not e.employee_id.identification_id">....................................</t>
+                                        </span> cấp ngày:
+                                        <span>
+                                            <t t-if='e.employee_id.id_start_date'>
+                                                <span t-esc="e.employee_id.id_start_date.strftime('%d/%m/%Y')"/>
+                                            </t>
+                                            <t t-if="not e.employee_id.id_start_date">....................................</t>
+                                        </span> tại:
+                                        <span>
+                                            <t t-if='e.employee_id.identification_place'>
+                                                <span t-field="e.employee_id.identification_place"/>
+                                            </t>
+                                            <t t-if="not e.employee_id.identification_place">......................................................</t>
+                                        </span>
+                                    </th>
+                                </tr>
+                            </table>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <p>Hai bên thoả thuận ký kết phụ lục hợp đồng lao động và cam kết làm đúng những điều khoản sau đây:</p>
+                                    <p class="font-weight-bold">Điều 1: Nội dung</p>
+                                    <div>
+                                        <table style="width:100%">
+                                            <tr>
+                                                <th style="width:24%"><span class="font-weight-bold">Tổng thu nhập (Gross)</span></th>
+                                                <td>
+                                                    <span class="font-weight-bold">:  </span>
+                                                    <span class="font-weight-bold">
+                                                        <t t-if="e.wage">
+                                                            <span t-esc="'{:,}'.format(int(e.wage + e.other_allowance))"/>
+                                                        </t>
+                                                        <t t-if="not e.wage">
+                                                            <t t-if="e.other_allowance">
+                                                                <span t-esc="'{:,}'.format(int(e.other_allowance))"/>
+                                                            </t>
+                                                            <t t-if="not e.other_allowance"> 0 </t>
+                                                        </t>VNĐ/tháng. <span class="font-weight-normal">Trong đó:</span>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Lương cơ bản</th>
+                                                <td>
+                                                    <span>:  </span>
+                                                    <span class="font-weight-normal">
+                                                        <t t-if="e.wage">
+                                                            <span t-esc="'{:,}'.format(int(e.wage))"/>
+                                                        </t>
+                                                        <t t-if="not e.wage"> 0 </t>VNĐ/tháng
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Các khoản chế độ phúc lợi</th>
+                                                <td>
+                                                    <span>:  </span>
+                                                    <span class="font-weight-normal">
+                                                        <t t-if="e.other_allowance">
+                                                            <span t-esc="'{:,}'.format(int(e.other_allowance))"/>
+                                                        </t>
+                                                        <t t-if="not e.other_allowance"> 0 </t>VNĐ/tháng
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <p>Thời gian tăng ca sẽ được tính khi có yêu cầu từ trưởng bộ phận hoặc khách hàng. Tiền công tăng ca hoặc ngày nghỉ được tính theo quy định của công ty.</p>
+                                    </div>
+                                    <p class="font-weight-bold">Điều 2: Thời hạn</p>
+                                    <div>
+                                        <p>Phụ lục này có hiệu lực từ ngày
+                                            <span t-esc="e.date_start.strftime('%d')"/>
+ tháng
+                                            <span t-esc="e.date_start.strftime('%m')"/>
+ năm
+                                            <span t-esc="e.date_start.strftime('%Y')"/>
+                                        </p>
+                                        <p>Và là bộ phận của hợp đồng số …………/HĐLĐ
+                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+ được lập thành 02 (hai) bản có giá trị như nhau, mỗi bên giữ 01 (một) bản
+                                        </p>
+                                        <p>Phụ lục hợp đồng được lập tại:
+                                            <span class="font-weight-bold">
+                                                <b>
+                                                    <t t-if='e.company_id.display_name'>
+                                                        <span t-field="e.company_id.display_name"/>
+                                                    </t>
+                                                    <t t-if="not e.company_id.display_name">CÔNG TY CỔ PHẦN D-SOFT
+                                                    </t>
+                                                </b>
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row contract-signature">
+                                <div class="col-6 text-center">
+                                    <p class="font-weight-bold">NGƯỜI LAO ĐỘNG</p>
+                                    <p class="font-italic">(Ký, ghi rõ họ tên)</p>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <p class="font-weight-bold">ĐẠI DIỆN
+                                        <b>
+                                            <t t-if='e.company_id.display_name'>
+                                                    <span t-field="e.company_id.display_name"/>
+                                            </t>
+                                            <t t-if="not e.company_id.display_name">CÔNG TY CỔ PHẦN D-SOFT
+                                            </t>
+                                        </b>
+                                    </p>
+                                    <p class="font-italic">
+                                        <t t-if='e.company_id.position'>(
+                                            <span t-field="e.company_id.position"/>
+                                        )</t>
+                                        </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="footer"></div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
