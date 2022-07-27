@@ -318,7 +318,7 @@ class Employee(models.Model):
         for i in range(0, len(dat)):
             money.append(dat[i][4])
             # money_format = "${:.2f}".format(money)
-            data.append({'label': dat[i][1], 'value': sum(money)})
+            data.append({'label': dat[i][2], 'value': sum(money)})
   
         return data
     @api.model

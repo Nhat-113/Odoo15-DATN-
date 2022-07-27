@@ -246,7 +246,7 @@
                                 <i class="fa fa-flag" style="margin-right:8px"></i>
                                 EVENT 
                             </h3>
-                            <img src="https://cdn-icons.flaticon.com/png/512/3920/premium/3920768.png?token=exp=1657856143~hmac=3f5f528a9b0854545e6692592c7eedf7" class= "image_event" ></img>
+                            <img src="/hrms_dashboard/static/src/img/event.png" class= "image_event" ></img>
                         </div>
                         <div class="col-xs-12 text-align list_news" id ="list_event">
                             <t t-foreach="widget.upcoming_events" t-as="event">

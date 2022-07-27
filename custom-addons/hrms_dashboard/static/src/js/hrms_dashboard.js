@@ -36,7 +36,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
         cssLibs: [
             // '/hrms_dashboard/static/src/css/lib/nv.d3.css'
         ],
-        jsLibs: ["/hrms_dashboard/static/src/js/lib/d3.min.js"],
+        jsLibs: ["/hrms_dashboard/static/src/js/lib/d3.min.js","/hrms_dashboard/static/src/js/lib/chart.js"],
+        // jsLibs: ["/hrms_dashboard/static/src/js/lib/chart.js"],
+
 
         events: {
             // "click .hr_payslip": "hr_payslip",
@@ -285,42 +287,43 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 })
                 .then(function(data) {
                     // console.log(`dataaaaaaaaaaa`, data);
-                const ctx = document.getElementById('myChart').getContext('2d');
-                const payroll = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: [],
-                        datasets: [{
-                            label: '# Payroll analytics',
-                            data: [],
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.2)',
-
-                            ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)',
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: (value) => `$ ${value}`,
-                                  },
-                                // ticks: {
-                                //     // callback: (label) => `$ ${label}`,
-                                    callback: function(label, index, labels) {
-                                        console.log(`113`);
+                    var ctx = document.getElementById("myChart").getContext('2d');
+                    var payroll = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: [],
+                            datasets: [{
+                                label: '# of Votes',
+                                data: [],
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255,99,132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero:true
                                     }
-
-                                // },
+                                }]
                             }
                         }
-                    }
-                }); 
+                    });
                 let  dataTemp = payroll.data;
                 for (let i = 0; i < data.length; i++) {
                     dataTemp.labels.push(data[i].label);

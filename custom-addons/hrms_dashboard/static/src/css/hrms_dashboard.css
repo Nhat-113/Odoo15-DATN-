@@ -2246,7 +2246,7 @@ button:focus {
 
 .text_news {
     color: #000;
-    width: 67%;
+    width: 63%;
     /* width: 80%; */
     /* width: 206px; */
     font-family: 'Inter';
@@ -2258,7 +2258,7 @@ button:focus {
     color: #343A40;
     flex: none;
     order: 0;
-    margin-left: 0px 0px 0px 11px;
+    margin-left: 18px;
     flex-grow: 0;
 }
 
