@@ -316,7 +316,7 @@ class BreakdownActivities(models.Model):
     def _compute_mandays(self):
         for record in self:
             if record.activity == False:
-                record.activity = 'Activity ' + str(record.sequence)
+                record.activity = self.check_load_duplicate_activity(self.activity_id.add_lines_breakdown_activity, record.sequence )
             if len(record.job_pos) == 0:
                 job_pos_id = self.env['config.job.position'].search([], limit=1)
                 record.job_pos = job_pos_id.id
@@ -335,7 +335,15 @@ class BreakdownActivities(models.Model):
                     record.mandays_input = record.mandays
             else:
                 record.mandays = record.mandays_input
-                    
+
+    def check_load_duplicate_activity(self, ls_breaks, sequence):
+        for index in range(len(ls_breaks)):
+            activity_name_rs = 'Activity ' + str(sequence + index)
+            if activity_name_rs not in (breakdown.activity for breakdown in ls_breaks):
+                return activity_name_rs
+            else:
+                index += 1 
+
     def _find_effort_activity_current(self, ls_activity, activity_current):
         result_effort = 0
         for record in ls_activity:
