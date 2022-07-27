@@ -13,6 +13,7 @@
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item o_dhx_create_phase" href="#">Create Phase</a>
                             <a class="dropdown-item o_dhx_create_milestone" href="#">Create Milestone</a>
+                            <a class="dropdown-item o_dhx_create_task" href="#">Create Task</a>
                         </div>
                     </div>
                     <button type="button" class="btn btn-secondary o_dhx_calendar_resource o_dhx_button_left">Booking Resource</button>

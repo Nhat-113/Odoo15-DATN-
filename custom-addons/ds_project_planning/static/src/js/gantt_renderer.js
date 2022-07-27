@@ -17,6 +17,7 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       "click button.o_dhx_export_to_pdf": "_exportToPDF",
       "click a.o_dhx_create_phase": "_onBtnCreatePhase",
       "click a.o_dhx_create_milestone": "_onBtnCreateMilestone",
+      "click a.o_dhx_create_task": "_onBtnCreateTask",
       "click button.o_dhx_calendar_resource": "_onBtnCalendarResource",
       //"click div.gantt-dropdown": "_onBtnCalendarResource",
 
@@ -642,6 +643,21 @@ odoo.define("dhx_gantt.GanttRenderer", function (require) {
       gantt.exportToPDF({
         header:
           "<style>.danger {border: 1px solid #990614;color: #f30f0f;background: #f30f0f;}.danger .gantt_task_progress {background: #990614;}.warning {border: 1px solid #eec41e;color: #ffffcc;background: #ffeb3b;}.warning .gantt_task_progress {background: #eec41e;}</style>",
+      });
+    },
+    _onBtnCreateTask: function (ev) {
+      // prevent the event propagation
+      if (ev) {
+        ev.stopPropagation();
+      }
+      var self = this;
+      var project_id = this.initDomain[0][2];
+      return this._rpc({
+        model: "project.task",
+        method: "open_create_task",
+        args: [project_id],
+      }).then(function (result) {
+        self.do_action(result);
       });
     },
     _onBtnCreatePhase: function (ev) {

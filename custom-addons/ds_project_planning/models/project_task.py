@@ -158,6 +158,18 @@ class ProjectTask(models.Model):
     def update_date_end(self, stage_id):
         return {}
 
+    @api.model
+    def open_create_task(self, project_id):
+        return {
+            "name": _("Create Task"),
+            "type": "ir.actions.act_window",
+            "res_model": "project.task",
+            "views": [[False, "form"]],
+            "view_mode": 'form',
+            # "target": "new",
+            "context": {'default_project_id': project_id, 'default_issues_type': 1},
+        }
+
 
 class DependingTasks(models.Model):
     _name = "project.depending.tasks"
