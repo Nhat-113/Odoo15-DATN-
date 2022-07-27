@@ -35,14 +35,15 @@ class EstimationModule(models.Model):
     def _compute_get_modules(self):
         for record in self:
             record.estimation_id.module_activate = record.component
-            record.get_module_activate = record.component
+            if record.component != '':
+                record.get_module_activate = record.component
+            else:
+                record.component = record.get_module_activate
             
             #check modified components name
             modules = self.env['estimation.module'].search([('key_primary', '=', record.key_primary)])
             for item in modules:
-                if record.component == '':
-                    record.component = item.component
-                elif item.component != record.component and record.check_save_estimation == False:
+                if item.component != record.component and record.check_save_estimation == False:
                     item.write({'component': record.component})
             
             
