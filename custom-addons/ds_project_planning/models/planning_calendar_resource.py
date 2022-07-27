@@ -29,7 +29,7 @@ class PlanningCalendarResource(models.Model):
                               readonly=True, help="The duration of working time in the project", default=1)
     calendar_effort = fields.Float(string="Booking Effort", default=1.0)
     effort_rate = fields.Float(string="Effort Rate", compute='_compute_effort_rate',
-                               readonly=True, help="Effort Rate (%) = Calendar Effort * 20 / Duration", store=True, default=0)
+                               readonly=True, help="Effort Rate (%) = Booking Effort * 20 / Duration", store=True, default=0)
     role_ids = fields.Many2many('planning.roles', string='Roles')
     note = fields.Text(string='Note')
     member_type = fields.Many2one(
@@ -62,7 +62,7 @@ class PlanningCalendarResource(models.Model):
         """ Calculates effort rate (%)"""
         for resource in self:
             if resource.duration != 0:
-                resource.effort_rate = resource.calendar_effort * 20 / resource.duration * 100       
+                resource.effort_rate = resource.calendar_effort * 20 / resource.duration * 100   
 
     def _check_dates(self):
         for resource in self:
@@ -73,8 +73,22 @@ class PlanningCalendarResource(models.Model):
                 ))
 
     @api.constrains('start_date', 'end_date')
-    def _check_start_end(self):
+    def _check_start_end(self):   
         return self._check_dates()
+
+    @api.constrains('start_date', 'end_date', 'member_type', 'effort_rate')
+    def _check_effort_rate(self):
+        for resource in self:
+            member_calendars = self.env['planning.calendar.resource'].search([('employee_id', '=', resource.employee_id.id), ('id', '!=', resource.id or resource.id.origin)])
+            for member_calendar in member_calendars:
+                    if resource.start_date <= member_calendar.start_date and resource.end_date >= member_calendar.end_date\
+                        or resource.start_date <= member_calendar.start_date and resource.end_date < member_calendar.end_date and resource.end_date > member_calendar.start_date\
+                        or resource.start_date > member_calendar.start_date and resource.end_date >= member_calendar.end_date and resource.start_date < member_calendar.end_date\
+                        or resource.start_date > member_calendar.start_date and resource.end_date < member_calendar.end_date\
+                        or resource.start_date == member_calendar.end_date or resource.end_date == member_calendar.start_date:
+                            if resource.effort_rate + member_calendar.effort_rate > 100 and resource.member_type.name != 'Shadow Time':
+                                raise UserError(_("There is a project that is scheduling employee (%(employee)s) from %(start_date)s to %(end_date)s.",
+                                    start_date=resource.start_date, end_date=resource.end_date, employee=member_calendar.employee_id.name))    
 
     @api.constrains('inactive', 'inactive_date')
     def _unassign_member_in_tasks(self):
@@ -133,11 +147,28 @@ class PlanningCalendarResource(models.Model):
 
         return super(PlanningCalendarResource, self).write(vals)
 
+    def create(self, vals_list):
+        res = super().create(vals_list)
+        for r in res:
+            member_calendars = self.env['planning.calendar.resource'].search([('employee_id', '=', r.employee_id.id)])
+            for member_calendar in member_calendars:
+                if member_calendar.id != r.id:
+                    if r.start_date <= member_calendar.start_date and r.end_date >= member_calendar.end_date\
+                        or r.start_date <= member_calendar.start_date and r.end_date < member_calendar.end_date and r.end_date > member_calendar.start_date\
+                        or r.start_date > member_calendar.start_date and r.end_date >= member_calendar.end_date and r.start_date < member_calendar.end_date\
+                        or r.start_date > member_calendar.start_date and r.end_date < member_calendar.end_date:
+                            if r.effort_rate + member_calendar.effort_rate > 100 and r.member_type.name != 'Shadow Time':
+                                raise UserError(_("There is a project that is scheduling employee (%(employee)s) from %(start_date)s to %(end_date)s.",
+                                    start_date=r.start_date, end_date=r.end_date, employee=member_calendar.employee_id.name
+                                ))
+
+        return res
+
 
 
 class PlanningAllocateEffortRate(models.Model):
     """ Type of member in project planning """
-    _name = "planning.member.type"
+    _name = "planning.member.type"    
     _description = "Member Type of Project"
     _rec_name = "name"
 
