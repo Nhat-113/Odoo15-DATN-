@@ -10,6 +10,14 @@
         <field name="implied_ids" eval="[(4, ref('project.group_project_user'))]"/>
         <field name="category_id" ref="base.module_category_services_project"/>
     </record>
+
+    <!-- Add new group-->
+    <record id="group_project_team_leader" model="res.groups">
+        <field name="name">Team Leader</field>
+        <field name="implied_ids" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="category_id" ref="base.module_category_services_project"/>
+    </record>
+    
     
     <!-- Add new Director group--> 
     <!-- This group only view all project & task -->
@@ -59,6 +67,18 @@
         <field name="perm_unlink" eval="True"/>
     </record>
 
+    <!-- Project Team Leader: can see only managed projects for leader and can see all projects assigned -->
+    <record model="ir.rule" id="project_project_team_leader_rule">
+        <field name="name">Project: Team Leader rule: see only projects assigned</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">[('member_ids', 'in', user.id)]</field>
+        <field name="groups" eval="[(4,ref('ds_project_planning.group_project_team_leader'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
     <function name="write" model="ir.model.data">
         <function name="search" model="ir.model.data">
             <value eval="[('module', '=', 'project'), ('name', '=', 'ir_rule_private_task')]" />
@@ -91,7 +111,7 @@
     </function>
 
     <record model="ir.rule" id="project.task_type_manager_rule">
-        <field name="groups" eval="[(4, ref('project.group_project_manager')), (4, ref('ds_project_planning.group_project_pm'))]"/>
+        <field name="groups" eval="[(4, ref('project.group_project_manager')), (4, ref('ds_project_planning.group_project_pm')), (4, ref('ds_project_planning.group_project_team_leader'))]"/>
     </record>
 
     <!-- reset noupdate -->
