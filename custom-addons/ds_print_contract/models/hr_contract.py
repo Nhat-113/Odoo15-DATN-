@@ -60,6 +60,9 @@ class HrContract(models.Model):
             if self.contract_document_type == 'annex':
                 template = self.env.ref(
                     'ds_print_contract.annex_contract_mail_template', False)
+            if self.contract_document_type == 'offical_labor' and self.struct_id.id == 2:
+                template = self.env.ref(
+                    'ds_print_contract.offical_labor_contract_gross_mail_template', False)
         except ValueError:
             template = False
         try:

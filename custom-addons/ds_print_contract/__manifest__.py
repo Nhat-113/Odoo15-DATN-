@@ -23,7 +23,11 @@
              "data/collaborator_contract_mail_template.xml",
              "views/annex_contract_report.xml",
              "data/annex_contract_mail_template.xml",
-             "views/res_company_views.xml"
+             "views/res_company_views.xml",
+             "views/annex_contract_gross_report.xml",
+             "views/contract_gross_report.xml",
+             "data/annex_contract_gross_mail_template.xml",
+             "data/offical_labor_contract_gross_mail_template.xml",
              ],
     "installable": True,
     'auto_install': False,
