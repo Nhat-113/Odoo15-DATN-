@@ -13,7 +13,7 @@ div[name="add_lines_resource_effort"] table thead tr th:first-child::after {
     content: '';
     display: none
 }
-
+/* 
 div[name="add_lines_resource_effort"] table tbody tr:nth-last-child(3) {
     visibility: collapse;
     user-select: none;
@@ -33,7 +33,7 @@ div[name="add_lines_resource_effort"] table tbody tr:last-child td:first-child {
 }
 div[name="add_lines_resource_effort"] table tfoot {
     background-color: #FFFFFF !important;
-}
+} */
 
 div[name="add_lines_summary_totalcost"] table tfoot .name::before, 
 div[name="add_lines_summary_totalcost"] table tfoot td:nth-child(2)::before {
