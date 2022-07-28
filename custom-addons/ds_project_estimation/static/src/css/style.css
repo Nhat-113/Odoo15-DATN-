@@ -161,3 +161,7 @@ th[data-name="check_activate"] {
     border-style: solid;
     border-color: transparent transparent #ccc transparent;
 }
+
+.template_project_type {
+    white-space: nowrap;
+}

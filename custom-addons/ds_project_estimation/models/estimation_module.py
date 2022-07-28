@@ -24,7 +24,7 @@ class EstimationModule(models.Model):
                             ('odc', 'ODC')],
                             default='base',
                             required=True,
-                            string="Project Type")
+                            string="Template Project Type")
 
     get_estimation_id = fields.Integer(string="Estimation Id")
     key_primary = fields.Char(string="Key unique module")

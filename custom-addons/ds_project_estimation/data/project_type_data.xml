@@ -6,15 +6,15 @@
             <field name="name">Internal</field>
             <field name="description">Internal</field>
         </record>
-        <record id="project_type_estimation_fixed" model="project.type">
+        <record id="project_type_estimation_base" model="project.type">
             <field name="sequence" eval="2" />
-            <field name="name">Fixed Price</field>
-            <field name="description">Fixed Price</field>
+            <field name="name">Project Base</field>
+            <field name="description">Project Base</field>
         </record>
-        <record id="project_type_estimation_based" model="project.type">
+        <record id="project_type_estimation_odc" model="project.type">
             <field name="sequence" eval="3" />
-            <field name="name">Based on Timesheet</field>
-            <field name="description">Based on Timesheet</field>
+            <field name="name">ODC</field>
+            <field name="description">ODC</field>
         </record>
     </data>
 </odoo>
