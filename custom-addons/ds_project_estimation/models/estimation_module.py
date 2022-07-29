@@ -50,8 +50,13 @@ class EstimationModule(models.Model):
     def write(self, vals):
         result = super(EstimationModule, self).write(vals)
         if 'estimation_id' in vals:
+            module_name = []
             for item in self:
                 item.check_save_estimation = True
+                module_name.append(item.component)
+
+            #write message description to overview
+            self._overview_autolog_description(module_name, ' has been created successfully!')
 
             modules = self.env['estimation.module'].search([('estimation_id', '=', vals['estimation_id'])])
             for module in self.estimation_id.add_lines_summary_totalcost:
@@ -70,14 +75,32 @@ class EstimationModule(models.Model):
 
 
     def unlink(self):
+        module_name = []
         for record in self:
             record.module_assumptions.unlink()
             record.module_summarys.unlink()
             record.module_effort_activity.unlink()
             record.module_config_activity.unlink()
+            
+            module_name.append(record.component)
+        #write message description to overview
+        self._overview_autolog_description(module_name, ' was deleted successfully!')
+        
             # record.summary_total_cost.unlink()
             # record.summary_cost_rate.unlink()
         return super(EstimationModule, self).unlink()
+    
+    def _overview_autolog_description(self, module_name, message):
+        if len(self.estimation_id.add_lines_overview) != 0:
+            descriptions = 'Module '
+            max_revision = max(item.revision for item in self.estimation_id.add_lines_overview)
+            for des in self.estimation_id.add_lines_overview:
+                if des.revision == max_revision:
+                    for index in range(len(module_name)):
+                        descriptions += module_name[index]
+                        if index < len(module_name) - 1:
+                            descriptions += ', '
+                    des.description = descriptions + message
                 
     @api.model
     def default_get(self, fields):
