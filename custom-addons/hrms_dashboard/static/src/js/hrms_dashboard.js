@@ -58,8 +58,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             "click .hr_contract": "hr_contract",
             "click .dashboard_today_meeting": "dashboard_today_meeting",
             "click .dashboard_in_recruiment": "dashboard_in_recruiment",
-
-
+            "click .view_detail": "openform",
+            // "click .close_form": "close_form",
             "click .hr_timesheets": "hr_timesheets",
             "click .login_broad_factor": "employee_broad_factor",
             "click .o_hr_attendance_sign_in_out_icon": function() {
@@ -128,6 +128,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         self.upcoming_events = res["event"];
                         // self.task_for_day = res["task_for_day"];
                         self.announcements = res["announcement"];
+                        // console.log(`self.announcements`,res["announcement"]);
                         // self.payslip_batches = res["payslip_batches"];
                     });
                 return $.when(def0, def1, def2);
@@ -638,23 +639,17 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
 
 
             });
-
-            // self._rpc({
-            //     // Get view id
-            //     model:'ir.model.data',
-            //     args: ['hr_recruitment.view_hr_job_kanban'], // View id goes here
-            // }).then(function(data){                
-            //     // Open view
-            //     self.do_action({
-            //         name: 'Example',
-            //         type: 'ir.actions.act_window',
-            //         res_model: 'hr.job', // Module name goes here
-            //         target: 'new',
-            //         views: [[data[1], 'form']], // data[1] variable contains the view id
-            //      });
-            // });
         },
-
+        openform: function(events) {
+            let targets = document.getElementsByClassName('view_detail');
+            console.log(`targets`, targets);
+            for (var i = 0; i < targets.length; i++) {
+                targets[i].addEventListener('click', function(){
+                    $(this).toggleClass('view_detail');
+                    $(this).toggleClass('view_detail_2');
+                })
+            }
+        },
         //leave request today
         leaves_request_today: function(e) {
             var self = this;

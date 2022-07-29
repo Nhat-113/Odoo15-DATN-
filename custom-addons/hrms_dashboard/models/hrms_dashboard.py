@@ -25,7 +25,8 @@ class HrLeave(models.Model):
 
 
 class Employee(models.Model):
-    _inherit = 'hr.employee'
+    # _name ="hr.dashboard"
+    _inherit = ['hr.employee']
 
     birthday = fields.Date('Date of Birth', groups="base.group_user", help="Birthday")
 
@@ -256,7 +257,7 @@ class Employee(models.Model):
         if employee:
             department = employee.department_id
             job_id = employee.job_id
-            sql = """select ha.date_end, ha.date_start,ha.announcement_reason
+            sql = """select ha.date_end, ha.date_start,ha.announcement_reason,ha.id,ha.announcement
             from hr_announcement ha
             left join hr_employee_announcements hea
             on hea.announcement = ha.id
