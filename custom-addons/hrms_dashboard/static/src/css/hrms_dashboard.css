@@ -2057,7 +2057,7 @@ button:focus {
     position: absolute;
     /* width: 6%; */
     height: 10%;
-    left: 27.5%;
+    right: 68%;
     top: 3%;
     transform: rotate(-20deg);
 }
@@ -2128,7 +2128,7 @@ button:focus {
     position: absolute;
     /* width: 6%; */
     height: 12%;
-    left: 26.5%;
+    right: 67.5%;
     top: 3%;
     transform: rotate(-20deg);
     z-index: 0;
