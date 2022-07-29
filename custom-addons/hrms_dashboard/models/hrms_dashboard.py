@@ -155,15 +155,9 @@ class Employee(models.Model):
             ('user_id', '=', uid),
             ('start','>=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 0, 0, 0)),\
             ('start','<=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 23, 59, 59)),])
-        
-
-        # query = """
-        # select count(id)
-        # from hr_leave
-        # where  DATE(hr_leave.create_date) = '%s' and state= 'confirm' """ %  (today)
-        # cr = self._cr
-        # cr.execute(query)
-        # leaves_today = cr.fetchall()
+        #payslip 
+        employee_id = self.env['hr.employee'].search([('user_id', '=' ,uid)]).id
+        payslip_count_done = self.env['hr.payslip'].sudo().search_count([('state', '=', 'done'),('employee_id','=' ,employee_id)])
        
         timesheet_count = self.env['account.analytic.line'].sudo().search_count(
             [('project_id', '!=', False), ('user_id', '=', uid)])
@@ -173,14 +167,6 @@ class Employee(models.Model):
         
         
         user_id = self.env['res.users'].search([('id', '=', uid)])        
-        # query = """
-        #         select count(id)
-        #         from hr_applicant
-        #         WHERE hr_applicant.company_id = '%s' and active = 'true'
-        #         """ % (company_id)
-        # cr = self._cr
-        # cr.execute(query)
-        # job_applications_all = cr.fetchall()
 
         job_applications = self.env['hr.applicant'].sudo().search_count([('active', '!=', False),('company_id','in' , selected_companies )])
         
@@ -215,7 +201,8 @@ class Employee(models.Model):
                     'experience': experience,
                     'age': age,
                     'recruitment': recruitment,
-                    'today_meeting': today_meeting
+                    'today_meeting': today_meeting,
+                    'payslip_count_done':payslip_count_done,
 
                 }
                 employee[0].update(data)
@@ -303,14 +290,9 @@ class Employee(models.Model):
             on hr_payslip.id=hr_payslip_line.slip_id
 			INNER JOIN hr_employee 
 			on hr_employee.id =  hr_payslip.employee_id
-            Where hr_payslip_line.code in ('NET','NET1')  AND  hr_employee.user_id = %s
+            Where hr_payslip_line.code in ('NET','NET1') AND hr_payslip.state ='done' AND  hr_employee.user_id = %s
+            order by date_from
             """) %  user_id
-        # sql=("""
-        #         select CURRENT_DATE, project_task.priority_type, project_task.name , project_task.id ,project_task.date_start  , hr_employee.name  from  project_task  
-        #         INNER JOIN  project_task_user_rel on project_task_user_rel.task_id = project_task.id 
-        #         INNER JOIN  hr_employee on hr_employee.user_id = project_task_user_rel.user_id and hr_employee.user_id = %s 
-        #         where DATE(project_task.date_start) = CURRENT_DATE
-        #                     """) %  user_id
         cr.execute(sql)
         dat = cr.fetchall()
         data = []

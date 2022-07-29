@@ -36,7 +36,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
         cssLibs: [
             // '/hrms_dashboard/static/src/css/lib/nv.d3.css'
         ],
-        jsLibs: ["/hrms_dashboard/static/src/js/lib/d3.min.js","/hrms_dashboard/static/src/js/lib/chart.js"],
+        jsLibs: ["/hrms_dashboard/static/src/js/lib/d3.min.js", "/hrms_dashboard/static/src/js/lib/chart.js"],
         // jsLibs: ["/hrms_dashboard/static/src/js/lib/chart.js"],
 
 
@@ -194,7 +194,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     });
                     var canvas = document.getElementById("myChart");
                     // console.log(`canvas`, canvas);
-                    if(canvas) {
+                    if (canvas) {
                         self.payroll();
                     }
                 }, 500);
@@ -280,7 +280,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 self.update_leave_trend();
             }
         },
-        payroll : function () {
+        payroll: function() {
             rpc
                 .query({
                     model: "hr.employee",
@@ -294,10 +294,10 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         data: {
                             labels: [],
                             datasets: [{
-                                label: '# of Votes',
+                                label: 'Payroll Analytics',
                                 data: [],
                                 backgroundColor: [
-                                    'rgba(255, 99, 132, 0.2)',
+                                    '#6869ac',
                                     'rgba(54, 162, 235, 0.2)',
                                     'rgba(255, 206, 86, 0.2)',
                                     'rgba(75, 192, 192, 0.2)',
@@ -319,24 +319,24 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                             scales: {
                                 yAxes: [{
                                     ticks: {
-                                        beginAtZero:true
+                                        beginAtZero: true
                                     }
                                 }]
                             }
                         }
                     });
-                let  dataTemp = payroll.data;
-                for (let i = 0; i < data.length; i++) {
-                    dataTemp.labels.push(data[i].label);
-                    dataTemp.datasets[0].data.push(data[i].value)
-                }
-                // console.log(`contract`, contract);
-                // console.log(`dataTemp`, dataTemp);
-                // contract.addData(dataTemp);
-                payroll.data.labels = dataTemp.labels;
-                payroll.data.datasets[0].data = dataTemp.datasets[0].data;
-                payroll.update();
-            });  
+                    let dataTemp = payroll.data;
+                    for (let i = 0; i < data.length; i++) {
+                        dataTemp.labels.push(data[i].label);
+                        dataTemp.datasets[0].data.push(data[i].value)
+                    }
+                    // console.log(`contract`, contract);
+                    // console.log(`dataTemp`, dataTemp);
+                    // contract.addData(dataTemp);
+                    payroll.data.labels = dataTemp.labels;
+                    payroll.data.datasets[0].data = dataTemp.datasets[0].data;
+                    payroll.update();
+                });
         },
 
         on_reverse_breadcrumb: function() {
@@ -346,13 +346,13 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             this.fetch_data().then(function() {
                 self.$(".o_hr_dashboard").empty();
                 self.render_dashboards();
-                setTimeout(() => {  
+                setTimeout(() => {
                     var canvas = document.getElementById("myChart");
                     // console.log(`canvas`, canvas);
-                    if(canvas) {
+                    if (canvas) {
                         self.payroll();
                     }
-                  }, 1000);
+                }, 1000);
             });
         },
 
@@ -421,7 +421,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     [false, "form"],
                 ],
                 domain: [
-                    ["employee_id", "=", this.login_employee.id]
+                    ["employee_id", "=", this.login_employee.id],
+                    ["state", "in", ["done"]]
                 ],
                 target: "current", //self on some of them
             }, {});

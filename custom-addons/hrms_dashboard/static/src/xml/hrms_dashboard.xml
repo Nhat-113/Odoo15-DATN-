@@ -56,7 +56,7 @@
                             <i class="fa fa-money"/>
                         </h4>
                         <h3  class="fearure_detail" >
-                             Payslip <t t-esc="widget.login_employee['payslip_count']"/>
+                             Payslip <t t-esc="widget.login_employee['payslip_count_done']"/>
                         </h3>
                     </button>
                     <button id="btn-contract" class="btn_expried hr_contract" style="display: none">
@@ -351,7 +351,7 @@
                             <i class="fa fa-money"/>
                         </h4>
                         <h3 class="fearure_detail_user">
-                             Payslip <t t-esc="widget.login_employee['payslip_count']"/>
+                             Payslip <t t-esc="widget.login_employee['payslip_count_done']"/>
                         </h3>
                     </button>
                 </div>
