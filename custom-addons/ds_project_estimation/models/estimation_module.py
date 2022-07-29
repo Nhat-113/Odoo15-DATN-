@@ -100,7 +100,10 @@ class EstimationModule(models.Model):
                         descriptions += module_name[index]
                         if index < len(module_name) - 1:
                             descriptions += ', '
-                    des.description = descriptions + message
+                    if des.description.find("Module :  Modified Modules") == -1:
+                        des.description += descriptions + message
+                    else:
+                        des.description = des.description.replace("Module :  Modified Modules", '' + descriptions + message)
                 
     @api.model
     def default_get(self, fields):
