@@ -72,9 +72,9 @@
                                 <tree editable="bottom" create="0" delete="0" order="module_id desc">
                                     <field name="sequence" />
                                     <field name="name"/>
-                                    <field name="types" />
-                                    <field name="role" domain="[('job_type.job_position', '=', types)]"/>
-                                    <field name="yen_month"  width="160px"/>
+                                    <field name="types"/>
+                                    <!-- <field name="role" domain="[('job_type.job_position', '=', types)]"/> -->
+                                    <field name="yen_month"  width="160px" readonly="0"/>
                                     <field name="yen_day"  width="145px"/>
 <!--                                    <field name="vnd_day" />-->
                                 </tree>

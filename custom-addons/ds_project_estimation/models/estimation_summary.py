@@ -1,4 +1,6 @@
+from re import L
 from odoo import models, fields, api
+from odoo import http
 
 
 class EstimationSummaryTotalCost(models.Model):
@@ -31,40 +33,13 @@ class EstimationSummaryTotalCost(models.Model):
             cost_rate_old = record.estimation_id.add_lines_summary_costrate
             if component != module_active:
                 cost_rate_old = self.env['estimation.summary.costrate'].search([('name', '=', component)])
-                for item in cost_rate_old:
-                    if item.connect_summary_costrate:
-                        cost_rate = self.env['cost.rate'].search([('id', '=', item.role.id)])
-
-                        if record.estimation_id.currency_id.id:
-                            currency_id = record.estimation_id.currency_id.id
-
-                        elif record.estimation_id.currency_id.id == False:
-                            currency_id = record.estimation_id.currency_id.id
-
-                        elif record.estimation_id.currency_id.id.origin:
-                            currency_id = record.estimation_id.currency_id.id
-
-                        else:
-                            currency_id = record.estimation_id.currency_id.id
-                            if currency_id == False:
-                                currency_id = 1
-
-                        if currency_id == 1:
-                            item.yen_month = cost_rate.cost_usd
-                            item.yen_day = cost_rate.cost_usd / 20
-                        elif currency_id == 22:
-                            item.yen_month = cost_rate.cost_vnd
-                            item.yen_day = cost_rate.cost_vnd / 20
-                        else:
-                            item.yen_month = cost_rate.cost_yen
-                            item.yen_day = cost_rate.cost_yen / 20
 
             if not len(cost_rate_old):
                 cost_rate_old = record.estimation_id.add_lines_summary_costrate
 
             cost = 0
             for item_cost_rate in cost_rate_old:
-                if (item_cost_rate.name == component)and(item_cost_rate.connect_summary_costrate):
+                if (item_cost_rate.name == component):
                     types = item_cost_rate.types
                     if types == 'Developer':
                         cost += record.dev_effort * item_cost_rate.yen_month
@@ -127,34 +102,41 @@ class EstimationSummaryCostRate(models.Model):
     sequence = fields.Integer(string="No", store=True)
     types = fields.Char(string="Type", store=True)
     role = fields.Many2one('cost.rate', string='Role', store=True)
-    yen_month = fields.Float(string="Unit (Currency/Month)", store=True, default=0.00, compute='_compute_yen_month', readonly=True)
-    yen_day = fields.Float(string="Unit (Currency/Day)", store=True, default=0.00, readonly=True)
+    yen_month = fields.Float(string="Unit (Currency/Month)", store=True, compute='_compute_yen_month')
+    yen_day = fields.Float(string="Unit (Currency/Day)", store=True, compute="_compute_yen_day")
+    check_load_default = fields.Boolean('Check load default cost', default=True)
 
-    @api.depends('role', 'connect_summary_costrate.currency_id', 'role.cost_usd', 'role.cost_yen', 'role.cost_vnd')
+    @api.depends('connect_summary_costrate.currency_id', 'role.cost_usd', 'role.cost_yen', 'role.cost_vnd')
     def _compute_yen_month(self):
+        
         for item in self:
-            cost_rate = self.env['cost.rate'].search([('id', '=', item.role.id)])
+            if item.check_load_default:
+                cost_rate = self.env['cost.rate'].search([('job_type', '=', item.types)])
 
-            if item.connect_summary_costrate.id:
-                currency_id = item.connect_summary_costrate.currency_id.id
+                if item.connect_summary_costrate.id:
+                    currency_id = item.connect_summary_costrate.currency_id.id
 
-            elif item.connect_summary_costrate.id == False:
-                currency_id = item.connect_summary_costrate.currency_id.id
+                elif item.connect_summary_costrate.id == False:
+                    currency_id = item.connect_summary_costrate.currency_id.id
 
-            elif item.connect_summary_costrate.id.origin:
-                currency_id = item.connect_summary_costrate.currency_id.id
+                elif item.connect_summary_costrate.id.origin:
+                    currency_id = item.connect_summary_costrate.currency_id.id
 
-            else:
-                currency_id = item.connect_summary_costrate.currency_id.id
-                if currency_id == False:
-                    currency_id = 1
+                else:
+                    currency_id = item.connect_summary_costrate.currency_id.id
+                    if currency_id == False:
+                        currency_id = 1
 
-            if currency_id == 1:
-                item.yen_month = cost_rate.cost_usd
-                item.yen_day = cost_rate.cost_usd / 20
-            elif currency_id == 22:
-                item.yen_month = cost_rate.cost_vnd
-                item.yen_day = cost_rate.cost_vnd / 20
-            else:
-                item.yen_month = cost_rate.cost_yen
-                item.yen_day = cost_rate.cost_yen / 20
+                if currency_id == 1:
+                    item.yen_month = cost_rate.cost_usd
+                elif currency_id == 22:
+                    item.yen_month = cost_rate.cost_vnd
+                else:
+                    item.yen_month = cost_rate.cost_yen
+                item.check_load_default = False
+
+
+    @api.depends("yen_month")
+    def _compute_yen_day(self):
+        for record in self:
+            record.yen_day = record.yen_month/20

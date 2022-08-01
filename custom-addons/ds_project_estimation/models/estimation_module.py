@@ -1,3 +1,4 @@
+from email.policy import default
 from odoo import models, fields, api
 from odoo.exceptions import UserError, ValidationError
 
@@ -18,6 +19,7 @@ class EstimationModule(models.Model):
     module_summarys = fields.One2many('estimation.module.summary', 'module_id')
     module_config_activity = fields.One2many('config.activity', 'module_id')
     module_effort_activity = fields.One2many('module.effort.activity', 'module_id')
+    check_load_default = fields.Boolean('Check load default cost', default=True)
     # estimation_resource_plan = fields.One2many('estimation.resource.effort', 'module_id')
 
     get_estimation_id = fields.Integer(string="Estimation Id")

@@ -6,9 +6,9 @@
         <field name="model">cost.rate</field>
         <field name="arch" type="xml">
             <tree editable="bottom">
-                <field name="role"/>
+                <!-- <field name="role"/> -->
+                <field name="job_type" readonly="1"/>
                 <field name="description" />
-                <field name="job_type"/>
                 <field name="currency_usd_id" invisible="1" />
                 <field name="currency_yen_id" invisible="1" />
                 <field name="currency_vnd_id" invisible="1" />
@@ -16,9 +16,7 @@
                 <field name="cost_yen" />
                 <field name="cost_vnd" />
                 <field name="create_date" string="Creation Date"/>
-
             </tree>
         </field>
     </record>
-
 </odoo>
