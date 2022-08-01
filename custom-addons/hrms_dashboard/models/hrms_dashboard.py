@@ -156,8 +156,8 @@ class Employee(models.Model):
             ('start','>=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 0, 0, 0)),\
             ('start','<=',datetime(today_timestamp.year, today_timestamp.month, today_timestamp.day, 23, 59, 59)),])
         #payslip 
-        employee_id = self.env['hr.employee'].search([('user_id', '=' ,uid)]).id
-        payslip_count_done = self.env['hr.payslip'].sudo().search_count([('state', '=', 'done'),('employee_id','=' ,employee_id)])
+        employee_id = self.env['hr.employee'].search([('user_id', '=' ,uid)], limit=1)
+        payslip_count_done = self.env['hr.payslip'].sudo().search_count([('state', '=', 'done'),('employee_id','=' ,employee_id.ids)])
        
         timesheet_count = self.env['account.analytic.line'].sudo().search_count(
             [('project_id', '!=', False), ('user_id', '=', uid)])
