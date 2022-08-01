@@ -9,7 +9,7 @@
         <field name="arch" type="xml">
             <field name="user_ids" position="replace">
                 <field name="user_id_domain" invisible="1"/>
-                <field name="user_ids" class="o_task_user_field" options="{'no_open': True, 'no_create': True}" widget="many2many_avatar_user" domain="user_id_domain"/>
+                <field name="user_ids" class="o_task_user_field" options="{'no_open': True, 'no_create': True}" widget="many2many_avatar_user" domain="user_id_domain" attrs="{'readonly': [('project_id', '=', False)]}"/>
             </field>
         </field>
     </record>
