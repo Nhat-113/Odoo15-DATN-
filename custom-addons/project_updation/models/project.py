@@ -100,6 +100,10 @@ class Task(models.Model):
     is_readonly = fields.Boolean(compute='_check_user_readonly')
     progress_input = fields.Integer(string='Progress (%)', tracking=True)
     status_color = fields.Char(compute='_get_status_color', store=True)
+    partner_id = fields.Many2one('res.partner',
+        string='Customer',
+        compute='_compute_partner_id', recursive=True, store=True, readonly=False, tracking=True,
+        domain="[('is_company','=','true')]")
 
     @api.onchange('status')
     def set_progerss(self):
