@@ -18,6 +18,7 @@
     ],
     'data': [
         'security/hr_payroll_security.xml',
+        'security/hr_payroll_security_update.xml',
         'security/ir.model.access.csv',
         'wizard/hr_payroll_payslips_by_employees_views.xml',
         'views/hr_leave_type_view.xml',

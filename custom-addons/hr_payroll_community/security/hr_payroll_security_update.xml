@@ -1,0 +1,58 @@
+<odoo>
+    <data>
+        <record id="group_hr_payroll_community_emp" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="hr_payroll_community.module_category_hr_payroll_community"/>
+        </record>
+
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'hr_payroll_community'), ('name', '=', 'group_hr_payroll_community_user')]" />
+            </function>
+            <value eval="{'noupdate': False}"/>
+        </function>
+
+        <record id="group_hr_payroll_community_user" model="res.groups">
+            <field name="name">Officer</field>
+            <field name="category_id" ref="hr_payroll_community.module_category_hr_payroll_community"/>
+            <field name="implied_ids" eval="[(4, ref('hr.group_hr_user')), (4, ref('hr_contract.group_hr_contract_manager')), (4, ref('hr_payroll_community.group_hr_payroll_community_emp'))]"/>
+        </record>
+
+        <!-- reset noupdate -->
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'hr_payroll_community'), ('name', '=', 'group_hr_payroll_community_user')]" />
+            </function>
+            <value eval="{'noupdate': True}" />
+        </function>
+
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'hr_payroll_community'), ('name', '=', 'group_hr_payroll_community_manager')]" />
+            </function>
+            <value eval="{'noupdate': False}"/>
+        </function>
+
+        <record id="group_hr_payroll_community_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="hr_payroll_community.module_category_hr_payroll_community"/>
+            <field name="implied_ids" eval="[(4, ref('hr_payroll_community.group_hr_payroll_community_user')), (4, ref('hr_payroll_community.group_hr_payroll_community_emp'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- reset noupdate -->
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'hr_payroll_community'), ('name', '=', 'group_hr_payroll_community_manager')]" />
+            </function>
+            <value eval="{'noupdate': True}" />
+        </function>
+
+        <record id="hr_payslip_rule_emp" model="ir.rule">
+            <field name="name">Only See Payslip Of Employee</field>
+            <field name="model_id" ref="model_hr_payslip"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('hr_payroll_community.group_hr_payroll_community_emp'))]"/>
+        </record>
+    </data>
+</odoo>
