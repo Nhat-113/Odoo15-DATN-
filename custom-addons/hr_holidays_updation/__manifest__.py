@@ -8,7 +8,7 @@
     'author': 'phuongtn',
     'company': 'Dsoft',
     'description': """""",
-    'depends': ['hr', 'base', 'hr_holidays'],
+    'depends': ['hr', 'base', 'hr_holidays', 'resource'],
     'data': [
         'data/hr_holidays_update_data.xml',
     ],
