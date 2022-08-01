@@ -292,7 +292,7 @@
             <field name="amount_python_compute">result = Basic / NCTT</field>
         </record>
 
-        <!-- <record id="hr_rule_nnkl" model="hr.salary.rule">
+        <record id="hr_rule_nnkl" model="hr.salary.rule">
             <field name="name">Ngày nghỉ không lương (Ngày)</field>
             <field name="sequence" eval="7"/>
             <field name="code">NNKL</field>
@@ -300,7 +300,7 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = ( worked_days.NNKL and worked_days.NNKL.number_of_days or 0)</field>
-        </record> -->
+        </record>
 
         <record id="hr_rule_nctte" model="hr.salary.rule">
             <field name="name">Ngày công tính lương (Ngày)</field>
