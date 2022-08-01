@@ -254,14 +254,12 @@ class HrPayslip(models.Model):
             work_data = contract.employee_id.get_work_days_data(day_from, day_to,
                                                                 calendar=contract.resource_calendar_id)
 
-            if contract.date_end and contract.date_start <= self.date_from and contract.date_end <= self.date_to:
+            if contract.date_end and contract.date_start <= self.date_from and contract.date_end < self.date_to:
                 unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) - 1
-            elif contract.date_end and contract.date_start >= self.date_from and contract.date_end >= self.date_to:
+            elif contract.date_end and contract.date_start > self.date_from and contract.date_end >= self.date_to:
                 unpaid_working_day = len(pd.bdate_range(self.date_from, contract.date_start)) - 1
-            elif contract.date_end and contract.date_start >= self.date_from and contract.date_end > self.date_to:
-                unpaid_working_day = len(pd.bdate_range(self.date_from, contract.date_start))
-            elif contract.date_end and contract.date_start >= self.date_from and contract.date_end <= self.date_to:
-                unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) + len(pd.bdate_range(self.date_from, contract.date_start)) - 1
+            elif contract.date_end and contract.date_start > self.date_from and contract.date_end < self.date_to:
+                unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) + len(pd.bdate_range(self.date_from, contract.date_start)) - 2
             else:
                 unpaid_working_day = 0
             attendances = {

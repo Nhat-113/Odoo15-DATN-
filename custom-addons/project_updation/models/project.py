@@ -112,7 +112,7 @@ class Task(models.Model):
         for task in self:
             if self.env.user.id not in task.user_ids.ids and self.env.user.has_group('ds_project_planning.group_project_pm') == False\
                 and self.env.user.has_group('project.group_project_manager') == False:
-               raise UserError('test')
+               raise UserError("Do not delete other people's tasks, issues, QA.")
         return super().unlink()
 
     @api.depends('status')
