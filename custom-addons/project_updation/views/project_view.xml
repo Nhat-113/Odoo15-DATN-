@@ -286,7 +286,7 @@
         </record>
 
         <record id="issues_type_action" model="ir.actions.act_window">
-            <field name="name">Issues Types</field>
+            <field name="name">Types</field>
             <field name="res_model">project.issues.type</field>
             <field name="view_mode">tree,form</field>
         </record>
@@ -472,7 +472,7 @@
 
 
         <menuitem name="Issues" id="menu_issues" parent="project.menu_main_pm" action="issues_action" sequence="3" groups="base.group_no_one,project.group_project_user"/>
-        <menuitem id="issues_type_menu" name="Type" parent="project.menu_project_config" action="issues_type_action" sequence="11" groups="project.group_project_manager"/>
+        <menuitem id="issues_type_menu" name="Types" parent="project.menu_project_config" action="issues_type_action" sequence="11" groups="project.group_project_manager"/>
         <menuitem id="task_status_menu" name="Status" parent="project.menu_project_config" action="task_status_action" sequence="12" groups="project.group_project_manager"/>
         <menuitem action="project.project_tags_action" id="project.menu_project_tags_act" parent="project.menu_project_config" groups="project.group_project_manager"/>
         <menuitem id="project.project_menu_config_activity_type" action="project.mail_activity_type_action_config_project_types" parent="project.menu_project_config" groups="project.group_project_manager"/>

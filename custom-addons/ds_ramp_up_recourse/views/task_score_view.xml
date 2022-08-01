@@ -5,7 +5,7 @@
             <field name="name">current.task.score.filter</field>
             <field name="model">current.task.score</field>
             <field name="arch" type="xml">
-                <search string="Employees">
+                <search string="Current">
                     <field name="name" string="Employee"/>
                     <field name="department_id" groups="hr.group_hr_user"/>
                     <field name="job_id"/>
@@ -22,7 +22,7 @@
             <field name="name">view.current.task.score</field>
             <field name="model">current.task.score</field>
             <field name="arch" type="xml">
-                <tree string="Employees" multi_edit="1" sample="1" js_class="hr_employee_list">
+                <tree string="Current" multi_edit="1" sample="1" js_class="hr_employee_list">
                     <field name="name" readonly="1"/>
                     <field name="department_id"/>
                     <field name="job_id"/>
@@ -65,7 +65,7 @@
         </record>
 
         <record id="open_view_employee_current_task_score" model="ir.actions.act_window">
-            <field name="name">Employees</field>
+            <field name="name">Current</field>
             <field name="res_model">current.task.score</field>
             <field name="view_mode">tree</field>
             <field name="domain">[]</field>
