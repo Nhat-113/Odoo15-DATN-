@@ -32,12 +32,20 @@ class ProjectTask(models.Model):
         'Serialized Links JSON', compute="compute_links_json")
     date_start = fields.Date('Start Date')
     date_end = fields.Date('End Date')
+    user_readonly = fields.Boolean(compute='_check_user_readonly_date')
     
     recursive_dependency_task_ids = fields.Many2many(
         string='Recursive Dependencies',
         comodel_name='project.task',
         compute='_compute_recursive_dependency_task_ids'
     )
+
+    def _check_user_readonly_date(self):
+        if self.env.user.has_group('project.group_project_manager') == False and self.env.user.has_group('ds_project_planning.group_project_team_leader') == False\
+            and self.env.user.has_group('ds_project_planning.group_project_pm') == False:
+            self.user_readonly = True
+        else:
+            self.user_readonly = False
 
     def write(self, vals):
         res = super(ProjectTask, self).write(vals)
