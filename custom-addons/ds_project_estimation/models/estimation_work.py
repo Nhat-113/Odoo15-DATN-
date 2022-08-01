@@ -171,9 +171,11 @@ class Estimation(models.Model):
                             module_delete.append(item[1])
 
                     component_delete = []
+                    estimation_id_delete = []
                     for rec in self.env["estimation.module"].search([('id', 'in', module_delete)]):
                         component_delete.append(rec.component)
-                    self.env["estimation.summary.costrate"].search([('name', 'in', component_delete)]).unlink()
+                        estimation_id_delete.append(rec.estimation_id.id)
+                    self.env["estimation.summary.costrate"].search([('name', 'in', component_delete),('connect_summary_costrate', 'in', estimation_id_delete)]).unlink()
                     self.env["estimation.summary.costrate"].search([('connect_summary_costrate', '=', False)]).unlink()
 
             # check miss cost rate
@@ -529,6 +531,7 @@ class Estimation(models.Model):
             # if cost_rate:
                 # role_default = cost_rate[0]
             lines_2 = (0, 0, {
+                'connect_summary_costrate': self.id or self.id.origin,
                 'sequence': index + 1,
                 'name': module.component,
                 'types': val.job_position,
