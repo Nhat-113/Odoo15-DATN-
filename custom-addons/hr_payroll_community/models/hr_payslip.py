@@ -7,6 +7,7 @@ from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
 from pytz import utc
+import pandas as pd
 
 from odoo import api, fields, models, tools, _
 from odoo.addons import decimal_precision as dp
@@ -252,6 +253,17 @@ class HrPayslip(models.Model):
             # compute worked days
             work_data = contract.employee_id.get_work_days_data(day_from, day_to,
                                                                 calendar=contract.resource_calendar_id)
+
+            if contract.date_end and contract.date_start <= self.date_from and contract.date_end <= self.date_to:
+                unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) - 1
+            elif contract.date_end and contract.date_start >= self.date_from and contract.date_end >= self.date_to:
+                unpaid_working_day = len(pd.bdate_range(self.date_from, contract.date_start)) - 1
+            elif contract.date_end and contract.date_start >= self.date_from and contract.date_end > self.date_to:
+                unpaid_working_day = len(pd.bdate_range(self.date_from, contract.date_start))
+            elif contract.date_end and contract.date_start >= self.date_from and contract.date_end <= self.date_to:
+                unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) + len(pd.bdate_range(self.date_from, contract.date_start)) - 1
+            else:
+                unpaid_working_day = 0
             attendances = {
                 'name': _("Ngày làm việc bình thường được trả 100%"),
                 'sequence': 1,
@@ -262,16 +274,17 @@ class HrPayslip(models.Model):
             }
 
             unpaid = {
-                'name': _("Ngày nghỉ không lương"),
+                'name': _("Ngày nằm ngoài hợp đồng"),
                 'sequence': 5,
                 'code': 'NNKL',
-                'number_of_days': 0,
+                'number_of_days': unpaid_working_day,
                 # 'number_of_hours': 0,
                 'contract_id': contract.id,
             }
 
             res.append(attendances)
-            res.append(unpaid)
+            if unpaid_working_day > 0:
+                res.append(unpaid)
             res.extend(leaves.values())
         return res
 

@@ -1,0 +1,141 @@
+<odoo>
+    <data noupdate="1">
+        <!-- Casual leave -->
+        <record id="holiday_status_cl" model="hr.leave.type">
+            <field name="name">Nghỉ phép có lương</field>
+            <field name="requires_allocation">yes</field>
+            <field name="leave_validation_type">hr</field>
+            <field name="allocation_validation_type">officer</field>
+            <field name="code">NPCL</field>
+            <field name="leave_notif_subtype_id" ref="hr_holidays.mt_leave"/>
+            <field name="allocation_notif_subtype_id" ref="hr_holidays.mt_leave_allocation"/>
+            <field name="responsible_id" ref="base.user_admin"/>
+            <field name="request_unit">half_day</field>
+            <field name="icon_id" ref="hr_holidays.icon_14"/>
+            <field name="color">2</field>
+        </record>
+
+        <record id="holiday_status_bts" model="hr.leave.type">
+            <field name="name">Nam nghỉ thai sản</field>
+            <field name="requires_allocation">no</field>
+            <field name="leave_validation_type">hr</field>
+            <field name="allocation_validation_type">officer</field>
+            <field name="code">BNTS</field>
+            <field name="leave_notif_subtype_id" ref="hr_holidays.mt_leave"/>
+            <field name="allocation_notif_subtype_id" ref="hr_holidays.mt_leave_allocation"/>
+            <field name="responsible_id" ref="base.user_admin"/>
+            <field name="request_unit">half_day</field>
+            <field name="icon_id" ref="hr_holidays.icon_15"/>
+            <field name="color">3</field>
+        </record>
+
+        <record id="holiday_status_gts" model="hr.leave.type">
+            <field name="name">Nữ nghỉ thai sản</field>
+            <field name="requires_allocation">no</field>
+            <field name="leave_validation_type">hr</field>
+            <field name="allocation_validation_type">officer</field>
+            <field name="code">GNTS</field>
+            <field name="leave_notif_subtype_id" ref="hr_holidays.mt_leave"/>
+            <field name="allocation_notif_subtype_id" ref="hr_holidays.mt_leave_allocation"/>
+            <field name="responsible_id" ref="base.user_admin"/>
+            <field name="request_unit">half_day</field>
+            <field name="icon_id" ref="hr_holidays.icon_16"/>
+            <field name="color">4</field>
+        </record>
+
+        <record id="holiday_status_kl" model="hr.leave.type">
+            <field name="name">Nghỉ việc riêng không hưởng lương</field>
+            <field name="requires_allocation">no</field>
+            <field name="leave_validation_type">hr</field>
+            <field name="allocation_validation_type">officer</field>
+            <field name="code">NVKL</field>
+            <field name="leave_notif_subtype_id" ref="hr_holidays.mt_leave"/>
+            <field name="allocation_notif_subtype_id" ref="hr_holidays.mt_leave_allocation"/>
+            <field name="responsible_id" ref="base.user_admin"/>
+            <field name="request_unit">half_day</field>
+            <field name="icon_id" ref="hr_holidays.icon_17"/>
+            <field name="color">5</field>
+        </record>
+
+        <record id="holiday_status_ntm" model="hr.leave.type">
+            <field name="name">Người thân mất</field>
+            <field name="requires_allocation">no</field>
+            <field name="leave_validation_type">hr</field>
+            <field name="allocation_validation_type">officer</field>
+            <field name="code">NTM</field>
+            <field name="leave_notif_subtype_id" ref="hr_holidays.mt_leave"/>
+            <field name="allocation_notif_subtype_id" ref="hr_holidays.mt_leave_allocation"/>
+            <field name="responsible_id" ref="base.user_admin"/>
+            <field name="request_unit">half_day</field>
+            <field name="icon_id" ref="hr_holidays.icon_18"/>
+            <field name="color">6</field>
+        </record>
+
+        <record id="holiday_status_nod" model="hr.leave.type">
+            <field name="name">Nghỉ ốm đau</field>
+            <field name="requires_allocation">no</field>
+            <field name="leave_validation_type">hr</field>
+            <field name="allocation_validation_type">officer</field>
+            <field name="code">NOD</field>
+            <field name="leave_notif_subtype_id" ref="hr_holidays.mt_leave"/>
+            <field name="allocation_notif_subtype_id" ref="hr_holidays.mt_leave_allocation"/>
+            <field name="responsible_id" ref="base.user_admin"/>
+            <field name="request_unit">half_day</field>
+            <field name="icon_id" ref="hr_holidays.icon_19"/>
+            <field name="color">7</field>
+        </record>
+
+        <record id="holiday_status_kh" model="hr.leave.type">
+            <field name="name">Kết hôn</field>
+            <field name="requires_allocation">no</field>
+            <field name="leave_validation_type">hr</field>
+            <field name="allocation_validation_type">officer</field>
+            <field name="code">NKH</field>
+            <field name="leave_notif_subtype_id" ref="hr_holidays.mt_leave"/>
+            <field name="allocation_notif_subtype_id" ref="hr_holidays.mt_leave_allocation"/>
+            <field name="responsible_id" ref="base.user_admin"/>
+            <field name="request_unit">half_day</field>
+            <field name="icon_id" ref="hr_holidays.icon_20"/>
+            <field name="color">8</field>
+        </record>
+
+        <record id="holiday_status_ckh" model="hr.leave.type">
+            <field name="name">Con đẻ, con nuôi kết hôn</field>
+            <field name="requires_allocation">no</field>
+            <field name="leave_validation_type">hr</field>
+            <field name="allocation_validation_type">officer</field>
+            <field name="code">CKH</field>
+            <field name="leave_notif_subtype_id" ref="hr_holidays.mt_leave"/>
+            <field name="allocation_notif_subtype_id" ref="hr_holidays.mt_leave_allocation"/>
+            <field name="responsible_id" ref="base.user_admin"/>
+            <field name="request_unit">half_day</field>
+            <field name="icon_id" ref="hr_holidays.icon_21"/>
+            <field name="color">9</field>
+        </record>
+
+        <record id="holiday_public_tnd" model="resource.calendar.leaves">
+            <field name="name">Tết Nguyên Đán</field>
+        </record>
+
+        <record id="holiday_public_tdl" model="resource.calendar.leaves">
+            <field name="name">Tết Dương Lịch</field>
+        </record>
+
+        <record id="holiday_public_gthv" model="resource.calendar.leaves">
+            <field name="name">Giỗ Tổ Hùng Vương</field>
+        </record>
+
+        <record id="holiday_public_gpmn" model="resource.calendar.leaves">
+            <field name="name">Giải Phóng Miền Nam</field>
+        </record>
+
+        <record id="holiday_public_qtld" model="resource.calendar.leaves">
+            <field name="name">Quốc Tế Lao Động</field>
+        </record>
+
+        <record id="holiday_public_qk" model="resource.calendar.leaves">
+            <field name="name">Quốc Khánh</field>
+        </record>
+
+    </data>
+</odoo>
