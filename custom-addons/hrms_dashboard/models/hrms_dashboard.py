@@ -252,7 +252,7 @@ class Employee(models.Model):
                             """) %  user_id
         cr.execute(sql)
         # task_for_day = cr.fetchall()
-        
+
         if employee:
             department = employee.department_id
             job_id = employee.job_id
@@ -288,9 +288,39 @@ class Employee(models.Model):
             'birthday': birthday,
             'event': event,
             'announcement': announcement ,
+            # 'payslip_batches' :payslip_batches
             # 'task_for_day' : task_for_day
         }
+    @api.model
+    def get_payroll_for_user(self):
+        cr = self._cr
+        user_id = request.session.uid
+        sql=("""
+             select hr_employee.name , hr_payslip.date_from, hr_payslip.date_to , hr_payslip.name,  ROUND(hr_payslip_line.amount)
+            from hr_payslip_line
+            INNER JOIN hr_payslip
+            on hr_payslip.id=hr_payslip_line.slip_id
+			INNER JOIN hr_employee 
+			on hr_employee.id =  hr_payslip.employee_id
+            Where hr_payslip_line.code in ('NET','NET1')  AND  hr_employee.user_id = %s
+            """) %  user_id
+        # sql=("""
+        #         select CURRENT_DATE, project_task.priority_type, project_task.name , project_task.id ,project_task.date_start  , hr_employee.name  from  project_task  
+        #         INNER JOIN  project_task_user_rel on project_task_user_rel.task_id = project_task.id 
+        #         INNER JOIN  hr_employee on hr_employee.user_id = project_task_user_rel.user_id and hr_employee.user_id = %s 
+        #         where DATE(project_task.date_start) = CURRENT_DATE
+        #                     """) %  user_id
+        cr.execute(sql)
+        dat = cr.fetchall()
+        data = []
+        money = []
 
+        for i in range(0, len(dat)):
+            money.append(dat[i][4])
+            # money_format = "${:.2f}".format(money)
+            data.append({'label': dat[i][1], 'value': sum(money)})
+  
+        return data
     @api.model
     def get_dept_employee(self):
         cr = self._cr

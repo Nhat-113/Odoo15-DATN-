@@ -1040,7 +1040,7 @@ h4 .stat-count {
 }
 
 .list_menu_user {
-    height: 8%
+    height: 15%
 }
 
 .list_menu_user button {
@@ -1216,12 +1216,12 @@ button:focus {
 .list_future_user {
     text-align: center;
     height: 20%;
-    margin-bottom: 50% !important
+    margin-bottom: 25% !important
 }
 
 .list_payslip_user {
     width: 90%;
-    margin: 10 0 0 0 auto;
+    margin: 10 0 0 0;
     /* border-radius: 26px; */
     height: 80%;
     overflow-y: scroll;
@@ -2105,6 +2105,7 @@ button:focus {
     flex-wrap: nowrap;
     /* height: 41%; */
     border-radius: 9px !important;
+    cursor: pointer;
     margin-top: 5px !important;
 }
 
@@ -2117,6 +2118,7 @@ button:focus {
     /* height: 41%; */
     border-radius: 9px !important;
     margin-top: 5px !important;
+    cursor: pointer;
 }
 
 .stat-widget-one .stat-icon i {
@@ -2168,6 +2170,7 @@ button:focus {
     /* height: 41%; */
     border-radius: 9px !important;
     margin-top: 2px !important;
+    cursor: pointer;
 }
 
 .button-checkout-user {
@@ -2176,16 +2179,15 @@ button:focus {
     display: flex;
     flex-direction: row-reverse;
     flex-wrap: nowrap;
-    /* height: 41%; */
     border-radius: 9px !important;
     margin-top: 2px !important;
+    cursor: pointer;
 }
 
 .button-checkout .stat-content .stat-text {
     font-size: 14px;
     color: white;
     margin: 14px 0 14px 80px;
-    /* margin-left: 80px; */
 }
 
 .button-checkout-user .stat-content .stat-text {
@@ -2376,7 +2378,7 @@ button:focus {
 }
 
 #btn_dashboard_detail_user {
-    height: 100% !important;
+    height: 45% !important;
     z-index: 99999999
 }
 
@@ -2504,7 +2506,7 @@ button:focus {
     /* overflow-y: scroll; */
 }
 
-.chart_payroll {
+.payroll_analytic_admin {
     display: none !important;
 }
 

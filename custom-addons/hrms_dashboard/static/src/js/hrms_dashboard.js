@@ -44,6 +44,9 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             "click .btn_announcements": "swap_menu",
             "click .btn_annalys": "swap_menu",
 
+            "click .btn_dashboard_detail_user": "swap_menu_user",
+            "click .btn_dashboard_payroll_user": "swap_menu_user",
+
             "click .hr_leave_request_approve": "leaves_to_approve",
             "click .hr_leave_allocations_approve": "leave_allocations_to_approve",
             "click .hr_job_application_approve": "job_applications_to_approve",
@@ -82,6 +85,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             this.employee_birthday = [];
             this.upcoming_events = [];
             this.announcements = [];
+            // this.payslip_batches = [];
             // this.task_for_day = [];
             this.login_employee = [];
         },
@@ -122,6 +126,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         self.upcoming_events = res["event"];
                         // self.task_for_day = res["task_for_day"];
                         self.announcements = res["announcement"];
+                        // self.payslip_batches = res["payslip_batches"];
                     });
                 return $.when(def0, def1, def2);
             });
@@ -184,6 +189,11 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                             document.getElementById("hide-application").style.display = "none";
                         }
                     });
+                    var canvas = document.getElementById("myChart");
+                    // console.log(`canvas`, canvas);
+                    if(canvas) {
+                        self.payroll();
+                    }
                 }, 500);
                 self.update_cp();
                 self.render_dashboards()
@@ -223,6 +233,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     self.upcoming_events = res["event"];
                     // self.task_for_day = res["task_for_day"];
                     self.announcements = res["announcement"];
+                    // self.payslip_batches = res["payslip_batches"];
                 });
             return $.when(def0, def1, def2);
         },
@@ -266,6 +277,63 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 self.update_leave_trend();
             }
         },
+        payroll : function () {
+            rpc
+                .query({
+                    model: "hr.employee",
+                    method: "get_payroll_for_user",
+                })
+                .then(function(data) {
+                    // console.log(`dataaaaaaaaaaa`, data);
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const payroll = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: '# Payroll analytics',
+                            data: [],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: (value) => `$ ${value}`,
+                                  },
+                                // ticks: {
+                                //     // callback: (label) => `$ ${label}`,
+                                    callback: function(label, index, labels) {
+                                        console.log(`113`);
+                                    }
+
+                                // },
+                            }
+                        }
+                    }
+                }); 
+                let  dataTemp = payroll.data;
+                for (let i = 0; i < data.length; i++) {
+                    dataTemp.labels.push(data[i].label);
+                    dataTemp.datasets[0].data.push(data[i].value)
+                }
+                // console.log(`contract`, contract);
+                // console.log(`dataTemp`, dataTemp);
+                // contract.addData(dataTemp);
+                payroll.data.labels = dataTemp.labels;
+                payroll.data.datasets[0].data = dataTemp.datasets[0].data;
+                payroll.update();
+            });  
+        },
 
         on_reverse_breadcrumb: function() {
             var self = this;
@@ -274,6 +342,13 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             this.fetch_data().then(function() {
                 self.$(".o_hr_dashboard").empty();
                 self.render_dashboards();
+                setTimeout(() => {  
+                    var canvas = document.getElementById("myChart");
+                    // console.log(`canvas`, canvas);
+                    if(canvas) {
+                        self.payroll();
+                    }
+                  }, 1000);
             });
         },
 
@@ -364,6 +439,28 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 target.className.includes("btn_announcements") ?
                 "announcements" :
                 "annalys";
+            document.querySelector(`.${targetClass}`).removeAttribute("style");
+            events.currentTarget.className += " active";
+        },
+        swap_menu_user: function(events) {
+            var i, tabcontent, tablinks, targetClass, target;
+            tabcontent = document.getElementsByClassName("tabcontent_2");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks_2");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            target = events.target;
+            targetClass = target.className.includes("btn_dashboard_detail_user") ?
+                "event_annoucement" :
+                target.className.includes("btn_dashboard_payroll_user") ?
+                "payroll" : targetClass
+
+            // console.log(`targetClass`, targetClass);
+
             document.querySelector(`.${targetClass}`).removeAttribute("style");
             events.currentTarget.className += " active";
         },
