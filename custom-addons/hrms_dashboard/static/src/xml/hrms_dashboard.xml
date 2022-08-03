@@ -48,7 +48,10 @@
                     <button class="btn_leave_request  hr_leave_request_approve">
                         <h4><i class="fa fa-plus"></i></h4>
                         <h3  class="fearure_detail">   
-                            Leave Request <t t-esc="widget.login_employee.leaves_to_approve"/>
+                            Leave Request 
+                            <div class="number_admin">
+                                <p class="count_number_admin"><t t-esc="widget.login_employee.leaves_to_approve"/></p>
+                            </div>
                         </h3>
                     </button>
                     <button id= "btn-payslip" class="btn_payslip hr_payslip" style="display: none">
@@ -56,13 +59,19 @@
                             <i class="fa fa-money"/>
                         </h4>
                         <h3  class="fearure_detail" >
-                             Payslip <t t-esc="widget.login_employee['payslip_count_done']"/>
+                            Payslip 
+                            <div class="number_admin">
+                                <p class="count_number_admin"> <t t-esc="widget.login_employee['payslip_count_done']"/></p>
+                            </div>
                         </h3>
                     </button>
                     <button id="btn-contract" class="btn_expried hr_contract" style="display: none">
                         <h4><i class="fa fa-fw fa-book" style="margin-left: -1px;"></i></h4>
                         <h3  class="fearure_detail">
-                            Contract <t t-esc="widget.login_employee['contracts_count']"/>
+                            Contract 
+                            <div class="number_admin">
+                                <p class="count_number_admin"><t t-esc="widget.login_employee['contracts_count']"/></p>
+                            </div>
                         </h3>
                     </button>
                 </div>
@@ -351,7 +360,10 @@
                             <i class="fa fa-money"/>
                         </h4>
                         <h3 class="fearure_detail_user">
-                             Payslip <t t-esc="widget.login_employee['payslip_count_done']"/>
+                            Payslip 
+                            <div class="payslip_count_number"> 
+                                <p class="count_number_admin"><t t-esc="widget.login_employee['payslip_count_done']"></t></p> 
+                            </div>
                         </h3>
                     </button>
                 </div>

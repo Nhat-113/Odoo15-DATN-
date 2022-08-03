@@ -1280,8 +1280,37 @@ button:focus {
     margin: 0 0 0 14px;
     float: left;
     padding-left: 27px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
 }
-
+.count_number_admin {
+    margin: 0;
+    font-weight: bold;
+    font-size: 15px;
+    float: right;
+}
+.payslip_count_number,.number_admin {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    width: 24px;
+    height: 24px;
+    background: #F0F0FF;
+    border-radius: 12px;
+    flex: none;
+    order: 1;
+    margin-top: -2px;
+    flex-grow: 0;
+    position: absolute;
+    right: 40px;
+}
+.number_admin{
+    margin-top: -7% !important;
+}
 .hr_contract>h3 {
     margin-left: -4px;
 }
@@ -1911,7 +1940,7 @@ button:focus {
     padding: 5px 24px;
     margin: 4% 0 0 0;
     background: #FAFAFA;
-    width: 95%;
+    width: 100%;
     border-radius: 16px;
     position: relative;
     height: 17%;
@@ -2468,7 +2497,7 @@ button:focus {
     margin: 4% 0 0 0 ;
     /* margin-top: 4%; */
     background: #FAFAFA;
-    width: 95%;
+    width: 100%;
     border-radius: 16px;
     position: relative;
     height: 7%;
