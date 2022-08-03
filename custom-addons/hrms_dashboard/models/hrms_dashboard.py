@@ -221,7 +221,7 @@ class Employee(models.Model):
             (to_char(dob,'ddd')::int-to_char(now(),'ddd')::int+total_days)%total_days as dif
             from (select he.id, he.name, to_char(he.birthday, 'Month dd') as birthday, he.birthday as dob,
             (to_char((to_char(now(),'yyyy')||'-12-31')::date,'ddd')::int) as total_days
-            FROM hr_employee he
+            FROM hr_employee he where  he.departure_reason_id is NULL
             ) birth
             where (to_char(dob,'ddd')::int-to_char(now(),'DDD')::int+total_days)%total_days between 0 and 15
             order by dif;""")
