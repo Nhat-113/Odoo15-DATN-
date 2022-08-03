@@ -579,6 +579,15 @@
                         <field name="description" placeholder="Add a description..."/>
                     </group>
                     <notebook>
+                        <page string="Phase in Projects">
+                            <field name="project_phases" colspan="4" nolabel="1" readonly="1" force_save="1">
+                                <tree string="Phase in Project" multi_edit="0" sample="1" js_class="project_list">
+                                    <field name="name"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                </tree>
+                            </field>
+                        </page>
                         <page string="Tasks">
                             <field name="project_tasks" colspan="4" nolabel="1" readonly="1" force_save="1">
                                 <tree string="Tasks" multi_edit="1" sample="1" js_class="project_list">

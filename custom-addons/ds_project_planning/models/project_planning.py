@@ -30,6 +30,8 @@ class Project(models.Model):
         string="Total phases", compute="_count_phase_milestone")
     total_milestone = fields.Integer(
         string="Total milestones", compute="_count_phase_milestone")
+    project_phases = fields.One2many(
+        'project.planning.phase', 'project_id', string='Phases In Project')
 
     def _compute_task_total(self):
         for project in self:

@@ -33,6 +33,8 @@ class PlanningPhase(models.Model):
         related='project_id.user_id', readonly=True, store=True)
     project_tasks = fields.One2many(
         'project.task', 'phase_id', string='Tasks')
+    project_phases = fields.One2many(
+        'project.planning.phase', 'project_id', string='Phases In Project', compute='_get_phase_in_project')
     name = fields.Char("Phase name", required=True)
     type = fields.Char("Type", required=True, default="phase")
 
@@ -52,6 +54,11 @@ class PlanningPhase(models.Model):
     _sql_constraints = [
         ('name_uniq', 'unique (project_id, name)', "Phase name already exists!"),
     ]
+
+    @api.onchange('name')
+    def _get_phase_in_project(self):
+        for phase in self:
+            phase.project_phases = self.env['project.planning.phase'].search([('project_id', '=', phase.project_id.id)])
 
     @api.depends('start_date', 'end_date')
     def _compute_phase_duration(self):
@@ -79,7 +86,7 @@ class PlanningPhase(models.Model):
     #     for r in self:
     #         if r.start_date and r.phase_duration and not r.env.context.get('ignore_onchange_phase_duration', False):
     #             r.end_date = r.start_date + timedelta(days=r.phase_duration)
-
+    
 
     def _check_dates(self):
         for phase in self:
