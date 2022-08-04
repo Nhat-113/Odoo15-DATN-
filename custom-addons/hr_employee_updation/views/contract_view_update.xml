@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_contract_view_form_update" model="ir.ui.view">
+        <field name="name">hr.contract.view.form.update</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='information']" position="after">
+                <page string="Salary History" name="salary_history">
+                    <field name="contract_old" colspan="4">
+                        <tree string="Salary History" delete="0" editable="top" create="0">
+                            <field name="salary_old"/>
+                            <field name="date_expire" readonly="0" width="115px"/>
+                            <button name="unlink_salary_old" type="object" string="Delete" class="oe_highlight" confirm="Are you sure you want to delete this record?"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

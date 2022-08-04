@@ -29,7 +29,7 @@
     'author': 'Cybrosys Techno solutions,Open HRMS',
     'company': 'Cybrosys Techno Solutions',
     'website': "https://www.openhrms.com",
-    'depends': ['base', 'hr', 'mail', 'hr_gamification', 'hr_contract'],
+    'depends': ['base', 'hr', 'mail', 'hr_gamification', 'hr_contract', 'hr_payroll_community'],
     'data': [
         'security/ir.model.access.csv',
         'data/data.xml',
@@ -37,7 +37,15 @@
         'views/contract_days_view.xml',
         'views/updation_config.xml',
         'views/hr_employee_view.xml',
+        'views/contract_view_update.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            '/hr_employee_updation/static/src/css/style.css',
+        ],
+        'web.assets_qweb': [
+        ]
+    },
     'images': ['static/description/banner.png'],
     'license': 'AGPL-3',
     'installable': True,

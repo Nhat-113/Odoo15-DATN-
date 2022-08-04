@@ -1,0 +1,5 @@
+button[name='unlink_salary_old'] {
+    position: absolute;
+    right: 1%;
+    display: block;
+}
