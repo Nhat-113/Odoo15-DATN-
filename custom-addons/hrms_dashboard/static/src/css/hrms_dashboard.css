@@ -777,10 +777,8 @@ h4 .stat-count {
     height: 100%;
 }
 #close_gantt {
-    display: flex !important;
     left: 44.53%;
     bottom: -1.36%;
-    background: #FFFFFF;
     border-radius: 1px;
     /* width: 2%; */
     height: 30px;
