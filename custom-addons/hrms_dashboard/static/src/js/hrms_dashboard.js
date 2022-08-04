@@ -59,6 +59,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             "click .dashboard_today_meeting": "dashboard_today_meeting",
             "click .dashboard_in_recruiment": "dashboard_in_recruiment",
             "click .view_detail": "openform",
+            "click #view_chart": "open_form_chart",
+            "click #close_gantt": "close_form_chart",
             // "click .close_form": "close_form",
             "click .hr_timesheets": "hr_timesheets",
             "click .login_broad_factor": "employee_broad_factor",
@@ -650,6 +652,16 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                     $(this).toggleClass('view_detail_2');
                 })
             }
+        },
+        open_form_chart: function(events) {
+            document.getElementById('leave_trend').style.display = "block"
+        },
+        close_form_chart: function(events) {
+            console.log(`123`);
+             var ele = document.getElementById('leave_trend')
+             if(ele.style.display === "block") {
+                ele.style.display = "none"
+             }
         },
         //leave request today
         leaves_request_today: function(e) {
