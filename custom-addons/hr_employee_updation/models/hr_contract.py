@@ -52,14 +52,13 @@ class Contract(models.Model):
                 contract.date_end = max(date.today(), contract.date_start)
 
         vals_olds = ['wage', 'non_taxable_allowance', 'taxable_allowance']
+        salary_old = self.env['hr.contract'].search([('id', '=', self.id)])
         for vals_old in vals_olds:
             if vals_old in vals:
                 self.env['hr.contract.old'].search([]).create({
                 'contract_id' : self.id,
                 'employee_id': self.employee_id.id,
-                'salary_old': (self.env['hr.contract'].search([('id', '=', self.id)]).wage + \
-                               self.env['hr.contract'].search([('id', '=', self.id)]).non_taxable_allowance + \
-                               self.env['hr.contract'].search([('id', '=', self.id)]).taxable_allowance),
+                'salary_old': salary_old.wage + salary_old.non_taxable_allowance + salary_old.taxable_allowance,
                 'date_expire': date.today()
                 })
                 break
