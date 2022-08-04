@@ -34,6 +34,13 @@
                     <field name="user_id_domain" invisible="1"/>
                     <field name="user_ids" class="o_task_user_field" options="{'no_open': True, 'no_create': True}" widget="many2many_avatar_user" domain="user_id_domain"/>
                 </xpath>
+                <xpath expr="//h1[hasclass('justify-content-between')]/field[@name='name']" position="replace">
+                    <field name="name" class="o_task_name text-truncate style_css_title" placeholder="Task Title..." default_focus="1"/>
+                </xpath>
+                <xpath expr="//field[@name='kanban_state']" position="replace">
+                    <field name="kanban_state" invisible="1"/>
+                </xpath>
+                
             </field>
         </record>
 
@@ -225,6 +232,9 @@
                             <field name="status"/>
                         </div>
                     </t>
+                </xpath>
+                <xpath expr="//field[@name='kanban_state']" position="replace">
+                    <field name="kanban_state" invisible="1"/>
                 </xpath>
             </field>
         </record>
