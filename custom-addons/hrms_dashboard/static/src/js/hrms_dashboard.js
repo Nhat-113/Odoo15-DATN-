@@ -657,7 +657,6 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             document.getElementById('leave_trend').style.display = "block"
         },
         close_form_chart: function(events) {
-            console.log(`123`);
              var ele = document.getElementById('leave_trend')
              if(ele.style.display === "block") {
                 ele.style.display = "none"
