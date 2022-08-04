@@ -138,6 +138,12 @@
 #gantt_dropdown> label > input[name="end_date"] {
     display: none !important;
 }
+#o_dhx_button_left {
+    display: none;
+}
+#dropdownMenuButton {
+    display: none;
+}
 /* .gantt_task_line.gantt_milestone {
     margin-left: 40px
 } */

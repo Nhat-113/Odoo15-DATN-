@@ -181,16 +181,30 @@ var GanttController = AbstractController.extend({
             return false;
         }
     });
-        // deny drag if task have progress === 100%
-    gantt.attachEvent("onBeforeTaskDrag", function (id, mode, e) {
-        var taskObj = gantt.getTask(id);
-        // console.log(`taskObj`,taskObj );
-        if( taskObj.progress === 1 || taskObj.type == "phase" ) {
-            return false;
-        }
-        return true;
+        // deny drag if task have progress === 100% and phase and role user
+        session.user_has_group("ds_project_planning.group_project_team_leader").then(function(has_group) {
+            gantt.attachEvent("onBeforeTaskDrag", function (id, mode, e) {
+                var taskObj = gantt.getTask(id);
+                if (has_group) {
+                    if( taskObj.progress === 1 || taskObj.type == "phase" ) {
+                        return false;
+                    }
+                    return true;
+                }
+                return false;
+            });
+            if (!has_group) {
+                var element = document.getElementById("dropdownMenuButton");
+                element.parentNode.removeChild(element);
     
-    });
+                var element2 = document.getElementById("o_dhx_button_left");
+                element2.parentNode.removeChild(element2);
+            }else {
+                // var element = document.getElementById("o_dhx_button_left");
+                document.getElementById("o_dhx_button_left").style.display = "block";
+                document.getElementById("dropdownMenuButton").style.display = "block";
+            }
+        });
     
     gantt.attachEvent("onBeforeTaskMove", function(id, parent, tindex){
         // console.log('tindex',parent);
