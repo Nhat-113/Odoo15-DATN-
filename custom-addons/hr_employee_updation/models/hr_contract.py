@@ -47,10 +47,6 @@ class Contract(models.Model):
         return contracts
 
     def write(self, vals):
-        if self.state == 'close':
-            for contract in self.filtered(lambda c: not c.date_end):
-                contract.date_end = max(date.today(), contract.date_start)
-
         vals_olds = ['wage', 'non_taxable_allowance', 'taxable_allowance']
         salary_old = self.env['hr.contract'].search([('id', '=', self.id)])
         for vals_old in vals_olds:
@@ -68,6 +64,12 @@ class Contract(models.Model):
     def _get_contract_old(self):
         for old in self:
             old.contract_old = self.env['hr.contract.old'].search([('contract_id', '=', old.id)])
+
+    @api.depends('state')
+    def check_status_expired(self):
+        if self.state == 'close':
+            for contract in self.filtered(lambda c: not c.date_end):
+                contract.date_end = max(date.today(), contract.date_start)
     
     # def _assign_open_contract(self):
     #     for contract in self:
