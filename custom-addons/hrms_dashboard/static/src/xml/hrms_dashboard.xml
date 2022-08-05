@@ -469,7 +469,7 @@
                             
 
                     </div>
-                    <div class="col-xs-12 monthly_leave_trend" id="monthly_leave_trend_user" style="padding:0px;margin-top:20px,border-radius:32px">
+                    <div class="col-xs-12 monthly_leave_trend" id="monthly_leave_trend_user">
                         <div class="oh-card_oh-card text-color text-color text-color ">
                             <div class="oh-card-body pb-0 header_view_chart">
                                 <h4 class="mb-0">
