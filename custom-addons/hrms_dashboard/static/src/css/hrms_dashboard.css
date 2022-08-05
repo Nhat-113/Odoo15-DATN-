@@ -2014,6 +2014,9 @@ button:focus {
     overflow-y: scroll;
     z-index: 100;
 }
+.link_news {
+    width: 100%;
+}
 
 #list_anoucement::-webkit-scrollbar {
     background: linear-gradient(180deg, #EFF9FD 0%, #DAEAF1 100%);
@@ -2038,8 +2041,8 @@ button:focus {
 }
 .birthday-detail-user img {
     position: static;
-    width: 40px;
-    height: 40px;
+    width: 12%;
+    height: 90%;
     left: 0px;
     top: 0px;
     /* Inside auto layout */
@@ -2047,7 +2050,7 @@ button:focus {
     order: 0;
     flex-grow: 0;
     margin: 0px 10px;
-    border-radius: 45%;
+    /* border-radius: 45%; */
 }
 .image_bitrh {
     width: 7%;
@@ -2197,6 +2200,7 @@ button:focus {
 
 .list_event_user {
     /* position: relative; */
+    cursor: pointer;
     width: 90%;
     margin: 0 auto;
     height: 80%;
@@ -2402,6 +2406,7 @@ button:focus {
     min-height: 7.6%;
     flex-direction: column;
     position: relative;
+    cursor: pointer;
 }
 
 .text_news {
@@ -2444,6 +2449,7 @@ button:focus {
     justify-content: space-between;
     flex-direction: column;
     position: relative;
+    cursor: pointer;
 }
 
 .text_detail_user .text_news_user  {
@@ -2588,7 +2594,7 @@ button:focus {
     width: 100%;
     border-radius: 16px;
     position: relative;
-    height: 7%;
+    height: 8%;
 }
 
 .birthday-detail p {
@@ -2623,8 +2629,8 @@ button:focus {
 
 .birthday-detail img {
     position: static;
-    width: 40px;
-    height: 40px;
+    height: 100%;
+    width: 11%;
     left: 0px;
     top: 0px;
     /* Inside auto layout */

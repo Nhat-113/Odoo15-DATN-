@@ -61,6 +61,8 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             "click .view_detail": "openform",
             "click #view_chart": "open_form_chart",
             "click #close_gantt": "close_form_chart",
+            "click #text_detail_event": "dashboard_event",
+            "click #text_detail_event_user": "dashboard_event",
             // "click .close_form": "close_form",
             "click .hr_timesheets": "hr_timesheets",
             "click .login_broad_factor": "employee_broad_factor",
@@ -369,6 +371,12 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 employee
             );
         },
+        get_url_news: function(announcement) {
+            return (
+                // window.location.origin +
+                `web#id=${announcement}&cids=1&model=hr.announcement&view_type=form`
+            );
+        },
 
         update_attendance: function() {
 
@@ -641,6 +649,24 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                 target: "current",
 
 
+            });
+        },
+        dashboard_event: function(e) {
+            var self = this;
+            e.stopPropagation();
+            e.preventDefault();
+            // var options = {
+            //     on_reverse_breadcrumb: self.on_reverse_breadcrumb,
+            // };
+            self.do_action({
+                name: _t("Event"),
+                type: "ir.actions.act_window",
+                res_model: "event.event",
+                view_mode: " kanban",
+                views: [
+                    [false, "kanban"],
+                ],
+                target: "current",
             });
         },
         openform: function(events) {
