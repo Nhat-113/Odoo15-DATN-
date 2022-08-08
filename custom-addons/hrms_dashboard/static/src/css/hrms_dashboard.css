@@ -287,6 +287,7 @@ path:hover {
     color: #f3f3f3;
 }
 
+
 /* .employee-prof p {
     margin: 0 0 9px;
     color: #fff;
@@ -698,7 +699,8 @@ h4 .stat-count {
     stroke: #6869AC;
     stroke-width: 1.5;
 }
-.header_view_chart{
+
+.header_view_chart {
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -707,6 +709,7 @@ h4 .stat-count {
     background: #6869AC;
     border-radius: 24px;
 }
+
 .view_chart {
     display: flex;
     flex-direction: row;
@@ -726,29 +729,49 @@ h4 .stat-count {
     margin-right: 22px;
     font-weight: bold;
 }
-.image-chart{
+
+.image-chart {
     margin-right: -10%;
 }
+
 .title_leave {
     color: #FFFFFF !important;
 }
-#leave_trend {
+#blur_back_ground {
     display: none;
+}
+#leave_trend {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
     padding: 8px 24px 48px;
-    /* gap: 24px; */
-    position: absolute;
-    width: 92%;
-    height: 50%;
-    left: 0px;
-    top: 0px;
-    background: #FFFFFF;
     border-radius: 16px;
-    top: 30%;
-    left: 4%;
+    top: 4.8%;
+    left: -1%;
+    width: 106%;
+    position: fixed;
+    background: rgba(0, 0, 0, 0.75);
+    height: 100%;
 }
+
+#chart_leave_trend_user>svg {
+    background: white;
+    border-radius: 24px;
+    position: absolute;
+    left: 20%;
+}
+
+.popup_chart {
+    width: 65%;
+    height: 43%;
+    background: white;
+    margin: 0;
+    position: absolute;
+    left: 18%;
+    top: 23%;
+    border-radius: 24px;
+}
+
 .hr-chart-1 {
     margin: 15px 0px;
     background: #fff;
@@ -764,6 +787,7 @@ h4 .stat-count {
     background: #fff;
     border-radius: 24px;
 }
+
 .monthly_leave_trend_user_detail {
     height: 100%;
 }
@@ -775,13 +799,14 @@ h4 .stat-count {
     margin-top: 1%;
     border-radius: 32px;
 }
+
 #monthly_leave_trend_user .text-color {
     height: 100%;
 }
+
 #close_gantt {
-    left: 44.53%;
-    bottom: -1.36%;
-    /* width: 2%; */
+    left: 47.5%;
+    bottom: -3.5%;
     height: 30px;
     display: flex;
     flex-direction: row;
@@ -798,11 +823,13 @@ h4 .stat-count {
     justify-content: center;
     align-content: center;
     color: white;
-    cursor:pointer
+    cursor: pointer
 }
-#close_gantt > p  {
+
+#close_gantt>p {
     margin: 0;
 }
+
 
 /* .monthly_leave_trend:hover{
     transform: translateY(-2px) translateZ(0) !important;
@@ -1005,6 +1032,7 @@ h4 .stat-count {
     height: 96%;
     padding-left: 1%;
 }
+
 .employee_infomation {
     background: #FFFFFF;
     border-radius: 24px;
@@ -1017,7 +1045,6 @@ h4 .stat-count {
 .image-employee {
     border-radius: 3%;
     height: 22%;
-    background-color: #00438b;
     min-width: 80%;
     margin: 0 auto;
     width: 100%;
@@ -1071,11 +1098,10 @@ h4 .stat-count {
 .image-employee img {
     width: 100%;
     border-radius: 3%;
-    margin-top: 2%;
     height: 100%;
     display: flex;
     margin: 0 auto;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .information {
@@ -1373,13 +1399,16 @@ button:focus {
     flex-wrap: nowrap;
     justify-content: space-around;
 }
+
 .count_number_admin {
     margin: 0;
     font-weight: bold;
     font-size: 15px;
     float: right;
 }
-.payslip_count_number,.number_admin {
+
+.payslip_count_number,
+.number_admin {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -1396,9 +1425,11 @@ button:focus {
     position: absolute;
     right: 40px;
 }
-.number_admin{
+
+.number_admin {
     margin-top: -7% !important;
 }
+
 .hr_contract>h3 {
     margin-left: -4px;
 }
@@ -1442,6 +1473,7 @@ button:focus {
     justify-content: space-around;
     background: #F0F0FF;
 }
+
 .employee_infomation_user .time {
     height: 6.5%;
     margin: 0;
@@ -1699,7 +1731,7 @@ button:focus {
     align-items: center;
     padding-top: 0;
     background-color: #FAFAFA;
-    margin: 4.75%  3.5% 3.5% 3.5% ;
+    margin: 4.75% 3.5% 3.5% 3.5%;
     height: 29%;
 }
 
@@ -1816,9 +1848,11 @@ button:focus {
     margin: 0 0 0 18%;
     /* margin-left: 18%; */
 }
-.leave_graph .legend >tbody > tr>td{
+
+.leave_graph .legend>tbody>tr>td {
     padding: 4px 6px 4px 1px !important;
 }
+
 .leave_graph .legend>tbody>tr {
     width: 50%;
 }
@@ -1871,7 +1905,7 @@ button:focus {
     order: 1;
     flex-grow: 0;
     width: 100%;
-    margin:  5.5% 0 0 0 ;
+    margin: 5.5% 0 0 0;
     /* margin-top: 5.5%; */
     height: 9%;
 }
@@ -1919,7 +1953,7 @@ button:focus {
 
 .list-announcements {
     /* margin-top: -20px !important; */
-    margin: -20 0 0 0  auto;
+    margin: -20 0 0 0;
 }
 
 .announcements_detail {
@@ -1930,16 +1964,19 @@ button:focus {
     background: #FFFFFF;
     border-radius: 24px;
 }
+
 #title_anoucement {
     color: #4DA5CC;
 }
+
 #title_birthday {
-    color: #CE5D73
-    ;
+    color: #CE5D73;
 }
+
 #title_event {
     color: #FFAC00;
 }
+
 #announcements_detail {
     background: linear-gradient(180deg, #EFF9FD 0%, #DAEAF1 100%);
 }
@@ -1950,7 +1987,7 @@ button:focus {
 }
 
 #event_detail {
-    margin :0 0 0 1% !important; 
+    margin: 0 0 0 1% !important;
     /* margin-right: 0 !important; */
     background: linear-gradient(180deg, #FFF8E9 0%, #FFE3A9 100%)
 }
@@ -1974,6 +2011,7 @@ button:focus {
 .payroll {
     height: 100%;
 }
+
 
 /* .list_payroll_user {
     flex: none;
@@ -2014,9 +2052,6 @@ button:focus {
     overflow-y: scroll;
     z-index: 100;
 }
-.link_news {
-    width: 100%;
-}
 
 #list_anoucement::-webkit-scrollbar {
     background: linear-gradient(180deg, #EFF9FD 0%, #DAEAF1 100%);
@@ -2025,7 +2060,8 @@ button:focus {
 #list_birthday::-webkit-scrollbar {
     background: linear-gradient(180deg, #FFF3F4 0%, #F2D7D9 100%);
 }
-.birthday-detail-user{
+
+.birthday-detail-user {
     display: flex;
     align-items: center;
     padding: 5px 24px;
@@ -2036,9 +2072,11 @@ button:focus {
     position: relative;
     height: 10%;
 }
+
 .birthday-detail-user:first-child {
     margin-top: 0;
 }
+
 .birthday-detail-user img {
     position: static;
     width: 12%;
@@ -2050,7 +2088,7 @@ button:focus {
     order: 0;
     flex-grow: 0;
     margin: 0px 10px;
-    /* border-radius: 45%; */
+    border-radius: 45%;
 }
 .image_bitrh {
     width: 7%;
@@ -2218,7 +2256,7 @@ button:focus {
     flex: none;
     width: 90%;
     text-align: center;
-    margin: 1.5% 0 0 0 ;
+    margin: 1.5% 0 0 0;
     height: 18%;
     /* margin-top: 1.5%; */
 }
@@ -2393,7 +2431,7 @@ button:focus {
     align-self: stretch;
     flex-grow: 0;
     /* margin-top: 4% !important; */
-    margin-bottom: 4% 0  1.5% 0;
+    margin-bottom: 4% 0 1.5% 0;
 }
 
 .text_detail {
@@ -2423,7 +2461,7 @@ button:focus {
 }
 
 .text_detail .new_code {
-    padding:0% 0% 3% 3%;;
+    padding: 0% 0% 3% 3%;
     width: 100%;
     font-style: normal;
     font-weight: 400;
@@ -2452,7 +2490,7 @@ button:focus {
     cursor: pointer;
 }
 
-.text_detail_user .text_news_user  {
+.text_detail_user .text_news_user {
     width: 95%;
     padding-top: 10px;
     display: block;
@@ -2485,7 +2523,7 @@ button:focus {
     height: 50.5px;
     width: 90%;
     /* margin: auto; */
-    margin-top: 3.3% 0  0 0 ;
+    margin: 3.3% 0 0 0;
     padding: 2.5%;
 }
 
@@ -2533,7 +2571,7 @@ button:focus {
 .Birthday h3 {
     text-align: center;
     color: #4D4E8B;
-    margin-top: 9% 0 3.4% 0;
+    margin: 9% 0 3.4% 0;
     /* height: 2.5%; */
     /* margin-bottom: 3.4%; */
 }
@@ -2588,8 +2626,7 @@ button:focus {
     display: flex;
     align-items: center;
     padding: 5px 24px;
-    margin: 4% 0 0 0 ;
-    /* margin-top: 4%; */
+    margin-top: 4%;
     background: #FAFAFA;
     width: 100%;
     border-radius: 16px;
@@ -2686,9 +2723,8 @@ button:focus {
     flex: none;
     width: 90%;
     text-align: center;
-    margin: 3.5% 0 0  0 auto;
+    margin-top: 3.5% auto;
     height: 8%;
-    /* margin-top: 3.5%; */
 }
 
 .event-detail p {
@@ -2756,11 +2792,12 @@ button:focus {
 .dashboard-not-employee_content {
     margin: 0;
 }
+
 @-webkit-keyframes round_image {
-    from{
+    from {
         -webkit-transform: rotate(0deg);
     }
-    to{
+    to {
         -webkit-transform: rotate(360deg);
     }
 }
@@ -2768,6 +2805,7 @@ button:focus {
 .round_image {
     -webkit-animation: round_image 5s linear infinite;
 }
+
 
 /* .round_image {
     -webkit-transform: rotate(360deg);
@@ -2777,7 +2815,10 @@ button:focus {
     -webkit-animation-iteration-count: infinite;
 } */
 
+
 /* use after for popup */
+
+
 /* .myForm {
     display: none;
 }

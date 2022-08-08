@@ -334,5 +334,44 @@
     .count_number_admin {
         font-size: 12px;
     }
-
+    .employee_dashboard_detail_user  {
+        height: 88%;
+    }
+    #monthly_leave_trend_user {
+        background: #fff;
+        height: 10%;
+        padding: 0px;
+        margin-top: 1%;
+        border-radius: 1px;
+    }
+    .popup_chart {
+        width: 80%;
+        height: 49%;
+        background: white;
+        margin: 0;
+        position: absolute;
+        left: 8.5%;
+        top: 20%;
+        border-radius: 24px;
+    }
+    #leave_trend {
+        top: 6.4%;
+    }
+    .header_view_chart {
+        background: #6869AC;
+        border-radius: 16px;
+        width: 100.5%;
+    }
+    .title_leave,.view_chart {
+        font-size: 10px;
+    }
+    .view_chart{
+        width: 8%;
+    }
+    #chart_leave_trend_user>svg {
+        background: white;
+        border-radius: 24px;
+        position: absolute;
+        left: 18%;
+    }
 }

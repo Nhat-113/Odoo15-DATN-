@@ -298,7 +298,7 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
                         data: {
                             labels: [],
                             datasets: [{
-                                label: 'Payroll Analytics',
+                                label: 'Payroll Statistics',
                                 data: [],
                                 backgroundColor: [
                                     '#6869ac',
@@ -680,10 +680,10 @@ odoo.define("hrms_dashboard.DashboardRewrite", function(require) {
             }
         },
         open_form_chart: function(events) {
-            document.getElementById('leave_trend').style.display = "block"
+            document.getElementById('blur_back_ground').style.display = "block"
         },
         close_form_chart: function(events) {
-             var ele = document.getElementById('leave_trend')
+             var ele = document.getElementById('blur_back_ground')
              if(ele.style.display === "block") {
                 ele.style.display = "none"
              }
