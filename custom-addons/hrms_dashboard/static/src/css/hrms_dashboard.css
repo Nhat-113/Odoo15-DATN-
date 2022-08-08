@@ -2245,7 +2245,7 @@ button:focus {
     overflow-y: scroll;
 }
 
-.list_event_user .event-detail {
+/* .list_event_user .event-detail {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -2258,8 +2258,7 @@ button:focus {
     text-align: center;
     margin: 1.5% 0 0 0;
     height: 18%;
-    /* margin-top: 1.5%; */
-}
+} */
 
 .announcements_detail h3 {
     text-align: center;
@@ -2417,23 +2416,6 @@ button:focus {
     flex-grow: 0;
     margin: 3% 4% 2% 4%;
 }
-
-.Event_user h3 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 5%;
-    color: #4D4E8B;
-    background: #FFFFFF;
-    border-radius: 24px;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
-    /* margin-top: 4% !important; */
-    margin-bottom: 4% 0 1.5% 0;
-}
-
 .text_detail {
     display: flex;
     background-color: #FAFAFA;
@@ -2653,7 +2635,7 @@ button:focus {
 
 .days {
     display: inline;
-    font-weight: 400;
+    font-weight: bold;
     font-size: 13px;
     line-height: 20px;
     margin: 0;
@@ -2712,7 +2694,7 @@ button:focus {
     display: none !important;
 }
 
-.event-detail {
+/* .event-detail {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -2723,7 +2705,7 @@ button:focus {
     flex: none;
     width: 90%;
     text-align: center;
-    margin-top: 3.5% auto;
+    margin-top: 3.5%;
     height: 8%;
 }
 
@@ -2733,7 +2715,7 @@ button:focus {
     margin: 0 !important;
     padding: 0% 3%;
     font-weight: bold;
-}
+} */
 
 
 /* phần dashboard */
