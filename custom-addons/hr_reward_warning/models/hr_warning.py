@@ -42,8 +42,7 @@ class HrAnnouncementTable(models.Model):
                                  help="Create Date of Record")
     attachment_id = fields.Many2many('ir.attachment', 'doc_warning_rel', 'doc_id', 'attach_id4',
                                      string="Attachment", help='You can attach the copy of your Letter')
-    company_id = fields.Many2one('res.company', string='Company',
-                                 default=lambda self: self.env.user.company_id, readonly=True, help="Login user Company")
+    company_id = fields.Many2one('res.company', string='Company', help="Login user Company")
     is_announcement = fields.Boolean(string='Is general Announcement?', help="To set Announcement as general announcement")
     announcement_type = fields.Selection([('employee', 'By Employee'), ('department', 'By Department'), ('job_position', 'By Job Position')])
     employee_ids = fields.Many2many('hr.employee', 'hr_employee_announcements', 'announcement', 'employee',
