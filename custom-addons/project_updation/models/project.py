@@ -141,7 +141,7 @@ class Task(models.Model):
         return switcher.get(i, "Red")
 
     def _check_user_readonly(self):
-        if self.env.user.has_group('project.group_project_manager') == True or\
+        if self.env.user.has_group('project.group_project_manager') == True or self.env.user.has_group('ds_project_planning.group_project_team_leader') == True or\
                 self.env.user.id == self.project_id.user_id.id or self.create_uid.id == self.env.user.id:
             self.is_readonly = False
         else:
