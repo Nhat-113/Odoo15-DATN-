@@ -213,9 +213,9 @@
                         <label for="member_type"/>
                         <div class="o_row" name="member_type">
                             <field name="member_type" nolabel="1"/>
-                            <span>
+                            <!-- <span>
                                 <field name="member_type_rate" digits="[12,2]" nolabel="1"/>
-                            </span> %
+                            </span> % -->
                         </div>
                         <label for="effort_rate"/>
                         <div class="o_row" name="effort_rate">
@@ -450,9 +450,9 @@
                                             <label for="member_type"/>
                                             <div class="o_row" name="member_type">
                                                 <field name="member_type" nolabel="1"/>
-                                                <span>
+                                                <!-- <span>
                                                     <field name="member_type_rate" digits="[12,2]" nolabel="1"/>
-                                                </span> %
+                                                </span> % -->
                                             </div>
                                             <label for="effort_rate"/>
                                             <div class="o_row" name="effort_rate">
