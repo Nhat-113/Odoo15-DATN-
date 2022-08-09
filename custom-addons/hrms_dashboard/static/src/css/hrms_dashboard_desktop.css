@@ -371,4 +371,7 @@
         position: absolute;
         left: 18%;
     }
+    .see_more, .see_more_user {
+        font-size: 9px;
+    }
 }

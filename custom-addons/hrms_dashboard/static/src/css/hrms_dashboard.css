@@ -2051,6 +2051,7 @@ button:focus {
     height: 80%;
     overflow-y: scroll;
     z-index: 100;
+    overflow-x: hidden;
 }
 
 #list_anoucement::-webkit-scrollbar {
