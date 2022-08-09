@@ -80,3 +80,38 @@ class HrEmployee(models.Model):
                     template_id = template_env.sudo().browse(int(manager_template_id))
                     for manager in self.env.ref("hr.group_hr_manager").users:
                         template_id.send_mail(manager.id)
+
+    def send_birthday(self):
+            """
+            This function opens a window to compose an email, with the edi payslip template message loaded by default
+            """
+            self.ensure_one()
+            try:
+                template = self.env.ref(
+                    'ds_employee_birthday_reminder.email_birthday_wishes_employee_template', False)
+            except ValueError:
+                template = False
+
+            if self.id != self.env.user.employee_id.id:
+                try:
+                    compose_form_id = self.env.ref(
+                        'mail.email_compose_message_wizard_form').id
+                except ValueError:
+                    compose_form_id = False
+                ctx = dict(
+                    default_model='hr.employee',
+                    default_res_id=self.id,
+                    default_use_template=bool(template),
+                    default_template_id=template and template.id or False,
+                    default_composition_mode='comment',
+                )
+                return {
+                    'type': 'ir.actions.act_window',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'mail.compose.message',
+                    'views': [(compose_form_id, 'form')],
+                    'view_id': compose_form_id,
+                    'target': 'new',
+                    'context': ctx,
+                }

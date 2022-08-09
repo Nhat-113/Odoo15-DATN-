@@ -59,5 +59,18 @@
                 </xpath>
             </field>
         </record>
+        
+        <!-- <record model="ir.ui.view" id="employee_payslip_tesst">
+            <field name="name">hr.employee.form</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="replace">
+                    <button name="%(hr.plan_wizard_action)d" string="Launch Plan" type="action" groups="hr.group_hr_manager"/>
+                    <button name="send_birthday" string="Send Birthday" type="object" class="oe_highlight"/>
+                </xpath>
+            </field>
+        </record> -->
+
     </data>
 </odoo>
