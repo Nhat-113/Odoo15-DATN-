@@ -223,7 +223,10 @@
                                 <a t-att-href="widget.get_url_news(announcement[3])" class="link_news">
                                     <div class="text_detail"  >
                                         <h2 class="text_news" style="font-size: 15px;word-break:break-word"><t t-esc="announcement[2]"/> </h2>
-                                        <div class="new_code"><t t-esc="announcement[1]"/></div>
+                                        <div class="new_code">
+                                            <t t-esc="announcement[1]"/>
+                                        </div> 
+                                        <p class="see_more">See More...</p>
                                     </div>  
                                 </a>
                             </t>
@@ -427,7 +430,10 @@
                                         <a t-att-href="widget.get_url_news(announcement[3])" class="link_news">
                                             <div class="text_detail_user">
                                                 <h2 class="text_news_user" style="font-size: 15px;word-break:break-word"><t t-esc="announcement[2]"/> <t></t></h2>
-                                                <h6 class="new_code_user"><t t-esc="announcement[1]"/></h6>
+                                                <h6 class="new_code_user">
+                                                    <t t-esc="announcement[1]"/>
+                                                </h6>
+                                                <p class="see_more_user">See More...</p>
                                             </div>
                                         </a>
                                     </t>

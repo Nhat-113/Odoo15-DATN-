@@ -214,6 +214,7 @@ class Employee(models.Model):
     def get_upcoming(self):
         cr = self._cr
         uid = request.session.uid
+        selected_companies = self.get_current_company_value()
         employee = self.env['hr.employee'].search([('user_id', '=', uid)], limit=1)
 
         cr.execute("""
@@ -229,7 +230,8 @@ class Employee(models.Model):
         # e.is_online # was there below
         #        where e.state ='confirm' on line 118/9 #change
         cr.execute("""select event_event.name , event_event.date_begin  + interval '7' hour ,event_event.date_end  + interval '7' hour  from event_event  
-         where event_event.stage_id = '1' or  event_event.stage_id = '2' or  event_event.stage_id = '3' 
+         where ( event_event.stage_id = '1' or  event_event.stage_id = '2' or  event_event.stage_id = '3' )
+         and  (event_event.company_id in  """ + str(tuple(selected_companies)) + """  or  event_event.company_id is null)
          order by date_begin  desc
          """)
         event = cr.fetchall()
@@ -257,7 +259,8 @@ class Employee(models.Model):
             where ha.state = 'approved' and
             ha.date_start <= now()::date and
             ha.date_end >= now()::date and
-            (ha.is_announcement = True or
+            (ha.company_id is NULL or ha.company_id in  """ + str(tuple(selected_companies)) + """) 
+            and (ha.is_announcement = True or
             (ha.is_announcement = False
             and ha.announcement_type = 'employee'
             and hea.employee = %s)""" % employee.id
@@ -272,7 +275,7 @@ class Employee(models.Model):
                 ha.announcement_type = 'job_position'
                 and hpa.job_position = %s)""" % job_id.id
             sql += ')'
-            sql += 'order by date_start desc'
+            sql += 'order by create_date desc'
             cr.execute(sql)
             announcement = cr.fetchall()
         return {
