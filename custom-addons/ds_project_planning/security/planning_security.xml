@@ -7,7 +7,7 @@
     <!-- Add new group-->
     <record id="group_project_pm" model="res.groups">
         <field name="name">Officer (PM)</field>
-        <field name="implied_ids" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="implied_ids" eval="[(4, ref('project.group_project_user')), (4, ref('ds_project_planning.group_project_team_leader'))]"/>
         <field name="category_id" ref="base.module_category_services_project"/>
     </record>
 
