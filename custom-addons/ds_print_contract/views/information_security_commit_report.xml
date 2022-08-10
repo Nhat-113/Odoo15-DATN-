@@ -48,11 +48,11 @@
                                         <tr>
                                             <th>
                                                 <em>Đà Nẵng, ngày
-                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
+                                                    <span t-esc="e.date_start.strftime('%d')"/>
                                                     tháng
-                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
+                                                    <span t-esc="e.date_start.strftime('%m')"/>
                                                     năm
-                                                    <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                                    <span t-esc="e.date_start.strftime('%Y')"/>
                                                 </em>
                                             </th>
                                         </tr>
@@ -223,11 +223,11 @@
                                 <div class="col-6 text-center">
                                     <p>
                                         Đà Nẵng, ngày
-                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d')"/>
-                                                    tháng
-                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m')"/>
-                                                    năm
-                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
+                                        <span t-esc="e.date_start.strftime('%d')"/>
+                                        tháng
+                                        <span t-esc="e.date_start.strftime('%m')"/>
+                                        năm
+                                        <span t-esc="e.date_start.strftime('%Y')"/>
                                     </p>
                                     <p class="font-italic">Người cam kết</p>
                                 </div>
