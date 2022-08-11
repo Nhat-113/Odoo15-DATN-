@@ -226,7 +226,7 @@
                                         <div class="new_code">
                                             <t t-esc="announcement[1]"/>
                                         </div> 
-                                        <p class="see_more">See More...</p>
+                                        <p class="see_more">Details...</p>
                                     </div>  
                                 </a>
                             </t>
@@ -433,7 +433,7 @@
                                                 <h6 class="new_code_user">
                                                     <t t-esc="announcement[1]"/>
                                                 </h6>
-                                                <p class="see_more_user">See More...</p>
+                                                <p class="see_more_user">Details...</p>
                                             </div>
                                         </a>
                                     </t>
