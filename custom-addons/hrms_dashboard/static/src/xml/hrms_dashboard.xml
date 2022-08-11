@@ -348,10 +348,10 @@
                         <h5 class="text_btn_dashboard_detail btn_dashboard_detail_user">Overview</h5>
                     </button >
 
-                    <button class="tablinks_2 btn_dashboard_payroll_user" id="btn_dashboard_payroll_user">
+                    <!-- <button class="tablinks_2 btn_dashboard_payroll_user" id="btn_dashboard_payroll_user">
                         <h5 class="icon_menu"> <i class='fa fa-money btn_dashboard_payroll_user '></i></h5>
                         <h5 class="text_btn_dashboard_detail btn_dashboard_payroll_user">Payroll Statistics</h5>
-                    </button >
+                    </button > -->
                 </div>
                 <hr></hr>
 
@@ -360,7 +360,7 @@
                         <h4><i class="fa fa-plus"></i></h4>
                         <h3 class="fearure_detail">Leave Request</h3>
                     </button>
-                    <button class="btn_payslip hr_payslip">
+                    <!-- <button class="btn_payslip hr_payslip">
                         <h4>  
                             <i class="fa fa-money"/>
                         </h4>
@@ -370,7 +370,7 @@
                                 <p class="count_number_admin"><t t-esc="widget.login_employee['payslip_count_done']"></t></p> 
                             </div>
                         </h3>
-                    </button>
+                    </button> -->
                 </div>
                 
                 <div class="time">

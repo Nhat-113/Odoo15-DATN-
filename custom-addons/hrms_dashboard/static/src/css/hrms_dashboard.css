@@ -1160,7 +1160,7 @@ h4 .stat-count {
 }
 
 .list_menu_user {
-    height: 15%
+    height: 7%
 }
 
 .list_menu_user button {
@@ -2596,7 +2596,7 @@ button:focus {
 }
 
 #btn_dashboard_detail_user {
-    height: 45% !important;
+    height: 100% !important;
     z-index: 99999999
 }
 
