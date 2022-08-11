@@ -43,7 +43,10 @@
         <record model="ir.rule" id="estimation_list_stage_officer_role">
             <field name="name">Estimation: Officer, Sale rule: see only estimation assigned</field>
             <field name="model_id" ref="model_estimation_work"/>
-            <field name="domain_force">['|','|',
+            <field name="domain_force">['|',
+                                    ('company_id', '=', False), 
+                                    ('company_id', 'in', company_ids),
+                                    '|','|',
                                     ('estimator_ids', '=', user.id), 
                                     ('reviewer_ids', '=', user.id),
                                     ('create_uid', '=', user.id)]</field>
@@ -54,7 +57,7 @@
         <record model="ir.rule" id="estimation_list_stage_sale_leader_role">
             <field name="name">Estimation: Director, Sale rule: see all estimation</field>
             <field name="model_id" ref="model_estimation_work"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4,ref('ds_project_estimation.estimation_access_sale_leader')),(4,ref('ds_project_estimation.estimation_access_director'))]"/>
         </record>
 
