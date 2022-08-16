@@ -248,14 +248,7 @@
             <field name="inherit_id" ref="project.view_task_search_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='my_tasks']" position="after">
-                    <filter
-                    string="My Tasks Today"
-                    name="my_task_today"
-                    domain=
-                        "[('date_start','&lt;=', context_today().strftime('%Y-%m-%d')),
-                        ('date_end','&gt;=',context_today().strftime('%Y-%m-%d')),
-                        ('user_ids', 'in', uid)]"
-                    />                    
+                    <filter string="My Tasks Today" name="my_task_today"  domain="[('date_start','&lt;=', context_today().strftime('%Y-%m-%d')), ('date_end','&gt;=',context_today().strftime('%Y-%m-%d')), ('user_ids', 'in', uid)]" />                    
                     <separator/>
                 </xpath>
             </field>
