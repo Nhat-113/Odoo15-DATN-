@@ -272,7 +272,7 @@
                                     <p class="font-italic">(Ký, ghi rõ họ tên)</p>
                                 </div>
                                 <div class="col-6 text-center">
-                                    <p class="font-weight-bold">ĐẠI DIỆN CÔNG TY
+                                    <p class="font-weight-bold">ĐẠI DIỆN
                                         <b>
                                             <t t-if='e.company_id.display_name'>
                                                     <span t-field="e.company_id.display_name"/>
