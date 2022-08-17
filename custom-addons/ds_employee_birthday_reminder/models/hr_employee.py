@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, date
+from email.policy import default
 
 from odoo import api, fields, models
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
@@ -30,9 +31,19 @@ class ResUsers(models.Model):
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
+    def _default_age_with_employee(self):
+        employees = self.env['hr.employee'].search([])
+        for employee in employees:
+            if employee.birthday:
+                today = date.today()
+                age = today.year - employee.birthday.year - (
+                    (today.month, today.day) < (employee.birthday.month, employee.birthday.day))
+                employee.employee_age = str(age)  
+        
+
     birthday_date = fields.Integer(compute="_compute_get_birthday_identifier", store=1)
     birthday_month = fields.Integer(compute="_compute_get_birthday_identifier", store=1)
-    employee_age = fields.Char(string="Age", store=1)
+    employee_age = fields.Char(string="Age", default=_default_age_with_employee)
 
     @api.depends("birthday")
     def _compute_get_birthday_identifier(self):
