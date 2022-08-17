@@ -7,9 +7,15 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='task_id']" position="replace">
                 <field name="task_id" optional="show" 
-                    options="{'no_quick_create':True,'no_create_edit':False,'no_open': False}" 
+                    options="{'no_quick_create': True,'no_create_edit': False,'no_open': False}" 
                     domain="[('project_id', '=', project_id)]"
                     attrs="{'readonly': [('project_id', '=', False)]}"
+                />
+            </xpath>
+            <xpath expr="//field[@name='employee_id']" position="replace">
+                <field name="employee_id" required="1"
+                    options="{'m2o_dialog': False, 'no_create': True}"
+                    string="Employee"
                 />
             </xpath>
         </field>
