@@ -1,0 +1,14 @@
+<odoo>
+    <data>
+        <!-- Company expense management group access rights -->
+        <record id="company_expense_access" model="ir.module.category">
+            <field name="name">Company Expense</field>
+        </record>
+
+        <!-- Option Role: Administrator -->
+        <record id="administrator_access_company_expense" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="ds_expense_management.company_expense_access"/>
+        </record>
+    </data>
+</odoo>

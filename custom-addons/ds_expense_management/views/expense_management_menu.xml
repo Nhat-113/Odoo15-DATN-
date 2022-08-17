@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="expense_management_menu" name="Company Expenses"/>
+
+    <record id="category_expense_action" model="ir.actions.act_window">
+        <field name="name">Category Expenses</field>
+        <field name="res_model">expense.general.category</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="management_expense_action" model="ir.actions.act_window">
+        <field name="name">General Expenses</field>
+        <field name="res_model">expense.management</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="project_expense_management_action" model="ir.actions.act_window">
+        <field name="name">Project Expenses</field>
+        <field name="res_model">project.expense.management</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="project_revenue_management_action" model="ir.actions.act_window">
+        <field name="name">Project Revenue</field>
+        <field name="res_model">project.revenue.management</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+            id="expense_management"
+            name="General Expenses"
+            sequence="1"
+            parent="ds_expense_management.expense_management_menu" 
+            action="management_expense_action"/>
+
+
+    <menuitem
+            id="project_expense_management"
+            name="Project Expenses"
+            sequence="2"
+            parent="ds_expense_management.expense_management_menu" 
+            action="project_expense_management_action"/>
+
+    
+    <menuitem
+            id="project_revenue_management"
+            name="Project Revenues"
+            sequence="3"
+            parent="ds_expense_management.expense_management_menu" 
+            action="project_revenue_management_action"/>
+
+
+    <menuitem id="expense_configuration"
+            name="Configuration"
+            sequence="6"
+            parent="ds_expense_management.expense_management_menu"/>
+
+
+
+    <menuitem id="expense_category_config"
+            name="Categories Expense"
+            sequence="1"
+            parent="ds_expense_management.expense_configuration"
+            action="category_expense_action"/>
+
+</odoo>

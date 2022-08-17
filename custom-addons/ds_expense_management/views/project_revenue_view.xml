@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="project_revenue_management_view_tree" model="ir.ui.view">
+        <field name="name">project.revenue.management.tree</field>
+        <field name="model">project.revenue.management</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="project_id"/>
+                <field name="revenue_project" sum="Total revenue"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="currency_id" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="project_revenue_management_view_form" model="ir.ui.view">
+        <field name="name">project.revenue.management.form</field>
+        <field name="model">project.revenue.management</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group name="group_top">
+                        <group name="group_left">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="project_id" attrs="{'readonly': [('company_id', '=', False)]}"/>
+                        </group>
+                        <group name="group_right">
+                            <label for="start_date" string="Stage"/>
+                            <div name="end_date" class="o_row">
+                                <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}'/>
+                                <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon" title="Arrow"/>
+                                <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow" attrs="{'invisible': [('start_date', '=', False), ('end_date', '=', False)]}"/>
+                                <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}'/>
+                            </div>
+                            <field name="revenue_project"/>
+                            <field name="currency_id"/>
+                        </group>
+                        <separator string="Description"/>
+                        <field name="description" placeholder="Description"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>
