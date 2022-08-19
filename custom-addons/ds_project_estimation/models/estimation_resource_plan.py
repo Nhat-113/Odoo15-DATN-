@@ -124,7 +124,15 @@ class EstimationResourcePlan(models.Model):
         mm_end = mm_start
         yy_end = yy_start
         surplus = 0
-        if vals_effort_mm < 1:
+        
+        if vals_effort_mm < 0:
+            mm_end = mm_start 
+            # scale = 1/31
+            surplus = 0 
+            dd_end = 1
+            result_end_day = EstimationResourcePlan.convert_to_datetime(dd_end, mm_end, yy_end)
+        
+        elif vals_effort_mm < 1:
             mm_end = mm_start 
             # scale = 1/31
             surplus = vals_effort_mm 

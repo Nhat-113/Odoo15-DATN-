@@ -7,19 +7,15 @@ class Project(models.Model):
     """
     _inherit = 'project.project'
     
-    def _compute_estimation_id_domain(self):
-        list_estimation = []
-        project = self.env['project.project'].search([])
-        for record in project:
-            list_estimation.append(record.estimation_id.ids)
+    estimation_id = fields.Many2one('estimation.work', string="Estimation")
 
-        flat_list = [item for sublist in list_estimation for item in sublist]
-        
-        self.estimation_id_domain = json.dumps(
-                [('id', 'not in', flat_list)]
-            )
 
-    estimation_id_domain = fields.Char(compute="_compute_estimation_id_domain", readonly=True, store=False,)
-    estimation_id = fields.Many2many('estimation.work', string="Estimation", domain="estimation_id_domain")
-    
-    
+    total_mm = fields.Float(string="Total Effort Estimate (Man Month)", compute="_compute_total_mm")
+
+    @api.depends("estimation_id")
+    def _compute_total_mm(self):
+        estimation_resource_effort = self.env['estimation.resource.effort'].search([('estimation_id','=',self.estimation_id.id),('name','=','Total (MM)')])
+        if estimation_resource_effort:
+            self.total_mm = estimation_resource_effort.total_effort
+        else:
+            self.total_mm = 0
