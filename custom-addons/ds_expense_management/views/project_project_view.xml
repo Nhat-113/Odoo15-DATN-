@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="project.edit_project"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='%(project.action_project_task_burndown_chart_report)d']" position="after">
-                <button name="action_open_project_company_expenses" type="object" class="oe_stat_button" icon="fa-money">
+                <button name="action_open_project_company_expenses" type="object" class="oe_stat_button" icon="fa-money" groups="ds_expense_management.administrator_access_company_expense">
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_value">
                             <field name="expenses_company_count" nolabel="1"/>

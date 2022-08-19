@@ -9,7 +9,7 @@ class Project(models.Model):
         for record in self:
             record.expenses_company_count = count  
 
-    expenses_company_count = fields.Integer('# Expenses', compute=_compute_expenses_company_count)
+    expenses_company_count = fields.Integer('# Expenses', compute=_compute_expenses_company_count, groups='ds_expense_management.administrator_access_company_expense')
     
     
     def action_open_project_company_expenses(self):

@@ -21,4 +21,5 @@ class ProjectExpense(models.Model):
     
     @api.onchange('company_id')
     def _compute_project_company(self):
-        self.project_id = False
+        if self.project_id.company_id.id != self.company_id.id:
+            self.project_id = False
