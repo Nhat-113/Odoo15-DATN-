@@ -17,3 +17,8 @@ class ProjectExpense(models.Model):
     total_expenses = fields.Monetary(string="Total Expenses", required=True)
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id, tracking=True)
     description = fields.Text(string="Description", tracking=True)
+    
+    
+    @api.onchange('company_id')
+    def _compute_project_company(self):
+        self.project_id = False
