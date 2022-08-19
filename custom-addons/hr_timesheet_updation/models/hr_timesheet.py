@@ -27,7 +27,7 @@ class AccountAnalyticLine(models.Model):
     def _check_task_in_project(self):
         for timesheet in self:
             if timesheet.task_id.project_id.id != timesheet.project_id.id:
-                raise UserError(_('Your task: %(task)s just created not in project: %(project)s.', project=timesheet.project_id.name, task=timesheet.task_id.name))
+                raise UserError(_('The task "%(task)s" is not belong to the project "%(project)s".', project=timesheet.project_id.name, task=timesheet.task_id.name))
                 
 
         
