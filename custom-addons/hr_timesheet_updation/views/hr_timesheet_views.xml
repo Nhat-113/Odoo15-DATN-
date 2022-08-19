@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_timesheet_line_tree" model="ir.ui.view">
+        <field name="name">account.analytic.line.tree.hr_timesheet_2</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='task_id']" position="replace">
+                <field name="task_id" optional="show" 
+                    options="{'no_quick_create': True,'no_create_edit': False,'no_open': False}" 
+                    domain="[('project_id', '=', project_id)]"
+                    attrs="{'readonly': [('project_id', '=', False)]}"
+                />
+            </xpath>
+            <xpath expr="//field[@name='employee_id']" position="replace">
+                <field name="employee_id" required="1"
+                    options="{'m2o_dialog': False, 'no_create': True, 'no_open': True}"
+                    string="Employee"
+                />
+            </xpath>
+            <xpath expr="//field[@name='project_id']" position="replace">
+                <field name="project_id" required="1"
+                    options="{'m2o_dialog': False, 'no_create': True, 'no_open': True}"
+                />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="timesheet_view_form_user" model="ir.ui.view">
+        <field name="name">account.analytic.line.tree.with.user_2</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.timesheet_view_form_user"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_id']" position="replace">
+                <field name="employee_id" required="1"
+                    options="{'m2o_dialog': False, 'no_create': True, 'no_open': True}"
+                    string="Employee"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>
