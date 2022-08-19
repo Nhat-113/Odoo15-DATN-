@@ -1,5 +1,4 @@
-from odoo import models, fields
-import json
+from odoo import models, fields, api
 
 class Project(models.Model):
     """
