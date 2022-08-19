@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='company_id']" position="after">
                 <field name="estimation_id" groups="project.group_project_manager"/>
-                <field name="total_mm" groups="project.group_project_manager"/>
+                <field name="total_mm" groups="project.group_project_manager" class="total_man_month"/>
             </xpath>
         </field>
     </record>
