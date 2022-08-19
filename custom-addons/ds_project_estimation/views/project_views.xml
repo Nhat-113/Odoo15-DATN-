@@ -6,8 +6,8 @@
         <field name="inherit_id" ref="project.edit_project"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='company_id']" position="after">
-                <field name="estimation_id"/>
-                <field name="total_mm" class="total_man_month"/>
+                <field name="estimation_id" groups="project.group_project_manager"/>
+                <field name="total_mm" groups="project.group_project_manager"/>
             </xpath>
         </field>
     </record>
