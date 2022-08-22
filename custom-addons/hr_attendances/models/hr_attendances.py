@@ -1,13 +1,11 @@
-from odoo import models, fields, api, exceptions, _
-from odoo.tools import float_round
-
+from odoo import models, exceptions, _
 
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
-    def attendance_manual_api(self, employee, date_time, next_action):
+    def attendance_manual_api(self, employee, date_time, next_action, entered_pin=None):
         employee.ensure_one()
-        can_check_without_pin = not employee.env.user.has_group('hr_attendance.group_hr_attendance_use_pin') or (employee.user_id == employee.env.user and entered_pin is None)
+        can_check_without_pin = not employee.env.user.has_group('hr_attendance.group_hr_attendance_use_pin') or (entered_pin is None)
         if can_check_without_pin or entered_pin is not None and entered_pin == employee.sudo().pin:
             return employee._attendance_action_api(next_action, date_time)
         return {'warning': _('Wrong PIN')}

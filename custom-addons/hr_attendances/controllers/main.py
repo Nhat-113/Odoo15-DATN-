@@ -11,9 +11,10 @@ import json
 class HrAttendance(http.Controller):
     @http.route('/api/facelog_attendances',auth='api_key', type='json')
     def facelog_attendances(self, **kw):
-
-        employees = request.env['hr.employee'].search([('work_email','like',kw['nick_name']),('name','=',kw['first_name']+' '+kw['middle_name']+' '+kw['last_name']),('mobile_phone','like', kw['phone'])])
-        if len(employees)==1:
+        # Fixme: get config domain email with comapy
+        email = kw['nick_name'] + '@d-soft.com.vn'
+        employees = request.env['hr.employee'].search([('work_email','=',email)])
+        if len(employees):
             # convert string to datetime
             date_time = datetime.datetime.strptime(kw['date_time'], "%m/%d/%Y, %H:%M:%S")
             # convert local+7 to UTC+0
