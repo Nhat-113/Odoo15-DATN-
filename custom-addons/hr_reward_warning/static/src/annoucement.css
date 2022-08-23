@@ -1,0 +1,43 @@
+.annoucement_header {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    min-height: 75px;
+    justify-content: space-evenly;
+    margin-top: 20px
+}
+
+.annoucement_header .oe_title {
+    width: 15%;
+}
+.annoucement_header .oe_title > label {
+    display: none;
+}
+.general_announcement {
+    position: absolute;
+    left: 1.5%;
+    top: 2%;
+    margin-top: 10px;
+}
+span[name=announcement_reason] {
+    font-size: 20px;
+    font-weight: bold;
+    top: 7%;
+    left: 6%;
+    color: #283136;
+}
+.annoucement_header .oe_title .o_field_char {
+    font-size: 20px;
+    position: absolute;
+    top: 16%;
+}
+.annoucement_header .o_field_input_33 {
+    position: absolute;
+    left: 1.5%;
+}
+
+@media only screen and (max-width: 1530px) {
+    .general_announcement {
+        left: 2.8%;
+    }
+}
