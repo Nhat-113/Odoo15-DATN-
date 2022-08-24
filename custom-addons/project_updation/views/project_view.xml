@@ -21,6 +21,13 @@
                 <xpath expr="//field[@name='recurring_task']" position="after">
                     <field name="task_score" widget="priority" eval="5"/>
                 </xpath>
+                <xpath expr="//field[@name='task_score']" position="before">
+                    <field name="task_id"
+                            options="{'m2o_dialog': False, 'no_create': True, 'no_open': True}"
+                            domain="[('project_id', '=', project_id),('issues_type.name', '=', 'Task')]"
+                            attrs="{'invisible': [('invisible_field', '=', False)]}"/>
+                    <field name="invisible_field" invisible="1"/>
+                </xpath>
                 <xpath expr="//group/group[2]/field[@name='date_deadline']" position="replace">
                     <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}" string="Actual End Date"/>
                 </xpath>
@@ -247,6 +254,11 @@
                 </xpath>
                 <xpath expr="//field[@name='kanban_state']" position="replace">
                     <field name="kanban_state" invisible="1"/>
+                </xpath>
+                <xpath expr="//div[hasclass('o_kanban_record_top')]" position="before">
+                    <div class="id_task_kaban">
+                        <field name="id" />
+                    </div>
                 </xpath>
             </field>
         </record>

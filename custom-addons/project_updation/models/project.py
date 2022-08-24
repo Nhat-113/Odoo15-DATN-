@@ -104,6 +104,19 @@ class Task(models.Model):
         string='Customer',
         compute='_compute_partner_id', recursive=True, store=True, readonly=False, tracking=True,
         domain="[('is_company','=','true')]")
+    task_id = fields.Many2one(
+        'project.task', 'Bug of Task', store=True, readonly=False, index=True)
+    invisible_field = fields.Boolean(compute='_check_issue_type')
+
+    @api.depends('issues_type')
+    def _check_issue_type(self):
+        if self.issues_type.name != 'Bug':
+            self.task_id = False
+
+        if self.issues_type.name == 'Bug':
+            self.invisible_field = True
+        else:
+            self.invisible_field = False
 
     @api.onchange('status')
     def set_progerss(self):
