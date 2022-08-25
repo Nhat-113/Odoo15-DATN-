@@ -24,6 +24,7 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_duration = params.duration;
             this.map_progress = params.progress;
             this.map_user_ids = params.user_ids;
+            this.map_status = params.status;
             this.map_working_day = params.working_day;
             this.map_portal_user_names = params.portal_user_names;
 
@@ -54,6 +55,8 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
             this.map_progress && fieldNames.push(this.map_progress);
             this.map_portal_user_names && fieldNames.push(this.map_portal_user_names);
             this.map_user_ids && fieldNames.push(this.map_user_ids);
+            this.map_status && fieldNames.push(this.map_status);
+
             this.map_working_day && fieldNames.push(this.map_working_day);
             this.map_child_ids && fieldNames.push(this.map_child_ids);
             this.map_total_float && fieldNames.push(this.map_total_float);
@@ -167,17 +170,16 @@ odoo.define('dhx_gantt.GanttModel', function (require) {
                 task.links_serialized_json = record[self.map_links_serialized_json];
                 task.total_float = record[self.map_total_float];
                 task.user_ids = record[self.map_user_ids];
+                task.status = record[self.map_status];
                 task.working_day = record[self.map_working_day];
                 task.project_name = record[self.map_parent] ? record[self.map_parent][1] : "";
                 task.type = record.type ? record.type : "";
-                // if(task.type !== "milestone"){
-                    task.start_date =gantt.date.convert_to_utc(task.start_date);
-                // }   
-                // console.log(`data`, data);
-                data.sort( function (start_1,start_2) {
-                    // console.log(`data2`,data );
-                    return start_1.start_date - start_2.start_date
-                }
+                task.start_date =gantt.date.convert_to_utc(task.start_date);
+
+                data.sort( 
+                    function (start_1, start_2) {
+                        return start_1.start_date - start_2.start_date
+                    }
                 ),
                 data.push(task);
                 if(!record.type) {

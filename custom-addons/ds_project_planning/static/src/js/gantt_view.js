@@ -28,6 +28,7 @@ odoo.define('dhx_gantt.GanttView', function (require) {
             this.loadParams.text = this.arch.attrs.text;
             this.loadParams.links_serialized_json = this.arch.attrs.links_serialized_json;
             this.loadParams.user_ids = this.arch.attrs.user_ids;
+            this.loadParams.status = this.arch.attrs.status;
             this.loadParams.working_day = this.arch.attrs.working_day;
             this.loadParams.date_deadline = this.arch.attrs.date_deadline
             this.loadParams.portal_user_names = this.arch.attrs.portal_user_names;
@@ -46,6 +47,7 @@ odoo.define('dhx_gantt.GanttView', function (require) {
                 this.arch.attrs.text,
                 this.arch.attrs.links_serialized_json,
                 this.arch.attrs.user_ids,
+                this.arch.attrs.status,
                 this.arch.attrs.working_day,
                 this.arch.attrs.portal_user_names,
                 this.arch.attrs.date_deadline
@@ -66,6 +68,7 @@ odoo.define('dhx_gantt.GanttView', function (require) {
             
 
             this.rendererParams.user_ids = this.arch.attrs.user_ids;
+            this.rendererParams.status = this.arch.attrs.status;
             this.rendererParams.working_day = this.arch.attrs.working_day;
             this.rendererParams.date_deadline = this.arch.attrs.date_deadline;
             this.rendererParams.portal_user_names = this.arch.attrs.portal_user_names
