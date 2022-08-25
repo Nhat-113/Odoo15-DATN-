@@ -4,17 +4,34 @@
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import AccessError, ValidationError
 from odoo.tools import consteq
+import string
+import random
 
 
 class AuthApiKey(models.Model):
     _name = "auth.api.key"
     _description = "API Key"
 
+    def _compute_default_key(self):
+        characters = list(string.ascii_letters + string.digits + "!@#$%^&*()")
+        random.shuffle(characters)
+        password = []
+        for i in range(20):
+            password.append(random.choice(characters))
+
+        ## shuffling the resultant password
+        random.shuffle(password)
+
+        ## converting the list to string
+        ## printing the list
+        val = "".join(password)
+        return val
+
     name = fields.Char(required=True)
     key = fields.Char(
         required=True,
         help="""The API key. Enter a dummy value in this field if it is
-        obtained from the server environment configuration.""",
+        obtained from the server environment configuration.""", default=_compute_default_key
     )
     user_id = fields.Many2one(
         comodel_name="res.users",
