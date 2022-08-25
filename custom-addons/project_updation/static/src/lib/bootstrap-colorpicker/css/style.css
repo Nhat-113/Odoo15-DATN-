@@ -15,9 +15,14 @@
 }
 
 .style_css_title {
-  position: absolute;
-  left: 5%;
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: break-spaces; 
+  position: inherit;
 }
+.o_form_project_tasks h1.justify-content-between {
+  justify-content: flex-start !important;
+} 
 .id_task_kaban {
   width: 25%;
   background: #6869AC;
