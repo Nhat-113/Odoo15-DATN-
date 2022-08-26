@@ -10,7 +10,7 @@
                     <page string="Dependencies">
                         <group string="Gantt Info">
                             <field name="date_start" attrs="{'readonly': [('user_readonly', '=', True)]}"/>
-                            <field name="date_end" string="End date" attrs="{'readonly': [('user_readonly', '=', True)]}"/>
+                            <field name="date_end" string="End Date" attrs="{'readonly': [('user_readonly', '=', True)]}"/>
                             <field name="working_day"/>
                             <field name="user_readonly" invisible="1"/>
                             <!-- <field name="planned_duration"/> -->
