@@ -160,6 +160,15 @@ class Task(models.Model):
         else:
             self.is_readonly = True
 
+    @api.model
+    def default_get(self, fields):
+        id_issue_type_task = self.env['project.issues.type'].search([('name', '=' , 'Task')]).id
+        result = super(Task, self).default_get(fields)
+        result.update({
+            'issues_type': id_issue_type_task 
+        })
+        return result
+
     @api.onchange('planned_hours')
     def _check_planned_hours(self):
         if self.planned_hours < 0:

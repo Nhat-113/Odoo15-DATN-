@@ -61,7 +61,7 @@
                             <field name="is_closed" invisible="1"/>
                             <field name="sequence" widget="handle"/>
                             <field name="name"/>
-                            <field name="display_project_id" string="Project" optional="show"/>
+                            <field name="display_project_id" string="Project" optional="show" required='1'/>
                             <field name="partner_id" optional="hide"/>
                             <field name="user_ids" widget="many2many_avatar_user" optional="show" domain="[('active', '=', True)]"/>
                             <field name="issues_type"  required='1'/>
