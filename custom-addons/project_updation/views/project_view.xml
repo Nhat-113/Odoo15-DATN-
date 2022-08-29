@@ -53,6 +53,28 @@
                         placeholder="Private" class="o_project_task_project_field oe_edit_only"
                         options="{'m2o_dialog': False, 'no_create': True, 'no_open': True}"/>
                 </xpath>
+                <xpath expr="//notebook/page[@name='sub_tasks_page']//field[@name='child_ids']" position="replace">
+                    <field name="child_ids" context="{'default_display_project_id': project_id if not parent_id or not display_project_id else display_project_id,
+                                                'default_user_ids': user_ids}">
+                        <tree editable="bottom">
+                            <field name="project_id" invisible="1"/>
+                            <field name="is_closed" invisible="1"/>
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="display_project_id" string="Project" optional="show"/>
+                            <field name="partner_id" optional="hide"/>
+                            <field name="user_ids" widget="many2many_avatar_user" optional="show" domain="[('active', '=', True)]"/>
+                            <field name="issues_type"  required='1'/>
+                            <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                            <field name="activity_ids" widget="list_activity" optional="hide"/>
+                            <field name="date_deadline" attrs="{'invisible': [('is_closed', '=', True)]}" optional="show" string="Actual End Date"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="hide"/>
+                            <field name="kanban_state" widget="state_selection" optional="hide"/>
+                            <field name="stage_id" optional="hide"/>
+                            <button name="action_open_task" type="object" title="View Task" string="View Task" class="btn btn-link pull-right"/>
+                        </tree>
+                    </field>
+                </xpath>
             </field>
         </record>
 
