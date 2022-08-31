@@ -110,7 +110,7 @@ var GanttController = AbstractController.extend({
                 task.unscheduled = true;
             }
             if (task.type == "") {
-                if(task.status[1] === 'Cancel') {
+                if(task.status[1] === 'Cancel' || task.status[1] === 'Cancelled')  {
                     return false;
                 }
             }
