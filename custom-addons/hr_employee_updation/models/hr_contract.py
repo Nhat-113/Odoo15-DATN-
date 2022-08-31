@@ -6,6 +6,7 @@ from datetime import date
 class Contract(models.Model):
     _inherit = 'hr.contract'
 
+    contract_old = fields.One2many('hr.contract.old', 'contract_id', string='Contract Old', compute='_get_contract_old', readonly=False)
     # @api.constrains('date_start', 'date_end')
     # def _check_dates(self):
     #     for contract in self:
@@ -46,13 +47,29 @@ class Contract(models.Model):
         return contracts
 
     def write(self, vals):
-        res = super(Contract, self).write(vals)
         if self.state == 'close':
             for contract in self.filtered(lambda c: not c.date_end):
                 contract.date_end = max(date.today(), contract.date_start)
 
-        return res
+        vals_olds = ['wage', 'non_taxable_allowance', 'taxable_allowance']
+        for vals_old in vals_olds:
+            if vals_old in vals:
+                self.env['hr.contract.old'].search([]).create({
+                'contract_id' : self.id,
+                'employee_id': self.employee_id.id,
+                'salary_old': (self.env['hr.contract'].search([('id', '=', self.id)]).wage + \
+                               self.env['hr.contract'].search([('id', '=', self.id)]).non_taxable_allowance + \
+                               self.env['hr.contract'].search([('id', '=', self.id)]).taxable_allowance),
+                'date_expire': date.today()
+                })
+                break
+        return super(Contract, self).write(vals)
 
+    @api.depends('wage', 'non_taxable_allowance', 'taxable_allowance')
+    def _get_contract_old(self):
+        for old in self:
+            old.contract_old = self.env['hr.contract.old'].search([('contract_id', '=', old.id)])
+    
     # def _assign_open_contract(self):
     #     for contract in self:
     #         if contract.date_end:

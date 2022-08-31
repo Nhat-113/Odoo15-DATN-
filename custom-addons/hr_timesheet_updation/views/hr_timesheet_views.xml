@@ -10,6 +10,7 @@
                     options="{'no_quick_create': True,'no_create_edit': False,'no_open': False}" 
                     domain="[('project_id', '=', project_id)]"
                     attrs="{'readonly': [('project_id', '=', False)]}"
+                    required="1"
                 />
             </xpath>
             <xpath expr="//field[@name='employee_id']" position="replace">

@@ -34,8 +34,11 @@ class Project(models.Model):
         'project.planning.phase', 'project_id', string='Phases In Project')
 
     def _compute_task_total(self):
+        id_status_cancel = self.env['project.task.status'].search([('name', '=' , 'Cancel')]).id
+        id_issue_type_task = self.env['project.issues.type'].search([('name', '=' , 'Task')]).id
+
         for project in self:
-            project.task_total = self.env['project.task'].search_count(['&',('issues_type','=',1),('project_id','=',project.id),('display_project_id','=',project.id),('active','=',True)])
+            project.task_total = self.env['project.task'].search_count(['&', ('issues_type', '=', id_issue_type_task), ('status', '!=' , id_status_cancel ), ('project_id','=',project.id), ('display_project_id', '=', project.id), ('active', '=', True)])
 
     task_total = fields.Integer(compute='_compute_task_total')
 

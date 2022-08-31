@@ -105,18 +105,15 @@ var GanttController = AbstractController.extend({
             // console.log(data);
             return true;
         });
-        gantt.attachEvent("onTaskLoading", function(task) {
-            //console.log(`task`, task);
-            // if (task.custom_date) 
-            if (task.working_day===0 && task.type !== "milestone" ) {
+        gantt.attachEvent("onTaskLoading", function(task) { 
+            if (task.working_day === 0 && task.type !== "milestone") {
                 task.unscheduled = true;
-                // console.log('123');
             }
-            // if(task.type !== "milestone") {
-            //     task.start_date = gantt.date.convert_to_utc(task.start_date);
-            //     task.end_date = gantt.date.convert_to_utc(task.end_date);    
-            // }
-           //console.log(`task`, task);
+            if (task.type == "") {
+                if(task.status[1] === 'Cancel') {
+                    return false;
+                }
+            }
             return true;
         });
         // dp.attachEvent("onBeforeLinkAdd", function(id, link){

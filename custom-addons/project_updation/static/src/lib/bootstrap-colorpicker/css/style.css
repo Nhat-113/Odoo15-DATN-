@@ -15,7 +15,26 @@
 }
 
 .style_css_title {
-  position: absolute;
-  left: 5%;
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: break-spaces; 
+  position: inherit;
+  word-break: break-word !important;
 }
-
+.o_form_project_tasks h1.justify-content-between {
+  justify-content: flex-start !important;
+} 
+.id_task_kaban {
+  width: 25%;
+  background: #6869AC;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  margin: -8px 0px 5px -8px;
+  color: white;
+  border-bottom-right-radius: 100px;
+}
+div[name="display_project_id"] button.o_external_button {
+  display: none !important;
+}

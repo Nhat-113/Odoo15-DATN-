@@ -36,6 +36,11 @@
         'security/reward_security.xml',
         'views/hr_announcement_view.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'hr_reward_warning/static/src/annoucement.css'
+        ]
+    },
     'demo': ['data/demo_data.xml'],
     'images': ['static/description/banner.png'],
     'license': 'AGPL-3',

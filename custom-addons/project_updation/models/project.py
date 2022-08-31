@@ -104,6 +104,19 @@ class Task(models.Model):
         string='Customer',
         compute='_compute_partner_id', recursive=True, store=True, readonly=False, tracking=True,
         domain="[('is_company','=','true')]")
+    task_id = fields.Many2one(
+        'project.task', 'Bug of Task', store=True, readonly=False, index=True)
+    invisible_field = fields.Boolean(compute='_check_issue_type')
+
+    @api.depends('issues_type')
+    def _check_issue_type(self):
+        if self.issues_type.name != 'Bug':
+            self.task_id = False
+
+        if self.issues_type.name == 'Bug':
+            self.invisible_field = True
+        else:
+            self.invisible_field = False
 
     @api.onchange('status')
     def set_progerss(self):
@@ -146,6 +159,15 @@ class Task(models.Model):
             self.is_readonly = False
         else:
             self.is_readonly = True
+
+    @api.model
+    def default_get(self, fields):
+        id_issue_type_task = self.env['project.issues.type'].search([('name', '=' , 'Task')]).id
+        result = super(Task, self).default_get(fields)
+        result.update({
+            'issues_type': id_issue_type_task 
+        })
+        return result
 
     @api.onchange('planned_hours')
     def _check_planned_hours(self):

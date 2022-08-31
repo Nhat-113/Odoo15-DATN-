@@ -27,3 +27,10 @@ div[name="task_score"] {
         width: 20%!important;
     }
 }
+/* project, annou*/
+.o_kanban_project_tasks .o_quick_editable, .oe_form_field_html p {
+    word-break: break-word !important;
+}
+span.o_quick_editable {
+    word-break: break-word !important;
+}
