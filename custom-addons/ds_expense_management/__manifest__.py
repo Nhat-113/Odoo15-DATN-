@@ -21,6 +21,7 @@
     ],
     'assets': {
         'web.assets_backend': [
+            '/ds_expense_management/static/src/css/style.css',
         ],
         'web.assets_qweb': [
         ]

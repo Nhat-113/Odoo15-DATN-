@@ -1,0 +1,75 @@
+span[name="get_month"]::after {
+    content: ",";
+}
+
+.label_for_get_month {
+    border-right: 1px solid #ddd;
+    padding-right: 45px;
+}
+
+.table_exchange_rate {
+    margin-top: 14px;
+}
+
+.title_exchange_rate {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.exchange_rate_box {
+    position: relative;
+    display: flex;
+    white-space: nowrap;
+}
+.exchange_rate_box {
+    position: relative;
+    display: flex;
+    white-space: nowrap;
+}
+
+.content_exchange_rate {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.exchange_rate_span {
+    line-height: 30px;
+    height: 30px;
+    padding: 0 5px;
+}
+
+
+.o_form_readonly span[name="rounding_usd_input"], 
+.o_form_readonly span[name="rounding_jpy_input"],
+.o_form_editable span[name="rounding_usd_input"], 
+.o_form_editable span[name="rounding_jpy_input"] {
+    height: 30px;
+    line-height: 30px;
+    margin-bottom: 0 !important;
+}
+
+.o_form_editable span[name="rounding_usd_input"], 
+.o_form_editable span[name="rounding_jpy_input"] {
+    line-height: 25px;
+}
+
+span[name="revenue_usd"], 
+span[name="revenue_jpy"] {
+    margin-bottom: 0 !important;
+    height: 30px;
+}
+
+span[name="revenue_usd"]::before, 
+span[name="revenue_jpy"]::before {
+    content: "Total Revenue (USD)";
+    font-weight: bold;
+    padding-right: 22px;
+    margin-right: 5px;
+    border-right: 1px solid #ddd;
+}
+
+span[name="revenue_jpy"]::before {
+    content: "Total Revenue (JPY)";
+    padding-right: 25px;
+}

@@ -6,11 +6,9 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="description"/>
-                <field name="total_expenses"/>
+                <field name="total_expenses" sum="Total Expenses"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="currency_id" optional="hide"/>
-                <field name="start_date" invisible="1"/>
-                <field name="end_date" invisible="1"/>
             </tree>
         </field>
     </record>
@@ -27,13 +25,18 @@
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group name="group_right">
-                            <label for="start_date" string="Month"/>
+                            <div class="o_row">
+                                <label for="get_month" string="Month" class="label_for_get_month"/>
+                                <field name="get_month" nolabel="1" placeholder="Please select month ..."/>
+                                <field name="get_year" nolabel="1" placeholder="Please select year ..."/>
+                            </div>
+                            <!-- <label for="start_date" string="Month"/>
                             <div name="end_date" class="o_row">
                                 <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}'/>
                                 <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon" title="Arrow"/>
                                 <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow" attrs="{'invisible': [('start_date', '=', False), ('end_date', '=', False)]}"/>
                                 <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}'/>
-                            </div>
+                            </div> -->
                         </group>
                     </group>
                     <notebook>

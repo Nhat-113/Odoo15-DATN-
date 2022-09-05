@@ -31,8 +31,32 @@
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="project_id" attrs="{'readonly': [('company_id', '=', False)]}"/>
                             <field name="total_expenses"/>
-                            <field name="currency_id"/>
+                            <field name="currency_id" invisible="1"/>
                         </group>
+
+                        <div class="table_exchange_rate">
+                            <h6 class="title_exchange_rate">Exchange rate</h6>
+                            <div class="content_exchange_rate">
+                                <div class="exchange_rate_box">
+                                    <span class="exchange_rate_span">1 USD = </span>
+                                    <field name="rounding_usd_input" nolabel="1"/>
+                                    <span class="exchange_rate_span">VND</span>
+                                </div>
+
+                                <div class="exchange_rate_box">
+                                    <span class="exchange_rate_span">1 JPY = </span>
+                                    <field name="rounding_jpy_input" nolabel="1"/>
+                                    <span class="exchange_rate_span">VND</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <field name="revenue_usd" attrs="{'invisible': ['|', ('rounding_usd_input', '=', 0.0), ('total_expenses', '=', 0.0)]}"/>
+                            <field name="revenue_jpy" attrs="{'invisible': ['|', ('rounding_jpy_input', '=', 0.0), ('total_expenses', '=', 0.0)]}"/>
+                            <field name="currency_usd" invisible="1"/>
+                            <field name="currency_jpy" invisible="1"/>
+                        </div>
+
                         <separator string="Description"/>
                         <field name="description" placeholder="Description ..."/>
                     </group>

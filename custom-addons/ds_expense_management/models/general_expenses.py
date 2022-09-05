@@ -1,16 +1,37 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 import calendar
+from datetime import date
 
 class ExpenseManagement(models.Model):
     _name = "expense.management"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "General expense management"
     _rec_name = "description"
-    _order = "start_date"
+    _order = "id"
     
-    start_date = fields.Date(string="Expenses Month", required=True, tracking=True)
-    end_date = fields.Date(string="Expenses Month End", required=True, tracking=True)
+    def _get_years(self):
+        year_list = []
+        for i in range(2010, 2051):
+            year_list.append((str(i), str(i)))
+        return year_list
+    
+    def _get_year_defaults(self):
+        return str(date.today().year)
+    
+    def _get_month_defaults(self):
+        return str(date.today().month)
+        
+    
+    get_month = fields.Selection([('1', 'January'), ('2', 'February'), ('3', 'March'), ('4', 'April'),
+                                    ('5', 'May'), ('6', 'June'), ('7', 'July'), ('8', 'August'), 
+                                    ('9', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')],
+                                default=_get_month_defaults,
+                                string="Month",
+                                required=True,
+                                tracking=True)
+    get_year = fields.Selection(selection=_get_years, default=_get_year_defaults, string='Year', required=True, tracking=True)
+    
     description = fields.Char(string="Expense Name", required=True, tracking=True)
     expense_generals = fields.One2many('expense.general', 'expense_management_id', string="General Expense")
     
@@ -24,21 +45,19 @@ class ExpenseManagement(models.Model):
         for record in self:
             record.total_expenses = sum(exp.total_expenses for exp in record.expense_generals)
     
-    @api.onchange('start_date', 'end_date')
-    def _validate_month(self):
-        month_engs = {1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June', 
-                     7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'}
-        if self.start_date != False and self.end_date != False:
-            last_days = calendar.monthrange(self.start_date.year, self.start_date.month)[1]
-            if self.start_date.day != 1:
-                raise UserError(_('The first day of the month must be equal to 1! Not %(day)s !', day = self.start_date.day))
-            if self.end_date.day != last_days:
-                month_letter = ''
-                for mm in month_engs:
-                    if mm == self.start_date.month:
-                        month_letter = month_engs[mm]
-                        break;
-                raise UserError(_('The last day of %(month)s must be equal to %(last_day)s! Not %(day)s !', month = month_letter, last_day = last_days, day = self.end_date.day))
+    @api.returns('self', lambda value: value.id)
+    def copy(self, default=None):
+        default = default or {}
+        new_expense_management = super(ExpenseManagement, self).copy(default)
+        for exp_gen in self.expense_generals:
+            exp_gen.copy(default={'expense_management_id': new_expense_management.id})
+        return new_expense_management
+    
+    
+    def unlink(self):
+        for record in self:
+            record.expense_generals.unlink()
+        return  super(ExpenseManagement, self).unlink()
 
 class ExpenseGeneral(models.Model):
     _name = 'expense.general'
