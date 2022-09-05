@@ -20,7 +20,7 @@ class HrAttendance(http.Controller):
                 return {"Status":"500 Internal Server Error","Message": "Value input does not match format '%m/%d/%Y, %H:%M:%S"}
             # convert local+7 to UTC+0
             date_time = date_time - timedelta(hours = 7)
-            result = request.env['hr.employee'].attendance_manual_api(employees, date_time, "hr_attendance.hr_attendance_action_my_attendances")
+            result = request.env['hr.employee'].attendance_manual_api(employees, date_time, "hr_attendance.hr_attendance_action_my_attendances", kw['is_checkin'])
             response_message = result['action']['attendance']
 
             response = {
@@ -38,9 +38,9 @@ class HrAttendance(http.Controller):
 
 class SessionCustom(Session):
     @http.route('/web/session/authenticate/api_attendances_key', type='json', auth='public', sitemap=False)
-    def authenticate(self, uuid):
+    def authenticate(self, uid):
         try:
-            api_key = request.env['auth.api.key'].search([('user_id','=',uuid)], limit=1).key
+            api_key = request.env['auth.api.key'].search([('user_id','=',uid)], limit=1).key
         except:
             api_key = None
         value = {"status": "200 success", "value": {"message": "Connect Success", "api_key": api_key}}
