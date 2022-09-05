@@ -187,10 +187,19 @@ class Task(models.Model):
         if self.issues_type.status:
             self.status = self.issues_type.status[0]
 
-    @api.constrains('status', 'timesheet_ids')
+    @api.constrains('status', 'timesheet_ids', 'child_ids')
     def _check_timesheet(self):
         if self.status.name == 'Done' or self.status.name == 'Closed' and self.issues_type.name == 'Task':
-            if len(self.timesheet_ids) == 0:
+            total_sub_task = self.env['project.task'].search_count([('parent_id', '=', self.id)])
+            total_sub_task_done = 0
+            for child_task in self.child_ids:
+                if child_task.status.name == 'Done':
+                        total_sub_task_done += 1
+            if total_sub_task != total_sub_task_done:
+                raise UserError(
+                'Sub Tasks must be completed when changing the status of the parent task!')
+
+            if len(self.timesheet_ids) == 0 and total_sub_task == 0:
                 raise UserError(
                     'Time Sheet field cannot be left blank')
             elif self.planned_hours == 0.0:
