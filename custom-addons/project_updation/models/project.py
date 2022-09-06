@@ -108,6 +108,18 @@ class Task(models.Model):
         'project.task', 'Bug of Task', store=True, readonly=False, index=True)
     invisible_field = fields.Boolean(compute='_check_issue_type')
 
+    def _default_count_time_sheet(self):
+        timesheet_task = self.env['project.task'].search([])
+        for record in timesheet_task: 
+            record.count_time_sheets = len(record.timesheet_ids.ids)
+ 
+    count_time_sheets = fields.Integer(tracking=True, store=True, default=_default_count_time_sheet, compute='_compute_timesheet_ids')
+    
+    @api.depends("timesheet_ids")
+    def _compute_timesheet_ids(self):
+        for item in self:
+            item.count_time_sheets = len(item.timesheet_ids.ids)
+        
     @api.depends('issues_type')
     def _check_issue_type(self):
         if self.issues_type.name != 'Bug':

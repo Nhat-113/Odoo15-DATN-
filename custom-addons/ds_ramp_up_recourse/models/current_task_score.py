@@ -54,6 +54,7 @@ class CurrentTaskScore(models.Model):
 						AND project_task.date_end <= CONCAT(to_char(date_part('year', CURRENT_DATE), '9999'), '-12-31')::date
 						AND project_task.issues_type = 1
 						AND project_task.task_score != '0'
+                        AND project_task.count_time_sheets > 0
 					GROUP BY
 						emp.id,
                         emp.name,
@@ -74,7 +75,7 @@ class CurrentTaskScore(models.Model):
             'search_view_id': [self.env.ref('ds_ramp_up_recourse.task_score_search').id, 'search'],
             "res_model": "project.task",
             "views": [[self.env.ref('ds_ramp_up_recourse.task_score_view_tree').id, "tree"]],
-            "domain": [('user_ids', 'in', user_id), ('issues_type', '=', 1), 
+            "domain": [('user_ids', 'in', user_id), ('issues_type', '=', 1), ('count_time_sheets', '>', 0),
                 ('date_start', '>=', date(date.today().year, 1, 1)), 
                 ('date_end', '<=', date(date.today().year, 12, 31)), ('task_score', 'not in', ['0'])]
         }
