@@ -1,5 +1,5 @@
-from odoo import models, fields, api
-
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 
 class ProjectExpense(models.Model):
@@ -44,3 +44,27 @@ class ProjectExpense(models.Model):
     def _compute_project_company(self):
         if self.project_id.company_id.id != self.company_id.id:
             self.project_id = False
+
+
+    @api.onchange('expense_date')
+    def _validate_duration_expense_date(self):
+        self.validate_project_expense_content(action = True)
+
+
+    @api.onchange('project_id')
+    def _validate_duration_project_expense(self):
+        self.validate_project_expense_content(action = False)
+
+
+    def validate_project_expense_content(self, action):
+        if self.project_id.id != False and self.expense_date != False:
+            if self.project_id.date == False or self.project_id.date_start == False:
+                raise UserError(_('The duration of the project is false! Please update duration of project "%(project)s"', 
+                                project = self.project_id.name))
+            else:
+                if self.expense_date > self.project_id.date or self.expense_date < self.project_id.date_start:
+                    if action == False:
+                        self.expense_date = False
+                    else:
+                        raise UserError(_('The date "%(date)s" is outside the project implementation period "%(project)s" !',
+                                        date = self.expense_date, project = self.project_id.name))
