@@ -33,11 +33,12 @@ class ProjectExpense(models.Model):
     
     @api.depends('total_expenses', 'rounding_usd_input', 'rounding_jpy_input')
     def _convert_currency_revenue(self):
-        if self.total_expenses != 0.0:
-            if self.rounding_usd_input != 0.0:
-                self.revenue_usd = self.total_expenses / self.rounding_usd_input
-            if self.rounding_jpy_input != 0.0:
-                self.revenue_jpy = self.total_expenses / self.rounding_jpy_input
+        for record in self:
+            if record.total_expenses != 0.0:
+                if record.rounding_usd_input != 0.0:
+                    record.revenue_usd = record.total_expenses / record.rounding_usd_input
+                if record.rounding_jpy_input != 0.0:
+                    record.revenue_jpy = record.total_expenses / record.rounding_jpy_input
     
     
     @api.onchange('company_id')
