@@ -9,7 +9,7 @@
     </record>
 
     <record id="management_expense_action" model="ir.actions.act_window">
-        <field name="name">General Expenses</field>
+        <field name="name">Operation Cost</field>
         <field name="res_model">expense.management</field>
         <field name="view_mode">tree,form</field>
     </record>
@@ -28,7 +28,7 @@
 
     <menuitem
             id="expense_management"
-            name="General Expenses"
+            name="Operation Cost"
             sequence="1"
             parent="ds_expense_management.expense_management_menu" 
             action="management_expense_action"/>
