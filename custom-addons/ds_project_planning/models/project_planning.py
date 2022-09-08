@@ -8,6 +8,7 @@ from numpy import require
 from odoo import models, fields, api, _
 from datetime import date, datetime, time
 from odoo.exceptions import UserError, ValidationError
+import pandas as pd
 
 
 class Project(models.Model):
@@ -32,6 +33,16 @@ class Project(models.Model):
         string="Total milestones", compute="_count_phase_milestone")
     project_phases = fields.One2many(
         'project.planning.phase', 'project_id', string='Phases In Project')
+    actual_effort = fields.Float('Actual Effort (MM)', compute='_compute_actual_effort')
+
+    def _compute_actual_effort(self):
+        for project in self:
+            total_actual_effort = 0
+            time_sheets = project.env['account.analytic.line'].search([('project_id', '=', project.id)])
+            for time_sheet in time_sheets:
+                total_actual_effort += time_sheet.unit_amount
+            
+            project.actual_effort = (total_actual_effort/8)/20
 
     def _compute_task_total(self):
         id_status_cancel = self.env['project.task.status'].search([('name', '=' , 'Cancel')]).id

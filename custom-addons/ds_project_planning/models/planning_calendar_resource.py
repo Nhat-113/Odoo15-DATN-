@@ -6,7 +6,7 @@ from email.policy import default
 from attr import field
 from numpy import require
 from odoo import models, fields, api, _
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError, ValidationError
 
@@ -25,11 +25,11 @@ class PlanningCalendarResource(models.Model):
                              default=fields.Date.today)
     end_date = fields.Date(string='End Date', readonly=False, required=True,
                            help="Date on which the member finished working on project")
-    duration = fields.Integer(compute='_compute_duration', string="Duration",
+    duration = fields.Integer(compute='_compute_duration', string="Duration (Working day)",
                               readonly=True, help="The duration of working time in the project", default=1)
-    calendar_effort = fields.Float(string="Booking Effort", default=0, compute='_compute_calendar_effort', readonly=True)
+    calendar_effort = fields.Float(string="Booking Effort (Man Month)", default=0, compute='_compute_calendar_effort', readonly=True)
     effort_rate = fields.Float(string="Effort Rate", compute='_compute_effort_rate_default',readonly=False,
-                               help="Effort Rate (%) = Booking Effort * 20 / Duration", store=True, default=0)
+                               help="Effort Rate (%) = Booking Effort * 20 / Duration", store=True, default=0, digits=(12,2))
     role_ids = fields.Many2many('planning.roles', string='Roles')
     note = fields.Text(string='Note')
     member_type = fields.Many2one(
@@ -40,6 +40,15 @@ class PlanningCalendarResource(models.Model):
                               default=False, store=True)
     inactive_date = fields.Date(string='Inactive Date', help="The start date of the member's inactivity in the project.",
                                 default=fields.Date.today)
+    check_upgrade_booking = fields.Boolean(default=False)
+    booking_upgrade_week = fields.One2many('booking.resource.week', 'booking_id', string='Week', compute='_get_booking_resource')
+    booking_upgrade_month = fields.One2many('booking.resource.month', 'booking_id', string='Month', compute='_get_booking_resource')
+    select_type_upgrade = fields.Selection([('month', 'Month'),
+                                            ('week', 'Week')],
+                                            required=False,
+                                            default='month')
+    check_edit_effort = fields.Char('Check edit effort')
+    get_id_month_edit = fields.Char('ID edit month', store=False, compute='get_id_month')
 
     @api.depends('start_date', 'end_date', 'inactive', 'inactive_date')
     def _compute_duration(self):
@@ -60,10 +69,22 @@ class PlanningCalendarResource(models.Model):
                 else:
                     resource.duration = 1
 
+    def get_id_month(self, id_month):
+        for resource in self:
+            if id_month:
+                resource.get_id_month_edit = str(id_month)
+
     @api.onchange('inactive')
     def _set_inactive_date(self):
         if self.inactive == False:
             self.inactive_date = False
+            self.check_upgrade_booking = True
+        else:
+            self.check_upgrade_booking = False
+
+    @api.onchange('inactive_date')
+    def _upgrade_booking_inactive_date(self):
+        self.check_upgrade_booking = False
 
     @api.constrains('inactive_date', 'start_date', 'end_date')
     def validate_inactive_date(self):
@@ -88,6 +109,7 @@ class PlanningCalendarResource(models.Model):
     def _calculate_default_calendar_effort(self):
         if self.start_date and self.end_date:
             self.calendar_effort = self.duration / 20
+            self.check_upgrade_booking = False
 
     @api.onchange('duration', 'calendar_effort')
     def _compute_effort_rate(self):
@@ -170,7 +192,7 @@ class PlanningCalendarResource(models.Model):
                 check_effort_rate['total_effort_booked'] = total_effort_booked
                 check_effort_rate['effort_rate'] = resource.effort_rate
                 message['employee'] = resource.employee_id.name
-                message['effort_rate'] = (100 - total_effort_booked) if (100 - total_effort_booked) > 0 else 0
+                message['effort_rate'] = round((100 - total_effort_booked), 2) if round((100 - total_effort_booked), 2) > 0 else 0
                 message['start_date'] = resource.start_date
                 message['end_date'] = resource.end_date
             else:
@@ -223,6 +245,8 @@ class PlanningCalendarResource(models.Model):
                         resource=calendar.employee_id.name, end=calendar.end_date, current=date.today()
                     ))
 
+            self.env['booking.resource.week'].search([('booking_id', '=', calendar.id)]).unlink()
+            self.env['booking.resource.month'].search([('booking_id', '=', calendar.id)]).unlink()
         return super(PlanningCalendarResource, self).unlink()
 
     def write(self, vals):
@@ -231,11 +255,184 @@ class PlanningCalendarResource(models.Model):
                 raise UserError(_(
                         'Can not edit member (%(resource)s) with End Date (%(end)s) < Current Date (%(current)s).',
                         resource=calendar.employee_id.name, end=calendar.end_date, current=date.today()
-                    ))
-
+                    ))            
+            
         return super(PlanningCalendarResource, self).write(vals)
+    
+    def upgrade_booking_common(self, end_date_common):
+        for resource in self:
+            # for upgrade booking month
+            upgrade_month = self.env['booking.resource.month'].search([('booking_id', '=', resource.id)])
+            day_count = (end_date_common - resource.start_date).days
+            if len(upgrade_month) > 0:
+                upgrade_month.unlink()
+            list_start_end = [resource.start_date]
+            start_date_booking = pd.Series(pd.date_range(resource.start_date.strftime("%Y-%m-%d"), periods=1))
+            if start_date_booking.dt.is_month_end[0] == True:
+                list_start_end.append(resource.start_date)
+            for date in pd.Series(pd.date_range((resource.start_date + timedelta(1)).strftime("%Y-%m-%d"), periods=day_count)):
+                if date.is_month_start == True or date.is_month_end == True:
+                    list_start_end.append(datetime.strptime(date._date_repr, '%Y-%m-%d').date())
+            end_date_booking = pd.Series(pd.date_range(end_date_common.strftime("%Y-%m-%d"), periods=1))
+            if end_date_booking.dt.is_month_end[0] == False:
+                list_start_end.append(end_date_common)
+            for i in range(0, len(list_start_end), 2):
+                month_temp = self.env['booking.resource.month.temp'].search([]).create({
+                    'name': 'Month ' + str(list_start_end[i].month),
+                    'start_date_month': list_start_end[i],
+                    'end_date_month': list_start_end[i+1],
+                    'effort_rate_month': resource.effort_rate,
+                    'booking_id' : resource.id,
+                    'employee_id': resource.employee_id.id
+                    })
+                
+                self.env['booking.resource.month'].search([]).create({
+                    'name': 'Month ' + str(list_start_end[i].month),
+                    'start_date_month': list_start_end[i],
+                    'end_date_month': list_start_end[i+1],
+                    'effort_rate_month': resource.effort_rate,
+                    'booking_id' : resource.id,
+                    'month_temp_id': month_temp.id,
+                    'employee_id': resource.employee_id.id
+                    })
+            # for upgrade booking week
+            upgrade_week = self.env['booking.resource.week'].search([('booking_id', '=', resource.id)])
+            if len(upgrade_week) > 0:
+                upgrade_week.unlink()
+            mon_sun = [resource.start_date]
+            if resource.start_date.strftime("%A") == 'Sunday' or\
+                 pd.Series(pd.date_range(resource.start_date.strftime("%Y-%m-%d"), periods=1)).dt.is_month_end[0] == True:
+                mon_sun.append(resource.start_date)
+            for single_date in (((resource.start_date + timedelta(1)) + timedelta(n)) for n in range(day_count)):
+                is_start_end_month = pd.Series(pd.date_range(single_date.strftime("%Y-%m-%d"), periods=1))
+                if single_date.strftime("%A") == "Monday" or single_date.strftime("%A") == "Sunday":
+                    mon_sun.append(single_date)
+                if is_start_end_month.dt.is_month_start[0] == True or is_start_end_month.dt.is_month_end[0] == True:
+                    mon_sun.append(single_date)
+            if end_date_common.strftime("%A") != 'Sunday' and pd.Series(pd.date_range(end_date_common.strftime("%Y-%m-%d"), periods=1)).dt.is_month_end[0] != True:
+                mon_sun.append(end_date_common)
+            if len(mon_sun) % 2 != 0:
+                mon_sun.append(end_date_common)
+            no_week = 1
+            for i in range(0, len(mon_sun), 2):
+                week_temp = self.env['booking.resource.week.temp'].search([]).create({
+                    'name': 'Week ' + str(no_week),
+                    'start_date_week': mon_sun[i],
+                    'end_date_week': mon_sun[i+1],
+                    'effort_rate_week': resource.effort_rate,
+                    'booking_id' : resource.id,
+                    'employee_id': resource.employee_id.id
+                })
 
+                self.env['booking.resource.week'].search([]).create({
+                    'name': 'Week ' + str(no_week),
+                    'start_date_week': mon_sun[i],
+                    'end_date_week': mon_sun[i+1],
+                    'effort_rate_week': resource.effort_rate,
+                    'booking_id' : resource.id,
+                    'week_temp_id': week_temp.id,
+                    'employee_id': resource.employee_id.id
+                })
 
+                no_week += 1
+
+            
+            resource.check_upgrade_booking = True
+
+    def action_upgrade_booking(self):
+        for resource in self:
+            if resource.inactive == False:
+                resource.upgrade_booking_common(resource.end_date)
+            else:
+                resource.upgrade_booking_common(resource.inactive_date)
+
+    @api.onchange('check_upgrade_booking')
+    def _get_booking_resource(self):
+        for resource in self:
+            resource.booking_upgrade_week = self.env['booking.resource.week'].search([('booking_id', '=', resource.id)])
+            resource.booking_upgrade_month = self.env['booking.resource.month'].search([('booking_id', '=', resource.id)])
+
+    @api.onchange('booking_upgrade_week')
+    def check_effort_week(self):
+        for resource in self:
+            for week in resource.booking_upgrade_week:
+                if week.effort_rate_week <= 0 or week.effort_rate_week > 100:
+                     raise UserError(_('Week : Effort Rate greater than or equal to 0% & less than or equal to 100%.'))
+            if resource.select_type_upgrade == 'week':
+                resource.check_edit_effort = 'effort_week'
+
+                     
+    @api.onchange('booking_upgrade_month')
+    def check_effort_month(self):
+        for resource in self:     
+            for month in resource.booking_upgrade_month:
+                if month.effort_rate_month <= 0 or month.effort_rate_month > 100:
+                    raise UserError(_('Month : Effort Rate greater than or equal to 0% & less than or equal to 100%.'))
+                if resource.select_type_upgrade == 'month':
+                    resource.check_edit_effort = 'effort_month' 
+
+    def compute_total_effort_common(self):
+        for resource in self:
+            total_effort_all = 0
+            for month in resource.booking_upgrade_month:
+                total_effort_all += month.effort_rate_month
+            len_booking_update_month = len(resource.env['booking.resource.month'].search([('booking_id', '=', resource.id or resource.id.origin)]))
+            if len_booking_update_month > 0:
+                self.env['planning.calendar.resource'].search([('id', '=', resource.id or resource.id.origin)]).write({
+                    'effort_rate' : round(total_effort_all / len_booking_update_month)
+                })
+    
+    def calculator_total_effort(self):
+        self.compute_total_effort_common()
+
+    def calculator_effort_month(self, effort_month_edit, total_effort_week_expired, len_week, len_week_no_expired):
+        return ((effort_month_edit * len_week) - (total_effort_week_expired)) / len_week_no_expired
+
+    @api.onchange('effort_rate')
+    def update_effort_month(self):
+        for resource in self:
+            len_week = 0
+            len_week_no_expired = 0
+            total_effort_week_expired = 0
+            actual_end_date = date.today()
+            for week in resource.booking_upgrade_week:
+                len_week += 1
+                if week.start_date_week > date.today():
+                    len_week_no_expired += 1 
+                else:
+                    total_effort_week_expired += week.effort_rate_week
+
+                if week.start_date_week <= date.today() and week.end_date_week >= date.today():
+                    actual_end_date = week.end_date_week
+            for month in resource.booking_upgrade_month:
+                month_total_effort_week_expired = 0
+                month_len_week = 0
+                month_len_week_no_expired = 0
+                for rec_week in resource.booking_upgrade_week:
+                    if month.start_date_month.month == rec_week.start_date_week.month and month.start_date_month.year == rec_week.start_date_week.year:
+                        month_len_week += 1
+
+                    if month.start_date_month.month == rec_week.start_date_week.month and month.start_date_month.year == rec_week.start_date_week.year \
+                        and rec_week.start_date_week > date.today():
+                        month_len_week_no_expired += 1 
+
+                    if month.start_date_month.month == rec_week.start_date_week.month and month.start_date_month.year == rec_week.start_date_week.year \
+                        and rec_week.start_date_week <= date.today():
+                        month_total_effort_week_expired += rec_week.effort_rate_week
+                if month.end_date_month > actual_end_date:
+                    eft_month = resource.calculator_effort_month(resource.effort_rate, total_effort_week_expired, len_week, len_week_no_expired)
+                    if (month_len_week - month_len_week_no_expired) == 0:
+                        month.effort_rate_month = eft_month
+                    else:
+                        month.effort_rate_month = (month_total_effort_week_expired + eft_month*month_len_week_no_expired)/month_len_week              
+
+    @api.constrains('booking_upgrade_week', 'booking_upgrade_month')
+    def recompute_when_save(self):
+        for resource in self:
+            if resource.booking_upgrade_week and resource.booking_upgrade_month:
+                resource.compute_total_effort_common()  
+
+                
 class PlanningAllocateEffortRate(models.Model):
     """ Type of member in project planning """
     _name = "planning.member.type"    
