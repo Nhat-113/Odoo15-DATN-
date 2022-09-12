@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="exchange_rate_management_tree" model="ir.ui.view">
+        <field name="name">api.exchange.rate.tree</field>
+        <field name="model">api.exchange.rate</field>
+        <field name="arch" type="xml">
+            <tree string="Exchange Rate">
+                <field name="name"/>
+                <field name="date_upgrade"/>
+                <field name="count_upgrade"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="exchange_rate_management_form" model="ir.ui.view">
+        <field name="name">api.exchange.rate.form</field>
+        <field name="model">api.exchange.rate</field>
+        <field name="arch" type="xml">
+            <form string="Exchange Rate">
+                <header>
+                    <button string="Upgrade Exchange Rate" 
+                            name="upgrade_exchane_rate_api" 
+                            type="object" 
+                            attrs="{'invisible': [('count_upgrade', '=', 8)]}"
+                            class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group name="group_top">
+                        <group name="group_left">
+                            <field name="usd_convert"/>
+                            <field name="jpy_convert"/>
+                        </group>
+                        <group name="group_right">
+                            <field name="count_upgrade"/>
+                            <field name="maximum_upgrade"/>
+                        </group>
+                        <field name="message_warning" attrs="{'invisible': [('count_upgrade', '!=', 8)]}"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="exchange_rate_action" model="ir.actions.act_window">
+        <field name="name">Exchange Rate</field>
+        <field name="res_model">api.exchange.rate</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+</odoo>
