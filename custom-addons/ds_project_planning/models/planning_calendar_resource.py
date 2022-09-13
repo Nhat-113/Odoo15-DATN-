@@ -98,16 +98,16 @@ class PlanningCalendarResource(models.Model):
                    raise UserError(_('Member %(resource)s: Inactive date should be between start date (%(start)s) and end date (%(end)s).',
                                     resource=resource.employee_id.name, start=resource.start_date, end=resource.end_date))
     
-    # @api.constrains('start_date', 'end_date', 'employee_id', 'effort_rate', 'member_type')
-    # def _effort_rate_when_close_form(self):
-    #     for resource in self:
-    #         message={}
-    #         check_effort_rate = {}
-    #         resource._common_check_effort_rate(check_effort_rate, message)
-    #         if check_effort_rate['check'] == False:
-    #             msg = "Over effort was assigned to the member {employee} for the time period ({start_date} to {end_date}).".format(employee=message['employee'],\
-    #                     start_date=message['start_date'], end_date=message['end_date'])
-    #             raise UserError(msg)
+    @api.constrains('start_date', 'end_date', 'employee_id', 'effort_rate', 'member_type')
+    def _effort_rate_when_close_form(self):
+        for resource in self:
+            message={}
+            check_effort_rate = {}
+            resource._common_check_effort_rate(check_effort_rate, message)
+            if check_effort_rate['check'] == False:
+                msg = "Over effort was assigned to the member {employee} for the time period ({start_date} to {end_date}).".format(employee=message['employee'],\
+                        start_date=message['start_date'], end_date=message['end_date'])
+                raise UserError(msg)
 
     @api.onchange('start_date', 'end_date')
     def _calculate_default_calendar_effort(self):
