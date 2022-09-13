@@ -107,6 +107,21 @@ class Task(models.Model):
     task_id = fields.Many2one(
         'project.task', 'Bug of Task', store=True, readonly=False, index=True)
     invisible_field = fields.Boolean(compute='_check_issue_type')
+    
+    status_task_score = fields.Selection([
+    ('draft', 'To Approve'),
+    ('confirm', 'Approved'),
+    ('refuse', 'Refused'),
+    ], default='draft', compute="reject_task_score", readonly=False, store=True, tracking=True)
+
+    def _check_status_taskscore(self):
+        for item in self: 
+            if item.status_task_score != 'draft':
+               item.readonly_task_score = False
+            else:
+               item.readonly_task_score = True
+
+    readonly_task_score = fields.Boolean(compute=_check_status_taskscore)
 
     def _default_count_time_sheet(self):
         timesheet_task = self.env['project.task'].search([])

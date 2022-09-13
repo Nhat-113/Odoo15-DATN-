@@ -1,8 +1,8 @@
 <odoo>
-    <menuitem id="ramp_up_menu" name="Management" groups="group_task_score_user"/>
+    <menuitem id="ramp_up_menu" name="Employee Evaluation" groups="group_task_score_user"/>
 
     <record id="open_view_ramp_up_all" model="ir.actions.act_window">
-        <field name="name">Resource Management</field>
+        <field name="name">Employee Evaluation</field>
         <field name="res_model">hr.employee</field>
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
@@ -15,13 +15,13 @@
         <field name="search_view_id" ref="ramp_up_detail_search"/>
     </record>
 
-    <menuitem
+    <!-- <menuitem
         id="menu_ramp_up_report"
         name="Resource Management"
         sequence="2"
         parent="ds_ramp_up_recourse.ramp_up_menu" 
         groups="group_task_score_admin"
-        action="ramp_up_report_action"/>
+        action="ramp_up_report_action"/> -->
 
     <menuitem id="hr_employee_task_score" name="Task Score" parent="ds_ramp_up_recourse.ramp_up_menu" sequence="1"/>
     <menuitem id="current_task_score_" name="Current" parent="ds_ramp_up_recourse.hr_employee_task_score" action="open_view_employee_current_task_score" sequence="1"/>

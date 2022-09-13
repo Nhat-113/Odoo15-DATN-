@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="ramp_up_view_search" model="ir.ui.view">
         <field name="name">ramp.up.view.search</field>
@@ -27,8 +27,8 @@
                 <field name="effort_rate" type="measure"/>
             </pivot>
         </field>
-    </record>
-
+    </record> -->
+<!-- 
     <record id="ramp_up_report_action" model="ir.actions.act_window">
         <field name="name">Resource Management</field>
         <field name="res_model">planning.calendar.resource</field>
@@ -36,5 +36,5 @@
         <field name="search_view_id" ref="ramp_up_view_search"/>
         <field name="groups_id" eval="[(4, ref('group_task_score_admin'))]"/>
         <field name="context">{'group_by': ['employee_id']}</field>
-    </record>
-</odoo>
+    </record> -->
+<!-- </odoo> -->

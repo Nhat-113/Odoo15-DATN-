@@ -38,3 +38,6 @@
 div[name="display_project_id"] button.o_external_button {
   display: none !important;
 }
+.o_form_project_tasks .o_readonly_modifier  {
+  pointer-events: none !important;
+}
