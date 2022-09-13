@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="ir_cron_gen_update_week_month" model="ir.cron">
+            <field name="name">Planning: Gen update week month</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">False</field>
+            <field name="model_id" ref="model_planning_calendar_resource"/>
+            <field name="state">code</field>
+            <field name="code">model.action_upgrade_booking()</field>
+        </record>
+    </data>
+</odoo>
