@@ -297,7 +297,7 @@ class PlanningCalendarResource(models.Model):
                     effort_week = resource.effort_rate if resource.effort_rate < message_week['effort_rate'] else message_week['effort_rate']
                 else:
                     effort_week = resource.effort_rate
-                if mon_sun[i] > book_end_date or mon_sun[i] < book_start_date:
+                if mon_sun[i] > book_end_date or mon_sun[i] < book_start_date and mon_sun[i+1] < book_start_date:
                     effort_week = 0
                 week_temp = booking.env['booking.resource.week.temp'].create({
                     'name': 'Week ' + str(no_week),
