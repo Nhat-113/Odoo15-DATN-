@@ -140,6 +140,12 @@ class BookingResourceWeek(models.Model):
         else:
             check_effort_rate_week['check'] = True
 
+    @api.constrains('effort_rate_week')
+    def check_effort_week_over_when_close(self):
+        for week in self:
+            if week.effort_rate_week < 0 or week.effort_rate_week > 100:
+                raise UserError(_('Week : Effort Rate greater than or equal to 0% & less than or equal to 100%.'))
+
 
 class BookingResourceWeekTemp(models.Model):
     _name = "booking.resource.week.temp"
@@ -294,6 +300,13 @@ class BookingResourceMonth(models.Model):
             message_month['effort_rate'] = round((100 - total_effort_booked), 2) if round((100 - total_effort_booked), 2) > 0 else 0
         else:
             check_effort_rate_month['check'] = True
+
+    
+    @api.constrains('effort_rate_month')
+    def check_effort_month_over_when_close(self):
+        for month in self:
+            if month.effort_rate_month < 0 or month.effort_rate_month > 100:
+                raise UserError(_('Month : Effort Rate greater than or equal to 0% & less than or equal to 100%.')) 
 
 
 

@@ -188,7 +188,7 @@ class PlanningCalendarResource(models.Model):
                         or resource.start_date > member_calendar.start_date and resource.end_date < member_calendar.end_date\
                         or resource.start_date == member_calendar.end_date or resource.end_date == member_calendar.start_date:
                         total_effort_booked += member_calendar.effort_rate
-            if resource.effort_rate + round(total_effort_booked) > 100 and resource.member_type.name != 'Shadow Time':
+            if resource.effort_rate + total_effort_booked > 100 and resource.member_type.name != 'Shadow Time':
                 if total_effort_booked > 0 and total_effort_booked < 100:
                     resource.effort_rate = 100 - total_effort_booked
                 elif total_effort_booked == 0:
