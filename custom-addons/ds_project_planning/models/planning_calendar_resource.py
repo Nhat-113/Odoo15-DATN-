@@ -98,16 +98,16 @@ class PlanningCalendarResource(models.Model):
                    raise UserError(_('Member %(resource)s: Inactive date should be between start date (%(start)s) and end date (%(end)s).',
                                     resource=resource.employee_id.name, start=resource.start_date, end=resource.end_date))
     
-    @api.constrains('start_date', 'end_date', 'employee_id', 'effort_rate', 'member_type')
-    def _effort_rate_when_close_form(self):
-        for resource in self:
-            message={}
-            check_effort_rate = {}
-            resource._common_check_effort_rate(check_effort_rate, message)
-            if check_effort_rate['check'] == False:
-                msg = "Over effort was assigned to the member {employee} for the time period ({start_date} to {end_date}).".format(employee=message['employee'],\
-                        start_date=message['start_date'], end_date=message['end_date'])
-                raise UserError(msg)
+    # @api.constrains('start_date', 'end_date', 'employee_id', 'effort_rate', 'member_type')
+    # def _effort_rate_when_close_form(self):
+    #     for resource in self:
+    #         message={}
+    #         check_effort_rate = {}
+    #         resource._common_check_effort_rate(check_effort_rate, message)
+    #         if check_effort_rate['check'] == False:
+    #             msg = "Over effort was assigned to the member {employee} for the time period ({start_date} to {end_date}).".format(employee=message['employee'],\
+    #                     start_date=message['start_date'], end_date=message['end_date'])
+    #             raise UserError(msg)
 
     @api.onchange('start_date', 'end_date')
     def _calculate_default_calendar_effort(self):
@@ -155,26 +155,26 @@ class PlanningCalendarResource(models.Model):
     def _check_start_end(self):   
         return self._check_dates()
 
-    @api.onchange('start_date', 'end_date', 'member_type', 'effort_rate', 'employee_id')
-    def _check_effort_rate(self):
-        if self.start_date and self.end_date and self.employee_id.id:
-            message={}
-            check_effort_rate = {}
-            self._common_check_effort_rate(check_effort_rate, message)
-            if check_effort_rate['check'] == False:
-                msg = "Employee {employee} has ({effort_rate}%) Effort Rate in the period from {start_date} to {end_date}.".format(employee=message['employee'],\
-                            effort_rate=message['effort_rate'], start_date=message['start_date'], end_date=message['end_date'])
-                warning = {
-                                'warning': {
-                                    'title': 'Warning!',
-                                    'message': msg
-                                }
-                            }
-                if check_effort_rate['effort_rate'] > 100:
-                    self.effort_rate = 100
-                    return warning
-                elif message['effort_rate'] < 100:
-                    return warning
+    # @api.onchange('start_date', 'end_date', 'member_type', 'effort_rate', 'employee_id')
+    # def _check_effort_rate(self):
+    #     if self.start_date and self.end_date and self.employee_id.id:
+    #         message={}
+    #         check_effort_rate = {}
+    #         self._common_check_effort_rate(check_effort_rate, message)
+    #         if check_effort_rate['check'] == False:
+    #             msg = "Employee {employee} has ({effort_rate}%) Effort Rate in the period from {start_date} to {end_date}.".format(employee=message['employee'],\
+    #                         effort_rate=message['effort_rate'], start_date=message['start_date'], end_date=message['end_date'])
+    #             warning = {
+    #                             'warning': {
+    #                                 'title': 'Warning!',
+    #                                 'message': msg
+    #                             }
+    #                         }
+    #             if check_effort_rate['effort_rate'] > 100:
+    #                 self.effort_rate = 100
+    #                 return warning
+    #             elif message['effort_rate'] < 100:
+    #                 return warning
 
     def _common_check_effort_rate(self, check_effort_rate, message):
         for resource in self:
@@ -256,15 +256,14 @@ class PlanningCalendarResource(models.Model):
             self.env['booking.resource.month'].search([('booking_id', '=', calendar.id)]).unlink()
         return super(PlanningCalendarResource, self).unlink()
 
-    def write(self, vals):
+    @api.constrains('start_date', 'end_date', 'member_type', 'effort_rate', 'role_ids', 'inactive')
+    def check_edit_member(self):
         for calendar in self:
             if calendar.end_date < date.today() and calendar.env.user.has_group('project.group_project_manager') == False:
                 raise UserError(_(
                         'Can not edit member (%(resource)s) with End Date (%(end)s) < Current Date (%(current)s).',
                         resource=calendar.employee_id.name, end=calendar.end_date, current=date.today()
                     ))
-            
-        return super(PlanningCalendarResource, self).write(vals)
     
     def upgrade_booking_common(booking, start_date_common, end_date_common, book_start_date, book_end_date):
         for resource in booking:
@@ -465,7 +464,11 @@ class PlanningCalendarResource(models.Model):
             if resource.booking_upgrade_week and resource.booking_upgrade_month:
                 resource.compute_total_effort_common()  
 
-                
+    @api.constrains('employee_id')
+    def gen_effort_week_month_when_create_booking(self):
+        for resource in self:
+            resource.action_upgrade_booking()
+
 class PlanningAllocateEffortRate(models.Model):
     """ Type of member in project planning """
     _name = "planning.member.type"    

@@ -31,12 +31,12 @@ class BookingResourceWeek(models.Model):
                     if record.start_date_month.month == week.start_date_week.month and record.start_date_month.year == week.start_date_week.year:
                         len_week += 1
                         if week.start_date_week > date.today():
-                            len_week_no_expired += 1 
-                        else:
                             effort_week_expired += week.effort_rate_week
+                            if week.end_date_week >= week.booking_id.start_date and week.start_date_week <= week.booking_id.end_date:
+                                len_week_no_expired += 1 
                 for rec in self:
                     if record.start_date_month.month == rec.start_date_week.month and record.start_date_month.year == rec.start_date_week.year \
-                        and rec.start_date_week > date.today():
+                        and rec.start_date_week > date.today() and rec.end_date_week >= rec.booking_id.start_date and rec.start_date_week <= rec.booking_id.end_date:
                         if len_week - len_week_no_expired > 0:
                             rec.effort_rate_week = self.calculator_effort_week(record.effort_rate_month, effort_week_expired, len_week, len_week_no_expired)
                         else:
@@ -46,18 +46,24 @@ class BookingResourceWeek(models.Model):
     @api.onchange('effort_rate_week')
     def check_edit_effort(self):
         for week in self:
-            if week.start_date_week <= date.today() and week.env.user.has_group('project.group_project_manager') == False:
-                raise UserError(_(
-                            'Can not edit (%(week)s) with Start Date (%(start)s) less than or equal Current Date (%(current)s).',
-                            week=week.name, start=week.start_date_week, current=date.today()
-                        ))
-            
-            if week.booking_id.inactive_date and week.start_date_week >= week.booking_id.inactive_date and week.booking_id.inactive == True\
-            and week.env.user.has_group('project.group_project_manager') == False:
-                raise UserError(_(
-                            'Can not edit (%(week)s) with Start Date (%(start)s) greater than or equal Inactive Date (%(inactive_date)s).',
-                            week=week.name, start=week.start_date_week, inactive_date=week.booking_id.inactive_date
-                        ))
+            if week.env.user.has_group('project.group_project_manager') == False:
+                if week.start_date_week <= date.today():
+                    raise UserError(_(
+                                'Can not edit (%(week)s) with Start Date (%(start)s) less than or equal Current Date (%(current)s).',
+                                week=week.name, start=week.start_date_week, current=date.today()
+                            ))
+                
+                if week.booking_id.inactive_date and week.start_date_week >= week.booking_id.inactive_date and week.booking_id.inactive == True:
+                    raise UserError(_(
+                                'Can not edit (%(week)s) with Start Date (%(start)s) greater than or equal Inactive Date (%(inactive_date)s).',
+                                week=week.name, start=week.start_date_week, inactive_date=week.booking_id.inactive_date
+                            ))
+
+                if week.end_date_week <= week.booking_id.start_date or week.start_date_week > week.booking_id.end_date:
+                    raise UserError(_(
+                                'Can not edit (%(week)s) outside the range from (%(start_book)s) to (%(end_book)s).',
+                                week=week.name, start_book=week.booking_id.start_date, end_book=week.booking_id.end_date
+                            ))
 
     def common_check_effort_rate_week(self, check_effort_rate, message, start_date_week, end_date_week):
         for week in self:
@@ -74,6 +80,10 @@ class BookingResourceWeek(models.Model):
             if week.effort_rate_week + total_effort_booked > 100 and week.booking_id.member_type.name != 'Shadow Time':
                 if total_effort_booked > 0 and total_effort_booked < 100:
                     week.effort_rate_week = 100 - total_effort_booked
+                elif total_effort_booked == 0:
+                    week.effort_rate_week = week.booking_id.effort_rate
+                else:
+                    week.effort_rate_week = 0
                 check_effort_rate['check'] = False
                 check_effort_rate['total_effort_booked'] = total_effort_booked
                 check_effort_rate['effort_rate'] = week.effort_rate_week
@@ -241,6 +251,10 @@ class BookingResourceMonth(models.Model):
             if month.effort_rate_month + total_effort_booked > 100 and month.booking_id.member_type.name != 'Shadow Time':
                 if total_effort_booked > 0 and total_effort_booked < 100:
                     month.effort_rate_month = 100 - total_effort_booked
+                elif total_effort_booked == 0:
+                    month.effort_rate_month = month.booking_id.effort_rate
+                else:
+                    month.effort_rate_month = 0
                 check_effort_rate['check'] = False
                 check_effort_rate['total_effort_booked'] = total_effort_booked
                 check_effort_rate['effort_rate'] = month.effort_rate_month

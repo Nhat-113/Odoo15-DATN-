@@ -186,7 +186,7 @@
                 <field name="calendar_effort" digits="[12,2]" string="Booking Effort (Man Month)"/>
                 <field name="effort_rate" digits="[12,2]" string="Effort Rate (%)"/>
                 <field name="member_type" string="Member Type"/>
-                <field name="role_ids"/>
+                <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                 <field name="inactive" invisible="1"/>
                 <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)]}" />
                 <field name="note" optional="hide" />
@@ -223,7 +223,7 @@
                             <field name="effort_rate" digits="[12,2]" nolabel="1"/>
                             <span> % </span>
                         </div>
-                        <field name="role_ids"/>
+                        <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                         <field name="inactive" />
                         <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
                     </group>
@@ -431,7 +431,7 @@
                                     <field name="calendar_effort" digits="[12,2]" string="Booking Effort (Man Month)"/>
                                     <field name="member_type" string="Member Type"/>
                                     <field name="effort_rate" digits="[12,2]" string="Effort Rate (%)"/>
-                                    <field name="role_ids"/>
+                                    <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                                     <field name="inactive" invisible="1"/>
                                     <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)]}" />
                                     <field name="note" optional="hide" />
@@ -440,7 +440,7 @@
                                     <sheet>
                                         <div class="oe_title" style="width: 500px">
                                             <h1>
-                                                <field name="employee_id" widget="many2one_avatar" class="o_text_overflow" placeholder="Member Name" options="{'no_create': True}"/>
+                                                <field name="employee_id" widget="many2one_avatar" class="o_text_overflow" placeholder="Member Name" options="{'no_create': True}" attrs="{'readonly': [('check_upgrade_booking', '=', True)]}"/>
                                             </h1>
                                         </div>
                                         <group col="4">
@@ -460,7 +460,7 @@
                                                 <field name="effort_rate" digits="[12,2]" nolabel="1" attrs="{'readonly': [('inactive', '=', True)]}"/>
                                                 <span> % </span>
                                             </div>
-                                            <field name="role_ids"/>
+                                            <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                                             <field name="inactive" />
                                             <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
                                         </group>
