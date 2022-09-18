@@ -21,21 +21,21 @@
             <tree string="Cost Management" create="0" delete="0" multi_edit="1" sample="1">
                 <!-- <field name="sequence" widget="handle"/> -->
                 <field name="project_id" string="Project" class="font-weight-bold"/>
+                <field name="project_type_id"/>
                 <field name="director"  widget="many2one_avatar_employee" optional="hide"/>
                 <field name="user_pm" string="Project Manager" widget="many2one_avatar_user" options="{'no_open':True, 'no_create': True, 'no_create_edit': True}"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True, 'no_create_edit': True}"  optional="hide"/>
                 <field name="date_start" string="Start Date" widget="daterange" options="{'related_end_date': 'date'}"/>
                 <field name="date_end" string="End Date" widget="daterange" options="{'related_start_date': 'date_start'}"/>
                 <field name="status" string="Status" widget="status_with_color" options="{'color_field': 'last_update_color'}"/>
-                <field name="stage_id" options="{'no_open': True}" optional="hide"/>
                 <field name="count_members" sum="Total Members"/>
                 <field name="total_salary" sum="Total Salary Cost"/>
-                <field name="total_expenses" sum="Total Project Cost"/>
-                <field name="total_cost" sum="Total Revenue"/>
-                <field name="total_effort" optional="hide" sum="Total Effort"/>
+                <field name="project_cost" sum="Total Project Cost"/>
+                <field name="revenue" sum="Total Revenue"/>
+                <field name="profit" sum="Total Profit"/>
+                <field name="last_update_color" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
                 <!-- <field name="bonus" /> -->
-                <!-- <field name="active" invisible="1"/> -->
-                <!-- <field name="last_update_color" invisible="1"/> -->
             </tree>
         </field>
     </record>
@@ -55,6 +55,7 @@
                     </div>
                     <group>
                         <group>
+                            <field name="project_type_id"/>
                             <field name="user_pm" string="Project Manager" widget="many2one_avatar_user" readonly="1" domain="[('share', '=', False)]"/>
                             <field name="director" widget="many2one_avatar_employee" readonly="1"/>
                             <label for="date_start" string="Dates"/>
@@ -68,46 +69,20 @@
                             <!-- <field name="image_1920" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;: &quot;avatar_128&quot;}"/> -->
                         </group>
                         <group>
-                            <field name="total_cost" readonly="1"/>
-                            <field name="total_effort" readonly="1"/>
+                            <field name="revenue" readonly="1"/>
                             <!-- <field name="bonus" readonly="1"/> -->
                             <field name="total_salary" readonly="1"/>
-                            <field name="total_expenses" readonly="1"/>
+                            <field name="project_cost" readonly="1"/>
+                            <field name="profit" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="Members Detail">
-                            <field name="member_ids">
-                                <tree>
-                                    <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
-                                    <field name="job_id" />
-                                    <field name="email" />
-                                    <field name="number_phone" />
-                                    <field name="salary" sum="Total Salary Employees"/>
-                                    
-                                </tree>
-                               
-                            </field>
-                        </page>
-                        <page string="Expenses Detail">
-                            <field name="project_expense_management">
-                                <tree  edit="0" delete="0" create="0">
-                                    <field name="expense_date"/>
-                                    <field name="name" />
-                                    <field name="total_expenses" sum="Total expense"/>
-                                    <field name="description"/>
-                                    <field name="company_id" optional="hide"/>
-                                    <field name="currency_id" optional="hide"/>
-                                </tree>
-                               
-                            </field>
-                        </page>
                         <page string="History Cost Management">
                             <field name="project_management_history">
                                 <tree edit="0" delete="0" create="0">
                                     <field name="month_start"/>
                                     <field name="month_end"/>
-                                    <field name="working_day"/>
+                                    <field name="working_day" sum="Total Working day"/>
                                     <field name="revenue" sum="Total revenue"/>
                                     <field name="members" sum="Total members"/>
                                     <field name="total_salary" sum="Total salary"/>
@@ -117,6 +92,37 @@
                                     <!-- <field name="all_members" sum="Total all members"/> -->
                                     <field name="average_cost_company" sum="Total average cost company" optional="hide"/>
                                     <field name="average_cost_project" sum="Total average cost project" optional="hide"/>
+                                </tree>
+                               
+                            </field>
+                        </page>
+                        <page string="Members Detail">
+                            <field name="member_ids">
+                                <tree>
+                                    <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
+                                    <field name="job_id" />
+                                    <field name="email" optional="hide"/>
+                                    <field name="number_phone" optional="hide"/>
+                                    <field name="start_date" />
+                                    <field name="end_date" />
+                                    <field name="member_type" />
+                                    <field name="effort_rate" />
+                                    <field name="role_ids" optional="hide"/>
+                                    <!-- <field name="salary" sum="Total Salary Employees"/> -->
+                                    
+                                </tree>
+                               
+                            </field>
+                        </page>
+                        <page string="Project Cost Detail">
+                            <field name="project_expense_management">
+                                <tree  edit="0" delete="0" create="0">
+                                    <field name="expense_date"/>
+                                    <field name="name" />
+                                    <field name="total_expenses" sum="Total expense"/>
+                                    <field name="description"/>
+                                    <field name="company_id" optional="hide"/>
+                                    <field name="currency_id" optional="hide"/>
                                 </tree>
                                
                             </field>

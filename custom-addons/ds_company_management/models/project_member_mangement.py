@@ -8,58 +8,41 @@ class ProjectMemberManagement(models.Model):
     
     project_management_id = fields.Many2one('project.management', string="Project Management")
 
-    employee_id = fields.Many2one('hr.employee', string="Employee") #, default=_get_member_detail
+    employee_id = fields.Many2one('hr.employee', string="Employee")
     job_id = fields.Many2one('hr.job', string="Job Position")
+    role_ids = fields.Many2one('config.job.position', string='Roles')
     email = fields.Char(string='Email')
     number_phone = fields.Char(string='Number Phone')
-    salary = fields.Float(string="Salary")
+    start_date = fields.Date(string='Start Date')
+    end_date = fields.Date(string='End Date')
+    member_type = fields.Many2one('planning.member.type', string="Member Type")
+    effort_rate = fields.Float(string="Effort Rate")
+    # salary = fields.Float(string="Salary")
     
     def init(self):
-        project_managements = self.env['project.management'].search([])
+        # project_managements = self.env['project.management'].search([])
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
                 SELECT
-                    ROW_NUMBER() OVER(ORDER BY name ASC) AS id,
-                    employee.employee_id AS employee_id,
-                    emp.work_email AS email,
-                    emp.work_phone AS number_phone,
-                    emp.job_id,
-                    employee.wage salary,
-                    employee.project_id AS project_management_id
-                FROM hr_employee AS emp
+                    ROW_NUMBER() OVER(ORDER BY employee_id ASC) AS id,
+                    pm.id AS project_management_id,
+                    plan.project_id,
+                    plan.employee_id,
+                    he.job_id,
+                    plan.role_ids,
+                    he.work_email AS email,
+                    he.work_phone AS number_phone,
+                    plan.start_date,
+                    plan.end_date,
+                    plan.member_type,
+                    plan.effort_rate
 
-                RIGHT JOIN (
-                    SELECT
-                        plan.employee_id,
-                        plan.project_id,
-                        (SELECT ctr.wage FROM hr_contract AS ctr WHERE ctr.employee_id = plan.employee_id AND ctr.state = 'open') AS wage
+                FROM planning_calendar_resource AS plan 
+                LEFT JOIN project_management AS pm
+                    ON plan.project_id = pm.project_id
+                LEFT JOIN hr_employee AS he
+                    ON he.id = plan.employee_id
                         
-                    FROM planning_calendar_resource AS plan 
-                    WHERE plan.project_id IN %s
-                    AND ((
-                            CASE WHEN EXTRACT(MONTH FROM CURRENT_DATE) - 1 = 0 THEN 12
-                                ELSE EXTRACT(MONTH FROM CURRENT_DATE) - 1
-                            END)
-                            BETWEEN EXTRACT(MONTH FROM plan.start_date) AND EXTRACT(MONTH FROM plan.end_date)  
-                        )
-                    AND ((
-                            CASE WHEN EXTRACT(MONTH FROM CURRENT_DATE) - 1 = 0 THEN EXTRACT(YEAR FROM CURRENT_DATE) - 1
-                                ELSE EXTRACT(YEAR FROM CURRENT_DATE)
-                            END)
-                            BETWEEN EXTRACT(YEAR FROM plan.start_date) AND EXTRACT(YEAR FROM plan.end_date)  
-                        )
-                ) AS employee 
-
-                ON emp.id = employee.employee_id 
-                GROUP BY
-                    id,
-                    employee_id,
-                    emp.work_email,
-                    emp.work_phone,
-                    emp.job_id,
-                    employee.wage,
-                    employee.project_id
-                        
-            )""" % (self._table, tuple(project_managements.ids))
+            )""" % (self._table)
         )
