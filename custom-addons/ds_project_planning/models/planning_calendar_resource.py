@@ -469,7 +469,7 @@ class PlanningCalendarResource(models.Model):
             if resource.booking_upgrade_week and resource.booking_upgrade_month:
                 resource.compute_total_effort_common()  
 
-    @api.constrains('employee_id')
+    @api.constrains('employee_id', 'start_date', 'end_date')
     def gen_effort_week_month_when_create_booking(self):
         for resource in self:
             resource.action_upgrade_booking()
