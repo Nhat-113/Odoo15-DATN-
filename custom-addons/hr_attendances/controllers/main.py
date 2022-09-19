@@ -84,8 +84,8 @@ class HrAttendance(http.Controller):
                 for record in public_holiday:
                     holiday = {
                                 'item': record.name,
-                                'date_from': record.date_from,
-                                'date_to': record.date_to
+                                'date_from': record.date_from + timedelta(hours = 7),
+                                'date_to': record.date_to + timedelta(hours = 7)
                                 }
                     vals.append(holiday)
 
@@ -106,7 +106,7 @@ class SessionCustom(Session):
     def authenticate(self, **uid):
         try:
             if uid:
-                user = request.env['auth.api.key'].search([('user_id','=',uid)], limit=1)
+                user = request.env['auth.api.key'].search([('user_id','=',uid["uid"])], limit=1)
                 api_key = user.key
             else:
                 return {"status": 404, "message": "Missing uid parameter"}
