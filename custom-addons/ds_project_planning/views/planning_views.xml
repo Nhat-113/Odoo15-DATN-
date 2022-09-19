@@ -461,12 +461,13 @@
                                                 <span> % </span>
                                             </div>
                                             <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}" required="1"/>
+                                            <field name="select_type_gen_week_month" attrs="{'invisible': [('check_upgrade_booking', '=', True)]}"/>
                                             <field name="inactive" />
                                             <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
                                         </group>
                                         <field name="note" string="Note" placeholder="Add a note..." colspan="2"/>
                                         <field name="check_upgrade_booking" invisible="1"/>
-                                        <button name="action_upgrade_booking" type="object" string="Upgrade Booking" attrs="{'invisible': [('check_upgrade_booking', '=', True)]}" class="oe_highlight"/>
+                                        <!-- <button name="action_upgrade_booking" type="object" string="Upgrade Booking" attrs="{'invisible': [('check_upgrade_booking', '=', True)]}" class="oe_highlight"/> -->
                                         <div attrs="{'invisible': [('check_upgrade_booking', '=', False)]}">
                                             <field name="select_type_upgrade" widget="radio" class="radio_type_upgrade"/>
                                         </div>

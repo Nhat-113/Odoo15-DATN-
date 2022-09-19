@@ -48,6 +48,11 @@ class PlanningCalendarResource(models.Model):
                                             default='month')
     check_edit_effort = fields.Char('Check edit effort')
     get_id_month_edit = fields.Char('ID edit month', store=True, compute='get_id_month')
+    select_type_gen_week_month = fields.Selection([('generator_effort_rate', 'Generator Effort Rate'),
+                                                   ('generator_remaining_effort', 'Generator Remaining Effort')],
+                                                    required=True,
+                                                    default='generator_effort_rate',
+                                                    string='Generator Type')
 
     @api.depends('start_date', 'end_date', 'inactive', 'inactive_date')
     def _compute_duration(self):
@@ -292,9 +297,9 @@ class PlanningCalendarResource(models.Model):
                 check_effort_rate_week = {}
                 resource.booking_upgrade_week.check_effort_week_when_gen(check_effort_rate_week, message_week, mon_sun[i], mon_sun[i+1],\
                     resource.employee_id, resource.effort_rate, resource.member_type.name)
-                if check_effort_rate_week['check'] == False:
-                    effort_week = resource.effort_rate if resource.effort_rate < message_week['effort_rate'] else message_week['effort_rate']
-                else:
+                if resource.select_type_gen_week_month == 'generator_remaining_effort':
+                    effort_week = message_week['effort_rate']
+                elif resource.select_type_gen_week_month == 'generator_effort_rate':
                     effort_week = resource.effort_rate
                 if mon_sun[i] > book_end_date or mon_sun[i] < book_start_date and mon_sun[i+1] < book_start_date:
                     effort_week = 0

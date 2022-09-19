@@ -31,9 +31,10 @@ class BookingResourceWeek(models.Model):
                     if record.start_date_month.month == week.start_date_week.month and record.start_date_month.year == week.start_date_week.year:
                         len_week += 1
                         if week.start_date_week > date.today():
-                            effort_week_expired += week.effort_rate_week
                             if week.end_date_week >= week.booking_id.start_date and week.start_date_week <= week.booking_id.end_date:
-                                len_week_no_expired += 1 
+                                len_week_no_expired += 1
+                        else:
+                            effort_week_expired += week.effort_rate_week 
                 for rec in self:
                     if record.start_date_month.month == rec.start_date_week.month and record.start_date_month.year == rec.start_date_week.year \
                         and rec.start_date_week > date.today() and rec.end_date_week >= rec.booking_id.start_date and rec.start_date_week <= rec.booking_id.end_date:
