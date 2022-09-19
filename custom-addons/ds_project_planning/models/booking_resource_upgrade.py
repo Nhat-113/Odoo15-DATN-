@@ -133,18 +133,18 @@ class BookingResourceWeek(models.Model):
             if week.effort_rate_week < 0 or week.effort_rate_week > 100:
                 raise UserError(_('Week : Effort Rate greater than or equal to 0% & less than or equal to 100%.'))
 
-    def check_effort_week_when_gen(self, check_effort_rate_week, message_week, start_date_week, end_date_week, employee_id, effort_week):
+    def check_effort_week_when_gen(self, check_effort_rate_week, message_week, start_date_week, end_date_week, employee_id, effort_week, member_type):
         member_calendars_week = self.env['booking.resource.week'].search([('employee_id', '=', employee_id.id)])
         total_effort_booked = 0
         for member_calendar in member_calendars_week:
-            if member_calendar.booking_id.member_type.name != 'Shadow Time':
+            if member_type != 'Shadow Time':
                 if start_date_week <= member_calendar.start_date_week and end_date_week >= member_calendar.end_date_week\
                     or start_date_week <= member_calendar.start_date_week and end_date_week < member_calendar.end_date_week and end_date_week > member_calendar.start_date_week\
                     or start_date_week > member_calendar.start_date_week and end_date_week >= member_calendar.end_date_week and start_date_week < member_calendar.end_date_week\
                     or start_date_week > member_calendar.start_date_week and end_date_week < member_calendar.end_date_week\
                     or start_date_week == member_calendar.end_date_week or end_date_week == member_calendar.start_date_week:
                     total_effort_booked += member_calendar.effort_rate_week
-        if len(member_calendars_week) <= 1 and member_calendars_week.booking_id.member_type.name != 'Shadow Time' or len(member_calendars_week) > 1 and member_calendars_week[0].booking_id.member_type.name != 'Shadow Time':
+        if member_type != 'Shadow Time':
             check_effort_rate_week['check'] = False
             message_week['effort_rate'] = round((100 - total_effort_booked), 2) if round((100 - total_effort_booked), 2) > 0 else 0
         else:
@@ -298,18 +298,18 @@ class BookingResourceMonth(models.Model):
                             effort_rate=message['effort_rate'], start_date=message['start_date'], end_date=message['end_date'], name=message['name'])
                 raise UserError(msg)
 
-    def check_effort_month_when_gen(self, check_effort_rate_month, message_month, start_date_month, end_date_month, employee_id, effort_month):
+    def check_effort_month_when_gen(self, check_effort_rate_month, message_month, start_date_month, end_date_month, employee_id, effort_month, member_type):
         member_calendars_month = self.env['booking.resource.month'].search([('employee_id', '=', employee_id.id)])
         total_effort_booked = 0
         for member_calendar in member_calendars_month:
-            if member_calendar.booking_id.member_type.name != 'Shadow Time':
+            if member_type != 'Shadow Time':
                 if start_date_month <= member_calendar.start_date_month and end_date_month >= member_calendar.end_date_month\
                     or start_date_month <= member_calendar.start_date_month and end_date_month < member_calendar.end_date_month and end_date_month > member_calendar.start_date_month\
                     or start_date_month > member_calendar.start_date_month and end_date_month >= member_calendar.end_date_month and start_date_month < member_calendar.end_date_month\
                     or start_date_month > member_calendar.start_date_month and end_date_month < member_calendar.end_date_month\
                     or start_date_month == member_calendar.end_date_month or end_date_month == member_calendar.start_date_month:
                     total_effort_booked += member_calendar.effort_rate_month
-        if len(member_calendars_month) <= 1 and member_calendars_month.booking_id.member_type.name != 'Shadow Time' or len(member_calendars_month) > 1 and member_calendars_month[0].booking_id.member_type.name != 'Shadow Time':
+        if member_type != 'Shadow Time':
             check_effort_rate_month['check'] = False
             message_month['effort_rate'] = round((100 - total_effort_booked), 2) if round((100 - total_effort_booked), 2) > 0 else 0
         else:

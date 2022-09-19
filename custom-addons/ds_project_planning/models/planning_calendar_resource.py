@@ -291,7 +291,7 @@ class PlanningCalendarResource(models.Model):
                 message_week={}
                 check_effort_rate_week = {}
                 resource.booking_upgrade_week.check_effort_week_when_gen(check_effort_rate_week, message_week, mon_sun[i], mon_sun[i+1],\
-                    resource.employee_id, resource.effort_rate)
+                    resource.employee_id, resource.effort_rate, resource.member_type.name)
                 if check_effort_rate_week['check'] == False:
                     effort_week = resource.effort_rate if resource.effort_rate < message_week['effort_rate'] else message_week['effort_rate']
                 else:
@@ -338,7 +338,7 @@ class PlanningCalendarResource(models.Model):
                 message_month={}
                 check_effort_rate_month = {}
                 resource.booking_upgrade_month.check_effort_month_when_gen(check_effort_rate_month, message_month, list_start_end[i], list_start_end[i+1],\
-                    resource.employee_id, resource.effort_rate)
+                    resource.employee_id, resource.effort_rate, resource.member_type.name)
                 effort_month = resource.compute_effort_month_when_gen(list_start_end[i], list_start_end, resource.employee_id.id,resource.id or resource.id.origin)
                 month_temp = booking.env['booking.resource.month.temp'].create({
                     'name': 'Month ' + str(list_start_end[i].month),
