@@ -6,10 +6,10 @@ class Project(models.Model):
     """
     _inherit = 'project.project'
     
-    estimation_id = fields.Many2one('estimation.work', string="Estimation")
+    estimation_id = fields.Many2one('estimation.work', string="Estimation", groups="ds_project_estimation.estimation_access_sale")
+    department_id = fields.Many2one("hr.department", string="Department", groups="ds_project_estimation.estimation_access_sale")
 
-
-    total_mm = fields.Float(string="Total Effort Estimate (Man Month)", compute="_compute_total_mm")
+    total_mm = fields.Float(string="Total Effort Estimate (Man Month)", compute="_compute_total_mm", groups="ds_project_estimation.estimation_access_sale")
 
     @api.depends("estimation_id")
     def _compute_total_mm(self):

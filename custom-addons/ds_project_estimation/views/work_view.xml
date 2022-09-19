@@ -16,6 +16,7 @@
                             <field name="project_name" />
                             <field name="project_code" />
                             <field name="project_type_id" placeholder="Select project type ..."/>
+                            <field name="department_id" placeholder="Select department ..."/>
                             <field name="estimator_ids" placeholder="Please select estimator ..." attrs="{'required': [('stage', '==', 8)]}"/> <!-- 8 is id record completed  -->
                             <field name="reviewer_ids" placeholder="Please select reviewer ..."/>
                         </group>
