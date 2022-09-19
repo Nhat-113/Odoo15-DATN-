@@ -1,0 +1,5 @@
+.salary_percentage_css::after {
+    content: "(%)";
+    font-weight: bold;
+    margin-left: 10px;
+}

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Add field to hr_applicant_view_form -->
+    <record id="hr_application_date_inherit" model="ir.ui.view">
+        <field name="name">hr.applicant.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='source_id']" position="after">
+                <field name="application_date"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_application_requester_recruiment" model="ir.ui.view">
+        <field name="name">hr.applicant.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="recruitment_requester" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Evaluation field -->
+    <record id="hr_application_evaluation_applicant" model="ir.ui.view">
+        <field name="name">hr.applicant.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook/page" position="after">
+                <page name="miadi_variantes_conditionnement_2" string="Evaluation">
+                    <field name="evaluation_applicant" placeholder="Evaluation applicant..."/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!--  Hide feild proposed salary with role PM  -->
+    <record id="hr_applicant_form_view_inherit" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='create_employee_from_applicant']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add button confirm CV -->
+    <record id="hr_applicant_form_view_inherit" model="ir.ui.view">
+        <field name="name">hr.applicant.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='create_employee_from_applicant']" position="replace">
+                <field name="stage_name" invisible="1"/>
+                <field name="check_pass_interview" invisible="1"/>
+                <button name="confirm_cv" string ="CONFIRM CV" type="object" data-hotkey="v" class="oe_highlight" attrs="{'invisible': [('stage_name', '!=', 'Confirm CV')]}"/>
+                <button name="applicant_pass_interview" string="PASS INTERVIEW" type="object" data-hotkey="v" class="oe_highlight" attrs="{'invisible': ['|',('stage_name', '!=', 'Interview'),('check_pass_interview','=',True)]}"/>
+                <button name="sent_mail_offer" string="SEND MAIL OFFER" type="object" class="oe_highlight" attrs="{'invisible': [('stage_name', '!=', 'Contract Proposal')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- <record id="hr_applicant_form_view_inherit_proposed_extra" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='salary_proposed_extra']" position="attributes">
+                <attribute name="groups">hr_recruitment_update.group_hr_recruitment_project_manager</attribute>
+            </xpath>
+        </field>
+    </record> -->
+
+    <record id="hr_applicant_form_view_inherit_widget" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/widget[1]" position="after">
+                <field name="check_pass_interview" invisible="1"/>
+                <widget name="web_ribbon" title="PASSED" bg_color="bg-success" attrs="{'invisible': [('check_pass_interview', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_applicant_form_view_inherit_salary_percentage" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='availability']" position="before">
+                <field name="salary_percentage" optional="show" class="salary_percentage_css" />
+                <field name="work_month" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_kanban_view_applicant_inherit_pass_interview" model="ir.ui.view">
+        <field name="name">hr.applicants.kanban.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_kanban_view_applicant"/>
+        <field name="arch" type="xml">
+            <xpath expr="//templates/t/div/field[@name='date_closed']" position="after">
+                <field name="check_pass_interview" invisible="1"/>
+                <div class="ribbon ribbon-top-right" attrs="{'invisible': [('check_pass_interview', '=', False)]}">
+                    <span class="bg-success">PASSED</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!--  Hide button send interview form hr survey  -->
+    <record id="hr_applicant_view_form_inherit" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_send_survey']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!--  Change role menu recruitment  -->
+    <menuitem name="Recruitment" id="hr_recruitment.menu_hr_recruitment_root" groups="hr_recruitment_application_update.group_hr_recruitment_project_manager"/>
+
+</odoo>
