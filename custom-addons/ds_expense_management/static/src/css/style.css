@@ -2,7 +2,7 @@ span[name="get_month"]::after {
     content: ",";
 }
 
-.label_for_get_month {
+/* .label_for_get_month {
     border-right: 1px solid #ddd;
     padding-right: 45px;
 }
@@ -72,4 +72,4 @@ span[name="revenue_jpy"]::before {
 span[name="revenue_jpy"]::before {
     content: "Total Revenue (JPY)";
     padding-right: 25px;
-}
+} */
