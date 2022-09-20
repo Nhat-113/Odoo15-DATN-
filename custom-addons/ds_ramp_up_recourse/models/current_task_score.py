@@ -3,6 +3,171 @@ from email.policy import default
 from odoo import fields, models, api
 from odoo import _
 
+class ProjectTask(models.Model):
+    _inherit = "project.task"
+    _name  ="project.task" 
+
+    reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True)
+    status_task_score = fields.Selection([
+    ('draft', 'To Approve'),
+    ('confirm', 'Approved'),
+    ('refuse', 'Refused'),
+    ], default='draft', compute="reject_task_score", readonly=False, store=True, tracking=True)
+
+    def _check_readonly(self):
+        if self.env.user.has_group('ds_ramp_up_recourse.group_task_score_pm') == True:
+            for task in self:
+                task.read_only_reason_refuse = True
+        else:
+            for task in self:
+                task.read_only_reason_refuse = False
+    #count all bugs of task when install 
+    def _default_search_count_bug_of_task_v2(self):
+        bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
+        count_bug_all_project = self.env['project.task'].search([])
+        for task in count_bug_all_project:
+            my_bug = self.env['project.task'].search([('task_id', '=', task.id), ('status', '!=',  bug_not_fix)])
+            task.search_count_bug_of_task_update = len(my_bug)
+
+    search_count_bug_of_task_update = fields.Integer(default=_default_search_count_bug_of_task_v2, store=True)
+
+    read_only_reason_refuse = fields.Boolean(compute=_check_readonly, store=False)
+
+    invisible_type_is_task = fields.Boolean(compute='_check_issue_type')
+    
+    @api.depends('issues_type')
+    def _check_issue_type(self):
+        if self.issues_type.name != 'Bug':
+            self.task_id = False
+
+        if self.issues_type.name == 'Bug':
+            self.invisible_type_is_task = True
+        else:
+            self.invisible_type_is_task = False
+    # count bugs of task  when created new bug
+    @api.model
+    def create(self, vals):
+        bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
+        issues_type = self.env['project.issues.type'].search([('name', '=' , 'Bug')]).id
+
+        if vals['issues_type'] ==  issues_type:
+            if 'task_id' in vals :
+                find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
+                count_bug = find_task.search_count_bug_of_task_update
+                if vals['status'] != bug_not_fix:
+                    find_task.write({'search_count_bug_of_task_update' : count_bug + 1})
+        return super(ProjectTask, self).create(vals)
+
+    # count bugs of task  when updated for isssue
+    def write(self, vals):
+        bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
+        find_task_before = self.env['project.task'].search([('id', '=', self.task_id.id)])
+        count_bug_task_before = find_task_before.search_count_bug_of_task_update
+        if 'task_id' in vals: 
+
+            if count_bug_task_before > 0:
+                find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before - 1})
+
+            find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
+            count_bug = find_task.search_count_bug_of_task_update
+            if  self.status != bug_not_fix :
+                find_task.write({'search_count_bug_of_task_update' : count_bug + 1 }) 
+        # when change  status to  not fixed 
+        elif 'status' in vals:
+            if vals['status'] == bug_not_fix:
+                if count_bug_task_before > 0:
+                    find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before - 1})
+            elif self.status.id == bug_not_fix and vals['status'] != bug_not_fix:
+                find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before + 1})
+        res = super(ProjectTask, self).write(vals)
+        return res
+
+    #count bugs of task when deleted bug 
+    def unlink(self):
+        for record in self:
+            bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
+            find_task = self.env['project.task'].search([('id', '=',  self.task_id.id)])
+            count_bug = find_task.search_count_bug_of_task_update
+            if self.status.id != bug_not_fix:
+                find_task.write({'search_count_bug_of_task_update' : count_bug - 1 })
+        return super(ProjectTask, self).unlink()
+
+    #thuat toan dung ma k update
+    # @api.constrains('status')
+    # def count_bug_of_task(self):
+    #     for task in self:
+    #         if  task.status.name == 'Not Fixed':
+    #             count_bug_before = task.task_id.search_count_bug_of_task_upd
+    #             task.write({'search_count_bug_of_task_upd': count_bug_before - 1})
+
+    def _check_status_taskscore(self):
+        for item in self: 
+            if item.status_task_score != 'draft':
+               item.readonly_task_score = False
+            else:
+               item.readonly_task_score = True
+
+    readonly_task_score = fields.Boolean(compute=_check_status_taskscore)
+
+    def _default_count_time_sheet(self):
+        timesheet_task = self.env['project.task'].search([])
+        for record in timesheet_task: 
+            record.count_time_sheets = len(record.timesheet_ids.ids)
+ 
+    count_time_sheets = fields.Integer(store=True, default=_default_count_time_sheet, compute='_compute_timesheet_ids')
+    
+    @api.depends("timesheet_ids")
+    def _compute_timesheet_ids(self):
+        for item in self:
+            item.count_time_sheets = len(item.timesheet_ids.ids)
+    def approve_task_score(self):
+        for record in self:
+            record.status_task_score = 'confirm'
+            # employee_id = record.user_ids
+
+    @api.depends('reason_reject')
+    def reject_task_score(self):
+        for task in self:
+            if task.reason_reject != False:
+                for emp in task.user_ids:
+                    task.status_task_score = 'refuse'
+            else:
+                task.status_task_score = 'draft'
+    
+    @api.onchange('reason_reject')
+    def send_mail(self):
+        for task in self:
+            if task.reason_reject != '':
+                self._task_message_auto_subscribe_notify_refuse_task_score({task: task.user_ids - self.env.user for task in task})
+    #function send mail refuse task score 
+    @api.model
+    def _task_message_auto_subscribe_notify_refuse_task_score(self, users_per_task):
+        # Utility method to send assignation notification upon writing/creation.
+        template_id = self.env['ir.model.data']._xmlid_to_res_id('ds_ramp_up_recourse.project_message_user_refuse', raise_if_not_found=False)
+        if not template_id:
+            return
+        view = self.env['ir.ui.view'].browse(template_id)
+        task_model_description = self.env['ir.model']._get(self._name).display_name
+        for task, users in users_per_task.items():
+            if not users:
+                continue
+            values = {
+                'object': task,
+                'model_description': task_model_description,
+                'access_link': task._notify_get_action_link('view'),
+            }
+            for user in users:
+                values.update(assignee_name=user.sudo().name)
+                assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
+                assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)
+                task.message_notify(
+                    subject=_('You have been refused task score of task has name %s', task.display_name),
+                    body=assignation_msg,
+                    partner_ids=user.partner_id.ids,
+                    record_name=task.display_name,
+                    email_layout_xmlid='mail.mail_notification_light',
+                    model_description=task_model_description,
+                )
 
 class CurrentTaskScore(models.Model):
     _name = "current.task.score"
@@ -84,91 +249,3 @@ class CurrentTaskScore(models.Model):
         return action
 
 
-class ProjectTask(models.Model):
-    _inherit = "project.task"
-    _name  ="project.task" 
-
-    def _search_count_bug_of_task(self):
-        for task in self:
-            my_bug = self.env['project.task'].search([('task_id', '=', task.id)])
-            task.search_count_bug_of_task = len(my_bug)
-            
-    def _check_readonly(self):
-        if self.env.user.has_group('ds_ramp_up_recourse.group_task_score_pm') == True and self.env.user.has_group('ds_ramp_up_recourse.group_task_score_admin') == False:
-            for task in self:
-                task.read_only_reason_refuse = True
-        else:
-            for task in self:
-                task.read_only_reason_refuse = False
-
-    reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True)
-    search_count_bug_of_task = fields.Integer(compute=_search_count_bug_of_task)
-
-    read_only_reason_refuse = fields.Boolean(compute=_check_readonly, store=False)
-
-    def approve_task_score(self):
-        for record in self:
-            record.status_task_score = 'confirm'
-            # employee_id = record.user_ids
-
-    @api.depends('reason_reject')
-    def reject_task_score(self):
-        for task in self:
-            if task.reason_reject != False:
-                for emp in task.user_ids:
-                    task.status_task_score = 'refuse'
-            else:
-                task.status_task_score = 'draft'
-        
-    # def send_mail_reject_task_score(self, emp):
-    #     IrConfigParameter = self.env["ir.config_parameter"].sudo()
-    #     template_env = self.env["mail.template"]
-    #     send_employee = True
-
-    #     # Send mail approve to employee
-    #     if send_employee:
-    #         domain = [
-    #             ("id", "=", emp),
-    #         ]
-    #         emp_template_id = IrConfigParameter.get_param(
-    #             "employee.emp_approve_template_id"
-    #         )
-    #         if emp_template_id:
-    #             template_id = template_env.sudo().browse(int(emp_template_id))
-    #             for employee in self.env["hr.employee"].search(domain):
-    #                 template_id.send_mail(employee.id)
-    
-    @api.onchange('reason_reject')
-    def send_mail(self):
-        for task in self:
-            if task.reason_reject != '':
-                self._task_message_auto_subscribe_notify_refuse_task_score({task: task.user_ids - self.env.user for task in task})
-    #function send mail refuse task score 
-    @api.model
-    def _task_message_auto_subscribe_notify_refuse_task_score(self, users_per_task):
-        # Utility method to send assignation notification upon writing/creation.
-        template_id = self.env['ir.model.data']._xmlid_to_res_id('ds_ramp_up_recourse.project_message_user_refuse', raise_if_not_found=False)
-        if not template_id:
-            return
-        view = self.env['ir.ui.view'].browse(template_id)
-        task_model_description = self.env['ir.model']._get(self._name).display_name
-        for task, users in users_per_task.items():
-            if not users:
-                continue
-            values = {
-                'object': task,
-                'model_description': task_model_description,
-                'access_link': task._notify_get_action_link('view'),
-            }
-            for user in users:
-                values.update(assignee_name=user.sudo().name)
-                assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
-                assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)
-                task.message_notify(
-                    subject=_('You have been refused task score of task has name %s', task.display_name),
-                    body=assignation_msg,
-                    partner_ids=user.partner_id.ids,
-                    record_name=task.display_name,
-                    email_layout_xmlid='mail.mail_notification_light',
-                    model_description=task_model_description,
-                )

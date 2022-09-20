@@ -105,45 +105,7 @@ class Task(models.Model):
         compute='_compute_partner_id', recursive=True, store=True, readonly=False, tracking=True,
         domain="[('is_company','=','true')]")
     task_id = fields.Many2one(
-        'project.task', 'Bug of Task', store=True, readonly=False, index=True)
-    invisible_field = fields.Boolean(compute='_check_issue_type')
-    
-    status_task_score = fields.Selection([
-    ('draft', 'To Approve'),
-    ('confirm', 'Approved'),
-    ('refuse', 'Refused'),
-    ], default='draft', compute="reject_task_score", readonly=False, store=True, tracking=True)
-
-    def _check_status_taskscore(self):
-        for item in self: 
-            if item.status_task_score != 'draft':
-               item.readonly_task_score = False
-            else:
-               item.readonly_task_score = True
-
-    readonly_task_score = fields.Boolean(compute=_check_status_taskscore)
-
-    def _default_count_time_sheet(self):
-        timesheet_task = self.env['project.task'].search([])
-        for record in timesheet_task: 
-            record.count_time_sheets = len(record.timesheet_ids.ids)
- 
-    count_time_sheets = fields.Integer(tracking=True, store=True, default=_default_count_time_sheet, compute='_compute_timesheet_ids')
-    
-    @api.depends("timesheet_ids")
-    def _compute_timesheet_ids(self):
-        for item in self:
-            item.count_time_sheets = len(item.timesheet_ids.ids)
-        
-    @api.depends('issues_type')
-    def _check_issue_type(self):
-        if self.issues_type.name != 'Bug':
-            self.task_id = False
-
-        if self.issues_type.name == 'Bug':
-            self.invisible_field = True
-        else:
-            self.invisible_field = False
+        'project.task', 'Bug of Task', store=True, readonly=False)
 
     @api.onchange('status')
     def set_progerss(self):

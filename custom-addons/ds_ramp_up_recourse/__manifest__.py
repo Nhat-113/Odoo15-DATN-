@@ -14,6 +14,7 @@
         'security/task_score_security.xml',
         'security/ir.model.access.csv',
         'views/ramp_up.xml',
+        'views/project_view.xml',
         # 'report/ramp_up_project.xml',
         'views/task_score_view.xml',
         'views/ramp_up_menu.xml',
