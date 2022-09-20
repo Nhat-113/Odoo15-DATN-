@@ -25,6 +25,7 @@ class Applicant(models.Model):
     evaluation_applicant = fields.Html("Evaluation applicant")
     salary_percentage = fields.Float(string="Percentage Salary")
     work_month = fields.Integer(string="Work Month")
+    user_send_mail = fields.Char(string="Get user send mail")
 
     @api.model
     def create(self, vals):
@@ -114,6 +115,7 @@ class Applicant(models.Model):
                 'access_link': task._notify_get_action_link('view'),
             }
             for user in users:
+                self.user_send_mail = user.name
                 values.update(assignee_name=user.sudo().name)
                 assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
                 assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)                 
