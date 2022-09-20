@@ -159,6 +159,11 @@
     flex-wrap: nowrap !important;
     align-content: space-between;
 }
+
+.note_booking {
+    word-break: break-word !important;
+}
+
 @media only screen and (max-width: 1000px) {
     .radio_type_upgrade {
         width: 14% !important;
@@ -166,4 +171,3 @@
         left: 25% !important;
     }
 }
-

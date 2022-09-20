@@ -474,6 +474,19 @@ class PlanningCalendarResource(models.Model):
         for resource in self:
             resource.action_upgrade_booking()
 
+    @api.constrains('start_date', 'end_date')
+    def check_booking_time(self):
+        for resource in self:
+            if resource.start_date < resource.project_id.date_start or resource.start_date > resource.project_id.date:
+               raise UserError(_('Member %(resource)s: Start Date (%(start_booking)s) of booking should be between start date (%(start)s) and end date (%(end)s) of project.',
+                                    resource=resource.employee_id.name, start_booking = resource.start_date, 
+                                    start=resource.project_id.date_start, end=resource.project_id.date))
+            
+            if resource.end_date < resource.project_id.date_start or resource.end_date > resource.project_id.date:
+               raise UserError(_('Member %(resource)s: End Date (%(end_booking)s) of booking should be between start date (%(start)s) and end date (%(end)s) of project.',
+                                    resource=resource.employee_id.name, end_booking = resource.end_date, 
+                                    start=resource.project_id.date_start, end=resource.project_id.date))
+
 class PlanningAllocateEffortRate(models.Model):
     """ Type of member in project planning """
     _name = "planning.member.type"    

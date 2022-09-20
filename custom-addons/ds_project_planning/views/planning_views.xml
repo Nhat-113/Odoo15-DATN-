@@ -465,7 +465,7 @@
                                             <field name="inactive" />
                                             <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
                                         </group>
-                                        <field name="note" string="Note" placeholder="Add a note..." colspan="2"/>
+                                        <field name="note" string="Note" placeholder="Add a note..." colspan="2" class="note_booking"/>
                                         <field name="check_upgrade_booking" invisible="1"/>
                                         <!-- <button name="action_upgrade_booking" type="object" string="Upgrade Booking" attrs="{'invisible': [('check_upgrade_booking', '=', True)]}" class="oe_highlight"/> -->
                                         <div attrs="{'invisible': [('check_upgrade_booking', '=', False)]}">
