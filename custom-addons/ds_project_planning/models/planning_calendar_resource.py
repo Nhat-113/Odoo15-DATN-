@@ -48,11 +48,22 @@ class PlanningCalendarResource(models.Model):
                                             default='month')
     check_edit_effort = fields.Char('Check edit effort')
     get_id_month_edit = fields.Char('ID edit month', store=True, compute='get_id_month')
-    select_type_gen_week_month = fields.Selection([('generator_effort_rate', 'Generator Effort Rate'),
-                                                   ('generator_remaining_effort', 'Generator Remaining Effort')],
+    select_type_gen_week_month = fields.Selection([('generator_effort_rate', 'Effort Rate'),
+                                                   ('generator_remaining_effort', 'Remaining Effort Rate')],
                                                     required=True,
                                                     default='generator_effort_rate',
-                                                    string='Generator Type')
+                                                    string='Generate Type')
+    readonly_date = fields.Boolean(compute="_check_readonly_date", default=False, store=False)   
+
+    def _check_readonly_date(self):
+        for resource in self:
+            if resource.env.user.has_group('project.group_project_manager') == False:
+                if resource.end_date < date.today():
+                    resource.readonly_date = True
+                else:
+                    resource.readonly_date = False
+            else:
+                resource.readonly_date = True
 
     @api.depends('start_date', 'end_date', 'inactive', 'inactive_date')
     def _compute_duration(self):
@@ -474,11 +485,19 @@ class PlanningCalendarResource(models.Model):
         for resource in self:
             resource.action_upgrade_booking()
 
+    @api.onchange('start_date', 'end_date')
+    def check_time_of_project(self):
+        for resource in self:
+            if resource.project_id.date_start == False or resource.project_id.date == False:
+               raise UserError('Start date and End date of the project cannot be empty.')
+
+
     @api.constrains('start_date', 'end_date')
     def check_booking_time(self):
         for resource in self:
-            if resource.start_date < resource.project_id.date_start or resource.start_date > resource.project_id.date:
-               raise UserError(_('Member %(resource)s: Start Date (%(start_booking)s) of booking should be between start date (%(start)s) and end date (%(end)s) of project.',
+            if resource.project_id.date_start and resource.project_id.date:
+                if resource.start_date < resource.project_id.date_start or resource.start_date > resource.project_id.date:
+                    raise UserError(_('Member %(resource)s: Start Date (%(start_booking)s) of booking should be between start date (%(start)s) and end date (%(end)s) of project.',
                                     resource=resource.employee_id.name, start_booking = resource.start_date, 
                                     start=resource.project_id.date_start, end=resource.project_id.date))
             

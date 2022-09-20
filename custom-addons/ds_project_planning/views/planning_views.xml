@@ -437,6 +437,9 @@
                                     <field name="note" optional="hide" />
                                 </tree>
                                 <form string="Assign Member">
+                                    <header>
+                                        <button name="calculator_total_effort" type="object" string="Compute Effort" attrs="{'invisible': [('check_upgrade_booking', '=', False)]}" class="oe_highlight"/>
+                                    </header>
                                     <sheet>
                                         <div class="oe_title" style="width: 500px">
                                             <h1>
@@ -444,8 +447,8 @@
                                             </h1>
                                         </div>
                                         <group col="4">
-                                            <field name="start_date" />
-                                            <field name="end_date" />
+                                            <field name="start_date" attrs="{'readonly': [('readonly_date', '=', True)]}"/>
+                                            <field name="end_date" attrs="{'readonly': [('readonly_date', '=', True)]}"/>
                                             <field name="duration" />
                                             <field name="calendar_effort" digits="[12,2]"/>
                                             <label for="member_type"/>
@@ -464,6 +467,7 @@
                                             <field name="select_type_gen_week_month" attrs="{'invisible': [('check_upgrade_booking', '=', True)]}"/>
                                             <field name="inactive" />
                                             <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
+                                            <field name="readonly_date" invisible="1"/>
                                         </group>
                                         <field name="note" string="Note" placeholder="Add a note..." colspan="2" class="note_booking"/>
                                         <field name="check_upgrade_booking" invisible="1"/>
@@ -471,7 +475,6 @@
                                         <div attrs="{'invisible': [('check_upgrade_booking', '=', False)]}">
                                             <field name="select_type_upgrade" widget="radio" class="radio_type_upgrade"/>
                                         </div>
-                                        <button name="calculator_total_effort" type="object" string="Calculator Effort" attrs="{'invisible': [('check_upgrade_booking', '=', False)]}" class="oe_highlight"/>
                                         <notebook attrs="{'invisible': [('check_upgrade_booking', '=', False)]}">
                                             <page string="Month" attrs="{'invisible': [('select_type_upgrade', '=', 'week')]}">
                                                 <field name="booking_upgrade_month" colspan="4" readonly="0">
