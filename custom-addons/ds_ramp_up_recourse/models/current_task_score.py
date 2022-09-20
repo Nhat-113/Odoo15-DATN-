@@ -44,65 +44,10 @@ class ProjectTask(models.Model):
             self.invisible_type_is_task = True
         else:
             self.invisible_type_is_task = False
-    # count bugs of task  when created new bug
-    @api.model
-    def create(self, vals):
-        bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
-        issues_type = self.env['project.issues.type'].search([('name', '=' , 'Bug')]).id
-
-        if vals['issues_type'] ==  issues_type:
-            if 'task_id' in vals :
-                find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
-                count_bug = find_task.search_count_bug_of_task_update
-                if vals['status'] != bug_not_fix:
-                    find_task.write({'search_count_bug_of_task_update' : count_bug + 1})
-        return super(ProjectTask, self).create(vals)
-
-    # count bugs of task  when updated for isssue
-    def write(self, vals):
-        bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
-        find_task_before = self.env['project.task'].search([('id', '=', self.task_id.id)])
-        count_bug_task_before = find_task_before.search_count_bug_of_task_update
-        if 'task_id' in vals: 
-
-            if count_bug_task_before > 0:
-                find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before - 1})
-
-            find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
-            count_bug = find_task.search_count_bug_of_task_update
-            if  self.status != bug_not_fix :
-                find_task.write({'search_count_bug_of_task_update' : count_bug + 1 }) 
-        # when change  status to  not fixed 
-        elif 'status' in vals:
-            if vals['status'] == bug_not_fix:
-                if count_bug_task_before > 0:
-                    find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before - 1})
-            elif self.status.id == bug_not_fix and vals['status'] != bug_not_fix:
-                find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before + 1})
-        res = super(ProjectTask, self).write(vals)
-        return res
-
-    #count bugs of task when deleted bug 
-    def unlink(self):
-        for record in self:
-            bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
-            find_task = self.env['project.task'].search([('id', '=',  self.task_id.id)])
-            count_bug = find_task.search_count_bug_of_task_update
-            if self.status.id != bug_not_fix:
-                find_task.write({'search_count_bug_of_task_update' : count_bug - 1 })
-        return super(ProjectTask, self).unlink()
-
-    #thuat toan dung ma k update
-    # @api.constrains('status')
-    # def count_bug_of_task(self):
-    #     for task in self:
-    #         if  task.status.name == 'Not Fixed':
-    #             count_bug_before = task.task_id.search_count_bug_of_task_upd
-    #             task.write({'search_count_bug_of_task_upd': count_bug_before - 1})
-
+   
     def _check_status_taskscore(self):
         for item in self: 
-            if item.status_task_score != 'draft':
+            if item.status_task_score == 'confirm':
                item.readonly_task_score = False
             else:
                item.readonly_task_score = True
@@ -168,6 +113,73 @@ class ProjectTask(models.Model):
                     email_layout_xmlid='mail.mail_notification_light',
                     model_description=task_model_description,
                 )
+        
+    def open_task_detail(self):
+        return {
+            "name": _("Open Task"),
+            "type": "ir.actions.act_window",
+            "res_model": "project.task",
+            "views": [[False, "form"]],
+            "view_mode": 'form',
+            "target": "new",
+            'res_id': self.id
+        }
+    
+    # count bugs of task  when created new bug
+    @api.model
+    def create(self, vals):
+        bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
+        issues_type = self.env['project.issues.type'].search([('name', '=' , 'Bug')]).id
+
+        if vals['issues_type'] ==  issues_type:
+            if 'task_id' in vals :
+                find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
+                count_bug = find_task.search_count_bug_of_task_update
+                if vals['status'] != bug_not_fix:
+                    find_task.write({'search_count_bug_of_task_update' : count_bug + 1})
+        return super(ProjectTask, self).create(vals)
+
+    # count bugs of task  when updated for isssue
+    def write(self, vals):
+        bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
+        find_task_before = self.env['project.task'].search([('id', '=', self.task_id.id)])
+        count_bug_task_before = find_task_before.search_count_bug_of_task_update
+        if 'task_id' in vals: 
+
+            if count_bug_task_before > 0:
+                find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before - 1})
+
+            find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
+            count_bug = find_task.search_count_bug_of_task_update
+            if  self.status != bug_not_fix :
+                find_task.write({'search_count_bug_of_task_update' : count_bug + 1 }) 
+        # when change  status to  not fixed 
+        elif 'status' in vals:
+            if vals['status'] == bug_not_fix:
+                if count_bug_task_before > 0:
+                    find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before - 1})
+            elif self.status.id == bug_not_fix and vals['status'] != bug_not_fix:
+                find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before + 1})
+        res = super(ProjectTask, self).write(vals)
+        return res
+
+    #count bugs of task when deleted bug 
+    def unlink(self):
+        for record in self:
+            bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
+            find_task = self.env['project.task'].search([('id', '=',  self.task_id.id)])
+            count_bug = find_task.search_count_bug_of_task_update
+            if self.status.id != bug_not_fix:
+                find_task.write({'search_count_bug_of_task_update' : count_bug - 1 })
+        return super(ProjectTask, self).unlink()
+
+    #thuat toan dung ma k update
+    # @api.constrains('status')
+    # def count_bug_of_task(self):
+    #     for task in self:
+    #         if  task.status.name == 'Not Fixed':
+    #             count_bug_before = task.task_id.search_count_bug_of_task_upd
+    #             task.write({'search_count_bug_of_task_upd': count_bug_before - 1})
 
 class CurrentTaskScore(models.Model):
     _name = "current.task.score"

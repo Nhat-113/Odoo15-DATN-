@@ -50,7 +50,7 @@
                     <field name="read_only_reason_refuse" invisible="1"/>
                     <button name="approve_task_score" string="Approve" icon="fa-thumbs-up" type="object" 
                                 attrs="{'invisible': ['|', ('status_task_score', '=', 'confirm'), ('read_only_reason_refuse', '=', False)]}"/>
-                    <button name="action_open_task" type="object" title="View Task" string="View Task" class="btn btn-link pull-right"/>
+                    <button name="open_task_detail" type="object" title="View Task" string="View Task" class="btn btn-link pull-right"/>
                 </tree>
             </field>
         </record>
