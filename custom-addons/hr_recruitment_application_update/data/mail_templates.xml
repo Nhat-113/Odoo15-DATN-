@@ -114,7 +114,7 @@
                 <p>We would like to invite you to come to our office to interview with below information:</p>
                 <br>
                 <p><b>Date: <t t-out=" object.start.date()"</t> </b></p> 
-                <p><b>Time: <t t-out=" object.start.time()"</t> </b></p>
+                <p><b>Time: <t t-out=" object.time_start.time()"</t> </b></p>
                 <p><b>Venue: 4F, 10 Hai Phong Street, Hai Chau District, Da Nang City</b></p>
                 <br>
                 <p>Please confirm if you can join the interview.</p>

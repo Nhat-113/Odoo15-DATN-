@@ -1,10 +1,18 @@
-from odoo import models
+from odoo import models, fields, api
 from odoo.tools.translate import _
 from odoo.exceptions import UserError
+from datetime import timedelta 
 
 class Meeting(models.Model):
     _inherit = 'calendar.event'
     _description = "Calendar Event"
+
+    time_start = fields.Datetime(string="Time interview with mail template", compute="_compute_time_start")
+
+    @api.depends('start')
+    def _compute_time_start(self):
+        for record in self:
+            record.time_start = record.start + timedelta(hours = 7)
 
     def action_open_composer(self):
         if not self.partner_ids:
