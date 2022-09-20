@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import http
-from odoo.addons.test_impex.tests.test_load import message
 from odoo.http import request
 from datetime import datetime, timedelta 
 from odoo.addons.web.controllers.main import Session
@@ -29,10 +28,17 @@ class HrAttendance(http.Controller):
                     return {"status": 500, "Message": "Value input does not match format '%m/%d/%Y, %H:%M:%S"}
                 # convert local+7 to UTC+0
                 date_time = date_time - timedelta(hours = 7)
+                
                 if kw['is_checkin']=='True' or kw['is_checkin']=='False':
-                    result = request.env['hr.employee'].attendance_manual_api(employees, date_time, "hr_attendance.hr_attendance_action_my_attendances", kw['is_checkin'])
+                    """ verifies if check_in is earlier than check_out. """
+                    if employees.attendance_ids:
+                        attendance = employees.attendance_ids[employees.attendance_ids.ids.index(max(employees.attendance_ids.ids))]
+                        if attendance.check_in and date_time < attendance.check_in and kw['is_checkin']=='False':
+                            return {"status": 402, "message": "'Check Out' cannot be earlier than 'Check In'"}
+                                 
+                    result = request.env['hr.employee'].attendance_manual_api(employees, date_time, "hr_attendance.hr_attendance_action_my_attendances", kw['is_checkin'])  
                 else: 
-                    return {"status":404, "message": "is_checkin param does not match format boolean"}
+                    return {"status": 404, "message": "is_checkin param does not match format boolean"}
                 
                 response_message = result['action']['attendance']
                 response = {
