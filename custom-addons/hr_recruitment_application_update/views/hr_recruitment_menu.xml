@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <menuitem name="Reporting" id="hr_recruitment.report_hr_recruitment" parent="hr_recruitment.menu_hr_recruitment_root" sequence="99" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
+
+    <menuitem name="Recruitment" id="hr_recruitment.menu_hr_recruitment_root" groups="hr_recruitment_application_update.group_hr_recruitment_project_manager"/>
+
+    <menuitem parent="hr_recruitment.menu_hr_recruitment_configuration" id="hr_recruitment.menu_hr_job_position_config" action="hr_recruitment.action_hr_job_config" sequence="10" groups="hr_recruitment.group_hr_recruitment_user"/>
+
+</odoo>

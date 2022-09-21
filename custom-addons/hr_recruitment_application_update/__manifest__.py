@@ -18,6 +18,8 @@
         'views/hr_recruitment_views.xml',
         'data/hr_recruitment_data.xml',
         'data/mail_templates.xml',
+        'views/hr_recruitment_menu.xml',
+        'views/hr_job_views.xml'
     ],
     'installable': True,
     'auto_install': False,

@@ -65,16 +65,27 @@
         </field>
     </record>
 
-    <!-- <record id="hr_applicant_form_view_inherit_proposed_extra" model="ir.ui.view">
+    <record id="hr_applicant_form_view_inherit_proposed_extra" model="ir.ui.view">
         <field name="name">hr.applicant.form.inherit</field>
         <field name="model">hr.applicant</field>
         <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='salary_proposed_extra']" position="attributes">
-                <attribute name="groups">hr_recruitment_update.group_hr_recruitment_project_manager</attribute>
+                <attribute name="groups">hr_recruitment_application_update.group_hr_recruitment_director</attribute>
             </xpath>
         </field>
-    </record> -->
+    </record>
+
+    <record id="hr_applicant_form_view_inherit_proposed" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='salary_proposed']" position="attributes">
+                <attribute name="groups">hr_recruitment_application_update.group_hr_recruitment_director</attribute>
+            </xpath>
+        </field>
+    </record>
 
     <record id="hr_applicant_form_view_inherit_widget" model="ir.ui.view">
         <field name="name">hr.applicant.form.inherit</field>
@@ -94,8 +105,8 @@
         <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='availability']" position="before">
-                <field name="salary_percentage" optional="show" class="salary_percentage_css" />
-                <field name="work_month" optional="show"/>
+                <field name="salary_percentage" optional="show" class="salary_percentage_css" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
+                <field name="work_month" optional="show" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
             </xpath>
         </field>
     </record>
@@ -126,7 +137,8 @@
         </field>
     </record>
 
-    <!--  Change role menu recruitment  -->
-    <menuitem name="Recruitment" id="hr_recruitment.menu_hr_recruitment_root" groups="hr_recruitment_application_update.group_hr_recruitment_project_manager"/>
+    <record model="ir.actions.act_window" id="hr_recruitment.action_hr_job_applications">
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
 
 </odoo>

@@ -7,7 +7,7 @@ class Applicant(models.Model):
     _inherit = 'hr.applicant'
 
     def _compute_domain_stage(self):
-        if self.user_has_groups('hr_recruitment.group_hr_recruitment_user')==False:
+        if self.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_director')==False:
             return json.dumps([('name', 'in', ['Initial Qualification', 'Confirm CV', 'Interview'])])
         else:
             return json.dumps([('name', 'in', ['Initial Qualification', 'Confirm CV', 'Interview', 'Contract Proposal', 'Contract Signed'])])
@@ -46,9 +46,11 @@ class Applicant(models.Model):
             except:
                 continue
 
-    @api.onchange('stage_id')
+    @api.constrains('stage_id')
     def check_role_stage_kanban(self):
-        if self.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_project_manager') and self.stage_id.name=="Interview":
+        if self.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_project_manager') \
+        and self.stage_id.name in ["Contract Proposal", "Contract Signed"] \
+        and self.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_director')==False:
             raise UserError("This action is out of authorization")
         
     def confirm_cv(self):
