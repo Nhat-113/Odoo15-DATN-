@@ -1,3 +1,5 @@
+from dataclasses import field
+from email.policy import default
 from odoo import api, fields, models, SUPERUSER_ID, _
 import json
 
@@ -26,11 +28,12 @@ class Applicant(models.Model):
     salary_percentage = fields.Float(string="Percentage Salary")
     work_month = fields.Integer(string="Work Month")
     user_send_mail = fields.Char(string="Get user send mail")
+    step_confirm = fields.Integer(string="Count step confirm CV", default=0)
 
     @api.model
     def create(self, vals):
         result = super(Applicant, self).create(vals)
-        result.send_mail_confirm_cv()
+        result.send_mail()
         return result
 
     @api.depends('stage_id')
@@ -39,10 +42,15 @@ class Applicant(models.Model):
             record.stage_name = record.stage_id.name
             try:
                 if record.stage_name == "Interview" and record.check_send_mail_confirm==False:
-                    self.send_mail_confirm_cv()
+                    self.send_mail()
                     record.check_send_mail_confirm=True
                 elif record.stage_name == "Confirm CV":
-                    self.send_mail_confirm_cv()
+                    record.step_confirm += 1
+                    if record.step_confirm==2:
+                        record.step_confirm = 0
+                        continue
+                    else:
+                        self.send_mail()
             except:
                 continue
 
@@ -57,7 +65,7 @@ class Applicant(models.Model):
         for record in self:
             stage = self.env["hr.recruitment.stage"].search([("name",'=' ,'Interview')])
             record.stage_id = stage
-            self.send_mail_confirm_cv()
+            self.send_mail()
             record.check_send_mail_confirm=True
         return record
 
@@ -79,9 +87,12 @@ class Applicant(models.Model):
         stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
         return stages.browse(stage_ids)
 
-    def send_mail_confirm_cv(self):
+    def send_mail(self):
         for item in self:
-            self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
+            if item.stage_name == "Confirm CV":
+                self._send_message_auto_subscribe_notify_recruitment({item: item.user_id.employee_id for item in item})
+            else:
+                self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
 
     # send mail confirm CV
     @api.model
