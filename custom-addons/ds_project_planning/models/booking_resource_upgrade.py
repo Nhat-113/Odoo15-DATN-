@@ -15,6 +15,7 @@ class BookingResourceWeek(models.Model):
     booking_id = fields.Many2one('planning.calendar.resource')
     week_temp_id = fields.Many2one('booking.resource.week.temp')
     employee_id = fields.Many2one('hr.employee')
+    member_type = fields.Many2one('planning.member.type')
 
     def calculator_effort_week(self, effort_month_edit, effort_week_expired, len_week, len_week_no_expired):
         return ((effort_month_edit * len_week) - effort_week_expired) / len_week_no_expired
@@ -135,7 +136,8 @@ class BookingResourceWeek(models.Model):
                 raise UserError(_('Week : Effort Rate greater than or equal to 0% & less than or equal to 100%.'))
 
     def check_effort_week_when_gen(self, check_effort_rate_week, message_week, start_date_week, end_date_week, employee_id, effort_week, member_type):
-        member_calendars_week = self.env['booking.resource.week'].search([('employee_id', '=', employee_id.id)])
+        id_member_type = self.env['planning.member.type'].search([('name', '=', 'Shadow Time')]).id
+        member_calendars_week = self.env['booking.resource.week'].search([('employee_id', '=', employee_id.id), ('member_type', '!=', id_member_type)])
         total_effort_booked = 0
         for member_calendar in member_calendars_week:
             if member_type != 'Shadow Time':
@@ -168,6 +170,7 @@ class BookingResourceWeekTemp(models.Model):
     effort_rate_week = fields.Float('Effort(%)', readonly=False, compute='compute_effort_week', store=True, digits=(12,2))
     booking_id = fields.Many2one('planning.calendar.resource')
     employee_id = fields.Many2one('hr.employee')
+    member_type = fields.Many2one('planning.member.type')
 
 
 class BookingResourceMonth(models.Model):
@@ -182,6 +185,7 @@ class BookingResourceMonth(models.Model):
     booking_id = fields.Many2one('planning.calendar.resource')
     month_temp_id = fields.Many2one('booking.resource.month.temp')
     employee_id = fields.Many2one('hr.employee')
+    member_type = fields.Many2one('planning.member.type')
 
     @api.depends('booking_id.booking_upgrade_week')
     def compute_effort_month(self):
@@ -300,7 +304,8 @@ class BookingResourceMonth(models.Model):
                 raise UserError(msg)
 
     def check_effort_month_when_gen(self, check_effort_rate_month, message_month, start_date_month, end_date_month, employee_id, effort_month, member_type):
-        member_calendars_month = self.env['booking.resource.month'].search([('employee_id', '=', employee_id.id)])
+        id_member_type = self.env['planning.member.type'].search([('name', '=', 'Shadow Time')]).id
+        member_calendars_month = self.env['booking.resource.month'].search([('employee_id', '=', employee_id.id), ('member_type', '!=', id_member_type)])
         total_effort_booked = 0
         for member_calendar in member_calendars_month:
             if member_type != 'Shadow Time':
@@ -316,13 +321,11 @@ class BookingResourceMonth(models.Model):
         else:
             check_effort_rate_month['check'] = True
 
-    
     @api.constrains('effort_rate_month')
     def check_effort_month_over_when_close(self):
         for month in self:
             if month.effort_rate_month < 0 or month.effort_rate_month > 100:
                 raise UserError(_('Month : Effort Rate greater than or equal to 0% & less than or equal to 100%.')) 
-
 
 
 class BookingResourceMonthTemp(models.Model):
@@ -336,3 +339,4 @@ class BookingResourceMonthTemp(models.Model):
     man_month = fields.Float('Man Month', readonly=True, store=True, compute='compute_man_month')
     booking_id = fields.Many2one('planning.calendar.resource')
     employee_id = fields.Many2one('hr.employee')
+    member_type = fields.Many2one('planning.member.type')

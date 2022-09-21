@@ -51,7 +51,7 @@ class PlanningCalendarResource(models.Model):
     select_type_gen_week_month = fields.Selection([('generator_effort_rate', 'Effort Rate'),
                                                    ('generator_remaining_effort', 'Remaining Effort Rate')],
                                                     required=True,
-                                                    default='generator_effort_rate',
+                                                    default='generator_remaining_effort',
                                                     string='Generate Type')
     readonly_date = fields.Boolean(compute="_check_readonly_date", default=False, store=False)   
 
@@ -63,7 +63,7 @@ class PlanningCalendarResource(models.Model):
                 else:
                     resource.readonly_date = False
             else:
-                resource.readonly_date = True
+                resource.readonly_date = False
 
     @api.depends('start_date', 'end_date', 'inactive', 'inactive_date')
     def _compute_duration(self):
@@ -309,7 +309,10 @@ class PlanningCalendarResource(models.Model):
                 resource.booking_upgrade_week.check_effort_week_when_gen(check_effort_rate_week, message_week, mon_sun[i], mon_sun[i+1],\
                     resource.employee_id, resource.effort_rate, resource.member_type.name)
                 if resource.select_type_gen_week_month == 'generator_remaining_effort':
-                    effort_week = message_week['effort_rate']
+                    if check_effort_rate_week['check'] == False:
+                        effort_week = resource.effort_rate if resource.effort_rate < message_week['effort_rate'] else message_week['effort_rate']
+                    else:
+                        effort_week = resource.effort_rate
                 elif resource.select_type_gen_week_month == 'generator_effort_rate':
                     effort_week = resource.effort_rate
                 if mon_sun[i] > book_end_date or mon_sun[i] < book_start_date and mon_sun[i+1] < book_start_date:
@@ -320,7 +323,9 @@ class PlanningCalendarResource(models.Model):
                     'end_date_week': mon_sun[i+1],
                     'effort_rate_week': effort_week,
                     'booking_id' : resource.id,
-                    'employee_id': resource.employee_id.id
+                    'employee_id': resource.employee_id.id,
+                    'member_type': resource.member_type.id
+
                 })
 
                 booking.env['booking.resource.week'].create({
@@ -330,7 +335,8 @@ class PlanningCalendarResource(models.Model):
                     'effort_rate_week': effort_week,
                     'booking_id' : resource.id,
                     'week_temp_id': week_temp.id,
-                    'employee_id': resource.employee_id.id
+                    'employee_id': resource.employee_id.id,
+                    'member_type': resource.member_type.id
                 })
 
                 no_week += 1
@@ -362,7 +368,8 @@ class PlanningCalendarResource(models.Model):
                     'end_date_month': list_start_end[i+1],
                     'effort_rate_month': effort_month,
                     'booking_id' : resource.id,
-                    'employee_id': resource.employee_id.id
+                    'employee_id': resource.employee_id.id,
+                    'member_type': resource.member_type.id
                     })
                 
                 booking.env['booking.resource.month'].create({
@@ -372,7 +379,8 @@ class PlanningCalendarResource(models.Model):
                     'effort_rate_month': effort_month,
                     'booking_id' : resource.id,
                     'month_temp_id': month_temp.id,
-                    'employee_id': resource.employee_id.id
+                    'employee_id': resource.employee_id.id,
+                    'member_type': resource.member_type.id
                     })
             
             resource.check_upgrade_booking = True
