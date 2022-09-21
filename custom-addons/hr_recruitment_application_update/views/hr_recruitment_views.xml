@@ -65,7 +65,7 @@
         </field>
     </record>
 
-    <record id="hr_applicant_form_view_inherit_widget" model="ir.ui.view">
+    <record id="hr_applicant_form_view_inherit_widget_passed" model="ir.ui.view">
         <field name="name">hr.applicant.form.inherit</field>
         <field name="model">hr.applicant</field>
         <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
@@ -73,6 +73,18 @@
             <xpath expr="//sheet/widget[1]" position="after">
                 <field name="check_pass_interview" invisible="1"/>
                 <widget name="web_ribbon" title="PASSED" bg_color="bg-success" attrs="{'invisible': [('check_pass_interview', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_applicant_form_view_inherit_widget_confirmed" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/widget[1]" position="after">
+                <field name="check_send_mail_confirm" invisible="1"/>
+                <widget name="web_ribbon" title="CONFIRMED" bg_color="bg-success" attrs="{'invisible': [('check_send_mail_confirm', '=', False)]}"/>
             </xpath>
         </field>
     </record>

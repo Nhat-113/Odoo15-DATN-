@@ -1,5 +1,3 @@
-from dataclasses import field
-from email.policy import default
 from odoo import api, fields, models, SUPERUSER_ID, _
 import json
 
@@ -29,6 +27,7 @@ class Applicant(models.Model):
     work_month = fields.Integer(string="Work Month")
     user_send_mail = fields.Char(string="Get user send mail")
     step_confirm = fields.Integer(string="Count step confirm CV", default=0)
+    last_stage = fields.Integer(string="ID last stage", default=0)
 
     @api.model
     def create(self, vals):
@@ -88,11 +87,14 @@ class Applicant(models.Model):
         return stages.browse(stage_ids)
 
     def send_mail(self):
-        for item in self:
-            if item.stage_name == "Confirm CV":
-                self._send_message_auto_subscribe_notify_recruitment({item: item.user_id.employee_id for item in item})
-            else:
-                self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
+        if self.id:
+            for item in self:
+                if item.stage_name == "Confirm CV":
+                    self._send_message_auto_subscribe_notify_recruitment({item: item.user_id.employee_id for item in item})
+                else:
+                    self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
+        else:
+            return
 
     # send mail confirm CV
     @api.model
@@ -128,18 +130,24 @@ class Applicant(models.Model):
                 'access_link': task._notify_get_action_link('view'),
             }
             for user in users:
-                self.user_send_mail = user.name
-                values.update(assignee_name=user.sudo().name)
-                assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
-                assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)                 
-                task.message_notify(
-                    subject=_('%s : %s', subject_template, task.display_name),
-                    body=assignation_msg,
-                    partner_ids = self.env['res.users'].search([('employee_ids.id','=',user.id)]).partner_id.ids,
-                    record_name=task.display_name,
-                    email_layout_xmlid='mail.mail_notification_light',
-                    model_description=task_model_description,
-                )
+                if (self.last_stage < self.stage_id.id) or \
+                (self.check_pass_interview==False and self.last_stage==3 and self.check_send_mail_confirm==False) or \
+                (self.check_pass_interview and self.stage_id.id==3):
+                    self.user_send_mail = user.name
+                    values.update(assignee_name=user.sudo().name)
+                    assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
+                    assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)                 
+                    task.message_notify(
+                        subject=_('%s : %s', subject_template, task.display_name),
+                        body=assignation_msg,
+                        partner_ids = self.env['res.users'].search([('employee_ids.id','=',user.id)]).partner_id.ids,
+                        record_name=task.display_name,
+                        email_layout_xmlid='mail.mail_notification_light',
+                        model_description=task_model_description,
+                    )
+                    self.last_stage = self.stage_id.id
+                else:                    
+                    return
 
     def sent_mail_offer(self):
             """
@@ -152,6 +160,8 @@ class Applicant(models.Model):
                 template = False
 
             if self.id != self.env.user.employee_id.id:
+                values = {'name':self.partner_name, 'email':self.email_from}
+                result = self.env['res.partner'].create(values)
                 try:
                     compose_form_id = self.env.ref(
                         'mail.email_compose_message_wizard_form').id

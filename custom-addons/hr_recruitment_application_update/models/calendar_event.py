@@ -18,7 +18,7 @@ class Meeting(models.Model):
         if not self.partner_ids:
             raise UserError(_("There are no attendees on these events"))
         if self.applicant_id:
-            template_id = self.env['ir.model.data']._xmlid_to_res_id('email_interview_for_candidate_template', raise_if_not_found=False)
+            template_id = self.env['ir.model.data']._xmlid_to_res_id('hr_recruitment_application_update.email_interview_for_candidate_template', raise_if_not_found=False)
         else:
             template_id = self.env['ir.model.data']._xmlid_to_res_id('calendar.calendar_template_meeting_update', raise_if_not_found=False)
         # The mail is sent with datetime corresponding to the sending user TZ
@@ -32,6 +32,8 @@ class Meeting(models.Model):
             default_partner_ids=self.partner_ids.ids,
             mail_tz=self.env.user.tz,
         )
+        values = {'name':self.applicant_id.partner_name, 'email':self.applicant_id.email_from}
+        result = self.env['res.partner'].create(values)
         return {
             'type': 'ir.actions.act_window',
             'name': _('Contact Attendees'),
