@@ -3,3 +3,9 @@
     font-weight: bold;
     margin-left: 10px;
 }
+
+.work_month_css::after {
+    content: "(month)";
+    font-weight: bold;
+    margin-left: 10px;
+}

@@ -517,7 +517,7 @@
     </record>
 
         <!-- hr related job position menu action -->
-         <record model="ir.actions.act_window" id="action_hr_job_config">
+         <!-- <record model="ir.actions.act_window" id="action_hr_job_config">
             <field name="name">Job Positions</field>
             <field name="res_model">hr.job</field>
             <field name="view_mode">tree,kanban,form</field>
@@ -533,7 +533,7 @@
                 Let's create a job position.
               </p>
             </field>
-        </record>
+        </record> -->
 
      <!--
         hr.applicant.refuse.reason views
