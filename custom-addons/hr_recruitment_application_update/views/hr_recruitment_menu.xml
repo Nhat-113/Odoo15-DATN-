@@ -6,6 +6,10 @@
 
     <menuitem parent="hr_recruitment.menu_hr_recruitment_configuration" id="hr_recruitment.menu_hr_job_position_config" action="hr_recruitment.action_hr_job_config" sequence="10" groups="hr_recruitment.group_hr_recruitment_user"/>
 
+    <menuitem id="hr_recruitment.menu_hr_recruitment_configuration" name="Configuration" parent="hr_recruitment.menu_hr_recruitment_root" sequence="100" groups="hr_recruitment.group_hr_recruitment_user"/>
+
     <menuitem name="All Applications" parent="hr_recruitment.menu_crm_case_categ0_act_job" id="hr_recruitment.menu_crm_case_categ_all_app" action="crm_case_categ0_act_job_inherit" sequence="2"/>
+
+    <menuitem id="hr_recruitment.menu_hr_department" name="Departments" parent="hr_recruitment.menu_hr_recruitment_configuration" action="hr_recruitment.action_hr_department" groups="hr_recruitment.group_hr_recruitment_user"/>
 
 </odoo>
