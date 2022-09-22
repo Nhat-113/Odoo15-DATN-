@@ -3,4 +3,4 @@ access_hr_applicant_project_manager,hr.applicant.project.manager,model_hr_applic
 access_hr_applicant_director,hr.applicant.director,model_hr_applicant,group_hr_recruitment_director,1,1,1,0
 access_hr_applicant_project_manager_stage,hr.applicant.project.manager.stage,hr_recruitment.model_hr_recruitment_stage,group_hr_recruitment_project_manager,1,0,0,0
 
-access_hr_job_project_manager,hr.job.project.manager,hr_recruitment.model_hr_job,group_hr_recruitment_project_manager,1,0,0,0
+access_hr_job_project_manager,hr.job.project.manager,hr_recruitment.model_hr_job,group_hr_recruitment_project_manager,1,1,0,0
