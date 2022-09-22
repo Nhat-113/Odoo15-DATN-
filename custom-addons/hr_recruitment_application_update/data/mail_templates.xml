@@ -72,7 +72,8 @@
                 <p>Firstly, thank you for joining the interview at D-Soft.</p>
                 <p>Congratulation! You have passed our interview!</p>
                 <br>
-                <p><b>We would like to invite you join to D-SOFT Company at the <b><t t-out="object.job_id.name"</t></b> position with NET salary is VND <b><t t-out="object.salary_proposed"</t></b> per month (probation period is <b><t t-out="object.work_month"</t></b> months with <b><t t-out="object.salary_percentage"</t></b>% Official Salary)</b></p>
+                <p>
+                    <b>We would like to invite you join to D-SOFT Company at the <b><t t-out="object.job_id.name"</t></b> position with NET salary is VND <b><t t-out="object.salary_proposed_float" t-options='{"widget": "float", "precision": 0}'</t></b> per month (probation period is <b><t t-out="object.work_month"</t></b> months with <b><t t-out="object.salary_percentage"</t></b>% Official Salary)</b></p>
                 <br>
                 <p>Besides that, we offer some benefits:</p>
  

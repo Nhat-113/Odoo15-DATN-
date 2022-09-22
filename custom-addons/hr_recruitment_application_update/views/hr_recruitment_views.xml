@@ -97,15 +97,16 @@
             <xpath expr="//sheet/group/group[4]" position="replace">
                 <group string="Contract">
                     <field name="availability"/>
+                    <field name="currency_id" invisible="1"/>
                     <label for="salary_expected"/>
                     <div class="o_row">
-                        <field class="salary_expected_css" digits="[42,0]" name="salary_expected"/>
+                        <field widget="monetary" class="salary_expected_css" digits="[42,0]" name="salary_expected"/>
                         <span attrs="{'invisible':[('salary_expected_extra','=',False)]}"> + </span>
                         <field class="salary_expected_extra_css" name="salary_expected_extra" placeholder="Extra advantages..."/>
                     </div>
                     <label for="salary_proposed" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
                     <div class="o_row">
-                        <field name="salary_proposed" digits="[42,0]" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
+                        <field widget="monetary" name="salary_proposed" digits="[42,0]" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
                         <span attrs="{'invisible':[('salary_proposed_extra','=',False)]}"> + </span>
                         <field name="salary_proposed_extra" class="salary_expected_extra_css" placeholder="Extra advantages..." groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
                     </div>

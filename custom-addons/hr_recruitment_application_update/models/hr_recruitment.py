@@ -29,6 +29,20 @@ class Applicant(models.Model):
     step_confirm = fields.Integer(string="Count step confirm CV", default=0)
     last_stage = fields.Integer(string="ID last stage", default=0)
 
+    salary_proposed = fields.Monetary("Proposed Salary", group_operator="avg", help="Salary Proposed by the Organisation")
+    salary_expected = fields.Monetary("Expected Salary", group_operator="avg", help="Salary Expected by Applicant")
+    salary_proposed_float = fields.Float("Proposed Salary", group_operator="avg", help="Salary Proposed by the Organisation", compute="_compute_salary")
+    currency_id = fields.Many2one('res.currency', string="Currency",
+                                 related='company_id.currency_id',
+                                 default=lambda
+                                 self: self.env.user.company_id.currency_id.id)
+
+    @api.depends('salary_proposed','salary_expected')
+    def _compute_salary(self):
+        for item in self:
+            item.salary_proposed_float = float(item.salary_proposed)
+        return
+
     @api.depends('job_id')
     def _compute_stage(self):
         for applicant in self:
