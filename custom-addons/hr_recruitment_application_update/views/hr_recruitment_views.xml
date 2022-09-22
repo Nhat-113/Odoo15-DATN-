@@ -155,4 +155,9 @@
         <field name="view_mode">kanban,tree,form</field>
     </record>
 
+    ######################## JOB OPPORTUNITIES (menu) ###########################
+    <record model="ir.actions.act_window" id="hr_recruitment.crm_case_categ0_act_job">
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+
 </odoo>

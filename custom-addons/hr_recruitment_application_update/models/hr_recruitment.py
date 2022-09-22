@@ -29,6 +29,21 @@ class Applicant(models.Model):
     step_confirm = fields.Integer(string="Count step confirm CV", default=0)
     last_stage = fields.Integer(string="ID last stage", default=0)
 
+    @api.depends('job_id')
+    def _compute_stage(self):
+        for applicant in self:
+            if applicant.job_id:
+                if not applicant.stage_id:
+                    stage_ids = self.env['hr.recruitment.stage'].search([
+                        '|',
+                        ('job_ids', '=', False),
+                        ('job_ids', '=', applicant.job_id.id),
+                        ('fold', '=', False)
+                    ], order='sequence asc', limit=1).ids
+                    applicant.stage_id = stage_ids[0] if stage_ids else False
+            else:
+                applicant.stage_id = self.env['hr.recruitment.stage'].search([('name','=','Initial Qualification')])
+
     @api.model
     def create(self, vals):
         result = super(Applicant, self).create(vals)
