@@ -4,7 +4,7 @@
 
     <menuitem name="Recruitment" id="hr_recruitment.menu_hr_recruitment_root" groups="hr_recruitment_application_update.group_hr_recruitment_project_manager"/>
 
-    <!-- <menuitem parent="hr_recruitment.menu_hr_recruitment_configuration" id="hr_recruitment.menu_hr_job_position_config" action="hr_recruitment.action_hr_job_config" sequence="10" groups="hr_recruitment.group_hr_recruitment_user"/> -->
+    <menuitem parent="hr_recruitment.menu_hr_recruitment_configuration" id="hr_recruitment.menu_hr_job_position_config" action="hr_recruitment.action_hr_job_config" sequence="10" groups="hr_recruitment.group_hr_recruitment_user"/>
 
     <menuitem name="All Applications" parent="hr_recruitment.menu_crm_case_categ0_act_job" id="hr_recruitment.menu_crm_case_categ_all_app" action="crm_case_categ0_act_job_inherit" sequence="2"/>
 
