@@ -58,7 +58,7 @@ class PlanningCalendarResource(models.Model):
     def _check_readonly_date(self):
         for resource in self:
             if resource.env.user.has_group('project.group_project_manager') == False:
-                if resource.end_date < date.today():
+                if resource.check_upgrade_booking == True:
                     resource.readonly_date = True
                 else:
                     resource.readonly_date = False
@@ -129,7 +129,6 @@ class PlanningCalendarResource(models.Model):
     def _calculate_default_calendar_effort(self):
         if self.start_date and self.end_date:
             self.calendar_effort = self.duration / 20
-            self.check_upgrade_booking = False
 
     @api.onchange('duration', 'calendar_effort')
     def _compute_effort_rate(self):
@@ -262,10 +261,10 @@ class PlanningCalendarResource(models.Model):
 
     def unlink(self):
         for calendar in self:
-            if calendar.end_date < date.today() and calendar.env.user.has_group('project.group_project_manager') == False:
+            if calendar.start_date < date.today() and calendar.env.user.has_group('project.group_project_manager') == False:
                 raise UserError(_(
-                        'Can not delete member (%(resource)s) with End Date (%(end)s) < Current Date (%(current)s).',
-                        resource=calendar.employee_id.name, end=calendar.end_date, current=date.today()
+                        'Can not delete member (%(resource)s) with Start Date (%(start)s) < Current Date (%(current)s).',
+                        resource=calendar.employee_id.name, start=calendar.start_date, current=date.today()
                     ))
 
             self.env['booking.resource.week'].search([('booking_id', '=', calendar.id)]).unlink()

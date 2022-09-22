@@ -460,7 +460,7 @@
                                             </div>
                                             <label for="effort_rate"/>
                                             <div class="o_row" name="effort_rate">
-                                                <field name="effort_rate" digits="[12,2]" nolabel="1" attrs="{'readonly': [('inactive', '=', True)]}"/>
+                                                <field name="effort_rate" digits="[12,2]" nolabel="1" attrs="{'readonly': ['|', ('inactive', '=', True), ('readonly_date', '=', True)]}"/>
                                                 <span> % </span>
                                             </div>
                                             <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}" required="1"/>
