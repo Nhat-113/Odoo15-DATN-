@@ -508,8 +508,8 @@ class PlanningCalendarResource(models.Model):
                                     resource=resource.employee_id.name, start_booking = resource.start_date, 
                                     start=resource.project_id.date_start, end=resource.project_id.date))
             
-            if resource.end_date < resource.project_id.date_start or resource.end_date > resource.project_id.date:
-               raise UserError(_('Member %(resource)s: End Date (%(end_booking)s) of booking should be between start date (%(start)s) and end date (%(end)s) of project.',
+                if resource.end_date < resource.project_id.date_start or resource.end_date > resource.project_id.date:
+                    raise UserError(_('Member %(resource)s: End Date (%(end_booking)s) of booking should be between start date (%(start)s) and end date (%(end)s) of project.',
                                     resource=resource.employee_id.name, end_booking = resource.end_date, 
                                     start=resource.project_id.date_start, end=resource.project_id.date))
 
