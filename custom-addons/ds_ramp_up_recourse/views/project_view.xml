@@ -1,0 +1,28 @@
+<odoo>
+    <data>
+        <record id="task_status" model="ir.ui.view">
+            <field name="name">task.status</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_form2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='recurring_task']" position="after">
+                    <field name="task_score" widget="priority" eval="5"
+                            attrs="{'readonly': [('readonly_task_score', '=', False)]}"/>
+                    <field name="readonly_task_score" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='task_score']" position="before">
+                    <field name="task_id"
+                            options="{'m2o_dialog': False, 'no_create': True, 'no_open': True}"
+                            domain="[('project_id', '=', project_id),('issues_type.name', '=', 'Task')]"
+                            attrs="{'invisible': [('invisible_type_is_task', '=', False)]}"/>
+                    <field name="invisible_type_is_task" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='task_score']" position="after">
+                    <field name="status_task_score" string="Status Task Score" 
+                            widget="badge" readonly="1" decoration-info="status_task_score == 'draft'" 
+                            decoration-warning="status_task_score in ('refuse')" decoration-success="status_task_score == 'confirm'" class="status_task_score"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

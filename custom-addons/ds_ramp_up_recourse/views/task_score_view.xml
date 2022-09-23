@@ -36,10 +36,21 @@
             <field name="name">project.task.tree.activity1</field>
             <field name="model">project.task</field>
             <field name="arch" type="xml">
-                <tree create="0">
-                    <field name="project_id"/>
-                    <field name="name" string="Task Name"/>
-                    <field name="task_score" widget="priority" readonly="1" type="int" avg="A"/>
+                <tree create="0" editable="bottom">
+                    <field name="company_id" invisible="1"/>
+                    <field name="project_id" readonly="1" />
+                    <field name="name" string="Task Name" readonly="1"/>
+                    <field name="task_score" widget="priority"   type="int" avg="A" 
+                            attrs="{'readonly': ['|', ('status_task_score', '=', 'confirm'), ('read_only_reason_refuse', '=', False)]}"/>
+                    <field name="user_ids" optional="show" widget="many2many_avatar_user" domain="[('active', '=', True)]" readonly="1"/>
+                    <field name="status_task_score" string="Status" widget="badge" readonly="1" decoration-info="status_task_score == 'draft'" decoration-warning="status_task_score in ('refuse')" decoration-success="status_task_score == 'confirm'"/>
+                    <field name="search_count_bug_of_task_update" string="Number Bugs Of Task" readonly="1"/>
+                    <field name="reason_reject" placeholder="Type Reason Refuse Taskscore..." 
+                            attrs="{'readonly': ['|', ('status_task_score', '=', 'confirm'), ('read_only_reason_refuse', '=', False)]}"/>
+                    <field name="read_only_reason_refuse" invisible="1"/>
+                    <button name="approve_task_score" string="Approve" icon="fa-thumbs-up" type="object" 
+                                attrs="{'invisible': ['|', ('status_task_score', '=', 'confirm'), ('read_only_reason_refuse', '=', False)]}"/>
+                    <button name="open_task_detail" type="object" title="View Task" string="View Task" class="btn btn-link pull-right"/>
                 </tree>
             </field>
         </record>

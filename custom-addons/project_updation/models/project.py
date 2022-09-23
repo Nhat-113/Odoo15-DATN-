@@ -105,18 +105,7 @@ class Task(models.Model):
         compute='_compute_partner_id', recursive=True, store=True, readonly=False, tracking=True,
         domain="[('is_company','=','true')]")
     task_id = fields.Many2one(
-        'project.task', 'Bug of Task', store=True, readonly=False, index=True)
-    invisible_field = fields.Boolean(compute='_check_issue_type')
-
-    @api.depends('issues_type')
-    def _check_issue_type(self):
-        if self.issues_type.name != 'Bug':
-            self.task_id = False
-
-        if self.issues_type.name == 'Bug':
-            self.invisible_field = True
-        else:
-            self.invisible_field = False
+        'project.task', 'Bug of Task', store=True, readonly=False)
 
     @api.onchange('status')
     def set_progerss(self):
@@ -187,52 +176,69 @@ class Task(models.Model):
         if self.issues_type.status:
             self.status = self.issues_type.status[0]
 
-    @api.constrains('status', 'timesheet_ids')
+    @api.constrains('status', 'timesheet_ids', 'child_ids')
     def _check_timesheet(self):
-        if self.status.name == 'Done' or self.status.name == 'Closed' and self.issues_type.name == 'Task':
-            if len(self.timesheet_ids) == 0:
-                raise UserError(
-                    'Time Sheet field cannot be left blank')
-            elif self.planned_hours == 0.0:
-                raise UserError(
-                    'Initially Planned Hours field cannot be left blank')
-            if self.progress_input != 100:
-                raise UserError(
-                    'Required when status Done or Closed, progress = 100%')
+        for item in self: 
+            if item.status.name == 'Done' and item.issues_type.name == 'Task':
+                total_sub_task = self.env['project.task'].search_count([('parent_id', '=', self.id)])
+                total_sub_task_done = 0
+                for child_task in item.child_ids:
+                    if child_task.status.name == 'Done':
+                            total_sub_task_done += 1
+                if total_sub_task != total_sub_task_done:
+                    raise UserError(
+                    'Sub Tasks must be completed when changing the status of the parent task!')
 
-    @api.constrains('status')
-    def _check_task_score(self):
-        if self.status.name == 'Done':
-            if self.task_score == '0':
-                raise UserError(
-                    'When the status is Done, you must score the task.')
+                if len(item.timesheet_ids) == 0 and total_sub_task == 0:
+                    raise UserError(
+                        'Time Sheet field cannot be left blank')
+                elif item.planned_hours == 0.0:
+                    raise UserError(
+                        'Initially Planned Hours field cannot be left blank')
+                if item.progress_input != 100:
+                    raise UserError(
+                        'Required when status Done or Closed, progress = 100%')
+                if  item.task_score == '0':
+                    raise UserError(
+                        'When the status is Done, you must score the task.')
+    # @api.constrains('status')
+    # def _check_task_score(self):
+    #     for item in self:
+    #         if item.status.name == 'Done' and item.task_score == '0':
+    #             raise UserError(
+    #                 'When the status is Done, you must score the task.')
 
 
     @api.constrains('progress_input')
     def _check_progress(self):
-        if self.progress_input < 0 or self.progress_input > 100:
-            raise UserError('Progress must be between 0 and 100%')
-        elif self.status.name == 'Done' or self.status.name == 'Closed' and self.issues_type.name == 'Task':
-            if self.progress_input != 100:
-                raise UserError(
-                    'Required when status Done or Closed, progress = 100%')
+        for item in self: 
+            if item.progress_input < 0 or item.progress_input > 100:
+                raise UserError('Progress must be between 0 and 100%')
 
     @api.constrains('progress_input', 'timesheet_ids')
     def _check_timesheet_progress(self):
-        if self.progress_input > 0:
-            if len(self.timesheet_ids) == 0:
-                raise UserError('Please update your timesheet.')
-        if len(self.timesheet_ids) > 0:
-            if self.progress_input == 0:
-                raise UserError('Please update current progress.')
-
-    @api.constrains('timesheet_ids')
-    def _check_hours_spent(self):
-        if len(self.timesheet_ids) > 0:
-            for ts in self.timesheet_ids:
-                if ts.unit_amount <= 0:
-                    raise UserError(
-                        'Required Hours Spent > 0')
+        total_sub_task = self.env['project.task'].search_count([('parent_id', '=', self.id)])
+        for item in self :
+            if len(item.timesheet_ids) == 0 and item.progress_input > 0 and total_sub_task == 0 :
+                    raise UserError('Please update your timesheet.')
+            if len(item.timesheet_ids) > 0 and  item.progress_input == 0 and total_sub_task == 0 :
+                    raise UserError('Please update current progress.')
+            # requied user input timesheet
+            if len(self.timesheet_ids) > 0:
+                for ts in item.timesheet_ids:
+                    if ts.unit_amount <= 0:
+                        raise UserError(
+                            'Required Hours Spent > 0')
+            # requied user input progress_input from 0 to 100 %
+            if item.progress_input < 0 or item.progress_input > 100:
+                raise UserError('Progress must be between 0 and 100%')
+    # @api.constrains('timesheet_ids')
+    # def _check_hours_spent(self):
+    #     if len(self.timesheet_ids) > 0:
+    #         for ts in self.timesheet_ids:
+    #             if ts.unit_amount <= 0:
+    #                 raise UserError(
+    #                     'Required Hours Spent > 0')
 
     @api.constrains('project_id')
     def _check_project_id(self):
