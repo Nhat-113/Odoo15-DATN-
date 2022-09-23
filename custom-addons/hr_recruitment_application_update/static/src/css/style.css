@@ -13,3 +13,25 @@
 .salary_expected_extra_css:empty{
     margin-bottom: -4px;
 }
+
+div[name="priority"] {
+    width: 16.3%!important;
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+@media only screen and (max-width: 1600px) {
+    div[name="priority"] {
+        width: 17%!important;
+    }
+}
+@media only screen and (max-width: 1400px) {
+    div[name="priority"] {
+        width: 16%!important;
+    }
+}
+@media only screen and (max-width: 1200px) {
+    div[name="priority"] {
+        width: 20%!important;
+    }
+}

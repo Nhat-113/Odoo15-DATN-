@@ -89,6 +89,17 @@
         </field>
     </record>
 
+    <record id="hr_applicant_form_view_inherit_priority" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group/field[@name='priority']" position="replace">
+                <field name="priority" widget="priority" class="priority_fix_ui"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="hr_applicant_form_view_inherit_salary_percentage" model="ir.ui.view">
         <field name="name">hr.applicant.form.inherit</field>
         <field name="model">hr.applicant</field>
@@ -123,8 +134,6 @@
             </xpath>
         </field>
     </record>
-
-
 
     <record id="hr_kanban_view_applicant_inherit_pass_interview" model="ir.ui.view">
         <field name="name">hr.applicants.kanban.inherit</field>
