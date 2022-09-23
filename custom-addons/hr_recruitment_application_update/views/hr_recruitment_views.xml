@@ -152,6 +152,17 @@
         </field>
     </record>
 
+    <record id="hr_applicant_view_tree_inherit_optional" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.crm_case_tree_view_job"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_ids']" position="replace">
+                <field name="categ_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
     <record model="ir.actions.act_window" id="hr_recruitment.action_hr_job_applications">
         <field name="view_mode">kanban,tree,form</field>
     </record>
