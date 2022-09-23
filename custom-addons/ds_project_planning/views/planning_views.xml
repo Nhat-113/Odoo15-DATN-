@@ -497,6 +497,16 @@
                                                     </tree>
                                                 </field>
                                             </page>
+                                            <page string="Day" invisible="1">
+                                                <field name="booking_upgrade_day" colspan="4" readonly="0">
+                                                    <tree string="Week" delete="0" editable="top" create="0">
+                                                        <field name="name"/>
+                                                        <field name="start_date_day"/>
+                                                        <field name="end_date_day"/>
+                                                        <field name="effort_rate_day" readonly="1"/>
+                                                    </tree>
+                                                </field>
+                                            </page>
                                         </notebook>
                                     </sheet>
                                 </form>

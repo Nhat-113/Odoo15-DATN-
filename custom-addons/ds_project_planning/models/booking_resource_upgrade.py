@@ -82,10 +82,6 @@ class BookingResourceWeek(models.Model):
             if week.effort_rate_week + total_effort_booked > 100 and week.booking_id.member_type.name != 'Shadow Time':
                 if total_effort_booked > 0 and total_effort_booked < 100:
                     week.effort_rate_week = 100 - total_effort_booked
-                elif total_effort_booked == 0:
-                    week.effort_rate_week = week.booking_id.effort_rate
-                else:
-                    week.effort_rate_week = 0
                 check_effort_rate['check'] = False
                 check_effort_rate['total_effort_booked'] = total_effort_booked
                 check_effort_rate['effort_rate'] = week.effort_rate_week
@@ -158,6 +154,26 @@ class BookingResourceWeek(models.Model):
         for week in self:
             if week.effort_rate_week < 0 or week.effort_rate_week > 100:
                 raise UserError(_('Week : Effort Rate greater than or equal to 0% & less than or equal to 100%.'))
+
+    @api.onchange('effort_rate_week')
+    def check_effort_week_remaining(self):
+        for week in self:
+            days = self.env['booking.resource.day'].search([('employee_id', '=', week.employee_id.id), ('booking_id', '=', week.booking_id.id or week.booking_id.id.origin)])
+            count_day = 0
+            day_of_week = []
+            for day in days:
+                if week.start_date_week <= day.start_date_day and week.end_date_week >= day.start_date_day:
+                    count_day += 1
+                    day_of_week.append(day)
+            total_effort_booked = 0
+            if len(day_of_week) > 0:
+                for rec in self.env['booking.resource.day'].search([('employee_id', '=', week.employee_id.id), ('start_date_day', '=', day_of_week[0].start_date_day), ('booking_id', '!=', day_of_week[0].booking_id.id)]):
+                    total_effort_booked += rec.effort_rate_day
+
+            remaining_effort = round(100 - total_effort_booked)
+            if week.effort_rate_week > (remaining_effort * count_day)/5:
+                raise UserError(_('Since %(name)s has only 2 days, the current amount of effort (%(effort_week)s) should not be greater than %(remaining)s.', name=week.name, \
+                    effort_week=week.effort_rate_week, remaining=(remaining_effort * count_day)/5))
 
 
 class BookingResourceWeekTemp(models.Model):
@@ -337,6 +353,60 @@ class BookingResourceMonthTemp(models.Model):
     end_date_month = fields.Date('End Date', readonly=True)
     effort_rate_month = fields.Float('Effort(%)', readonly=False, compute='compute_effort_month', store=True, digits=(12,2))
     man_month = fields.Float('Man Month', readonly=True, store=True, compute='compute_man_month')
+    booking_id = fields.Many2one('planning.calendar.resource')
+    employee_id = fields.Many2one('hr.employee')
+    member_type = fields.Many2one('planning.member.type')
+
+
+class BookingResourceDay(models.Model):
+    _name = "booking.resource.day"
+    _description = "Planning Booking Resource Day"
+
+    name = fields.Char('Name', readonly=True)
+    start_date_day = fields.Date('Start Date', readonly=True)
+    end_date_day = fields.Date('End Date', readonly=True)
+    effort_rate_day = fields.Float('Effort(%)', readonly=False, compute='compute_effort_day', store=True, digits=(12,2))
+    booking_id = fields.Many2one('planning.calendar.resource')
+    day_temp_id = fields.Many2one('booking.resource.day.temp')
+    employee_id = fields.Many2one('hr.employee')
+    member_type = fields.Many2one('planning.member.type')
+
+    @api.depends('booking_id.booking_upgrade_week')
+    def compute_effort_day(self):
+        for week in self.booking_id.booking_upgrade_week:
+            len_total_day = 0
+            for record in self:
+                if record.start_date_day >= week.start_date_week and record.start_date_day <= week.end_date_week:
+                    len_total_day += 1
+
+            for rec in self:
+                if rec.start_date_day >= week.start_date_week and rec.start_date_day <= week.end_date_week:
+                    if len_total_day > 0:
+                        rec.effort_rate_day = (week.effort_rate_week * 5)/len_total_day
+
+    def check_effort_day_when_gen(self, check_effort_rate_day, message_day, start_date_day, end_date_day, employee_id, member_type):
+        id_member_type = self.env['planning.member.type'].search([('name', '=', 'Shadow Time')]).id
+        member_calendars_day = self.env['booking.resource.day'].search([('employee_id', '=', employee_id.id), ('member_type', '!=', id_member_type)])
+        total_effort_booked = 0
+        for member_calendar in member_calendars_day:
+            if member_type != 'Shadow Time':
+                if start_date_day == member_calendar.start_date_day and end_date_day == member_calendar.end_date_day:
+                    total_effort_booked += member_calendar.effort_rate_day
+        if member_type != 'Shadow Time':
+            check_effort_rate_day['check'] = False
+            message_day['effort_rate'] = round((100 - total_effort_booked), 2) if round((100 - total_effort_booked), 2) > 0 else 0
+        else:
+            check_effort_rate_day['check'] = True
+
+
+class BookingResourceDay(models.Model):
+    _name = "booking.resource.day.temp"
+    _description = "Planning Booking Resource Day Temp"
+
+    name = fields.Char('Name', readonly=True)
+    start_date_day = fields.Date('Start Date', readonly=True)
+    end_date_day = fields.Date('End Date', readonly=True)
+    effort_rate_day = fields.Float('Effort(%)', readonly=False, store=True, digits=(12,2))
     booking_id = fields.Many2one('planning.calendar.resource')
     employee_id = fields.Many2one('hr.employee')
     member_type = fields.Many2one('planning.member.type')
