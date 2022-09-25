@@ -109,6 +109,7 @@
                 <group string="Contract">
                     <field name="availability"/>
                     <field name="currency_id" invisible="1"/>
+                    <field name="check_hide_sign_plus" invisible="1"/>
                     <label for="salary_expected"/>
                     <div class="o_row">
                         <field widget="monetary" class="salary_expected_css" digits="[42,0]" name="salary_expected"/>
@@ -118,7 +119,7 @@
                     <label for="salary_proposed" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
                     <div class="o_row">
                         <field widget="monetary" name="salary_proposed" digits="[42,0]" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
-                        <span attrs="{'invisible':[('salary_proposed_extra','=',False)]}"> + </span>
+                        <span attrs="{'invisible':['|', ('salary_proposed_extra','=',False), ('check_hide_sign_plus','=',False)]}"> + </span>
                         <field name="salary_proposed_extra" class="salary_expected_extra_css" placeholder="Extra advantages..." groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
                     </div>
                     <label for="salary_percentage" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>

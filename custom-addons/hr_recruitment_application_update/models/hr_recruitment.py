@@ -37,6 +37,15 @@ class Applicant(models.Model):
                                  default=lambda
                                  self: self.env.user.company_id.currency_id.id)
 
+    def _get_hide_plus_sign(self):
+        for item in self:
+            if self.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_director')==False:
+                item.check_hide_sign_plus = False
+            else:
+                item.check_hide_sign_plus = True
+
+    check_hide_sign_plus = fields.Boolean("Check hide sign plus in salary field with pm role", compute="_get_hide_plus_sign")
+
     @api.depends('salary_proposed','salary_expected')
     def _compute_salary(self):
         for item in self:
