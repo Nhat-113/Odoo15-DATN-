@@ -9,5 +9,5 @@ access_hr_applicant_admin,hr.applicant.admin,model_hr_applicant,hr_recruitment.g
 access_hr_job_project_manager,hr.job.project.manager,hr_recruitment.model_hr_job,group_hr_recruitment_project_manager,1,1,0,0
 access_hr_job_director,hr.job.director,hr_recruitment.model_hr_job,group_hr_recruitment_director,1,1,0,0
 
-hr_recruitment.access_applicant_get_refuse_reason,access.applicant.get.refuse.reason,hr_recruitment.model_applicant_get_refuse_reason,group_hr_recruitment_project_manager,1,1,1,1
-hr_recruitment.access_hr_recruitment_refuse_reason,hr.applicant.refuse.reason,hr_recruitment.model_hr_applicant_refuse_reason,group_hr_recruitment_project_manager,1,1,1,1
+access_applicant_get_refuse_reason_pm,access.applicant.get.refuse.reason.pm,hr_recruitment.model_applicant_get_refuse_reason,group_hr_recruitment_project_manager,1,1,1,0
+access_hr_recruitment_refuse_reason_pm,hr.applicant.refuse.reason.pm,hr_recruitment.model_hr_applicant_refuse_reason,group_hr_recruitment_project_manager,1,1,1,1
