@@ -57,14 +57,15 @@ class ProjectTask(models.Model):
     def _default_count_time_sheet(self):
         timesheet_task = self.env['project.task'].search([])
         for record in timesheet_task: 
-            record.count_time_sheets = len(record.timesheet_ids.ids)
+            record.count_time_sheet_of_tasks = len(record.timesheet_ids.ids)
  
-    count_time_sheets = fields.Integer(store=True, default=_default_count_time_sheet, compute='_compute_timesheet_ids')
+    count_time_sheet_of_tasks = fields.Integer(store=True, default=_default_count_time_sheet, compute='_compute_timesheet_ids')
     
     @api.depends("timesheet_ids")
     def _compute_timesheet_ids(self):
         for item in self:
-            item.count_time_sheets = len(item.timesheet_ids.ids)
+            item.count_time_sheet_of_tasks = len(item.timesheet_ids.ids)
+            
     def approve_task_score(self):
         for record in self:
             record.status_task_score = 'confirm'
@@ -228,12 +229,15 @@ class CurrentTaskScore(models.Model):
 					LEFT JOIN
                         project_task
                             ON ab.task_id = project_task.id
+                    LEFT JOIN
+                        project_issues_type
+                            ON  project_issues_type.id = project_task.issues_type
 					WHERE
 						project_task.date_start >= CONCAT(to_char(date_part('year', CURRENT_DATE), '9999'), '-01-01')::date
 						AND project_task.date_end <= CONCAT(to_char(date_part('year', CURRENT_DATE), '9999'), '-12-31')::date
-						AND project_task.issues_type = 1
+						AND project_issues_type.name = 'Task'
 						AND project_task.task_score != '0'
-                        AND project_task.count_time_sheets > 0
+                        AND project_task.count_time_sheet_of_tasks > 0
 					GROUP BY
 						emp.id,
                         emp.name,
@@ -248,13 +252,14 @@ class CurrentTaskScore(models.Model):
     def current_task_score_action(self):
         user_id = self.env['hr.employee'].search([('id', '=', self.id)]).user_id.id
         name_view = self.env['hr.employee'].search([('id', '=', self.id)]).name
+        issues_type_is_task = self.env['project.issues.type'].search([('name', '=' , 'Task')]).id
         action = {
             "name": name_view,
             "type": "ir.actions.act_window",
             'search_view_id': [self.env.ref('ds_ramp_up_recourse.task_score_search').id, 'search'],
             "res_model": "project.task",
             "views": [[self.env.ref('ds_ramp_up_recourse.task_score_view_tree').id, "tree"]],
-            "domain": [('user_ids', 'in', user_id), ('issues_type', '=', 1), ('count_time_sheets', '>', 0),
+            "domain": [('user_ids', 'in', user_id), ('issues_type', '=', issues_type_is_task), ('count_time_sheet_of_tasks', '>', 0),
                 ('date_start', '>=', date(date.today().year, 1, 1)), 
                 ('date_end', '<=', date(date.today().year, 12, 31)), ('task_score', 'not in', ['0'])]
         }
