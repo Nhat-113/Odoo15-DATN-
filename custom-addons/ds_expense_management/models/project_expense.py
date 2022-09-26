@@ -17,11 +17,11 @@ class ProjectExpense(models.Model):
     expense_date = fields.Date(string="Expense Date", required=True, tracking=True)
     company_id = fields.Many2one('res.company', string="Company", required=True, default=lambda self: self.env.company, tracking=True)
     project_id = fields.Many2one('project.project', string="Project", required=True, domain="[('company_id', '=', company_id)]", tracking=True)
-    total_expenses = fields.Monetary(string="Total Expenses", currency_field='currency_id', required=True)
+    total_expenses = fields.Monetary(string="Total Expense", currency_field='currency_id', required=True)
     description = fields.Text(string="Description", tracking=True)
     
-    rounding_usd_input = fields.Monetary(string="USD to VND", currency_field='currency_vnd', tracking=True)
-    rounding_jpy_input = fields.Monetary(string="JPY to VND", currency_field='currency_vnd', tracking=True)
+    rounding_usd_input = fields.Float(string="USD to VND", tracking=True)
+    rounding_jpy_input = fields.Float(string="JPY to VND", tracking=True)
     
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id, tracking=True)
     currency_usd = fields.Many2one('res.currency', string="USD Currency", default=lambda self: self._get_default_currency('USD'), readonly=True)    

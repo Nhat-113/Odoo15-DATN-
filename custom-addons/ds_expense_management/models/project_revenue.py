@@ -21,8 +21,8 @@ class ProjectRevenue(models.Model):
     revenue_project = fields.Monetary(string="Total Revenue", currency_field='currency_id', required=True, tracking=True)
     description = fields.Text(string="Description", tracking=True)
     
-    rounding_usd_input = fields.Monetary(string="USD to VND", currency_field='currency_vnd', tracking=True)
-    rounding_jpy_input = fields.Monetary(string="JPY to VND", currency_field='currency_vnd', tracking=True)
+    rounding_usd_input = fields.Float(string="USD to VND", tracking=True)
+    rounding_jpy_input = fields.Float(string="JPY to VND", tracking=True)
     
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id, tracking=True)
     currency_usd = fields.Many2one('res.currency', string="USD Currency", default=lambda self: self._get_default_currency('USD'), readonly=True)    
@@ -55,15 +55,15 @@ class ProjectRevenue(models.Model):
                 elif record.currency_id.name == 'JPY':   
                     record.revenue_jpy = record.revenue_project
                     record.revenue_vnd = record.revenue_project * record.rounding_jpy_input
-                    if record.rounding_usd_input != 0:
-                        record.revenue_usd = record.revenue_vnd / record.rounding_usd_input
-                    else:
-                        record.revenue_usd = 0
+                    # if record.rounding_usd_input != 0:
+                    #     record.revenue_usd = record.revenue_vnd / record.rounding_usd_input
+                    # else:
+                    #     record.revenue_usd = 0
                     
                 else:
                     record.revenue_usd = record.revenue_project
                     record.revenue_vnd = record.revenue_project * record.rounding_usd_input
-                    record.revenue_jpy = record.revenue_vnd * record.rounding_jpy_input
+                    # record.revenue_jpy = record.revenue_vnd * record.rounding_jpy_input
             else:
                 record.revenue_usd = 0
                 record.revenue_jpy = 0

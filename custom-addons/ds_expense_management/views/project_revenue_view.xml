@@ -25,8 +25,8 @@
                         <group name="group_left">
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="project_id" attrs="{'readonly': [('company_id', '=', False)]}"/>
-                            <field name="rounding_usd_input"/>
-                            <field name="rounding_jpy_input"/>
+                            <field name="rounding_usd_input" attrs="{'required': [('get_currency_name', '=', 'USD')], 'invisible': [('get_currency_name', '=', 'JPY')]}"/>
+                            <field name="rounding_jpy_input" attrs="{'required': [('get_currency_name', '=', 'JPY')], 'invisible': [('get_currency_name', '=', 'USD')]}"/>
                         </group>
                         <group name="group_right">
                             <label for="start_date" string="Stage"/>
@@ -38,8 +38,8 @@
                             </div>
                             <field name="currency_id"/>
                             <field name="revenue_project"/>
-                            <field name="revenue_usd" attrs="{'invisible': [('get_currency_name', '=', 'USD')]}"/>
-                            <field name="revenue_jpy" attrs="{'invisible': [('get_currency_name', '=', 'JPY')]}"/>
+                            <field name="revenue_usd" attrs="{'invisible': ['|', ('get_currency_name', '=', 'USD'), ('get_currency_name', '=', 'JPY')]}"/>
+                            <field name="revenue_jpy" attrs="{'invisible': ['|', ('get_currency_name', '=', 'JPY'), ('get_currency_name', '=', 'USD')]}"/>
                             <field name="revenue_vnd" attrs="{'invisible': [('get_currency_name', '=', 'VND')]}"/>
                             <field name="currency_usd" invisible="1"/>
                             <field name="currency_jpy" invisible="1"/>
