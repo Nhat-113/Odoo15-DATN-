@@ -55,7 +55,7 @@ class DepartmentProjectDetail(models.Model):
     
     def get_detail_project_management(self):
         action = {
-            'name': self.project_id.name,
+            # 'name': self.project_id.name,
             'type': 'ir.actions.act_window',
             'res_model': 'project.management',
             'res_id': self.project_management_id.id,

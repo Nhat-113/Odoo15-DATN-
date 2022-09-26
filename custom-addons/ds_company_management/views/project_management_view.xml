@@ -37,6 +37,7 @@
                 <field name="last_update_color" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
                 <field name="user_login" invisible="1"/>
+                <field name="sub_user_login" invisible="1"/>
                 <!-- <field name="bonus" /> -->
             </tree>
         </field>

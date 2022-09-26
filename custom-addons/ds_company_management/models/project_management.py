@@ -9,16 +9,8 @@ class ProjectManagement(models.Model):
     
     
     def _compute_last_update_color(self):
-        projects = self.env['project.project'].search([])
         for record in self:
-            check = False
-            for project in projects:
-                if record.project_id.id == project.id:
-                    check = True
-                    record.last_update_color = project.last_update_color
-            if check == False:
-                record.last_update_color = 0
-                
+            record.last_update_color = record.project_id.last_update_color
 
     def _content_compute_total(self, field, model_relationship, field_related):
         for record in self:
@@ -68,6 +60,7 @@ class ProjectManagement(models.Model):
     project_type_id = fields.Many2one("project.type", string="Project Type")
     
     user_login = fields.Many2one('res.users', string="User")
+    sub_user_login = fields.Many2one('res.users', string="Sub CEO")
     
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
@@ -171,12 +164,17 @@ class ProjectManagement(models.Model):
                         pmc.status,
                         pmc.project_cost,
                         pmc.revenue,
-                        he.user_id AS user_login
+                        he.user_id AS user_login,
+                        ru.id AS sub_user_login
                     FROM project_management_compute AS pmc
                     LEFT JOIN hr_department AS hd
                         ON hd.id = pmc.department_id
                     LEFT JOIN hr_employee AS he
                         ON he.id = hd.manager_id
+                    LEFT JOIN res_company AS rc
+                        ON rc.id = pmc.company_id
+                    LEFT JOIN res_users AS ru
+                        ON ru.login = rc.user_email
 
             ) """ % (self._table)
         )
