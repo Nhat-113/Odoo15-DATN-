@@ -131,13 +131,13 @@ class ProjectTask(models.Model):
     def create(self, vals):
         bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
         issues_type = self.env['project.issues.type'].search([('name', '=' , 'Bug')]).id
-
-        if vals['issues_type'] ==  issues_type:
-            if 'task_id' in vals :
-                find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
-                count_bug = find_task.search_count_bug_of_task_update
-                if vals['status'] != bug_not_fix:
-                    find_task.write({'search_count_bug_of_task_update' : count_bug + 1})
+        
+        if 'issues_type' in vals and 'task_id' in vals:
+            if vals['issues_type'] ==  issues_type:
+                    find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
+                    count_bug = find_task.search_count_bug_of_task_update
+                    if vals['status'] != bug_not_fix:
+                        find_task.write({'search_count_bug_of_task_update' : count_bug + 1})
         return super(ProjectTask, self).create(vals)
 
     # count bugs of task  when updated for isssue
