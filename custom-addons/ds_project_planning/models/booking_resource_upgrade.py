@@ -237,12 +237,26 @@ class BookingResourceMonth(models.Model):
                     month=month.name, start=month.start_date_month, inactive_date=month.booking_id.inactive_date
                 ))                     
         
-    @api.depends('booking_id.booking_upgrade_month')
+    @api.depends('effort_rate_month')
     def compute_man_month(self):
         for month in self:
-            working_day = len(pd.bdate_range(month.start_date_month.strftime('%Y-%m-%d'),
-                                            month.end_date_month.strftime('%Y-%m-%d')))
-            month.man_month = working_day/20 * month.effort_rate_month/100
+            working_day = 0
+            for week in month.booking_id.booking_upgrade_week:
+                if month.start_date_month.month == week.start_date_week.month and month.start_date_month.year == week.start_date_week.year:
+                    if week.start_date_week >= week.booking_id.start_date and week.start_date_week <= week.booking_id.end_date or\
+                        week.end_date_week >= week.booking_id.start_date and week.end_date_week <= week.booking_id.end_date:
+                        if week.start_date_week < week.booking_id.start_date:
+                            start_date = week.booking_id.start_date
+                        else:
+                            start_date = week.start_date_week
+
+                        if week.end_date_week > week.booking_id.end_date:
+                            end_date = week.booking_id.end_date
+                        else:
+                            end_date = week.end_date_week
+                        working_day += len(pd.bdate_range(start_date.strftime('%Y-%m-%d'),
+                                            end_date.strftime('%Y-%m-%d')))
+            month.man_month = round(working_day/20 * month.effort_rate_month/100, 3)
 
     @api.onchange('effort_rate_month')
     def check_effort_month_over(self):

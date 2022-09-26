@@ -482,7 +482,7 @@
                                                         <field name="name"/>
                                                         <field name="start_date_month"/>
                                                         <field name="end_date_month"/>
-                                                        <field name="man_month"/>
+                                                        <field name="man_month" digits="[12,3]"/>
                                                         <field name="effort_rate_month" readonly="0"/>
                                                     </tree>
                                                 </field>
