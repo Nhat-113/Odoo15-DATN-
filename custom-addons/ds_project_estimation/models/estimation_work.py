@@ -23,7 +23,7 @@ class Estimation(models.Model):
     currency_id = fields.Many2one("estimation.currency", string="Currency", required=True, default=1)
     currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
-    department_id = fields.Many2one("hr.department", string="Department")
+    department_id = fields.Many2one("hr.department", string="Department", domain="[('company_id','=', company_id)]")
 
     potential_budget = fields.Float(string="Potential Budget")
     total_cost = fields.Float(string="Total Cost", compute='_compute_total_cost', store=True)

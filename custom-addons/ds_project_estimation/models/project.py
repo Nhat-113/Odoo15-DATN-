@@ -7,7 +7,7 @@ class Project(models.Model):
     _inherit = 'project.project'
     
     estimation_id = fields.Many2one('estimation.work', string="Estimation", groups="ds_project_estimation.estimation_access_sale")
-    department_id = fields.Many2one("hr.department", string="Department", groups="ds_project_estimation.estimation_access_sale")
+    department_id = fields.Many2one("hr.department", string="Department", domain="[('company_id','=', company_id)]", groups="ds_project_estimation.estimation_access_sale")
 
     total_mm = fields.Float(string="Total Effort Estimate (Man Month)", compute="_compute_total_mm", groups="ds_project_estimation.estimation_access_sale")
 
