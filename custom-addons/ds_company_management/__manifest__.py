@@ -23,12 +23,14 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
-        'data/cron_history_project_management.xml',
+        'data/cron_reset_upgrade_exchange_rate_api.xml',
         'data/exchange_rate_api_data.xml',
-        'views/project_project_view.xml',
         'views/exchange_rate_view.xml',
         'views/human_resource_management_view.xml',
         'views/project_management_view.xml',
+        'views/project_management_subceo_view.xml',
+        'views/project_management_ceo_view.xml',
+        'views/department_project_detail_view.xml',
         'views/company_management_menu.xml',
         'views/project_expense_management_views.xml'
     ],

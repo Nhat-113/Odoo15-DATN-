@@ -34,6 +34,7 @@ class ProjectManagementHistory(models.Model):
                         ROW_NUMBER() OVER(ORDER BY months ASC) AS id,
                         phm.project_management_id,
                         phm.project_id,
+                        phm.company_id,
                         phm.date_start,
                         phm.date_end,
                         --- Total cost is taken from estimation or project revenue and converted to VND ---
@@ -57,6 +58,7 @@ class ProjectManagementHistory(models.Model):
                         SELECT 
                             pm.id AS project_management_id,
                             pm.project_id,
+                            pm.company_id,
                             generate_series(
                                 date_trunc('month', min(pm.date_start)), 
                                 date_trunc('month', max(pm.date_end)), 
@@ -70,6 +72,7 @@ class ProjectManagementHistory(models.Model):
                         GROUP BY
                             project_management_id,
                             pm.project_id,
+                            pm.company_id,
                             pm.date_start,
                             pm.date_end,
                             pm.revenue
@@ -92,12 +95,8 @@ class ProjectManagementHistory(models.Model):
                         ) AS operation_cost,
                         
                         --- Compute duration month equal man month follow working day ---
-                        (CASE 
-                            WHEN prhm.working_day >= 20 
-                                THEN 1
-                            ELSE (prhm.working_day::decimal / 20)::numeric(6, 3)
-                        END
-                        ) AS duration_month
+                        
+                        ((prhm.working_day::decimal / 20)::numeric(6, 3)) AS duration_month
                         
                     FROM (
                         SELECT  *, (
@@ -118,7 +117,7 @@ class ProjectManagementHistory(models.Model):
                                 --- Compute total project cost by month---
                                 (SELECT 
                                     --- Handling when value is null ---
-                                        (SELECT coalesce(NULLIF(SUM(pem.total_expenses), NULL), 0))
+                                        (SELECT coalesce(NULLIF(SUM(pem.expense_vnd), NULL), 0))
                                     FROM project_expense_management AS pem
                                     WHERE pem.project_id = gmp.project_id 
                                         AND pem.expense_date between gmp.month_start AND gmp.month_end
@@ -139,6 +138,7 @@ class ProjectManagementHistory(models.Model):
                         GROUP BY
                             gmp.id,
                             gmp.project_id,
+                            gmp.company_id,
                             gmp.month_start,
                             gmp.month_end,
                             gmp.date_start,
@@ -174,13 +174,15 @@ class ProjectManagementHistory(models.Model):
                                     --- Compute all member by month ---
                                     SELECT SUM(members) 
                                         FROM project_compute_value_by_month AS tmp
-                                    WHERE EXTRACT (MONTH FROM pcv.month_start) = EXTRACT (MONTH FROM tmp.month_start)
+                                    WHERE tmp.company_id = pcv.company_id
+                                        AND EXTRACT (MONTH FROM pcv.month_start) = EXTRACT (MONTH FROM tmp.month_start)
                                         AND EXTRACT (YEAR FROM pcv.month_start) = EXTRACT (YEAR FROM tmp.month_start)
                                 ) AS all_members
                             FROM project_compute_value_by_month AS pcv
                             GROUP BY
                                 pcv.id,
                                 pcv.project_id,
+                                pcv.company_id,
                                 pcv.date_start,
                                 pcv.date_end,
                                 pcv.month_start,
@@ -286,26 +288,5 @@ class ProjectManagementHistory(models.Model):
             )""" % (self._table)
         )
     
-    
-    @api.model
-    def cron_create_history_project_management_by_month(self):
-        todays = datetime.date.today()
-        this_month = todays.replace(day=1)
-        last_month = this_month - datetime.timedelta(days=1)
-        last_month_start = last_month.replace(day=1)
-        # last_month_end = last_month_start.replace(day=31)
-        # months = last_month.strftime("%Y%m")
-        project_managements = self.env['project.management'].search([])
-        for pj in project_managements:
-            expenses = self.env['hr.expense'].search([('project_management_id', '=', pj.id), ('date', '<', this_month)])
-            expense_months = self.env['hr.expense'].search([('project_management_id', '=', pj.id), ('date', '>=', last_month_start), ('date', '<', this_month)])
-            
-            vals = {
-                'project_management_id': pj.id,
-                'total_expenses': sum(exp.total_amount_company for exp in expenses),
-                'expense_month': sum(exp.total_amount_company for exp in expense_months),
-                'month': (str(last_month.month) if last_month.month >= 10 else str(0) + str(last_month.month)) + '/' + str(last_month.year)
-            }
-            if vals:
-                self.env['project.management.history'].create(vals)
+
             

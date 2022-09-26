@@ -19,10 +19,12 @@
 
     <record id="group_company_management_ceo" model="res.groups">
         <field name="name">CEO</field>
-        <field name="implied_ids" eval="[(4, ref('group_company_management_div')), (4, ref('group_company_management_sub_ceo'))]"/>
+        <field name="implied_ids" eval="[(4, ref('group_company_management_sub_ceo'))]"/>
         <field name="category_id" ref="module_category_company_management"/>
     </record>
 
+
+    <!-- Record rule Human Resource -->
     <record model="ir.rule" id="human_resource_management_div">
         <field name="name">Human resource management div</field>
         <field name="model_id" ref="model_human_resource_management"/>
@@ -48,6 +50,25 @@
         <field name="name">Human resource management multi company rule</field>
         <field name="model_id" ref="model_human_resource_management"/>
         <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <!-- Record rule Cost Management -->
+    <record id="project_cost_management_rule" model="ir.rule">
+        <field name="name">Project Cost Management</field>
+        <field name="model_id" ref="model_project_management"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids),('user_login', '=', user.id)]</field>
+    </record>
+
+    <record id="department_cost_management_rule" model="ir.rule">
+        <field name="name">Department Cost Management</field>
+        <field name="model_id" ref="model_project_management_subceo"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids),('user_login', '=', user.id)]</field>
+    </record>
+
+    <record id="company_cost_management_rule" model="ir.rule">
+        <field name="name">CEO: Company Cost Management Multi Company Rule</field>
+        <field name="model_id" ref="model_project_management_ceo"/>
+        <field name="domain_force">[(1,'=',1)]</field>
     </record>
 
 </odoo>

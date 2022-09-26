@@ -22,7 +22,8 @@
                 <!-- <field name="sequence" widget="handle"/> -->
                 <field name="project_id" string="Project" class="font-weight-bold"/>
                 <field name="project_type_id"/>
-                <field name="director"  widget="many2one_avatar_employee" optional="hide"/>
+                <!-- <field name="director"  widget="many2one_avatar_employee" optional="hide"/> -->
+                <field name="department_id" optional="hide"/>
                 <field name="user_pm" string="Project Manager" widget="many2one_avatar_user" options="{'no_open':True, 'no_create': True, 'no_create_edit': True}"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True, 'no_create_edit': True}"  optional="hide"/>
                 <field name="date_start" string="Start Date" widget="daterange" options="{'related_end_date': 'date'}"/>
@@ -35,6 +36,7 @@
                 <field name="profit" sum="Total Profit"/>
                 <field name="last_update_color" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
+                <field name="user_login" invisible="1"/>
                 <!-- <field name="bonus" /> -->
             </tree>
         </field>
@@ -57,7 +59,8 @@
                         <group>
                             <field name="project_type_id"/>
                             <field name="user_pm" string="Project Manager" widget="many2one_avatar_user" readonly="1" domain="[('share', '=', False)]"/>
-                            <field name="director" widget="many2one_avatar_employee" readonly="1"/>
+                            <!-- <field name="director" widget="many2one_avatar_employee" readonly="1"/> -->
+                            <field name="department_id"/>
                             <label for="date_start" string="Dates"/>
                             <div name="date_end" class="o_row">
                                 <field name="date_start" widget="daterange" options='{"related_end_date": "date_end"}' readonly="1"/>
@@ -89,7 +92,7 @@
                                     <field name="total_project_expense" sum="Total project expense"/>
                                     <field name="operation_cost" sum="Total operation cost" optional="show"/>
                                     <field name="profit" sum="Total profit"/>
-                                    <!-- <field name="all_members" sum="Total all members"/> -->
+                                    <field name="all_members" sum="Total all members" optional="hide"/>
                                     <field name="average_cost_company" sum="Total average cost company" optional="hide"/>
                                     <field name="average_cost_project" sum="Total average cost project" optional="hide"/>
                                 </tree>
@@ -119,10 +122,10 @@
                                 <tree  edit="0" delete="0" create="0">
                                     <field name="expense_date"/>
                                     <field name="name" />
-                                    <field name="total_expenses" sum="Total expense"/>
+                                    <field name="expense_vnd" sum="Total expense"/>
                                     <field name="description"/>
                                     <field name="company_id" optional="hide"/>
-                                    <field name="currency_id" optional="hide"/>
+                                    <field name="currency_vnd" optional="hide"/>
                                 </tree>
                                
                             </field>
@@ -135,7 +138,7 @@
     </record>
 
     <record id="project_management_action" model="ir.actions.act_window">
-        <field name="name">Cost Management</field>
+        <field name="name">Project Cost Management</field>
         <field name="res_model">project.management</field>
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="project_sidebar_filter"/>

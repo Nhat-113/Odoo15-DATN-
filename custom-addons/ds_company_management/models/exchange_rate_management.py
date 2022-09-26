@@ -10,34 +10,30 @@ class GetAPIDataExchangeRate(models.Model):
     _description = "Exchange rate"
     _rec_name = "name"
     
-    def _get_default_currency(self, type_currency):
-        return self.env['res.currency'].search([('name', '=', type_currency)])
+    # def _get_default_currency(self, type_currency):
+    #     return self.env['res.currency'].search([('name', '=', type_currency)])
 
-    def _get_default_name_exchange_rate(self):
-        return "Exchange Rate"
 
     name = fields.Char(string="Exchange Rate", default="Exchange Rate")
-    usd_convert = fields.Monetary(string="USD to VND", currency_field='currency_id')
-    jpy_convert = fields.Monetary(string="JPY to VND", currency_field='currency_id')
+    usd_convert = fields.Float(string="USD to VND", tracking=True)
+    jpy_convert = fields.Float(string="JPY to VND", tracking=True)
     date_upgrade = fields.Datetime(string="Date upgrade")
-    count_upgrade = fields.Integer(string="Number of Upgrades", readonly=True, tracking=True)
-    message_warning = fields.Char(string="Warning", 
+    count_upgrade = fields.Integer(string="Number of upgrades", readonly=True, tracking=True)
+    message_warning = fields.Char(string="Warning", readonly=True,
                                   default="The number of exchange rate updates for the day has expired! Please update tomorrow")
-    maximum_upgrade = fields.Integer(string="Maximum Upgrades", default=8, tracking=True)
+    maximum_upgrade = fields.Integer(string="Maximum Upgrades", readonly=True, default=8)
     
-    currency_id = fields.Many2one('res.currency', string="Currency", required=True, readonly=True, default=lambda self: self._get_default_currency('VND'))
+    # currency_id = fields.Many2one('res.currency', string="Currency", required=True, readonly=True, default=lambda self: self._get_default_currency('VND'))
     
     
     def upgrade_exchane_rate_api(self):
-        if self.count_upgrade == self.maximum_upgrade:
-            raise ValidationError(_("The number of exchange rate updates for the day has expired! Please update tomorrow"))
-        else:
-            self.count_upgrade += 1
-            self.update({
-                "usd_convert": self.get_currency_api("USD"),
-                "jpy_convert": self.get_currency_api("JPY"),
-                "date_upgrade": datetime.now()
-            })
+        # if self.count_upgrade == self.maximum_upgrade:
+        #     raise ValidationError(_("The number of exchange rate updates for the day has expired! Please update tomorrow"))
+        # else:
+        self.count_upgrade += 1
+        self.usd_convert = self.get_currency_api("USD")
+        self.jpy_convert = self.get_currency_api("JPY")
+        self.date_upgrade = datetime.now()
         
     def get_currency_api(self, currency):
         data = {}
@@ -52,3 +48,8 @@ class GetAPIDataExchangeRate(models.Model):
             vals['date_upgrade'] = datetime.now()
         result = super(GetAPIDataExchangeRate, self).write(vals)
         return result
+    
+
+    def cron_reset_upgrate_exchange_rate_api(self):
+        exchange_rate = self.env['api.exchange.rate'].search([])
+        exchange_rate.count_upgrade = 0

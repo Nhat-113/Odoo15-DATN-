@@ -27,15 +27,15 @@
                 <sheet>
                     <group name="group_top">
                         <group name="group_left">
-                            <field name="usd_convert"/>
-                            <field name="jpy_convert"/>
+                            <field name="usd_convert" class="exchange_rate_vnd"/>
+                            <field name="jpy_convert" class="exchange_rate_vnd"/>
                         </group>
                         <group name="group_right">
                             <field name="count_upgrade"/>
-                            <field name="maximum_upgrade"/>
+                            <field name="maximum_upgrade" invisible="1"/>
                         </group>
                         <field name="message_warning" attrs="{'invisible': [('count_upgrade', '!=', 8)]}"/>
-                        <field name="currency_id" invisible="1"/>
+                        <!-- <field name="currency_id" invisible="1"/> -->
                     </group>
                 </sheet>
                 <div class="oe_chatter">

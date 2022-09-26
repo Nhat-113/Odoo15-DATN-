@@ -9,17 +9,45 @@
         parent="ds_company_management.company_management_menu" 
         action="human_resource_management_action"/>
 
+
     <menuitem
-        id="project_management"
+        id="cost_management"
         name="Cost Management"
         sequence="2"
-        parent="ds_company_management.company_management_menu" 
-        action="project_management_action"/>
+        parent="ds_company_management.company_management_menu"/>
+
+
+    <menuitem
+        id="cost_management_div"
+        name="Project Cost Management"
+        sequence="1"
+        parent="ds_company_management.cost_management" 
+        action="project_management_action"
+        groups="ds_company_management.group_company_management_div"/>
+    
+
+    <menuitem
+        id="cost_management_subceo"
+        name="Department Cost Management"
+        sequence="2"
+        parent="ds_company_management.cost_management" 
+        action="project_management_subceo_action"
+        groups="ds_company_management.group_company_management_sub_ceo"/>
+
+
+    <menuitem
+        id="cost_management_ceo"
+        name="Company Cost Management"
+        sequence="3"
+        parent="ds_company_management.cost_management" 
+        action="project_management_ceo_action"
+        groups="ds_company_management.group_company_management_ceo"/>
+    
 
     <menuitem
         id="configuration"
         name="Configuration"
-        sequence="3"
+        sequence="4"
         parent="ds_company_management.company_management_menu"/>
 
     <menuitem

@@ -11,9 +11,14 @@ class ProjectManagement(models.Model):
     def _compute_last_update_color(self):
         projects = self.env['project.project'].search([])
         for record in self:
+            check = False
             for project in projects:
                 if record.project_id.id == project.id:
+                    check = True
                     record.last_update_color = project.last_update_color
+            if check == False:
+                record.last_update_color = 0
+                
 
     def _content_compute_total(self, field, model_relationship, field_related):
         for record in self:
@@ -38,7 +43,8 @@ class ProjectManagement(models.Model):
 
     id = fields.Integer("ID")
     project_id = fields.Many2one('project.project', string="Project")
-    director = fields.Many2one('hr.employee', string="Director")
+    # director = fields.Many2one('hr.employee', string="Director")
+    department_id = fields.Many2one("hr.department", string="Department")
     user_pm = fields.Many2one('res.users', string="Project Manager")
     company_id = fields.Many2one('res.company', string="Company")
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, compute='_compute_currency_default')
@@ -61,6 +67,8 @@ class ProjectManagement(models.Model):
     last_update_color = fields.Integer(compute='_compute_last_update_color')
     project_type_id = fields.Many2one("project.type", string="Project Type")
     
+    user_login = fields.Many2one('res.users', string="User")
+    
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
@@ -70,7 +78,7 @@ class ProjectManagement(models.Model):
                         ROW_NUMBER() OVER(ORDER BY pr.id ASC) AS id,
                         pr.id AS project_id,
                         pr.user_id AS user_pm,
-                        pr.div_manager AS director,
+                        pr.department_id,
                         pr.company_id,
                         pr.date_start,
                         pr.date AS date_end,
@@ -105,7 +113,7 @@ class ProjectManagement(models.Model):
                         project_id,
                         est.project_type_id,
                         user_pm,
-                        director,
+                        pr.department_id,
                         pr.company_id,
                         pr.date_start,
                         date_end,
@@ -114,49 +122,61 @@ class ProjectManagement(models.Model):
                         est.total_cost,
                         est.currency_id,
                         project_cost
+                    ),
+                    project_management_compute AS (
+                        SELECT
+                            pem.id,
+                            pem.project_id,
+                            pem.project_type_id,
+                            pem.user_pm,
+                            pem.department_id,
+                            pem.company_id,
+                            pem.date_start,
+                            pem.date_end,
+                            pem.status,
+                            --- Handling when value is null ---
+                            (SELECT COALESCE(NULLIF(pem.project_cost, NULL), 0)) AS project_cost,
+
+                            (CASE 
+                            --- Get total cost when estimation exists ---
+                                WHEN pem.total_cost <> 0 
+                                    THEN (CASE 
+                                            WHEN pem.currency_id = (SELECT id FROM estimation_currency WHERE name = 'USD')
+                                                THEN pem.total_cost * (SELECT usd_convert FROM api_exchange_rate)
+                                            WHEN pem.currency_id = (SELECT id FROM estimation_currency WHERE name = 'JPY')
+                                                THEN pem.total_cost * (SELECT jpy_convert FROM api_exchange_rate)
+                                            ELSE pem.total_cost
+                                        END
+                                    )
+                            --- Get project revenue VND when estimation does not exists ---
+                                WHEN prm.revenue_vnd IS NOT NULL AND prm.revenue_vnd <> 0
+                                    THEN prm.revenue_vnd
+                                ELSE 0
+                            END
+                            ) AS revenue
+
+                        FROM project_estimation_merged AS pem
+                        LEFT JOIN project_revenue_management AS prm
+                            ON pem.project_id = prm.project_id
                     )
-                    
                     SELECT
-                        pem.id,
-                        pem.project_id,
-                        pem.project_type_id,
-                        pem.user_pm,
-                        pem.director,
-                        pem.company_id,
-                        pem.date_start,
-                        pem.date_end,
-                        pem.status,
-                        --- Handling when value is null ---
-                        (SELECT COALESCE(NULLIF(pem.project_cost, NULL), 0)) AS project_cost,
-
-                        (CASE 
-                        --- Get total cost when estimation exists ---
-                            WHEN pem.total_cost <> 0 
-                                THEN (CASE 
-                                        WHEN pem.currency_id = (SELECT id FROM estimation_currency WHERE name = 'USD')
-                                            THEN pem.total_cost * (SELECT usd_convert FROM api_exchange_rate)
-                                        WHEN pem.currency_id = (SELECT id FROM estimation_currency WHERE name = 'JPY')
-                                            THEN pem.total_cost * (SELECT jpy_convert FROM api_exchange_rate)
-                                        ELSE pem.total_cost
-                                    END
-                                )
-                        --- Get project revenue when estimation does not exists ---
-                            WHEN prm.revenue_project IS NOT NULL AND prm.revenue_project <> 0
-                                THEN (CASE
-                                        WHEN prm.currency_id = (SELECT id FROM res_currency WHERE name = 'USD')
-                                            THEN prm.revenue_project * (SELECT usd_convert FROM api_exchange_rate)
-                                        WHEN prm.currency_id = (SELECT id FROM res_currency WHERE name = 'JPY')
-                                            THEN prm.revenue_project * (SELECT jpy_convert FROM api_exchange_rate)
-                                        ELSE prm.revenue_project
-                                    END
-                                )
-                            ELSE 0
-                        END
-                        ) AS revenue
-
-                    FROM project_estimation_merged AS pem
-                    LEFT JOIN project_revenue_management AS prm
-                        ON pem.project_id = prm.project_id
+                        pmc.id,
+                        pmc.project_id,
+                        pmc.project_type_id,
+                        pmc.user_pm,
+                        pmc.department_id,
+                        pmc.company_id,
+                        pmc.date_start,
+                        pmc.date_end,
+                        pmc.status,
+                        pmc.project_cost,
+                        pmc.revenue,
+                        he.user_id AS user_login
+                    FROM project_management_compute AS pmc
+                    LEFT JOIN hr_department AS hd
+                        ON hd.id = pmc.department_id
+                    LEFT JOIN hr_employee AS he
+                        ON he.id = hd.manager_id
 
             ) """ % (self._table)
         )
