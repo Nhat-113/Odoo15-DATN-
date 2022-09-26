@@ -361,7 +361,8 @@ class PlanningCalendarResource(models.Model):
             for i in range(0, len(mon_sun), 2):
                 message_week={}
                 check_effort_rate_week = {}
-                effort_week = resource.compute_effort_week_when_gen(mon_sun[i], mon_sun[i+1], resource.employee_id.id, resource.id or resource.id.origin)
+                working_day_week = 5
+                effort_week = resource.compute_effort_when_gen(mon_sun[i], mon_sun[i+1], resource.employee_id.id, resource.id or resource.id.origin, working_day_week)
                 if mon_sun[i] > book_end_date or mon_sun[i] < book_start_date and mon_sun[i+1] < book_start_date:
                     effort_week = 0
                 week_temp = booking.env['booking.resource.week.temp'].create({
@@ -411,7 +412,9 @@ class PlanningCalendarResource(models.Model):
                 check_effort_rate_month = {}
                 resource.booking_upgrade_month.check_effort_month_when_gen(check_effort_rate_month, message_month, list_start_end[i], list_start_end[i+1],\
                     resource.employee_id, resource.effort_rate, resource.member_type.name)
-                effort_month = resource.compute_effort_month_when_gen(list_start_end[i], list_start_end, resource.employee_id.id,resource.id or resource.id.origin)
+                working_day_month = len(pd.bdate_range(list_start_end[i].strftime('%Y-%m-%d'),
+                                            list_start_end[i+1].strftime('%Y-%m-%d')))
+                effort_month = resource.compute_effort_when_gen(list_start_end[i], list_start_end[i+1], resource.employee_id.id, resource.id or resource.id.origin, working_day_month)
                 month_temp = booking.env['booking.resource.month.temp'].create({
                     'name': 'Month ' + str(list_start_end[i].month),
                     'start_date_month': list_start_end[i],
@@ -435,25 +438,25 @@ class PlanningCalendarResource(models.Model):
             
             resource.check_upgrade_booking = True
     
-    def compute_effort_month_when_gen(self, start_date_month, list_start_end, employee_id, booking_id):
-        for _ in range(int(len(list_start_end)/2)):
-            total_effort_month = 0
-            len_total_week = 0
-            for rec in self.env['booking.resource.week'].search([('employee_id', '=', employee_id), ('booking_id', '=', booking_id)]):
-                if start_date_month.month == rec.start_date_week.month and start_date_month.year == rec.start_date_week.year:
-                    total_effort_month += (rec.effort_rate_week)
-                    len_total_week += 1
+    # def compute_effort_month_when_gen(self, start_date_month, list_start_end, employee_id, booking_id):
+    #     for _ in range(int(len(list_start_end)/2)):
+    #         total_effort_month = 0
+    #         len_total_week = 0
+    #         for rec in self.env['booking.resource.week'].search([('employee_id', '=', employee_id), ('booking_id', '=', booking_id)]):
+    #             if start_date_month.month == rec.start_date_week.month and start_date_month.year == rec.start_date_week.year:
+    #                 total_effort_month += (rec.effort_rate_week)
+    #                 len_total_week += 1
 
-            if len_total_week > 0:
-                return total_effort_month/len_total_week
+    #         if len_total_week > 0:
+    #             return total_effort_month/len_total_week
 
-    def compute_effort_week_when_gen(self, start_date_week, end_date_week, employee_id, booking_id):
+    def compute_effort_when_gen(self, start_date, end_date, employee_id, booking_id, working_day):
         total_effort_week = 0
         for rec in self.env['booking.resource.day'].search([('employee_id', '=', employee_id), ('booking_id', '=', booking_id)]):
-            if start_date_week <= rec.start_date_day and end_date_week >= rec.start_date_day:
+            if start_date <= rec.start_date_day and end_date >= rec.start_date_day:
                 total_effort_week += (rec.effort_rate_day)
 
-        return total_effort_week/5
+        return total_effort_week/working_day
 
 
     def action_upgrade_booking(self):
