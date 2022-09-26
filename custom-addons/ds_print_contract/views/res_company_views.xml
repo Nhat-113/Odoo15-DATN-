@@ -8,8 +8,9 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='social_media']" position="after">
                 <group>
-                    <field name="representative" required="1"/>
-                    <field name="position" required="1"/>
+                    <field name="representative"/>
+                    <field name="user_email"/>
+                    <field name="position"/>
                 </group>
             </xpath>
         </field>
