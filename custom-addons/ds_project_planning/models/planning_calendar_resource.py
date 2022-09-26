@@ -147,8 +147,12 @@ class PlanningCalendarResource(models.Model):
     @api.depends('duration', 'effort_rate')
     def _compute_calendar_effort(self):
         for resource in self:
+            total_working_day_off = 0
+            for day in self.booking_upgrade_day:
+                if day.effort_rate_day == 0:
+                    total_working_day_off += 1
             if resource.duration != 0:
-                resource.calendar_effort = (resource.effort_rate * resource.duration) / (20 * 100)
+                resource.calendar_effort = (resource.effort_rate * (resource.duration - total_working_day_off)) / (20 * 100)
 
             if resource.inactive_date == False:
                 resource.select_type_upgrade = 'month'        
@@ -494,9 +498,11 @@ class PlanningCalendarResource(models.Model):
     def compute_total_effort_common(self):
         for resource in self:
             total_effort_all = 0
+            len_booking_update_month = 0
             for month in resource.booking_upgrade_month:
                 total_effort_all += month.effort_rate_month
-            len_booking_update_month = len(resource.env['booking.resource.month'].search([('booking_id', '=', resource.id or resource.id.origin)]))
+                if month.effort_rate_month > 0:
+                    len_booking_update_month += 1
             if len_booking_update_month > 0:
                 self.env['planning.calendar.resource'].search([('id', '=', resource.id or resource.id.origin)]).write({
                     'effort_rate' : total_effort_all / len_booking_update_month

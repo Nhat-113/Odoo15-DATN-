@@ -203,12 +203,13 @@ class BookingResourceMonth(models.Model):
         for record in self:
             if record.booking_id.check_edit_effort == 'effort_week':
                 total_effort_week = 0
+                working_day = 0
                 for rec in record.booking_id.booking_upgrade_day:
                     if record.start_date_month <= rec.start_date_day and record.end_date_month >= rec.start_date_day:
                         total_effort_week += (rec.effort_rate_day)
+                        if rec.effort_rate_day > 0:
+                            working_day += 1
 
-                working_day = len(pd.bdate_range(record.start_date_month.strftime('%Y-%m-%d'),
-                                            record.end_date_month.strftime('%Y-%m-%d')))
                 if working_day > 0:
                     record.effort_rate_month = total_effort_week/working_day
 
@@ -382,41 +383,42 @@ class BookingResourceDay(models.Model):
 
     @api.depends('booking_id.booking_upgrade_week', 'booking_id.booking_upgrade_month')
     def compute_effort_day(self):
-        if self.booking_id.check_edit_effort == 'effort_week':
-            for week in self.booking_id.booking_upgrade_week:
-                len_total_day = 0
-                for record in self:
-                    if record.start_date_day >= week.start_date_week and record.start_date_day <= week.end_date_week:
-                        len_total_day += 1
+        for booking in self.booking_id:
+            if booking.check_edit_effort == 'effort_week' or booking.select_type_upgrade == 'week':
+                for week in self.booking_id.booking_upgrade_week:
+                    len_total_day = 0
+                    for record in self:
+                        if record.start_date_day >= week.start_date_week and record.start_date_day <= week.end_date_week:
+                            len_total_day += 1
 
-                for rec in self:
-                    if rec.start_date_day >= week.start_date_week and rec.start_date_day <= week.end_date_week:
-                        if len_total_day > 0:
-                            rec.effort_rate_day = (week.effort_rate_week * 5)/len_total_day
-        elif self.booking_id.check_edit_effort == 'effort_month':
-            for record in self.booking_id.booking_upgrade_month:
-                len_week = 0
-                len_week_no_expired = 0
-                effort_week_expired = 0
-                id_month_db = self.env['planning.calendar.resource'].search([('id', '=', record.booking_id.id or record.booking_id.id.origin)]).get_id_month_edit
-                if str(record.id.origin) in id_month_db:
-                    for week in self.booking_id.booking_upgrade_week:
-                        if record.start_date_month.month == week.start_date_week.month and record.start_date_month.year == week.start_date_week.year:
-                            len_week += 1
-                            if week.start_date_week > date.today():
-                                if week.end_date_week >= week.booking_id.start_date and week.start_date_week <= week.booking_id.end_date:
-                                    len_week_no_expired += 1
-                            else:
-                                effort_week_expired += week.effort_rate_week 
-                    for rec in self.booking_id.booking_upgrade_week:
-                        if record.start_date_month.month == rec.start_date_week.month and record.start_date_month.year == rec.start_date_week.year \
-                            and rec.start_date_week > date.today() and rec.end_date_week >= rec.booking_id.start_date and rec.start_date_week <= rec.booking_id.end_date:
-                            for day in self:
-                                if rec.start_date_week <= day.start_date_day and rec.end_date_week >= day.end_date_day:
-                                    if len_week - len_week_no_expired > 0:
-                                        day.effort_rate_day = self.calculator_effort_week(record.effort_rate_month, effort_week_expired, len_week, len_week_no_expired)
-                                    else:
-                                        day.effort_rate_day = record.effort_rate_month
+                    for rec in self:
+                        if rec.start_date_day >= week.start_date_week and rec.start_date_day <= week.end_date_week:
+                            if len_total_day > 0:
+                                rec.effort_rate_day = (week.effort_rate_week * 5)/len_total_day
+            elif booking.check_edit_effort == 'effort_month' or booking.select_type_upgrade == 'month':
+                for record in self.booking_id.booking_upgrade_month:
+                    len_week = 0
+                    len_week_no_expired = 0
+                    effort_week_expired = 0
+                    id_month_db = self.env['planning.calendar.resource'].search([('id', '=', record.booking_id.id or record.booking_id.id.origin)]).get_id_month_edit
+                    if id_month_db and str(record.id or record.id.origin) in id_month_db:
+                        for week in self.booking_id.booking_upgrade_week:
+                            if record.start_date_month.month == week.start_date_week.month and record.start_date_month.year == week.start_date_week.year:
+                                len_week += 1
+                                if week.start_date_week > date.today():
+                                    if week.end_date_week >= week.booking_id.start_date and week.start_date_week <= week.booking_id.end_date:
+                                        len_week_no_expired += 1
+                                else:
+                                    effort_week_expired += week.effort_rate_week 
+                        for rec in self.booking_id.booking_upgrade_week:
+                            if record.start_date_month.month == rec.start_date_week.month and record.start_date_month.year == rec.start_date_week.year \
+                                and rec.start_date_week > date.today():
+                                for day in self:
+                                    if rec.start_date_week <= day.start_date_day and rec.end_date_week >= day.end_date_day:
+                                        if len_week - len_week_no_expired > 0:
+                                            day.effort_rate_day = self.calculator_effort_week(record.effort_rate_month, effort_week_expired, len_week, len_week_no_expired)
+                                        else:
+                                            day.effort_rate_day = record.effort_rate_month
 
     def calculator_effort_week(self, effort_month_edit, effort_week_expired, len_week, len_week_no_expired):
         return ((effort_month_edit * len_week) - effort_week_expired) / len_week_no_expired
