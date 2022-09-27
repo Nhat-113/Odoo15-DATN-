@@ -21,15 +21,14 @@ class ProjectTask(models.Model):
         else:
             for task in self:
                 task.read_only_reason_refuse = False
-    #count all bugs of task when install 
-    def _default_search_count_bug_of_task_v2(self):
-        bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
-        count_bug_all_project = self.env['project.task'].search([])
-        for task in count_bug_all_project:
-            my_bug = self.env['project.task'].search([('task_id', '=', task.id), ('status', '!=',  bug_not_fix)])
-            task.search_count_bug_of_task_update = len(my_bug)
 
-    search_count_bug_of_task_update = fields.Integer(default=_default_search_count_bug_of_task_v2, store=True)
+    # count all bugs of task when install 
+    def _search_count_bug_of_task_v2(self):
+        bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
+        for task in self:
+            task.search_count_bug_of_task_update  = self.env['project.task'].search_count([('task_id', '=', task.id), ('status', '!=',  bug_not_fix)])
+
+    search_count_bug_of_task_update = fields.Integer(compute=_search_count_bug_of_task_v2)
 
     read_only_reason_refuse = fields.Boolean(compute=_check_readonly, store=False)
 
@@ -54,17 +53,17 @@ class ProjectTask(models.Model):
 
     readonly_task_score = fields.Boolean(compute=_check_status_taskscore)
 
-    def _default_count_time_sheet(self):
-        timesheet_task = self.env['project.task'].search([])
-        for record in timesheet_task: 
-            record.count_time_sheet_of_tasks = len(record.timesheet_ids.ids)
+    # def _default_count_time_sheet(self):
+    #     timesheet_task = self.env['project.task'].search([])
+    #     for record in timesheet_task: 
+    #         record.count_time_sheet_of_tasks = len(record.timesheet_ids.ids)
  
-    count_time_sheet_of_tasks = fields.Integer(store=True, default=_default_count_time_sheet, compute='_compute_timesheet_ids')
+    # count_time_sheet_of_tasks = fields.Integer(store=True, default=_default_count_time_sheet, compute='_compute_timesheet_ids')
     
-    @api.depends("timesheet_ids")
-    def _compute_timesheet_ids(self):
-        for item in self:
-            item.count_time_sheet_of_tasks = len(item.timesheet_ids.ids)
+    # @api.depends("timesheet_ids")
+    # def _compute_timesheet_ids(self):
+    #     for item in self:
+    #         item.count_time_sheet_of_tasks = len(item.timesheet_ids.ids)
             
     def approve_task_score(self):
         for record in self:
@@ -127,52 +126,51 @@ class ProjectTask(models.Model):
         }
     
     # count bugs of task  when created new bug
-    @api.model
-    def create(self, vals):
-        bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
-        issues_type = self.env['project.issues.type'].search([('name', '=' , 'Bug')]).id
+    # @api.model
+    # def create(self, vals):
+    #     bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
+    #     issues_type = self.env['project.issues.type'].search([('name', '=' , 'Bug')]).id
         
-        if 'issues_type' in vals and 'task_id' in vals:
-            if vals['issues_type'] ==  issues_type:
-                    find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
-                    count_bug = find_task.search_count_bug_of_task_update
-                    if vals['status'] != bug_not_fix:
-                        find_task.write({'search_count_bug_of_task_update' : count_bug + 1})
-        return super(ProjectTask, self).create(vals)
+    #     if 'issues_type' in vals and 'task_id' in vals:
+    #         if vals['issues_type'] ==  issues_type:
+    #                 find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
+    #                 count_bug = find_task.search_count_bug_of_task_update
+    #                 if vals['status'] != bug_not_fix:
+    #                     find_task.write({'search_count_bug_of_task_update' : count_bug + 1})
+    #     return super(ProjectTask, self).create(vals)
 
     # count bugs of task  when updated for isssue
-    def write(self, vals):
-        bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
-        find_task_before = self.env['project.task'].search([('id', '=', self.task_id.id)])
-        count_bug_task_before = find_task_before.search_count_bug_of_task_update
-        if 'task_id' in vals: 
+    # def write(self, vals):
+    #     bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
+    #     find_task_before = self.env['project.task'].search([('id', '=', self.task_id.id)])
+    #     count_bug_task_before = find_task_before.search_count_bug_of_task_update
+    #     if 'task_id' in vals: 
+    #         if count_bug_task_before > 0:
+    #             find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before - 1})
 
-            if count_bug_task_before > 0:
-                find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before - 1})
+    #         find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
+    #         count_bug = find_task.search_count_bug_of_task_update
+    #         if  self.status != bug_not_fix :
+    #             find_task.write({'search_count_bug_of_task_update' : count_bug + 1 }) 
+    #     # when change  status to  not fixed 
+    #     elif 'status' in vals:
+    #         if vals['status'] == bug_not_fix:
+    #             if count_bug_task_before > 0:
+    #                 find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before - 1})
+    #         elif self.status.id == bug_not_fix and vals['status'] != bug_not_fix:
+    #             find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before + 1})
+    #     res = super(ProjectTask, self).write(vals)
+    #     return res
 
-            find_task = self.env['project.task'].search([('id', '=', vals['task_id'])])
-            count_bug = find_task.search_count_bug_of_task_update
-            if  self.status != bug_not_fix :
-                find_task.write({'search_count_bug_of_task_update' : count_bug + 1 }) 
-        # when change  status to  not fixed 
-        elif 'status' in vals:
-            if vals['status'] == bug_not_fix:
-                if count_bug_task_before > 0:
-                    find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before - 1})
-            elif self.status.id == bug_not_fix and vals['status'] != bug_not_fix:
-                find_task_before.write({'search_count_bug_of_task_update' : count_bug_task_before + 1})
-        res = super(ProjectTask, self).write(vals)
-        return res
-
-    #count bugs of task when deleted bug 
-    def unlink(self):
-        for record in self:
-            bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
-            find_task = self.env['project.task'].search([('id', '=',  self.task_id.id)])
-            count_bug = find_task.search_count_bug_of_task_update
-            if self.status.id != bug_not_fix:
-                find_task.write({'search_count_bug_of_task_update' : count_bug - 1 })
-        return super(ProjectTask, self).unlink()
+    # count bugs of task when deleted bug 
+    # def unlink(self):
+    #     for record in self:
+    #         bug_not_fix = self.env['project.task.status'].search([('name', '=' , 'Not Fixed')]).id
+    #         find_task = self.env['project.task'].search([('id', '=',  self.task_id.id)])
+    #         count_bug = find_task.search_count_bug_of_task_update
+    #         if self.status.id != bug_not_fix:
+    #             find_task.write({'search_count_bug_of_task_update' : count_bug - 1 })
+    #     return super(ProjectTask, self).unlink()
 
     #thuat toan dung ma k update
     # @api.constrains('status')
@@ -237,7 +235,6 @@ class CurrentTaskScore(models.Model):
 						AND project_task.date_end <= CONCAT(to_char(date_part('year', CURRENT_DATE), '9999'), '-12-31')::date
 						AND project_issues_type.name = 'Task'
 						AND project_task.task_score != '0'
-                        AND project_task.count_time_sheet_of_tasks > 0
 					GROUP BY
 						emp.id,
                         emp.name,
@@ -259,7 +256,7 @@ class CurrentTaskScore(models.Model):
             'search_view_id': [self.env.ref('ds_ramp_up_recourse.task_score_search').id, 'search'],
             "res_model": "project.task",
             "views": [[self.env.ref('ds_ramp_up_recourse.task_score_view_tree').id, "tree"]],
-            "domain": [('user_ids', 'in', user_id), ('issues_type', '=', issues_type_is_task), ('count_time_sheet_of_tasks', '>', 0),
+            "domain": [('user_ids', 'in', user_id), ('issues_type', '=', issues_type_is_task),
                 ('date_start', '>=', date(date.today().year, 1, 1)), 
                 ('date_end', '<=', date(date.today().year, 12, 31)), ('task_score', 'not in', ['0'])]
         }
