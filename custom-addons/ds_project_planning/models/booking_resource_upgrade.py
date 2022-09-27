@@ -212,6 +212,8 @@ class BookingResourceMonth(models.Model):
 
                 if working_day > 0:
                     record.effort_rate_month = total_effort_week/working_day
+                else:
+                    record.effort_rate_month = 0
 
     @api.onchange('effort_rate_month')
     def check_edit_effort(self):

@@ -149,7 +149,7 @@ class PlanningCalendarResource(models.Model):
         for resource in self:
             total_working_day_off = 0
             for day in self.booking_upgrade_day:
-                if day.effort_rate_day == 0:
+                if day.start_date_day <= resource.end_date and day.effort_rate_day == 0:
                     total_working_day_off += 1
             if resource.duration != 0:
                 resource.calendar_effort = (resource.effort_rate * (resource.duration - total_working_day_off)) / (20 * 100)
