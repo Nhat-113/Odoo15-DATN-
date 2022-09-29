@@ -465,15 +465,8 @@ class PlanningCalendarResource(models.Model):
 
     def action_upgrade_booking(self):
         booking = self if len(self) > 0 else self.env['planning.calendar.resource'].search([])
-        for resource in booking:
-            start_date_common = resource.start_date
-            end_date_common = resource.end_date
-            if pd.Series(pd.date_range(resource.start_date.strftime("%Y-%m-%d"), periods=1)).dt.is_month_start[0] == False:
-                start_date_common = date(resource.start_date.year, resource.start_date.month, 1)
-            if pd.Series(pd.date_range(resource.end_date.strftime("%Y-%m-%d"), periods=1)).dt.is_month_end[0] == False:
-                end_date_common = date(resource.end_date.year, resource.end_date.month, calendar.monthrange(resource.end_date.year, resource.end_date.month)[1])
-            
-            resource.upgrade_booking_common(start_date_common, end_date_common, resource.start_date, resource.end_date)
+        for resource in booking:           
+            resource.upgrade_booking_common(resource.start_date, resource.end_date, resource.start_date, resource.end_date)
             resource.compute_total_effort_common()
 
     @api.onchange('check_upgrade_booking')

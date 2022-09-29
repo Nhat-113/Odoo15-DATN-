@@ -59,10 +59,7 @@ class Project(models.Model):
 
             if len(project.planning_calendar_resources) > 0:
                 for resource in project.planning_calendar_resources:
-                    if resource.member_type:
-                        total_effort += resource.calendar_effort * resource.member_type.rate / 100
-                    else:
-                        total_effort += resource.calendar_effort
+                    total_effort += resource.calendar_effort
             project.total_calendar_effort = total_effort
 
     @api.depends('planning_calendar_resources')
