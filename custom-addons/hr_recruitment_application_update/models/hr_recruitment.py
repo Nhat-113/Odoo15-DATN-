@@ -185,13 +185,15 @@ class Applicant(models.Model):
             }
             
             for user in users:
-                if user.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_project_manager') \
-        and self.stage_id.name in ["Contract Proposal", "Contract Signed"] \
-        and user.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_director')==False:
+                if self.pool.get('res.users').has_group(user.user_id, 'hr_recruitment_application_update.group_hr_recruitment_project_manager') \
+                and self.stage_id.name in ["Contract Proposal", "Contract Signed"] \
+                and self.pool.get('res.users').has_group(user.user_id,'hr_recruitment_application_update.group_hr_recruitment_director')==False:
                     continue
+
                 if (self.last_stage < self.stage_id.id) or \
                 (self.check_pass_interview==False and self.last_stage==3 and self.check_send_mail_confirm==False) or \
                 (self.check_pass_interview and self.stage_id.id==3):
+                
                     self.user_send_mail = user.name
                     values.update(assignee_name=user.sudo().name)
                     assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
@@ -203,10 +205,11 @@ class Applicant(models.Model):
                         record_name=task.display_name,
                         email_layout_xmlid='mail.mail_notification_light',
                         model_description=task_model_description,
-                    )
-                    self.last_stage = self.stage_id.id
+                    )      
                 else:                    
                     return
+
+            self.last_stage = self.stage_id.id
 
     def sent_mail_offer(self):
             """
