@@ -54,63 +54,63 @@ class BookingResourceWeek(models.Model):
                                 week=week.name, start_book=week.booking_id.start_date, end_book=week.booking_id.end_date
                             ))
 
-    def common_check_effort_rate_week(self, check_effort_rate, message, start_date_week, end_date_week):
-        for week in self:
-            member_calendars_week = self.env['booking.resource.week'].search([('employee_id', '=', week.employee_id.id), ('id', '!=', week.id or week.id.origin)])
-            total_effort_booked = 0
-            for member_calendar in member_calendars_week:
-                if member_calendar.booking_id.member_type.name != 'Shadow Time':
-                    if start_date_week <= member_calendar.start_date_week and end_date_week >= member_calendar.end_date_week\
-                        or start_date_week <= member_calendar.start_date_week and end_date_week < member_calendar.end_date_week and end_date_week > member_calendar.start_date_week\
-                        or start_date_week > member_calendar.start_date_week and end_date_week >= member_calendar.end_date_week and start_date_week < member_calendar.end_date_week\
-                        or start_date_week > member_calendar.start_date_week and end_date_week < member_calendar.end_date_week\
-                        or start_date_week == member_calendar.end_date_week or end_date_week == member_calendar.start_date_week:
-                        total_effort_booked += member_calendar.effort_rate_week
-            if week.effort_rate_week + total_effort_booked > 100 and week.booking_id.member_type.name != 'Shadow Time':
-                if total_effort_booked > 0 and total_effort_booked < 100:
-                    week.effort_rate_week = 100 - total_effort_booked
-                check_effort_rate['check'] = False
-                check_effort_rate['total_effort_booked'] = total_effort_booked
-                check_effort_rate['effort_rate'] = week.effort_rate_week
-                message['employee'] = week.employee_id.name
-                message['name'] = week.name
-                message['effort_rate'] = round((100 - total_effort_booked), 2) if round((100 - total_effort_booked), 2) > 0 else 0
-                message['start_date'] = week.start_date_week
-                message['end_date'] = week.end_date_week
-            else:
-                check_effort_rate['check'] = True
+    # def common_check_effort_rate_week(self, check_effort_rate, message, start_date_week, end_date_week):
+    #     for week in self:
+    #         member_calendars_week = self.env['booking.resource.week'].search([('employee_id', '=', week.employee_id.id), ('id', '!=', week.id or week.id.origin)])
+    #         total_effort_booked = 0
+    #         for member_calendar in member_calendars_week:
+    #             if member_calendar.booking_id.member_type.name != 'Shadow Time':
+    #                 if start_date_week <= member_calendar.start_date_week and end_date_week >= member_calendar.end_date_week\
+    #                     or start_date_week <= member_calendar.start_date_week and end_date_week < member_calendar.end_date_week and end_date_week > member_calendar.start_date_week\
+    #                     or start_date_week > member_calendar.start_date_week and end_date_week >= member_calendar.end_date_week and start_date_week < member_calendar.end_date_week\
+    #                     or start_date_week > member_calendar.start_date_week and end_date_week < member_calendar.end_date_week\
+    #                     or start_date_week == member_calendar.end_date_week or end_date_week == member_calendar.start_date_week:
+    #                     total_effort_booked += member_calendar.effort_rate_week
+    #         if week.effort_rate_week + total_effort_booked > 100 and week.booking_id.member_type.name != 'Shadow Time':
+    #             if total_effort_booked > 0 and total_effort_booked < 100:
+    #                 week.effort_rate_week = 100 - total_effort_booked
+    #             check_effort_rate['check'] = False
+    #             check_effort_rate['total_effort_booked'] = total_effort_booked
+    #             check_effort_rate['effort_rate'] = week.effort_rate_week
+    #             message['employee'] = week.employee_id.name
+    #             message['name'] = week.name
+    #             message['effort_rate'] = round((100 - total_effort_booked), 2) if round((100 - total_effort_booked), 2) > 0 else 0
+    #             message['start_date'] = week.start_date_week
+    #             message['end_date'] = week.end_date_week
+    #         else:
+    #             check_effort_rate['check'] = True
 
-    @api.onchange('effort_rate_week')
-    def check_effort_rate_week(self):
-        for week in self:
-            message={}
-            check_effort_rate = {}
-            week.common_check_effort_rate_week(check_effort_rate, message, week.start_date_week, week.end_date_week)
-            if check_effort_rate['check'] == False:
-                msg = "{name}: Employee {employee} has ({effort_rate}%) Effort Rate in the period from {start_date} to {end_date}.".format(employee=message['employee'],\
-                            effort_rate=message['effort_rate'], start_date=message['start_date'], end_date=message['end_date'], name=message['name'])
-                warning = {
-                                'warning': {
-                                    'title': 'Warning!',
-                                    'message': msg
-                                }
-                            }
-                if check_effort_rate['effort_rate'] > 100:
-                    week.effort_rate_week = 100
-                    return warning
-                elif message['effort_rate'] < 100:
-                    return warning
+    # @api.onchange('effort_rate_week')
+    # def check_effort_rate_week(self):
+    #     for week in self:
+    #         message={}
+    #         check_effort_rate = {}
+    #         week.common_check_effort_rate_week(check_effort_rate, message, week.start_date_week, week.end_date_week)
+    #         if check_effort_rate['check'] == False:
+    #             msg = "{name}: Employee {employee} has ({effort_rate}%) Effort Rate in the period from {start_date} to {end_date}.".format(employee=message['employee'],\
+    #                         effort_rate=message['effort_rate'], start_date=message['start_date'], end_date=message['end_date'], name=message['name'])
+    #             warning = {
+    #                             'warning': {
+    #                                 'title': 'Warning!',
+    #                                 'message': msg
+    #                             }
+    #                         }
+    #             if check_effort_rate['effort_rate'] > 100:
+    #                 week.effort_rate_week = 100
+    #                 return warning
+    #             elif message['effort_rate'] < 100:
+    #                 return warning
 
-    @api.constrains('effort_rate_week')
-    def _effort_rate_when_close_form(self):
-        for week in self:
-            message={}
-            check_effort_rate = {}
-            week.common_check_effort_rate_week(check_effort_rate, message, week.start_date_week, week.end_date_week)
-            if check_effort_rate['check'] == False:
-                msg = "{name}: Employee {employee} has ({effort_rate}%) Effort Rate in the period from {start_date} to {end_date}.".format(employee=message['employee'],\
-                            effort_rate=message['effort_rate'], start_date=message['start_date'], end_date=message['end_date'], name=message['name'])
-                raise UserError(msg)
+    # @api.constrains('effort_rate_week')
+    # def _effort_rate_when_close_form(self):
+    #     for week in self:
+    #         message={}
+    #         check_effort_rate = {}
+    #         week.common_check_effort_rate_week(check_effort_rate, message, week.start_date_week, week.end_date_week)
+    #         if check_effort_rate['check'] == False:
+    #             msg = "{name}: Employee {employee} has ({effort_rate}%) Effort Rate in the period from {start_date} to {end_date}.".format(employee=message['employee'],\
+    #                         effort_rate=message['effort_rate'], start_date=message['start_date'], end_date=message['end_date'], name=message['name'])
+    #             raise UserError(msg)
 
     @api.onchange('effort_rate_week')
     def check_effort_week_over(self):
@@ -269,67 +269,67 @@ class BookingResourceMonth(models.Model):
             month_id += ' ' + str(month.id or month.id.origin)
         self.booking_id.get_id_month(month_id)
 
-    def common_check_effort_rate_month(self, check_effort_rate, message, start_date_month, end_date_month):
-        for month in self:
-            member_calendars_month = self.env['booking.resource.month'].search([('employee_id', '=', month.employee_id.id), ('id', '!=', month.id or month.id.origin)])
-            total_effort_booked = 0
-            for member_calendar in member_calendars_month:
-                if member_calendar.booking_id.member_type.name != 'Shadow Time':
-                    if start_date_month <= member_calendar.start_date_month and end_date_month >= member_calendar.end_date_month\
-                        or start_date_month <= member_calendar.start_date_month and end_date_month < member_calendar.end_date_month and end_date_month > member_calendar.start_date_month\
-                        or start_date_month > member_calendar.start_date_month and end_date_month >= member_calendar.end_date_month and start_date_month < member_calendar.end_date_month\
-                        or start_date_month > member_calendar.start_date_month and end_date_month < member_calendar.end_date_month\
-                        or start_date_month == member_calendar.end_date_month or end_date_month == member_calendar.start_date_month:
-                        total_effort_booked += member_calendar.effort_rate_month
-            if month.effort_rate_month + total_effort_booked > 100 and month.booking_id.member_type.name != 'Shadow Time':
-                if total_effort_booked > 0 and total_effort_booked < 100:
-                    month.effort_rate_month = 100 - total_effort_booked
-                elif total_effort_booked == 0:
-                    month.effort_rate_month = month.booking_id.effort_rate
-                else:
-                    month.effort_rate_month = 0
-                check_effort_rate['check'] = False
-                check_effort_rate['total_effort_booked'] = total_effort_booked
-                check_effort_rate['effort_rate'] = month.effort_rate_month
-                message['employee'] = month.employee_id.name
-                message['name'] = month.name
-                message['effort_rate'] = round((100 - total_effort_booked), 2) if round((100 - total_effort_booked), 2) > 0 else 0
-                message['start_date'] = month.start_date_month
-                message['end_date'] = month.end_date_month
-            else:
-                check_effort_rate['check'] = True
+    # def common_check_effort_rate_month(self, check_effort_rate, message, start_date_month, end_date_month):
+    #     for month in self:
+    #         member_calendars_month = self.env['booking.resource.month'].search([('employee_id', '=', month.employee_id.id), ('id', '!=', month.id or month.id.origin)])
+    #         total_effort_booked = 0
+    #         for member_calendar in member_calendars_month:
+    #             if member_calendar.booking_id.member_type.name != 'Shadow Time':
+    #                 if start_date_month <= member_calendar.start_date_month and end_date_month >= member_calendar.end_date_month\
+    #                     or start_date_month <= member_calendar.start_date_month and end_date_month < member_calendar.end_date_month and end_date_month > member_calendar.start_date_month\
+    #                     or start_date_month > member_calendar.start_date_month and end_date_month >= member_calendar.end_date_month and start_date_month < member_calendar.end_date_month\
+    #                     or start_date_month > member_calendar.start_date_month and end_date_month < member_calendar.end_date_month\
+    #                     or start_date_month == member_calendar.end_date_month or end_date_month == member_calendar.start_date_month:
+    #                     total_effort_booked += member_calendar.effort_rate_month
+    #         if month.effort_rate_month + total_effort_booked > 100 and month.booking_id.member_type.name != 'Shadow Time':
+    #             if total_effort_booked > 0 and total_effort_booked < 100:
+    #                 month.effort_rate_month = 100 - total_effort_booked
+    #             elif total_effort_booked == 0:
+    #                 month.effort_rate_month = month.booking_id.effort_rate
+    #             else:
+    #                 month.effort_rate_month = 0
+    #             check_effort_rate['check'] = False
+    #             check_effort_rate['total_effort_booked'] = total_effort_booked
+    #             check_effort_rate['effort_rate'] = month.effort_rate_month
+    #             message['employee'] = month.employee_id.name
+    #             message['name'] = month.name
+    #             message['effort_rate'] = round((100 - total_effort_booked), 2) if round((100 - total_effort_booked), 2) > 0 else 0
+    #             message['start_date'] = month.start_date_month
+    #             message['end_date'] = month.end_date_month
+    #         else:
+    #             check_effort_rate['check'] = True
 
-    @api.onchange('effort_rate_month')
-    def check_effort_rate_month(self):
-        for month in self:
-            message={}
-            check_effort_rate = {}
-            month.common_check_effort_rate_month(check_effort_rate, message, month.start_date_month, month.end_date_month)
-            if check_effort_rate['check'] == False:
-                msg = "{name}: Employee {employee} has ({effort_rate}%) Effort Rate in the period from {start_date} to {end_date}.".format(employee=message['employee'],\
-                            effort_rate=message['effort_rate'], start_date=message['start_date'], end_date=message['end_date'], name=message['name'])
-                warning = {
-                                'warning': {
-                                    'title': 'Warning!',
-                                    'message': msg
-                                }
-                            }
-                if check_effort_rate['effort_rate'] > 100:
-                    month.effort_rate_month = 100
-                    return warning
-                elif message['effort_rate'] < 100:
-                    return warning
+    # @api.onchange('effort_rate_month')
+    # def check_effort_rate_month(self):
+    #     for month in self:
+    #         message={}
+    #         check_effort_rate = {}
+    #         month.common_check_effort_rate_month(check_effort_rate, message, month.start_date_month, month.end_date_month)
+    #         if check_effort_rate['check'] == False:
+    #             msg = "{name}: Employee {employee} has ({effort_rate}%) Effort Rate in the period from {start_date} to {end_date}.".format(employee=message['employee'],\
+    #                         effort_rate=message['effort_rate'], start_date=message['start_date'], end_date=message['end_date'], name=message['name'])
+    #             warning = {
+    #                             'warning': {
+    #                                 'title': 'Warning!',
+    #                                 'message': msg
+    #                             }
+    #                         }
+    #             if check_effort_rate['effort_rate'] > 100:
+    #                 month.effort_rate_month = 100
+    #                 return warning
+    #             elif message['effort_rate'] < 100:
+    #                 return warning
 
-    @api.constrains('effort_rate_month')
-    def _effort_rate_when_close_form(self):
-        for month in self:
-            message={}
-            check_effort_rate = {}
-            month.common_check_effort_rate_month(check_effort_rate, message, month.start_date_month, month.end_date_month)
-            if check_effort_rate['check'] == False:
-                msg = "{name}: Employee {employee} has ({effort_rate}%) Effort Rate in the period from {start_date} to {end_date}.".format(employee=message['employee'],\
-                            effort_rate=message['effort_rate'], start_date=message['start_date'], end_date=message['end_date'], name=message['name'])
-                raise UserError(msg)
+    # @api.constrains('effort_rate_month')
+    # def _effort_rate_when_close_form(self):
+    #     for month in self:
+    #         message={}
+    #         check_effort_rate = {}
+    #         month.common_check_effort_rate_month(check_effort_rate, message, month.start_date_month, month.end_date_month)
+    #         if check_effort_rate['check'] == False:
+    #             msg = "{name}: Employee {employee} has ({effort_rate}%) Effort Rate in the period from {start_date} to {end_date}.".format(employee=message['employee'],\
+    #                         effort_rate=message['effort_rate'], start_date=message['start_date'], end_date=message['end_date'], name=message['name'])
+    #             raise UserError(msg)
 
     def check_effort_month_when_gen(self, check_effort_rate_month, message_month, start_date_month, end_date_month, employee_id, effort_month, member_type):
         id_member_type = self.env['planning.member.type'].search([('name', '=', 'Shadow Time')]).id
@@ -425,8 +425,6 @@ class BookingResourceDay(models.Model):
     def calculator_effort_week(self, effort_month_edit, effort_week_expired, len_week, len_week_no_expired):
         return ((effort_month_edit * len_week) - effort_week_expired) / len_week_no_expired
 
-
-
     def check_effort_day_when_gen(self, check_effort_rate_day, message_day, start_date_day, end_date_day, employee_id, member_type):
         id_member_type = self.env['planning.member.type'].search([('name', '=', 'Shadow Time')]).id
         member_calendars_day = self.env['booking.resource.day'].search([('employee_id', '=', employee_id.id), ('member_type', '!=', id_member_type)])
@@ -440,6 +438,71 @@ class BookingResourceDay(models.Model):
             message_day['effort_rate'] = round((100 - total_effort_booked), 2) if round((100 - total_effort_booked), 2) > 0 else 0
         else:
             check_effort_rate_day['check'] = True
+
+    @api.constrains('effort_rate_day')
+    def check_effort_month_over(self):
+        for day in self:
+            if day.effort_rate_day < 0 or day.effort_rate_day > 100:
+                raise UserError(_('Day : Effort Rate greater than or equal to 0% & less than or equal to 100%.'))
+
+
+    def common_check_effort_rate_day(self, check_effort_rate, message, start_date_day, end_date_day):
+        for day in self:
+            member_calendars_day = self.env['booking.resource.day'].search([('employee_id', '=', day.employee_id.id), ('id', '!=', day.id or day.id.origin), ('start_date_day', '=', start_date_day)])
+            total_effort_booked = 0
+            for member_calendar in member_calendars_day:
+                if member_calendar.booking_id.member_type.name != 'Shadow Time':
+                    if start_date_day == member_calendar.start_date_day and end_date_day == member_calendar.end_date_day:
+                        total_effort_booked += member_calendar.effort_rate_day
+            if day.effort_rate_day + total_effort_booked > 100 and day.booking_id.member_type.name != 'Shadow Time':
+                if total_effort_booked > 0 and total_effort_booked < 100:
+                    day.effort_rate_day = 100 - total_effort_booked
+                elif total_effort_booked == 0:
+                    day.effort_rate_day = day.booking_id.effort_rate
+                else:
+                    day.effort_rate_day = 0
+                check_effort_rate['check'] = False
+                check_effort_rate['total_effort_booked'] = total_effort_booked
+                check_effort_rate['effort_rate'] = day.effort_rate_day
+                message['employee'] = day.employee_id.name
+                message['name'] = day.name
+                message['effort_rate'] = round((100 - total_effort_booked), 2) if round((100 - total_effort_booked), 2) > 0 else 0
+                message['start_date'] = day.start_date_day
+                message['end_date'] = day.end_date_day
+            else:
+                check_effort_rate['check'] = True
+
+    @api.onchange('effort_rate_day')
+    def check_effort_rate_day(self):
+        for day in self:
+            message={}
+            check_effort_rate = {}
+            day.common_check_effort_rate_day(check_effort_rate, message, day.start_date_day, day.end_date_day)
+            if check_effort_rate['check'] == False:
+                msg = "{name}: Employee {employee} has ({effort_rate}%) Effort Rate in day {start_date}.".format(employee=message['employee'],\
+                            effort_rate=message['effort_rate'], start_date=message['start_date'], name=message['name'])
+                warning = {
+                                'warning': {
+                                    'title': 'Warning!',
+                                    'message': msg
+                                }
+                            }
+                if check_effort_rate['effort_rate'] > 100:
+                    day.effort_rate_day = 100
+                    return warning
+                elif message['effort_rate'] < 100:
+                    return warning
+
+    @api.constrains('effort_rate_day')
+    def _effort_rate_when_close_form(self):
+        for day in self:
+            message={}
+            check_effort_rate = {}
+            day.common_check_effort_rate_day(check_effort_rate, message, day.start_date_day, day.end_date_day)
+            if check_effort_rate['check'] == False:
+                msg = "{name}: Employee {employee} has ({effort_rate}%) Effort Rate in day {start_date}.".format(employee=message['employee'],\
+                            effort_rate=message['effort_rate'], start_date=message['start_date'], name=message['name'])
+                raise UserError(msg) 
 
 
 class BookingResourceDay(models.Model):
