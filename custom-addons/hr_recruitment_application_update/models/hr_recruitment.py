@@ -37,6 +37,8 @@ class Applicant(models.Model):
                                  default=lambda
                                  self: self.env.user.company_id.currency_id.id)
 
+    check_contract_click = fields.Boolean("Check contract click", default=False)
+
     def _get_hide_plus_sign(self):
         for item in self:
             if self.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_director')==False:
@@ -88,6 +90,8 @@ class Applicant(models.Model):
                         continue
                     else:
                         self.send_mail()
+                elif record.stage_name =="Contract Signed":
+                    self.send_mail()
             except:
                 continue
 
@@ -110,6 +114,12 @@ class Applicant(models.Model):
         for item in self:
             item.check_pass_interview = True
             self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
+    
+    def confirm_contract_click(self):
+        self.check_contract_click = True
+        for item in self:
+            self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
+            self.send_mail()
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
@@ -150,6 +160,12 @@ class Applicant(models.Model):
         elif self.stage_id.name=="Confirm CV":
             template = 'hr_recruitment_application_update.hearing_cv_application_message'
             subject_template = "Hearing CV"
+        elif self.stage_id.name=="Contract Signed":
+            template = 'hr_recruitment_application_update.contract_sign_application_message'
+            subject_template = "Contract Signed"
+        elif self.stage_id.name=="Contract Proposal":
+            template = 'hr_recruitment_application_update.confirm_contract'
+            subject_template = "Confirm Contract"
         else:
             template = ''
             subject_template = ""
@@ -167,7 +183,12 @@ class Applicant(models.Model):
                 'model_description': task_model_description,
                 'access_link': task._notify_get_action_link('view'),
             }
+            
             for user in users:
+                if user.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_project_manager') \
+        and self.stage_id.name in ["Contract Proposal", "Contract Signed"] \
+        and user.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_director')==False:
+                    continue
                 if (self.last_stage < self.stage_id.id) or \
                 (self.check_pass_interview==False and self.last_stage==3 and self.check_send_mail_confirm==False) or \
                 (self.check_pass_interview and self.stage_id.id==3):

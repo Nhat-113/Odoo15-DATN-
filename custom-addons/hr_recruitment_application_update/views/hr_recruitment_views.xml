@@ -58,9 +58,11 @@
             <xpath expr="//button[@name='create_employee_from_applicant']" position="replace">
                 <field name="stage_name" invisible="1"/>
                 <field name="check_pass_interview" invisible="1"/>
+                <field name="check_contract_click" invisible="1"/>
                 <button name="confirm_cv" string ="CONFIRM CV" type="object" data-hotkey="v" class="oe_highlight" attrs="{'invisible': [('stage_name', '!=', 'Confirm CV')]}"/>
                 <button name="applicant_pass_interview" string="PASS INTERVIEW" type="object" data-hotkey="v" class="oe_highlight" attrs="{'invisible': ['|',('stage_name', '!=', 'Interview'),('check_pass_interview','=',True)]}"/>
-                <button name="sent_mail_offer" string="SEND MAIL OFFER" type="object" class="oe_highlight" attrs="{'invisible': [('stage_name', '!=', 'Contract Proposal')]}"/>
+                <button name="sent_mail_offer" string="SEND MAIL OFFER" type="object" class="oe_highlight" attrs="{'invisible':  ['|', ('check_contract_click','=',False),('stage_name', '!=', 'Contract Proposal')]}"/>
+                <button name="confirm_contract_click" string="CONFIRM CONTRACT" type="object" class="oe_highlight" attrs="{'invisible': ['|',('stage_name', '!=', 'Contract Proposal'),('check_contract_click','=',True)]}"/>
             </xpath>
         </field>
     </record>
