@@ -159,16 +159,16 @@ class BookingResourceWeek(models.Model):
 
             remaining_effort = round(100 - total_effort_booked)
             if week.effort_rate_week > (remaining_effort * count_day)/5:
-                raise UserError(_('Since %(name)s has only %(day_count)s days, the current amount of effort (%(effort_week)s) should not be greater than %(remaining)s.', name=week.name, \
-                    effort_week=week.effort_rate_week, remaining=(remaining_effort * count_day)/5, day_count=count_day))
+                raise UserError(_('%(employee)s : Since %(name)s has only %(day_count)s days, the current amount of effort (%(effort_week)s) should not be greater than %(remaining)s.', name=week.name, \
+                    effort_week=week.effort_rate_week, remaining=(remaining_effort * count_day)/5, day_count=count_day, employee=week.employee_id.name))
 
     @api.onchange('effort_rate_week')
     def check_effort_week_remaining_onchange(self):
         self.check_effort_week_remaining_common()
 
-    @api.constrains('effort_rate_week')
-    def check_effort_week_remaining_constrains(self):
-        self.check_effort_week_remaining_common()
+    # @api.constrains('effort_rate_week')
+    # def check_effort_week_remaining_constrains(self):
+    #     self.check_effort_week_remaining_common()
 
 
 class BookingResourceWeekTemp(models.Model):

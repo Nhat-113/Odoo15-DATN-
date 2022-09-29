@@ -148,7 +148,7 @@ class PlanningCalendarResource(models.Model):
     def _compute_calendar_effort(self):
         for resource in self:
             total_working_day_off = 0
-            for day in self.booking_upgrade_day:
+            for day in resource.booking_upgrade_day:
                 if day.start_date_day <= resource.end_date and day.effort_rate_day == 0:
                     total_working_day_off += 1
             if resource.duration != 0:
