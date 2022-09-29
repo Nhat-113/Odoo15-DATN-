@@ -124,12 +124,12 @@ class Project(models.Model):
 
     def open_planning_task_all(self):
         for project in self:
-            if self.env['project.task'].search_count(['&',('project_id','=',project.id),('issues_type','=',1)]) == 0:
-                raise UserError(
-                     _("No tasks found. Let's create one!"))
-            else:
-                action = self.with_context(active_id=self.id, active_ids=self.ids) \
-                    .env.ref('ds_project_planning.open_planning_task_all_on_gantt') \
-                    .sudo().read()[0]
+            # if self.env['project.task'].search_count(['&',('project_id','=',project.id),('issues_type','=',1)]) == 0:
+            #     raise UserError(
+            #          _("No tasks found. Let's create one!"))
+            # else:
+            action = self.with_context(active_id=self.id, active_ids=self.ids) \
+                .env.ref('ds_project_planning.open_planning_task_all_on_gantt') \
+                .sudo().read()[0]
             action['display_name'] = self.name
         return action
