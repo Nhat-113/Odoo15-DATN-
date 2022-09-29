@@ -33,7 +33,7 @@
         <template id="new_application_message">
             <p style="margin: 0px;">
                 <span>Dear <t t-esc="object.user_send_mail"/>,</span><br/>
-                <span style="margin-top: 8px;">An application <b><t t-esc="object.display_name"/></b> has just been by <b>created</b> by <b><t t-esc="object.user_id.name"/></b></span>
+                <span style="margin-top: 8px;">An application <b><t t-esc="object.display_name"/></b> has just been <b>created</b> with Recruiter: <b><t t-esc="object.user_id.name"/></b></span>
                 <br></br>
             </p>
             <p style="padding-top: 24px; padding-bottom: 16px;">
@@ -47,7 +47,7 @@
         <template id="hearing_cv_application_message">
             <p style="margin: 0px;">
                 <span>Dear <t t-esc="object.user_send_mail"/>,</span><br/>
-                <span style="margin-top: 8px;">Application <b><t t-esc="object.display_name"/></b> has just <b>received CV</b>, check now!</span>
+                <span style="margin-top: 8px;">Application <b><t t-esc="object.display_name"/></b> has just <b>Received CV</b>, check now!</span>
                 <br></br>
             </p>
             <p style="padding-top: 24px; padding-bottom: 16px;">
