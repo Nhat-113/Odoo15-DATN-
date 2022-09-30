@@ -18,7 +18,7 @@
         <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='user_id']" position="after">
-                <field name="recruitment_requester" widget="many2many_tags"/>
+                <field name="recruitment_requester" widget="many2many_tags" options="{'m2o_dialog': False, 'no_create': True, 'no_open': True}"/>
             </xpath>
         </field>
     </record>
