@@ -147,6 +147,34 @@ class BookingResourceWeek(models.Model):
             if week.effort_rate_week < 0 or week.effort_rate_week > 100:
                 raise UserError(_('Week : Effort Rate greater than or equal to 0% & less than or equal to 100%.'))
 
+    def check_effort_week_remaining_common(self):
+        for week in self:
+            days = self.env['booking.resource.day'].search([('employee_id', '=', week.employee_id.id), ('booking_id', '=', week.booking_id.id or week.booking_id.id.origin)])
+            count_day = 0
+            day_of_week = []
+            for day in days:
+                if week.start_date_week <= day.start_date_day and week.end_date_week >= day.start_date_day:
+                    count_day += 1
+                    day_of_week.append(day)
+            total_effort_booked = 0
+            if len(day_of_week) > 0:
+                for rec in self.env['booking.resource.day'].search([('employee_id', '=', week.employee_id.id), ('start_date_day', '=', day_of_week[0].start_date_day), ('booking_id', '!=', day_of_week[0].booking_id.id)]):
+                    total_effort_booked += rec.effort_rate_day
+
+            remaining_effort = round(100 - total_effort_booked)
+            working_day = len(pd.bdate_range(week.start_date_week.strftime('%Y-%m-%d'),
+                                            week.end_date_week.strftime('%Y-%m-%d')))
+            if working_day > 0:
+                if week.effort_rate_week > (remaining_effort * count_day)/working_day:
+                    raise UserError(_('%(name)s : The current amount of effort (%(effort_week)s) should not be greater than %(remaining)s.', effort_week=week.effort_rate_week,\
+                        remaining=(remaining_effort * count_day)/working_day, day_count=count_day, employee=week.name))
+            else:
+                raise UserError('Do not edit the week with working day equal to 0.')
+
+    @api.onchange('effort_rate_week')
+    def check_effort_week_remaining_onchange(self):
+        self.check_effort_week_remaining_common()
+
 
 class BookingResourceWeekTemp(models.Model):
     _name = "booking.resource.week.temp"

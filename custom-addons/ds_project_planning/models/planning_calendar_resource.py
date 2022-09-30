@@ -503,16 +503,22 @@ class PlanningCalendarResource(models.Model):
 
     def compute_total_effort_common(self):
         for resource in self:
-            total_effort_all = 0
-            len_booking_update_month = 0
-            for month in resource.booking_upgrade_month:
-                total_effort_all += month.effort_rate_month
-                if month.effort_rate_month > 0:
-                    len_booking_update_month += 1
-            if len_booking_update_month > 0:
-                self.env['planning.calendar.resource'].search([('id', '=', resource.id or resource.id.origin)]).write({
-                    'effort_rate' : total_effort_all / len_booking_update_month
-                })
+            total_effort_week = 0
+            working_day = 0
+            for rec in resource.booking_upgrade_day:
+                if resource.start_date <= rec.start_date_day and resource.end_date >= rec.start_date_day:
+                    total_effort_week += (rec.effort_rate_day)
+                    if rec.effort_rate_day > 0:
+                        working_day += 1
+
+            if working_day > 0:
+                effort_rate_total = total_effort_week/working_day
+            else:
+                effort_rate_total = 0
+
+            self.env['planning.calendar.resource'].search([('id', '=', resource.id or resource.id.origin)]).write({
+                'effort_rate' : effort_rate_total
+            })
     
     def calculator_total_effort(self):
         self.compute_total_effort_common()
