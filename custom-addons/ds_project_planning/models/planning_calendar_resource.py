@@ -469,8 +469,10 @@ class PlanningCalendarResource(models.Model):
                 total_effort_week += (rec.effort_rate_day)
                 if rec.effort_rate_day > 0:
                     working_day_month += 1
-
-        return total_effort_week/working_day_month
+        if working_day_month > 0:
+            return total_effort_week/working_day_month
+        else:
+            return 0
 
     def action_upgrade_booking(self):
         booking = self if len(self) > 0 else self.env['planning.calendar.resource'].search([])
