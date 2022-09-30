@@ -416,9 +416,8 @@ class PlanningCalendarResource(models.Model):
                 check_effort_rate_month = {}
                 resource.booking_upgrade_month.check_effort_month_when_gen(check_effort_rate_month, message_month, list_start_end[i], list_start_end[i+1],\
                     resource.employee_id, resource.effort_rate, resource.member_type.name)
-                working_day_month = len(pd.bdate_range(list_start_end[i].strftime('%Y-%m-%d'),
-                                            list_start_end[i+1].strftime('%Y-%m-%d')))
-                effort_month = resource.compute_effort_when_gen(list_start_end[i], list_start_end[i+1], resource.employee_id.id, resource.id or resource.id.origin, working_day_month)
+
+                effort_month = resource.compute_effort_month_when_gen(list_start_end[i], list_start_end[i+1], resource.employee_id.id, resource.id or resource.id.origin)
                 month_temp = booking.env['booking.resource.month.temp'].create({
                     'name': 'Month ' + str(list_start_end[i].month),
                     'start_date_month': list_start_end[i],
@@ -462,6 +461,16 @@ class PlanningCalendarResource(models.Model):
 
         return total_effort_week/working_day
 
+    def compute_effort_month_when_gen(self, start_date, end_date, employee_id, booking_id):
+        total_effort_week = 0
+        working_day_month = 0
+        for rec in self.env['booking.resource.day'].search([('employee_id', '=', employee_id), ('booking_id', '=', booking_id)]):
+            if start_date <= rec.start_date_day and end_date >= rec.start_date_day:
+                total_effort_week += (rec.effort_rate_day)
+                if rec.effort_rate_day > 0:
+                    working_day_month += 1
+
+        return total_effort_week/working_day_month
 
     def action_upgrade_booking(self):
         booking = self if len(self) > 0 else self.env['planning.calendar.resource'].search([])

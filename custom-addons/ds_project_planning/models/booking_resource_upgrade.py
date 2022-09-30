@@ -252,8 +252,10 @@ class BookingResourceMonth(models.Model):
                             end_date = week.booking_id.end_date
                         else:
                             end_date = week.end_date_week
-                        working_day += len(pd.bdate_range(start_date.strftime('%Y-%m-%d'),
-                                            end_date.strftime('%Y-%m-%d')))
+            for day in month.booking_id.booking_upgrade_day:
+                if day.start_date_day >= month.start_date_month and day.end_date_day <= month.end_date_month:
+                    if day.effort_rate_day > 0:
+                        working_day += 1
             month.man_month = round(working_day/20 * month.effort_rate_month/100, 3)
 
     @api.onchange('effort_rate_month')
