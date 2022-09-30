@@ -1,0 +1,37 @@
+.salary_percentage_css::after {
+    content: "(%)";
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.work_month_css::after {
+    content: "(month)";
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.salary_expected_extra_css:empty{
+    margin-bottom: -4px;
+}
+
+.priority_fix_ui {
+    width: 16.3%!important;
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+@media only screen and (max-width: 1600px) {
+    .priority_fix_ui {
+        width: 17%!important;
+    }
+}
+@media only screen and (max-width: 1400px) {
+    .priority_fix_ui {
+        width: 16%!important;
+    }
+}
+@media only screen and (max-width: 1200px) {
+    .priority_fix_ui {
+        width: 20%!important;
+    }
+}

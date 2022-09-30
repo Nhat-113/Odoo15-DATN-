@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Add field to hr_applicant_view_form -->
+    <record id="hr_application_date_inherit" model="ir.ui.view">
+        <field name="name">hr.applicant.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='source_id']" position="after">
+                <field name="application_date"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_application_requester_recruiment" model="ir.ui.view">
+        <field name="name">hr.applicant.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="recruitment_requester" widget="many2many_tags" options="{'m2o_dialog': False, 'no_create': True, 'no_open': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Evaluation field -->
+    <record id="hr_application_evaluation_applicant" model="ir.ui.view">
+        <field name="name">hr.applicant.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook/page" position="after">
+                <page name="miadi_variantes_conditionnement_2" string="Evaluation">
+                    <field name="evaluation_applicant" placeholder="Evaluation applicant..."/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!--  Hide feild proposed salary with role PM  -->
+    <record id="hr_applicant_form_view_inherit" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='create_employee_from_applicant']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add button confirm CV -->
+    <record id="hr_applicant_form_view_inherit" model="ir.ui.view">
+        <field name="name">hr.applicant.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='create_employee_from_applicant']" position="replace">
+                <field name="stage_name" invisible="1"/>
+                <field name="check_pass_interview" invisible="1"/>
+                <field name="check_contract_click" invisible="1"/>
+                <button name="confirm_cv" string ="CONFIRM CV" type="object" data-hotkey="v" class="oe_highlight" attrs="{'invisible': [('stage_name', '!=', 'Confirm CV')]}"/>
+                <button name="applicant_pass_interview" string="PASS INTERVIEW" type="object" data-hotkey="v" class="oe_highlight" attrs="{'invisible': ['|',('stage_name', '!=', 'Interview'),('check_pass_interview','=',True)]}"/>
+                <button name="sent_mail_offer" string="SEND MAIL OFFER" type="object" class="oe_highlight" attrs="{'invisible':  ['|', ('check_contract_click','=',False),('stage_name', '!=', 'Contract Proposal')]}"/>
+                <button name="confirm_contract_click" string="CONFIRM CONTRACT" type="object" class="oe_highlight" attrs="{'invisible': ['|',('stage_name', '!=', 'Contract Proposal'),('check_contract_click','=',True)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_applicant_form_view_inherit_widget_passed" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/widget[1]" position="after">
+                <field name="check_pass_interview" invisible="1"/>
+                <widget name="web_ribbon" title="PASSED" bg_color="bg-success" attrs="{'invisible': [('check_pass_interview', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_applicant_form_view_inherit_widget_confirmed" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/widget[1]" position="after">
+                <field name="check_send_mail_confirm" invisible="1"/>
+                <widget name="web_ribbon" title="CONFIRMED" bg_color="bg-success" attrs="{'invisible': [('check_send_mail_confirm', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_applicant_form_view_inherit_priority" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group/field[@name='priority']" position="replace">
+                <field name="priority" widget="priority" class="priority_fix_ui"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_applicant_form_view_inherit_salary_percentage" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group/group[4]" position="replace">
+                <group string="Contract">
+                    <field name="availability"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="check_hide_sign_plus" invisible="1"/>
+                    <label for="salary_expected"/>
+                    <div class="o_row">
+                        <field widget="monetary" class="salary_expected_css" digits="[42,0]" name="salary_expected"/>
+                        <span attrs="{'invisible':[('salary_expected_extra','=',False)]}"> + </span>
+                        <field class="salary_expected_extra_css" name="salary_expected_extra" placeholder="Extra advantages..."/>
+                    </div>
+                    <label for="salary_proposed" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
+                    <div class="o_row">
+                        <field widget="monetary" name="salary_proposed" digits="[42,0]" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
+                        <span attrs="{'invisible':['|', ('salary_proposed_extra','=',False), ('check_hide_sign_plus','=',False)]}"> + </span>
+                        <field name="salary_proposed_extra" class="salary_expected_extra_css" placeholder="Extra advantages..." groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
+                    </div>
+                    <label for="salary_percentage" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
+                    <div class="o_row">
+                        <field name="salary_percentage" optional="show" class="salary_percentage_css" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
+                    </div>
+                    <label for="work_month" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
+                    <div class="o_row">
+                        <field name="work_month" optional="show" class="work_month_css" groups="hr_recruitment_application_update.group_hr_recruitment_director"/>
+                    </div>
+                    <field name="emp_id" invisible="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_kanban_view_applicant_inherit_pass_interview" model="ir.ui.view">
+        <field name="name">hr.applicants.kanban.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_kanban_view_applicant"/>
+        <field name="arch" type="xml">
+            <xpath expr="//templates/t/div/field[@name='date_closed']" position="after">
+                <field name="check_pass_interview" invisible="1"/>
+                <div class="ribbon ribbon-top-right" attrs="{'invisible': [('check_pass_interview', '=', False)]}">
+                    <span class="bg-success">PASSED</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!--  Hide button send interview form hr survey  -->
+    <record id="hr_applicant_view_form_inherit" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_send_survey']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_applicant_view_tree_inherit_optional" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.crm_case_tree_view_job"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_ids']" position="replace">
+                <field name="categ_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="hr_recruitment.action_hr_job_applications">
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+    
+    ######################## JOB OPPORTUNITIES (menu) ###########################
+    <record model="ir.actions.act_window" id="crm_case_categ0_act_job_inherit">
+        <field name="name">Applications</field>
+        <field name="res_model">hr.applicant</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" eval="False"/>
+        <field name="search_view_id" ref="hr_recruitment.hr_applicant_view_search_bis"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">
+            No applications yet
+            </p>
+            <p>
+            Odoo helps you track applicants in the recruitment
+            process and follow up all operations: meetings, interviews, etc.
+            </p>
+            <p>
+            Applicants and their attached CV are created automatically when an email is sent.
+            If you install the document management modules, all resumes are indexed automatically,
+            so that you can easily search through their content.
+            </p>
+        </field>
+    </record>
+
+</odoo>

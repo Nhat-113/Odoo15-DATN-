@@ -1,0 +1,12 @@
+<odoo>
+    <record id="applicant_get_refuse_reason_view_form_send_mail" model="ir.ui.view">
+        <field name="name">applicant.get.refuse.reason.form</field>
+        <field name="model">applicant.get.refuse.reason</field>
+        <field name="inherit_id" ref="hr_recruitment.applicant_get_refuse_reason_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='send_mail']" position="replace">
+                <field name="send_mail" attrs="{'invisible': [('refuse_reason_id', '=', False)]}" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
