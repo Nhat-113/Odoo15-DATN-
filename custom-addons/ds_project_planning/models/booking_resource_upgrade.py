@@ -2,6 +2,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from datetime import date
 import pandas as pd
+import calendar
 
 
 class BookingResourceWeek(models.Model):
@@ -28,8 +29,12 @@ class BookingResourceWeek(models.Model):
                         if week.start_date_week <= rec.start_date_day and week.end_date_week >= rec.start_date_day:
                             total_effort_week += (rec.effort_rate_day)
 
-                    working_day = 5
-                    week.effort_rate_week = total_effort_week/working_day
+                    working_day = len(pd.bdate_range(week.start_date_week.strftime('%Y-%m-%d'),
+                                                    week.end_date_week.strftime('%Y-%m-%d')))
+                    if working_day > 0:
+                        week.effort_rate_week = total_effort_week/working_day
+                    else:
+                        week.effort_rate_week = 0
     
 
     @api.onchange('effort_rate_week')
@@ -143,34 +148,6 @@ class BookingResourceWeek(models.Model):
                 raise UserError(_('Week : Effort Rate greater than or equal to 0% & less than or equal to 100%.'))
 
 
-    def check_effort_week_remaining_common(self):
-        for week in self:
-            days = self.env['booking.resource.day'].search([('employee_id', '=', week.employee_id.id), ('booking_id', '=', week.booking_id.id or week.booking_id.id.origin)])
-            count_day = 0
-            day_of_week = []
-            for day in days:
-                if week.start_date_week <= day.start_date_day and week.end_date_week >= day.start_date_day:
-                    count_day += 1
-                    day_of_week.append(day)
-            total_effort_booked = 0
-            if len(day_of_week) > 0:
-                for rec in self.env['booking.resource.day'].search([('employee_id', '=', week.employee_id.id), ('start_date_day', '=', day_of_week[0].start_date_day), ('booking_id', '!=', day_of_week[0].booking_id.id)]):
-                    total_effort_booked += rec.effort_rate_day
-
-            remaining_effort = round(100 - total_effort_booked)
-            if week.effort_rate_week > (remaining_effort * count_day)/5:
-                raise UserError(_('%(employee)s : Since %(name)s has only %(day_count)s days, the current amount of effort (%(effort_week)s) should not be greater than %(remaining)s.', name=week.name, \
-                    effort_week=week.effort_rate_week, remaining=(remaining_effort * count_day)/5, day_count=count_day, employee=week.employee_id.name))
-
-    @api.onchange('effort_rate_week')
-    def check_effort_week_remaining_onchange(self):
-        self.check_effort_week_remaining_common()
-
-    # @api.constrains('effort_rate_week')
-    # def check_effort_week_remaining_constrains(self):
-    #     self.check_effort_week_remaining_common()
-
-
 class BookingResourceWeekTemp(models.Model):
     _name = "booking.resource.week.temp"
     _description = "Planning Booking Resource Week Temp"
@@ -197,6 +174,7 @@ class BookingResourceMonth(models.Model):
     month_temp_id = fields.Many2one('booking.resource.month.temp')
     employee_id = fields.Many2one('hr.employee')
     member_type = fields.Many2one('planning.member.type')
+    effort_rate_month_actual = fields.Float('Effort Actual(%)', compute='compute_effort_month_actual', store=True, digits=(12,2))
 
     @api.depends('booking_id.booking_upgrade_week')
     def compute_effort_month(self):
@@ -257,6 +235,22 @@ class BookingResourceMonth(models.Model):
                     if day.effort_rate_day > 0:
                         working_day += 1
             month.man_month = round(working_day/20 * month.effort_rate_month/100, 3)
+
+    @api.depends('effort_rate_month')
+    def compute_effort_month_actual(self):
+        for month in self:
+            working_day_actual = 0
+            for day in month.booking_id.booking_upgrade_day:
+                if day.start_date_day >= month.start_date_month and day.end_date_day <= month.end_date_month:
+                    if day.effort_rate_day > 0:
+                        working_day_actual += 1
+
+            start_date_of_month = date(month.start_date_month.year, month.start_date_month.month, 1)
+            end_date_of_month = date(month.start_date_month.year, month.start_date_month.month, calendar.monthrange(month.start_date_month.year, month.start_date_month.month)[1])
+            working_day_of_month = len(pd.bdate_range(start_date_of_month.strftime('%Y-%m-%d'),
+                                                    end_date_of_month.strftime('%Y-%m-%d')))
+            
+            month.effort_rate_month_actual = (working_day_actual/working_day_of_month)*month.effort_rate_month
 
     @api.onchange('effort_rate_month')
     def check_effort_month_over(self):
@@ -398,7 +392,7 @@ class BookingResourceDay(models.Model):
                     for rec in self:
                         if rec.start_date_day >= week.start_date_week and rec.start_date_day <= week.end_date_week:
                             if len_total_day > 0:
-                                rec.effort_rate_day = (week.effort_rate_week * 5)/len_total_day
+                                rec.effort_rate_day = week.effort_rate_week
             elif booking.check_edit_effort == 'effort_month' or booking.select_type_upgrade == 'month':
                 for record in self.booking_id.booking_upgrade_month:
                     len_week = 0

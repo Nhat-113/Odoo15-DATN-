@@ -363,9 +363,8 @@ class PlanningCalendarResource(models.Model):
                 mon_sun.append(end_date_common)
             no_week = 1
             for i in range(0, len(mon_sun), 2):
-                message_week={}
-                check_effort_rate_week = {}
-                working_day_week = 5
+                working_day_week = len(pd.bdate_range(mon_sun[i].strftime('%Y-%m-%d'),
+                                                    mon_sun[i+1].strftime('%Y-%m-%d')))
                 effort_week = resource.compute_effort_when_gen(mon_sun[i], mon_sun[i+1], resource.employee_id.id, resource.id or resource.id.origin, working_day_week)
                 if mon_sun[i] > book_end_date or mon_sun[i] < book_start_date and mon_sun[i+1] < book_start_date:
                     effort_week = 0
@@ -459,7 +458,10 @@ class PlanningCalendarResource(models.Model):
             if start_date <= rec.start_date_day and end_date >= rec.start_date_day:
                 total_effort_week += (rec.effort_rate_day)
 
-        return total_effort_week/working_day
+        if working_day > 0:
+            return total_effort_week/working_day
+        else:
+            return 0
 
     def compute_effort_month_when_gen(self, start_date, end_date, employee_id, booking_id):
         total_effort_week = 0
