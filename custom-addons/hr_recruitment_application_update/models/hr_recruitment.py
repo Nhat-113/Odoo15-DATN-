@@ -38,6 +38,8 @@ class Applicant(models.Model):
                                  self: self.env.user.company_id.currency_id.id)
 
     check_contract_click = fields.Boolean("Check contract click", default=False)
+    stage_field_name = fields.Char("Stage name")
+    date_closed = fields.Datetime("Hire Date", compute='_compute_date_closed', store=True, index=True, readonly=False, tracking=True)
 
     def _get_hide_plus_sign(self):
         for item in self:
@@ -77,6 +79,7 @@ class Applicant(models.Model):
 
     @api.depends('stage_id')
     def _compute_stage_name(self):
+        self.stage_field_name = self.stage_id.name
         for record in self:
             record.stage_name = record.stage_id.name
             try:
@@ -85,13 +88,15 @@ class Applicant(models.Model):
                     record.check_send_mail_confirm=True
                 elif record.stage_name == "Confirm CV":
                     record.step_confirm += 1
-                    if record.step_confirm==2:
+                    if record.step_confirm == 2:
                         record.step_confirm = 0
                         continue
                     else:
                         self.send_mail()
-                elif record.stage_name =="Contract Signed":
+                elif record.stage_name == "Contract Signed":
                     self.send_mail()
+                elif record.stage_name == 'Contract Proposal':
+                    self.check_pass_interview = False
             except:
                 continue
 
@@ -107,16 +112,18 @@ class Applicant(models.Model):
             stage = self.env["hr.recruitment.stage"].search([("name",'=' ,'Interview')])
             record.stage_id = stage
             self.send_mail()
-            record.check_send_mail_confirm=True
+            record.check_send_mail_confirm = True
         return record
 
     def applicant_pass_interview(self):
         for item in self:
             item.check_pass_interview = True
+            item.check_send_mail_confirm = False
             self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
     
     def confirm_contract_click(self):
         self.check_contract_click = True
+        self.check_pass_interview = False
         for item in self:
             self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
             self.send_mail()
@@ -143,6 +150,15 @@ class Applicant(models.Model):
                     self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
         else:
             return
+
+    @api.depends('stage_id.hired_stage')
+    def _compute_date_closed(self):
+        for applicant in self:
+            applicant.check_contract_click = False
+            if applicant.stage_id and applicant.stage_id.hired_stage and not applicant.date_closed:
+                applicant.date_closed = fields.datetime.now()
+            if not applicant.stage_id.hired_stage:
+                applicant.date_closed = False
 
     # send mail confirm CV
     @api.model
