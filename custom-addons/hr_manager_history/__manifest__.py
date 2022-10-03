@@ -13,6 +13,8 @@
     'depends': ['base', 'hr', 'mail'],
     'data': [
         'security/ir.model.access.csv',
+        'views/hr_department_history_views.xml',
+        'views/hr_company_history_views.xml'
     ],
     'assets': {
         'web.assets_backend': [

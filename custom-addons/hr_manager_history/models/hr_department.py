@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
+from datetime import timedelta
 
 class Department(models.Model):
     _inherit = "hr.department"
@@ -37,7 +38,10 @@ class Department(models.Model):
             last_record_id = self.env['hr.department.history'].search([('department_id', '=', department.id)], limit=1, order='id desc')
 
             if len(last_record_id):
-                last_record_id.date_end = action_date
+                if last_record_id.date_start.day > action_date.day:
+                    last_record_id.date_end = last_record_id.date_start
+                else:
+                    last_record_id.date_end = action_date
             else:
                 self.env['hr.department.history'].create({
                 'department_id': department.id or False,
@@ -46,12 +50,20 @@ class Department(models.Model):
                 'manager_history_id': department.manager_id.id or False
             })
 
+            last_record_id = self.env['hr.department.history'].search([('department_id', '=', department.id)], limit=1, order='id desc')
+
             # Create new history department manager
             self.env['hr.department.history'].create({
                 'department_id': department.id or False,
-                'date_start': action_date,
+                'date_start': last_record_id.date_end + timedelta(days=1),
                 'date_end': False,
                 'manager_history_id': manager_id
             })
         return True
         
+
+    def unlink(self):
+        for record in self:
+            record.department_history_id.unlink()
+
+        return super(Department, self).unlink()
