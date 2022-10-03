@@ -106,8 +106,9 @@
                         </page>
                         <page string="Members Detail">
                             <field name="member_ids">
-                                <tree>
+                                <tree edit="0" delete="0" create="0">
                                     <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
+                                    <field name="company_id" optional="hide"/>
                                     <field name="job_id" />
                                     <field name="email" optional="hide"/>
                                     <field name="number_phone" optional="hide"/>
@@ -117,9 +118,40 @@
                                     <field name="effort_rate" />
                                     <field name="role_ids" optional="hide"/>
                                     <!-- <field name="salary" sum="Total Salary Employees"/> -->
-                                    
+                                    <button name="view_detail_member" type="object" string="Detail" class="btn btn-primary"/>
                                 </tree>
-                               
+
+                                <!-- <form>
+                                    <group name="group_top">
+                                        <group name="group_left">
+                                            <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
+                                            <field name="job_id" />
+                                            <field name="role_ids" optional="hide"/>
+                                            <field name="email" optional="hide"/>
+                                            <field name="number_phone" optional="hide"/>
+                                        </group>
+                                        <group name="group_right">
+                                            <field name="start_date" />
+                                            <field name="end_date" />
+                                            <field name="member_type" />
+                                            <field name="effort_rate" />
+                                        </group>
+                                    </group>
+                                    <notebook>
+                                        <page string="Members Detail">
+                                            <field name="member_details">
+                                                <tree>
+                                                    <field name="month_start"/>
+                                                    <field name="month_end" />
+                                                    <field name="effort_rate"/>
+                                                    <field name="average_cost_company"/>
+                                                    <field name="average_cost_project"/>
+                                                    <field name="salary"/>
+                                                </tree>
+                                            </field>
+                                        </page>
+                                    </notebook>
+                                </form> -->
                             </field>
                         </page>
                         <page string="Project Cost Detail">

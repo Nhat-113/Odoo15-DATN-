@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  
+    <!-- <record id="view_tree_project_management_member_detail" model="ir.ui.view">
+        <field name="name">project.management.member.detail.tree</field>
+        <field name="model">project.management.member.detail</field>
+        <field name="arch" type="xml">
+            <tree string="Cost Management">
+                <field name="employee_id"/>
+                <field name="member_type"/>
+                <field name="role_ids"/>
+                <field name="month_start"/>
+                <field name="month_end" />
+                <field name="effort_rate"/>
+                <field name="average_cost_company"/>
+                <field name="average_cost_project"/>
+                <field name="salary"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_form_project_management_member_detail" model="ir.ui.view">
+        <field name="name">project.management.member.detail.form</field>
+        <field name="model">project.management.member.detail</field>
+        <field name="arch" type="xml">
+            <form string="Cost Management">
+                <sheet>
+                    <field name="employee_id"/>
+                    <field name="member_type"/>
+                    <field name="role_ids"/>
+                    <field name="month_start"/>
+                    <field name="month_end" />
+                    <field name="effort_rate"/>
+                    <field name="average_cost_company"/>
+                    <field name="average_cost_project"/>
+                    <field name="salary"/>
+                </sheet>
+            </form>
+        </field>
+    </record> -->
+
+    <record id="view_form_project_management_member" model="ir.ui.view">
+        <field name="name">project.management.member.form</field>
+        <field name="model">project.management.member</field>
+        <field name="arch" type="xml">
+            <form edit="0" delete="0" create="0">
+                <sheet>
+                    <group name="group_top">
+                        <group name="group_left">
+                            <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}" readonly="1"/>
+                            <field name="job_id" readonly="1" />
+                            <field name="role_ids" optional="hide" readonly="1"/>
+                            <field name="email" optional="hide" readonly="1"/>
+                            <field name="number_phone" optional="hide" readonly="1"/>
+                        </group>
+                        <group name="group_right">
+                            <field name="start_date" readonly="1" />
+                            <field name="end_date" readonly="1" />
+                            <field name="member_type" readonly="1" />
+                            <field name="effort_rate" readonly="1" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Members Detail">
+                            <field name="member_details">
+                                <tree delete="0" create="0" editable="0">
+                                    <field name="month_start" readonly="1"/>
+                                    <field name="month_end" readonly="1"/>
+                                    <field name="working_day" readonly="1"/>
+                                    <field name="man_month" readonly="1"/>
+                                    <field name="effort_rate" readonly="1"/>
+                                    <field name="salary" readonly="1"/>
+                                    <field name="average_profit" readonly="1"/>
+                                    <field name="total_members" optional="hide"/>
+                                    <field name="average_cost_company" optional="hide"/>
+                                    <field name="average_cost_project" optional="hide"/>
+                                    <field name="profit" optional="hide"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    
+
+</odoo>

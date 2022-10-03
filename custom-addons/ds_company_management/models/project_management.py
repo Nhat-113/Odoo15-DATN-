@@ -40,7 +40,7 @@ class ProjectManagement(models.Model):
     profit = fields.Float(string="Profit", compute=_content_compute_total)
     profit_margin = fields.Float(string="Profit Margin (%)",compute=_content_compute_total, digits=(12,2), help="Profit Margin = profit / revenue * 100")
     
-    member_ids = fields.One2many('project.member.management', 'project_management_id', string="Members")
+    member_ids = fields.One2many('project.management.member', 'project_management_id', string="Members")
     project_expense_management = fields.One2many('project.expense.management', 'project_management_id', string="Project Cost Management")
     project_management_history = fields.One2many('project.management.history', 'project_management_id', string="Project Management History")
     project_management_history_temp = fields.One2many('project.history.group.temp', 'project_management_id', string="Project Management History Temp")
