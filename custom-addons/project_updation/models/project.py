@@ -270,6 +270,7 @@ class Project(models.Model):
         readonly=True,
         store=False,
     )
+    project_type = fields.Many2one('project.type', string="Project Type")
 
     @api.depends('last_update_status')
     def _compute_last_update_color(self):

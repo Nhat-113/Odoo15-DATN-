@@ -330,7 +330,8 @@ class Estimation(models.Model):
                 'user_id':estimation.estimator_ids.id,
                 'estimation_id': estimation.id,
                 'department_id': estimation.department_id.id,
-                'company_id': estimation.company_id.id
+                'company_id': estimation.company_id.id,
+                'project_type': estimation.project_type_id.id
             })
             modules = self.env['estimation.module'].search([('estimation_id', '=', estimation.id)])
             for module in modules:
