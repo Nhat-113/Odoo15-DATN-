@@ -38,8 +38,10 @@ class Applicant(models.Model):
                                  self: self.env.user.company_id.currency_id.id)
 
     check_contract_click = fields.Boolean("Check contract click", default=False)
+    check_signed_click = fields.Boolean("Check signed click", default=False)
     stage_field_name = fields.Char("Stage name")
     date_closed = fields.Datetime("Hire Date", compute='_compute_date_closed', store=True, index=True, readonly=False, tracking=True)
+    user_click_name = fields.Char('User click name', default=False)
 
     def _get_hide_plus_sign(self):
         for item in self:
@@ -71,62 +73,122 @@ class Applicant(models.Model):
             else:
                 applicant.stage_id = self.env['hr.recruitment.stage'].search([('name','=','Initial Qualification')])
 
-    @api.model
-    def create(self, vals):
-        result = super(Applicant, self).create(vals)
-        result.send_mail()
-        return result
-
-    @api.depends('stage_id')
-    def _compute_stage_name(self):
-        self.stage_field_name = self.stage_id.name
-        for record in self:
-            record.stage_name = record.stage_id.name
-            try:
-                if record.stage_name == "Interview" and record.check_send_mail_confirm==False:
-                    self.send_mail()
-                    record.check_send_mail_confirm=True
-                elif record.stage_name == "Confirm CV":
-                    record.step_confirm += 1
-                    if record.step_confirm == 2:
-                        record.step_confirm = 0
-                        continue
-                    else:
-                        self.send_mail()
-                elif record.stage_name == "Contract Signed":
-                    self.send_mail()
-                elif record.stage_name == 'Contract Proposal':
-                    self.check_pass_interview = False
-            except:
-                continue
-
     @api.constrains('stage_id')
     def check_role_stage_kanban(self):
         if self.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_project_manager') \
         and self.stage_id.name in ["Contract Proposal", "Contract Signed"] \
         and self.user_has_groups('hr_recruitment_application_update.group_hr_recruitment_director')==False:
             raise UserError("This action is out of authorization")
-        
+
+    @api.depends('stage_id.hired_stage')
+    def _compute_date_closed(self):
+        for applicant in self:
+            applicant.check_contract_click = False
+            if applicant.stage_id and applicant.stage_id.hired_stage and not applicant.date_closed:
+                applicant.date_closed = fields.datetime.now()
+            if not applicant.stage_id.hired_stage:
+                applicant.date_closed = False
+
+    @api.model
+    def create(self, vals):
+        result = super(Applicant, self).create(vals)
+        result._send_mail_create_application()
+        return result
+
+    def _send_mail_create_application(self):
+        template = 'hr_recruitment_application_update.new_application_message'
+        subject_template = "Create Application"
+        self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in self}, template, subject_template)
+        self.last_stage = self.stage_id.id
+
+    def _send_mail_hearing_cv(self):
+        template = 'hr_recruitment_application_update.hearing_cv_application_message'
+        subject_template = "Hearing CV"
+        self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in self}, template, subject_template)
+    
     def confirm_cv(self):
+        self.check_pass_interview = False
+        self.check_contract_click = False
+        self.check_signed_click = False
+
+        template = 'hr_recruitment_application_update.confirm_cv_message'
+        subject_template = "Confirm CV"
+
         for record in self:
-            stage = self.env["hr.recruitment.stage"].search([("name",'=' ,'Interview')])
-            record.stage_id = stage
-            self.send_mail()
+            self._send_message_auto_subscribe_notify_recruitment({item: item.user_id.employee_id for item in self}, template, subject_template)
             record.check_send_mail_confirm = True
         return record
+
+    @api.depends('stage_id')
+    def _compute_stage_name(self):
+        for record in self:
+            record.stage_name = record.stage_id.name
+
+            # Send mail hearing CV
+            if record.stage_id.name == "Confirm CV" and \
+                record.last_stage == self.env['hr.recruitment.stage'].search([('name','=','Initial Qualification')]).id:
+
+                if record.id:
+                    self._send_mail_hearing_cv()
+                    record.last_stage = self.stage_id.id
+
+                    self.check_pass_interview = False
+                    self.check_contract_click = False
+                    self.check_signed_click = False
+                    self.check_send_mail_confirm = False
+                else:
+                    self.check_pass_interview = False
+
+            # Send mail Sign
+            if record.stage_id.name == 'Contract Signed' and not self.check_signed_click and record.id:
+                self.send_mail_signed()
+                self.check_signed_click = True
+                record.last_stage = self.stage_id.id
+
+                self.check_pass_interview = False
+                self.check_contract_click = False
+                self.check_send_mail_confirm = False    
+
+            if record.stage_id.name == 'Contract Proposal':
+                self.check_signed_click = False
+                self.check_pass_interview = False
+                self.check_send_mail_confirm = False    
+
+            # Reset flag with stage is Initial Qualification
+            if record.stage_id.name == 'Initial Qualification':
+                self.check_signed_click = False
+                self.check_pass_interview = False
+                self.check_send_mail_confirm = False  
+                self.check_contract_click = False
+        
 
     def applicant_pass_interview(self):
         for item in self:
             item.check_pass_interview = True
             item.check_send_mail_confirm = False
-            self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
+            item.check_contract_click = False
+
+            template = 'hr_recruitment_application_update.pass_interview_message'
+            subject_template = "Pass Interview"
+            self._send_message_auto_subscribe_notify_recruitment({item: item.user_id.employee_id for item in self}, template, subject_template)
     
     def confirm_contract_click(self):
         self.check_contract_click = True
         self.check_pass_interview = False
+
+        template = 'hr_recruitment_application_update.confirm_contract'
+        subject_template = "Confirm Contract"
         for item in self:
-            self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
-            self.send_mail()
+            self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item}, template, subject_template)
+
+    def send_mail_signed(self):
+        self.check_pass_interview = False
+
+        template = 'hr_recruitment_application_update.contract_sign_application_message'
+        subject_template = "Contract Signed"
+
+        for item in self:
+            self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item}, template, subject_template)
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
@@ -141,50 +203,8 @@ class Applicant(models.Model):
         stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
         return stages.browse(stage_ids)
 
-    def send_mail(self):
-        if self.id:
-            for item in self:
-                if item.stage_name == "Confirm CV":
-                    self._send_message_auto_subscribe_notify_recruitment({item: item.user_id.employee_id for item in item})
-                else:
-                    self._send_message_auto_subscribe_notify_recruitment({item: item.recruitment_requester for item in item})
-        else:
-            return
-
-    @api.depends('stage_id.hired_stage')
-    def _compute_date_closed(self):
-        for applicant in self:
-            applicant.check_contract_click = False
-            if applicant.stage_id and applicant.stage_id.hired_stage and not applicant.date_closed:
-                applicant.date_closed = fields.datetime.now()
-            if not applicant.stage_id.hired_stage:
-                applicant.date_closed = False
-
-    # send mail confirm CV
     @api.model
-    def _send_message_auto_subscribe_notify_recruitment(self, users_per_task):
-        # Utility method to send assignation notification upon writing/creation.
-        if self.stage_id.name=="Interview" and self.check_pass_interview==False:
-            template = 'hr_recruitment_application_update.confirm_cv_message'
-            subject_template = "Confirm CV for Applicant"
-        elif self.stage_id.name=="Interview" and self.check_pass_interview==True:
-            template = 'hr_recruitment_application_update.pass_interview_message'
-            subject_template = "Pass Interview"
-        elif self.stage_id.name=="Initial Qualification":
-            template = 'hr_recruitment_application_update.new_application_message'
-            subject_template = "Create Application"
-        elif self.stage_id.name=="Confirm CV":
-            template = 'hr_recruitment_application_update.hearing_cv_application_message'
-            subject_template = "Hearing CV"
-        elif self.stage_id.name=="Contract Signed":
-            template = 'hr_recruitment_application_update.contract_sign_application_message'
-            subject_template = "Contract Signed"
-        elif self.stage_id.name=="Contract Proposal":
-            template = 'hr_recruitment_application_update.confirm_contract'
-            subject_template = "Confirm Contract"
-        else:
-            template = ''
-            subject_template = ""
+    def _send_message_auto_subscribe_notify_recruitment(self, users_per_task, template, subject_template):
 
         template_id = self.env['ir.model.data']._xmlid_to_res_id(template, raise_if_not_found=False)
         if not template_id:
@@ -205,27 +225,20 @@ class Applicant(models.Model):
                 and self.stage_id.name in ["Contract Proposal", "Contract Signed"] \
                 and self.pool.get('res.users').has_group(user.user_id,'hr_recruitment_application_update.group_hr_recruitment_director')==False:
                     continue
-
-                if (self.last_stage < self.stage_id.id) or \
-                (self.check_pass_interview==False and self.last_stage==3 and self.check_send_mail_confirm==False) or \
-                (self.check_pass_interview and self.stage_id.id==3):
                 
-                    self.user_send_mail = user.name
-                    values.update(assignee_name=user.sudo().name)
-                    assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
-                    assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)                 
-                    task.message_notify(
-                        subject=_('%s : %s', subject_template, task.display_name),
-                        body=assignation_msg,
-                        partner_ids = self.env['res.users'].search([('employee_ids.id','=',user.id)]).partner_id.ids,
-                        record_name=task.display_name,
-                        email_layout_xmlid='mail.mail_notification_light',
-                        model_description=task_model_description,
-                    )      
-                else:                    
-                    return
-
-            self.last_stage = self.stage_id.id
+                self.user_send_mail = user.name
+                self.user_click_name = self.env.user.display_name
+                values.update(assignee_name=user.sudo().name)
+                assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
+                assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)                 
+                task.message_notify(
+                    subject = _('%s : %s', subject_template, task.job_id.name),
+                    body = assignation_msg,
+                    partner_ids = self.env['res.users'].search([('employee_ids.id','=',user.id)]).partner_id.ids,
+                    record_name = task.display_name,
+                    email_layout_xmlid = 'mail.mail_notification_light',
+                    model_description = task_model_description,
+                )
 
     def sent_mail_offer(self):
             """

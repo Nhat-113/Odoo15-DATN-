@@ -23,6 +23,8 @@ class ApplicantGetRefuseReason(models.TransientModel):
             item.applicant_ids.check_contract_click = False
             item.applicant_ids.check_pass_interview = False
             item.applicant_ids.check_send_mail_confirm = False
+            item.applicant_ids.check_signed_click = False
+
         if self.send_mail:
             if not self.template_id:
                 raise UserError(_("Email template must be selected to send a mail"))
