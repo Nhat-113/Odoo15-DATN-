@@ -92,6 +92,7 @@ class ProjectManagementHistory(models.Model):
                                 ON eg.expense_management_id = em.id
                             WHERE em.get_month::int = EXTRACT (MONTH FROM prhm.month_start)
                                 AND em.get_year::int = EXTRACT (YEAR FROM prhm.month_start)
+                                AND em.company_id = prhm.company_id
                         ) AS operation_cost,
                         
                         --- Compute duration month equal man month follow working day ---
