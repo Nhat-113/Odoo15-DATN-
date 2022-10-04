@@ -11,7 +11,7 @@ class ProjectManagementCeo(models.Model):
     representative = fields.Many2one('hr.employee', string='Representative')
     month_start = fields.Date(string="Month Start")
     month_end = fields.Date(string="Month End")
-    total_members = fields.Float(string='Members')
+    total_members = fields.Float(string='Members', digits=(12,3))
     total_salary = fields.Monetary(string="Salary Cost")
     total_project_cost = fields.Monetary(string="Project Cost")
     total_revenue = fields.Monetary(string="Revenue")

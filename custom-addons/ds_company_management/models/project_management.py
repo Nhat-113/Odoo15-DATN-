@@ -54,7 +54,7 @@ class ProjectManagement(models.Model):
     project_expense_management = fields.One2many('project.expense.management', 'project_management_id', string="Project Cost Management")
     project_management_history = fields.One2many('project.management.history', 'project_management_id', string="Project Management History")
     
-    count_members = fields.Float(string='Members', compute=_compute_count_member)
+    count_members = fields.Float(string='Members', compute=_compute_count_member, digits=(12,3))
     
     last_update_color = fields.Integer(compute='_compute_last_update_color')
     project_type_id = fields.Many2one("project.type", string="Project Type")

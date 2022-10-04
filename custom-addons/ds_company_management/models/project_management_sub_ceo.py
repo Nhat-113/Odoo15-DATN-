@@ -11,7 +11,7 @@ class ProjectManagementSubCeo(models.Model):
     department_id = fields.Many2one('hr.department', string='Department')
     month_start = fields.Date(string="Month Start")
     month_end = fields.Date(string="Month End")
-    total_members = fields.Float(string='Members')
+    total_members = fields.Float(string='Members', digits=(12,3))
     total_salary = fields.Monetary(string="Salary Cost")
     total_project_cost = fields.Monetary(string="Project Cost")
     total_revenue = fields.Monetary(string="Revenue")
@@ -165,7 +165,12 @@ class ProjectManagementSubCeo(models.Model):
                                             ELSE
                                                 mdhm.total_members + (1 - mdhm.man_month_manager)
                                         END)
-                                ELSE mdhm.total_members + 1
+                                ELSE (CASE
+                                        WHEN mdhm.manager_id IS NULL
+                                            THEN mdhm.total_members
+                                        ELSE
+                                            mdhm.total_members + 1
+                                    END)
                             END) AS total_members,
                             
                             --- compute salary with manager ---

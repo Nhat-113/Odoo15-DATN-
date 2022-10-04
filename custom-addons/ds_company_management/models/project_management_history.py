@@ -17,8 +17,8 @@ class ProjectManagementHistory(models.Model):
     operation_cost = fields.Monetary(string="Operation Cost", help="Total Operation Cost")
     average_cost_company = fields.Monetary(string="Average cost company")
     average_cost_project = fields.Monetary(string="Average cost project")
-    members = fields.Float(string="Members", help="Number Of Members By Month")
-    all_members = fields.Float(string="Total members of company")
+    members = fields.Float(string="Members", help="Number Of Members By Month", digits=(12,3))
+    all_members = fields.Float(string="Total members of company", digits=(12,3))
     
     total_salary = fields.Monetary(string="Salary Cost", help="Total salary Employees By Month = SUM(salary_employee * effort_rate)")
     revenue = fields.Monetary(string="Revenue", help="Revenue By Month")
