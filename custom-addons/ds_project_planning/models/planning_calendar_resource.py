@@ -93,20 +93,11 @@ class PlanningCalendarResource(models.Model):
 
     @api.onchange('inactive')
     def _set_inactive_date(self):
-        if self.inactive == False:
-            self.inactive_date = False                                             
-
-    @api.onchange('inactive_date')
-    def _upgrade_booking_inactive_date(self):
         for resource in self:
-            resource.select_type_upgrade = 'week'
-            resource.check_edit_effort = 'effort_week'
-            for week in resource.booking_upgrade_week:
-                if resource.inactive_date and week.start_date_week >= resource.inactive_date:
-                    week.effort_rate_week = 0
-            resource.booking_upgrade_month.compute_effort_month()
+            resource.check_upgrade_booking = False
+            if resource.inactive == False:
+                resource.inactive_date = False   
             
-
     @api.constrains('inactive_date', 'start_date', 'end_date')
     def validate_inactive_date(self):
         for resource in self:
@@ -147,15 +138,8 @@ class PlanningCalendarResource(models.Model):
     @api.depends('duration', 'effort_rate')
     def _compute_calendar_effort(self):
         for resource in self:
-            total_working_day_off = 0
-            for day in resource.booking_upgrade_day:
-                if day.start_date_day <= resource.end_date and day.effort_rate_day == 0:
-                    total_working_day_off += 1
             if resource.duration != 0:
-                resource.calendar_effort = (resource.effort_rate * (resource.duration - total_working_day_off)) / (20 * 100)
-
-            if resource.inactive_date == False:
-                resource.select_type_upgrade = 'month'        
+                resource.calendar_effort = (resource.effort_rate * resource.duration) / (20 * 100)
 
     def _check_dates(self):
         for resource in self:
@@ -289,7 +273,7 @@ class PlanningCalendarResource(models.Model):
                         resource=calendar.employee_id.name, end=calendar.end_date, current=date.today()
                     ))
     
-    def upgrade_booking_common(booking, start_date_common, end_date_common, book_start_date, book_end_date):
+    def upgrade_booking_common(booking, start_date_common, end_date_common):
         for resource in booking:
             #for upgrade booking day
             upgrade_day = booking.env['booking.resource.day'].search([('booking_id', '=', resource.id)])
@@ -298,9 +282,9 @@ class PlanningCalendarResource(models.Model):
                 upgrade_day.unlink()
             if len(upgrade_day_temp) > 0:
                 upgrade_day_temp.unlink()
-            day_count_day = (resource.end_date - resource.start_date).days + 1
+            day_count_day = (end_date_common - start_date_common).days + 1
             day_arr = []
-            for single_day in ((resource.start_date + timedelta(n)) for n in range(day_count_day)):
+            for single_day in ((start_date_common + timedelta(n)) for n in range(day_count_day)):
                 if single_day.strftime("%A") != "Sunday" and single_day.strftime("%A") != "Saturday":
                     day_arr.append(single_day)
             no_day = 1
@@ -363,11 +347,8 @@ class PlanningCalendarResource(models.Model):
                 mon_sun.append(end_date_common)
             no_week = 1
             for i in range(0, len(mon_sun), 2):
-                working_day_week = len(pd.bdate_range(mon_sun[i].strftime('%Y-%m-%d'),
-                                                    mon_sun[i+1].strftime('%Y-%m-%d')))
+                working_day_week = 5
                 effort_week = resource.compute_effort_when_gen(mon_sun[i], mon_sun[i+1], resource.employee_id.id, resource.id or resource.id.origin, working_day_week)
-                if mon_sun[i] > book_end_date or mon_sun[i] < book_start_date and mon_sun[i+1] < book_start_date:
-                    effort_week = 0
                 week_temp = booking.env['booking.resource.week.temp'].create({
                     'name': 'Week ' + str(no_week),
                     'start_date_week': mon_sun[i],
@@ -458,19 +439,17 @@ class PlanningCalendarResource(models.Model):
             if start_date <= rec.start_date_day and end_date >= rec.start_date_day:
                 total_effort_week += (rec.effort_rate_day)
 
-        if working_day > 0:
-            return total_effort_week/working_day
-        else:
-            return 0
+        return total_effort_week/working_day
 
     def compute_effort_month_when_gen(self, start_date, end_date, employee_id, booking_id):
         total_effort_week = 0
-        working_day_month = 0
+        start_date_month_actual = date(start_date.year, start_date.month, 1)
+        end_date_month_actual = date(end_date.year, end_date.month, calendar.monthrange(end_date.year, end_date.month)[1])
+        working_day_month = len(pd.bdate_range(start_date_month_actual.strftime('%Y-%m-%d'),
+                                                    end_date_month_actual.strftime('%Y-%m-%d')))
         for rec in self.env['booking.resource.day'].search([('employee_id', '=', employee_id), ('booking_id', '=', booking_id)]):
             if start_date <= rec.start_date_day and end_date >= rec.start_date_day:
                 total_effort_week += (rec.effort_rate_day)
-                if rec.effort_rate_day > 0:
-                    working_day_month += 1
         if working_day_month > 0:
             return total_effort_week/working_day_month
         else:
@@ -478,8 +457,12 @@ class PlanningCalendarResource(models.Model):
 
     def action_upgrade_booking(self):
         booking = self if len(self) > 0 else self.env['planning.calendar.resource'].search([])
-        for resource in booking:           
-            resource.upgrade_booking_common(resource.start_date, resource.end_date, resource.start_date, resource.end_date)
+        for resource in booking:
+            if resource.inactive == False:          
+                resource.upgrade_booking_common(resource.start_date, resource.end_date)
+            else:
+                if resource.inactive_date:
+                    resource.upgrade_booking_common(resource.start_date, resource.inactive_date)
             resource.compute_total_effort_common()
 
     @api.onchange('check_upgrade_booking')
@@ -508,8 +491,7 @@ class PlanningCalendarResource(models.Model):
             for rec in resource.booking_upgrade_day:
                 if resource.start_date <= rec.start_date_day and resource.end_date >= rec.start_date_day:
                     total_effort_week += (rec.effort_rate_day)
-                    if rec.effort_rate_day > 0:
-                        working_day += 1
+                    working_day += 1
 
             if working_day > 0:
                 effort_rate_total = total_effort_week/working_day
