@@ -7,7 +7,7 @@ class ProjectExpense(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Project Expense Management"
     _rec_name = "name"
-    _order = "id DESC"
+    _order = "expense_date DESC"
     
     
     def _get_default_currency(self, type_currency):
