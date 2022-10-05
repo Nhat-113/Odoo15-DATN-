@@ -65,7 +65,7 @@ odoo.define('human_resource_template.Dashboard', function(require) {
                     for (var i = 0, len = cell_elements.length; i < len; i++) {
 
                         if (cell_elements[i].innerHTML < 0) {
-                            cell_elements[i].innerText = "N/A";
+                            cell_elements[i].innerText = "NaN";
                         }
                         if (cell_elements[i].innerText == "" && cell_elements[i].className == "AVG_colum") {
                             cell_elements[i].innerText = "0";
@@ -74,9 +74,9 @@ odoo.define('human_resource_template.Dashboard', function(require) {
                     var input = document.getElementById("search_input");
                     // Event search in when input onchange
                     input.addEventListener('keyup', self.searchFunction)
-                    // after event search run, event compute_avg call again to calculator avg effort 
+                        // after event search run, event compute_avg call again to calculator avg effort 
                     input.addEventListener('keyup', () => self.compute_avg())
-                    // compute avg effort member in table when render DOM element
+                        // compute avg effort member in table when render DOM element
                     self.compute_avg();
                 }, 200);
             });
@@ -132,7 +132,8 @@ odoo.define('human_resource_template.Dashboard', function(require) {
             var total_available_member = tbody.rows[tbody.rows.length - 1];
             var count_compute_available_member = 0;
             var howManyCols = tbody.rows[1].cells.length;
-
+            // var count_number_row = 0;
+            // var count_number_record = document.getElementById('count_number_record');
             // for (var j = 1; j < howManyCols; j++) {
             //     count_compute_available_member = self.compute_available_member(j);
             //     total_available_member.cells[j].innerText = count_compute_available_member;
@@ -141,11 +142,13 @@ odoo.define('human_resource_template.Dashboard', function(require) {
             // Start compute in column number six 
             for (var j = 6; j < howManyCols; j++) {
                 count_compute_available_member = self.compute_available_member(j);
+                // count_number_row = self.compute_count_number_row(j);
                 total_available_member.cells[j].innerText = count_compute_available_member;
                 final = self.computeTableColumnTotal(j);
 
                 // avg = (total effort( > 0 and another N/A  )) / total members in column with effort another N/A 
                 total_row.cells[j].innerText = parseFloat(final / count_compute_available_member).toFixed(2);
+                // count_number_record.innerText  = count_number_row
             }
 
         },
@@ -187,12 +190,38 @@ odoo.define('human_resource_template.Dashboard', function(require) {
                 return count_row;
             }
         },
+
+        //     var table = document.getElementById("human_resource_table");
+        //     var howManyRows = 0;
+        //     let count_number_row = 0;
+        //     try {
+        //         var howManyRows = table.rows.length;
+        //         for (var i = 1; i < howManyRows - 2; i++) {
+        //             let row = table.rows[i];
+        //             let parent_style = row.cells[colNumber].parentElement.style.display;
+        //             if (parent_style != 'none') {
+        //                 count_number_row += 1
+        //             }
+        //         }
+        //     } finally {
+        //         return count_number_row;
+        //     }
+        // },
+
+
         export_excel: function() {
+            Table2Excel.extend((cell, cellText) => {
+                return $(cell).attr('type') == 'string' ? {
+                  t: 's',
+                  v: cellText
+                } : null;
+            });
+            
             var table2excel = new Table2Excel();
             table2excel.export(document.querySelectorAll("#human_resource_table"));
         },
-        sort_table : function() {
-            
+        sort_table: function() {
+
         }
     });
     core.action_registry.add('human_resource_template', HumanResourceTemplate);

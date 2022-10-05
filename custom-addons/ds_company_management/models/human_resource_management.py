@@ -1,6 +1,6 @@
 # from datetime import date
 from odoo import models, api,_ , tools
-
+from odoo.http import request
 
 class HumanResourceManagement(models.Model):
     _name = "human.resource.management"
@@ -339,27 +339,44 @@ class HumanResourceManagement(models.Model):
     #     else:
     #         return False
 
+    def get_current_company_value(self):
+        cookies_cids = [int(r) for r in request.httprequest.cookies.get('cids').split(",")] \
+            if request.httprequest.cookies.get('cids') \
+            else [request.env.user.company_id.id]
+
+        for company_id in cookies_cids:
+            if company_id not in self.env.user.company_ids.ids:
+                cookies_cids.remove(company_id)
+        if not cookies_cids:
+            cookies_cids = [self.env.company.id]
+        if len(cookies_cids) == 1:
+            cookies_cids.append(0)
+        return cookies_cids
     # function get data human resource
     @api.model
     def get_list_human_resource(self):
         user_id_login = self.env.user.id
+        selected_companies = self.get_current_company_value();
         # div_manager_department_id =  self.env.user.employee_ids.department_id.id
         cr = self._cr
+        sql_domain_for_company = 'where company_id in ' + str(tuple(selected_companies)) 
         sql_domain_for_role = ''
+
         if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
             sql_domain_for_role = ''
 
         elif self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and \
                 self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
-            sql_domain_for_role = 'where company_manager_user_id = ' + \
+            sql_domain_for_role = 'and company_manager_user_id = ' + \
                 str(user_id_login)
 
         elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
                 self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
-            sql_domain_for_role = 'where department_manager_user_id = ' + \
+            sql_domain_for_role = ' and department_manager_user_id = ' + \
                 str(user_id_login)
 
         sql = ("""select * from human_resource_management """)
+        sql += sql_domain_for_company
         sql += sql_domain_for_role
 
         cr.execute(sql)

@@ -4,12 +4,24 @@
     <meta name="viewport" content="initial-scale=1"/>
     <t t-name="Human_resource">
         <div class="main_content_hmrc">
-            <div class="header_human_resource">
-                <h2 class="cd-title-search">Search Data In Table:</h2>
-                <input type="text" id="search_input" placeholder="Search ..." />
+            <div class="human_resource_in_top">
+                <div class="header_human_resource">
+                    <h2 class="title_human_resource">Human Resource Management</h2>
+                    <div class="search_textbox">
+                        <input type="text" id="search_input" placeholder="Search ..." />
+                        <i title="Search..." role="img" aria-label="Search..." class="o_searchview_icon icon_search_human fa fa-search"></i>
+                    </div>
+                </div>
+                <div class="human_resouce_value">
+                    <button class="export_excel" >
+                        <img src="/ds_company_management/static/src/img/export.png" class="export_img"></img>
+                        <p class="export_data">Export</p>
+                    </button>
+                    <!-- <h3 class="value_when_search">
+                      <p id="count_number_record"></p> records
+                    </h3> -->
+                </div>
             </div>
-            <h3>Human Resource Management</h3>
-            <button class="export_excel">Export</button>
 
             <div class="humam_resource_template">
                 <table id="human_resource_table">
@@ -37,107 +49,107 @@
                         </tr>
                         <t t-foreach="widget.list_human_resource" t-as="list_human_resource">
                             <tr class="detail">
-                                <td class="td_value"></td>
-                                <td class="td_value">
+                                <td class="td_value_none"></td>
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[1]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[2]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[3]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[4]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[5]"/>
                                 </td>
                                 <!-- <td class="td_value">
                                     <t t-esc="list_human_resource[6]"/>
                                 </td> -->
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[7]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[8]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[9]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[10]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[11]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[12]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[13]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[14]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[15]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[16]"/>
                                 </td>
-                                <td class="td_value">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[17]"/>
                                 </td>
-                                <td class="AVG_colum">
+                                <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[18]"/>
                                 </td>
-                                <td class="AVG_colum">
+                                <td class="AVG_colum" type="string">
                                     <t t-esc="list_human_resource[19]"/>
                                 </td>
                             </tr>
                         </t>
                         <tr class="Avg_effort_member">
-                            <th scope="row">Avg Effort Member</th>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
+                            <th scope="row" class="td_value_none">Avg Effort Member</th>
+                            <td class="td_value_none"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
                         </tr>
                         <tr class="total_member_avai">
                             <th scope="row">Toltal Members Available</th>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
-                            <td class="td_value"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
                         </tr>
                     </tbody>
                 </table>
