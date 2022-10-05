@@ -49,7 +49,7 @@
         <template id="confirm_contract">
             <p style="margin: 0px;">
                 <span>Dear <t t-esc="object.user_send_mail"/>,</span><br/>
-                <span style="margin-top: 8px;">The Contract you are following <b><t t-esc="object.display_name"/></b> have been <b>Confirmed CV</b> by <b><t t-esc="object.user_click_name"/></b></span>
+                <span style="margin-top: 8px;">The Contract you are following <b><t t-esc="object.display_name"/></b> have been <b>Confirmed Contract</b> by <b><t t-esc="object.user_click_name"/></b></span>
                 <br></br>
             </p>
             <p style="padding-top: 24px; padding-bottom: 16px;">
