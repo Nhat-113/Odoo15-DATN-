@@ -493,12 +493,13 @@ class BookingResourceDay(models.Model):
                     if start_date_day == member_calendar.start_date_day and end_date_day == member_calendar.end_date_day:
                         total_effort_booked += member_calendar.effort_rate_day
             if day.effort_rate_day + total_effort_booked > 100 and day.booking_id.member_type.name != 'Shadow Time':
-                if total_effort_booked > 0 and total_effort_booked < 100:
-                    day.effort_rate_day = 100 - total_effort_booked
-                elif total_effort_booked == 0:
-                    day.effort_rate_day = day.booking_id.effort_rate
-                else:
-                    day.effort_rate_day = 0
+                if day.booking_id.select_type_gen_week_month == 'generator_remaining_effort':
+                    if total_effort_booked > 0 and total_effort_booked < 100:
+                        day.effort_rate_day = 100 - total_effort_booked
+                    elif total_effort_booked == 0:
+                        day.effort_rate_day = day.booking_id.effort_rate
+                    else:
+                        day.effort_rate_day = 0
                 check_effort_rate['check'] = False
                 check_effort_rate['total_effort_booked'] = total_effort_booked
                 check_effort_rate['effort_rate'] = day.effort_rate_day
