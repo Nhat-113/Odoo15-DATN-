@@ -196,13 +196,18 @@ class DependingTasks(models.Model):
     @api.depends('task_id')
     def _compute_task_id_domain(self):
         for task in self:
-            if task.depending_task_id:
+            id_bug = self.env['project.issues.type'].search([('name', '=', 'Task')]).id
+            if len(task.depending_task_id.ids) > 0:
                 task.task_id_domain = json.dumps(
-                    [('project_id', '=', task.project_id.id), ('id', '!=', task.depending_task_id.ids[0]), ('issues_type', '=', 1)]
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.depending_task_id.ids[0]), ('issues_type', '=', id_bug)]
                 )
-            elif task.task_id:
+            elif len(task.task_id.ids) > 0:
                 task.task_id_domain = json.dumps(
-                    [('project_id', '=', task.project_id.id), ('id', '!=', task.task_id.ids[0]), ('issues_type', '=', 1)]
+                    [('project_id', '=', task.project_id.id), ('id', '!=', task.task_id.ids[0]), ('issues_type', '=', id_bug)]
+                )
+            else:
+                task.task_id_domain = json.dumps(
+                    [('project_id', '=', task.project_id.id), ('issues_type', '=', id_bug)]
                 )
 
     task_id_domain = fields.Char(
