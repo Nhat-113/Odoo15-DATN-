@@ -56,13 +56,16 @@
         <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='create_employee_from_applicant']" position="replace">
+                <field name="active" invisible="1"/>
+                <field name="refuse_reason_id" invisible="1"/>
                 <field name="stage_name" invisible="1"/>
                 <field name="check_pass_interview" invisible="1"/>
                 <field name="check_contract_click" invisible="1"/>
-                <button name="confirm_cv" string ="CONFIRM CV" type="object" data-hotkey="v" class="oe_highlight" attrs="{'invisible': [('stage_name', '!=', 'Confirm CV')]}"/>
-                <button name="applicant_pass_interview" string="PASS INTERVIEW" type="object" data-hotkey="v" class="oe_highlight" attrs="{'invisible': ['|',('stage_name', '!=', 'Interview'),('check_pass_interview','=',True)]}"/>
-                <button name="sent_mail_offer" string="SEND MAIL OFFER" type="object" class="oe_highlight" attrs="{'invisible':  ['|', ('check_contract_click','=',False),('stage_name', '!=', 'Contract Proposal')]}"/>
-                <button name="confirm_contract_click" string="CONFIRM CONTRACT" type="object" class="oe_highlight" attrs="{'invisible': ['|',('stage_name', '!=', 'Contract Proposal'),('check_contract_click','=',True)]}"/>
+                <field name="stage_field_name" invisible="1"/>
+                <button name="confirm_cv" string ="CONFIRM CV" type="object" data-hotkey="v" class="oe_highlight" attrs="{'invisible': ['|', ('active', '!=', True),('stage_name', '!=', 'Confirm CV')]}"/>
+                <button name="applicant_pass_interview" string="PASS INTERVIEW" type="object" data-hotkey="v" class="oe_highlight" attrs="{'invisible': ['|', ('active', '!=', True), ('stage_name', '!=', 'Interview')]}"/>
+                <button name="sent_mail_offer" string="SEND MAIL OFFER" type="object" class="oe_highlight" attrs="{'invisible':  ['|', '|', ('active', '!=', True), ('check_contract_click','=',False),('stage_name', '!=', 'Contract Proposal')]}"/>
+                <button name="confirm_contract_click" string="CONFIRM CONTRACT" type="object" class="oe_highlight" attrs="{'invisible': ['|','|', ('active', '!=', True), ('check_contract_click','!=',False), ('stage_name', '!=', 'Contract Proposal')]}"/>
             </xpath>
         </field>
     </record>
@@ -73,8 +76,22 @@
         <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet/widget[1]" position="after">
+                <field name="stage_name" invisible="1"/>
                 <field name="check_pass_interview" invisible="1"/>
-                <widget name="web_ribbon" title="PASSED" bg_color="bg-success" attrs="{'invisible': [('check_pass_interview', '=', False)]}"/>
+                <widget name="web_ribbon" title="PASS INTERVIEW" bg_color="bg-success" attrs="{'invisible':[ '|', ('check_pass_interview', '=', False), ('stage_name', '!=', 'Interview')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_applicant_form_view_inherit_widget_confirm_contract" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/widget[1]" position="after">
+                <field name="stage_name" invisible="1"/>
+                <field name="check_contract_click" invisible="1"/>
+                <widget name="web_ribbon" title="CONFIRM CONTRACT" bg_color="bg-success" attrs="{'invisible': ['|',('check_contract_click', '=', False), ('stage_name','!=','Contract Proposal')]}"/>
             </xpath>
         </field>
     </record>
@@ -86,7 +103,8 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet/widget[1]" position="after">
                 <field name="check_send_mail_confirm" invisible="1"/>
-                <widget name="web_ribbon" title="CONFIRMED" bg_color="bg-success" attrs="{'invisible': [('check_send_mail_confirm', '=', False)]}"/>
+                <field name="stage_field_name" invisible="1"/>
+                <widget name="web_ribbon" title="CONFIRMED CV" bg_color="bg-success" attrs="{'invisible': ['|',('check_send_mail_confirm','=',False), ('stage_name', '!=', 'Confirm CV')]}"/>
             </xpath>
         </field>
     </record>

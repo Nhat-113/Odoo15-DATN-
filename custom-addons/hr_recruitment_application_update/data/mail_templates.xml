@@ -5,7 +5,7 @@
         <template id="confirm_cv_message">
             <p style="margin: 0px;">
                 <span>Dear <t t-esc="object.user_send_mail"/>,</span><br/>
-                <span style="margin-top: 8px;">Application you are following <b><t t-esc="object.display_name"/></b> have been <b>Confirmed</b> by <b><t t-esc="object.user_id.name"/></b></span>
+                <span style="margin-top: 8px;">Application you are following <b><t t-esc="object.display_name"/></b> have been <b>Confirmed</b> by <b><t t-esc="object.user_click_name"/></b></span>
                 <br></br>
             </p>
             <p style="padding-top: 24px; padding-bottom: 16px;">
@@ -19,7 +19,7 @@
         <template id="pass_interview_message">
             <p style="margin: 0px;">
                 <span>Dear <t t-esc="object.user_send_mail"/>,</span><br/>
-                <span style="margin-top: 8px;">Application you are following <b><t t-esc="object.display_name"/></b> have been <b>Passed</b> by <b><t t-esc="object.user_id.name"/></b></span>
+                <span style="margin-top: 8px;">Application you are following <b><t t-esc="object.display_name"/></b> have been <b>Passed</b> by <b><t t-esc="object.user_click_name"/></b></span>
                 <br></br>
             </p>
             <p style="padding-top: 24px; padding-bottom: 16px;">
@@ -49,7 +49,7 @@
         <template id="confirm_contract">
             <p style="margin: 0px;">
                 <span>Dear <t t-esc="object.user_send_mail"/>,</span><br/>
-                <span style="margin-top: 8px;">The Contract you are following <b><t t-esc="object.display_name"/></b> have been <b>Confirmed</b> by <b><t t-esc="object.user_id.name"/></b></span>
+                <span style="margin-top: 8px;">The Contract you are following <b><t t-esc="object.display_name"/></b> have been <b>Confirmed Contract</b> by <b><t t-esc="object.user_click_name"/></b></span>
                 <br></br>
             </p>
             <p style="padding-top: 24px; padding-bottom: 16px;">
@@ -63,7 +63,7 @@
         <template id="confirm_cv_message">
             <p style="margin: 0px;">
                 <span>Dear <t t-esc="object.user_send_mail"/>,</span><br/>
-                <span style="margin-top: 8px;">Application you are following <b><t t-esc="object.display_name"/></b> have been <b>Confirmed</b> by <b><t t-esc="object.user_id.name"/></b></span>
+                <span style="margin-top: 8px;">Application you are following <b><t t-esc="object.display_name"/></b> have been <b>Confirmed</b> by <b><t t-esc="object.user_click_name"/></b></span>
                 <br></br>
             </p>
             <p style="padding-top: 24px; padding-bottom: 16px;">
@@ -104,7 +104,7 @@
 
         <record id="email_offer_for_candidate_template" model="mail.template">
             <field name="name">Offer For Candidate Template</field>
-            <field name="subject">[{{object.user_id.company_id.display_name}}] Job offer from D-Soft _ {{object.name}}</field>
+            <field name="subject">[{{object.user_id.company_id.display_name}}] Job offer from D-Soft - {{object.job_id.name}}</field>
             <field name="email_from">{{ (object.user_id.company_id.email_formatted or object.partner_id.email_formatted or '') }}</field>
             <field name="email_to">"{{object.email_from}}"</field>
             <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
