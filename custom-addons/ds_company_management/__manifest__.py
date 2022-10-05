@@ -26,7 +26,7 @@
         'data/cron_reset_upgrade_exchange_rate_api.xml',
         'data/exchange_rate_api_data.xml',
         'views/exchange_rate_view.xml',
-        'views/human_resource_management_view.xml',
+        # 'views/human_resource_management_view.xml',
         'views/project_management_view.xml',
         'views/project_management_subceo_view.xml',
         'views/project_management_ceo_view.xml',
@@ -36,10 +36,12 @@
     ],
     'assets': {
         'web.assets_backend': [
-            '/ds_company_management/static/src/css/style.css'
+            '/ds_company_management/static/src/css/style.css',
+            '/ds_company_management/static/src/js/human_resource_view.js',
+            'ds_company_management/static/src/js/lib/table2excel.js',
         ],
         'web.assets_qweb': [
-           
+           'ds_company_management/static/src/xml/human_resource_view.xml',
         ],
     },
 
