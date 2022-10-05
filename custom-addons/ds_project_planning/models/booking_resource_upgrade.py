@@ -14,7 +14,7 @@ class BookingResourceWeek(models.Model):
     end_date_week = fields.Date('End Date', readonly=True)
     effort_rate_week = fields.Float('Effort(%)', readonly=False, compute='compute_effort_week', store=True, digits=(12,2))
     booking_id = fields.Many2one('planning.calendar.resource')
-    week_temp_id = fields.Many2one('booking.resource.week.temp')
+    # week_temp_id = fields.Many2one('booking.resource.week.temp')
     employee_id = fields.Many2one('hr.employee')
     member_type = fields.Many2one('planning.member.type')
 
@@ -173,17 +173,17 @@ class BookingResourceWeek(models.Model):
         self.check_effort_week_remaining_common()
 
 
-class BookingResourceWeekTemp(models.Model):
-    _name = "booking.resource.week.temp"
-    _description = "Planning Booking Resource Week Temp"
+# class BookingResourceWeekTemp(models.Model):
+#     _name = "booking.resource.week.temp"
+#     _description = "Planning Booking Resource Week Temp"
 
-    name = fields.Char('Name', readonly=True)
-    start_date_week = fields.Date('Start Date', readonly=True)
-    end_date_week = fields.Date('End Date', readonly=True)
-    effort_rate_week = fields.Float('Effort(%)', readonly=False, compute='compute_effort_week', store=True, digits=(12,2))
-    booking_id = fields.Many2one('planning.calendar.resource')
-    employee_id = fields.Many2one('hr.employee')
-    member_type = fields.Many2one('planning.member.type')
+#     name = fields.Char('Name', readonly=True)
+#     start_date_week = fields.Date('Start Date', readonly=True)
+#     end_date_week = fields.Date('End Date', readonly=True)
+#     effort_rate_week = fields.Float('Effort(%)', readonly=False, compute='compute_effort_week', store=True, digits=(12,2))
+#     booking_id = fields.Many2one('planning.calendar.resource')
+#     employee_id = fields.Many2one('hr.employee')
+#     member_type = fields.Many2one('planning.member.type')
 
 
 class BookingResourceMonth(models.Model):
@@ -196,7 +196,7 @@ class BookingResourceMonth(models.Model):
     effort_rate_month = fields.Float('Effort(%)', readonly=False, compute='compute_effort_month', store=True, digits=(12,2))
     man_month = fields.Float('Man Month', readonly=True, store=True, compute='compute_man_month')
     booking_id = fields.Many2one('planning.calendar.resource')
-    month_temp_id = fields.Many2one('booking.resource.month.temp')
+    # month_temp_id = fields.Many2one('booking.resource.month.temp')
     employee_id = fields.Many2one('hr.employee')
     member_type = fields.Many2one('planning.member.type')
     effort_rate_month_actual = fields.Float('Effort Actual(%)', store=False, digits=(12,2))
@@ -377,18 +377,18 @@ class BookingResourceMonth(models.Model):
         self.check_effort_month_remaining_common()
 
 
-class BookingResourceMonthTemp(models.Model):
-    _name = "booking.resource.month.temp"
-    _description = "Planning Booking Resource Month Temp"
+# class BookingResourceMonthTemp(models.Model):
+#     _name = "booking.resource.month.temp"
+#     _description = "Planning Booking Resource Month Temp"
 
-    name = fields.Char('Name', readonly=True)
-    start_date_month = fields.Date('Start Date', readonly=True)
-    end_date_month = fields.Date('End Date', readonly=True)
-    effort_rate_month = fields.Float('Effort(%)', readonly=False, compute='compute_effort_month', store=True, digits=(12,2))
-    man_month = fields.Float('Man Month', readonly=True, store=True, compute='compute_man_month')
-    booking_id = fields.Many2one('planning.calendar.resource')
-    employee_id = fields.Many2one('hr.employee')
-    member_type = fields.Many2one('planning.member.type')
+#     name = fields.Char('Name', readonly=True)
+#     start_date_month = fields.Date('Start Date', readonly=True)
+#     end_date_month = fields.Date('End Date', readonly=True)
+#     effort_rate_month = fields.Float('Effort(%)', readonly=False, compute='compute_effort_month', store=True, digits=(12,2))
+#     man_month = fields.Float('Man Month', readonly=True, store=True, compute='compute_man_month')
+#     booking_id = fields.Many2one('planning.calendar.resource')
+#     employee_id = fields.Many2one('hr.employee')
+#     member_type = fields.Many2one('planning.member.type')
 
 
 class BookingResourceDay(models.Model):
@@ -400,7 +400,7 @@ class BookingResourceDay(models.Model):
     end_date_day = fields.Date('End Date', readonly=True)
     effort_rate_day = fields.Float('Effort(%)', readonly=False, compute='compute_effort_day', store=True, digits=(12,2))
     booking_id = fields.Many2one('planning.calendar.resource')
-    day_temp_id = fields.Many2one('booking.resource.day.temp')
+    # day_temp_id = fields.Many2one('booking.resource.day.temp')
     employee_id = fields.Many2one('hr.employee')
     member_type = fields.Many2one('planning.member.type')
 
@@ -544,14 +544,14 @@ class BookingResourceDay(models.Model):
                 raise UserError(msg) 
 
 
-class BookingResourceDay(models.Model):
-    _name = "booking.resource.day.temp"
-    _description = "Planning Booking Resource Day Temp"
+# class BookingResourceDayTemp(models.Model):
+#     _name = "booking.resource.day.temp"
+#     _description = "Planning Booking Resource Day Temp"
 
-    name = fields.Char('Name', readonly=True)
-    start_date_day = fields.Date('Start Date', readonly=True)
-    end_date_day = fields.Date('End Date', readonly=True)
-    effort_rate_day = fields.Float('Effort(%)', readonly=False, store=True, digits=(12,2))
-    booking_id = fields.Many2one('planning.calendar.resource')
-    employee_id = fields.Many2one('hr.employee')
-    member_type = fields.Many2one('planning.member.type')
+#     name = fields.Char('Name', readonly=True)
+#     start_date_day = fields.Date('Start Date', readonly=True)
+#     end_date_day = fields.Date('End Date', readonly=True)
+#     effort_rate_day = fields.Float('Effort(%)', readonly=False, store=True, digits=(12,2))
+#     booking_id = fields.Many2one('planning.calendar.resource')
+#     employee_id = fields.Many2one('hr.employee')
+#     member_type = fields.Many2one('planning.member.type')

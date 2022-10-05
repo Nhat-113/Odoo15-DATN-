@@ -258,10 +258,10 @@ class PlanningCalendarResource(models.Model):
 
             self.env['booking.resource.week'].search([('booking_id', '=', calendar.id)]).unlink()
             self.env['booking.resource.month'].search([('booking_id', '=', calendar.id)]).unlink()
-            self.env['booking.resource.week.temp'].search([('booking_id', '=', calendar.id)]).unlink()
-            self.env['booking.resource.month.temp'].search([('booking_id', '=', calendar.id)]).unlink()
             self.env['booking.resource.day'].search([('booking_id', '=', calendar.id)]).unlink()
-            self.env['booking.resource.day.temp'].search([('booking_id', '=', calendar.id)]).unlink()
+            # self.env['booking.resource.week.temp'].search([('booking_id', '=', calendar.id)]).unlink()
+            # self.env['booking.resource.month.temp'].search([('booking_id', '=', calendar.id)]).unlink()
+            # self.env['booking.resource.day.temp'].search([('booking_id', '=', calendar.id)]).unlink()
         return super(PlanningCalendarResource, self).unlink()
 
     @api.constrains('start_date', 'end_date', 'member_type', 'effort_rate', 'role_ids', 'inactive')
@@ -277,11 +277,11 @@ class PlanningCalendarResource(models.Model):
         for resource in booking:
             #for upgrade booking day
             upgrade_day = booking.env['booking.resource.day'].search([('booking_id', '=', resource.id)])
-            upgrade_day_temp = booking.env['booking.resource.day.temp'].search([('booking_id', '=', resource.id)])
+            # upgrade_day_temp = booking.env['booking.resource.day.temp'].search([('booking_id', '=', resource.id)])
             if len(upgrade_day) > 0:
                 upgrade_day.unlink()
-            if len(upgrade_day_temp) > 0:
-                upgrade_day_temp.unlink()
+            # if len(upgrade_day_temp) > 0:
+            #     upgrade_day_temp.unlink()
             day_count_day = (end_date_common - start_date_common).days + 1
             day_arr = []
             for single_day in ((start_date_common + timedelta(n)) for n in range(day_count_day)):
@@ -300,15 +300,15 @@ class PlanningCalendarResource(models.Model):
                         effort_day = resource.effort_rate
                 elif resource.select_type_gen_week_month == 'generator_effort_rate':
                     effort_day = resource.effort_rate
-                day_temp = booking.env['booking.resource.day.temp'].create({
-                    'name': 'Day ' + str(no_day),
-                    'start_date_day': date,
-                    'end_date_day': date,
-                    'effort_rate_day': effort_day,
-                    'booking_id' : resource.id,
-                    'employee_id': resource.employee_id.id,
-                    'member_type': resource.member_type.id
-                })
+                # day_temp = booking.env['booking.resource.day.temp'].create({
+                #     'name': 'Day ' + str(no_day),
+                #     'start_date_day': date,
+                #     'end_date_day': date,
+                #     'effort_rate_day': effort_day,
+                #     'booking_id' : resource.id,
+                #     'employee_id': resource.employee_id.id,
+                #     'member_type': resource.member_type.id
+                # })
 
                 booking.env['booking.resource.day'].create({
                     'name': 'Day ' + str(no_day),
@@ -316,7 +316,7 @@ class PlanningCalendarResource(models.Model):
                     'end_date_day': date,
                     'effort_rate_day': resource.effort_rate,
                     'booking_id' : resource.id,
-                    'day_temp_id': day_temp.id,
+                    # 'day_temp_id': day_temp.id,
                     'employee_id': resource.employee_id.id,
                     'member_type': resource.member_type.id
                 })
@@ -325,12 +325,12 @@ class PlanningCalendarResource(models.Model):
 
             # for upgrade booking week
             upgrade_week = booking.env['booking.resource.week'].search([('booking_id', '=', resource.id)])
-            upgrade_week_temp = booking.env['booking.resource.week.temp'].search([('booking_id', '=', resource.id)])
+            # upgrade_week_temp = booking.env['booking.resource.week.temp'].search([('booking_id', '=', resource.id)])
             day_count = (end_date_common - start_date_common).days
             if len(upgrade_week) > 0:
                 upgrade_week.unlink()
-            if len(upgrade_week_temp) > 0:
-                upgrade_week_temp.unlink()
+            # if len(upgrade_week_temp) > 0:
+            #     upgrade_week_temp.unlink()
             mon_sun = [start_date_common]
             if start_date_common.strftime("%A") == 'Sunday' or\
                  pd.Series(pd.date_range(start_date_common.strftime("%Y-%m-%d"), periods=1)).dt.is_month_end[0] == True:
@@ -349,16 +349,16 @@ class PlanningCalendarResource(models.Model):
             for i in range(0, len(mon_sun), 2):
                 working_day_week = 5
                 effort_week = resource.compute_effort_when_gen(mon_sun[i], mon_sun[i+1], resource.employee_id.id, resource.id or resource.id.origin, working_day_week)
-                week_temp = booking.env['booking.resource.week.temp'].create({
-                    'name': 'Week ' + str(no_week),
-                    'start_date_week': mon_sun[i],
-                    'end_date_week': mon_sun[i+1],
-                    'effort_rate_week': effort_week,
-                    'booking_id' : resource.id,
-                    'employee_id': resource.employee_id.id,
-                    'member_type': resource.member_type.id
+                # week_temp = booking.env['booking.resource.week.temp'].create({
+                #     'name': 'Week ' + str(no_week),
+                #     'start_date_week': mon_sun[i],
+                #     'end_date_week': mon_sun[i+1],
+                #     'effort_rate_week': effort_week,
+                #     'booking_id' : resource.id,
+                #     'employee_id': resource.employee_id.id,
+                #     'member_type': resource.member_type.id
 
-                })
+                # })
 
                 booking.env['booking.resource.week'].create({
                     'name': 'Week ' + str(no_week),
@@ -366,7 +366,7 @@ class PlanningCalendarResource(models.Model):
                     'end_date_week': mon_sun[i+1],
                     'effort_rate_week': effort_week,
                     'booking_id' : resource.id,
-                    'week_temp_id': week_temp.id,
+                    # 'week_temp_id': week_temp.id,
                     'employee_id': resource.employee_id.id,
                     'member_type': resource.member_type.id
                 })
@@ -376,11 +376,11 @@ class PlanningCalendarResource(models.Model):
 
             # for upgrade booking month
             upgrade_month = booking.env['booking.resource.month'].search([('booking_id', '=', resource.id)])
-            upgrade_month_temp = booking.env['booking.resource.month.temp'].search([('booking_id', '=', resource.id)])
+            # upgrade_month_temp = booking.env['booking.resource.month.temp'].search([('booking_id', '=', resource.id)])
             if len(upgrade_month) > 0:
                 upgrade_month.unlink()
-            if len(upgrade_month_temp) > 0:
-                upgrade_month_temp.unlink()
+            # if len(upgrade_month_temp) > 0:
+            #     upgrade_month_temp.unlink()
             list_start_end = [start_date_common]
             start_date_booking = pd.Series(pd.date_range(start_date_common.strftime("%Y-%m-%d"), periods=1))
             if start_date_booking.dt.is_month_end[0] == True:
@@ -398,15 +398,15 @@ class PlanningCalendarResource(models.Model):
                     resource.employee_id, resource.effort_rate, resource.member_type.name)
 
                 effort_month = resource.compute_effort_month_when_gen(list_start_end[i], list_start_end[i+1], resource.employee_id.id, resource.id or resource.id.origin)
-                month_temp = booking.env['booking.resource.month.temp'].create({
-                    'name': 'Month ' + str(list_start_end[i].month),
-                    'start_date_month': list_start_end[i],
-                    'end_date_month': list_start_end[i+1],
-                    'effort_rate_month': effort_month,
-                    'booking_id' : resource.id,
-                    'employee_id': resource.employee_id.id,
-                    'member_type': resource.member_type.id
-                    })
+                # month_temp = booking.env['booking.resource.month.temp'].create({
+                #     'name': 'Month ' + str(list_start_end[i].month),
+                #     'start_date_month': list_start_end[i],
+                #     'end_date_month': list_start_end[i+1],
+                #     'effort_rate_month': effort_month,
+                #     'booking_id' : resource.id,
+                #     'employee_id': resource.employee_id.id,
+                #     'member_type': resource.member_type.id
+                #     })
                 
                 booking.env['booking.resource.month'].create({
                     'name': 'Month ' + str(list_start_end[i].month),
@@ -414,7 +414,7 @@ class PlanningCalendarResource(models.Model):
                     'end_date_month': list_start_end[i+1],
                     'effort_rate_month': effort_month,
                     'booking_id' : resource.id,
-                    'month_temp_id': month_temp.id,
+                    # 'month_temp_id': month_temp.id,
                     'employee_id': resource.employee_id.id,
                     'member_type': resource.member_type.id
                     })
