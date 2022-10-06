@@ -9,7 +9,7 @@
                 <xpath expr="//form/sheet/notebook/page" position="after">
                     <page name="company_history_page" string="Company History">
                         <field name="company_history_id">
-                            <tree create="0" delete="1" multi_edit="1">
+                            <tree create="0" delete="1" multi_edit="1" editable="bottom">
                                 <field name="representative" widget="many2one_avatar_employee"/>
                                 <field name="email_history_id"/>
                                 <field name="date_start" />
