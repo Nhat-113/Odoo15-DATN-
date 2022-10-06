@@ -33,18 +33,18 @@ class EstimationSummaryTotalCost(models.Model):
     @api.depends('estimation_id.add_lines_summary_costrate.yen_month', 'estimation_id.add_lines_summary_costrate.role', 'total_effort')
     def _compute_cost(self):
         for record in self:
-            component = record.name
-            module_active = record.estimation_id.module_activate
-            cost_rate_old = record.estimation_id.add_lines_summary_costrate
-            if component != module_active:
-                cost_rate_old = self.env['estimation.summary.costrate'].search([('name', '=', component)])
-
-            if not len(cost_rate_old):
-                cost_rate_old = record.estimation_id.add_lines_summary_costrate
+            estimation_id = self.estimation_id.id
+            key_primary = record.key_primary
+            cost_rate_db = self.env['estimation.summary.costrate'].search([('key_primary','=', key_primary)])
+            
+            if cost_rate_db:
+                cost_rate = cost_rate_db
+            else:
+                cost_rate = record.estimation_id.add_lines_summary_costrate
 
             cost = 0
-            for item_cost_rate in cost_rate_old:
-                if (item_cost_rate.name == component):
+            for item_cost_rate in cost_rate:
+                if item_cost_rate.key_primary == key_primary:
                     types = item_cost_rate.types
                     if types == 'Developer':
                         cost += record.dev_effort * item_cost_rate.yen_month
@@ -60,6 +60,7 @@ class EstimationSummaryTotalCost(models.Model):
                         cost += record.pm_effort * item_cost_rate.yen_month
                     else:
                         continue
+
             record.cost = cost
 
     @api.depends('design_effort', 'dev_effort', 'tester_effort', 'comtor_effort', 'brse_effort', 'pm_effort')
