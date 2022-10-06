@@ -13,13 +13,7 @@
                     </div>
                 </div>
                 <div class="human_resouce_value">
-                    <button class="export_excel" >
-                        <img src="/ds_company_management/static/src/img/export.png" class="export_img"></img>
-                        <p class="export_data">Export</p>
-                    </button>
-                    <!-- <h3 class="value_when_search">
-                      <p id="count_number_record"></p> records
-                    </h3> -->
+                    <button class="export_excel btn btn-secondary fa fa-download o_list_export_xlsx" ></button>
                 </div>
             </div>
 
