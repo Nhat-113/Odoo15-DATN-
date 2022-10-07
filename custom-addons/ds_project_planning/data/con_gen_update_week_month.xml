@@ -11,4 +11,64 @@
             <field name="code">model.action_upgrade_booking()</field>
         </record>
     </data>
+
+    <data>
+        <record id="ir_cron_gen_update_week_month2" model="ir.cron">
+            <field name="name">Planning: Gen update week month2</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">False</field>
+            <field name="model_id" ref="model_planning_calendar_resource"/>
+            <field name="state">code</field>
+            <field name="code">model.action_upgrade_booking2()</field>
+        </record>
+    </data>
+
+    <data>
+        <record id="ir_cron_gen_update_week_month3" model="ir.cron">
+            <field name="name">Planning: Gen update week month3</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">False</field>
+            <field name="model_id" ref="model_planning_calendar_resource"/>
+            <field name="state">code</field>
+            <field name="code">model.action_upgrade_booking3()</field>
+        </record>
+    </data>
+
+    <data>
+        <record id="ir_cron_gen_update_week_month4" model="ir.cron">
+            <field name="name">Planning: Gen update week month4</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">False</field>
+            <field name="model_id" ref="model_planning_calendar_resource"/>
+            <field name="state">code</field>
+            <field name="code">model.action_upgrade_booking4()</field>
+        </record>
+    </data>
+
+    <data>
+        <record id="ir_cron_gen_update_week_month5" model="ir.cron">
+            <field name="name">Planning: Gen update week month5</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">False</field>
+            <field name="model_id" ref="model_planning_calendar_resource"/>
+            <field name="state">code</field>
+            <field name="code">model.action_upgrade_booking5()</field>
+        </record>
+    </data>
+
+    <data>
+        <record id="ir_cron_gen_update_week_month6" model="ir.cron">
+            <field name="name">Planning: Re Gen</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">False</field>
+            <field name="model_id" ref="model_planning_calendar_resource"/>
+            <field name="state">code</field>
+            <field name="code">model.action_upgrade_booking6()</field>
+        </record>
+    </data>
 </odoo>
