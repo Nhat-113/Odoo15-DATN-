@@ -456,7 +456,61 @@ class PlanningCalendarResource(models.Model):
             return 0
 
     def action_upgrade_booking(self):
-        booking = self if len(self) > 0 else self.env['planning.calendar.resource'].search([])
+        booking = self if len(self) > 0 else self.env['planning.calendar.resource'].search([])[:34]
+        for resource in booking:
+            if resource.inactive == False:          
+                resource.upgrade_booking_common(resource.start_date, resource.end_date)
+            else:
+                if resource.inactive_date:
+                    resource.upgrade_booking_common(resource.start_date, resource.inactive_date)
+            resource.compute_total_effort_common()
+
+    def action_upgrade_booking2(self):
+        booking = self if len(self) > 0 else self.env['planning.calendar.resource'].search([])[34:68]
+        for resource in booking:
+            if resource.inactive == False:          
+                resource.upgrade_booking_common(resource.start_date, resource.end_date)
+            else:
+                if resource.inactive_date:
+                    resource.upgrade_booking_common(resource.start_date, resource.inactive_date)
+            resource.compute_total_effort_common()
+
+    def action_upgrade_booking3(self):
+        booking = self if len(self) > 0 else self.env['planning.calendar.resource'].search([])[68:102]
+        for resource in booking:
+            if resource.inactive == False:          
+                resource.upgrade_booking_common(resource.start_date, resource.end_date)
+            else:
+                if resource.inactive_date:
+                    resource.upgrade_booking_common(resource.start_date, resource.inactive_date)
+            resource.compute_total_effort_common()
+
+    def action_upgrade_booking4(self):
+        booking = self if len(self) > 0 else self.env['planning.calendar.resource'].search([])[102:136]
+        for resource in booking:
+            if resource.inactive == False:          
+                resource.upgrade_booking_common(resource.start_date, resource.end_date)
+            else:
+                if resource.inactive_date:
+                    resource.upgrade_booking_common(resource.start_date, resource.inactive_date)
+            resource.compute_total_effort_common()
+
+    def action_upgrade_booking5(self):
+        booking = self if len(self) > 0 else self.env['planning.calendar.resource'].search([])[136:]
+        for resource in booking:
+            if resource.inactive == False:          
+                resource.upgrade_booking_common(resource.start_date, resource.end_date)
+            else:
+                if resource.inactive_date:
+                    resource.upgrade_booking_common(resource.start_date, resource.inactive_date)
+            resource.compute_total_effort_common()
+
+    def action_upgrade_booking6(self):
+        month_gened = self.env['booking.resource.month'].search([])
+        booked = []
+        for month in month_gened:
+            booked.append(month.booking_id.id)
+        booking = self if len(self) > 0 else self.env['planning.calendar.resource'].search([('id', 'not in', booked)])
         for resource in booking:
             if resource.inactive == False:          
                 resource.upgrade_booking_common(resource.start_date, resource.end_date)

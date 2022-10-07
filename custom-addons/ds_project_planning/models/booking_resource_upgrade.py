@@ -538,7 +538,7 @@ class BookingResourceDay(models.Model):
             message={}
             check_effort_rate = {}
             day.common_check_effort_rate_day(check_effort_rate, message, day.start_date_day, day.end_date_day)
-            if check_effort_rate['check'] == False and day.effort_rate_day > message['effort_rate']:
+            if check_effort_rate['check'] == False and round(day.effort_rate_day, 2) > round(message['effort_rate'], 2):
                 msg = "{name}: Employee {employee} has ({effort_rate}%) Effort Rate in day {start_date}.".format(employee=message['employee'],\
                             effort_rate=message['effort_rate'], start_date=message['start_date'], name=message['name'])
                 raise UserError(msg) 
