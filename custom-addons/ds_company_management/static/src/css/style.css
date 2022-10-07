@@ -161,6 +161,17 @@ span[name="message_warning"] {
 #count_number_record {
     display: inline;
 }
+.header_tabel {
+    cursor: pointer;
+}
+.icon-sort-header{
+    width: 11px;
+    display: none;
+}
+.header_tabel > th:hover .icon-sort-header{
+    display: initial !important;
+}
+
 /* for desktop screen */
 @media only screen and (max-width: 1600px) {
     .humam_resource_template tbody {

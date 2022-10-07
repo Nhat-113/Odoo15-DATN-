@@ -22,24 +22,79 @@
                     <tbody class="human_resource_content">
                         <tr class="header_tabel">
                             <th></th>
-                            <th>Employee</th>
-                            <th>Company</th>
-                            <th>Department</th>
-                            <th>Project</th>
-                            <th>Project Type</th>
-                            <th>January</th>
-                            <th>February</th>
-                            <th>March</th>
-                            <th>April</th>
-                            <th>May</th>
-                            <th>June</th>
-                            <th>July</th>
-                            <th>August</th>
-                            <th>September</th>
-                            <th>October</th>
-                            <th>November</th>
-                            <th>December</th>
-                            <th>AVG</th>
+                            <th>
+                                Employee
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                Company
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                Department
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                Project
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                Project Type
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                January
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                February
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                March
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                April
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                May
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                June
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                July
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                August
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                September
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                October
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                November
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                December
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                AVG(%)
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+
                         </tr>
                         <t t-foreach="widget.list_human_resource" t-as="list_human_resource">
                             <tr class="detail">
@@ -103,8 +158,8 @@
                                 </td>
                             </tr>
                         </t>
-                        <tr class="Avg_effort_member">
-                            <th scope="row" class="td_value_none">Avg Effort Member</th>
+                        <tr id="avg-row" class="Avg_effort_member">
+                            <th scope="row" class="td_value_none">Avg Effort Members</th>
                             <td class="td_value_none"></td>
                             <td class="td_value" type="string"></td>
                             <td class="td_value" type="string"></td>
@@ -124,8 +179,8 @@
                             <td class="td_value" type="string"></td>
                             <td class="td_value" type="string"></td>
                         </tr>
-                        <tr class="total_member_avai">
-                            <th scope="row">Toltal Members Available</th>
+                        <tr id="total-row" class="total_member_avai">
+                            <th scope="row">Total Members</th>
                             <td class="td_value" type="string"></td>
                             <td class="td_value" type="string"></td>
                             <td class="td_value" type="string"></td>

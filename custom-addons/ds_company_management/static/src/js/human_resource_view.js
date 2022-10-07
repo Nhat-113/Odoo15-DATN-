@@ -77,6 +77,24 @@ odoo.define('human_resource_template.Dashboard', function(require) {
                         // after event search run, event compute_avg call again to calculator avg effort 
                     input.addEventListener('keyup', () => self.compute_avg())
                         // compute avg effort member in table when render DOM element
+
+                        //sort table
+                    const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+                    const comparer = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))
+                        (getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+                    var th = document.querySelectorAll('th')
+                    var avgRow = document.getElementById('avg-row');
+                    var totalRow = document.getElementById('total-row');
+                    th.forEach(th => th.addEventListener('click', (() => {
+                        let table = th.closest('tbody');
+                        Array.from(table.querySelectorAll('tr.detail'))
+                            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
+                            .forEach(tr => table.appendChild(tr));
+                            // append 2 this row in last row
+                        table.appendChild(avgRow);
+                        table.appendChild(totalRow);
+                    })));
+
                     self.compute_avg();
                 }, 200);
             });
