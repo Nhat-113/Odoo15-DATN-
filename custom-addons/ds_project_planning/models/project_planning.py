@@ -8,6 +8,7 @@ from numpy import require
 from odoo import models, fields, api, _
 from datetime import date, datetime, time
 from odoo.exceptions import UserError, ValidationError
+import pandas as pd
 
 
 class Project(models.Model):
@@ -32,6 +33,16 @@ class Project(models.Model):
         string="Total milestones", compute="_count_phase_milestone")
     project_phases = fields.One2many(
         'project.planning.phase', 'project_id', string='Phases In Project')
+    actual_effort = fields.Float('Actual Effort (MM)', compute='_compute_actual_effort')
+
+    def _compute_actual_effort(self):
+        for project in self:
+            total_actual_effort = 0
+            time_sheets = project.env['account.analytic.line'].search([('project_id', '=', project.id)])
+            for time_sheet in time_sheets:
+                total_actual_effort += time_sheet.unit_amount
+            
+            project.actual_effort = (total_actual_effort/8)/20
 
     def _compute_task_total(self):
         id_status_cancel = self.env['project.task.status'].search([('name', '=' , 'Cancel')]).id
@@ -48,10 +59,7 @@ class Project(models.Model):
 
             if len(project.planning_calendar_resources) > 0:
                 for resource in project.planning_calendar_resources:
-                    if resource.member_type:
-                        total_effort += resource.calendar_effort * resource.member_type.rate / 100
-                    else:
-                        total_effort += resource.calendar_effort
+                    total_effort += resource.calendar_effort
             project.total_calendar_effort = total_effort
 
     @api.depends('planning_calendar_resources')
@@ -116,12 +124,12 @@ class Project(models.Model):
 
     def open_planning_task_all(self):
         for project in self:
-            if self.env['project.task'].search_count(['&',('project_id','=',project.id),('issues_type','=',1)]) == 0:
-                raise UserError(
-                     _("No tasks found. Let's create one!"))
-            else:
-                action = self.with_context(active_id=self.id, active_ids=self.ids) \
-                    .env.ref('ds_project_planning.open_planning_task_all_on_gantt') \
-                    .sudo().read()[0]
+            # if self.env['project.task'].search_count(['&',('project_id','=',project.id),('issues_type','=',1)]) == 0:
+            #     raise UserError(
+            #          _("No tasks found. Let's create one!"))
+            # else:
+            action = self.with_context(active_id=self.id, active_ids=self.ids) \
+                .env.ref('ds_project_planning.open_planning_task_all_on_gantt') \
+                .sudo().read()[0]
             action['display_name'] = self.name
         return action

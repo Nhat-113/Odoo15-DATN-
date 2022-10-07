@@ -182,11 +182,11 @@
                 <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
                 <field name="start_date" />
                 <field name="end_date" />
-                <field name="duration" string="Duration (days)"/>
-                <field name="calendar_effort" digits="[12,2]" string="Booking Effort (MM)"/>
+                <field name="duration" string="Duration (Working days)"/>
+                <field name="calendar_effort" digits="[12,2]" string="Booking Effort (Man Month)"/>
                 <field name="effort_rate" digits="[12,2]" string="Effort Rate (%)"/>
                 <field name="member_type" string="Member Type"/>
-                <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                 <field name="inactive" invisible="1"/>
                 <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)]}" />
                 <field name="note" optional="hide" />
@@ -223,7 +223,7 @@
                             <field name="effort_rate" digits="[12,2]" nolabel="1"/>
                             <span> % </span>
                         </div>
-                        <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                        <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                         <field name="inactive" />
                         <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
                     </group>
@@ -427,25 +427,29 @@
                                     <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
                                     <field name="start_date" />
                                     <field name="end_date" />
-                                    <field name="duration" string="Duration (days)"/>
-                                    <field name="calendar_effort" digits="[12,2]" string="Booking Effort (MM)"/>
+                                    <field name="duration" string="Duration (Working day)"/>
+                                    <field name="calendar_effort" digits="[12,2]" string="Booking Effort (Man Month)"/>
                                     <field name="member_type" string="Member Type"/>
                                     <field name="effort_rate" digits="[12,2]" string="Effort Rate (%)"/>
-                                    <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                    <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                                     <field name="inactive" invisible="1"/>
                                     <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)]}" />
                                     <field name="note" optional="hide" />
                                 </tree>
                                 <form string="Assign Member">
+                                    <header>
+                                        <button name="calculator_total_effort" type="object" string="Compute Effort" attrs="{'invisible': [('check_upgrade_booking', '=', False)]}" class="oe_highlight"/>
+                                        <button name="action_upgrade_booking" type="object" string="Upgrade Booking" attrs="{'invisible': ['|', ('check_upgrade_booking', '=', True), ('inactive', '=', False)]}" class="oe_highlight"/>
+                                    </header>
                                     <sheet>
                                         <div class="oe_title" style="width: 500px">
                                             <h1>
-                                                <field name="employee_id" widget="many2one_avatar" class="o_text_overflow" placeholder="Member Name" options="{'no_create': True}"/>
+                                                <field name="employee_id" widget="many2one_avatar" class="o_text_overflow" placeholder="Member Name" options="{'no_create': True}" attrs="{'readonly': [('check_upgrade_booking', '=', True)]}"/>
                                             </h1>
                                         </div>
                                         <group col="4">
-                                            <field name="start_date" />
-                                            <field name="end_date" />
+                                            <field name="start_date" attrs="{'readonly': [('readonly_date', '=', True)]}"/>
+                                            <field name="end_date" attrs="{'readonly': [('readonly_date', '=', True)]}"/>
                                             <field name="duration" />
                                             <field name="calendar_effort" digits="[12,2]"/>
                                             <label for="member_type"/>
@@ -457,14 +461,53 @@
                                             </div>
                                             <label for="effort_rate"/>
                                             <div class="o_row" name="effort_rate">
-                                                <field name="effort_rate" digits="[12,2]" nolabel="1"/>
+                                                <field name="effort_rate" digits="[12,2]" nolabel="1" attrs="{'readonly': ['|', ('inactive', '=', True), ('readonly_date', '=', True)]}"/>
                                                 <span> % </span>
                                             </div>
-                                            <field name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                            <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}" required="1"/>
+                                            <field name="select_type_gen_week_month" attrs="{'invisible': [('check_upgrade_booking', '=', True)]}"/>
                                             <field name="inactive" />
                                             <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
+                                            <field name="readonly_date" invisible="1"/>
                                         </group>
-                                        <field name="note" string="Note" placeholder="Add a note..." colspan="2"/>
+                                        <field name="note" string="Note" placeholder="Add a note..." colspan="2" class="note_booking"/>
+                                        <field name="check_upgrade_booking" invisible="1"/>
+                                        <div attrs="{'invisible': [('check_upgrade_booking', '=', False)]}">
+                                            <field name="select_type_upgrade" widget="radio" class="radio_type_upgrade"/>
+                                        </div>
+                                        <notebook attrs="{'invisible': [('check_upgrade_booking', '=', False)]}">
+                                            <page string="Month" attrs="{'invisible': [('select_type_upgrade', '=', 'week')]}">
+                                                <field name="booking_upgrade_month" colspan="4" attrs="{'readonly': [('inactive','=', True)]}">
+                                                    <tree string="Month" delete="0" editable="top" create="0">
+                                                        <field name="name"/>
+                                                        <field name="start_date_month"/>
+                                                        <field name="end_date_month"/>
+                                                        <field name="man_month" digits="[12,3]"/>
+                                                        <field name="effort_rate_month" readonly="0"/>
+                                                    </tree>
+                                                </field>
+                                            </page>
+                                            <page string="Week" attrs="{'invisible': [('select_type_upgrade', '=', 'month')]}">
+                                                <field name="booking_upgrade_week" colspan="4" attrs="{'readonly': [('inactive','=', True)]}">
+                                                    <tree string="Week" delete="0" editable="top" create="0">
+                                                        <field name="name"/>
+                                                        <field name="start_date_week"/>
+                                                        <field name="end_date_week"/>
+                                                        <field name="effort_rate_week" readonly="0"/>
+                                                    </tree>
+                                                </field>
+                                            </page>
+                                            <page string="Day" invisible="1">
+                                                <field name="booking_upgrade_day" colspan="4" readonly="0">
+                                                    <tree string="Week" delete="0" editable="top" create="0">
+                                                        <field name="name"/>
+                                                        <field name="start_date_day"/>
+                                                        <field name="end_date_day"/>
+                                                        <field name="effort_rate_day" readonly="1"/>
+                                                    </tree>
+                                                </field>
+                                            </page>
+                                        </notebook>
                                     </sheet>
                                 </form>
                             </field>
@@ -496,8 +539,9 @@
                 <field name="analytic_account_id" optional="hide" groups="analytic.group_analytic_accounting"/>
                 <field name="date_start" string="Start Date" widget="daterange" options="{'related_end_date': 'date'}"/>
                 <field name="date" string="End Date" widget="daterange" options="{'related_start_date': 'date_start'}"/>
-                <field name="total_calendar_effort" string="Booking Effort (MM)"/>
                 <field name="total_estimate_effort" string="Estimate Effort (MM)"/>
+                <field name="total_calendar_effort" string="Booking Effort (MM)"/>
+                <field name="actual_effort"/>
                 <field name="user_id" optional="show" string="Project Manager" widget="many2one_avatar_user" options="{'no_open':True, 'no_create': True, 'no_create_edit': True}"/>
                 <field name="last_update_color" invisible="1"/>
                 <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="hide"/>
