@@ -1,5 +1,4 @@
-from odoo import models, fields, api
-
+from odoo import fields, models, api
 
 
 class ProjectRevenue(models.Model):
@@ -14,8 +13,8 @@ class ProjectRevenue(models.Model):
         return self.env['res.currency'].search([('name', '=', type_currency)])
 
     
-    start_date = fields.Date(string="Start date", required=True, tracking=True)
-    end_date = fields.Date(string="End date", required=True, tracking=True)
+    start_date = fields.Date(string="Start date", required=False, tracking=True, compute='_compute_date_from_project', store=True)
+    end_date = fields.Date(string="End date", required=False, tracking=True, compute='_compute_date_from_project', store=True)
     company_id = fields.Many2one('res.company', string="Company", required=True, default=lambda self: self.env.company, tracking=True)
     project_id = fields.Many2one('project.project', string="Project", required=True, domain="[('company_id', '=', company_id)]", tracking=True)
     revenue_project = fields.Monetary(string="Total Revenue", currency_field='currency_id', required=True, tracking=True)
@@ -35,6 +34,11 @@ class ProjectRevenue(models.Model):
     
     get_currency_name = fields.Char(string='Currency Name', readonly=True, store=True)
 
+    @api.depends('project_id','project_id.date_start','project_id.date')
+    def _compute_date_from_project(self):
+        for record in self:
+            record.start_date = record.project_id.date_start
+            record.end_date = record.project_id.date
 
     @api.depends('revenue_project', 'rounding_usd_input', 'rounding_jpy_input', 'currency_id')
     def _convert_currency_revenue(self):
