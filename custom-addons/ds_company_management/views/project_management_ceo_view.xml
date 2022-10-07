@@ -34,7 +34,7 @@
         <field name="arch" type="xml">
             <tree string="Project Management CEO" default_order="company_id, month_start desc">
                 <field name="company_id" groups="base.group_multi_company"/>
-                <field name="representative"/>
+                <field name="representative" invisible="1"/>
                 <field name="month_start"/>
                 <field name="month_end"/>
                 <field name="total_members" sum="Total Members"/>
