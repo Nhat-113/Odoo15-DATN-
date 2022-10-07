@@ -9,8 +9,8 @@ class ProjectManagementCeo(models.Model):
     
     company_id = fields.Many2one('res.company', string='Company')
     representative = fields.Many2one('hr.employee', string='Representative')
-    month_start = fields.Date(string="Month Start")
-    month_end = fields.Date(string="Month End")
+    month_start = fields.Date(string="Start Month")
+    month_end = fields.Date(string="End Month")
     total_members = fields.Float(string='Members', digits=(12,3))
     total_salary = fields.Monetary(string="Salary Cost")
     total_project_cost = fields.Monetary(string="Project Cost")
@@ -23,25 +23,9 @@ class ProjectManagementCeo(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
-                WITH hr_payslip_payroll AS (
-                    SELECT 
-                        hp.employee_id,
-                        hp.date_from,
-                        hp.date_to,
-                        hp.contract_id,
-                        hp.state,
-                        hpl.total,
-                        hpl.code
-                    FROM hr_payslip hp
-                    LEFT JOIN hr_payslip_line hpl
-                                    ON hp.id = hpl.slip_id
-                    WHERE hpl.code IN('NET', 'NET1') AND hp.state = 'done'
-                ),
-                
-                cost_management_group AS (
+                WITH cost_management_subceo_group AS (
                     SELECT 
                         pms.company_id,
-                        he.id AS representative,
                         pms.month_start,
                         pms.month_end,
                         (SUM(pms.total_members)) AS total_members,
@@ -49,80 +33,353 @@ class ProjectManagementCeo(models.Model):
                         (SUM(pms.total_project_cost)) AS total_project_cost,
                         (SUM(pms.total_revenue)) AS total_revenue,
                         (SUM(pms.total_profit)) AS total_profit,
-                        hpp.total AS salary_manager,
                         pms.currency_id
                         
                     FROM project_management_subceo AS pms
-                    LEFT JOIN res_company AS rc
-                        ON rc.id = pms.company_id
-                    LEFT JOIN hr_employee AS he
-                        ON he.work_email = rc.user_email
-                    LEFT JOIN hr_payslip_payroll AS hpp
-                        ON hpp.employee_id = he.id
-                        AND EXTRACT(MONTH FROM pms.month_start) = EXTRACT(MONTH FROM hpp.date_from)
-                        AND EXTRACT(YEAR FROM pms.month_start) = EXTRACT(YEAR FROM hpp.date_from)
                     GROUP BY pms.company_id,
-                            he.id,
                             pms.month_start,
                             pms.month_end,
-                            hpp.total,
                             pms.currency_id
-                    )
-                        
-                    SELECT 
-                        ROW_NUMBER() OVER(ORDER BY month_start ASC) AS id,
-                        cmg.company_id,
-                        cmg.representative,
-                        cmg.month_start,
-                        cmg.month_end,
-                        cmg.total_revenue,
-                        cmg.total_project_cost,
-                        cmg.currency_id,
+                ),
+                
+                handling_datetime_company_history AS (
+                    SELECT
+                        hch.id,
+                        hch.company_id,
+                        hch.representative AS old_manager_id,
+                        (CASE
+                            WHEN hch.date_start IS NULL
+                                THEN '1/1/2021'::date
+                            ELSE
+                                hch.date_start::date
+                        END) AS date_start,
                         
                         (CASE
-                            WHEN brm.effort_rate_month IS NOT NULL
+                            WHEN hch.date_end IS NULL
+                                THEN (date_trunc('month', CURRENT_DATE::DATE) + interval '1 month - 1 day')::date
+                            ELSE
+                                hch.date_end::date
+                        END) AS date_end
+                    FROM hr_company_history AS hch
+                ),
+                history_manager_company AS (
+                    SELECT
+                        rc.id AS company_id,
+                        he.id AS manager_id,
+                        hdc.old_manager_id,
+                        hdc.date_start,
+                        hdc.date_end,
+                        generate_series(
+                                date_trunc('month', 
+                                        (CASE
+                                            --- When manager is expired ---
+                                            WHEN hdc.date_start IS NOT NULL
+                                                    THEN hdc.date_start::date
+                                            ELSE '1/1/2021'::date
+                                        END)
+                                ), 
+                                date_trunc('month', 
+                                        (CASE
+                                            --- When manager is expired ---
+                                            WHEN hdc.date_end IS NOT NULL
+                                                    THEN hdc.date_end::date
+                                            ELSE (CURRENT_DATE::DATE - interval '1 month')
+                                        END)
+                                
+                                ),	
+                                '1 month'
+                        )::date  AS months
+                        
+                    FROM res_company AS rc
+                    LEFT JOIN handling_datetime_company_history AS hdc
+                        ON hdc.company_id = rc.id
+                    LEFT JOIN hr_employee AS he
+                        ON rc.user_email = he.work_email
+                ),
+
+                history_company_gen_month AS (
+                    SELECT
+                        hmc.company_id,
+                        hmc.manager_id,
+                        hmc.old_manager_id,
+                        hmc.months,
+                        (CASE 
+                            WHEN EXTRACT(MONTH FROM hmc.months) = EXTRACT(MONTH FROM hmc.date_start) 
+                                    AND EXTRACT(YEAR FROM hmc.months) = EXTRACT(YEAR FROM hmc.date_start)
+                                THEN hmc.date_start::date
+                            ELSE hmc.months
+                        END) AS month_start,
+
+                        (CASE 
+                            WHEN EXTRACT(MONTH FROM hmc.months) = EXTRACT(MONTH FROM hmc.date_end) 
+                                    AND	EXTRACT(YEAR FROM hmc.months) = EXTRACT(YEAR FROM hmc.date_end)
+                                THEN hmc.date_end::date
+                            ELSE (SELECT date_trunc('month', hmc.months) + interval '1 month - 1 day')::date
+                        END) AS month_end,
+                                
+                        (SELECT date_trunc('month', hmc.months) + interval '1 month - 1 day')::date AS month_end_date
+                        
+                    FROM history_manager_company AS hmc
+                ),
+
+                compute_working_day_manager AS (
+                    SELECT
+                        hc.company_id,
+                        hc.manager_id,
+                        hc.old_manager_id,
+                        hc.month_start,
+                        hc.month_end,
+                        hc.months AS month_start_date,
+                        hc.month_end_date,
+                        
+                        (SELECT COUNT(*)
+                            FROM (
+                                SELECT dd, 
+                                        EXTRACT(DOW FROM dd) AS dw
+                                FROM generate_series(
+                                            hc.month_start, 
+                                            hc.month_end, 
+                                            interval '1 day'
+                                ) AS dd 
+                            ) AS days
+                            WHERE dw NOT IN (6,0)
+                            
+                        ) AS working_day,
+                        
+                        (SELECT COUNT(*)
+                            FROM (
+                                SELECT dd, 
+                                        EXTRACT(DOW FROM dd) AS dw
+                                FROM generate_series(
+                                            hc.months, 
+                                            hc.month_end_date, 
+                                            interval '1 day'
+                                ) AS dd 
+                            ) AS days
+                            
+                            WHERE dw NOT IN (6,0)
+                        ) AS working_day_total
+                        
+                    FROM history_company_gen_month AS hc
+                ),
+
+                get_salary_manager_company AS (
+                    SELECT
+                        cw.company_id,
+                        cw.manager_id,
+                        cw.old_manager_id,
+                        cw.month_start,
+                        cw.month_end,
+                        cw.month_start_date,
+                        cw.month_end_date,
+                        cw.working_day,
+                        cw.working_day_total,
+                        hpl.total,
+                        hpll.total AS bqnc
+                    FROM compute_working_day_manager AS cw
+                    LEFT JOIN hr_payslip AS hp
+                        ON (CASE
+                                WHEN cw.old_manager_id IS NULL
+                                    THEN hp.employee_id = cw.manager_id
+                                ELSE
+                                    hp.employee_id = cw.old_manager_id
+                            END)
+                        AND EXTRACT(MONTH FROM hp.date_from) = EXTRACT(MONTH FROM cw.month_start)
+                        AND EXTRACT(YEAR FROM hp.date_from) = EXTRACT(YEAR FROM cw.month_start)
+                        
+                    LEFT JOIN hr_payslip_line AS hpl
+                            ON hpl.slip_id = hp.id
+                            AND hpl.code IN('NET', 'NET1') AND hp.state = 'done'
+                    LEFT JOIN hr_payslip_line AS hpll
+                            ON hpll.slip_id = hp.id
+                            AND hpll.code IN('BQNC') AND hp.state = 'done'
+
+                ),
+
+                compute_salary_subceo AS (
+                    SELECT 
+                        cms.company_id,
+                    -- 	gs.manager_id,
+                    -- 	gs.old_manager_id,
+                        (CASE
+                            WHEN gs.old_manager_id IS NOT NULL
+                                THEN gs.old_manager_id
+                            ELSE
+                                gs.manager_id
+                        END) AS manager,
+                    -- 	gs.month_start AS month_start_manager,
+                    -- 	gs.month_end AS month_end_manager,
+                    -- 	rcm.months as month_start_date,
+                    -- 	gs.month_end_date,
+                        cms.month_start,
+                        cms.month_end,
+                    -- 	gs.working_day,
+                    -- 	gs.working_day_total,
+                    -- 	gs.total,
+                    -- 	gs.bqnc,
+                    -- 	brm.effort_rate_month,
+                    -- 	brm.man_month,
+                        
+                    -- 	mdh.manager_id AS manager_department,
+                    -- 	mdh.manager_history_id AS old_manager_department,
+                        cms.total_revenue,
+                        cms.total_members,
+                        cms.total_salary,
+                        cms.total_project_cost,
+                        cms.total_profit,
+                        -- 	calculate members Manager company ---
+                        (CASE
+                            -- 	when manager company is a manager department
+                            WHEN mdh.manager_id IS NOT NULL OR mdh.manager_history_id IS NOT NULL
+                                THEN 0
+                            ELSE
+                                (CASE
+                                    -- when manager company doesn't join project ---
+                                    WHEN brm.man_month IS NULL
+                                        THEN (gs.working_day::NUMERIC(10,5) / 20)
+                                    ELSE
+                                        (gs.working_day::NUMERIC(10,5) / 20) - brm.man_month
+                                END)
+                        END) AS remaining_members,
+                        
+                        (CASE
+                            WHEN mdh.manager_id IS NOT NULL OR mdh.manager_history_id IS NOT NULL
                                 THEN (CASE
-                                        WHEN cmg.total_members + (1 - brm.man_month) < 0
-                                            THEN 0
+                                        -- when manager company is manager department and doesn't join project but only work for half a month ---
+                                        WHEN mdh.working_day <> mdh.working_day_total AND mdh.effort_rate_month IS NULL
+                                            THEN
+                                                COALESCE(NULLIF(mdh.salary_manager, NULL), 0) - (COALESCE(NULLIF(mdh.bqnc, NULL), 0) * mdh.working_day)
                                         ELSE
-                                            cmg.total_members + (1 - brm.man_month)
+                                            0
                                     END)
                             ELSE
-                                cmg.total_members + 1
-                        END) AS total_members,
-                        
-                        (CASE
-                            WHEN cmg.salary_manager IS NULL
-                                THEN cmg.total_salary
-                            ELSE (CASE
-                                    WHEN brm.effort_rate_month IS NULL
-                                        THEN cmg.total_salary + cmg.salary_manager
+                                (CASE
+                                    --- when the manager quits in the middle of the month ---
+                                    WHEN gs.working_day <> gs.working_day_total
+                                        THEN (CASE
+                                                WHEN brm.effort_rate_month IS NULL
+                                                    THEN COALESCE(NULLIF(gs.bqnc, NULL), 0) * gs.working_day
+                                                ELSE
+                                                    COALESCE(NULLIF(gs.bqnc, NULL), 0) * gs.working_day * (100 - brm.effort_rate_month) / 100
+                                            END)
                                     ELSE
-                                        cmg.total_salary + cmg.salary_manager - ( cmg.salary_manager * brm.effort_rate_month / 100)
+                                        (CASE
+                                            WHEN brm.effort_rate_month IS NULL
+                                                THEN COALESCE(NULLIF(gs.total, NULL), 0)
+                                            ELSE
+                                                COALESCE(NULLIF(gs.total, NULL), 0) * (100 - brm.effort_rate_month) / 100
+                                        END)
                                 END)
-                        END) AS total_salary,
-                        
-                        (CASE
-                            WHEN cmg.salary_manager IS NULL
-                                THEN cmg.total_profit
-                            ELSE (CASE
-                                    WHEN brm.effort_rate_month IS NULL
-                                        THEN cmg.total_profit - cmg.salary_manager
-                                            
-                                    --- case when manager join project ---
-                                    ELSE cmg.total_profit - (cmg.salary_manager - (cmg.salary_manager * brm.effort_rate_month / 100 ))
-                                END)
-                        END)::NUMERIC(20, 4) AS total_profit,
-                        
-                        brm.employee_id,
-                        cmg.salary_manager,
-                        brm.effort_rate_month
+                        END) AS remaining_salary
 
-                    FROM cost_management_group AS cmg
+                    FROM cost_management_subceo_group AS cms
+                    LEFT JOIN get_salary_manager_company AS gs
+                        ON gs.company_id = cms.company_id
+                        AND gs.month_start_date = cms.month_start
                     LEFT JOIN booking_resource_month AS brm
-                        ON cmg.representative = brm.employee_id
-                        AND EXTRACT(MONTH FROM cmg.month_start) = EXTRACT(MONTH FROM brm.start_date_month)
-                        AND EXTRACT(YEAR FROM cmg.month_start) = EXTRACT(YEAR FROM brm.start_date_month)
+                        ON (CASE
+                                WHEN gs.old_manager_id IS NOT NULL
+                                    THEN gs.old_manager_id = brm.employee_id
+                                ELSE
+                                    gs.manager_id = brm.employee_id
+                            END)
+
+                        AND EXTRACT(MONTH FROM gs.month_start_date) = EXTRACT(MONTH FROM brm.start_date_month)
+                        AND EXTRACT(YEAR FROM gs.month_start_date) = EXTRACT(YEAR FROM brm.start_date_month)
+                    LEFT JOIN manager_department_history AS mdh
+                        ON (CASE
+                                WHEN mdh.manager_history_id IS NOT NULL
+                                    THEN (CASE
+                                            WHEN gs.old_manager_id IS NOT NULL
+                                                THEN mdh.manager_history_id = gs.old_manager_id
+                                            ELSE
+                                                mdh.manager_history_id = gs.manager_id
+                                        END)
+                                ELSE
+                                    (CASE
+                                        WHEN gs.old_manager_id IS NOT NULL
+                                            THEN mdh.manager_id = gs.old_manager_id
+                                        ELSE
+                                            mdh.manager_id = gs.manager_id
+                                    END)
+                            END)
+                        AND EXTRACT(MONTH FROM mdh.month_start) = EXTRACT(MONTH FROM cms.month_start)
+                        AND EXTRACT(YEAR FROM mdh.month_start) = EXTRACT(YEAR FROM cms.month_start)
+
+                        ORDER BY company_id, gs.manager_id, month_start
+                ),
+
+                remove_department_record_superfluous AS (
+                    SELECT
+                        css.company_id,
+                        css.manager,
+                        css.month_start,
+                        css.month_end,
+                        css.total_revenue,
+                        css.total_members,
+                        css.total_salary,
+                        css.total_project_cost,
+                        css.total_profit,
+                        css.remaining_members,
+                        css.remaining_salary
+                    FROM compute_salary_subceo AS css
+                    GROUP BY
+
+                        css.company_id,
+                        css.manager,
+                        css.month_start,
+                        css.month_end,
+                        css.total_revenue,
+                        css.total_members,
+                        css.total_project_cost,
+                        css.total_salary,
+                        css.total_profit,
+                        css.remaining_members,
+                        css.remaining_salary
+                ),
+                cost_management_final AS (
+                    SELECT
+                        ROW_NUMBER() OVER(ORDER BY month_start ASC) AS id,
+                        company_id,
+                        month_start,
+                        month_end,
+                        total_revenue,
+                        total_project_cost,
+                        (total_members + SUM(remaining_members)) AS total_members,
+                        (total_salary + SUM(remaining_salary)) AS total_salary,
+                        (total_profit - SUM(remaining_salary)) AS total_profit
+
+                    FROM remove_department_record_superfluous AS rd
+                    GROUP BY
+                        company_id,
+                        month_start,
+                        month_end,
+                        total_revenue,
+                        total_members,
+                        total_project_cost,
+                        total_salary,
+                        total_profit
+                )
+                
+                SELECT
+                    cm.id,
+                    cm.company_id,
+                    he.id AS representative,
+                    cm.month_start,
+                    cm.month_end,
+                    cm.total_revenue,
+                    cm.total_members,
+                    cm.total_project_cost,
+                    cm.total_salary,
+                    cm.total_profit,
+                    rcu.id AS currency_id
+                FROM cost_management_final AS cm
+                LEFT JOIN res_company AS rc
+                    ON rc.id = cm.company_id
+                LEFT JOIN hr_employee AS he
+                    ON he.work_email = rc.user_email
+                LEFT JOIN res_currency AS rcu
+	                ON rcu.name = 'VND'
             ) """ % (self._table)
         )
         

@@ -10,8 +10,8 @@ class ProjectManagementHistory(models.Model):
     
     project_management_id = fields.Many2one('project.management', string="Project Management")
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id)
-    month_start = fields.Date(string="Month Start")
-    month_end = fields.Date(string="Month End")
+    month_start = fields.Date(string="Start Month")
+    month_end = fields.Date(string="End Month")
     working_day = fields.Float(string="Working day")
     total_project_expense = fields.Monetary(string="Project Cost", help="Total Project Expenses By Month")
     operation_cost = fields.Monetary(string="Operation Cost", help="Total Operation Cost")

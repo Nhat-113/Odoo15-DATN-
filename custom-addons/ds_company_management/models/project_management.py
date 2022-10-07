@@ -23,7 +23,7 @@ class ProjectManagement(models.Model):
         self._content_compute_total('total_salary', 'project_management_history', 'total_salary')
 
     def _compute_total_project_cost(self):
-        self._content_compute_total('project_cost', 'project_expense_management', 'total_expenses')
+        self._content_compute_total('project_cost', 'project_expense_management', 'expense_vnd')
         
     def _compute_total_profit(self):
         self._content_compute_total('profit', 'project_management_history', 'profit')
