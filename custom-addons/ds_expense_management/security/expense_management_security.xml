@@ -1,0 +1,38 @@
+<odoo>
+    <data>
+        <!-- Company expense management group access rights -->
+        <record id="company_expense_access" model="ir.module.category">
+            <field name="name">Company Expense</field>
+        </record>
+
+        <!-- Option Role: Administrator -->
+        <record id="administrator_access_company_expense" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="ds_expense_management.company_expense_access"/>
+        </record>
+
+        <!-- View General Expense By Company -->
+        <record model="ir.rule" id="access_general_expense_by_company">
+            <field name="name">Company Expense: View General Expense By Company</field>
+            <field name="model_id" ref="model_expense_management"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4,ref('ds_expense_management.administrator_access_company_expense'))]"/>
+        </record>
+
+        <!-- View Project Expense By Company -->
+        <record model="ir.rule" id="access_project_expense_by_company">
+            <field name="name">Company Expense: View Project Expense By Company</field>
+            <field name="model_id" ref="model_project_expense_management"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4,ref('ds_expense_management.administrator_access_company_expense'))]"/>
+        </record>
+
+         <!-- View Project Revenue By Company -->
+        <record model="ir.rule" id="access_project_revenue_by_company">
+            <field name="name">Company Expense: View Project Revenue By Company</field>
+            <field name="model_id" ref="model_project_revenue_management"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4,ref('ds_expense_management.administrator_access_company_expense'))]"/>
+        </record>
+    </data>
+</odoo>
