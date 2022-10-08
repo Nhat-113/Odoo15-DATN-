@@ -58,8 +58,8 @@ class Activities(models.Model):
         for record in self:
             final_manday = 0.0
             for item in record.add_lines_breakdown_activity:
-                if item.mandays > 1000 or item.mandays < 0:
-                    raise UserError('Expected (man-days) must be less than 1000 and larger than 0!')
+                if item.mandays > 1000:
+                    raise UserError('Expected (man-days) must be less than 1000!')
                 else:
                     if item.type == 'type_1':
                         effort_activity_current = self.env['module.breakdown.activity']._find_effort_activity_current(record.module_id.module_config_activity, record.activity_current)

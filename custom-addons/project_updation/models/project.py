@@ -2,7 +2,7 @@ from datetime import date
 import json
 from random import randint
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 STATUS_COLOR = {
@@ -270,6 +270,22 @@ class Project(models.Model):
         readonly=True,
         store=False,
     )
+    project_type = fields.Many2one('project.type', string="Project Type", readonly=False, compute='_compute_project_type', store=True)
+
+    @api.depends('estimation_id', 'estimation_id.project_type_id')
+    def _compute_project_type(self):
+        for record in self:
+            if record.estimation_id.project_type_id.id:
+                record.project_type = record.estimation_id.project_type_id.id
+            else:
+                record.project_type = False
+
+    @api.constrains('project_type')
+    def _validation_project_type(self):
+        for record in self:
+            if record.estimation_id.project_type_id.id and record.project_type.id != record.estimation_id.project_type_id.id:
+                raise UserError ('Project Type of Project does not match with Project Type of Estimation')
+
 
     @api.depends('last_update_status')
     def _compute_last_update_color(self):

@@ -165,3 +165,9 @@ th[data-name="check_activate"] {
 .template_project_type {
     white-space: nowrap;
 }
+
+.total_man_month::after {
+    content: "(MM)";
+    font-weight: bold;
+    margin-left: 10px;
+}

@@ -23,6 +23,7 @@ class Estimation(models.Model):
     currency_id = fields.Many2one("estimation.currency", string="Currency", required=True, default=1)
     currency_id_domain = fields.Char(compute="_compute_currency_id_domain", readonly=True, store=False,)
     project_type_id = fields.Many2one("project.type", string="Project Type", help="Please select project type ...")
+    department_id = fields.Many2one("hr.department", string="Department", domain="[('company_id','=', company_id)]")
 
     potential_budget = fields.Float(string="Potential Budget")
     total_cost = fields.Float(string="Total Cost", compute='_compute_total_cost', store=True)
@@ -213,6 +214,8 @@ class Estimation(models.Model):
                 vals[item] = self.env['estimation.status'].search([('id','=',vals[item])]).status
             elif item == "company_id" and vals[item] != '':
                 vals[item] = self.env['res.company'].search([('id','=',vals[item])]).name
+            elif item == "department_id" and vals[item] != '':
+                vals[item] = self.env['hr.department'].search([('id','=',vals[item])]).name
         return vals
         
     def merge_dict_vals(self, a, b, vals_tab_module) :
@@ -277,7 +280,7 @@ class Estimation(models.Model):
     def get_values(self, est):
         vals_values = []
         mess_field = ["project_name", "project_code", "description"] # List type String
-        mess_field_obj = ["estimator_ids", "reviewer_ids", "customer_ids",  "stage", "currency_id", "project_type_id", "company_id"] # List type Int (id)
+        mess_field_obj = ["estimator_ids", "reviewer_ids", "customer_ids",  "stage", "currency_id", "project_type_id", "company_id", "department_id"] # List type Int (id)
         mess_field_date = ["sale_date", "deadline"] #List type Date
        
         for item in est:
@@ -326,7 +329,9 @@ class Estimation(models.Model):
                 'name': estimation.project_name,
                 'user_id':estimation.estimator_ids.id,
                 'estimation_id': estimation.id,
-                'company_id': estimation.company_id.id
+                'department_id': estimation.department_id.id,
+                'company_id': estimation.company_id.id,
+                'project_type': estimation.project_type_id.id
             })
             modules = self.env['estimation.module'].search([('estimation_id', '=', estimation.id)])
             for module in modules:
