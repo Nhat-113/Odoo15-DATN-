@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_department_form_inherit" model="ir.ui.view">
+            <field name="name">hr.department.form</field>
+            <field name="model">hr.department</field>
+            <field name="inherit_id" ref="hr.view_department_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form/sheet/group" position="after">
+                    <notebook>
+                        <page name="department_history_page" string="Department History">
+                            <field name="department_history_id">
+                                <tree create="0" editable="bottom">
+                                    <field name="manager_history_id" widget="many2one_avatar_employee"/>
+                                    <field name="date_start" />
+                                    <field name="date_end" />
+                                </tree> 
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
