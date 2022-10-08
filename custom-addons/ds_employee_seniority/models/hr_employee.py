@@ -6,10 +6,11 @@ class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
     seniority_by_days = fields.Integer(compute='_compute_seniority_by_days', string='Seniority By Days', store=True)
-    seniority = fields.Char(compute='_compute_seniority', string='Employee Seniority')
+    seniority = fields.Char(compute='compute_seniority', string='Employee Seniority', store=True)
 
-    def _compute_seniority(self):
-        for employee in self:
+    @api.onchange('contract_id')
+    def compute_seniority(self):
+        for employee in self.env['hr.employee'].search([]):
             diff = relativedelta(datetime.today(), employee['joining_date'])
             years = diff.years
             months = diff.months

@@ -1,0 +1,42 @@
+<!-- <?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="human_resource_filter" model="ir.ui.view">
+        <field name="name">human.resource.search</field>
+        <field name="model">human.resource.management</field>
+        <field name="arch" type="xml">
+            <search string="Employees">
+                <searchpanel>
+                    <field name="company_id" groups="base.group_multi_company" icon="fa-building" enable_counters="1"/>
+                    <field name="department_id" icon="fa-users" enable_counters="1"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="human_resource_management_tree" model="ir.ui.view">
+        <field name="name">human.resource.management.tree</field>
+        <field name="model">human.resource.management</field>
+        <field name="arch" type="xml">
+            <tree string="Resource Detail">
+                <field name="name"/>
+                <field name="work_phone"/>
+                <field name="work_email"/>
+                <field name="parent_id"/>
+                <field name="job_id"/>
+                <field name="department_id"/>
+                <field name="seniority"/>
+                <field name="salary"/>
+                <field name="company_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="human_resource_management_action" model="ir.actions.act_window">
+        <field name="name">Human Resource Management</field>
+        <field name="res_model">human.resource.management</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="human_resource_filter"/>
+    </record>
+
+
+</odoo> -->

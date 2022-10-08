@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="exchange_rate_api_date" model="api.exchange.rate">
+            <field name="name">Exchange Rate</field>
+            <field name="usd_convert">0</field>
+            <field name="jpy_convert">0</field>
+            <field name="message_warning">The number of exchange rate updates for the day has expired! Please update tomorrow</field>
+            <field name="maximum_upgrade">8</field>
+        </record>
+    </data>
+</odoo>

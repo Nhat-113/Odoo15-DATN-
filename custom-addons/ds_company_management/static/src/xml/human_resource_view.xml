@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="initial-scale=1"/>
+    <t t-name="Human_resource">
+        <div class="main_content_hmrc">
+            <div class="human_resource_in_top">
+                <div class="header_human_resource">
+                    <h2 class="title_human_resource">Human Resource Management</h2>
+                    <div class="search_textbox">
+                        <input type="text" id="search_input" placeholder="Search ..." />
+                        <i title="Search..." role="img" aria-label="Search..." class="o_searchview_icon icon_search_human fa fa-search"></i>
+                    </div>
+                </div>
+                <div class="human_resouce_value">
+                    <button class="export_excel btn btn-secondary fa fa-download o_list_export_xlsx" ></button>
+                </div>
+            </div>
+
+            <div class="humam_resource_template">
+                <table id="human_resource_table">
+                    <tbody class="human_resource_content">
+                        <tr class="header_tabel">
+                            <th></th>
+                            <th>
+                                Employee
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                Company
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                Department
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                Project
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                Project Type
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                January
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                February
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                March
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                April
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                May
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                June
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                July
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                August
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                September
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                October
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                November
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                December
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th>
+                                AVG(%)
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+
+                        </tr>
+                        <t t-foreach="widget.list_human_resource" t-as="list_human_resource">
+                            <tr class="detail">
+                                <td class="td_value_none"></td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[1]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[2]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[3]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[4]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[5]"/>
+                                </td>
+                                <!-- <td class="td_value">
+                                    <t t-esc="list_human_resource[6]"/>
+                                </td> -->
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[7]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[8]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[9]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[10]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[11]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[12]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[13]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[14]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[15]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[16]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[17]"/>
+                                </td>
+                                <td class="td_value" type="string">
+                                    <t t-esc="list_human_resource[18]"/>
+                                </td>
+                                <td class="AVG_colum" type="string">
+                                    <t t-esc="list_human_resource[19]"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr id="avg-row" class="Avg_effort_member">
+                            <th scope="row" class="td_value_none">Avg Effort Members</th>
+                            <td class="td_value_none"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                        </tr>
+                        <tr id="total-row" class="total_member_avai">
+                            <th scope="row">Total Members</th>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                            <td class="td_value" type="string"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </t>
+</templates>

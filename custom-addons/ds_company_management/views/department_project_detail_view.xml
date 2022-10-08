@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <!-- Sidebar filter  -->
+    <record id="sidebar_filter_department_project_detail" model="ir.ui.view">
+        <field name="name">department.project.detail.search</field>
+        <field name="model">department.project.detail</field>
+        <field name="arch" type="xml">
+            <search>
+                <searchpanel>
+                    <field name="user_pm" icon="fa-users" enable_counters="1"/>
+                </searchpanel>
+
+                <!-- <group expand="1" string="Group By">
+                    <filter string="Company" name="group_by_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                    <separator orientation="vertical" />
+                    <filter string="Department" name="group_by_department" context="{'group_by': 'department_id'}"/>
+                    <separator orientation="vertical" />
+                </group> -->
+            </search>
+        </field>
+    </record>
+
+    <record id="view_tree_department_project_detail" model="ir.ui.view">
+        <field name="name">department.project.detail.tree</field>
+        <field name="model">department.project.detail</field>
+        <field name="arch" type="xml">
+            <tree string="Project Management Detail" default_order="user_pm">
+                <field name="department_id" optional="hide"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+                <field name="project_id"/>
+                <field name="user_pm"/>
+                <field name="month_start"/>
+                <field name="month_end"/>
+                <field name="working_day"/>
+                <field name="total_members" sum="Total Members"/>
+                <field name="total_salary" sum="Total Salary Cost"/>
+                <field name="total_project_cost" sum="Total Project Cost"/>
+                <field name="total_revenue" sum="Total Revenue"/>
+                <field name="total_profit" sum="Total Profit"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="project_management_id" invisible="1"/>
+                <button name="get_detail_project_management" type="object" string="Detail" class="btn btn-primary"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="department_project_detail_action" model="ir.actions.act_window">
+        <field name="name">Department Project Detail</field>
+        <field name="res_model">department.project.detail</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="sidebar_filter_department_project_detail"/>
+        <!-- <field name="context">{'search_default_filter_current_year': 1, 'search_default_group_by_department': 1}</field> -->
+    </record>
+
+</odoo>
+<!-- <field name="domain">[('month_start', '=', (context_today() - relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]</field> -->
