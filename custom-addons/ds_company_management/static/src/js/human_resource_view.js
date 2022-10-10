@@ -158,7 +158,7 @@ odoo.define('human_resource_template.Dashboard', function(require) {
             // }
 
             // Start compute in column number six 
-            for (var j = 6; j < howManyCols; j++) {
+            for (var j = 7; j < howManyCols; j++) {
                 count_compute_available_member = self.compute_available_member(j);
                 // count_number_row = self.compute_count_number_row(j);
                 total_available_member.cells[j].innerText = count_compute_available_member;
@@ -200,7 +200,10 @@ odoo.define('human_resource_template.Dashboard', function(require) {
                     let row = table.rows[i];
                     let parent_style = row.cells[colNumber].parentElement.style.display;
                     var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);
-                    if (parent_style != 'none' && !isNaN(thisNumber)) {
+                    var employee_id_before = table.rows[i].cells[1].innerText;
+                    var employee_id_after = table.rows[i+1].cells[1].innerText;                  
+
+                    if (parent_style != 'none' && !isNaN(thisNumber) && employee_id_before !== employee_id_after ) {
                         count_row += 1
                     }
                 }

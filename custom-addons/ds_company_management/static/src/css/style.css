@@ -171,6 +171,9 @@ span[name="message_warning"] {
 .header_tabel > th:hover .icon-sort-header{
     display: initial !important;
 }
+.human_employee_id {
+    display: none !important;
+}
 
 /* for desktop screen */
 @media only screen and (max-width: 1600px) {
