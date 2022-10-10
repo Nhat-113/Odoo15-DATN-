@@ -10,6 +10,7 @@
                     <div class="search_textbox">
                         <input type="text" id="search_input" placeholder="Search ..." />
                         <i title="Search..." role="img" aria-label="Search..." class="o_searchview_icon icon_search_human fa fa-search"></i>
+                        <h3 id="count_member_of_company"></h3>
                     </div>
                 </div>
                 <div class="human_resouce_value">

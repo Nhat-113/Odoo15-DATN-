@@ -150,24 +150,21 @@ odoo.define('human_resource_template.Dashboard', function(require) {
             var total_available_member = tbody.rows[tbody.rows.length - 1];
             var count_compute_available_member = 0;
             var howManyCols = tbody.rows[1].cells.length;
-            // var count_number_row = 0;
-            // var count_number_record = document.getElementById('count_number_record');
-            // for (var j = 1; j < howManyCols; j++) {
-            //     count_compute_available_member = self.compute_available_member(j);
-            //     total_available_member.cells[j].innerText = count_compute_available_member;
-            // }
+            var total_member_company = document.getElementById("count_member_of_company");
 
-            // Start compute in column number six 
+            // Start compute in column number seven
             for (var j = 7; j < howManyCols; j++) {
                 count_compute_available_member = self.compute_available_member(j);
+
                 // count_number_row = self.compute_count_number_row(j);
                 total_available_member.cells[j].innerText = count_compute_available_member;
                 final = self.computeTableColumnTotal(j);
 
                 // avg = (total effort( > 0 and another N/A  )) / total members in column with effort another N/A 
                 total_row.cells[j].innerText = parseFloat(final / count_compute_available_member).toFixed(2);
-                // count_number_record.innerText  = count_number_row
             }
+            //count members of company with value from second column
+            total_member_company.innerText = String(self.compute_member_company() + ' Members' );
 
         },
 
@@ -211,6 +208,28 @@ odoo.define('human_resource_template.Dashboard', function(require) {
                 return count_row;
             }
         },
+
+        compute_member_company: function(colNumber = 1) {
+            var table = document.getElementById("human_resource_table");
+            var howManyRows = 0;
+            let count_members_of_company = 0;
+            try {
+                var howManyRows = table.rows.length;
+                for (var i = 1; i < howManyRows - 2; i++) {
+                    let row = table.rows[i];
+                    let parent_style = row.cells[colNumber].parentElement.style.display;
+                    var employee_id_before = table.rows[i].cells[1].innerText;
+                    var employee_id_after = table.rows[i+1].cells[1].innerText;                  
+
+                    if (parent_style != 'none' && employee_id_before !== employee_id_after ) {
+                        count_members_of_company += 1
+                    }
+                }
+            } finally {
+                return count_members_of_company;
+            }
+        },
+
 
         //     var table = document.getElementById("human_resource_table");
         //     var howManyRows = 0;
