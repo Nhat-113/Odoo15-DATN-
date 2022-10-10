@@ -191,18 +191,22 @@ odoo.define('human_resource_template.Dashboard', function(require) {
             var table = document.getElementById("human_resource_table");
             var howManyRows = 0;
             let count_row = 0;
+            let listId = [];
             try {
                 var howManyRows = table.rows.length;
                 for (var i = 1; i < howManyRows - 2; i++) {
                     let row = table.rows[i];
+                    let id_employee = table.rows[i].cells[1].innerText;
                     let parent_style = row.cells[colNumber].parentElement.style.display;
                     var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);
-                    var employee_id_before = table.rows[i].cells[1].innerText;
-                    var employee_id_after = table.rows[i+1].cells[1].innerText;                  
+                    // var employee_id_before = table.rows[i].cells[1].innerText;
+                    // var employee_id_after = table.rows[i+1].cells[1].innerText;                  
 
-                    if (parent_style != 'none' && !isNaN(thisNumber) && employee_id_before !== employee_id_after ) {
-                        count_row += 1
+                    if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) ) {
+                        count_row += 1;
+                        listId.push(id_employee);
                     }
+
                 }
             } finally {
                 return count_row;
@@ -213,16 +217,17 @@ odoo.define('human_resource_template.Dashboard', function(require) {
             var table = document.getElementById("human_resource_table");
             var howManyRows = 0;
             let count_members_of_company = 0;
+            let listId = [];
             try {
                 var howManyRows = table.rows.length;
                 for (var i = 1; i < howManyRows - 2; i++) {
                     let row = table.rows[i];
-                    let parent_style = row.cells[colNumber].parentElement.style.display;
-                    var employee_id_before = table.rows[i].cells[1].innerText;
-                    var employee_id_after = table.rows[i+1].cells[1].innerText;                  
+                    let id_employee = table.rows[i].cells[1].innerText;
+                    let parent_style = row.cells[colNumber].parentElement.style.display;            
 
-                    if (parent_style != 'none' && employee_id_before !== employee_id_after ) {
+                    if (parent_style != 'none'  && !listId.includes(id_employee) ) {
                         count_members_of_company += 1
+                        listId.push(id_employee);
                     }
                 }
             } finally {
