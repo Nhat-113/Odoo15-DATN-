@@ -278,6 +278,9 @@
                         <field name="id" />
                     </div>
                 </xpath>
+                <div class="dropdown-divider" position="before">
+                   <a t-if="widget.editable" role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                </div>
             </field>
         </record>
 

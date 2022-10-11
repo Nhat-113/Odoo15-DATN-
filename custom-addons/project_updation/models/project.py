@@ -314,13 +314,57 @@ class Project(models.Model):
     @api.model
     def update_status(self):
         projects = self.env['project.project'].search([('active', '=', True)])
+        id_status_done = self.env['project.task.status'].search([('name', '=', 'Done')]).id
+        id_status_cancel = self.env['project.task.status'].search([('name', '=', 'Cancelled')]).id
+        id_status_pending = self.env['project.task.status'].search([('name', '=', 'Pending')]).id
+        id_type_task = self.env['project.issues.type'].search([('name', '=', 'Task')]).id
         for project in projects:
-            task_all = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1), ('status','!=',7)])
-            task_out_of_date = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',1),('status','not in',[6,7]),('date_end','<',date.today())])
-            if task_all > 0 and task_out_of_date/task_all >= 0.1 and project.last_update_status not in ['off_track', 'on_hold']:
-                project.write({'last_update_status': 'at_risk'})
+            task_expired = []
+            task_all = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',id_type_task), ('status','not in',[id_status_done, id_status_cancel, id_status_pending])])
+            task_out_of_date = self.env['project.task'].search(['&',('project_id', '=', project.id),('issues_type','=',id_type_task),('status','not in',[id_status_done,id_status_cancel,id_status_pending]),('date_end','<',date.today())])
+            if task_all > 0:
+                # nếu số task bị trễ >= 10%(0.1) thì sẽ send mail và chuyển status thành at_risk
+                if len(task_out_of_date)/task_all >= 0.1 and project.last_update_status not in ['off_track', 'on_hold', 'missing_resource']:
+                    for task_expire in task_out_of_date:
+                        task_expired.append(str(task_expire.id))
+                    # Send mail
+                    template = 'project_updation.warning_task_late'
+                    subject_template = '[Warning] Project'
+                    self._send_message_auto_task_deadline(project, task_expired, template, subject_template)
+                    project.write({'last_update_status': 'at_risk'})
+                elif len(task_out_of_date)/task_all < 0.1 and project.last_update_status not in ['off_track', 'on_hold', 'on_track', 'missing_resource']:
+                    project.write({'last_update_status': 'on_track'})
+            else:
+                project.write({'last_update_status': 'on_track'})
 
         return True
+
+    @api.model
+    def _send_message_auto_task_deadline(self, project, task_expired, template, subject_template):
+
+        template_id = self.env['ir.model.data']._xmlid_to_res_id(template, raise_if_not_found=False)
+        if not template_id:
+            return
+        view = self.env['ir.ui.view'].browse(template_id)
+        task_model_description = self.env['ir.model']._get(self._name).display_name
+        values = {
+            'object': project,
+            'task' : task_expired,
+            'model_description': task_model_description,
+            'access_link': project._notify_get_action_link('view'),
+        }
+        
+        values.update(assignee_name=self.env['hr.employee'].search([('user_id', '=', project.user_id.id)]).sudo().name)
+        assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
+        assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)                 
+        project.message_notify(
+            subject = _('%s : %s', subject_template, str(project.name)+' late task'),
+            body = assignation_msg,
+            partner_ids = project.user_id.partner_id.ids,
+            record_name = project.name,
+            email_layout_xmlid = 'mail.mail_notification_light',
+            model_description = task_model_description,
+        )
 
     @api.depends('planning_calendar_resources')
     def _compute_employee_id_domain(self):
