@@ -10,6 +10,7 @@
                     <div class="search_textbox">
                         <input type="text" id="search_input" placeholder="Search ..." />
                         <i title="Search..." role="img" aria-label="Search..." class="o_searchview_icon icon_search_human fa fa-search"></i>
+                        <h3 id="count_member_of_company"></h3>
                     </div>
                 </div>
                 <div class="human_resouce_value">
@@ -22,6 +23,10 @@
                     <tbody class="human_resource_content">
                         <tr class="header_tabel">
                             <th></th>
+                            <th class="human_employee_id">
+                                Employee ID
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
                             <th>
                                 Employee
                                 <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
@@ -99,6 +104,9 @@
                         <t t-foreach="widget.list_human_resource" t-as="list_human_resource">
                             <tr class="detail">
                                 <td class="td_value_none"></td>
+                                <td class="td_value human_employee_id" type="string">
+                                    <t t-esc="list_human_resource[25]"/>
+                                </td>
                                 <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[1]"/>
                                 </td>
@@ -161,6 +169,7 @@
                         <tr id="avg-row" class="Avg_effort_member">
                             <th scope="row" class="td_value_none">Avg Effort Members</th>
                             <td class="td_value_none"></td>
+                            <td class="td_value human_employee_id" type="string" ></td>
                             <td class="td_value" type="string"></td>
                             <td class="td_value" type="string"></td>
                             <td class="td_value" type="string"></td>
@@ -181,6 +190,7 @@
                         </tr>
                         <tr id="total-row" class="total_member_avai">
                             <th scope="row">Total Members</th>
+                            <td class="td_value human_employee_id" type="string"></td>
                             <td class="td_value" type="string"></td>
                             <td class="td_value" type="string"></td>
                             <td class="td_value" type="string"></td>

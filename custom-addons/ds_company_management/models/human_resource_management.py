@@ -11,7 +11,7 @@ class HumanResourceManagement(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
-				  SELECT
+				SELECT
 					ROW_NUMBER() OVER(ORDER BY EMPLOYEE_NAME ASC) AS ID,
 					EMPLOYEE_NAME,
 					COMPANY_NAME,
@@ -40,7 +40,9 @@ class HumanResourceManagement(models.Model):
 					DEPARTMENT_MANAGER_USER_ID,
 					COMPANY_PROJECT_ID,
 					COMPANY_ID,
-					DEPARTMENT_ID	
+					DEPARTMENT_ID,
+					EMPLOYEE_ID,
+					DEPARTMENT_MANAGER_PROJECT_ID
 				FROM (
 					SELECT DISTINCT EMP.NAME AS EMPLOYEE_NAME,
 					(SELECT NAME FROM RES_COMPANY RP WHERE RP.ID = EMP.COMPANY_ID) AS COMPANY_NAME,
@@ -319,7 +321,9 @@ class HumanResourceManagement(models.Model):
 					(SELECT USER_ID FROM HR_EMPLOYEE HE WHERE HE.ID = (SELECT MANAGER_ID FROM HR_DEPARTMENT HD WHERE HD.ID = EMP.DEPARTMENT_ID)) AS DEPARTMENT_MANAGER_USER_ID,
 					PP.COMPANY_ID AS COMPANY_PROJECT_ID,
 					EMP.COMPANY_ID,
-					EMP.DEPARTMENT_ID
+					EMP.DEPARTMENT_ID, 
+					EMP.ID AS EMPLOYEE_ID,
+					(SELECT USER_ID FROM HR_EMPLOYEE HE WHERE HE.ID = (SELECT MANAGER_ID FROM HR_DEPARTMENT HD WHERE HD.ID = PP.DEPARTMENT_ID)) AS DEPARTMENT_MANAGER_PROJECT_ID		
 					FROM (PUBLIC.HR_EMPLOYEE AS EMP
 						LEFT JOIN PUBLIC.HR_CONTRACT AS HC ON EMP.ID = HC.EMPLOYEE_ID)
 							LEFT JOIN PUBLIC.BOOKING_RESOURCE_MONTH AS BRM ON HC.EMPLOYEE_ID = BRM.EMPLOYEE_ID
@@ -328,7 +332,8 @@ class HumanResourceManagement(models.Model):
 										LEFT JOIN PUBLIC.ESTIMATION_WORK AS EW ON PP.ESTIMATION_ID=EW.ID
 					WHERE ((EXTRACT(YEAR FROM BRM.START_DATE_MONTH) IS NULL) OR ((EXTRACT(YEAR FROM BRM.START_DATE_MONTH) = EXTRACT(YEAR FROM NOW())) AND (EXTRACT(MONTH FROM BRM.START_DATE_MONTH) BETWEEN 1 AND 12))) AND (EXTRACT(MONTH FROM (SELECT(MIN( HC1.DATE_START)) FROM HR_CONTRACT AS HC1 WHERE HC1.EMPLOYEE_ID=EMP.ID)) IS NOT NULL)
 				) AS X
-				GROUP BY EMPLOYEE_NAME, COMPANY_NAME, DEPARTMENT_NAME, PROJECT_NAME, PROJECT_TYPE_NAME, YEAR_OF_PROJECT, COMPANY_MANAGER_USER_ID, DEPARTMENT_MANAGER_USER_ID, COMPANY_PROJECT_ID, COMPANY_ID, DEPARTMENT_ID
+				GROUP BY EMPLOYEE_NAME, COMPANY_NAME, DEPARTMENT_NAME, PROJECT_NAME, PROJECT_TYPE_NAME, YEAR_OF_PROJECT, COMPANY_MANAGER_USER_ID, DEPARTMENT_MANAGER_USER_ID, COMPANY_PROJECT_ID, COMPANY_ID, DEPARTMENT_ID, EMPLOYEE_ID, DEPARTMENT_MANAGER_PROJECT_ID
+				  
                 )
         """ % (self._table)
         )
@@ -370,13 +375,11 @@ class HumanResourceManagement(models.Model):
 
         elif self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and \
                 self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
-            sql_domain_for_role = 'and company_manager_user_id = ' + \
-                str(user_id_login)
+            sql_domain_for_role = ' or company_manager_user_id = ' + str(user_id_login)
 
         elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
                 self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
-            sql_domain_for_role = ' and department_manager_user_id = ' + \
-                str(user_id_login)
+            sql_domain_for_role = ' and (department_manager_user_id = ' + str(user_id_login) + ' or department_manager_project_id = ' + str(user_id_login) + ')'
 
         sql = ("""select * from human_resource_management """)
         sql += sql_domain_for_company

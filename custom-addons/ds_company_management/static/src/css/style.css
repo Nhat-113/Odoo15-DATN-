@@ -108,7 +108,7 @@ span[name="message_warning"] {
     display: none;
 }
 .export_excel {
-    margin: 0px 0px 6px 12px;
+    margin: 0px 0px 6px 20px;
 }
 .title_human_resource {
     margin: 13px 0px 0px 12px;
@@ -128,11 +128,14 @@ span[name="message_warning"] {
     flex-wrap: nowrap;
     align-content: center;
     justify-content: space-evenly;
+    margin-right: 12px;
 }
 .icon_search_human {
-    position: relative;
-    top: 32%;
-    left: -4%;
+    width: 10px;
+    height: 18px;
+    position: absolute;
+    margin-top: 20px;
+    right: 45px;
 }
 .export_data {
     margin: 2px 7px 0px 7px;
@@ -171,13 +174,30 @@ span[name="message_warning"] {
 .header_tabel > th:hover .icon-sort-header{
     display: initial !important;
 }
-
+.human_employee_id {
+    display: none !important;
+}
+#count_member_of_company {
+    position: absolute;
+    margin-top: 64px;
+    right: 22px;
+}
 /* for desktop screen */
+@media only screen and (max-width: 1800px) {
+    .icon_search_human {
+        right: 55px;
+    }
+}
+
 @media only screen and (max-width: 1600px) {
     .humam_resource_template tbody {
         height: 510px;
     }
+    .icon_search_human {
+        right: 65px;
+    }
 }
+
 @media only screen and (max-width: 1400px) {
     .humam_resource_template tbody {
         height: 450px;
