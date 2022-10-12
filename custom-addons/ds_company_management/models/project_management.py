@@ -7,56 +7,39 @@ class ProjectManagement(models.Model):
     _auto = False
     _rec_name = "project_id"
     
-    
-    def _compute_last_update_color(self):
+
+    def _content_compute_total(self):
         for record in self:
+            record.count_members = sum(item.members for item in record.project_management_history)
+            record.total_salary = sum(item.total_salary for item in record.project_management_history)
+            record.profit = sum(item.profit for item in record.project_management_history)
             record.last_update_color = record.project_id.last_update_color
-
-    def _content_compute_total(self, field, model_relationship, field_related):
-        for record in self:
-            record[field] = sum(item[field_related] for item in record[model_relationship])
-
-    def _compute_count_member(self):
-        self._content_compute_total('count_members', 'project_management_history', 'members')
-
-    def _compute_total_salary_member(self):
-        self._content_compute_total('total_salary', 'project_management_history', 'total_salary')
-
-    def _compute_total_project_cost(self):
-        self._content_compute_total('project_cost', 'project_expense_management', 'expense_vnd')
-        
-    def _compute_total_profit(self):
-        self._content_compute_total('profit', 'project_management_history', 'profit')
-            
-    def _compute_currency_default(self):
-        for record in self:
-            record.currency_id = self.env['res.currency'].search([('name', '=', 'VND')])
         
 
     id = fields.Integer("ID")
     project_id = fields.Many2one('project.project', string="Project")
-    # director = fields.Many2one('hr.employee', string="Director")
     department_id = fields.Many2one("hr.department", string="Department")
     user_pm = fields.Many2one('res.users', string="Project Manager")
     company_id = fields.Many2one('res.company', string="Company")
-    currency_id = fields.Many2one('res.currency', string="Currency", required=True, compute='_compute_currency_default')
+    currency_id = fields.Many2one('res.currency', string="Currency")
     date_start = fields.Date(string='Start Date')
     date_end = fields.Date(string='End Date')
     status = fields.Char(string='Status')
     
     # bonus = fields.Float(string="Bonus")
     revenue = fields.Monetary(string="Revenue")
-    project_cost = fields.Monetary(string="Project Cost", compute=_compute_total_project_cost)
-    profit = fields.Monetary(string="Profit", compute=_compute_total_profit)
+    project_cost = fields.Monetary(string="Project Cost")
     
-    total_salary = fields.Monetary(string="Salary Cost", compute=_compute_total_salary_member)
+    last_update_color = fields.Integer(compute=_content_compute_total)
+    count_members = fields.Float(string='Members', compute=_content_compute_total, digits=(12,3))
+    total_salary = fields.Monetary(string="Salary Cost", compute=_content_compute_total)
+    profit = fields.Monetary(string="Profit", compute=_content_compute_total)
+    
     member_ids = fields.One2many('project.member.management', 'project_management_id', string="Members")
     project_expense_management = fields.One2many('project.expense.management', 'project_management_id', string="Project Cost Management")
     project_management_history = fields.One2many('project.management.history', 'project_management_id', string="Project Management History")
     
-    count_members = fields.Float(string='Members', compute=_compute_count_member, digits=(12,3))
     
-    last_update_color = fields.Integer(compute='_compute_last_update_color')
     project_type_id = fields.Many2one("project.type", string="Project Type")
     
     user_login = fields.Many2one('res.users', string="User")
@@ -165,7 +148,8 @@ class ProjectManagement(models.Model):
                         pmc.project_cost,
                         pmc.revenue,
                         he.user_id AS user_login,
-                        ru.id AS sub_user_login
+                        ru.id AS sub_user_login,
+		                cr.id AS currency_id
                     FROM project_management_compute AS pmc
                     LEFT JOIN hr_department AS hd
                         ON hd.id = pmc.department_id
@@ -175,6 +159,8 @@ class ProjectManagement(models.Model):
                         ON rc.id = pmc.company_id
                     LEFT JOIN res_users AS ru
                         ON ru.login = rc.user_email
+                    LEFT JOIN res_currency AS cr
+		                ON cr.name = 'VND'
 
             ) """ % (self._table)
         )
