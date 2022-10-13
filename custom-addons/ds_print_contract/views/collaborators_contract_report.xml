@@ -85,7 +85,7 @@
                                         </p>
                                         <p>
                                             <div class="row">
-                                                <div class="col-6">- Người đại diện: Ông: <span>
+                                                <div class="col-6">- Người đại diện: Ông/Bà: <span>
                                                     <t t-if='e.company_id.representative'>
                                                         <span t-field="e.company_id.representative"/>
                                                     </t>

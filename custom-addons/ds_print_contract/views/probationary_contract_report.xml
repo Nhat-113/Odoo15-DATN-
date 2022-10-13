@@ -107,7 +107,7 @@
                                         <tr>
                                             <th>Người đại diện</th>
                                             <td>
-                                                <span>:  </span>Ông
+                                                <span>:  </span>Ông/Bà
                                                 <b>
                                                     <t t-if='e.company_id.representative'>
                                                         <span t-field="e.company_id.representative"/>
