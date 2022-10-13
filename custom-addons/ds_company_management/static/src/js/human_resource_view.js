@@ -1,4 +1,4 @@
-odoo.define('human_resource_template.Dashboard', function(require) {
+odoo.define('human_resource_template.Dashboard', function (require) {
     "use strict";
 
     const ActionMenus = require("web.ActionMenus");
@@ -47,16 +47,16 @@ odoo.define('human_resource_template.Dashboard', function(require) {
 
         },
 
-        init: function(parent, context) {
+        init: function (parent, context) {
             this.action_id = context['id'];
             this._super(parent, context);
             this.list_human_resource = [];
         },
 
-        start: function() {
+        start: function () {
             let self = this;
             this.set("title", 'Human Resource Management');
-            return this._super().then(function() {
+            return this._super().then(function () {
                 // self.render_dashboards();
                 setTimeout(() => {
                     var table, cell_elements;
@@ -74,11 +74,11 @@ odoo.define('human_resource_template.Dashboard', function(require) {
                     var input = document.getElementById("search_input");
                     // Event search in when input onchange
                     input.addEventListener('keyup', self.searchFunction)
-                        // after event search run, event compute_avg call again to calculator avg effort 
+                    // after event search run, event compute_avg call again to calculator avg effort 
                     input.addEventListener('keyup', () => self.compute_avg())
-                        // compute avg effort member in table when render DOM element
+                    // compute avg effort member in table when render DOM element
 
-                        //sort table
+                    //sort table
                     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
                     const comparer = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))
                         (getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
@@ -90,7 +90,7 @@ odoo.define('human_resource_template.Dashboard', function(require) {
                         Array.from(table.querySelectorAll('tr.detail'))
                             .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
                             .forEach(tr => table.appendChild(tr));
-                            // append 2 this row in last row
+                        // append 2 this row in last row
                         table.appendChild(avgRow);
                         table.appendChild(totalRow);
                     })));
@@ -101,29 +101,91 @@ odoo.define('human_resource_template.Dashboard', function(require) {
         },
 
 
-        willStart: function() {
+        willStart: function () {
             let self = this;
-            return $.when(ajax.loadLibs(this), this._super()).then(function() {
+            return $.when(ajax.loadLibs(this), this._super()).then(function () {
                 return self.fetch_data();
 
             });
         },
 
-        fetch_data: function() {
+        fetch_data: function () {
             let self = this;
             var def2 = this._rpc({
-                    model: "human.resource.management",
-                    method: "get_list_human_resource",
-                })
-                .then(function(res) {
-                    self.list_human_resource = res["list_human_resource"];
+                model: "human.resource.management",
+                method: "get_list_human_resource",
+            })
+                .then(function (res) {
+                    self.list_human_resource = self.processMonthAvailable(res["list_human_resource"]);
                 });
             // return $.when(def1, def2);
             return $.when(def2);
 
         },
+        
+        // Function: Process effort rate's employee data depend on state (running or expired) of contract
+        processMonthAvailable: function (arr) {
+            // Get array of dimensions
+            const dimensions = [arr.length, arr[0].length];
 
-        searchFunction: function(e) {
+            let arrCheckMonth = new Array();
+            
+            arr.forEach(childArr => {
+                if (childArr[dimensions[1] - 2] != null) {
+                    /*
+                        Start Date column's index is 2rd last of array
+                        End Date column's index is the last index of array
+                     */
+                    let arrStartDate = childArr[dimensions[1] - 2].split(',');
+                    let arrEndDate = childArr[dimensions[1] - 1].split(',');
+            
+                    let contractAvailableSet = new Set();
+            
+                    for (let index = 0; index < arrStartDate.length; index++) {
+                        if (parseInt(arrStartDate[index].split('-')[1]) < (new Date().getFullYear())
+                            && parseInt(arrEndDate[index].split('-')[1]) == 0) {
+                            for (let i = 1; i <= 12; i++) {
+                                contractAvailableSet.add(i);
+                            }
+                        } else if ( parseInt(arrStartDate[index].split('-')[1]) == (new Date().getFullYear())) {
+                            if ( parseInt(arrStartDate[index].split('-')[0]) <= parseInt(arrEndDate[index].split('-')[0])
+                                && parseInt(arrEndDate[index].split('-')[0]) != 0) {
+                                for (let i = parseInt(arrStartDate[index].split('-')[0]); i <= parseInt(arrEndDate[index].split('-')[0]); i++) {
+                                    contractAvailableSet.add(i);
+                                }
+                            } else if (parseInt(arrEndDate[index].split('-')[0]) == 0) {
+                                for (let i = parseInt(arrStartDate[index].split('-')[0]); i <= 12; i++) {
+                                    contractAvailableSet.add(i);
+                                }
+                            }
+                        }
+                    }
+                    arrCheckMonth.push(contractAvailableSet);
+                } else {
+                    arrCheckMonth.push(new Set());
+                }
+            });
+            for (let index = 0; index < arr.length; index++) {
+                let sum = 0, cnt = 0;
+                /*
+                    January column's index in array is 7
+                    December column's index in arrayy is 18
+                 */
+                for (let i = 7; i <= 18; i++) {
+                    if (!arrCheckMonth[index].has(i-6)) {
+                        arr[index][i] = -1;
+                    } else {
+                        sum+=arr[index][i];
+                        cnt++;
+                    }
+                }
+                // Average column's index in array is 19
+                arr[index][19] = cnt > 0 ? Number.parseFloat(sum/cnt).toFixed(2) : "NaN";
+            }
+            return arr;
+        },
+
+        searchFunction: function (e) {
             var input, filter, table, tr, td, i, txtValue;
             input = document.getElementById("search_input");
             filter = input.value.toUpperCase();
@@ -142,7 +204,7 @@ odoo.define('human_resource_template.Dashboard', function(require) {
             }
         },
 
-        compute_avg: function() {
+        compute_avg: function () {
             let self = this;
             var final = 0;
             var tbody = document.querySelector("tbody");
@@ -164,11 +226,11 @@ odoo.define('human_resource_template.Dashboard', function(require) {
                 total_row.cells[j].innerText = parseFloat(final / count_compute_available_member).toFixed(2);
             }
             //count members of company with value from second column
-            total_member_company.innerText = String(self.compute_member_company() + ' Members' );
+            total_member_company.innerText = String(self.compute_member_company() + ' Members');
 
         },
 
-        computeTableColumnTotal: function(colNumber) {
+        computeTableColumnTotal: function (colNumber) {
             var table = document.getElementById("human_resource_table");
             let result = 0;
             var howManyRows = 0;
@@ -187,7 +249,7 @@ odoo.define('human_resource_template.Dashboard', function(require) {
             }
         },
 
-        compute_available_member: function(colNumber) {
+        compute_available_member: function (colNumber) {
             var table = document.getElementById("human_resource_table");
             var howManyRows = 0;
             let count_row = 0;
@@ -202,7 +264,7 @@ odoo.define('human_resource_template.Dashboard', function(require) {
                     // var employee_id_before = table.rows[i].cells[1].innerText;
                     // var employee_id_after = table.rows[i+1].cells[1].innerText;                  
 
-                    if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) ) {
+                    if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee)) {
                         count_row += 1;
                         listId.push(id_employee);
                     }
@@ -213,7 +275,7 @@ odoo.define('human_resource_template.Dashboard', function(require) {
             }
         },
 
-        compute_member_company: function(colNumber = 1) {
+        compute_member_company: function (colNumber = 1) {
             var table = document.getElementById("human_resource_table");
             var howManyRows = 0;
             let count_members_of_company = 0;
@@ -223,9 +285,9 @@ odoo.define('human_resource_template.Dashboard', function(require) {
                 for (var i = 1; i < howManyRows - 2; i++) {
                     let row = table.rows[i];
                     let id_employee = table.rows[i].cells[1].innerText;
-                    let parent_style = row.cells[colNumber].parentElement.style.display;            
+                    let parent_style = row.cells[colNumber].parentElement.style.display;
 
-                    if (parent_style != 'none'  && !listId.includes(id_employee) ) {
+                    if (parent_style != 'none' && !listId.includes(id_employee)) {
                         count_members_of_company += 1
                         listId.push(id_employee);
                     }
@@ -254,18 +316,18 @@ odoo.define('human_resource_template.Dashboard', function(require) {
         // },
 
 
-        export_excel: function() {
+        export_excel: function () {
             Table2Excel.extend((cell, cellText) => {
                 return $(cell).attr('type') == 'string' ? {
-                  t: 's',
-                  v: cellText
+                    t: 's',
+                    v: cellText
                 } : null;
             });
-            
+
             var table2excel = new Table2Excel();
             table2excel.export(document.querySelectorAll("#human_resource_table"));
         },
-        sort_table: function() {
+        sort_table: function () {
 
         }
     });
