@@ -112,17 +112,16 @@ class ProjectManagementHistory(models.Model):
                 ),
 
                 company_count_member_not_intern AS (
+                    -- count total employee (unique) from booking resource by month
                     SELECT
                         ROW_NUMBER() OVER(ORDER BY months ASC) AS id,
-                        ppb.company_id,
-                        ppb.months,
-                        (SUM(ppb.man_month)) AS all_members
+                        company_id,
+                        months,
+                        COUNT(DISTINCT (employee_id)) all_members
                     FROM project_planning_booking AS ppb
                     WHERE ppb.member_type_name NOT IN ('Intern', 'intern') 
                             OR ppb.member_type_name IS NULL
-                    GROUP BY company_id,
-                            months
-
+                    GROUP BY company_id, months
                 ),
 
                 --- project expense management generate month ---
@@ -201,12 +200,12 @@ class ProjectManagementHistory(models.Model):
                         (COALESCE(NULLIF(em.total_expenses, NULL), 0)) AS operation_cost,
                         (COALESCE(NULLIF(pcm.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project,
                         (COALESCE(NULLIF(pni.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project_not_intern,
-                        (COALESCE(NULLIF(cni.all_members, NULL), 0))::NUMERIC(20, 4) AS all_members,
+                        (COALESCE(NULLIF(cni.all_members, NULL), 0)) AS all_members,
                         
                         (CASE 
                             WHEN cni.all_members = 0 OR cni.all_members IS NULL
                                 THEN 0
-                            ELSE (COALESCE(NULLIF(em.total_expenses, NULL), 0)) / cni.all_members 
+                            ELSE (COALESCE(NULLIF(em.total_expenses, NULL), 0)) / cni.all_members::numeric(10, 4)
                         END)::numeric(20, 4) AS average_cost_company
                         
                         
