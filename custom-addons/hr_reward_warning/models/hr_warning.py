@@ -31,6 +31,14 @@ class HrAnnouncementTable(models.Model):
     _description = 'HR Announcement'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
+
+
+    def default_select_mail_all_staff(self):
+        email_all_staff = 'allstaff@d-soft.com.vn'
+        employee_id_all_staff = self.env['hr.employee'].search([('work_email', '=', email_all_staff)]).ids
+
+        return employee_id_all_staff
+
     name = fields.Char(string='Code No:', help="Sequence Number of the Announcement")
     announcement_reason = fields.Text(string='Title', states={'draft': [('readonly', False)]}, required=True,
                                       readonly=True, help="Announcement Subject")
@@ -59,14 +67,50 @@ class HrAnnouncementTable(models.Model):
                                                                                                "announcement want too"
                                                                                                " see")
 
+    email_to = fields.Many2many('hr.employee', string="Send To", default=lambda self: self.default_select_mail_all_staff())
+    
     def reject(self):
         self.state = 'rejected'
 
     def approve(self):
         self.state = 'approved'
 
+        subject = self.announcement_reason
+        mail_template_id = 'hr_reward_warning.announcements_template_mail'
+        self._sendmail_announcements_for_employee({item: item.email_to for item in self}, subject, mail_template_id)
+
+
     def sent(self):
         self.state = 'to_approve'
+
+    @api.model
+    def _sendmail_announcements_for_employee(self, announcements_item, subject, mail_template_id):
+        template_id = self.env['ir.model.data']._xmlid_to_res_id(mail_template_id, raise_if_not_found=False)
+        if not template_id:
+            return
+        view = self.env['ir.ui.view'].browse(template_id)
+        anno_model_description = self.env['ir.model']._get(self._name).display_name
+        for value, users in announcements_item.items():
+            if not users:
+                continue
+            values = {
+                'letter': value.announcement,
+                'object': value,
+                'model_description': anno_model_description,
+                'access_link': value._notify_get_action_link('view'),
+            }
+            for user in users:
+                values.update(assignee_name=user.sudo().name)
+                assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
+                assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)
+                value.message_notify(
+                    subject = _(subject),
+                    body = assignation_msg,
+                    partner_ids = user.user_id.partner_id.ids,
+                    record_name = value.announcement_reason,
+                    email_layout_xmlid = 'mail.mail_notification_light',
+                    model_description = anno_model_description,
+                )
 
     @api.constrains('date_start', 'date_end')
     def validation(self):
