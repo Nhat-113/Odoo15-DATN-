@@ -1,6 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-from datetime import date
+from datetime import date, datetime
 import pandas as pd
 import calendar
 
@@ -243,12 +243,20 @@ class BookingResourceMonth(models.Model):
     @api.depends('effort_rate_month')
     def compute_man_month(self):
         for month in self:
-            start_date_of_month = date(month.start_date_month.year, month.start_date_month.month, 1)
-            end_date_of_month = date(month.start_date_month.year, month.start_date_month.month, calendar.monthrange(month.start_date_month.year, month.start_date_month.month)[1])
-            working_day_of_month = len(pd.bdate_range(start_date_of_month.strftime('%Y-%m-%d'),
-                                                    end_date_of_month.strftime('%Y-%m-%d')))
-            month.man_month = round(working_day_of_month/20 * month.effort_rate_month/100, 3)
-
+            working_day_of_month = len(pd.bdate_range(month.start_date_month.strftime('%Y-%m-%d'),
+                                                    month.end_date_month.strftime('%Y-%m-%d')))
+            working_day_actual = len(pd.bdate_range(datetime(year=month.start_date_month.year, month=month.start_date_month.month, day=1).strftime('%Y-%m-%d'),
+                                                        datetime(year=month.end_date_month.year, month=month.end_date_month.month, day=calendar.monthrange(month.end_date_month.year, month.end_date_month.month)[1]).strftime('%Y-%m-%d')))
+            effort_avg_day = 0
+            len_day = 0
+            for day in month.booking_id.booking_upgrade_day:
+                if day.start_date_day >= month.start_date_month and day.end_date_day <= month.end_date_month:
+                    effort_avg_day += day.effort_rate_day
+                    len_day += 1
+            if len_day > 0:
+                month.man_month = round((working_day_of_month/working_day_actual) * ((effort_avg_day/len_day)/100), 2)
+            else:
+                month.man_month = 0
 
     @api.onchange('effort_rate_month')
     def check_effort_month_over(self):
