@@ -1,22 +1,25 @@
 <?xml version="1.0" ?>
 <odoo>
-    <data noupdate="0">
+    <data>
         <record id="email_birthday_wishes_employee_template" model="mail.template">
             <field name="name">Employee Birthday Wish Template</field>
-            <field name="subject">Happy Birthday {{object.name}} 🎂</field>
-            <field name="email_from">"{{object.company_id.name}}"&lt;{{object.company_id.email}}&gt;</field>
-            <field name="email_to">{{(object.work_email or '')}}</field>
-            <field name="email_cc">{{('allstaff@d-soft.com.vn')}}</field>
+            <field name="subject">Happy Birthday</field>
+            <field name="email_from">"{{("Name Department")}}"&lt;{{("email_department")}}&gt;</field>
+            <field name="email_to">{{("recipient's email")}}</field>
+            <field name="email_cc">{{("cc recipient's email")}}</field>
             <field name="model_id" ref="hr.model_hr_employee" />
             <field name="auto_delete" eval="True"/>
-            <field
-                name="body_html"
-            ><![CDATA[
-                <p>Dear <b><t t-out="object.name"</b> 🥳,</p>
-                <p>On behalf of the entire <b><t t-out="object.company_id.name"</b></p>
-                <p>We wish you a very happy birthday 🎂 and
-                    sending you our best wishes for much happiness in your life 🎉.</p>
-                <p>Have a best one! </p>
+            <field name="body_html"><![CDATA[
+                
+                <p><b>Chúc mừng sinh nhật </b></p>
+                <br>
+                <p>Thay mặt toàn thể nhân viên công ty <b><t t-out="object.company_id.name"/></b>,</p>
+                <p>Công đoàn xin được gửi lời chúc mừng sinh nhật đến <b><t t-out="object.name"./></b></p>
+                <br>
+                <p>Chúc bạn có một ngày sinh nhật thật vui vẻ, hạnh phúc bên cạnh những người đồng nghiệp, người thân yêu quý của mình.</p>
+                <br>
+                <p>Thân</p>
+                <p><b>CÔNG ĐOÀN CÔNG TY.</b></p>
                 ]]>
             </field>
         </record>
@@ -26,20 +29,19 @@
             <field name="name">Employee Birthday Reminder Template</field>
             <field name="subject">Reminder For Upcoming Birthday</field>
             <field name="email_from">"{{object.company_id.name}}"&lt;{{object.company_id.email}}&gt;</field>
-            <field name="email_to">{{"hr@d-soft.com.vn"}}</field>
-            <field name="partner_to">{{object.partner_id.email or ''}}</field>
-            <field name="model_id" ref="base.model_res_users" />
+            <field name="email_to">{{("object.email")}}</field>
+            <field name="partner_to">{{""}}</field>
+            <field name="model_id" ref="base.model_res_users"/>
             <field name="auto_delete" eval="True" />
-            <field
-                name="body_html"
-            ><![CDATA[
-                <p>Hello Manager,</p>
-                <p>This is a notification of upcoming birthday of the employees in the company.
-                </p>
-                <p>Please visit the Employee list to get the list of employees with birthdays next week.
-                </p>
+            <field name="body_html"><![CDATA[
+                <p>Hello <b><t t-out="object.name"/></b>,</p>
+                <br>
+                <p>Dưới đây là danh sách những Member có ngày sinh nhật trong <b><t t-out="object.users_reminder.reminder_before_day"/></b> ngày tới:</p>
+                <p><b><t t-out="object.users_reminder.employee_list" or ''/></b></p>
+                <p>Bộ phận HR xem xét để tổ chức cũng như có những phần quà đến với các Member của công ty trong ngày sinh nhật của họ.</p>
                 <br/>
-                <p>Thank You</p>
+                <p><b>Cảm ơn</b></p>
+                <p><b><t t-out="object.company_id.name"/></b></p>
                 ]]>
             </field>
         </record>

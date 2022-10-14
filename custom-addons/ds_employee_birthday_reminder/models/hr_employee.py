@@ -8,6 +8,8 @@ from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 class ResUsers(models.Model):
     _inherit = "res.users"
 
+    users_reminder = fields.One2many('res.users.reminder', 'user_id')
+
     @api.model
     def get_employee_birthday_info(self):
         reminder_before_day = (
@@ -66,6 +68,12 @@ class HrEmployee(models.Model):
         send_employee = bool(IrConfigParameter.get_param("employee.send_wish_employee"))
         send_manager = bool(IrConfigParameter.get_param("employee.send_wish_manager"))
 
+        reminder_before_day = (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("employee.reminder_before_day")
+        )
+
         # Send birthday wish to employee
         if send_employee:
             domain = [
@@ -83,6 +91,10 @@ class HrEmployee(models.Model):
         # Send birthday reminder to HR manager
         if send_manager:
             birthday_info = self.env["res.users"].get_employee_birthday_info()
+            employee_list = ''
+            for item in birthday_info['employees']:
+                employee_list += '<p><b>' + str(item.display_name) + '</b></p>'
+
             if len(birthday_info.get("employees")):
                 manager_template_id = IrConfigParameter.get_param(
                     "employee.manager_wish_template_id"
@@ -90,6 +102,15 @@ class HrEmployee(models.Model):
                 if manager_template_id:
                     template_id = template_env.sudo().browse(int(manager_template_id))
                     for manager in self.env.ref("hr.group_hr_manager").users:
+                        vals ={'user_id': manager.id, 'reminder_before_day': reminder_before_day, 'employee_list': employee_list}
+                        
+                        user_reminder = self.env['res.users.reminder'].search([('user_id','=', manager.id)])
+                        
+                        if user_reminder:
+                            user_reminder.env['res.users.reminder'].write(vals)
+                        else:
+                            user_reminder.env['res.users.reminder'].create(vals)
+
                         template_id.send_mail(manager.id)
 
     def send_birthday(self):
@@ -126,3 +147,11 @@ class HrEmployee(models.Model):
                     'target': 'new',
                     'context': ctx,
                 }
+
+
+class UserReminder(models.Model):
+    _name = "res.users.reminder"
+
+    user_id = fields.Many2one('res.users')
+    reminder_before_day = fields.Integer("Reminder before day", default=False)
+    employee_list = fields.Html('List Employee Reminder', default=False)
