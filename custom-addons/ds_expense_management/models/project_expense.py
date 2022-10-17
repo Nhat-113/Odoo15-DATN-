@@ -22,19 +22,22 @@ class ProjectExpense(models.Model):
     
     rounding_usd_input = fields.Float(string="USD to VND", tracking=True)
     rounding_jpy_input = fields.Float(string="JPY to VND", tracking=True)
+    rounding_sgd_input = fields.Float(string="SGD to VND", tracking=True)
     
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id, tracking=True)
     currency_usd = fields.Many2one('res.currency', string="USD Currency", default=lambda self: self._get_default_currency('USD'), readonly=True)    
     currency_jpy = fields.Many2one('res.currency', string="YPY Currency", default=lambda self: self._get_default_currency('JPY'), readonly=True)   
+    currency_sgd = fields.Many2one('res.currency', string="SGD Currency", default=lambda self: self._get_default_currency('SGD'), readonly=True)   
     currency_vnd = fields.Many2one('res.currency', string="VND Currency", default=lambda self: self._get_default_currency('VND'), readonly=True)
     
     expense_usd = fields.Monetary(string="Total Expense", currency_field='currency_usd', store=True, compute="_convert_currency_revenue")
     expense_jpy = fields.Monetary(string="Total Expense", currency_field='currency_jpy', store=True, readonly=True)
+    expense_sgd = fields.Monetary(string="Total Expense", currency_field='currency_sgd', store=True, readonly=True)
     expense_vnd = fields.Monetary(string="Total Expense", currency_field='currency_vnd', store=True, readonly=True)
     
     get_currency_name = fields.Char(string='Currency Name', readonly=True, store=True)
     
-    @api.depends('total_expenses', 'rounding_usd_input', 'rounding_jpy_input', 'currency_id')
+    @api.depends('total_expenses', 'rounding_usd_input', 'rounding_jpy_input', 'rounding_sgd_input', 'currency_id')
     def _convert_currency_revenue(self):
         for record in self:
             record.get_currency_name = record.currency_id.name
@@ -49,22 +52,31 @@ class ProjectExpense(models.Model):
                         record.expense_jpy = record.total_expenses / record.rounding_jpy_input
                     else:
                         record.expense_jpy = 0
+                    if record.rounding_sgd_input != 0.0:
+                        record.expense_sgd = record.total_expenses / record.rounding_sgd_input
+                    else:
+                        record.expense_sgd = 0 
                         
                 elif record.currency_id.name == 'JPY':   
                     record.expense_jpy = record.total_expenses
                     record.expense_vnd = record.total_expenses * record.rounding_jpy_input
-                    if record.rounding_usd_input != 0:
-                        record.expense_usd = record.expense_vnd / record.rounding_usd_input
-                    else:
-                        record.expense_usd = 0
+                    # if record.rounding_usd_input != 0:
+                    #     record.expense_usd = record.expense_vnd / record.rounding_usd_input
+                    # else:
+                    #     record.expense_usd = 0
+                    
+                elif record.currency_id.name == 'SGD':
+                    record.expense_sgd = record.total_expenses
+                    record.expense_vnd = record.total_expenses * record.rounding_sgd_input
                     
                 else:
                     record.expense_usd = record.total_expenses
                     record.expense_vnd = record.total_expenses * record.rounding_usd_input
-                    record.expense_jpy = record.expense_vnd * record.rounding_jpy_input
+                    # record.expense_jpy = record.expense_vnd * record.rounding_jpy_input
             else:
                 record.expense_usd = 0
                 record.expense_jpy = 0
+                record.expense_sgd = 0
                 record.expense_vnd = 0
     
     

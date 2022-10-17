@@ -63,7 +63,7 @@ class ProjectManagement(models.Model):
                         est.currency_id,
 
                         (SELECT 
-                            SUM(pe.total_expenses) 
+                            SUM(pe.expense_vnd) 
                         FROM project_expense_management AS pe 
                         WHERE pe.project_id = pr.id
                         ) AS project_cost,
