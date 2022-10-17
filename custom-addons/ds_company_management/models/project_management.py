@@ -61,6 +61,7 @@ class ProjectManagement(models.Model):
                         pr.last_update_status AS status,
                         est.project_type_id,
                         est.currency_id,
+                        ec.name AS est_currency_name,
 
                         (SELECT 
                             SUM(pe.expense_vnd) 
@@ -81,6 +82,8 @@ class ProjectManagement(models.Model):
                         project_project AS pr 
                     LEFT JOIN estimation_work AS est
                         ON est.id = pr.estimation_id
+                    LEFT JOIN estimation_currency AS ec
+		                ON ec.id = est.currency_id
                     WHERE (EXTRACT(MONTH FROM pr.date_start) < EXTRACT(MONTH FROM CURRENT_DATE)
                         AND EXTRACT(YEAR FROM pr.date_start) = EXTRACT(YEAR FROM CURRENT_DATE))
                         OR EXTRACT(YEAR FROM pr.date_start) < EXTRACT(YEAR FROM CURRENT_DATE)
@@ -97,6 +100,7 @@ class ProjectManagement(models.Model):
                         est.stage,
                         est.total_cost,
                         est.currency_id,
+                        est_currency_name,
                         project_cost
                     ),
                     project_management_compute AS (
@@ -117,10 +121,12 @@ class ProjectManagement(models.Model):
                             --- Get total cost when estimation exists ---
                                 WHEN pem.total_cost <> 0 
                                     THEN (CASE 
-                                            WHEN pem.currency_id = (SELECT id FROM estimation_currency WHERE name = 'USD')
+                                            WHEN pem.est_currency_name = 'USD'
                                                 THEN pem.total_cost * (SELECT usd_convert FROM api_exchange_rate)
-                                            WHEN pem.currency_id = (SELECT id FROM estimation_currency WHERE name = 'JPY')
+                                            WHEN pem.est_currency_name = 'JPY'
                                                 THEN pem.total_cost * (SELECT jpy_convert FROM api_exchange_rate)
+                                            WHEN pem.est_currency_name = 'SGD'
+							                    THEN pem.total_cost * (SELECT sgd_convert FROM api_exchange_rate)
                                             ELSE pem.total_cost
                                         END
                                     )

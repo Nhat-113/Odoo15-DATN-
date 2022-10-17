@@ -63,6 +63,7 @@ class ProjectManagementHistory(models.Model):
                         phm.company_id,
                         phm.date_start,
                         phm.date_end,
+                        phm.months AS first_date,
                         --- Total cost is taken from estimation or project revenue and converted to VND ---
                         phm.revenue AS total_cost,
 
@@ -194,6 +195,19 @@ class ProjectManagementHistory(models.Model):
                             WHERE dw NOT IN (6,0)
                         ) AS working_day,
                         
+                        (SELECT COUNT(*)
+                            FROM (
+                                SELECT dd, 
+                                        EXTRACT(DOW FROM dd) AS dw
+                                FROM generate_series(
+                                        gmp.first_date, 
+                                        (date_trunc('month', gmp.first_date) + interval '1 month - 1 day')::DATE, 
+                                        interval '1 day'
+                                    ) AS dd 
+                                ) AS days
+                            WHERE dw NOT IN (6,0)
+                        ) AS total_working_day,
+                        
                         gmp.total_cost,
                         (COALESCE(NULLIF(cts.salary, NULL), 0)) AS total_salary,
                         (COALESCE(NULLIF(pemt.total_project_expense, NULL), 0)) AS total_project_expense,
@@ -245,7 +259,7 @@ class ProjectManagementHistory(models.Model):
                 project_compute_average_cost_project AS (
                     SELECT *, 
                         
-                            ((pcv.working_day::decimal / 20)::numeric(6, 4)) AS duration_month,
+                            ((pcv.working_day::decimal / pcv.total_working_day)::numeric(6, 4)) AS duration_month,
                             
                             (CASE 
                                 WHEN pcv.members_project_not_intern = 0 OR pcv.total_project_expense = 0

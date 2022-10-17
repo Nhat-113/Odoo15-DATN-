@@ -17,6 +17,7 @@ class GetAPIDataExchangeRate(models.Model):
     name = fields.Char(string="Exchange Rate", default="Exchange Rate")
     usd_convert = fields.Float(string="USD to VND", tracking=True)
     jpy_convert = fields.Float(string="JPY to VND", tracking=True)
+    sgd_convert = fields.Float(string="SGD to VND", tracking=True)
     date_upgrade = fields.Datetime(string="Date upgrade")
     count_upgrade = fields.Integer(string="Number of upgrades", readonly=True, tracking=True)
     message_warning = fields.Char(string="Warning", readonly=True,
@@ -33,6 +34,7 @@ class GetAPIDataExchangeRate(models.Model):
         self.count_upgrade += 1
         self.usd_convert = self.get_currency_api("USD")
         self.jpy_convert = self.get_currency_api("JPY")
+        self.sgd_convert = self.get_currency_api("SGD")
         self.date_upgrade = datetime.now()
         
     def get_currency_api(self, currency):

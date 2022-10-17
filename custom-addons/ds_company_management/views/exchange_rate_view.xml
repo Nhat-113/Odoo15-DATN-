@@ -29,6 +29,7 @@
                         <group name="group_left">
                             <field name="usd_convert" class="exchange_rate_vnd"/>
                             <field name="jpy_convert" class="exchange_rate_vnd"/>
+                            <field name="sgd_convert" class="exchange_rate_vnd"/>
                         </group>
                         <group name="group_right">
                             <field name="count_upgrade"/>

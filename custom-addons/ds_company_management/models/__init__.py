@@ -3,9 +3,9 @@ from . import exchange_rate_management
 from . import human_resource_management
 from . import manager_department_history
 from . import project_management
+from . import project_expenses_management
 from . import project_management_history
 from . import project_management_sub_ceo
 from . import project_management_ceo
 from . import department_project_detail
 from . import project_member_mangement
-from . import project_expenses_management
