@@ -71,4 +71,16 @@
             <field name="code">model.action_upgrade_booking6()</field>
         </record>
     </data>
+
+    <data>
+        <record id="ir_cron_gen_delete_week_month" model="ir.cron">
+            <field name="name">Planning: Delete week month day</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">False</field>
+            <field name="model_id" ref="model_planning_calendar_resource"/>
+            <field name="state">code</field>
+            <field name="code">model.action_delete_booking()</field>
+        </record>
+    </data>
 </odoo>
