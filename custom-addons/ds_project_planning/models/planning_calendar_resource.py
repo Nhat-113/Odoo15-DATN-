@@ -29,7 +29,7 @@ class PlanningCalendarResource(models.Model):
                               readonly=True, help="The duration of working time in the project", default=1)
     calendar_effort = fields.Float(string="Booking Effort (Man Month)", default=0, compute='_compute_calendar_effort', readonly=True)
     effort_rate = fields.Float(string="Effort Rate", compute='_compute_effort_rate_default',readonly=False,
-                               help="Effort Rate (%) = Booking Effort * 20 / Duration", store=True, default=0, digits=(12,2))
+                               store=True, default=0, digits=(12,2))
     role_ids = fields.Many2one('config.job.position', string='Roles', require=True)
     note = fields.Text(string='Note')
     member_type = fields.Many2one(
