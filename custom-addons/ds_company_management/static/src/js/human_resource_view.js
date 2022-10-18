@@ -116,7 +116,11 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 method: "get_list_human_resource",
             })
                 .then(function (res) {
-                    self.list_human_resource = self.processMonthAvailable(res["list_human_resource"]);
+                    if (self.list_human_resource.length > 0) {
+                        self.list_human_resource = self.processMonthAvailable(res["list_human_resource"])
+                    } else {
+                        self.list_human_resource = res["list_human_resource"]
+                    }
                 });
             // return $.when(def1, def2);
             return $.when(def2);
@@ -169,7 +173,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 let sum = 0, cnt = 0;
                 /*
                     January column's index in array is 7
-                    December column's index in arrayy is 18
+                    December column's index in array is 18
                  */
                 for (let i = 7; i <= 18; i++) {
                     if (!arrCheckMonth[index].has(i-6)) {
