@@ -347,14 +347,17 @@ class Project(models.Model):
             return
         view = self.env['ir.ui.view'].browse(template_id)
         task_model_description = self.env['ir.model']._get(self._name).display_name
+        action_planning_id = self.env.ref('ds_project_planning.open_planning_task_all_on_gantt', raise_if_not_found=False).id
+        action_project_id = self.env.ref('project.act_project_project_2_project_task_all', raise_if_not_found=False).id
+        first_task = self.env['project.task'].search([('id', '=', int(task_expired[0]))])
         values = {
             'object': project,
             'task' : task_expired,
             'model_description': task_model_description,
-            'access_link': project._notify_get_action_link('view'),
+            'view_planning': first_task._notify_get_action_link_custom_mtech('view', action_planning_id, project.id, 'dhx_gantt'),
+            'view_project': first_task._notify_get_action_link_custom_mtech('view', action_project_id, project.id, 'kanban'),
         }
-        
-        values.update(assignee_name=self.env['hr.employee'].search([('user_id', '=', project.user_id.id)]).sudo().name)
+    
         assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
         assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)                 
         project.message_notify(

@@ -525,19 +525,6 @@
             </field>
         </record>
 
-        <record id="ir_cron_data_project_update_status" model="ir.cron">
-            <field name="name">Project: update status</field>
-            <field name="model_id" ref="model_project_project"/>
-            <field name="type">ir.actions.server</field>
-            <field name="state">code</field>
-            <field name="code">model.update_status()</field>
-            <field name="interval_number">1</field>
-            <field name="interval_type">days</field>
-            <field name="numbercall">-1</field>
-            <field name="nextcall" eval="(DateTime.now() + relativedelta(days=1)).strftime('%Y-%m-%d 16:59:59')" />
-        </record>
-
-
         <menuitem name="Issues" id="menu_issues" parent="project.menu_main_pm" action="issues_action" sequence="3" groups="base.group_no_one,project.group_project_user"/>
         <menuitem id="issues_type_menu" name="Types" parent="project.menu_project_config" action="issues_type_action" sequence="11" groups="project.group_project_manager"/>
         <menuitem id="task_status_menu" name="Status" parent="project.menu_project_config" action="task_status_action" sequence="12" groups="project.group_project_manager"/>
