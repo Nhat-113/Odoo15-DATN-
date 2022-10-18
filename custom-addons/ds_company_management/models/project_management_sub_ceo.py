@@ -143,13 +143,13 @@ class ProjectManagementSubCeo(models.Model):
                         
                         (CASE
                             WHEN mdh.effort_rate_month IS NULL
-                                THEN (mdh.working_day::NUMERIC(10,5) / 20)::NUMERIC(10,5)
+                                THEN (mdh.working_day::NUMERIC(10,5) / mdh.working_day_total)::NUMERIC(10,5)
                             ELSE
                                 (CASE
                                     WHEN mdh.effort_rate_month = 100
                                         THEN 0
                                     ELSE
-                                        ((mdh.working_day::NUMERIC(10,5) / 20) * ((100.00 - mdh.effort_rate_month)/ 100))::NUMERIC(10,5)
+                                        ((mdh.working_day::NUMERIC(10,5) / mdh.working_day_total) * ((100.00 - mdh.effort_rate_month)/ 100))::NUMERIC(10,5)
                                 END)
                         END) AS remaining_member
                         

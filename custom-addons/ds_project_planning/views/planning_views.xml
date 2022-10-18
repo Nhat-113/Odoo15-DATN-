@@ -186,7 +186,7 @@
                 <field name="calendar_effort" digits="[12,2]" string="Booking Effort (Man Month)"/>
                 <field name="effort_rate" digits="[12,2]" string="Effort Rate (%)"/>
                 <field name="member_type" string="Member Type"/>
-                <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
+                <field name="planning_role_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                 <field name="inactive" invisible="1"/>
                 <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)]}" />
                 <field name="note" optional="hide" />
@@ -223,7 +223,7 @@
                             <field name="effort_rate" digits="[12,2]" nolabel="1"/>
                             <span> % </span>
                         </div>
-                        <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
+                        <field name="planning_role_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                         <field name="inactive" />
                         <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
                     </group>
@@ -431,7 +431,7 @@
                                     <field name="calendar_effort" digits="[12,2]" string="Booking Effort (Man Month)"/>
                                     <field name="member_type" string="Member Type"/>
                                     <field name="effort_rate" digits="[12,2]" string="Effort Rate (%)"/>
-                                    <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
+                                    <field name="planning_role_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                                     <field name="inactive" invisible="1"/>
                                     <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)]}" />
                                     <field name="note" optional="hide" />
@@ -464,11 +464,12 @@
                                                 <field name="effort_rate" digits="[12,2]" nolabel="1" attrs="{'readonly': ['|', ('inactive', '=', True), ('readonly_date', '=', True)]}"/>
                                                 <span> % </span>
                                             </div>
-                                            <field name="role_ids" options="{'no_create': True, 'no_edit': True, 'no_open': True}" required="1"/>
+                                            <field name="planning_role_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}" required="1" domain="role_id_domain"/>
                                             <field name="select_type_gen_week_month" attrs="{'invisible': [('check_upgrade_booking', '=', True)]}"/>
                                             <field name="inactive" />
                                             <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
                                             <field name="readonly_date" invisible="1"/>
+                                            <field name="role_id_domain" invisible="1"/>
                                         </group>
                                         <field name="note" string="Note" placeholder="Add a note..." colspan="2" class="note_booking"/>
                                         <field name="check_upgrade_booking" invisible="1"/>
@@ -776,6 +777,7 @@
         <field name="arch" type="xml">
             <tree string="Roles" editable="top" sample="1">
                 <field name="name" />
+                <field name="company_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
                 <field name="color" widget="color_picker" optional="show"/>
             </tree>
         </field>

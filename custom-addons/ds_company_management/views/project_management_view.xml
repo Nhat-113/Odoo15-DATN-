@@ -77,6 +77,7 @@
                             <field name="revenue"/>
                             <!-- <field name="bonus"/> -->
                             <field name="profit"/>
+                            <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -95,6 +96,7 @@
                                     <field name="all_members" sum="Total all members" optional="hide"/>
                                     <field name="average_cost_company" sum="Total average cost company" optional="hide"/>
                                     <field name="average_cost_project" sum="Total average cost project" optional="hide"/>
+                                    <field name="currency_id" invisible="1"/>
                                 </tree>
                                
                             </field>

@@ -236,9 +236,9 @@ class ProjectManagementCeo(models.Model):
                                 (CASE
                                     -- when manager company doesn't join project ---
                                     WHEN brm.man_month IS NULL
-                                        THEN (gs.working_day::NUMERIC(10,5) / 20)
+                                        THEN (gs.working_day::NUMERIC(10,5) / gs.working_day_total)
                                     ELSE
-                                        (gs.working_day::NUMERIC(10,5) / 20) - brm.man_month
+                                        (gs.working_day::NUMERIC(10,5) / gs.working_day_total) - brm.man_month
                                 END)
                         END) AS remaining_members,
                         

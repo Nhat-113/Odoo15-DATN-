@@ -12,6 +12,8 @@ class PlanningRoles(models.Model):
 
     name = fields.Char('Name', required=True)
     color = fields.Integer(string='Color', default=_get_default_color)
+    company_id = fields.Many2one('res.company', string='Company', required=False, readonly=False,
+        default=lambda self: self.env.company)
 
     _sql_constraints = [
         ('name_uniq', 'unique (name)', "Role name already exists!"),
