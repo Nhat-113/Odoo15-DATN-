@@ -11,7 +11,7 @@
                 <field name="end_date"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="description"/>
-                <field name="stage_id"/>
+                <field name="stage_id" widget="badge"/>
             </tree>
         </field>
     </record>
@@ -22,11 +22,11 @@
         <field name="arch" type="xml">
             <form string="Request Overtime - Form">
                 <header>
-                    <button string="Submit" name="archive_request_overtime" type="object" class="btn-primary"/>
+                    <button string="Submit" name="archive_request_overtime" type="object" class="btn-primary" />
                     <button string="Comfirm" name="archive_request_overtime" type="object" class="btn-primary"/>
                     <button string="Approvals" name="archive_request_overtime" type="object" class="btn-primary"/>
                     <button string="Refuse" name="archive_request_overtime" type="object" attrs="{'invisible': [('active', '=', False)]}" data-hotkey="x"/>
-                    <field name="stage_id" widget="statusbar"/>
+                    <field name="stage_id" widget="statusbar" options="{'clickable': '1'}"/>
                 </header>
                 <sheet>
                     <sheet>
@@ -44,17 +44,19 @@
                             <group name="group_right">
                                 <label for="start_date" string="Dates"/>
                                 <div name="end_date" class="o_row">
-                                    <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}' attrs="{'readonly': [('project_id','!=',False)]}"/>
+                                    <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}'/>
                                     <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon" title="Arrow"/>
                                     <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow" attrs="{'invisible': [('start_date', '=', False), ('end_date', '=', False)]}"/>
-                                    <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}' attrs="{'readonly': [('project_id','!=',False)]}"/>
+                                    <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}'/>
                                 </div>
+                                <field name="requester_id"/>
                             </group>
                         </group>
                         <separator string="Description"/>
                         <field name="description" placeholder="Description"/>
-                        <label for="member_ids" style="min-width: 150px"/>
-                        <field name="member_ids" widget="many2many_avatar_user" readonly="1" force_save="1"/>
+                        <group>
+                            <field name="member_ids" widget="many2many_avatar_user" readonly="1" force_save="1"/>
+                        </group>
                         <notebook>
                             <page string="Booking Overtime">
                                 <field name="booking_overtime" colspan="4" nolabel="1">
