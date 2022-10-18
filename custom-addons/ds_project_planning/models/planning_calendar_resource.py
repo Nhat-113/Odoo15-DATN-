@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import pandas as pd
 
 import calendar
@@ -54,8 +55,21 @@ class PlanningCalendarResource(models.Model):
                                                     required=True,
                                                     default='generator_remaining_effort',
                                                     string='Generate Type')
-    readonly_date = fields.Boolean(compute="_check_readonly_date", default=False, store=False)   
+    readonly_date = fields.Boolean(compute="_check_readonly_date", default=False, store=False)
+    planning_role_id = fields.Many2one('planning.roles', string='Roles', require=True)
+    role_id_domain = fields.Char(
+        compute='_get_role_id_domain',
+        readonly=True,
+        store=False
+    )
 
+    @api.depends('start_date', 'end_date')
+    def _get_role_id_domain(self):
+        for resource in self:
+            resource.role_id_domain = json.dumps(
+                [('company_id', '=', resource.project_id.company_id.id)]
+            )
+    
     def _check_readonly_date(self):
         for resource in self:
             if resource.env.user.has_group('project.group_project_manager') == False:
