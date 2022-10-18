@@ -495,7 +495,7 @@ class Estimation(models.Model):
         cost_rate_line = self.env['config.job.position'].search([])
         for index, val in enumerate(cost_rate_line):
             cost_rate = self.env['cost.rate'].search([('job_type', '=', val.job_position)], limit=1)
-            currencies = {'cost_usd': 'USD', 'cost_vnd': 'VND', 'cost_yen': 'JPY'}
+            currencies = {'cost_usd': 'USD', 'cost_vnd': 'VND', 'cost_yen': 'JPY', 'cost_sgd': 'SGD'}
             for currency in currencies:
                 if self.currency_id.name == currencies[currency]:
                     lines_2 = (0, 0, {
