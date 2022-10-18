@@ -10,13 +10,17 @@ class ProjectManagement(models.Model):
 
     def _content_compute_total(self):
         for record in self:
-            record.count_members = sum(item.members for item in record.project_management_history)
-            record.total_salary = sum(item.total_salary for item in record.project_management_history)
-            record.profit = sum(item.profit for item in record.project_management_history)
+            record.count_members = record.project_management_history_temp.total_members
+            record.total_salary = record.project_management_history_temp.total_salary
+            record.profit = record.project_management_history_temp.total_profit
             record.last_update_color = record.project_id.last_update_color
-        
+            if record.revenue != 0:
+                record.profit_margin = (record.profit / record.revenue) * 100
+            else:
+                record.profit_margin = 0
 
-    id = fields.Integer("ID")
+
+    # id = fields.Integer("ID")
     project_id = fields.Many2one('project.project', string="Project")
     department_id = fields.Many2one("hr.department", string="Department")
     user_pm = fields.Many2one('res.users', string="Project Manager")
@@ -34,10 +38,12 @@ class ProjectManagement(models.Model):
     count_members = fields.Float(string='Members', compute=_content_compute_total, digits=(12,3))
     total_salary = fields.Monetary(string="Salary Cost", compute=_content_compute_total)
     profit = fields.Monetary(string="Profit", compute=_content_compute_total)
+    profit_margin = fields.Float(string="Profit Margin (%)",compute=_content_compute_total, digits=(12,2), help="Profit Margin = profit / revenue * 100")
     
     member_ids = fields.One2many('project.member.management', 'project_management_id', string="Members")
     project_expense_management = fields.One2many('project.expense.management', 'project_management_id', string="Project Cost Management")
     project_management_history = fields.One2many('project.management.history', 'project_management_id', string="Project Management History")
+    project_management_history_temp = fields.One2many('project.history.group.temp', 'project_management_id', string="Project Management History Temp")
     
     
     project_type_id = fields.Many2one("project.type", string="Project Type")

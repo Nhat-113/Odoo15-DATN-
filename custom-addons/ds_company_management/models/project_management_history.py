@@ -23,6 +23,7 @@ class ProjectManagementHistory(models.Model):
     total_salary = fields.Monetary(string="Salary Cost", help="Total salary Employees By Month = SUM(salary_employee * effort_rate)")
     revenue = fields.Monetary(string="Revenue", help="Revenue By Month")
     profit = fields.Monetary(string="Profit")
+    profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2), help="Profit Margin = profit / revenue * 100")
     
     
     def init(self):
@@ -310,9 +311,18 @@ class ProjectManagementHistory(models.Model):
 
                 SELECT 
                         *,
-                        (cpr.revenue - (
-                            cpr.members_project_not_intern * cpr.average_cost_project + cpr.total_salary)
-                        ) AS profit
+                        (cpr.revenue - (cpr.members_project_not_intern 
+                                        * cpr.average_cost_project 
+                                        + cpr.total_salary)
+                        ) AS profit,
+                        (CASE
+                            WHEN cpr.revenue = 0
+                                THEN 0
+                            ELSE (cpr.revenue - (cpr.members_project_not_intern 
+                                                * cpr.average_cost_project 
+                                                + cpr.total_salary)
+                                    ) / cpr.revenue * 100
+                        END) AS profit_margin
                 FROM compute_project_revenue AS cpr
 
             )""" % (self._table)

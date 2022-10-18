@@ -20,7 +20,7 @@ class DepartmentProjectDetail(models.Model):
     total_project_cost = fields.Monetary(string="Project Cost")
     total_revenue = fields.Monetary(string="Revenue")
     total_profit = fields.Monetary(string="Profit")
-    
+    profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2), help="Profit Margin = profit / revenue * 100")
     
     
     def init(self):
@@ -40,6 +40,7 @@ class DepartmentProjectDetail(models.Model):
                     pmh.total_salary,
                     pmh.revenue AS total_revenue,
                     pmh.profit AS total_profit,
+                    pmh.profit_margin,
                     pmh.currency_id,
                     pm.department_id,
                     pmh.project_management_id

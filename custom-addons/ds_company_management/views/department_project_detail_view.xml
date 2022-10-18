@@ -38,6 +38,7 @@
                 <field name="total_project_cost" sum="Total Project Cost"/>
                 <field name="total_revenue" sum="Total Revenue"/>
                 <field name="total_profit" sum="Total Profit"/>
+                <field name="profit_margin" avg="Average profit margin"/>
                 <field name="currency_id" invisible="1"/>
                 <field name="project_management_id" invisible="1"/>
                 <button name="get_detail_project_management" type="object" string="Detail" class="btn btn-primary"/>

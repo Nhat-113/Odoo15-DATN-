@@ -7,6 +7,14 @@ class ProjectManagementCeo(models.Model):
     _auto = False
     
     
+    def _compute_average_profit_margin(self):
+        for record in self:
+            if record.total_revenue != 0:
+                record.profit_margin = (record.total_profit / record.total_revenue) * 100
+            else:
+                record.profit_margin = 0
+    
+    
     company_id = fields.Many2one('res.company', string='Company')
     representative = fields.Many2one('hr.employee', string='Representative')
     month_start = fields.Date(string="Start Month")
@@ -16,6 +24,7 @@ class ProjectManagementCeo(models.Model):
     total_project_cost = fields.Monetary(string="Project Cost")
     total_revenue = fields.Monetary(string="Revenue")
     total_profit = fields.Monetary(string="Profit")
+    profit_margin = fields.Float(string="Profit Margin (%)", compute=_compute_average_profit_margin, digits=(12,2))
     currency_id = fields.Many2one('res.currency', string="Currency")
     
     

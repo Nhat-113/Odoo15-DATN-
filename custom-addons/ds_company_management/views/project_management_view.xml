@@ -34,6 +34,7 @@
                 <field name="project_cost" sum="Total Project Cost"/>
                 <field name="revenue" sum="Total Revenue"/>
                 <field name="profit" sum="Total Profit"/>
+                <field name="profit_margin" avg="Average profit margin"/>
                 <field name="last_update_color" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
                 <field name="user_login" invisible="1"/>
@@ -93,6 +94,7 @@
                                     <field name="total_project_expense" sum="Total project expense"/>
                                     <field name="operation_cost" sum="Total operation cost" optional="show"/>
                                     <field name="profit" sum="Total profit"/>
+                                    <field name="profit_margin" avg="Average profit margin"/>
                                     <field name="all_members" sum="Total all members" optional="hide"/>
                                     <field name="average_cost_company" sum="Total average cost company" optional="hide"/>
                                     <field name="average_cost_project" sum="Total average cost project" optional="hide"/>
