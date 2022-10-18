@@ -14,7 +14,10 @@ class Project(models.Model):
     @api.depends("estimation_id")
     def _compute_total_mm(self):
         for record in self:
-            for item in record.estimation_id.add_lines_resource_effort:
-                if item.key_primary == 'Total (MM)':
-                    record.total_mm = item.total_effort
+            if record.estimation_id.add_lines_resource_effort:
+                for item in record.estimation_id.add_lines_resource_effort:
+                    if item.key_primary == 'Total (MM)':
+                        record.total_mm = item.total_effort
+            else:
+                record.total_mm = 0
         
