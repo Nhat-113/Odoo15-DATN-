@@ -16,7 +16,6 @@
                 'ds_project_planning', 
                 'project_updation', 
                 'hr_employee_updation', 
-                'ds_employee_seniority', 
                 'ds_project_estimation',
                 'ds_expense_management'
     ],
