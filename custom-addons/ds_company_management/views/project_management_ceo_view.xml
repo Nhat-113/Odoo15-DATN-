@@ -35,14 +35,15 @@
             <tree string="Project Management CEO" default_order="company_id, month_start desc">
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="representative" invisible="1"/>
-                <field name="month_start"/>
-                <field name="month_end"/>
+                <field name="months"/>
+                <field name="month_start" optional="hide"/>
+                <field name="month_end" optional="hide"/>
                 <field name="total_members" sum="Total Members"/>
-                <field name="total_salary" sum="Total Salary Cost"/>
-                <field name="total_project_cost" sum="Total Project Cost"/>
-                <field name="total_revenue" sum="Total Revenue"/>
-                <field name="total_profit" sum="Total Profit"/>
-                <field name="profit_margin" avg="Average profit margin"/>
+                <field name="total_salary" sum="Total Salary Cost" widget="monetary"/>
+                <field name="total_project_cost" sum="Total Project Cost" widget="monetary"/>
+                <field name="total_revenue" sum="Total Revenue" widget="monetary"/>
+                <field name="total_profit" sum="Total Profit" widget="monetary"/>
+                <field name="profit_margin" avg="Average profit margin" width="116px"/>
                 <field name="currency_id" invisible="1"/>
                 <button name="get_department_management_detail" type="object" string="Detail" class="btn btn-primary"/>
             </tree>

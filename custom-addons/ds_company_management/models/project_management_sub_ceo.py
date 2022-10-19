@@ -17,13 +17,14 @@ class ProjectManagementSubCeo(models.Model):
     
     company_id = fields.Many2one('res.company', string='Company')
     department_id = fields.Many2one('hr.department', string='Department')
+    months = fields.Char(string="Month")
     month_start = fields.Date(string="Start Month")
     month_end = fields.Date(string="End Month")
     total_members = fields.Float(string='Members', digits=(12,3))
-    total_salary = fields.Monetary(string="Salary Cost")
-    total_project_cost = fields.Monetary(string="Project Cost")
-    total_revenue = fields.Monetary(string="Revenue")
-    total_profit = fields.Monetary(string="Profit")
+    total_salary = fields.Float(string="Salary Cost")
+    total_project_cost = fields.Float(string="Project Cost")
+    total_revenue = fields.Float(string="Revenue")
+    total_profit = fields.Float(string="Profit")
     profit_margin = fields.Float(string="Profit Margin (%)", compute=_compute_average_profit_margin, digits=(12,2))
     
     currency_id = fields.Many2one('res.currency', string="Currency")
@@ -192,6 +193,7 @@ class ProjectManagementSubCeo(models.Model):
                     csg.company_id,
                     csg.department_id,
                 -- 	csg.manager_id,
+                    (CONCAT((EXTRACT(YEAR FROM csg.months))::text, ' ', TO_CHAR(csg.months, 'Month'))) AS months,
                     csg.months AS month_start,
                     (date_trunc('month', csg.months) + interval '1 month - 1 day'
                         )::date AS month_end,

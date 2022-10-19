@@ -31,13 +31,13 @@ class ProjectManagement(models.Model):
     status = fields.Char(string='Status')
     
     # bonus = fields.Float(string="Bonus")
-    revenue = fields.Monetary(string="Revenue")
-    project_cost = fields.Monetary(string="Project Cost")
+    revenue = fields.Float(string="Revenue")
+    project_cost = fields.Float(string="Project Cost")
     
     last_update_color = fields.Integer(compute=_content_compute_total)
     count_members = fields.Float(string='Members', compute=_content_compute_total, digits=(12,3))
-    total_salary = fields.Monetary(string="Salary Cost", compute=_content_compute_total)
-    profit = fields.Monetary(string="Profit", compute=_content_compute_total)
+    total_salary = fields.Float(string="Salary Cost", compute=_content_compute_total)
+    profit = fields.Float(string="Profit", compute=_content_compute_total)
     profit_margin = fields.Float(string="Profit Margin (%)",compute=_content_compute_total, digits=(12,2), help="Profit Margin = profit / revenue * 100")
     
     member_ids = fields.One2many('project.member.management', 'project_management_id', string="Members")
@@ -55,9 +55,30 @@ class ProjectManagement(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
-                WITH project_estimation_merged AS (
+                WITH project_expense_management_group AS (
                     SELECT
-                        ROW_NUMBER() OVER(ORDER BY pr.id ASC) AS id,
+                        company_id,
+                        project_id,
+                        (SUM(expense_vnd)) AS expense_vnd
+                    FROM project_expense_management
+                    GROUP BY company_id,
+                            project_id
+                
+                ),
+                project_revenue_management_group AS (
+                    SELECT
+                        company_id,
+                        project_id,
+                        (SUM(revenue_vnd)) AS revenue_vnd
+                    
+                    FROM project_revenue_management
+                    GROUP BY company_id,
+                            project_id
+                ),
+                
+                project_estimation_merged AS (
+                    SELECT
+                        -- ROW_NUMBER() OVER(ORDER BY pr.id ASC) AS id,
                         pr.id AS project_id,
                         pr.user_id AS user_pm,
                         pr.department_id,
@@ -68,17 +89,10 @@ class ProjectManagement(models.Model):
                         est.project_type_id,
                         est.currency_id,
                         ec.name AS est_currency_name,
-
-                        (SELECT 
-                            SUM(pe.expense_vnd) 
-                        FROM project_expense_management AS pe 
-                        WHERE pe.project_id = pr.id
-                        ) AS project_cost,
+                        pem.expense_vnd AS project_cost,
 
                         (CASE 
-                            WHEN est.stage = (SELECT id 
-                                                FROM estimation_status 
-                                            WHERE type = 'completed')
+                            WHEN es.type = 'completed'
                                 THEN est.total_cost
                             ELSE 0
                         END
@@ -88,14 +102,18 @@ class ProjectManagement(models.Model):
                         project_project AS pr 
                     LEFT JOIN estimation_work AS est
                         ON est.id = pr.estimation_id
+                    LEFT JOIN project_expense_management_group AS pem
+		                ON pem.project_id = pr.id
                     LEFT JOIN estimation_currency AS ec
 		                ON ec.id = est.currency_id
+                    LEFT JOIN estimation_status AS es
+		                ON es.id = est.stage
                     WHERE (EXTRACT(MONTH FROM pr.date_start) < EXTRACT(MONTH FROM CURRENT_DATE)
                         AND EXTRACT(YEAR FROM pr.date_start) = EXTRACT(YEAR FROM CURRENT_DATE))
                         OR EXTRACT(YEAR FROM pr.date_start) < EXTRACT(YEAR FROM CURRENT_DATE)
 
                     GROUP BY
-                        project_id,
+                        pr.id,
                         est.project_type_id,
                         user_pm,
                         pr.department_id,
@@ -107,11 +125,12 @@ class ProjectManagement(models.Model):
                         est.total_cost,
                         est.currency_id,
                         est_currency_name,
-                        project_cost
+                        project_cost,
+                        es.type
                     ),
                     project_management_compute AS (
                         SELECT
-                            pem.id,
+                            -- pem.id,
                             pem.project_id,
                             pem.project_type_id,
                             pem.user_pm,
@@ -141,14 +160,21 @@ class ProjectManagement(models.Model):
                                     THEN prm.revenue_vnd
                                 ELSE 0
                             END
-                            ) AS revenue
+                            ) AS revenue,
+                            (CASE
+                                WHEN pem.total_cost <> 0 
+                                    THEN 'estimation'
+                                WHEN prm.revenue_vnd IS NOT NULL AND prm.revenue_vnd <> 0
+                                    THEN 'project_revenue'
+                                ELSE 'null'
+                            END) AS revenue_from
 
                         FROM project_estimation_merged AS pem
-                        LEFT JOIN project_revenue_management AS prm
+                        LEFT JOIN project_revenue_management_group AS prm
                             ON pem.project_id = prm.project_id
                     )
                     SELECT
-                        pmc.id,
+                        ROW_NUMBER() OVER(ORDER BY project_id ASC) AS id,
                         pmc.project_id,
                         pmc.project_type_id,
                         pmc.user_pm,
@@ -159,6 +185,7 @@ class ProjectManagement(models.Model):
                         pmc.status,
                         pmc.project_cost,
                         pmc.revenue,
+                        pmc.revenue_from,
                         he.user_id AS user_login,
                         ru.id AS sub_user_login,
 		                cr.id AS currency_id
