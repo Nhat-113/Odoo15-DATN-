@@ -1,4 +1,3 @@
-from email.policy import default
 from odoo import api, fields, models, _
 
 
@@ -11,7 +10,9 @@ class HrRequestOvertimeStage(models.Model):
     sequence = fields.Integer(
         "Sequence", default=10,
         help="Gives the sequence order when displaying a list of stages.")
-
+    confirm_stage = fields.Boolean('Confirm Stage',
+        help="...")
+    
 
 class HrRequestOverTime(models.Model):
     _name = "hr.request.overtime"
@@ -23,10 +24,11 @@ class HrRequestOverTime(models.Model):
     def _get_default_stage_id(self):
         return self.env['hr.request.overtime.stage'].search([], limit=1).id
 
-    project_id = fields.Many2one('project.project', string="Project", required=True, domain="[('company_id', '=', company_id)]", tracking=True)
+    name = fields.Char("Subject", required=True)
+    project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True)
     start_date = fields.Date(string="Start Date", required=False, tracking=True, store=True)
     end_date = fields.Date(string="End Date", required=False, tracking=True, store=True)
-    company_id = fields.Many2one('res.company', string="Company", required=True, default=lambda self: self.env.company, tracking=True)
+    company_id = fields.Many2one('res.company', string="Company", required=True, readonly=True, compute='_compute_project_manager')
     description = fields.Text(string="Description", tracking=True)
     stage_id = fields.Many2one('hr.request.overtime.stage', 'Stage', ondelete='restrict',
                             default=_get_default_stage_id, 
@@ -65,3 +67,10 @@ class HrRequestOverTime(models.Model):
     def _compute_project_manager(self):
         for item in self:
             item.user_id = item.project_id.user_id or False
+            item.company_id = item.project_id.company_id or False
+
+    @api.model
+    def create(self, vals_list):
+        return super().create(vals_list)
+
+        

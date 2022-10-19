@@ -9,7 +9,7 @@
     "license": "LGPL-3",
     "author": "Dientd",
     "website": "",
-    'depends': ['base', 'project'],
+    'depends': ['base', 'project','hr_timesheet'],
     "development_status": "Alpha",
     "data": [
     "security/hr_request_overtime_security.xml",

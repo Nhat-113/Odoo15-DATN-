@@ -22,10 +22,17 @@ class HrBookingOvertime(models.Model):
                               readonly=False, help="The booking of working overtime in the project", default=False)
 
     actual_overtime = fields.Integer(string="Actual Overtime",
-                              readonly=False, help="The duration actual of working overtime in the project", default=1)
+                              readonly=False, help="The duration actual of working overtime in the project", compute="_compute_actual_overtime")
     
     inactive = fields.Boolean(string="Inactive Member", default=False, store=True)
     description = fields.Text("Description", translate=True)
+    read_stage = fields.Char(string="Read Stage request overtime", compute="_compute_stage")
+
+    @api.onchange("request_overtime_id.stage_id")
+    def _compute_stage(self):
+        for item in self:
+            item.read_stage = item.request_overtime_id.stage_id.name
+
 
     @api.depends('start_date', 'end_date')
     def _compute_duration(self):
@@ -46,5 +53,27 @@ class HrBookingOvertime(models.Model):
                 else:
                     record.duration = 1
 
-    def action_view_timesheet_overtime(self):
-        print('-----------------------------------')
+    def timesheets_overtime_detail_action(self):
+        name_view = self.employee_id.name
+        action = {
+            "name": name_view,
+            "type": "ir.actions.act_window",
+            "res_model": "account.analytic.line",
+            "views": [[self.env.ref('hr_timesheet.hr_timesheet_line_tree').id, "tree"]],
+            "domain": 
+                [('project_id', '=', self.request_overtime_id.project_id.id),
+                ('employee_id', '=', self.employee_id.id), ('type_ot','=','yes')]
+        }
+        return action
+
+    @api.depends("request_overtime_id.stage_id")
+    def _compute_actual_overtime(self):
+        for item in self:
+            list_timesheet_overtime = self.env['account.analytic.line'].search([('project_id', '=', item.request_overtime_id.project_id.id),\
+                ('employee_id', '=', item.employee_id.id), ('type_ot','=','yes')])
+            
+            total_hour_spent_overtime = 0
+            for record in list_timesheet_overtime:
+                    total_hour_spent_overtime += record.unit_amount
+
+            item.actual_overtime = total_hour_spent_overtime
