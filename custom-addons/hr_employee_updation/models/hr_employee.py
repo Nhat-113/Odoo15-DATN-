@@ -122,6 +122,12 @@ class HrEmployee(models.Model):
     insurance_id = fields.Char(string='Insurance ID', groups="hr.group_hr_user",  tracking=True)
     personal_income_tax_code = fields.Char(string="Personal Income Tax Code", groups="hr.group_hr_user", tracking=True)
     address = fields.Char(string='Address', groups="hr.group_hr_user",  tracking=True)
+    time_off_remaining = fields.Float('Time Off', compute='get_time_off_remaining')
+
+    def get_time_off_remaining(self):
+        for employee in self:
+            employee.time_off_remaining = float(employee.allocation_display) - float(employee.allocation_used_display)
+
     def _first_contract(self):
         hr_contract = self.env['hr.contract'].sudo()
         return hr_contract.search([('employee_id', '=', self.id)],

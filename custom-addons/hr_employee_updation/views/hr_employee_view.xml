@@ -78,5 +78,16 @@
             </field>
         </record>
 
+        <record id="hr_employee_view_tree_inherit_mtech" model="ir.ui.view">
+            <field name="name">hr.employee.view.tre.inherit.mtect</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="after">
+                    <field name="time_off_remaining"/>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>
