@@ -1,20 +1,43 @@
-from odoo import fields, models, api
+from odoo import fields, models, api, _
+from odoo.exceptions import UserError
+from datetime import datetime
 
-
+List_month = [('1', 'January'), ('2', 'February'), ('3', 'March'), ('4', 'April'),
+            ('5', 'May'), ('6', 'June'), ('7', 'July'), ('8', 'August'), 
+            ('9', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')]
 class ProjectRevenue(models.Model):
     _name = "project.revenue.management"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Project Revenue Management"
     _rec_name = "project_id"
-    _order = "id DESC"
     
     
     def _get_default_currency(self, type_currency):
         return self.env['res.currency'].search([('name', '=', type_currency)])
-
     
+    def _get_years(self):
+        return self.env['expense.management']._get_years()
+    
+    def _get_year_defaults(self):
+        return self.env['expense.management']._get_year_defaults()
+    
+    def _get_month_defaults(self):
+        return self.env['expense.management']._get_month_defaults()
+
+
     start_date = fields.Date(string="Start date", required=False, tracking=True, compute='_compute_date_from_project', store=True)
     end_date = fields.Date(string="End date", required=False, tracking=True, compute='_compute_date_from_project', store=True)
+    
+    get_month = fields.Selection(selection=List_month,
+                                    default=_get_month_defaults,
+                                    string="Month",
+                                    required=True,
+                                    tracking=True)
+    get_year = fields.Selection(selection=_get_years, default=_get_year_defaults, string='Year', required=True, tracking=True)
+    
+    show_date = fields.Char(string="Month")
+    sort_date = fields.Date(string="Soft Date")
+    
     company_id = fields.Many2one('res.company', string="Company", required=True, default=lambda self: self.env.company, tracking=True)
     project_id = fields.Many2one('project.project', string="Project", required=True, domain="[('company_id', '=', company_id)]", tracking=True)
     revenue_project = fields.Monetary(string="Total Revenue", currency_field='currency_id', required=True, tracking=True)
@@ -89,3 +112,36 @@ class ProjectRevenue(models.Model):
     def _compute_project_company(self):
         if self.company_id.id != self.project_id.company_id.id:
             self.project_id = False
+            
+    @api.onchange('get_month', 'get_year')
+    def _validate_stage_project(self):
+        if self.project_id.id:
+            self._validate_content(action = True)
+            
+    @api.onchange('project_id')
+    def _validate_project(self):
+        self._validate_content(action = False)
+
+    def _validate_content(self, action):
+        if self.project_id.date == False or self.project_id.date_start == False:
+            if action == True:
+                raise UserError(_('The duration of the project is false! Please update duration of project "%(project)s"', 
+                                    project = self.project_id.name))
+            else:
+                self.get_month = ''
+                    
+        if self.get_year and self.get_month:
+            if int(self.get_year) < self.start_date.year or int(self.get_year) > self.end_date.year or\
+                int(self.get_month) < self.start_date.month or int(self.get_month) > self.end_date.month:
+                    if action == True:
+                        raise UserError(_('The month "%(month)s/%(year)s" is outside the project implementation period "%(project)s" !',
+                                    month = '0' + self.get_month if int(self.get_month) < 10 else self.get_month,
+                                    year = self.get_year, project = self.project_id.name))
+                    else:
+                        self.get_month = ''
+            else:
+                self.sort_date = datetime.strptime(('01' + '/' + self.get_month + '/' + self.get_year), '%d/%m/%Y')
+                for item in List_month:
+                    if item[0] == self.get_month:
+                        self.show_date = self.get_year + ' ' + item[1]
+                        break

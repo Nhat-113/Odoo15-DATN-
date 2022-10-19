@@ -4,12 +4,14 @@
         <field name="name">project.revenue.management.tree</field>
         <field name="model">project.revenue.management</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree default_order="project_id desc, sort_date desc">
                 <field name="project_id"/>
                 <field name="revenue_vnd" sum="Total revenue"/>
-                <field name="start_date"/>
-                <field name="end_date"/>
+                <field name="show_date"/>
                 <field name="company_id" groups="base.group_multi_company"/>
+                <field name="sort_date" invisible="1"/>
+                <field name="start_date" invisible="1"/>
+                <field name="end_date" invisible="1"/>
                 <field name="currency_vnd" invisible="1"/>
             </tree>
         </field>
@@ -25,18 +27,27 @@
                         <group name="group_left">
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="project_id" attrs="{'readonly': [('company_id', '=', False)]}"/>
-                            <field name="rounding_usd_input" attrs="{'required': [('get_currency_name', '=', 'USD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'SGD'])]}"/>
-                            <field name="rounding_jpy_input" attrs="{'required': [('get_currency_name', '=', 'JPY')], 'invisible': [('get_currency_name', 'in', ['USD', 'SGD'])]}"/>
-                            <field name="rounding_sgd_input" attrs="{'required': [('get_currency_name', '=', 'SGD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'USD'])]}"/>
-                        </group>
-                        <group name="group_right">
-                            <label for="start_date" string="Stage"/>
-                            <div name="end_date" class="o_row">
+                            <label for="start_date" string="Duration"/>
+                            <div class="o_row">
                                 <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}' attrs="{'readonly': [('project_id','!=',False)]}"/>
                                 <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon" title="Arrow"/>
                                 <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow" attrs="{'invisible': [('start_date', '=', False), ('end_date', '=', False)]}"/>
                                 <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}' attrs="{'readonly': [('project_id','!=',False)]}"/>
                             </div>
+
+                            <field name="rounding_usd_input" attrs="{'required': [('get_currency_name', '=', 'USD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'SGD'])]}"/>
+                            <field name="rounding_jpy_input" attrs="{'required': [('get_currency_name', '=', 'JPY')], 'invisible': [('get_currency_name', 'in', ['USD', 'SGD'])]}"/>
+                            <field name="rounding_sgd_input" attrs="{'required': [('get_currency_name', '=', 'SGD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'USD'])]}"/>
+                        </group>
+                        <group name="group_right" class="custom_table_view">
+                            <div class="custom_table_view_box">
+                                <label for="get_month" string="Month" class="label_for_get_month"/>
+                                <div class="custom_view_month">
+                                    <field name="get_month" nolabel="1" width="100px"/>
+                                    <field name="get_year" nolabel="1" width="100px"/>
+                                </div>
+                            </div>
+
                             <field name="currency_id"/>
                             <field name="revenue_project"/>
                             <field name="revenue_usd" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
@@ -48,6 +59,9 @@
                             <field name="currency_sgd" invisible="1"/>
                             <field name="currency_vnd" invisible="1"/>
                             <field name="get_currency_name" invisible="1"/>
+                            <field name="show_date" invisible="1"/>
+                            <field name="sort_date" invisible="1"/>
+                            
                         </group>
                         <!-- <div class="table_exchange_rate">
                             <h6 class="title_exchange_rate">Exchange rate</h6>
