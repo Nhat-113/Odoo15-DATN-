@@ -36,6 +36,6 @@ class MailThreadCustom(models.AbstractModel):
 
         link = '%s%s' % (base_link, urls.url_encode(params))
         if self:
-            link = self[0].get_base_url() + link
+            link = self.env['ir.config_parameter'].search([('key', '=', 'web.base.url')]).value + link
 
         return link
