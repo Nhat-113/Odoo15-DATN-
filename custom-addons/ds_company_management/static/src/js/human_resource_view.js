@@ -116,7 +116,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 method: "get_list_human_resource",
             })
                 .then(function (res) {
-                    if (self.list_human_resource.length > 0) {
+                    if (res["list_human_resource"].length > 0) {
                         self.list_human_resource = self.processMonthAvailable(res["list_human_resource"])
                     } else {
                         self.list_human_resource = res["list_human_resource"]
