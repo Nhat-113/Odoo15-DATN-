@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="overtime_get_refuse_reason_view_form" model="ir.ui.view">
+        <field name="name">hr.request.overtime.refuse.reason.form</field>
+        <field name="model">hr.request.overtime.refuse.reason</field>
+        <field name="arch" type="xml">
+            <form string="Refuse Reason">
+                <!-- <div class="alert alert-danger" role="alert" attrs="{'invisible': [('applicant_without_email', '=', False)]}">
+                    <field name="applicant_without_email" class="mr4"/>
+                </div> -->
+                <group class="oe_title">
+                    <field name="subject_refuse_reason"/>
+                    <!-- <field name="send_mail" attrs="{'invisible': [('refuse_reason_id', '=', False)]}"/> -->
+                    <!-- <field name="template_id" attrs="{'invisible': [('send_mail', '=', False)], 'required': [('send_mail', '=', True)]}"/> -->
+                    <field name="request_overtime_ids" invisible="1"/>
+                </group>
+                <footer>
+                    <button string="Submit" name="action_refuse_reason_apply" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="overtime_get_refuse_reason_action" model="ir.actions.act_window">
+        <field name="name">Refuse Reason</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.request.overtime.refuse.reason</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="overtime_get_refuse_reason_view_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

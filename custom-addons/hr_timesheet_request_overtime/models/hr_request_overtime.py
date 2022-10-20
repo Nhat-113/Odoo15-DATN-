@@ -1,6 +1,5 @@
 from odoo import api, fields, models, _
 
-
 class HrRequestOvertimeStage(models.Model):
     _name = "hr.request.overtime.stage"
     _description = "Timesheet Request Overtime Stages"
@@ -47,6 +46,26 @@ class HrRequestOverTime(models.Model):
 
     booking_overtime = fields.One2many('hr.booking.overtime', 'request_overtime_id', string='Booking Overtime')
 
+    def action_refuse_reason(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Refuse Reason'),
+            'res_model': 'hr.request.overtime.refuse.reason',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_applicant_ids': self.ids, 'active_test': False},
+            'views': [[False, 'form']]
+        }
+
+    # def toggle_active(self):
+    #     res = super(HrRequestOverTime, self).toggle_active()
+    #     applicant_active = self.filtered(lambda applicant: applicant.active)
+    #     if applicant_active:
+    #         applicant_active.reset_applicant()
+    #     applicant_inactive = self.filtered(lambda applicant: not applicant.active)
+    #     if applicant_inactive:
+    #         return applicant_inactive.archive_applicant()
+    #     return res
 
     def archive_request_overtime(self):
         print('-------------------------------------')

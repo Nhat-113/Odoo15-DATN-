@@ -27,7 +27,8 @@
                     <button string="Submit" name="archive_request_overtime" type="object" class="btn-primary" />
                     <button string="Comfirm" name="archive_request_overtime" type="object" class="btn-primary"/>
                     <button string="Approvals" name="archive_request_overtime" type="object" class="btn-primary"/>
-                    <button string="Refuse" name="archive_request_overtime" type="object" attrs="{'invisible': [('active', '=', False)]}" data-hotkey="x"/>
+                    <button string="Refuse" name="action_refuse_reason" type="object" attrs="{'invisible': [('active', '=', False)]}" data-hotkey="x"/>
+                    <!-- <button string="Restore" name="toggle_active" type="object" attrs="{'invisible': [('active', '=', True)]}" data-hotkey="z"/> -->
                     <field name="stage_id" widget="statusbar" options="{'clickable': '1'}"/>
                 </header>
                 <sheet>

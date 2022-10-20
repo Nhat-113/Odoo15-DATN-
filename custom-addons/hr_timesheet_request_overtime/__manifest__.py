@@ -13,7 +13,8 @@
     "development_status": "Alpha",
     "data": [
     "security/hr_request_overtime_security.xml",
-    "security/ir.model.access.csv", 
+    "security/ir.model.access.csv",
+    "wizard/hr_request_overtime_refuse_reason.xml",
     "data/hr_request_overtime_data.xml",
     "views/hr_timesheet_menu_view.xml",
     "views/hr_timesheet_request_overtime_view.xml"

@@ -2,3 +2,5 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_hr_request_overtime,user.request.overtime,model_hr_request_overtime,,1,1,1,1
 access_hr_request_overtime_stage,timesheet.user.stage,model_hr_request_overtime_stage,,1,1,1,1
 access_hr_booking_overtime,timesheet.user.booking.overtime,model_hr_booking_overtime,,1,1,1,1
+
+access_hr_overtime_refuse_reason,timesheet.user.booking.overtime.refuse.reason,model_hr_request_overtime_refuse_reason,,1,1,1,1
