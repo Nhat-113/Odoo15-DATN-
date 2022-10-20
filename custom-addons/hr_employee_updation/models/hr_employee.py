@@ -122,7 +122,7 @@ class HrEmployee(models.Model):
     insurance_id = fields.Char(string='Insurance ID', groups="hr.group_hr_user",  tracking=True)
     personal_income_tax_code = fields.Char(string="Personal Income Tax Code", groups="hr.group_hr_user", tracking=True)
     address = fields.Char(string='Address', groups="hr.group_hr_user",  tracking=True)
-    time_off_remaining = fields.Float('Time Off', compute='get_time_off_remaining')
+    time_off_remaining = fields.Float('Remaining TimeOff', compute='get_time_off_remaining')
 
     def get_time_off_remaining(self):
         for employee in self:
