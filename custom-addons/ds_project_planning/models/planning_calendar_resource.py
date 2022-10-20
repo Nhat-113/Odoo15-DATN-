@@ -157,7 +157,7 @@ class PlanningCalendarResource(models.Model):
     def _compute_calendar_effort(self):
         for resource in self:
             if resource.check_upgrade_booking == False:
-                if resource.start_date and resource.end_date:
+                if resource.start_date and resource.end_date and resource.start_date < resource.end_date:
                     list_start_end = self.count_total_month(resource.start_date, resource.end_date)
                     booking_effort = 0
                     for i in range(0, len(list_start_end), 2):
@@ -629,38 +629,8 @@ class PlanningCalendarResource(models.Model):
     @api.onchange('effort_rate')
     def update_effort_month(self):
         for resource in self:
-            len_week = 0
-            len_week_no_expired = 0
-            total_effort_week_expired = 0
-            actual_end_date = date.today()
-            resource.booking_upgrade_month.get_id_month_edit()
-            for week in resource.booking_upgrade_week:
-                len_week += 1
-                if week.start_date_week > date.today():
-                    len_week_no_expired += 1 
-                else:
-                    total_effort_week_expired += week.effort_rate_week
-
-                if week.start_date_week <= date.today() and week.end_date_week >= date.today():
-                    actual_end_date = week.end_date_week
-            for month in resource.booking_upgrade_month:
-                month_total_effort_week_expired = 0
-                month_len_week = 0
-                month_len_week_no_expired = 0
-                for rec_week in resource.booking_upgrade_week:
-                    if month.start_date_month.month == rec_week.start_date_week.month and month.start_date_month.year == rec_week.start_date_week.year:
-                        month_len_week += 1
-                        if rec_week.start_date_week > date.today():
-                            month_len_week_no_expired += 1
-                        else:
-                            month_total_effort_week_expired += rec_week.effort_rate_week                        
-                        
-                if month.end_date_month > actual_end_date:
-                    eft_month = resource.calculator_effort_month(resource.effort_rate, total_effort_week_expired, len_week, len_week_no_expired)
-                    if (month_len_week - month_len_week_no_expired) == 0:
-                        month.effort_rate_month = eft_month
-                    else:
-                        month.effort_rate_month = (month_total_effort_week_expired + eft_month*month_len_week_no_expired)/month_len_week              
+            for day in resource.booking_upgrade_day:
+                day.effort_rate_day = resource.effort_rate              
 
     @api.constrains('booking_upgrade_week', 'booking_upgrade_month')
     def recompute_when_save(self):
