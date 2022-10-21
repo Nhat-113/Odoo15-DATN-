@@ -15,6 +15,7 @@ class HrRequestOvertimeStage(models.Model):
 
 class HrRequestOverTime(models.Model):
     _name = "hr.request.overtime"
+    _inherit = ['mail.thread']
 
     _description = "Hr Request Overtime"
     _order = "id DESC"
@@ -37,15 +38,22 @@ class HrRequestOverTime(models.Model):
                             # domain=lambda self: self._compute_domain_stage(),
                             copy=False, index=True,
                             )
-    requester_id = fields.Many2one('res.users', string='Requester', readonly=False)
-
+    requester_id = fields.Many2one('res.users', string='Requester', required = True)
     user_id = fields.Many2one('res.users', string='Project Manager', tracking=True, readonly=True, compute='_compute_project_manager')
-    active = fields.Boolean(string='Invisible Refuse Button', default=True)
     member_ids = fields.Many2many('res.users', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
-
     booking_overtime = fields.One2many('hr.booking.overtime', 'request_overtime_id', string='Booking Overtime')
-
+    active = fields.Boolean(string='Invisible Refuse Button', default=True)
+    refuse_reason_id = fields.One2many('hr.request.overtime.refuse.reason', 'request_overtime_ids', tracking=True)
+    refuse_reason = fields.Char('Refuse Reason')
+    
+    submit_flag = fields.Boolean(default=True)
+    confirm_flag = fields.Boolean(default=True)
+    approve_flag = fields.Boolean(default=True)
+    stage_name = fields.Text(string="Name",tracking = True, compute = '_get_stage_name', default ="Draw")
+    request_creator_id = fields.Many2one('res.users', string='Request Creator', required=True)
+    last_stage = fields.Integer(string="Last stage", default =0)
+    
     def action_refuse_reason(self):
         return {
             'type': 'ir.actions.act_window',
@@ -53,22 +61,28 @@ class HrRequestOverTime(models.Model):
             'res_model': 'hr.request.overtime.refuse.reason',
             'view_mode': 'form',
             'target': 'new',
-            'context': {'default_applicant_ids': self.ids, 'active_test': False},
+            'context': {'default_request_overtime_ids': self.id},
             'views': [[False, 'form']]
         }
+       
+    def reset_request_overtime(self):
+        """ Reinsert the request into the recruitment pipe in the first stage"""
+        default_stage = self.env['hr.request.overtime.stage'].search([], order='sequence asc', limit=1).id
+        for request in self:
+            request.write(
+                {'stage_id': default_stage})
+        #TODO reset flag in here
 
-    # def toggle_active(self):
-    #     res = super(HrRequestOverTime, self).toggle_active()
-    #     applicant_active = self.filtered(lambda applicant: applicant.active)
-    #     if applicant_active:
-    #         applicant_active.reset_applicant()
-    #     applicant_inactive = self.filtered(lambda applicant: not applicant.active)
-    #     if applicant_inactive:
-    #         return applicant_inactive.archive_applicant()
-    #     return res
-
-    def archive_request_overtime(self):
-        print('-------------------------------------')
+    def toggle_active(self):
+        res = super(HrRequestOverTime, self).toggle_active()
+        request_active = self.filtered(lambda request: request.active)
+        if request_active:
+            request_active.reset_request_overtime()
+        
+        request_overtime_inactive = self.filtered(lambda request: not request.active)
+        if request_overtime_inactive:
+            return request_overtime_inactive.action_refuse_reason()
+        return res
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
@@ -88,8 +102,82 @@ class HrRequestOverTime(models.Model):
             item.user_id = item.project_id.user_id or False
             item.company_id = item.project_id.company_id or False
 
+    def action_submit_request_overtime(self):
+        self.stage_id = 2
+        self.submit_flag = False
+
+        # Send mail submit for requester
+        mail_template = "hr_timesheet_request_overtime.submit_request_overtime_template"
+        subject_template = "Submit Request Overtime"
+
+        self._send_message_auto_subscribe_notify_request_overtime({self: item.requester_id for item in self}, mail_template, subject_template)
+
+
+    def action_confirm_request_overtime(self):
+        self.stage_id = 3
+        self.confirm_flag=False
+
+        # Send mail confirm from Requester for Request creator
+        mail_template = "hr_timesheet_request_overtime.confirm_request_overtime_template"
+        subject_template = "Submit Request Overtime"
+        self._send_message_auto_subscribe_notify_request_overtime({self: item.requester_id for item in self}, mail_template, subject_template)
+
+    def action_approve_request_overtime(self):
+        self.stage_id=4
+        self.approve_flag = False
+
+    @api.depends('stage_id')
+    def _get_stage_name(self):
+        for record in self:
+            record.stage_name = record.stage_id.name
+            if record.stage_id.name =="Draw":
+                self.confirm_flag = True
+                self.submit_flag = True
+                self.approve_flag = True
+            if record.stage_id.name == "Submit":
+                self.submit_flag =False
+                self.confirm_flag = True
+                self.approve_flag = True
+            if record.stage_id.name == "Confirm":
+                self.submit_flag =True
+                self.confirm_flag = False
+                self.approve_flag = True
+            if record.stage_id.name == "Approval":
+                self.submit_flag =True
+                self.confirm_flag = True
+                self.approve_flag = False
+
+
+    @api.model
+    def _send_message_auto_subscribe_notify_request_overtime(self, users_per_task, mail_template, subject_template):
+
+        template_id = self.env['ir.model.data']._xmlid_to_res_id(mail_template, raise_if_not_found=False)
+        if not template_id:
+            return
+        view = self.env['ir.ui.view'].browse(template_id)
+        for task, users in users_per_task.items():
+            if not users:
+                continue
+            values = {
+                'object': task,
+                'model_description': "Request",
+                'access_link': task._notify_get_action_link('view'),
+            }
+            
+            for user in users:
+                values.update(assignee_name=user.sudo().name)
+                assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
+                assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)                 
+                task.message_notify(
+                    subject = subject_template,
+                    body = assignation_msg,
+                    partner_ids = user.partner_id.ids,
+                    record_name = task.display_name,
+                    email_layout_xmlid = 'mail.mail_notification_light',
+                    model_description = "Request Overtime",
+                )
+    
     @api.model
     def create(self, vals_list):
         return super().create(vals_list)
-
-        
+    

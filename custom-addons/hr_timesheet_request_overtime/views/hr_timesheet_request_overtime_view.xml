@@ -24,12 +24,16 @@
         <field name="arch" type="xml">
             <form string="Request Overtime - Form">
                 <header>
-                    <button string="Submit" name="archive_request_overtime" type="object" class="btn-primary" />
-                    <button string="Comfirm" name="archive_request_overtime" type="object" class="btn-primary"/>
-                    <button string="Approvals" name="archive_request_overtime" type="object" class="btn-primary"/>
-                    <button string="Refuse" name="action_refuse_reason" type="object" attrs="{'invisible': [('active', '=', False)]}" data-hotkey="x"/>
-                    <!-- <button string="Restore" name="toggle_active" type="object" attrs="{'invisible': [('active', '=', True)]}" data-hotkey="z"/> -->
-                    <field name="stage_id" widget="statusbar" options="{'clickable': '1'}"/>
+                    <field name='submit_flag' invisible="1"/>
+                    <field name='stage_name' invisible="1"/>
+                    <field name='confirm_flag' invisible="1"/>
+                    <field name='approve_flag' invisible="1"/>
+                    <button string="Submit" name="action_submit_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('submit_flag', '!=', True), ('stage_name', '!=', 'Draw')]}" />
+                    <button string="Confirm" name="action_confirm_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('confirm_flag', '!=', True), ('stage_name', '!=', 'Submit')]}"/>
+                    <button string="Approval" name="action_approve_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('approve_flag', '!=', True), ('stage_name', '!=', 'Confirm')]}"/>
+                    <button string="Refuse" name="action_refuse_reason" type="object" attrs="{'invisible': [('active', '=', False)]}" data-hotkey="x" />
+                    <button string="Restore" name="toggle_active" type="object" attrs="{'invisible': [('active', '=', True)]}" data-hotkey="z"/>
+                    <field name="stage_id" widget="statusbar" options="{'clickable': '1'}" attrs="{'invisible': [('active', '=', False)]}" />
                 </header>
                 <sheet>
                     <sheet>
@@ -44,9 +48,10 @@
                         <group >
                             <field name="active" invisible="1"/>
                             <group name="group_left">
-                                <field name="project_id"/>
+                                <field name="project_id" options="{'no_create_edit': True, 'no_open': True}"/>
                                 <field name="user_id" string="Project Manager" widget="many2one_avatar_user" domain="[('share', '=', False)]"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="request_creator_id" options="{'no_create_edit': True, 'no_open': True}"/>
                             </group>
                             <group name="group_right">
                                 <label for="start_date" string="Dates"/>
@@ -56,7 +61,8 @@
                                     <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow" attrs="{'invisible': [('start_date', '=', False), ('end_date', '=', False)]}"/>
                                     <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}'/>
                                 </div>
-                                <field name="requester_id"/>
+                                <field name="requester_id" options="{'no_create_edit': True, 'no_open': True}"/>
+                                <field name="refuse_reason" attrs="{'invisible': [('active', '=', True)]}"/>
                             </group>
                         </group>
                         <separator string="Description"/>

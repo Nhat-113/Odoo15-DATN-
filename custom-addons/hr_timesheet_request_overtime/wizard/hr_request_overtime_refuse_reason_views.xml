@@ -5,13 +5,9 @@
         <field name="model">hr.request.overtime.refuse.reason</field>
         <field name="arch" type="xml">
             <form string="Refuse Reason">
-                <!-- <div class="alert alert-danger" role="alert" attrs="{'invisible': [('applicant_without_email', '=', False)]}">
-                    <field name="applicant_without_email" class="mr4"/>
-                </div> -->
                 <group class="oe_title">
-                    <field name="subject_refuse_reason"/>
-                    <!-- <field name="send_mail" attrs="{'invisible': [('refuse_reason_id', '=', False)]}"/> -->
-                    <!-- <field name="template_id" attrs="{'invisible': [('send_mail', '=', False)], 'required': [('send_mail', '=', True)]}"/> -->
+                    <field name="subject_refuse_reason"  placeholder="e.g. Typing refuse reason ... "/>
+                    <field name="request_overtime_ids" invisible="1"/>
                     <field name="request_overtime_ids" invisible="1"/>
                 </group>
                 <footer>
