@@ -389,21 +389,22 @@ class BookingResourceMonth(models.Model):
     @api.onchange('effort_rate_month')
     def check_edit_effort_warning(self):
         for month in self:
-            effort_total_edited = month.effort_rate_month * len(pd.bdate_range(month.start_date_month.strftime('%Y-%m-%d'),
-                                                                                month.end_date_month.strftime('%Y-%m-%d')))
+            if self.env.user.has_group('project.group_project_manager') == False:
+                effort_total_edited = month.effort_rate_month * len(pd.bdate_range(month.start_date_month.strftime('%Y-%m-%d'),
+                                                                                    month.end_date_month.strftime('%Y-%m-%d')))
 
-            day_expired = date.today()    
-            for week in month.booking_id.booking_upgrade_week:
-                if week.start_date_week <= date.today() and week.end_date_week >= date.today():
-                    day_expired = week.end_date_week
+                day_expired = date.today()    
+                for week in month.booking_id.booking_upgrade_week:
+                    if week.start_date_week <= date.today() and week.end_date_week >= date.today():
+                        day_expired = week.end_date_week
 
-            effort_total_used = 0
-            for day in month.booking_id.booking_upgrade_day:
-                if day.start_date_day < day_expired and day.start_date_day >= month.start_date_month and day.end_date_day <= month.end_date_month:
-                    effort_total_used += day.effort_rate_day
+                effort_total_used = 0
+                for day in month.booking_id.booking_upgrade_day:
+                    if day.start_date_day < day_expired and day.start_date_day >= month.start_date_month and day.end_date_day <= month.end_date_month:
+                        effort_total_used += day.effort_rate_day
 
-            if effort_total_edited <= effort_total_used:
-               raise UserError('Cannot edit effort rate less than total effort used')
+                if effort_total_edited <= effort_total_used:
+                    raise UserError('Cannot edit effort rate less than total effort used')
 
             
 
