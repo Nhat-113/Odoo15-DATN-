@@ -124,9 +124,69 @@ class HrEmployee(models.Model):
     address = fields.Char(string='Address', groups="hr.group_hr_user",  tracking=True)
     time_off_remaining = fields.Float('Remaining TimeOff', compute='get_time_off_remaining')
 
+    @api.depends_context('employee_id', 'default_employee_id')
     def get_time_off_remaining(self):
         for employee in self:
-            employee.time_off_remaining = float(employee.allocation_display) - float(employee.allocation_used_display)
+
+            data_days = (self.get_employees_days(employee.id)[employee.id[0]] if isinstance(employee.id, list) else
+                         self.get_employees_days([employee.id])[employee.id])
+
+            employee.time_off_remaining = data_days.get('time_off_remaining')
+
+    def get_employees_days(self, employee_ids, date=None):
+        result = {
+            employee_id: {
+                    'time_off_remaining': 0
+            } for employee_id in employee_ids
+        }
+
+        if not date:
+            date = fields.Date.context_today(self)
+
+        all_allocations = self.env['hr.leave.allocation'].search([
+            ('state', 'in', ['confirm', 'validate1', 'validate']),
+            ('date_from', '<=', date),
+            '|', ('date_to', '=', False),
+                 ('date_to', '>=', date),
+        ])
+
+        id_holiday = []
+        for all_allocation in all_allocations:
+            if all_allocation.holiday_status_id.id not in id_holiday:
+                id_holiday.append(all_allocation.holiday_status_id.id)
+
+
+        requests = self.env['hr.leave'].search([
+            ('employee_id', 'in', employee_ids),
+            ('state', 'in', ['confirm', 'validate1', 'validate']),
+            ('holiday_status_id', 'in', id_holiday)
+        ])
+
+        allocations = self.env['hr.leave.allocation'].search([
+            ('employee_id', 'in', employee_ids),
+            ('state', 'in', ['confirm', 'validate1', 'validate']),
+            ('holiday_status_id', 'in', id_holiday),
+            ('date_from', '<=', date),
+            '|', ('date_to', '=', False),
+                 ('date_to', '>=', date),
+        ])
+
+        for request in requests:
+            status_dict = result[request.employee_id.id]
+            if not request.holiday_allocation_id or request.holiday_allocation_id in allocations:
+                if request.leave_type_request_unit == 'hour':
+                    status_dict['time_off_remaining'] -= request.number_of_hours_display/8
+                else:
+                    status_dict['time_off_remaining'] -= request.number_of_days
+
+        for allocation in allocations.sudo():
+            status_dict = result[allocation.employee_id.id]
+            if allocation.state == 'validate':
+                if allocation.type_request_unit == 'hour':
+                    status_dict['time_off_remaining'] += allocation.number_of_hours_display/8
+                else:
+                    status_dict['time_off_remaining'] += allocation.number_of_days
+        return result
 
     def _first_contract(self):
         hr_contract = self.env['hr.contract'].sudo()
