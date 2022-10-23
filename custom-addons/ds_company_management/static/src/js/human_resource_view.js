@@ -219,7 +219,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var total_member_company = document.getElementById("count_member_of_company");
 
             // Start compute in column number seven
-            for (var j = 7; j < howManyCols; j++) {
+            for (var j = 7; j < howManyCols -1; j++) {
                 count_compute_available_member = self.compute_available_member(j);
 
                 // count_number_row = self.compute_count_number_row(j);
