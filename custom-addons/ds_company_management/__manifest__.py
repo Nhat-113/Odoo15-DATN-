@@ -39,9 +39,13 @@
             '/ds_company_management/static/src/css/style.css',
             '/ds_company_management/static/src/js/human_resource_view.js',
             'ds_company_management/static/src/js/lib/table2excel.js',
+            '/ds_company_management/static/src/css/bom_dashboard.css',
+            '/ds_company_management/static/src/js/lib/chart.js',
+            '/ds_company_management/static/src/js/dynamic_dashboard.js',
         ],
         'web.assets_qweb': [
-           'ds_company_management/static/src/xml/human_resource_view.xml',
+            'ds_company_management/static/src/xml/human_resource_view.xml',
+            'ds_company_management/static/src/xml/dynamic_dashboard_view.xml',
         ],
     },
 

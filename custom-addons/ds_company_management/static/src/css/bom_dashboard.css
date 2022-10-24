@@ -1,0 +1,12 @@
+.chart_project_status {
+    width: 50%;
+}
+.chart_project {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-direction: row;
+}
+.chart_ODC, .chart_project_base, .chart_project_internal, .chart_avg_project {
+    width: 50%
+}

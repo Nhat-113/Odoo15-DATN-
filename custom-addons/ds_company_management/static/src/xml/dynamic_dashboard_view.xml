@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="dynamic_bom_dashboard">
+        <div class="container">
+            <div  class ="chart_project_status">
+                <canvas id="project_status" width="200" height="50"></canvas>
+            </div>
+
+            <div  class ="chart_postition_employee">
+                <canvas id="job-position" width="200" height="50"></canvas>
+            </div>
+
+            <div class="chart_project" >
+                <div  class ="chart_ODC">
+                    <canvas id="chart_ODC"></canvas>
+                </div>
+                <div  class ="chart_project_base">
+                    <canvas id="chart_project_base"></canvas>
+                </div>
+                <div  class ="chart_project_internal">
+                    <canvas id="chart_project_internal"></canvas>
+                </div>
+                <div class ="chart_avg_project">
+                    <canvas id="chart_avg_project"></canvas>
+                </div>
+            </div>
+
+            <div class="chart_project_revenue">
+                <canvas id="chart_project_revenue"></canvas>
+            </div>
+
+            <div class="chart_company_revenue">
+                <canvas id="chart_company_revenue"></canvas>
+            </div>
+        </div>
+    </t>
+</templates>
