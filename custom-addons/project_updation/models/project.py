@@ -308,7 +308,7 @@ class Project(models.Model):
         action = self.with_context(active_id=self.id, active_ids=self.ids) \
             .env.ref('project_updation.act_project_project_2_project_issue_all') \
             .sudo().read()[0]
-        action['display_name'] = self.name
+        action['display_name'] = 'Issues/'+str(self.name)
         return action
 
     @api.model

@@ -134,6 +134,11 @@
                 <xpath expr="//div[hasclass('oe_kanban_bottom_right')]/span" position="before">
                     <field name="last_update_status" widget="badge" decoration-success="last_update_status == 'on_track'" decoration-warning="last_update_status == 'at_risk'" decoration-danger="last_update_status == 'off_track'" decoration-info="last_update_status == 'on_hold'" decoration-primary="last_update_status == 'missing_resource'"/>
                 </xpath>
+                <xpath expr="//div[hasclass('o_kanban_manage_view')]" position="inside">
+                    <div role="menuitem">
+                        <a name="action_view_issues" type="object">Issues</a>
+                    </div>
+                </xpath>
                 <xpath expr="//div[hasclass('o_kanban_card_manage_settings')]" position="replace">
                     <div class="o_kanban_card_manage_settings row" groups="ds_project_planning.group_project_pm">
                         <div role="menuitem" aria-haspopup="true" class="col-8">
@@ -397,7 +402,7 @@
 
 
         <record id="act_project_project_2_project_issue_all" model="ir.actions.act_window">
-            <field name="name">Tasks</field>
+            <field name="name">Issues</field>
             <field name="res_model">project.task</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('display_project_id', '=', active_id), ('issues_type', '!=', 1)]</field>
