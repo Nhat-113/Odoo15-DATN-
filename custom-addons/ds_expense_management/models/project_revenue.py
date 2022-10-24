@@ -45,7 +45,7 @@ class ProjectRevenue(models.Model):
     
     get_currency_name = fields.Char(string='Currency Name', readonly=True, related='currency_id.name',store=True)
     get_domain_projects = fields.Char(string='Domain Project', readonly=True, store=False, compute='_get_domain_project')
-    check_estimation = fields.Boolean(string="Check estimation", default=False, store=False)
+    check_estimation = fields.Boolean(string="Check estimation", default=False, store=True)
     
     project_revenue_value_ids = fields.One2many('project.revenue.value', 'project_revenue_management_id', string='Project Revenue Value')
 
