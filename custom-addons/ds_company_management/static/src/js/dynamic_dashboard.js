@@ -74,6 +74,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 })
                 .then(function(data) {
                     var ele = document.getElementById("project_status");
+                    if (!ele) 
+                        return
                     const ctx = ele.getContext("2d");
                     const project_status = new Chart(ctx, {
                         type: "pie",
@@ -134,6 +136,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 .then(function(data) {
                     var data_employee = data;
                     var ele = document.getElementById("job-position");
+                    if (!ele) 
+                        return
                     const ctx = ele.getContext("2d");
                     // Chart.defaults.scales.linear.min = 0;
                     const jobPosition = new Chart(ctx, {
@@ -196,6 +200,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 .then(function(data) {
                     var data_employee = self.valueProjectODC(data);
                     var ele = document.getElementById("chart_ODC");
+                    if (!ele) 
+                        return
                     const ctx = ele.getContext("2d");
 
                     const chartODC = new Chart(ctx, {
@@ -359,6 +365,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 .then(function(data) {
                     var data_employee = self.valueProjectBase(data);
                     var ele = document.getElementById("chart_project_base");
+                    if (!ele) 
+                        return
                     const ctx = ele.getContext("2d");
 
                     const chartProjectBase = new Chart(ctx, {
@@ -528,6 +536,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 .then(function(data) {
                     var data_employee = self.valueProjectInternal(data);
                     var ele = document.getElementById("chart_project_internal");
+                    if (!ele) 
+                        return
                     const ctx = ele.getContext("2d");
 
                     const chartProjectInternal = new Chart(ctx, {
@@ -694,6 +704,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 .then(function(data) {
                     var data_employee = self.valueProjectAVG(data);
                     var ele = document.getElementById("chart_avg_project");
+                    if (!ele) 
+                        return
                     const ctx = ele.getContext("2d");
 
                     const chartAvgProject = new Chart(ctx, {
@@ -862,6 +874,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 })
                 .then(function(data) {
                     var ele = document.getElementById("chart_company_revenue");
+                    if (!ele) 
+                        return
                     const ctx = ele.getContext("2d");
 
                     const chartCompanyRevenue = new Chart(ctx, {

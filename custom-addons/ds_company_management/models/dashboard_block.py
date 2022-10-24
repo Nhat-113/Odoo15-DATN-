@@ -29,9 +29,11 @@ class DashboardBlock(models.Model):
 
     @api.model
     def get_position_employee(self):
+        selected_companies = self.get_current_company_value(); 
         cr = self._cr
         cr.execute("""select hr_job.name,count(*) from hr_employee inner join hr_job on hr_job.id = hr_employee.job_id
-                        group by  hr_job.name """)
+                       where  hr_employee.company_id in  """ + str(tuple(selected_companies)) + """
+                       group by  hr_job.name """)
 
         dat = cr.fetchall()
         data = []
@@ -42,8 +44,10 @@ class DashboardBlock(models.Model):
 
     @api.model
     def get_project_status(self):
+        selected_companies = self.get_current_company_value(); 
         cr = self._cr
         cr.execute("""select last_update_status ,count(*)  from project_project 
+                        where  company_id in  """ + str(tuple(selected_companies)) + """
                         group by last_update_status""")
         dat = cr.fetchall()
         data = []
@@ -53,19 +57,23 @@ class DashboardBlock(models.Model):
 
     @api.model
     def get_effort_human_resource(self):
+        selected_companies = self.get_current_company_value(); 
         cr = self._cr
         cr.execute("""select employee_name, project_type_name, month1, month2, month3, month4, month5, month6, month7, month8, month9, month10, month11, month12,
                          average, start_date_contract,
-                         end_date_contract from human_resource_management""")
+                         end_date_contract from human_resource_management
+                         where  company_id in  """ + str(tuple(selected_companies)) + """
+                         """)
         data = cr.fetchall()
         
         return data    
      
     @api.model
     def get_revenue_company(self):
+        selected_companies = self.get_current_company_value(); 
         cr = self._cr
         cr.execute("""select to_char(month_start, 'Month YYYY') as l_month ,sum(total_revenue)/10000000 as revenue, sum(total_members) as members from project_management_ceo
-                WHERE   to_char(month_start, 'YYYY') = '2022'
+                WHERE   to_char(month_start, 'YYYY') = '2022' and  company_id in  """ + str(tuple(selected_companies)) + """
                 group by month_start""")
         data = cr.fetchall()
         
