@@ -42,15 +42,17 @@ odoo.define('human_resource_template.Dashboard', function (require) {
         template: 'Human_resource',
         jsLibs: ["ds_company_management/static/src/js/lib/table2excel.js"],
         events: {
-            "click .export_excel": "export_excel",
-            "click .header_tabel": "sort_table",
 
+            "click .export_excel": "export_excel",
+            "click .view-member-free": "view_effort_member_free",
+            "click .close-table": "close_effort_member_free",
         },
 
         init: function (parent, context) {
             this.action_id = context['id'];
             this._super(parent, context);
             this.list_human_resource = [];
+            this.list_human_resource_free = [];
         },
 
         start: function () {
@@ -59,18 +61,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             return this._super().then(function () {
                 // self.render_dashboards();
                 setTimeout(() => {
-                    var table, cell_elements;
-                    table = document.getElementById('human_resource_table');
-                    cell_elements = table.getElementsByTagName('td');
-                    for (var i = 0, len = cell_elements.length; i < len; i++) {
 
-                        if (cell_elements[i].innerHTML < 0) {
-                            cell_elements[i].innerText = "NaN";
-                        }
-                        if (cell_elements[i].innerText == "" && cell_elements[i].className == "AVG_colum") {
-                            cell_elements[i].innerText = "0";
-                        }
-                    }
                     var input = document.getElementById("search_input");
                     // Event search in when input onchange
                     input.addEventListener('keyup', self.searchFunction)
@@ -82,7 +73,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
                     const comparer = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))
                         (getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
-                    var th = document.querySelectorAll('th')
+                    var th = document.querySelectorAll('th.header_human_table')
                     var avgRow = document.getElementById('avg-row');
                     var totalRow = document.getElementById('total-row');
                     th.forEach(th => th.addEventListener('click', (() => {
@@ -95,6 +86,20 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                         table.appendChild(totalRow);
                     })));
 
+                    // sort table member free
+                    var th = document.querySelectorAll('th.header_member_free')
+                    var avgRow = document.getElementById('avg-row');
+                    var totalRow = document.getElementById('total-row');
+                    th.forEach(th => th.addEventListener('click', (() => {
+                        let table = th.closest('tbody');
+                        Array.from(table.querySelectorAll('tr.detail'))
+                            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
+                            .forEach(tr => table.appendChild(tr));
+                        // append 2 this row in last row
+                    })));
+
+                    self.replace_value_human_resource()
+                    self.replace_value_human_resource_free()
                     self.compute_avg();
                 }, 200);
             });
@@ -111,7 +116,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
 
         fetch_data: function () {
             let self = this;
-            var def2 = this._rpc({
+            var def1 = this._rpc({
                 model: "human.resource.management",
                 method: "get_list_human_resource",
             })
@@ -122,18 +127,27 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                         self.list_human_resource = res["list_human_resource"]
                     }
                 });
-            // return $.when(def1, def2);
-            return $.when(def2);
 
+            var def2 = this._rpc({
+                model: "human.resource.management",
+                method: "get_human_resource_free",
+            })
+                .then(function (res) {
+                    if (res["list_human_resource_free"].length > 0) {
+                        self.list_human_resource_free = self.processMonthAvailableFree(res["list_human_resource_free"])
+                    } else {
+                        self.list_human_resource_free = res["list_human_resource_free"]
+                    }
+                });
+            return $.when(def1, def2);
         },
-        
+
         // Function: Process effort rate's employee data depend on state (running or expired) of contract
         processMonthAvailable: function (arr) {
             // Get array of dimensions
             const dimensions = [arr.length, arr[0].length];
 
             let arrCheckMonth = new Array();
-            
             arr.forEach(childArr => {
                 if (childArr[dimensions[1] - 2] != null) {
                     /*
@@ -142,18 +156,18 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                      */
                     let arrStartDate = childArr[dimensions[1] - 2].split(',');
                     let arrEndDate = childArr[dimensions[1] - 1].split(',');
-            
+
                     let contractAvailableSet = new Set();
-            
+
                     for (let index = 0; index < arrStartDate.length; index++) {
-                        if (parseInt(arrStartDate[index].split('-')[1]) < (new Date().getFullYear())
-                            && parseInt(arrEndDate[index].split('-')[1]) == 0) {
+                        if (parseInt(arrStartDate[index].split('-')[1]) < (new Date().getFullYear()) &&
+                            parseInt(arrEndDate[index].split('-')[1]) == 0) {
                             for (let i = 1; i <= 12; i++) {
                                 contractAvailableSet.add(i);
                             }
-                        } else if ( parseInt(arrStartDate[index].split('-')[1]) == (new Date().getFullYear())) {
-                            if ( parseInt(arrStartDate[index].split('-')[0]) <= parseInt(arrEndDate[index].split('-')[0])
-                                && parseInt(arrEndDate[index].split('-')[0]) != 0) {
+                        } else if (parseInt(arrStartDate[index].split('-')[1]) == (new Date().getFullYear())) {
+                            if (parseInt(arrStartDate[index].split('-')[0]) <= parseInt(arrEndDate[index].split('-')[0]) &&
+                                parseInt(arrEndDate[index].split('-')[0]) != 0) {
                                 for (let i = parseInt(arrStartDate[index].split('-')[0]); i <= parseInt(arrEndDate[index].split('-')[0]); i++) {
                                     contractAvailableSet.add(i);
                                 }
@@ -170,23 +184,96 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 }
             });
             for (let index = 0; index < arr.length; index++) {
-                let sum = 0, cnt = 0;
+                let sum = 0,
+                    cnt = 0,
+                    cntGreaterThanZero = 0;
                 /*
                     January column's index in array is 7
-                    December column's index in array is 18
+                    December column's index in arrayy is 18
                  */
                 for (let i = 7; i <= 18; i++) {
-                    if (!arrCheckMonth[index].has(i-6)) {
+                    if (!arrCheckMonth[index].has(i - 6)) {
                         arr[index][i] = -1;
                     } else {
-                        sum+=arr[index][i];
+                        sum += arr[index][i];
                         cnt++;
+                        if (arr[index][i] > 0) cntGreaterThanZero++;
                     }
                 }
                 // Average column's index in array is 19
-                arr[index][19] = cnt > 0 ? Number.parseFloat(sum/cnt).toFixed(2) : "NaN";
+                arr[index][19] = cnt > 0 ? Number.parseFloat(sum / (cntGreaterThanZero > 0 ? cntGreaterThanZero : 1) ).toFixed(2) : "NaN";
             }
             return arr;
+        },
+
+        processMonthAvailableFree: function (arrFree) {
+
+            const dimensions = [arrFree.length, arrFree[0].length];
+
+            let arrCheckMonth = new Array();
+
+            arrFree.forEach(childArr => {
+                if (childArr[dimensions[1] - 2] != null) {
+                    /*
+                        Start Date column's index is 2rd last of array
+                        End Date column's index is thearrCheckMonth last index of array
+                     */
+                    let arrStartDate = childArr[dimensions[1] - 2].split(',');
+                    let arrEndDate = childArr[dimensions[1] - 1].split(',');
+
+                    let contractAvailableSet = new Set();
+
+                    for (let index = 0; index < arrStartDate.length; index++) {
+                        if (parseInt(arrStartDate[index].split('-')[1]) < (new Date().getFullYear()) &&
+                            parseInt(arrEndDate[index].split('-')[1]) == 0) {
+                            for (let i = 1; i <= 12; i++) {
+                                contractAvailableSet.add(i);
+                            }
+                        } else if (parseInt(arrStartDate[index].split('-')[1]) == (new Date().getFullYear())) {
+                            if (parseInt(arrStartDate[index].split('-')[0]) <= parseInt(arrEndDate[index].split('-')[0]) &&
+                                parseInt(arrEndDate[index].split('-')[0]) != 0) {
+                                for (let i = parseInt(arrStartDate[index].split('-')[0]); i <= parseInt(arrEndDate[index].split('-')[0]); i++) {
+                                    contractAvailableSet.add(i);
+                                }
+                            } else if (parseInt(arrEndDate[index].split('-')[0]) == 0) {
+                                for (let i = parseInt(arrStartDate[index].split('-')[0]); i <= 12; i++) {
+                                    contractAvailableSet.add(i);
+                                }
+                            }
+                        }
+                    }
+                    arrCheckMonth.push(contractAvailableSet);
+                } else {
+                    arrCheckMonth.push(new Set());
+                }
+            });
+
+            let notFreeEmployeeSet = new Array();
+
+            for (let index = 0; index < arrFree.length; index++) {
+                let cnt = 0, cntMonthNotContract = 0;
+                /*
+                    January column's index in array is 4
+                    December column's index in array is 15
+                 */
+                for (let i = 4; i <= 15; i++) {
+                    if (!arrCheckMonth[index].has(i - 3)) {
+                        arrFree[index][i] = -1;
+                        cntMonthNotContract++;
+                    } else {
+                        if (arrFree[index][i] == 100) {
+                            cnt++;
+                        }
+                    }
+                }
+                if (cnt + cntMonthNotContract == 12) {
+                    notFreeEmployeeSet.push(index);
+                }
+            }
+            for (let i = notFreeEmployeeSet.length - 1; i >= 0; i--) {
+                arrFree.splice(notFreeEmployeeSet[i], 1);
+            }
+            return arrFree;
         },
 
         searchFunction: function (e) {
@@ -219,7 +306,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var total_member_company = document.getElementById("count_member_of_company");
 
             // Start compute in column number seven
-            for (var j = 7; j < howManyCols -1; j++) {
+            for (var j = 7; j < howManyCols - 1; j++) {
                 count_compute_available_member = self.compute_available_member(j);
 
                 // count_number_row = self.compute_count_number_row(j);
@@ -301,25 +388,6 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             }
         },
 
-
-        //     var table = document.getElementById("human_resource_table");
-        //     var howManyRows = 0;
-        //     let count_number_row = 0;
-        //     try {
-        //         var howManyRows = table.rows.length;
-        //         for (var i = 1; i < howManyRows - 2; i++) {
-        //             let row = table.rows[i];
-        //             let parent_style = row.cells[colNumber].parentElement.style.display;
-        //             if (parent_style != 'none') {
-        //                 count_number_row += 1
-        //             }
-        //         }
-        //     } finally {
-        //         return count_number_row;
-        //     }
-        // },
-
-
         export_excel: function () {
             Table2Excel.extend((cell, cellText) => {
                 return $(cell).attr('type') == 'string' ? {
@@ -331,10 +399,48 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var table2excel = new Table2Excel();
             table2excel.export(document.querySelectorAll("#human_resource_table"));
         },
-        sort_table: function () {
 
+        view_effort_member_free: function () {
+            document.getElementById('back-ground').style.display = "block"
+        },
+
+        close_effort_member_free: function () {
+            var ele = document.getElementById('back-ground')
+            if (ele.style.display === "block") {
+                ele.style.display = "none"
+            }
+        },
+
+        replace_value_human_resource: function () {
+            var table, cell_elements;
+            table = document.getElementById('human_resource_table');
+            cell_elements = table.getElementsByTagName('td');
+            for (var i = 0, len = cell_elements.length; i < len; i++) {
+
+                if (cell_elements[i].innerHTML < 0) {
+                    cell_elements[i].innerText = "NaN";
+                }
+                if (cell_elements[i].innerText == "" && cell_elements[i].className == "AVG_colum") {
+                    cell_elements[i].innerText = "0";
+                }
+            }
+        },
+
+        replace_value_human_resource_free: function () {
+            var table_free, cell_elements_free;
+            table_free = document.getElementById('human_resource_free_table');
+            cell_elements_free = table_free.querySelectorAll('td.td_value');
+            for (var i = 0, len = cell_elements_free.length; i < len; i++) {
+                if (cell_elements_free[i].innerHTML < 0) {
+                    cell_elements_free[i].innerText = "NaN";
+                }
+            }
+            for (var i = 0, len = cell_elements_free.length; i < len; i++) {
+                cell_elements_free[i].innerText = (100 - parseFloat(cell_elements_free[i].innerText)).toFixed(2);
+            }
         }
     });
+
     core.action_registry.add('human_resource_template', HumanResourceTemplate);
 
     return HumanResourceTemplate;
