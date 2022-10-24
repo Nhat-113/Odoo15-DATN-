@@ -45,7 +45,7 @@ class ProjectManagementHistory(models.Model):
                         pm.date_start,
                         pm.date_end,
                         pm.revenue,
-		                pm.revenue_from
+                        pm.revenue_from
 
                     FROM project_management AS pm
                     GROUP BY
@@ -55,7 +55,7 @@ class ProjectManagementHistory(models.Model):
                         pm.date_start,
                         pm.date_end,
                         pm.revenue,
-		                pm.revenue_from
+                        pm.revenue_from
                 ),
 
                 -- get month start & month end from project ---
@@ -71,7 +71,16 @@ class ProjectManagementHistory(models.Model):
                         --- Total cost is taken from estimation or project revenue and converted to VND ---
                         phm.revenue AS total_cost,
                         phm.revenue_from,
-		                prm.revenue_vnd,
+                        (CASE
+                            WHEN prm.get_currency_name = 'USD'
+                                THEN prv.revenue_project * prm.rounding_usd_input
+                            WHEN prm.get_currency_name = 'JPY'
+                                THEN prv.revenue_project * prm.rounding_jpy_input
+                            WHEN prm.get_currency_name = 'SGD'
+                                THEN prv.revenue_project * rounding_sgd_input
+                            ELSE prv.revenue_project
+                        END) AS revenue_vnd,
+                        
 
                         --- Generate month_start & month_end from generate month
                         (CASE WHEN EXTRACT(MONTH FROM phm.months) = EXTRACT(MONTH FROM phm.date_start) 
@@ -87,10 +96,12 @@ class ProjectManagementHistory(models.Model):
                         END) AS month_end
 
                     FROM extract_month_project AS phm 
+                    LEFT JOIN project_revenue_value AS prv
+                        ON prv.project_id = phm.project_id
+                        AND prv.get_month::int = EXTRACT(MONTH FROM phm.months)
+                        AND prv.get_year::int = EXTRACT(YEAR FROM phm.months)
                     LEFT JOIN project_revenue_management AS prm
-                        ON prm.project_id = phm.project_id
-                        AND prm.get_month::int = EXTRACT(MONTH FROM phm.months)
-                        AND prm.get_year::int = EXTRACT(YEAR FROM phm.months)
+                        ON prm.id = prv.project_revenue_management_id
                     ORDER By project_id
                 ),
 
@@ -137,28 +148,36 @@ class ProjectManagementHistory(models.Model):
 
                 --- project expense management generate month ---
 
-                project_expense_management_month AS (
+                project_expense_value_month AS (
                     SELECT 
-                        pem.id,
                         pem.company_id,
-                        pem.project_id,
-                        pem.project_management_id,
-                        pem.expense_date,
-                        date_trunc('month', pem.expense_date)::DATE AS months,
-                        pem.expense_vnd
+                        pev.project_id,
+                        pev.expense_date,
+                        date_trunc('month', pev.expense_date)::DATE AS months,
+                        (CASE
+                            WHEN pem.get_currency_name = 'VND'
+                                THEN pev.total_expenses
+                            WHEN pem.get_currency_name = 'USD'
+                                THEN pev.total_expenses * pem.rounding_usd_input
+                            WHEN pem.get_currency_name = 'JPY'
+                                THEN pev.total_expenses * pem.rounding_jpy_input
+                            ELSE pev.total_expenses * pem.rounding_sgd_input
+                        END) AS expense_vnd
                         
-                    FROM project_expense_management AS pem
+                    FROM project_expense_value AS pev
+                    LEFT JOIN project_expense_management AS pem
+                        ON pem.id = pev.project_expense_management_id
                 ),
 
                 -- compute total project expense management by month ---
-                project_expense_management_total AS (
+                project_expense_value_total AS (
                     SELECT
                         company_id,
                         project_id,
                         months,
                         (Sum(expense_vnd)) AS total_project_expense
 
-                    FROM project_expense_management_month
+                    FROM project_expense_value_month
                     GROUP BY company_id,
                             project_id,
                             months
@@ -220,9 +239,9 @@ class ProjectManagementHistory(models.Model):
                         
                         gmp.total_cost,
                         gmp.revenue_from,
-		                gmp.revenue_vnd,
+                        gmp.revenue_vnd,
                         (COALESCE(NULLIF(cts.salary, NULL), 0)) AS total_salary,
-                        (COALESCE(NULLIF(pemt.total_project_expense, NULL), 0)) AS total_project_expense,
+                        (COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)) AS total_project_expense,
                         (COALESCE(NULLIF(em.total_expenses, NULL), 0)) AS operation_cost,
                         (COALESCE(NULLIF(pcm.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project,
                         (COALESCE(NULLIF(pni.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project_not_intern,
@@ -236,10 +255,10 @@ class ProjectManagementHistory(models.Model):
                         
                         
                     FROM generate_month_project AS gmp
-                    LEFT JOIN project_expense_management_total AS pemt
-                        ON pemt.project_id = gmp.project_id
-                        AND EXTRACT(MONTH FROM pemt.months) = EXTRACT(MONTH FROM gmp.month_start)
-                        AND EXTRACT(YEAR FROM pemt.months) = EXTRACT(YEAR FROM gmp.month_start)
+                    LEFT JOIN project_expense_value_total AS pevt
+                        ON pevt.project_id = gmp.project_id
+                        AND EXTRACT(MONTH FROM pevt.months) = EXTRACT(MONTH FROM gmp.month_start)
+                        AND EXTRACT(YEAR FROM pevt.months) = EXTRACT(YEAR FROM gmp.month_start)
                         
                     LEFT JOIN expense_management AS em
                         ON em.company_id = gmp.company_id
@@ -312,11 +331,10 @@ class ProjectManagementHistory(models.Model):
                         pac.average_cost_project,
                         pac.duration_month,
                         (CASE
-                            WHEN pac.revenue_from = 'estimation'
-                                THEN 
-                                    pac.duration_month * pac.total_cost / pdm.total_duration_month
                             WHEN pac.revenue_from = 'project_revenue'
-                                THEN COALESCE(NULLIF(pac.revenue_vnd, NULL), 0) 
+                                THEN COALESCE(NULLIF(pac.revenue_vnd, NULL), 0)
+                            WHEN pac.revenue_from = 'estimation'
+                                THEN pac.duration_month * pac.total_cost / pdm.total_duration_month
                             ELSE
                                 pac.total_cost
                         END) AS revenue,

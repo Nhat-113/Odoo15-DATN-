@@ -41,7 +41,7 @@ class ProjectManagement(models.Model):
     profit_margin = fields.Float(string="Profit Margin (%)",compute=_content_compute_total, digits=(12,2), help="Profit Margin = profit / revenue * 100")
     
     member_ids = fields.One2many('project.management.member', 'project_management_id', string="Members")
-    project_expense_management = fields.One2many('project.expense.management', 'project_management_id', string="Project Cost Management")
+    project_expense_values = fields.One2many('project.expense.value', 'project_management_id', string="Project Cost Management")
     project_management_history = fields.One2many('project.management.history', 'project_management_id', string="Project Management History")
     project_management_history_temp = fields.One2many('project.history.group.temp', 'project_management_id', string="Project Management History Temp")
     
@@ -55,28 +55,7 @@ class ProjectManagement(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
-                WITH project_expense_management_group AS (
-                    SELECT
-                        company_id,
-                        project_id,
-                        (SUM(expense_vnd)) AS expense_vnd
-                    FROM project_expense_management
-                    GROUP BY company_id,
-                            project_id
-                
-                ),
-                project_revenue_management_group AS (
-                    SELECT
-                        company_id,
-                        project_id,
-                        (SUM(revenue_vnd)) AS revenue_vnd
-                    
-                    FROM project_revenue_management
-                    GROUP BY company_id,
-                            project_id
-                ),
-                
-                project_estimation_merged AS (
+                WITH project_estimation_merged AS (
                     SELECT
                         -- ROW_NUMBER() OVER(ORDER BY pr.id ASC) AS id,
                         pr.id AS project_id,
@@ -102,12 +81,12 @@ class ProjectManagement(models.Model):
                         project_project AS pr 
                     LEFT JOIN estimation_work AS est
                         ON est.id = pr.estimation_id
-                    LEFT JOIN project_expense_management_group AS pem
-		                ON pem.project_id = pr.id
+                    LEFT JOIN project_expense_management AS pem
+                        ON pem.project_id = pr.id
                     LEFT JOIN estimation_currency AS ec
-		                ON ec.id = est.currency_id
+                        ON ec.id = est.currency_id
                     LEFT JOIN estimation_status AS es
-		                ON es.id = est.stage
+                        ON es.id = est.stage
                     WHERE (EXTRACT(MONTH FROM pr.date_start) < EXTRACT(MONTH FROM CURRENT_DATE)
                         AND EXTRACT(YEAR FROM pr.date_start) = EXTRACT(YEAR FROM CURRENT_DATE))
                         OR EXTRACT(YEAR FROM pr.date_start) < EXTRACT(YEAR FROM CURRENT_DATE)
@@ -143,7 +122,11 @@ class ProjectManagement(models.Model):
                             (SELECT COALESCE(NULLIF(pem.project_cost, NULL), 0)) AS project_cost,
 
                             (CASE 
-                            --- Get total cost when estimation exists ---
+                                --- Get project revenue VND exists ---
+                                WHEN prm.revenue_vnd IS NOT NULL AND prm.revenue_vnd <> 0
+                                    THEN prm.revenue_vnd
+                            
+                            --- Get total cost when project revenue does not exists ---
                                 WHEN pem.total_cost <> 0 
                                     THEN (CASE 
                                             WHEN pem.est_currency_name = 'USD'
@@ -151,26 +134,24 @@ class ProjectManagement(models.Model):
                                             WHEN pem.est_currency_name = 'JPY'
                                                 THEN pem.total_cost * (SELECT jpy_convert FROM api_exchange_rate)
                                             WHEN pem.est_currency_name = 'SGD'
-							                    THEN pem.total_cost * (SELECT sgd_convert FROM api_exchange_rate)
+                                                THEN pem.total_cost * (SELECT sgd_convert FROM api_exchange_rate)
                                             ELSE pem.total_cost
                                         END
                                     )
-                            --- Get project revenue VND when estimation does not exists ---
-                                WHEN prm.revenue_vnd IS NOT NULL AND prm.revenue_vnd <> 0
-                                    THEN prm.revenue_vnd
+                            
                                 ELSE 0
                             END
                             ) AS revenue,
                             (CASE
-                                WHEN pem.total_cost <> 0 
-                                    THEN 'estimation'
                                 WHEN prm.revenue_vnd IS NOT NULL AND prm.revenue_vnd <> 0
                                     THEN 'project_revenue'
+                                WHEN pem.total_cost <> 0 
+                                    THEN 'estimation'
                                 ELSE 'null'
                             END) AS revenue_from
 
                         FROM project_estimation_merged AS pem
-                        LEFT JOIN project_revenue_management_group AS prm
+                        LEFT JOIN project_revenue_management AS prm
                             ON pem.project_id = prm.project_id
                     )
                     SELECT
@@ -188,7 +169,7 @@ class ProjectManagement(models.Model):
                         pmc.revenue_from,
                         he.user_id AS user_login,
                         ru.id AS sub_user_login,
-		                cr.id AS currency_id
+                        cr.id AS currency_id
                     FROM project_management_compute AS pmc
                     LEFT JOIN hr_department AS hd
                         ON hd.id = pmc.department_id
@@ -199,7 +180,7 @@ class ProjectManagement(models.Model):
                     LEFT JOIN res_users AS ru
                         ON ru.login = rc.user_email
                     LEFT JOIN res_currency AS cr
-		                ON cr.name = 'VND'
+                        ON cr.name = 'VND'
 
             ) """ % (self._table)
         )

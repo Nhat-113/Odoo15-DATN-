@@ -1,7 +1,7 @@
 from odoo import api, fields, models, _
 
 class ProjectExpense(models.Model):
-    _inherit = 'project.expense.management'
+    _inherit = 'project.expense.value'
     
     def _get_default_project_management_id(self):
         return self.env['project.management'].search([('project_id', '=', self.project_id.id)]).id

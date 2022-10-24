@@ -6,7 +6,7 @@
         <field name="model">project.expense.management</field>
         <field name="inherit_id" ref="ds_expense_management.project_expense_management_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='project_id']" position="after">
+            <xpath expr="//page/field[@name='project_expense_value_ids']/tree//field[@name='currency_id']" position="after">
                 <field name="project_management_id" readonly="1" force_save="1" invisible="1"/>
             </xpath>
         </field>
