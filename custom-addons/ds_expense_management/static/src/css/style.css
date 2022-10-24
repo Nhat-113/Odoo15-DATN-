@@ -82,7 +82,7 @@ span[name="revenue_jpy"]::before {
     content: "Total Revenue (JPY)";
     padding-right: 25px;
 } */
-.custom_table_view tr:first-child td {
+/* .custom_table_view tr:first-child td {
     width: 0 !important;
     border-right: 1px solid #ddd;
     padding-bottom: 6px;
@@ -109,4 +109,8 @@ select[name='get_month'] {
     width: 100px !important;
     margin-left: 2px;
 }
+
+td[name='get_month'] select[name='get_month'] {
+    width: 100% !important;
+} */
 

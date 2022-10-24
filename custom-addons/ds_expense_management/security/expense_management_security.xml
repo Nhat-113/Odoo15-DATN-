@@ -9,6 +9,7 @@
         <record id="administrator_access_company_expense" model="res.groups">
             <field name="name">Administrator</field>
             <field name="category_id" ref="ds_expense_management.company_expense_access"/>
+            <field name="implied_ids" eval="[(4, ref('ds_project_estimation.estimation_access_sale_leader'))]"/>
         </record>
 
         <!-- View General Expense By Company -->
