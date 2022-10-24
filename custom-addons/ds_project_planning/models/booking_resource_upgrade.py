@@ -480,7 +480,8 @@ class BookingResourceDay(models.Model):
                                                 day.effort_rate_day = record.effort_rate_month
                         else:
                             for day in self:
-                                day.effort_rate_day = record.effort_rate_month
+                                if day.start_date_day >= record.start_date_month and day.end_date_day <= record.end_date_month:
+                                    day.effort_rate_day = record.effort_rate_month
                     else:
                         for week in self.booking_id.booking_upgrade_week:
                             if self.env.user.has_group('project.group_project_manager') == False:
