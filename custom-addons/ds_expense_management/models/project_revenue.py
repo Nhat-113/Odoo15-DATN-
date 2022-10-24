@@ -43,7 +43,7 @@ class ProjectRevenue(models.Model):
     revenue_sgd = fields.Monetary(string="Total Revenue", currency_field='currency_sgd', store=True, readonly=True)
     revenue_vnd = fields.Monetary(string="Total Revenue", currency_field='currency_vnd', store=True, readonly=True)
     
-    get_currency_name = fields.Char(string='Currency Name', readonly=True, store=True)
+    get_currency_name = fields.Char(string='Currency Name', readonly=True, related='currency_id.name',store=True)
     get_domain_projects = fields.Char(string='Domain Project', readonly=True, store=False, compute='_get_domain_project')
     check_estimation = fields.Boolean(string="Check estimation", default=False, store=False)
     
@@ -97,7 +97,7 @@ class ProjectRevenue(models.Model):
     @api.depends('revenue_project', 'rounding_usd_input', 'rounding_jpy_input', 'rounding_sgd_input', 'currency_id')
     def _convert_currency_revenue(self):
         for record in self:
-            record.get_currency_name = record.currency_id.name
+            # record.get_currency_name = record.currency_id.name
             if record.revenue_project != 0.0:
                 if record.currency_id.name == 'VND':
                     record.revenue_vnd = record.revenue_project

@@ -58,7 +58,7 @@
                                 </div>
                             </div> -->
 
-                            <field name="currency_id" attrs="{'readonly': [('check_estimation', '=', True)]}"/>
+                            <field name="currency_id" attrs="{'readonly': [('check_estimation', '=', True)]}" force_save="1"/>
                             <field name="total_cost" widget="monetary" attrs="{'invisible': [('check_estimation', '=', False)]}"/>
                             <field name="revenue_project" widget="monetary"/>
                             <field name="revenue_usd" widget="monetary" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
@@ -69,7 +69,7 @@
                             <field name="currency_jpy" invisible="1"/>
                             <field name="currency_sgd" invisible="1"/>
                             <field name="currency_vnd" invisible="1"/>
-                            <field name="get_currency_name" invisible="1"/>
+                            <field name="get_currency_name" invisible="1" force_save="1"/>
                             <field name="check_estimation" invisible="1"/>
                             <field name="estimation_id" invisible="1"/>
                             
