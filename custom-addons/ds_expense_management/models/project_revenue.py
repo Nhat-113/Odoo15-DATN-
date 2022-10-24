@@ -136,12 +136,11 @@ class ProjectRevenue(models.Model):
     def _compute_total_revenue(self):
         for record in self:
             total_revenue = sum(item.revenue_project for item in record.project_revenue_value_ids)
-            if record.estimation_id:
-                if total_revenue > record.total_cost:
+            if record.estimation_id and total_revenue > record.total_cost:
                     raise UserError(_('Project revenue must not be greater than total cost estimate "%(total_cost)s %(currency)s" ', 
                                     total_cost = babel.numbers.format_currency( record.total_cost, '' ), currency = record.currency_id.name))
-                else:
-                    record.revenue_project = total_revenue
+            else:
+                record.revenue_project = total_revenue
             
             
     @api.onchange('project_revenue_value_ids')
