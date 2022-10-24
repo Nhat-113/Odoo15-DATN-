@@ -1,3 +1,4 @@
+from email.policy import default
 from odoo import api, fields, models, _
 
 class HrRequestOvertimeStage(models.Model):
@@ -11,6 +12,10 @@ class HrRequestOvertimeStage(models.Model):
         help="Gives the sequence order when displaying a list of stages.")
     confirm_stage = fields.Boolean('Confirm Stage',
         help="...")
+    
+    @api.model
+    def create(self, vals_list):
+        return super().create(vals_list)
     
 
 class HrRequestOverTime(models.Model):
@@ -39,6 +44,7 @@ class HrRequestOverTime(models.Model):
                             copy=False, index=True,
                             )
     requester_id = fields.Many2one('res.users', string='Requester', required = True)
+    request_creator_id = fields.Many2one('res.users', string='Request Creator', required=True)
     user_id = fields.Many2one('res.users', string='Project Manager', tracking=True, readonly=True, compute='_compute_project_manager')
     member_ids = fields.Many2many('res.users', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
@@ -47,11 +53,12 @@ class HrRequestOverTime(models.Model):
     refuse_reason_id = fields.One2many('hr.request.overtime.refuse.reason', 'request_overtime_ids', tracking=True)
     refuse_reason = fields.Char('Refuse Reason')
     
-    submit_flag = fields.Boolean(default=True)
+    submit_flag = fields.Boolean(default=False)
     confirm_flag = fields.Boolean(default=True)
     approve_flag = fields.Boolean(default=True)
+    request_flag = fields.Boolean(default=True)
+
     stage_name = fields.Text(string="Name",tracking = True, compute = '_get_stage_name', default ="Draw")
-    request_creator_id = fields.Many2one('res.users', string='Request Creator', required=True)
     last_stage = fields.Integer(string="Last stage", default =0)
     
     def action_refuse_reason(self):
@@ -103,28 +110,41 @@ class HrRequestOverTime(models.Model):
             item.company_id = item.project_id.company_id or False
 
     def action_submit_request_overtime(self):
-        self.stage_id = 2
+        self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Submit')]).id
         self.submit_flag = False
 
-        # Send mail submit for requester
+        # Send mail submit (from pm to director)
         mail_template = "hr_timesheet_request_overtime.submit_request_overtime_template"
         subject_template = "Submit Request Overtime"
 
         self._send_message_auto_subscribe_notify_request_overtime({self: item.requester_id for item in self}, mail_template, subject_template)
 
-
     def action_confirm_request_overtime(self):
-        self.stage_id = 3
+        self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Confirm')]).id
         self.confirm_flag=False
 
-        # Send mail confirm from Requester for Request creator
+        # Send mail confirm (from director to pm)
         mail_template = "hr_timesheet_request_overtime.confirm_request_overtime_template"
-        subject_template = "Submit Request Overtime"
+        subject_template = "Confirm Request Overtime"
+        self._send_message_auto_subscribe_notify_request_overtime({self: item.request_creator_id for item in self}, mail_template, subject_template)
+
+    def action_request_overtime(self):
+        self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Request')]).id
+        self.approve_flag = False
+
+        # Send mail request timesheets ot (from pm to director)
+        mail_template = "hr_timesheet_request_overtime.request_timesheets_overtime_template"
+        subject_template = "Request Timesheets Overtime"
         self._send_message_auto_subscribe_notify_request_overtime({self: item.requester_id for item in self}, mail_template, subject_template)
 
     def action_approve_request_overtime(self):
-        self.stage_id=4
+        self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Approval')]).id
         self.approve_flag = False
+
+        # Send mail approvals request overtime (from director to pm)
+        mail_template = "hr_timesheet_request_overtime.approvals_request_overtime_template"
+        subject_template = "Approvals Request Timesheets Overtime"
+        self._send_message_auto_subscribe_notify_request_overtime({self: item.request_creator_id for item in self}, mail_template, subject_template)
 
     @api.depends('stage_id')
     def _get_stage_name(self):
@@ -133,18 +153,27 @@ class HrRequestOverTime(models.Model):
             if record.stage_id.name =="Draw":
                 self.confirm_flag = True
                 self.submit_flag = True
+                self.request_flag = True
                 self.approve_flag = True
             if record.stage_id.name == "Submit":
                 self.submit_flag =False
                 self.confirm_flag = True
+                self.request_flag = True
                 self.approve_flag = True
             if record.stage_id.name == "Confirm":
                 self.submit_flag =True
                 self.confirm_flag = False
+                self.request_flag = True
+                self.approve_flag = True
+            if record.stage_id.name == "Request":
+                self.submit_flag =True
+                self.confirm_flag = True
+                self.request_flag = False
                 self.approve_flag = True
             if record.stage_id.name == "Approval":
                 self.submit_flag =True
                 self.confirm_flag = True
+                self.request_flag = True
                 self.approve_flag = False
 
 
@@ -179,5 +208,8 @@ class HrRequestOverTime(models.Model):
     
     @api.model
     def create(self, vals_list):
+        if 'submit_flag' in vals_list:
+            vals_list['submit_flag']=True
+
         return super().create(vals_list)
     

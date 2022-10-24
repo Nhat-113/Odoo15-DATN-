@@ -5,6 +5,7 @@ import pandas as pd
 
 class HrBookingOvertime(models.Model):
     _name = "hr.booking.overtime"
+    _inherit=['mail.thread']
 
     request_overtime_id = fields.Many2one('hr.request.overtime', string='Booking Overtime', readonly=False)
     
@@ -77,3 +78,45 @@ class HrBookingOvertime(models.Model):
                     total_hour_spent_overtime += record.unit_amount
 
             item.actual_overtime = total_hour_spent_overtime
+
+    @api.model
+    def create(self,vals):
+        booking_overtime = super(HrBookingOvertime, self).create(vals)
+        subject_template = 'You have been assigned to %s' % booking_overtime.request_overtime_id.display_name
+        mail_template = "hr_timesheet_request_overtime.assign_request_overtime" 
+        self._send_message_auto_subscribe_notify_assign_request_overtime({item: item.employee_id for item in booking_overtime}, mail_template, subject_template)
+        return booking_overtime
+    
+    @api.model
+    def _send_message_auto_subscribe_notify_assign_request_overtime(self, users_per_task, mail_template, subject_template):
+
+        template_id = self.env['ir.model.data']._xmlid_to_res_id(mail_template, raise_if_not_found=False)
+        if not template_id:
+            return
+        view = self.env['ir.ui.view'].browse(template_id)
+        for task, users in users_per_task.items():
+            if not users:
+                continue
+
+            #TODO Fix get access link -> remote access_link when deploy product
+            access_link = task.request_overtime_id._notify_get_action_link('view').replace('https://taskmanagement.d-soft.tech','http://192.168.4.58:8089')
+
+            values = {
+                'assign_name': task.employee_id.name,
+                'object': task.request_overtime_id,
+                'model_description': "Plan Overtime",
+                'access_link': access_link,
+                # 'access_link': task._notify_get_action_link('view'),
+            }
+            for user in users:
+                values.update(assignee_name=user.sudo().name)
+                assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
+                assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)                 
+                task.request_overtime_id.message_notify(
+                    subject = subject_template,
+                    body = assignation_msg,
+                    partner_ids = self.env['res.users'].search([('employee_ids.id','=',user.id)]).partner_id.ids,
+                    record_name = task.request_overtime_id.display_name,
+                    email_layout_xmlid = 'mail.mail_notification_light',
+                    model_description = "Plan Overtime",
+                )
