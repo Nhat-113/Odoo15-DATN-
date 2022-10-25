@@ -78,32 +78,32 @@ class ProjectRevenue(models.Model):
             if self.project_id.date == False or self.project_id.date_start == False:
                 raise UserError(_('The duration of the project is false! Please update duration of project "%(project)s"', 
                                     project = self.project_id.name))
-        get_datas = self.env['project.revenue.value'].search([('project_revenue_management_id', 'in', [self.id or self.id.origin, False]),
-                                                              ('project_id', '=', self.project_id.id)])
-        if get_datas:
-            self.project_revenue_value_ids = get_datas
-            self.check_restore_data = True
-        for record in self.project_revenue_value_ids:
-            if int(record.get_year) < self.project_id.date_start.year or int(record.get_year) > self.project_id.date.year or\
-                int(record.get_month) < self.project_id.date_start.month or int(record.get_month) > self.project_id.date.month:
-                    record.write({'project_revenue_management_id': [(2, self.id or self.id.origin)]})
-            
-        if self.estimation_id and self.estimation_id.stage.type == 'completed':
-            get_currency = self.env['res.currency'].search([('name', '=', self.estimation_id.currency_id.name)])
-            currency_restore = self.search([('id', '=', self.id or self.id.origin)])
-            self.currency_estimation_id = get_currency
-            self.currency_id = currency_restore.currency_id
-            self.check_estimation = True
-            
-            if self.get_currency_name != self.estimation_id.currency_id.name:
-                if len(self.project_revenue_value_ids) == 0:
-                    self.currency_id = get_currency
-                # else:
-                #     self.currency_estimation_id
-        else:
-            self.check_estimation = False
-            self.currency_id = self.env.ref('base.main_company').currency_id
-            self.currency_estimation_id = self.env.ref('base.main_company').currency_id
+            get_datas = self.env['project.revenue.value'].search([('project_revenue_management_id', 'in', [self.id or self.id.origin, False]),
+                                                                ('project_id', '=', self.project_id.id)])
+            if get_datas:
+                self.project_revenue_value_ids = get_datas
+                self.check_restore_data = True
+            for record in self.project_revenue_value_ids:
+                if int(record.get_year) < self.project_id.date_start.year or int(record.get_year) > self.project_id.date.year or\
+                    int(record.get_month) < self.project_id.date_start.month or int(record.get_month) > self.project_id.date.month:
+                        record.write({'project_revenue_management_id': [(2, self.id or self.id.origin)]})
+                
+            if self.estimation_id and self.estimation_id.stage.type == 'completed':
+                get_currency = self.env['res.currency'].search([('name', '=', self.estimation_id.currency_id.name)])
+                currency_restore = self.search([('id', '=', self.id or self.id.origin)])
+                self.currency_estimation_id = get_currency
+                self.currency_id = currency_restore.currency_id
+                self.check_estimation = True
+                
+                if self.get_currency_name != self.estimation_id.currency_id.name:
+                    if len(self.project_revenue_value_ids) == 0:
+                        self.currency_id = get_currency
+                    # else:
+                    #     self.currency_estimation_id
+            else:
+                self.check_estimation = False
+                self.currency_id = self.env.ref('base.main_company').currency_id
+                self.currency_estimation_id = self.env.ref('base.main_company').currency_id
             
 
     # @api.depends('revenue_project', 'rounding_usd_input', 'rounding_jpy_input', 'rounding_sgd_input', 'currency_id')
@@ -274,7 +274,8 @@ class ProjectRevenueValue(models.Model):
     @api.onchange('project_id')
     def _validate_project(self):
         for record in self:
-            record._validate_content(action = False)
+            if record.project_id:
+                record._validate_content(action = False)
             
     @api.onchange('exchange_rate', 'revenue_project', 'project_revenue_management_id.currency_id')
     def _compute_total_revenue(self):

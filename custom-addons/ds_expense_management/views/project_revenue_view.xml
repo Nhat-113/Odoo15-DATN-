@@ -25,7 +25,9 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_open_estimation" type="object" class="oe_stat_button" icon="fa-money" groups="ds_project_estimation.estimation_access_sale" attrs="{'invisible': [('check_estimation', '=', False)]}">
+                        <button name="action_open_estimation" type="object" class="oe_stat_button" icon="fa-money" 
+                                groups="ds_project_estimation.estimation_access_sale" 
+                                attrs="{'invisible': ['|', ('check_estimation', '=', False), ('project_id', '=', False)]}">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_value">
                                     <field name="estimation_id" nolabel="1"/>
