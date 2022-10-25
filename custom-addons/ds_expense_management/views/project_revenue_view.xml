@@ -19,9 +19,13 @@
         <field name="model">project.revenue.management</field>
         <field name="arch" type="xml">
             <form duplicate="0">
+                <header>
+                    <button string="Compute Sheet" class="oe_highlight"
+                            name="action_update_value" type="object"/>
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_open_estimation" type="object" class="oe_stat_button" icon="fa-money" groups="ds_project_estimation.estimation_access_sale" attrs="{'invisible': [('estimation_id', '=', False)]}">
+                        <button name="action_open_estimation" type="object" class="oe_stat_button" icon="fa-money" groups="ds_project_estimation.estimation_access_sale" attrs="{'invisible': [('check_estimation', '=', False)]}">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_value">
                                     <field name="estimation_id" nolabel="1"/>
@@ -59,7 +63,7 @@
                             </div> -->
 
                             <field name="currency_id" attrs="{'readonly': [('check_estimation', '=', True)]}" force_save="1"/>
-                            <field name="total_cost" widget="monetary" attrs="{'invisible': [('check_estimation', '=', False)]}" force_save="1"/>
+                            <field name="total_cost" widget="monetary" options="{'currency_field': 'currency_estimation_id'}" attrs="{'invisible': [('check_estimation', '=', False)]}" force_save="1"/>
                             <field name="revenue_project" widget="monetary"/>
                             <field name="revenue_usd" widget="monetary" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
                             <field name="revenue_jpy" widget="monetary" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
@@ -69,6 +73,8 @@
                             <field name="currency_jpy" invisible="1"/>
                             <field name="currency_sgd" invisible="1"/>
                             <field name="currency_vnd" invisible="1"/>
+                            <field name="currency_estimation_id" invisible="1" force_save="1"/>
+                            <field name="check_restore_data" invisible="1" />
                             <field name="get_currency_name" invisible="1" force_save="1"/>
                             <field name="check_estimation" invisible="1" force_save="1"/>
                             <field name="estimation_id" invisible="1"/>

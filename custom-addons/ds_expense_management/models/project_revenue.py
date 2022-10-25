@@ -32,6 +32,7 @@ class ProjectRevenue(models.Model):
     rounding_jpy_input = fields.Float(string="JPY to VND", tracking=True)
     rounding_sgd_input = fields.Float(string="SGD to VND", tracking=True)
     
+    currency_estimation_id = fields.Many2one('res.currency', string='Currency estimation', store=True)
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, store=True, default=lambda self: self.env.ref('base.main_company').currency_id, tracking=True)
     currency_usd = fields.Many2one('res.currency', string="USD Currency", default=lambda self: self._get_default_currency('USD'), readonly=True)    
     currency_jpy = fields.Many2one('res.currency', string="YPY Currency", default=lambda self: self._get_default_currency('JPY'), readonly=True)   
@@ -46,15 +47,10 @@ class ProjectRevenue(models.Model):
     get_currency_name = fields.Char(string='Currency Name', readonly=True, related='currency_id.name',store=True)
     get_domain_projects = fields.Char(string='Domain Project', readonly=True, store=False, compute='_get_domain_project')
     check_estimation = fields.Boolean(string="Check estimation", default=False, store=True)
+    check_restore_data = fields.Boolean(string='Check restore', default=False, store=False)
     
     project_revenue_value_ids = fields.One2many('project.revenue.value', 'project_revenue_management_id', string='Project Revenue Value')
 
-    # @api.depends('project_id','project_id.date_start','project_id.date')
-    # def _compute_date_from_project(self):
-    #     for record in self:
-    #         project_revenues = self.env['project.revenue.management'].search_count([('id', '!=', record.id or record.id.origin), ('project_id', '=', record.project_id.id)])
-    #         if project_revenues != 0:
-    #             raise UserError(_('The project revenue "%(project)s" already exists!', project = record.project_id.name))
     
     
     @api.depends('company_id')
@@ -78,21 +74,37 @@ class ProjectRevenue(models.Model):
             
     @api.onchange('project_id')
     def _validate_project_revenue(self):
+        if self.project_id:
+            if self.project_id.date == False or self.project_id.date_start == False:
+                raise UserError(_('The duration of the project is false! Please update duration of project "%(project)s"', 
+                                    project = self.project_id.name))
         get_datas = self.env['project.revenue.value'].search([('project_revenue_management_id', 'in', [self.id or self.id.origin, False]),
                                                               ('project_id', '=', self.project_id.id)])
-        self.project_revenue_value_ids = get_datas
+        if get_datas:
+            self.project_revenue_value_ids = get_datas
+            self.check_restore_data = True
         for record in self.project_revenue_value_ids:
             if int(record.get_year) < self.project_id.date_start.year or int(record.get_year) > self.project_id.date.year or\
                 int(record.get_month) < self.project_id.date_start.month or int(record.get_month) > self.project_id.date.month:
-                    record.write({'project_expense_management_id': [(2, self.id or self.id.origin)]})
+                    record.write({'project_revenue_management_id': [(2, self.id or self.id.origin)]})
             
-        if self.estimation_id:
+        if self.estimation_id and self.estimation_id.stage.type == 'completed':
             get_currency = self.env['res.currency'].search([('name', '=', self.estimation_id.currency_id.name)])
-            self.currency_id = get_currency
+            currency_restore = self.search([('id', '=', self.id or self.id.origin)])
+            self.currency_estimation_id = get_currency
+            self.currency_id = currency_restore.currency_id
             self.check_estimation = True
+            
+            if self.get_currency_name != self.estimation_id.currency_id.name:
+                if len(self.project_revenue_value_ids) == 0:
+                    self.currency_id = get_currency
+                # else:
+                #     self.currency_estimation_id
         else:
             self.check_estimation = False
             self.currency_id = self.env.ref('base.main_company').currency_id
+            self.currency_estimation_id = self.env.ref('base.main_company').currency_id
+            
 
     @api.depends('revenue_project', 'rounding_usd_input', 'rounding_jpy_input', 'rounding_sgd_input', 'currency_id')
     def _convert_currency_revenue(self):
@@ -136,15 +148,25 @@ class ProjectRevenue(models.Model):
     def _compute_total_revenue(self):
         for record in self:
             total_revenue = sum(item.revenue_project for item in record.project_revenue_value_ids)
-            if record.estimation_id and total_revenue > record.total_cost:
-                    raise UserError(_('Project revenue must not be greater than total cost estimate "%(total_cost)s %(currency)s" ', 
-                                    total_cost = babel.numbers.format_currency( record.total_cost, '' ), currency = record.currency_id.name))
+            if not record.id and record.estimation_id and record.estimation_id.stage.type == 'completed' and self.check_restore_data == False:
+                if self.get_currency_name != self.currency_estimation_id.name:
+                    raise UserError(_("You cannot add/edit project revenue details because the currency of the project income does not match to the currency of the estimation!"))
+                else:
+                    if total_revenue > record.total_cost:
+                        raise UserError(_('Project revenue must not be greater than total cost estimate "%(total_cost)s %(currency)s" ', 
+                                        total_cost = babel.numbers.format_currency( record.total_cost, '' ), currency = record.currency_id.name))
+                    else:
+                        record.revenue_project = total_revenue
             else:
                 record.revenue_project = total_revenue
             
             
     @api.onchange('project_revenue_value_ids')
     def _validate_new_record(self):
+        if self.estimation_id and self.estimation_id.stage.type == 'completed':
+            if self.get_currency_name != self.estimation_id.currency_id.name and self.check_restore_data == False:
+                raise UserError(_("You cannot add/edit project revenue details because the currency of the project income does not match to the currency of the estimation!"))
+        
         months = [(record.get_month, record.get_year) for record in self.project_revenue_value_ids]
         month_unique = []
         for index, value in months:
@@ -158,7 +180,8 @@ class ProjectRevenue(models.Model):
                         break
                 raise UserError(_('The "%(month)s %(year)s" of project "%(project)s" already exists!',
                         month = month_eng, year = value, project = self.project_id.name))
-            
+        self.write({'check_restore_data': False})
+
     def unlink(self):
         for record in self:
             record.project_revenue_value_ids.unlink()
@@ -175,6 +198,32 @@ class ProjectRevenue(models.Model):
             'domain': [('id', '=', self.estimation_id.id)]
         }
         return action
+    
+    def action_update_value(self):
+        if self.estimation_id and self.estimation_id.stage.type == 'completed':
+            get_currency = self.env['res.currency'].search([('name', '=', self.estimation_id.currency_id.name)])
+            self.currency_estimation_id = get_currency
+            if len(self.project_revenue_value_ids) == 0:
+                self.currency_id = get_currency
+            self.check_estimation = True
+            # notification = {
+            #     'type': 'ir.actions.client',
+            #     'tag': 'display_notification',
+            #     'params': {
+            #         'title': _('Project revenue update successfully'),
+            #         'type': 'success',
+            #         'sticky':{'type': 'ir.actions.act_window_close'},
+            #     }
+            # }
+        else:
+            # notification['params'].update({
+            #     'title': _('Project revenue update failed'),
+            #     'type': 'warning',
+            #     'next': {'type': 'ir.actions.act_window_close'},
+            # })
+            
+            self.check_estimation = False
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
                     
 class ProjectRevenueValue(models.Model):
     _name = 'project.revenue.value'
