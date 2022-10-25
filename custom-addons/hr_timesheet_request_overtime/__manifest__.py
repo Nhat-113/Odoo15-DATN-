@@ -6,6 +6,7 @@
     "summary": """
         Module Request Over Time of D-soft Company""",
     "version": "15.0.1.0.0",
+    'category': 'Services/Timesheet Overtime',
     "license": "LGPL-3",
     "author": "Dientd",
     "website": "",

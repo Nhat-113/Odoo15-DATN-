@@ -1,4 +1,3 @@
-from email.policy import default
 from odoo import api, fields, models, _
 
 class HrRequestOvertimeStage(models.Model):
@@ -20,7 +19,7 @@ class HrRequestOvertimeStage(models.Model):
 
 class HrRequestOverTime(models.Model):
     _name = "hr.request.overtime"
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     _description = "Hr Request Overtime"
     _order = "id DESC"
@@ -43,7 +42,7 @@ class HrRequestOverTime(models.Model):
                             # domain=lambda self: self._compute_domain_stage(),
                             copy=False, index=True,
                             )
-    requester_id = fields.Many2one('res.users', string='Requester', required = True)
+    requester_id = fields.Many2one('res.users', string='Requester', required=True)
     request_creator_id = fields.Many2one('res.users', string='Request Creator', required=True)
     user_id = fields.Many2one('res.users', string='Project Manager', tracking=True, readonly=True, compute='_compute_project_manager')
     member_ids = fields.Many2many('res.users', string='Members',
@@ -51,15 +50,15 @@ class HrRequestOverTime(models.Model):
     booking_overtime = fields.One2many('hr.booking.overtime', 'request_overtime_id', string='Booking Overtime')
     active = fields.Boolean(string='Invisible Refuse Button', default=True)
     refuse_reason_id = fields.One2many('hr.request.overtime.refuse.reason', 'request_overtime_ids', tracking=True)
-    refuse_reason = fields.Char('Refuse Reason')
+    refuse_reason = fields.Char('Refuse Reason', tracking=True)
     
     submit_flag = fields.Boolean(default=False)
     confirm_flag = fields.Boolean(default=True)
     approve_flag = fields.Boolean(default=True)
     request_flag = fields.Boolean(default=True)
 
-    stage_name = fields.Text(string="Name",tracking = True, compute = '_get_stage_name', default ="Draw")
-    last_stage = fields.Integer(string="Last stage", default =0)
+    stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draw")
+    last_stage = fields.Integer(string="Last stage", default=0)
     
     def action_refuse_reason(self):
         return {
@@ -78,7 +77,6 @@ class HrRequestOverTime(models.Model):
         for request in self:
             request.write(
                 {'stage_id': default_stage})
-        #TODO reset flag in here
 
     def toggle_active(self):
         res = super(HrRequestOverTime, self).toggle_active()
@@ -175,7 +173,6 @@ class HrRequestOverTime(models.Model):
                 self.confirm_flag = True
                 self.request_flag = True
                 self.approve_flag = False
-
 
     @api.model
     def _send_message_auto_subscribe_notify_request_overtime(self, users_per_task, mail_template, subject_template):

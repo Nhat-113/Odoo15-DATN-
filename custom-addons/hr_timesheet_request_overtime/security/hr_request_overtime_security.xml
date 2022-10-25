@@ -1,5 +1,37 @@
 <odoo>
     <data>
-    
+
+        <record model="ir.module.category" id="module_category_services_overtime">
+            <field name="name">Timesheet Overtime</field>
+            <field name="parent_id" ref="base.module_category_services"/>
+        </record>
+
+        <!-- Option Role: User -->
+        <record id="request_overtime_access_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="module_category_services_overtime"/>
+        </record>
+
+        <!-- Option Role: PM -->
+        <record id="request_overtime_access_projmanager" model="res.groups">
+            <field name="name">Project Manager</field>
+            <field name="category_id" ref="module_category_services_overtime"/>
+            <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_user'))]"/>
+        </record>
+
+        <!-- Option Role: Director -->
+        <record id="request_overtime_access_director" model="res.groups">
+            <field name="name">Director</field>
+            <field name="category_id" ref="module_category_services_overtime"/>
+            <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_projmanager'))]"/>
+        </record>
+
+        <!-- Option Role: Administrator -->
+        <record id="request_overtime_access_admin" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="module_category_services_overtime"/>
+            <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_director'))]"/>
+        </record>
+
     </data>
 </odoo>

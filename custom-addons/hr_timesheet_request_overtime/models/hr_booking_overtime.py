@@ -10,7 +10,7 @@ class HrBookingOvertime(models.Model):
     request_overtime_id = fields.Many2one('hr.request.overtime', string='Booking Overtime', readonly=False)
     
     employee_id = fields.Many2one(
-        'hr.employee', string='Member Name', required=True, help="Member name")
+        'hr.employee', string='Member', required=True, help="Member name assgin overtime")
     start_date = fields.Date(string='Start Date', readonly=False, required=True, help="Date on which the member started working overtime on project",
                              default=fields.Date.today)
     end_date = fields.Date(string='End Date', readonly=False, required=True,
