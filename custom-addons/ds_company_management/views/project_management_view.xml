@@ -29,7 +29,7 @@
                 <field name="date_start" string="Start Date" widget="daterange" options="{'related_end_date': 'date'}"/>
                 <field name="date_end" string="End Date" widget="daterange" options="{'related_start_date': 'date_start'}"/>
                 <field name="status" string="Status" widget="status_with_color" options="{'color_field': 'last_update_color'}"/>
-                <field name="count_members" sum="Total Members" widget="monetary"/>
+                <field name="count_members" sum="Total Members"/>
                 <field name="total_salary" sum="Total Salary Cost" widget="monetary"/>
                 <field name="project_cost" sum="Total Project Cost" widget="monetary"/>
                 <field name="revenue" sum="Total Revenue" widget="monetary"/>

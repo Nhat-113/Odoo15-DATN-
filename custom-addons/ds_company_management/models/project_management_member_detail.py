@@ -64,7 +64,7 @@ class ProjectManagementMemberDetail(models.Model):
                     (CASE
                         WHEN pmt.name IN('intern', 'Intern')
                             THEN 0
-                        ELSE hpl.total * brm.effort_rate_month
+                        ELSE hpl.total * brm.effort_rate_month / 100
                     END) AS salary,
                     
                     (CASE
