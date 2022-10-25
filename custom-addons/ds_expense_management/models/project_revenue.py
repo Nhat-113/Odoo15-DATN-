@@ -246,9 +246,6 @@ class ProjectRevenueValue(models.Model):
         return self.env['expense.management']._get_month_defaults()
     
     
-    def _get_default_currency(self, type_currency):
-        return self.env['res.currency'].search([('name', '=', type_currency)])
-    
     project_revenue_management_id = fields.Many2one('project.revenue.management', string="Project Revenue Management")
 
     get_month = fields.Selection(selection=LIST_MONTHS,
@@ -263,7 +260,7 @@ class ProjectRevenueValue(models.Model):
     
     exchange_rate = fields.Float(string="Exchange Rate")
     revenue_vnd = fields.Monetary(string="Total Revenue (VND)", currency_field='currency_vnd')
-    currency_vnd = fields.Many2one('res.currency', string="VND Currency", default=lambda self: self._get_default_currency('VND'), readonly=True)   
+    currency_vnd = fields.Many2one('res.currency', string="VND Currency", related='project_revenue_management_id.currency_vnd', readonly=True)   
     
     project_id = fields.Many2one('project.project', string="Project", related="project_revenue_management_id.project_id", store=True)
     currency_id = fields.Many2one('res.currency', string="Currency", related='project_revenue_management_id.currency_id', store=True)

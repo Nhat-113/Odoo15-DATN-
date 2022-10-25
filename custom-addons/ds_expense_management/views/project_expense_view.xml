@@ -32,21 +32,21 @@
                                 <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}' readonly="1"/>
                             </div>
 
-                            <field name="rounding_usd_input" attrs="{'required': [('get_currency_name', '=', 'USD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'SGD'])]}"/>
+                            <!-- <field name="rounding_usd_input" attrs="{'required': [('get_currency_name', '=', 'USD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'SGD'])]}"/>
                             <field name="rounding_jpy_input" attrs="{'required': [('get_currency_name', '=', 'JPY')], 'invisible': [('get_currency_name', 'in', ['USD', 'SGD'])]}"/>
-                            <field name="rounding_sgd_input" attrs="{'required': [('get_currency_name', '=', 'SGD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'USD'])]}"/>
+                            <field name="rounding_sgd_input" attrs="{'required': [('get_currency_name', '=', 'SGD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'USD'])]}"/> -->
                             <field name="get_domain_projects" invisible="1"/>
                         </group>
                         <group name="group_right">
                             <field name="currency_id"/>
                             <field name="total_expenses" widget='monetary'/>
-                            <field name="expense_usd" widget='monetary' attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
+                            <!-- <field name="expense_usd" widget='monetary' attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
                             <field name="expense_jpy" widget='monetary' attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
-                            <field name="expense_sgd" widget='monetary' attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
+                            <field name="expense_sgd" widget='monetary' attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/> -->
                             <field name="expense_vnd" widget='monetary' attrs="{'invisible': [('get_currency_name', '=', 'VND')]}"/>
-                            <field name="currency_usd" invisible="1"/>
+                            <!-- <field name="currency_usd" invisible="1"/>
                             <field name="currency_jpy" invisible="1"/>
-                            <field name="currency_sgd" invisible="1"/>
+                            <field name="currency_sgd" invisible="1"/> -->
                             <field name="currency_vnd" invisible="1"/>
                             <field name="get_currency_name" invisible="1"/>
                         </group>
@@ -61,9 +61,24 @@
                                     <field name="name"/>
                                     <field name="expense_date" width="120px"/>
                                     <field name="total_expenses" widget='monetary' sum="Total Expenses" width="135px"/>
+                                    <field name="exchange_rate" 
+                                                width="130px"
+                                                force_save="1"
+                                                attrs="{'column_invisible': [('parent.get_currency_name', '=', 'VND')], 
+                                                                'required': [('parent.get_currency_name', '!=', 'VND')]}"/>
+
+                                    <field name="expense_vnd" 
+                                            width="160px"
+                                            widget="monetary"
+                                            sum="Total Expense"
+                                            force_save="1"
+                                            attrs="{'column_invisible': [('parent.get_currency_name', '=', 'VND')], 
+                                                            'readonly': [('parent.get_currency_name', '!=', 'VND')]}"/>
+
                                     <field name="description"/>
                                     <field name="project_id" invisible="1"/>
                                     <field name="currency_id" invisible="1"/>
+                                    <field name="currency_vnd" invisible="1"/>
                                 </tree>
                             </field>
                         </page>

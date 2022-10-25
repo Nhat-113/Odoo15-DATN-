@@ -114,11 +114,13 @@
                                         <field name="get_year" width="198px"/>
                                         <field name="revenue_project" sum="Total Revenue" widget="monetary" width="250px"/>
                                         <field name="exchange_rate" 
+                                                width="130px"
                                                 force_save="1"
                                                 attrs="{'column_invisible': [('parent.get_currency_name', '=', 'VND')], 
                                                                 'required': [('parent.get_currency_name', '!=', 'VND')]}"/>
 
                                         <field name="revenue_vnd" 
+                                                width="160px"
                                                 widget="monetary"
                                                 sum="Total Revenue"
                                                 force_save="1"
