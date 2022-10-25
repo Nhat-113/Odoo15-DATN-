@@ -102,9 +102,16 @@ class ProjectRevenue(models.Model):
                     #     self.currency_estimation_id
             else:
                 self.check_estimation = False
-                self.currency_id = self.env.ref('base.main_company').currency_id
-                self.currency_estimation_id = self.env.ref('base.main_company').currency_id
-            
+                restore_currency = self.search([('id', '=', self.id or self.id.origin)])
+                if restore_currency:
+                    self.currency_id = restore_currency.currency_id
+                    self.currency_estimation_id = restore_currency.currency_id
+                else:
+                    self.currency_id = self.env.ref('base.main_company').currency_id
+                    self.currency_estimation_id = self.env.ref('base.main_company').currency_id
+        else:
+            self.currency_id = self.env.ref('base.main_company').currency_id
+            self.currency_estimation_id = self.env.ref('base.main_company').currency_id
 
     # @api.depends('revenue_project', 'rounding_usd_input', 'rounding_jpy_input', 'rounding_sgd_input', 'currency_id')
     # def _convert_currency_revenue(self):
