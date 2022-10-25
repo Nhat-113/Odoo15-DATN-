@@ -54,8 +54,13 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 self.chartProjectBase();
                 self.chartProjectInternal();
                 self.chartProjectAvg();
-                self.chartCompanyAvg();
+                self.departmentBarChart();
+                self.contractBarChart();
+                self.payrollDashboard();
             }, 1000);
+            setTimeout(() => {
+                self.chartCompanyAvg();
+            }, 4000);
         },
 
         willStart: function() {
@@ -208,18 +213,18 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         type: "line",
                         data: {
                             labels: [
-                                "January",
-                                "February",
-                                "March",
-                                "April",
+                                "Jan",
+                                "Feb",
+                                "Mar",
+                                "Apr",
                                 "May",
-                                "June",
-                                "July",
-                                "August",
-                                "September",
-                                "October",
-                                "November",
-                                "December",
+                                "Jun",
+                                "Jul",
+                                "Aug",
+                                "Sep",
+                                "Oct",
+                                "Nov",
+                                "Dec",
                             ],
                             datasets: [{
                                 label: "Line Chart project ODC",
@@ -373,18 +378,18 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         type: "line",
                         data: {
                             labels: [
-                                "January",
-                                "February",
-                                "March",
-                                "April",
+                                "Jan",
+                                "Feb",
+                                "Mar",
+                                "Apr",
                                 "May",
-                                "June",
-                                "July",
-                                "August",
-                                "September",
-                                "October",
-                                "November",
-                                "December",
+                                "Jun",
+                                "Jul",
+                                "Aug",
+                                "Sep",
+                                "Oct",
+                                "Nov",
+                                "Dec",
                             ],
                             datasets: [{
                                 label: "Line Chart Project Base",
@@ -544,18 +549,18 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         type: "line",
                         data: {
                             labels: [
-                                "January",
-                                "February",
-                                "March",
-                                "April",
+                                "Jan",
+                                "Feb",
+                                "Mar",
+                                "Apr",
                                 "May",
-                                "June",
-                                "July",
-                                "August",
-                                "September",
-                                "October",
-                                "November",
-                                "December",
+                                "Jun",
+                                "Jul",
+                                "Aug",
+                                "Sep",
+                                "Oct",
+                                "Nov",
+                                "Dec",
                             ],
                             datasets: [{
                                 label: "Project Internal",
@@ -887,15 +892,15 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                     label: "Revenue",
                                     data: [],
                                     borderWidth: 1,
-                                    backgroundColor: "blue",
-                                    borderColor: "blue",
+                                    backgroundColor: "rgba(255, 99, 132, 0.2)",
+                                    borderColor: "rgba(255, 99, 132, 1)",
                                 },
                                 {
                                     yAxisID: "B", // <-- the Y axis to use for this data set
                                     label: "Members",
                                     data: [],
-                                    backgroundColor: "green",
-                                    borderColor: "green",
+                                    backgroundColor: "rgba(54, 162, 235, 0.2)",
+                                    borderColor: "rgba(54, 162, 235, 1)",
                                 },
                             ],
                         },
@@ -906,13 +911,13 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                 A: {
                                     type: "linear",
                                     position: "left",
-                                    ticks: { beginAtZero: true, color: "blue" },
+                                    ticks: { beginAtZero: true, color: "rgba(255, 99, 132, 1)" },
                                     grid: { display: false },
                                 },
                                 B: {
                                     type: "linear",
                                     position: "right",
-                                    ticks: { beginAtZero: true, color: "green" },
+                                    ticks: { beginAtZero: true, color: "rgba(54, 162, 235, 1)" },
                                     grid: { display: false },
                                 },
                                 x: { ticks: { beginAtZero: true } },
@@ -934,6 +939,153 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     chartCompanyRevenue.data.datasets[1].data = dataTemp.datasets[1].data;
                     chartCompanyRevenue.update();
                 });
+        },
+
+        departmentBarChart: function() {
+            rpc
+                .query({
+                    model: "dashboard.block",
+                    method: "get_dept_employee",
+                })
+                .then(function(data) {
+                    const ctx = document.getElementById('department').getContext('2d');
+                    const department = new Chart(ctx, {
+                        type: "bar",
+                        data: {
+                            labels: [],
+                            datasets: [{
+                                label: "Department",
+                                data: [],
+                                backgroundColor: [
+                                    "rgba(255, 99, 132, 0.2)",
+                                    "rgba(54, 162, 235, 0.2)",
+                                    "rgba(255, 206, 86, 0.2)",
+                                ],
+                                borderColor: [
+                                    "rgba(255, 99, 132, 1)",
+                                    "rgba(54, 162, 235, 1)",
+                                    "rgba(255, 206, 86, 1)",
+                                ],
+                                borderWidth: 1,
+                            }, ],
+                        },
+                        options: {
+                            scales: {
+                                yAxes: {
+                                    ticks: {
+                                        beginAtZero: true,
+                                    },
+                                },
+                            },
+                        },
+                    });
+                    const dataTemp = department.data;
+                    for (let i = 0; i < data.length; i++) {
+                        dataTemp.labels.push(data[i].label);
+                        dataTemp.datasets[0].data.push(data[i].value)
+                    }
+                    department.data.labels = dataTemp.labels;
+                    department.data.datasets[0].data = dataTemp.datasets[0].data;
+                    department.update();
+
+                });
+
+        },
+        contractBarChart: function() {
+            rpc
+                .query({
+                    model: "dashboard.block",
+                    method: "get_contract_type",
+                })
+                .then(function(data) {
+                    const ctx = document.getElementById('contract').getContext('2d');
+                    const contract = new Chart(ctx, {
+                        type: "bar",
+                        data: {
+                            labels: [],
+                            datasets: [{
+                                label: "Contract",
+                                data: [],
+                                backgroundColor: [
+                                    "rgba(255, 99, 132, 0.2)",
+                                    "rgba(54, 162, 235, 0.2)",
+                                    "rgba(255, 206, 86, 0.2)",
+                                ],
+                                borderColor: [
+                                    "rgba(255, 99, 132, 1)",
+                                    "rgba(54, 162, 235, 1)",
+                                    "rgba(255, 206, 86, 1)",
+                                ],
+                                borderWidth: 1,
+                            }, ],
+                        },
+                        options: {
+                            scales: {
+                                yAxes: {
+                                    ticks: {
+                                        beginAtZero: true,
+                                    },
+                                },
+                            },
+                        },
+                    });
+                    const dataTemp = contract.data;
+                    for (let i = 0; i < data.length; i++) {
+                        dataTemp.labels.push(data[i].label);
+                        dataTemp.datasets[0].data.push(data[i].value)
+                    }
+                    contract.data.labels = dataTemp.labels;
+                    contract.data.datasets[0].data = dataTemp.datasets[0].data;
+                    contract.update();
+
+                });
+
+        },
+        payrollDashboard: function() {
+            rpc
+                .query({
+                    model: "dashboard.block",
+                    method: "get_payroll_follow_month",
+                })
+                .then(function(data) {
+                    const ctx = document.getElementById('payroll').getContext('2d');
+                    const payroll = new Chart(ctx, {
+                        type: "line",
+                        data: {
+                            labels: [],
+                            datasets: [{
+                                label: "Payroll ana",
+                                data: [],
+                                backgroundColor: [
+                                    "rgba(255, 99, 132, 0.2)",
+                                ],
+                                borderColor: [
+                                    "rgba(255, 99, 132, 1)",
+                                ],
+                                borderWidth: 1,
+                            }, ],
+                        },
+                        options: {
+                            scales: {
+                                yAxes: {
+                                    ticks: {
+                                        beginAtZero: true,
+                                    },
+                                },
+                            },
+                        },
+                    });
+                    const dataTemp = payroll.data;
+                    for (let i = 0; i < data.length; i++) {
+                        dataTemp.labels.push(data[i].label);
+                        dataTemp.datasets[0].data.push(data[i].value)
+                    }
+                    payroll.data.labels = dataTemp.labels;
+                    payroll.data.datasets[0].data = dataTemp.datasets[0].data;
+                    payroll.update();
+
+                });
+
         },
     });
 

@@ -72,11 +72,76 @@ class DashboardBlock(models.Model):
     def get_revenue_company(self):
         selected_companies = self.get_current_company_value(); 
         cr = self._cr
-        cr.execute("""select to_char(month_start, 'Month YYYY') as l_month ,sum(total_revenue)/10000000 as revenue, sum(total_members) as members from project_management_ceo
-                WHERE   to_char(month_start, 'YYYY') = '2022' and  company_id in  """ + str(tuple(selected_companies)) + """
-                group by month_start""")
+        cr.execute("""select to_char(month_start, 'Month YYYY') as l_month ,sum(total_revenue)/10000000 as revenue,
+                    sum(total_members) as members from project_management_ceo
+                    WHERE   to_char(month_start, 'YYYY') = '2022' and  company_id in  """ + str(tuple(selected_companies)) + """
+                    group by month_start""")
         data = cr.fetchall()
         
+        return data
+
+
+      #get data department type
+    @api.model
+    def get_dept_employee(self):
+        cr = self._cr
+        cr.execute("""select department_id, hr_department.name,count(*)
+            from hr_employee join hr_department on hr_department.id=hr_employee.department_id
+            group by hr_employee.department_id,hr_department.name""")
+        dat = cr.fetchall()
+        data = []
+        for i in range(0, len(dat)):
+            data.append({'label': dat[i][1], 'value': dat[i][2]})
+        return data
+        
+    # get data for contract type
+    @api.model
+    def get_contract_type(self):
+        cr = self._cr
+        cr.execute("""select hr_contract.contract_document_type ,count(*) from hr_contract
+            group by hr_contract.contract_document_type""")
+        dat = cr.fetchall()
+        data = []
+        for i in range(0, len(dat)):
+            data.append({'label': dat[i][0], 'value': dat[i][1]})
+        return data
+    #get data payroll follow months 
+    @api.model
+    def get_payroll_follow_month(self):
+        company_id = self.get_current_company_value()
+        cr = self._cr
+        cr.execute("""SELECT hr_payslip.date_from, hr_payslip.date_to ,
+                hr_payslip.name, hr_payslip_line.slip_id, hr_payslip.id, hr_payslip_line.amount
+                FROM hr_payslip_line
+                INNER JOIN hr_payslip
+                ON hr_payslip.id=hr_payslip_line.slip_id
+           		Where hr_payslip.company_id IN  """ + str(tuple(company_id)) + """and hr_payslip_line.code = 'NET' or  hr_payslip_line.code = 'NET1' or  hr_payslip_line.code = 'HOUR'
+            order by  hr_payslip.date_from 
+            """)
+        dat = cr.fetchall()
+        data_payroll = []
+        # sum = 0 
+        for i in range(0, len(dat)):
+            data_payroll.append({'label': dat[i][0], 'value': dat[i][5] })
+
+        data = []
+        years = []
+        months = []
+        for item in data_payroll:
+            if item['label'].year not in years:
+                years.append(item['label'].year)
+            if item['label'].month not in months:
+                months.append(item['label'].month)
+
+        for year in years:
+            for month in months:
+                sum = 0
+                for item in data_payroll:
+                    if (item['label'].month==month)and(item['label'].year==year):
+                        sum += item['value']
+                if sum:
+                    data.append({'label':[month, year], 'value': sum})
+            
         return data
     
     # @api.model
