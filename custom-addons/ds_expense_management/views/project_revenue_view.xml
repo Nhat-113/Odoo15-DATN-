@@ -48,9 +48,9 @@
                                 <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}'/>
                             </div>
 
-                            <field name="rounding_usd_input" attrs="{'required': [('get_currency_name', '=', 'USD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'SGD'])]}"/>
+                            <!-- <field name="rounding_usd_input" attrs="{'required': [('get_currency_name', '=', 'USD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'SGD'])]}"/>
                             <field name="rounding_jpy_input" attrs="{'required': [('get_currency_name', '=', 'JPY')], 'invisible': [('get_currency_name', 'in', ['USD', 'SGD'])]}"/>
-                            <field name="rounding_sgd_input" attrs="{'required': [('get_currency_name', '=', 'SGD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'USD'])]}"/>
+                            <field name="rounding_sgd_input" attrs="{'required': [('get_currency_name', '=', 'SGD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'USD'])]}"/> -->
                             <field name="get_domain_projects" invisible="1"/>
                         </group>
                         <group name="group_right" class="custom_table_view">
@@ -65,13 +65,13 @@
                             <field name="currency_id" attrs="{'readonly': [('check_estimation', '=', True)]}" force_save="1"/>
                             <field name="total_cost" widget="monetary" options="{'currency_field': 'currency_estimation_id'}" attrs="{'invisible': [('check_estimation', '=', False)]}" force_save="1"/>
                             <field name="revenue_project" widget="monetary"/>
-                            <field name="revenue_usd" widget="monetary" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
+                            <!-- <field name="revenue_usd" widget="monetary" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
                             <field name="revenue_jpy" widget="monetary" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
-                            <field name="revenue_sgd" widget="monetary" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
+                            <field name="revenue_sgd" widget="monetary" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/> -->
                             <field name="revenue_vnd" widget="monetary" attrs="{'invisible': [('get_currency_name', '=', 'VND')]}"/>
-                            <field name="currency_usd" invisible="1"/>
+                            <!-- <field name="currency_usd" invisible="1"/>
                             <field name="currency_jpy" invisible="1"/>
-                            <field name="currency_sgd" invisible="1"/>
+                            <field name="currency_sgd" invisible="1"/> -->
                             <field name="currency_vnd" invisible="1"/>
                             <field name="currency_estimation_id" invisible="1" force_save="1"/>
                             <field name="check_restore_data" invisible="1" />
@@ -113,10 +113,23 @@
                                         <field name="get_month" width="198px"/>
                                         <field name="get_year" width="198px"/>
                                         <field name="revenue_project" sum="Total Revenue" widget="monetary" width="250px"/>
+                                        <field name="exchange_rate" 
+                                                force_save="1"
+                                                attrs="{'column_invisible': [('parent.get_currency_name', '=', 'VND')], 
+                                                                'required': [('parent.get_currency_name', '!=', 'VND')]}"/>
+
+                                        <field name="revenue_vnd" 
+                                                widget="monetary"
+                                                sum="Total Revenue"
+                                                force_save="1"
+                                                attrs="{'column_invisible': [('parent.get_currency_name', '=', 'VND')], 
+                                                                'readonly': [('parent.get_currency_name', '!=', 'VND')]}"/>
+
                                         <field name="description" />
                                         <field name="project_id" force_save="1" invisible="1"/>
                                         <field name="sort_date" force_save="1" invisible="1"/>
                                         <field name="currency_id" invisible="1"/>
+                                        <field name="currency_vnd" invisible="1"/>
                                     </tree>
                                 </field>
                             </page>

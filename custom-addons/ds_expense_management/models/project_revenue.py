@@ -28,20 +28,20 @@ class ProjectRevenue(models.Model):
     total_cost = fields.Float(string="Total Cost", related='project_id.estimation_id.total_cost', store=True)
     description = fields.Text(string="Description", tracking=True)
     
-    rounding_usd_input = fields.Float(string="USD to VND", tracking=True)
-    rounding_jpy_input = fields.Float(string="JPY to VND", tracking=True)
-    rounding_sgd_input = fields.Float(string="SGD to VND", tracking=True)
+    # rounding_usd_input = fields.Float(string="USD to VND", tracking=True)
+    # rounding_jpy_input = fields.Float(string="JPY to VND", tracking=True)
+    # rounding_sgd_input = fields.Float(string="SGD to VND", tracking=True)
     
     currency_estimation_id = fields.Many2one('res.currency', string='Currency estimation', store=True)
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, store=True, default=lambda self: self.env.ref('base.main_company').currency_id, tracking=True)
-    currency_usd = fields.Many2one('res.currency', string="USD Currency", default=lambda self: self._get_default_currency('USD'), readonly=True)    
-    currency_jpy = fields.Many2one('res.currency', string="YPY Currency", default=lambda self: self._get_default_currency('JPY'), readonly=True)   
-    currency_sgd = fields.Many2one('res.currency', string="SGD Currency", default=lambda self: self._get_default_currency('SGD'), readonly=True)
+    # currency_usd = fields.Many2one('res.currency', string="USD Currency", default=lambda self: self._get_default_currency('USD'), readonly=True)    
+    # currency_jpy = fields.Many2one('res.currency', string="YPY Currency", default=lambda self: self._get_default_currency('JPY'), readonly=True)   
+    # currency_sgd = fields.Many2one('res.currency', string="SGD Currency", default=lambda self: self._get_default_currency('SGD'), readonly=True)
     currency_vnd = fields.Many2one('res.currency', string="VND Currency", default=lambda self: self._get_default_currency('VND'), readonly=True)   
     
-    revenue_usd = fields.Monetary(string="Total Revenue", currency_field='currency_usd', store=True, readonly=True, compute="_convert_currency_revenue")
-    revenue_jpy = fields.Monetary(string="Total Revenue", currency_field='currency_jpy', store=True, readonly=True)
-    revenue_sgd = fields.Monetary(string="Total Revenue", currency_field='currency_sgd', store=True, readonly=True)
+    # revenue_usd = fields.Monetary(string="Total Revenue", currency_field='currency_usd', store=True, readonly=True, compute="_convert_currency_revenue")
+    # revenue_jpy = fields.Monetary(string="Total Revenue", currency_field='currency_jpy', store=True, readonly=True)
+    # revenue_sgd = fields.Monetary(string="Total Revenue", currency_field='currency_sgd', store=True, readonly=True)
     revenue_vnd = fields.Monetary(string="Total Revenue", currency_field='currency_vnd', store=True, readonly=True)
     
     get_currency_name = fields.Char(string='Currency Name', readonly=True, related='currency_id.name',store=True)
@@ -106,59 +106,66 @@ class ProjectRevenue(models.Model):
             self.currency_estimation_id = self.env.ref('base.main_company').currency_id
             
 
-    @api.depends('revenue_project', 'rounding_usd_input', 'rounding_jpy_input', 'rounding_sgd_input', 'currency_id')
-    def _convert_currency_revenue(self):
-        for record in self:
-            # record.get_currency_name = record.currency_id.name
-            if record.revenue_project != 0.0:
-                if record.currency_id.name == 'VND':
-                    record.revenue_vnd = record.revenue_project
-                    if record.rounding_usd_input != 0.0:
-                        record.revenue_usd = record.revenue_project / record.rounding_usd_input
-                    else:
-                        record.revenue_usd = 0
-                    if record.rounding_jpy_input != 0.0:
-                        record.revenue_jpy = record.revenue_project / record.rounding_jpy_input
-                    else:
-                        record.revenue_jpy = 0
-                    if record.rounding_sgd_input != 0.0:
-                        record.revenue_sgd = record.revenue_project / record.rounding_sgd_input
-                    else:
-                        record.revenue_sgd = 0 
+    # @api.depends('revenue_project', 'rounding_usd_input', 'rounding_jpy_input', 'rounding_sgd_input', 'currency_id')
+    # def _convert_currency_revenue(self):
+    #     for record in self:
+    #         # record.get_currency_name = record.currency_id.name
+    #         if record.revenue_project != 0.0:
+    #             if record.currency_id.name == 'VND':
+    #                 record.revenue_vnd = record.revenue_project
+    #                 if record.rounding_usd_input != 0.0:
+    #                     record.revenue_usd = record.revenue_project / record.rounding_usd_input
+    #                 else:
+    #                     record.revenue_usd = 0
+    #                 if record.rounding_jpy_input != 0.0:
+    #                     record.revenue_jpy = record.revenue_project / record.rounding_jpy_input
+    #                 else:
+    #                     record.revenue_jpy = 0
+    #                 if record.rounding_sgd_input != 0.0:
+    #                     record.revenue_sgd = record.revenue_project / record.rounding_sgd_input
+    #                 else:
+    #                     record.revenue_sgd = 0 
                         
-                elif record.currency_id.name == 'JPY':   
-                    record.revenue_jpy = record.revenue_project
-                    record.revenue_vnd = record.revenue_project * record.rounding_jpy_input
+    #             elif record.currency_id.name == 'JPY':   
+    #                 record.revenue_jpy = record.revenue_project
+    #                 record.revenue_vnd = record.revenue_project * record.rounding_jpy_input
                 
-                elif record.currency_id.name == 'SGD':
-                    record.revenue_sgd = record.revenue_project
-                    record.revenue_vnd = record.revenue_project * record.rounding_sgd_input
+    #             elif record.currency_id.name == 'SGD':
+    #                 record.revenue_sgd = record.revenue_project
+    #                 record.revenue_vnd = record.revenue_project * record.rounding_sgd_input
                     
-                else:
-                    record.revenue_usd = record.revenue_project
-                    record.revenue_vnd = record.revenue_project * record.rounding_usd_input
-            else:
-                record.revenue_usd = 0
-                record.revenue_jpy = 0
-                record.revenue_sgd = 0
-                record.revenue_vnd = 0
+    #             else:
+    #                 record.revenue_usd = record.revenue_project
+    #                 record.revenue_vnd = record.revenue_project * record.rounding_usd_input
+    #         else:
+    #             record.revenue_usd = 0
+    #             record.revenue_jpy = 0
+    #             record.revenue_sgd = 0
+    #             record.revenue_vnd = 0
 
         
     @api.depends('project_revenue_value_ids.revenue_project')
     def _compute_total_revenue(self):
         for record in self:
-            total_revenue = sum(item.revenue_project for item in record.project_revenue_value_ids)
+            total_revenue_curr = 0
+            total_revenue_vnd = 0
+            for item in record.project_revenue_value_ids:
+                total_revenue_curr += item.revenue_project
+                total_revenue_vnd += item.revenue_vnd
+            
             if not record.id and record.estimation_id and record.estimation_id.stage.type == 'completed' and self.check_restore_data == False:
                 if self.get_currency_name != self.currency_estimation_id.name:
                     raise UserError(_("You cannot add/edit project revenue details because the currency of the project income does not match to the currency of the estimation!"))
                 else:
-                    if total_revenue > record.total_cost:
+                    if total_revenue_curr > record.total_cost:
                         raise UserError(_('Project revenue must not be greater than total cost estimate "%(total_cost)s %(currency)s" ', 
                                         total_cost = babel.numbers.format_currency( record.total_cost, '' ), currency = record.currency_id.name))
                     else:
-                        record.revenue_project = total_revenue
+                        record.revenue_project = total_revenue_curr
+                        record.revenue_vnd = total_revenue_vnd
             else:
-                record.revenue_project = total_revenue
+                record.revenue_project = total_revenue_curr
+                record.revenue_vnd = total_revenue_vnd
             
             
     @api.onchange('project_revenue_value_ids')
@@ -186,7 +193,6 @@ class ProjectRevenue(models.Model):
         for record in self:
             record.project_revenue_value_ids.unlink()
         return super(ProjectRevenue, self).unlink()
-    
     
     def action_open_estimation(self):
         action = {
@@ -239,6 +245,10 @@ class ProjectRevenueValue(models.Model):
     def _get_month_defaults(self):
         return self.env['expense.management']._get_month_defaults()
     
+    
+    def _get_default_currency(self, type_currency):
+        return self.env['res.currency'].search([('name', '=', type_currency)])
+    
     project_revenue_management_id = fields.Many2one('project.revenue.management', string="Project Revenue Management")
 
     get_month = fields.Selection(selection=LIST_MONTHS,
@@ -250,6 +260,10 @@ class ProjectRevenueValue(models.Model):
     sort_date = fields.Date(string="Soft Date", store=True)
     revenue_project = fields.Monetary(string="Total Revenue", currency_field='currency_id', required=True)
     description = fields.Text(string="Description")
+    
+    exchange_rate = fields.Float(string="Exchange Rate")
+    revenue_vnd = fields.Monetary(string="Total Revenue (VND)", currency_field='currency_vnd')
+    currency_vnd = fields.Many2one('res.currency', string="VND Currency", default=lambda self: self._get_default_currency('VND'), readonly=True)   
     
     project_id = fields.Many2one('project.project', string="Project", related="project_revenue_management_id.project_id", store=True)
     currency_id = fields.Many2one('res.currency', string="Currency", related='project_revenue_management_id.currency_id', store=True)
@@ -264,6 +278,15 @@ class ProjectRevenueValue(models.Model):
     def _validate_project(self):
         for record in self:
             record._validate_content(action = False)
+            
+    @api.onchange('exchange_rate', 'revenue_project', 'project_revenue_management_id.currency_id')
+    def _compute_total_revenue(self):
+        if self.currency_id.name == 'VND':
+            self.revenue_vnd = self.revenue_project
+        else:
+            self.revenue_vnd = self.revenue_project * self.exchange_rate
+       
+        
 
     def _validate_content(self, action):
         if self.project_id.date == False or self.project_id.date_start == False:
