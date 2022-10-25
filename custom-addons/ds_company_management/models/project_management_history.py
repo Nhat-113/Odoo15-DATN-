@@ -71,16 +71,7 @@ class ProjectManagementHistory(models.Model):
                         --- Total cost is taken from estimation or project revenue and converted to VND ---
                         phm.revenue AS total_cost,
                         phm.revenue_from,
-                        (CASE
-                            WHEN prm.get_currency_name = 'USD'
-                                THEN prv.revenue_project * prm.rounding_usd_input
-                            WHEN prm.get_currency_name = 'JPY'
-                                THEN prv.revenue_project * prm.rounding_jpy_input
-                            WHEN prm.get_currency_name = 'SGD'
-                                THEN prv.revenue_project * rounding_sgd_input
-                            ELSE prv.revenue_project
-                        END) AS revenue_vnd,
-                        
+                        prv.revenue_vnd,
 
                         --- Generate month_start & month_end from generate month
                         (CASE WHEN EXTRACT(MONTH FROM phm.months) = EXTRACT(MONTH FROM phm.date_start) 
@@ -90,7 +81,7 @@ class ProjectManagementHistory(models.Model):
                         END) AS month_start,
 
                         (CASE WHEN EXTRACT(MONTH FROM phm.months) = EXTRACT(MONTH FROM phm.date_end) 
-                                    AND	EXTRACT(YEAR FROM phm.months) = EXTRACT(YEAR FROM phm.date_end)
+                                    AND EXTRACT(YEAR FROM phm.months) = EXTRACT(YEAR FROM phm.date_end)
                             THEN phm.date_end::date
                             ELSE (SELECT date_trunc('month', phm.months) + interval '1 month - 1 day')::date
                         END) AS month_end
@@ -100,8 +91,6 @@ class ProjectManagementHistory(models.Model):
                         ON prv.project_id = phm.project_id
                         AND prv.get_month::int = EXTRACT(MONTH FROM phm.months)
                         AND prv.get_year::int = EXTRACT(YEAR FROM phm.months)
-                    LEFT JOIN project_revenue_management AS prm
-                        ON prm.id = prv.project_revenue_management_id
                     ORDER By project_id
                 ),
 
@@ -150,36 +139,23 @@ class ProjectManagementHistory(models.Model):
 
                 project_expense_value_month AS (
                     SELECT 
-                        pem.company_id,
                         pev.project_id,
                         pev.expense_date,
                         date_trunc('month', pev.expense_date)::DATE AS months,
-                        (CASE
-                            WHEN pem.get_currency_name = 'VND'
-                                THEN pev.total_expenses
-                            WHEN pem.get_currency_name = 'USD'
-                                THEN pev.total_expenses * pem.rounding_usd_input
-                            WHEN pem.get_currency_name = 'JPY'
-                                THEN pev.total_expenses * pem.rounding_jpy_input
-                            ELSE pev.total_expenses * pem.rounding_sgd_input
-                        END) AS expense_vnd
+                        pev.expense_vnd
                         
                     FROM project_expense_value AS pev
-                    LEFT JOIN project_expense_management AS pem
-                        ON pem.id = pev.project_expense_management_id
                 ),
 
                 -- compute total project expense management by month ---
                 project_expense_value_total AS (
                     SELECT
-                        company_id,
                         project_id,
                         months,
                         (Sum(expense_vnd)) AS total_project_expense
 
                     FROM project_expense_value_month
-                    GROUP BY company_id,
-                            project_id,
+                    GROUP BY project_id,
                             months
                 ),
 
