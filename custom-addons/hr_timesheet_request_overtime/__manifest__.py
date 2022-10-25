@@ -14,7 +14,7 @@
     'depends': ['base', 
                 'project',
                 'hr_timesheet',
-                'mail'],
+                'mail', 'project_updation'],
 
     "development_status": "Alpha",
 

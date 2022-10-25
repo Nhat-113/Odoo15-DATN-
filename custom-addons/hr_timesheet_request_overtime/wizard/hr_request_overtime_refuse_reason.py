@@ -32,15 +32,11 @@ class OvertimeGetRefuseReason(models.TransientModel):
             if not users:
                 continue
 
-            #TODO Fix get access link -> remote access_link when deploy product
-            access_link = task._notify_get_action_link('view').replace('https://taskmanagement.d-soft.tech','http://192.168.4.58:8089')
-
             values = {
                 'object': task,
                 'model_description': "Request",
-                'access_link': access_link,
-                'refuse_reason': self.subject_refuse_reason
-                # 'access_link': task._notify_get_action_link('view'),
+                'refuse_reason': self.subject_refuse_reason,
+                'access_link': task._notify_get_action_link('view'),
             }
             for user in users:
                 values.update(assignee_name=user.sudo().name)

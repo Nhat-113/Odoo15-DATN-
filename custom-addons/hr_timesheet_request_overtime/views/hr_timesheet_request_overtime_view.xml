@@ -81,9 +81,10 @@
                             <page string="Booking Overtime">
                                 <field name="booking_overtime" colspan="4" nolabel="1">
                                     <tree string="Assign Members">
+                                        <field name="user_id_domain" invisible="1"/>
                                         <field name="read_stage" invisible="1"/>
                                         <field name="inactive" invisible='1'/>
-                                        <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}" width="1"/>
+                                        <field name="user_id" widget="many2one_avatar" options="{'no_create': True}" width="1" domain="user_id_domain"/>
                                         <field name="start_date" />
                                         <field name="end_date" />
                                         <field name="duration" string="Duration" width="1"/>
@@ -98,7 +99,8 @@
                                         <sheet>
                                             <div class="oe_title" style="width: 500px">
                                                 <h1>
-                                                    <field name="employee_id" widget="many2one_avatar" class="o_text_overflow" placeholder="Member Name" options="{'no_create': True}" />
+                                                    <field name="user_id_domain" invisible="1"/>
+                                                    <field name="user_id" domain="user_id_domain" widget="many2one_avatar" class="o_text_overflow" placeholder="Member Name" options="{'no_create': True}" />
                                                 </h1>
                                             </div>
                                             <group col="4">
@@ -123,6 +125,48 @@
                     <field name="message_ids" options="{'post_refresh': 'always'}"/>
                 </div>
             </form>
+        </field>
+    </record>
+
+
+    <!-- Inherit Timesheets task -->
+    <record id="view_task_form_timesheet_ot_inhit" model="ir.ui.view">
+        <field name="name">view.task.form.timesheet.inhit</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='employee_id']" position="after">
+                <field name="request_overtime_ids" invisible="1"/>
+                <field name="check_request_ot" invisible="1"/>
+                <field name="check_approval_ot" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='unit_amount']" position="attributes">
+                <attribute name="attrs">{'readonly': [('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date']" position="attributes">
+                <attribute name="attrs">{'readonly': [('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- inherit Timesheets -->
+    <record id="hr_timesheet_line_tree_inhit" model="ir.ui.view">
+        <field name="name">view.tree</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="request_overtime_ids" invisible="1"/>
+                <field name="check_request_ot" invisible="1"/>
+                <field name="check_approval_ot" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='unit_amount']" position="attributes">
+                <attribute name="attrs">{'readonly': [('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date']" position="attributes">
+                <attribute name="attrs">{'readonly': [('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            
         </field>
     </record>
 
