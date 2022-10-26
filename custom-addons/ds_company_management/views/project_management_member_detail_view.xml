@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  
+    <record id="view_tree_project_management_member" model="ir.ui.view">
+        <field name="name">project.management.member.tree</field>
+        <field name="model">project.management.member</field>
+        <field name="arch" type="xml">
+            <tree edit="0" delete="0" create="0">
+                <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
+                <field name="company_id" optional="hide"/>
+                <field name="job_id" />
+                <field name="email" optional="hide"/>
+                <field name="number_phone" optional="hide"/>
+                <field name="start_date" />
+                <field name="end_date" />
+                <field name="member_type" />
+                <field name="effort_rate" />
+                <field name="planning_role_id" optional="hide"/>
+                <button name="view_detail_member" type="object" string="Detail" class="btn btn-primary"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_form_project_management_member" model="ir.ui.view">
+        <field name="name">project.management.member.form</field>
+        <field name="model">project.management.member</field>
+        <field name="arch" type="xml">
+            <form edit="0" delete="0" create="0">
+                <sheet>
+                    <group name="group_top">
+                        <group name="group_left">
+                            <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}" readonly="1"/>
+                            <field name="job_id" readonly="1" />
+                            <field name="planning_role_id" optional="hide" readonly="1"/>
+                            <field name="email" optional="hide" readonly="1"/>
+                            <field name="number_phone" optional="hide" readonly="1"/>
+                        </group>
+                        <group name="group_right">
+                            <field name="start_date" readonly="1" />
+                            <field name="end_date" readonly="1" />
+                            <field name="member_type" readonly="1" />
+                            <field name="effort_rate" readonly="1" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Members Detail">
+                            <field name="member_details">
+                                <tree delete="0" create="0" editable="0">
+                                    <field name="month_start" readonly="1"/>
+                                    <field name="month_end" readonly="1"/>
+                                    <field name="working_day" readonly="1"/>
+                                    <field name="man_month" readonly="1"/>
+                                    <field name="effort_rate" readonly="1"/>
+                                    <field name="salary" readonly="1" widget="monetary"/>
+                                    <field name="average_profit" readonly="1" widget="monetary"/>
+                                    <field name="average_cost_company" optional="hide" widget="monetary"/>
+                                    <field name="average_cost_project" optional="hide" widget="monetary"/>
+                                    <field name="profit" optional="hide" widget="monetary"/>
+                                    <field name="total_members" optional="hide"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    
+
+</odoo>
