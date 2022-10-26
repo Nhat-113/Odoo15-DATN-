@@ -10,20 +10,20 @@ class ProjectManagementMemberDetail(models.Model):
     currency_id = fields.Many2one('res.currency', string="Currency")
     member_type = fields.Many2one('planning.member.type', string='Member Type')
     
-    month_start = fields.Date(string="Month Start")
-    month_end = fields.Date(string="Month End")
+    month_start = fields.Date(string="Start")
+    month_end = fields.Date(string="End")
     effort_rate = fields.Float(string="Effort Rate(%)")
     working_day = fields.Float(string="Working day")
     man_month = fields.Float(string="Man month")
-    total_members = fields.Float(string="Members project", digits=(12,3))
+    total_members = fields.Float(string="Effort(MM)", digits=(12,3))
     months = fields.Char(string="Month")
     
-    average_cost_company = fields.Float(string="Average Cost Company")
-    average_cost_project = fields.Float(string="Average Cost Project")
+    average_cost_company = fields.Float(string="Company Avg Cost")
+    average_cost_project = fields.Float(string="Prj Avg Cost")
     
     salary = fields.Monetary(string="Salary")
     profit = fields.Monetary(string="Profit")
-    average_profit = fields.Monetary(string="Average profit")
+    average_profit = fields.Monetary(string="Avg profit")
     
     currency_id = fields.Many2one('res.currency', string="Currency")
     project_members = fields.Many2one('project.management.member', string="Project members")

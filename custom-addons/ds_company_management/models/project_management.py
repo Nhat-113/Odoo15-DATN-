@@ -23,11 +23,11 @@ class ProjectManagement(models.Model):
     # id = fields.Integer("ID")
     project_id = fields.Many2one('project.project', string="Project")
     department_id = fields.Many2one("hr.department", string="Department")
-    user_pm = fields.Many2one('res.users', string="Project Manager")
+    user_pm = fields.Many2one('res.users', string="PM")
     company_id = fields.Many2one('res.company', string="Company")
     currency_id = fields.Many2one('res.currency', string="Currency")
-    date_start = fields.Date(string='Start Date')
-    date_end = fields.Date(string='End Date')
+    date_start = fields.Date(string='Start')
+    date_end = fields.Date(string='End')
     status = fields.Char(string='Status')
     
     # bonus = fields.Float(string="Bonus")
@@ -35,7 +35,7 @@ class ProjectManagement(models.Model):
     project_cost = fields.Float(string="Project Cost")
     
     last_update_color = fields.Integer(compute=_content_compute_total)
-    count_members = fields.Float(string='Members', compute=_content_compute_total, digits=(12,3))
+    count_members = fields.Float(string='Effort(MM)', compute=_content_compute_total, digits=(12,3))
     total_salary = fields.Float(string="Salary Cost", compute=_content_compute_total)
     profit = fields.Float(string="Profit", compute=_content_compute_total)
     profit_margin = fields.Float(string="Profit Margin (%)",compute=_content_compute_total, digits=(12,2), help="Profit Margin = profit / revenue * 100")
