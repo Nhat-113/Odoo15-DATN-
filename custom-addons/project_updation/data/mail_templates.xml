@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data noupdate="0">
+        <!-- Confirm CV -->
+        <template id="warning_task_late">
+            <p style="margin: 0px;">
+                <span>Dear <t t-esc="object.user_id.name"/>,</span><br/>
+                <span style="margin-top: 8px;">Task has ID <b><t t-esc="task"/></b> are delay. Please update progress of these tasks.</span>
+                <br></br>
+            </p>
+            <div style=" display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center;">
+                <p style="padding-top: 24px; padding-bottom: 16px;">
+                    <a t-att-href="view_planning" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">
+                            View <t t-esc="'Planning'"/>
+                    </a>
+                </p>
+                <p style="padding-top: 24px; padding-right: -20px; margin-left: 19px; padding-bottom: 16px;">
+                    <a t-att-href="view_project" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">
+                            View <t t-esc="'Project'"/>
+                    </a>
+                </p>
+            </div>            
+        </template>
+
+    </data>
+</odoo>

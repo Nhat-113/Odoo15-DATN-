@@ -15,7 +15,9 @@
         'views/report_timesheet_templates_update.xml',
         'security/ir.model.access.csv',
         'data/type_default.xml',
-        'views/hr_timesheet_line_task.xml'
+        'views/hr_timesheet_line_task.xml',
+        'data/mail_templates.xml',
+        'data/cron_job_update_status_project.xml'
     ],
     'assets': {
         'web.assets_backend': [
