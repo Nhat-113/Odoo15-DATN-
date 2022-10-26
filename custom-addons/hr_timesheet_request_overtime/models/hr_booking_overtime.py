@@ -6,6 +6,13 @@ import json
 class AccountAnalyticLine(models.Model):
     _inherit = 'account.analytic.line'
 
+    type_day_ot = fields.Selection([
+        ('other', 'Other'),
+        ('normal_day', 'Normal Day'),
+        ('weekend', 'Weekend'),
+        ('holiday', 'Holiday'),
+    ], string='Type Day OT', index=True, copy=False, default='normal_day', tracking=True, required=True)
+
     request_overtime_ids = fields.Many2one('hr.request.overtime', string='Request Overtime Name', compute='_compute_request_overtime_id', store=True)
     check_request_ot = fields.Boolean('Check Readonly records timesheet', compute='_compute_request_overtime_id', store=True, default=False)
     check_approval_ot = fields.Boolean('Check Approvals records timesheet', compute='_compute_request_overtime_id', store=True, default=False)
@@ -32,6 +39,12 @@ class AccountAnalyticLine(models.Model):
             
             else:
                 record.request_overtime_ids = False
+
+
+class AccountAnalyticLineOvertime(models.Model):
+    _name = 'account.analytic.overtime.line'
+    
+    name = fields.Char(string='Name')
 
     
 class HrBookingOvertime(models.Model):

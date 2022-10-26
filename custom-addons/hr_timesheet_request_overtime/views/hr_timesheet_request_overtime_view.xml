@@ -140,6 +140,9 @@
                 <field name="check_request_ot" invisible="1"/>
                 <field name="check_approval_ot" invisible="1"/>
             </xpath>
+            <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='type_ot']" position="after">
+                <field name="type_day_ot" attrs="{'invisible': [('type_ot', '=', 'no')]}"/>
+            </xpath>
             <xpath expr="//field[@name='unit_amount']" position="attributes">
                 <attribute name="attrs">{'readonly': [('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
@@ -166,7 +169,9 @@
             <xpath expr="//field[@name='date']" position="attributes">
                 <attribute name="attrs">{'readonly': [('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
-            
+            <xpath expr="//field[@name='type_ot']" position="after">
+                <field name="type_day_ot" attrs="{'invisible': [('type_ot', '=', 'no')]}"/>
+            </xpath>
         </field>
     </record>
 

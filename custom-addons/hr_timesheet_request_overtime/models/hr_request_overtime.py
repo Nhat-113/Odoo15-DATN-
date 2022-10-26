@@ -98,8 +98,8 @@ class HrRequestOverTime(models.Model):
     def _add_booking_overtime(self):
         # update member_ids list
         user_ids = [
-            user.user_id.id for user in self.booking_overtime.user_id]
-        self.member_ids = self.env['res.users'].search([('id', 'in', user_ids)])
+            user.id for user in self.booking_overtime.user_id]
+        self.member_ids = user_ids
 
     @api.onchange('project_id')
     def _compute_project_manager(self):
