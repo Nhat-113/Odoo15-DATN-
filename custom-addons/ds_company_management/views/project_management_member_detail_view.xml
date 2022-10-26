@@ -46,8 +46,9 @@
                         <page string="Members Detail">
                             <field name="member_details">
                                 <tree delete="0" create="0" editable="0">
-                                    <field name="month_start" readonly="1"/>
-                                    <field name="month_end" readonly="1"/>
+                                    <field name="months" readonly="1"/>
+                                    <field name="month_start" optional="hide" readonly="1"/>
+                                    <field name="month_end" optional="hide" readonly="1"/>
                                     <field name="working_day" readonly="1"/>
                                     <field name="man_month" readonly="1"/>
                                     <field name="effort_rate" readonly="1"/>

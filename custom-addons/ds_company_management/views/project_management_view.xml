@@ -112,9 +112,9 @@
                                 <tree  edit="0" delete="0" create="0">
                                     <field name="expense_date"/>
                                     <field name="name" />
-                                    <field name="total_expenses" sum="Total expense" widget="monetary"/>
+                                    <field name="expense_vnd" sum="Total expense" widget="monetary"/>
                                     <field name="description"/>
-                                    <field name="currency_id" optional="hide"/>
+                                    <field name="currency_vnd" optional="hide"/>
                                 </tree>
                                
                             </field>

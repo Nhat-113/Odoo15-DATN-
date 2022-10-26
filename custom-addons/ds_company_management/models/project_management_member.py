@@ -27,7 +27,7 @@ class ProjectMemberManagement(models.Model):
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
                 SELECT
-                    ROW_NUMBER() OVER(ORDER BY pm.id ASC) AS id,
+                    ROW_NUMBER() OVER(ORDER BY plan.id ASC) AS id,
                     pm.id AS project_management_id,
                     plan.project_id,
                     plan.employee_id,
