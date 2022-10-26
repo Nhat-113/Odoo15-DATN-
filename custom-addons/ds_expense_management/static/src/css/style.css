@@ -3,7 +3,8 @@ span[name="get_month"]::after {
 }
 
 span[name="rounding_usd_input"]::after, 
-span[name="rounding_jpy_input"]::after {
+span[name="rounding_jpy_input"]::after,
+span[name="rounding_sgd_input"]::after {
     content: '₫';
     margin-left: 5px;
     font-weight: 600;
@@ -81,3 +82,35 @@ span[name="revenue_jpy"]::before {
     content: "Total Revenue (JPY)";
     padding-right: 25px;
 } */
+/* .custom_table_view tr:first-child td {
+    width: 0 !important;
+    border-right: 1px solid #ddd;
+    padding-bottom: 6px;
+}
+
+.custom_table_view_box {
+    white-space: nowrap;
+    display: flex;
+}
+.custom_table_view_box .label_for_get_month {
+    border: none;
+    padding: 0;
+}
+
+.custom_table_view_box .label_for_get_month::after {
+    content: '*';
+    color: red;
+    padding-left: 3px;
+}
+.custom_view_month {
+    margin-left: 72%;
+}
+select[name='get_month'] {
+    width: 100px !important;
+    margin-left: 2px;
+}
+
+td[name='get_month'] select[name='get_month'] {
+    width: 100% !important;
+} */
+

@@ -5,12 +5,10 @@
         <field name="model">project.expense.management</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="expense_date"/>
-                <field name="name"/>
-                <field name="expense_vnd" sum="Total expense"/>
-                <field name="description"/>
                 <field name="project_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
+                <field name="expense_vnd" sum="Total expense"/>
+                <field name="description"/>
                 <field name="currency_vnd" invisible="1"/>
             </tree>
         </field>
@@ -20,58 +18,71 @@
         <field name="name">project.expense.management.form</field>
         <field name="model">project.expense.management</field>
         <field name="arch" type="xml">
-            <form>
+            <form duplicate="0">
                 <sheet>
                     <group name="group_top">
                         <group name="group_left">
-                            <field name="expense_date"/>
-                            <field name="name"/>
-                            <field name="rounding_usd_input" attrs="{'required': [('get_currency_name', '=', 'USD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'SGD'])]}"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="project_id" domain='get_domain_projects' attrs="{'readonly': [('company_id', '=', False)]}"/>
+                            <label for="start_date" string="Duration" attrs="{'invisible': [('project_id','=',False)]}"/>
+                            <div class="o_row" attrs="{'invisible': [('project_id','=',False)]}">
+                                <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}' readonly="1"/>
+                                <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon" title="Arrow"/>
+                                <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow"/>
+                                <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}' readonly="1"/>
+                            </div>
+
+                            <!-- <field name="rounding_usd_input" attrs="{'required': [('get_currency_name', '=', 'USD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'SGD'])]}"/>
                             <field name="rounding_jpy_input" attrs="{'required': [('get_currency_name', '=', 'JPY')], 'invisible': [('get_currency_name', 'in', ['USD', 'SGD'])]}"/>
-                            <field name="rounding_sgd_input" attrs="{'required': [('get_currency_name', '=', 'SGD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'USD'])]}"/>
+                            <field name="rounding_sgd_input" attrs="{'required': [('get_currency_name', '=', 'SGD')], 'invisible': [('get_currency_name', 'in', ['JPY', 'USD'])]}"/> -->
+                            <field name="get_domain_projects" invisible="1"/>
                         </group>
                         <group name="group_right">
-                            <field name="company_id" groups="base.group_multi_company"/>
-                            <field name="project_id" attrs="{'readonly': [('company_id', '=', False)]}"/>
                             <field name="currency_id"/>
-                            <field name="total_expenses"/>
-                            <field name="expense_usd" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
-                            <field name="expense_jpy" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
-                            <field name="expense_sgd" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
-                            <field name="expense_vnd" attrs="{'invisible': [('get_currency_name', '=', 'VND')]}"/>
-                            <field name="currency_usd" invisible="1"/>
+                            <field name="total_expenses" widget='monetary'/>
+                            <!-- <field name="expense_usd" widget='monetary' attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
+                            <field name="expense_jpy" widget='monetary' attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/>
+                            <field name="expense_sgd" widget='monetary' attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/> -->
+                            <field name="expense_vnd" widget='monetary' attrs="{'invisible': [('get_currency_name', '=', 'VND')]}"/>
+                            <!-- <field name="currency_usd" invisible="1"/>
                             <field name="currency_jpy" invisible="1"/>
-                            <field name="currency_sgd" invisible="1"/>
+                            <field name="currency_sgd" invisible="1"/> -->
                             <field name="currency_vnd" invisible="1"/>
                             <field name="get_currency_name" invisible="1"/>
                         </group>
-
-                        <!-- <div class="table_exchange_rate">
-                            <h6 class="title_exchange_rate">Exchange rate</h6>
-                            <div class="content_exchange_rate">
-                                <div class="exchange_rate_box">
-                                    <span class="exchange_rate_span">1 USD = </span>
-                                    <field name="rounding_usd_input" nolabel="1"/>
-                                    <span class="exchange_rate_span">VND</span>
-                                </div>
-
-                                <div class="exchange_rate_box">
-                                    <span class="exchange_rate_span">1 JPY = </span>
-                                    <field name="rounding_jpy_input" nolabel="1"/>
-                                    <span class="exchange_rate_span">VND</span>
-                                </div>
-                            </div>
-                        </div> -->
-                        <!-- <div>
-                            <field name="revenue_usd" attrs="{'invisible': ['|', ('rounding_usd_input', '=', 0.0), ('total_expenses', '=', 0.0)]}"/>
-                            <field name="revenue_jpy" attrs="{'invisible': ['|', ('rounding_jpy_input', '=', 0.0), ('total_expenses', '=', 0.0)]}"/>
-                            <field name="currency_usd" invisible="1"/>
-                            <field name="currency_jpy" invisible="1"/>
-                        </div> -->
-
                         <separator string="Description"/>
                         <field name="description" placeholder="Description ..."/>
                     </group>
+
+                    <notebook>
+                        <page string="Project Expense Details">
+                            <field name="project_expense_value_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="expense_date" width="120px"/>
+                                    <field name="total_expenses" widget='monetary' sum="Total Expenses" width="135px"/>
+                                    <field name="exchange_rate" 
+                                                width="130px"
+                                                force_save="1"
+                                                attrs="{'column_invisible': [('parent.get_currency_name', '=', 'VND')], 
+                                                                'required': [('parent.get_currency_name', '!=', 'VND')]}"/>
+
+                                    <field name="expense_vnd" 
+                                            width="160px"
+                                            widget="monetary"
+                                            sum="Total Expense"
+                                            force_save="1"
+                                            attrs="{'column_invisible': [('parent.get_currency_name', '=', 'VND')], 
+                                                            'readonly': [('parent.get_currency_name', '!=', 'VND')]}"/>
+
+                                    <field name="description"/>
+                                    <field name="project_id" invisible="1"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="currency_vnd" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" groups="base.group_user"/>
