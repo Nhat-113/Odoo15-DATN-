@@ -54,7 +54,7 @@ class HrBookingOvertime(models.Model):
     request_overtime_id = fields.Many2one('hr.request.overtime', string='Booking Overtime', readonly=False)
     
     user_id = fields.Many2one(
-        'res.users', string='Member', required=True, help="Member name assgin overtime")
+        'hr.employee', string='Member', required=True, help="Member name assgin overtime")
 
     user_id_domain = fields.Char(
         compute="_compute_user_id_domain",
@@ -68,9 +68,9 @@ class HrBookingOvertime(models.Model):
                            help="Date on which the member finished overtime on project")
 
     duration = fields.Integer(compute='_compute_duration', string="Duration (Working day)",
-                              readonly=True, help="The duration of working overtime in the project", default=1)
+                              readonly=True, help="The duration of working overtime in the project", default=0)
 
-    booking_time_overtime = fields.Integer(string="Plan Overtime",
+    booking_time_overtime = fields.Integer(string="Plan Overtime (Hours)",
                               readonly=False, help="The booking of working overtime in the project", default=False)
 
     actual_overtime = fields.Integer(string="Actual Overtime",
@@ -84,11 +84,12 @@ class HrBookingOvertime(models.Model):
     def _compute_user_id_domain(self):
         for record in self:
             user_ids = [
-                user.id for user in record.request_overtime_id.project_id.user_id]
+                user.employee_id.id for user in record.request_overtime_id.project_id.planning_calendar_resources]
             user_ids.append(self._uid)
             record.user_id_domain = json.dumps(
                 [('id', 'in', user_ids)]
             )
+
 
     @api.onchange("request_overtime_id.stage_id")
     def _compute_stage(self):
@@ -124,7 +125,7 @@ class HrBookingOvertime(models.Model):
             "views": [[self.env.ref('hr_timesheet.hr_timesheet_line_tree').id, "tree"]],
             "domain": 
                 [('project_id', '=', self.request_overtime_id.project_id.id),
-                ('employee_id', '=', self.user_id.employee_id.id), ('type_ot','=','yes'),
+                ('employee_id', '=', self.user_id.id), ('type_ot','=','yes'),
                 ('date', '>=' ,self.start_date), ('date', '<=' ,self.end_date)]
         }
         return action
@@ -133,7 +134,7 @@ class HrBookingOvertime(models.Model):
     def _compute_actual_overtime(self):
         for item in self:
             list_timesheet_overtime = self.env['account.analytic.line'].search([('project_id', '=', item.request_overtime_id.project_id.id),\
-                ('employee_id', '=', item.user_id.employee_id.id), ('type_ot','=','yes')])
+                ('employee_id', '=', item.user_id.id), ('type_ot','=','yes')])
             
             total_hour_spent_overtime = 0
             for record in list_timesheet_overtime:
@@ -173,7 +174,7 @@ class HrBookingOvertime(models.Model):
                 task.request_overtime_id.message_notify(
                     subject = subject_template,
                     body = assignation_msg,
-                    partner_ids = user.partner_id.ids,
+                    partner_ids = user.user_id.partner_id.ids,
                     record_name = task.request_overtime_id.display_name,
                     email_layout_xmlid = 'mail.mail_notification_light',
                     model_description = "Plan Overtime",

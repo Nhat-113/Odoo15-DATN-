@@ -1,4 +1,7 @@
 from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
+import pandas as pd
+
 
 class HrRequestOvertimeStage(models.Model):
     _name = "hr.request.overtime.stage"
@@ -29,10 +32,17 @@ class HrRequestOverTime(models.Model):
         return self.env['hr.request.overtime.stage'].search([], limit=1).id
 
     name = fields.Char("Subject", required=True)
+
     project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True)
-    start_date = fields.Date(string="Start Date", required=False, tracking=True, store=True)
-    end_date = fields.Date(string="End Date", required=False, tracking=True, store=True)
-    company_id = fields.Many2one('res.company', string="Company", required=True, readonly=True, compute='_compute_project_manager')
+    start_date_project = fields.Date(string="Start Date", required=False,store=True, compute='_compute_project_info')
+    end_date_project = fields.Date(string="End Date", required=False, store=True, compute='_compute_project_info')
+    
+    start_date = fields.Date(string="Start Date", required=True, tracking=True, store=True)
+    end_date = fields.Date(string="End Date", required=True, tracking=True, store=True)
+    duration_overtime = fields.Integer(compute='_compute_duration_overtime', string="Duration (Working day)",
+                              readonly=True, help="The duration of working overtime in the project", default=0)
+
+    company_id = fields.Many2one('res.company', string="Company", required=True, readonly=True, compute='_compute_project_info')
     description = fields.Text(string="Description", tracking=True)
     stage_id = fields.Many2one('hr.request.overtime.stage', 'Stage', ondelete='restrict',
                             default=_get_default_stage_id, 
@@ -42,10 +52,10 @@ class HrRequestOverTime(models.Model):
                             # domain=lambda self: self._compute_domain_stage(),
                             copy=False, index=True,
                             )
-    requester_id = fields.Many2one('res.users', string='Requester', required=True)
-    request_creator_id = fields.Many2one('res.users', string='Request Creator', required=True)
-    user_id = fields.Many2one('res.users', string='Project Manager', tracking=True, readonly=True, compute='_compute_project_manager')
-    member_ids = fields.Many2many('res.users', string='Members',
+    requester_id = fields.Many2many('res.users', string='Approvals', required=True, compute='_compute_partner_approvals', readonly=False)
+    request_creator_id = fields.Many2one('res.users', string='Info to', required=True, default=lambda self: self.env.user)
+    user_id = fields.Many2one('res.users', string='Project Manager', tracking=True, readonly=True, compute='_compute_project_info')
+    member_ids = fields.Many2many('hr.employee', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
     booking_overtime = fields.One2many('hr.booking.overtime', 'request_overtime_id', string='Booking Overtime')
     active = fields.Boolean(string='Invisible Refuse Button', default=True)
@@ -57,7 +67,7 @@ class HrRequestOverTime(models.Model):
     approve_flag = fields.Boolean(default=True)
     request_flag = fields.Boolean(default=True)
 
-    stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draw")
+    stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draft")
     last_stage = fields.Integer(string="Last stage", default=0)
     
     def action_refuse_reason(self):
@@ -102,10 +112,35 @@ class HrRequestOverTime(models.Model):
         self.member_ids = user_ids
 
     @api.onchange('project_id')
-    def _compute_project_manager(self):
+    def _compute_project_info(self):
         for item in self:
             item.user_id = item.project_id.user_id or False
             item.company_id = item.project_id.company_id or False
+            item.start_date_project = item.project_id.date_start
+            item.end_date_project = item.project_id.date
+
+    @api.onchange('request_creator_id')
+    def _compute_partner_approvals(self):
+        for record in self:
+            record.requester_id = record.request_creator_id.employee_id.parent_id.user_id.ids or False
+
+    @api.depends('start_date', 'end_date')
+    def _compute_duration_overtime(self):
+        """ Calculates duration working time"""
+        for record in self:
+            if record.end_date and record.start_date:
+                working_days = len(pd.bdate_range(record.start_date.strftime('%Y-%m-%d'),
+                                                record.end_date.strftime('%Y-%m-%d')))
+                record.duration_overtime = working_days if working_days > 0 else 1
+            else:
+                record.duration_overtime = 1
+
+    @api.constrains('start_date', 'end_date')
+    def _validate_plan_overtime(self):
+        for record in self:
+            if (record.start_date_project and record.end_date_project) and \
+                (record.start_date < record.start_date_project or record.end_date > record.end_date_project):
+                    raise ValidationError(_("Plan Date Overtime must be within the duration of the project."))
 
     def action_submit_request_overtime(self):
         self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Submit')]).id
@@ -119,7 +154,7 @@ class HrRequestOverTime(models.Model):
 
     def action_confirm_request_overtime(self):
         self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Confirm')]).id
-        self.confirm_flag=False
+        self.confirm_flag = False
 
         # Send mail confirm (from director to pm)
         mail_template = "hr_timesheet_request_overtime.confirm_request_overtime_template"
@@ -144,29 +179,30 @@ class HrRequestOverTime(models.Model):
         subject_template = "Approvals Request Timesheets Overtime"
         self._send_message_auto_subscribe_notify_request_overtime({self: item.request_creator_id for item in self}, mail_template, subject_template)
 
+    # TODO Fix this, refator code
     @api.depends('stage_id')
     def _get_stage_name(self):
         for record in self:
             record.stage_name = record.stage_id.name
-            if record.stage_id.name =="Draw":
+            if record.stage_id.name =="Draft":
                 self.confirm_flag = True
                 self.submit_flag = True
-                self.request_flag = True
-                self.approve_flag = True
-            if record.stage_id.name == "Submit":
-                self.submit_flag =False
-                self.confirm_flag = True
-                self.request_flag = True
-                self.approve_flag = True
-            if record.stage_id.name == "Confirm":
-                self.submit_flag =True
-                self.confirm_flag = False
                 self.request_flag = True
                 self.approve_flag = True
             if record.stage_id.name == "Request":
                 self.submit_flag =True
                 self.confirm_flag = True
                 self.request_flag = False
+                self.approve_flag = True
+            if record.stage_id.name == "Confirm":
+                self.submit_flag =True
+                self.confirm_flag = False
+                self.request_flag = True
+                self.approve_flag = True
+            if record.stage_id.name == "Submit":
+                self.submit_flag =False
+                self.confirm_flag = True
+                self.request_flag = True
                 self.approve_flag = True
             if record.stage_id.name == "Approval":
                 self.submit_flag =True

@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
 
         <record model="hr.request.overtime.stage" id="stage_overtime_job1">
-            <field name="name">Draw</field>
+            <field name="name">Draft</field>
             <field name="sequence">1</field>
         </record>
         <record model="hr.request.overtime.stage" id="stage_overtime_job2">
-            <field name="name">Submit</field>
+            <field name="name">Request</field>
             <field name="sequence">2</field>
         </record>
         <record model="hr.request.overtime.stage" id="stage_overtime_job3">
@@ -15,7 +15,7 @@
             <field name="sequence">3</field>
         </record>
         <record model="hr.request.overtime.stage" id="stage_overtime_job4">
-            <field name="name">Request</field>
+            <field name="name">Submit</field>
             <field name="sequence">4</field>
         </record>
         <record model="hr.request.overtime.stage" id="stage_overtime_job5">

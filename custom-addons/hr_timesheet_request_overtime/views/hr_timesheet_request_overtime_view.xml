@@ -8,7 +8,7 @@
                 <field name="name"/>
                 <field name="project_id"/>
                 <field name="user_id"/>
-                <field name="member_ids" widget="many2many_avatar_user" />
+                <field name="member_ids" widget="many2many_avatar_employee"/>
                 <field name="start_date"/>
                 <field name="end_date"/>
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -29,10 +29,10 @@
                     <field name='confirm_flag' invisible="1"/>
                     <field name='request_flag' invisible="1"/>
                     <field name='approve_flag' invisible="1"/>
-                    <button string="Submit" name="action_submit_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('submit_flag', '!=', True), ('stage_name', '!=', 'Draw')]}" />
-                    <button string="Confirm" name="action_confirm_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('confirm_flag', '!=', True), ('stage_name', '!=', 'Submit')]}"/>
-                    <button string="Request" name="action_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('request_flag', '!=', True), ('stage_name', '!=', 'Confirm')]}"/>
-                    <button string="Approval" name="action_approve_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('approve_flag', '!=', True), ('stage_name', '!=', 'Request')]}"/>
+                    <button string="Request" name="action_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('request_flag', '!=', True), ('stage_name', '!=', 'Draft')]}"/>
+                    <button string="Confirm" name="action_confirm_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('confirm_flag', '!=', True), ('stage_name', '!=', 'Request')]}"/>
+                    <button string="Submit" name="action_submit_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('submit_flag', '!=', True), ('stage_name', '!=', 'Confirm')]}" />
+                    <button string="Approval" name="action_approve_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('approve_flag', '!=', True), ('stage_name', '!=', 'Submit')]}"/>
                     <button string="Refuse" name="action_refuse_reason" type="object" attrs="{'invisible': [('active', '=', False)]}" data-hotkey="x" />
                     <button string="Restore" name="toggle_active" type="object" attrs="{'invisible': [('active', '=', True)]}" data-hotkey="z"/>
                     <field name="stage_id" widget="statusbar" options="{'clickable': '1'}" attrs="{'invisible': [('active', '=', False)]}" />
@@ -57,25 +57,33 @@
                             <group name="group_left">
                                 <field name="refuse_reason" attrs="{'invisible': [('active', '=', True)]}"/>
                                 <field name="project_id" options="{'no_create_edit': True, 'no_open': True}"/>
+                                <label for="start_date" string="Dates"/>
+                                <div name="end_date" class="o_row">
+                                    <field name="start_date_project" widget="daterange" options='{"related_end_date": "end_date"}'/>
+                                    <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon" title="Arrow"/>
+                                    <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow" attrs="{'invisible': [('start_date', '=', False), ('end_date', '=', False)]}"/>
+                                    <field name="end_date_project" widget="daterange" options='{"related_start_date": "start_date"}'/>
+                                </div>
                                 <field name="user_id" string="Project Manager" widget="many2one_avatar_user" domain="[('share', '=', False)]"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                                 <field name="request_creator_id" options="{'no_create_edit': True, 'no_open': True}"/>
                             </group>
                             <group name="group_right">
-                                <label for="start_date" string="Dates"/>
+                                <label for="start_date" string="Plan Date Overtime"/>
                                 <div name="end_date" class="o_row">
                                     <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}'/>
                                     <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon" title="Arrow"/>
                                     <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow" attrs="{'invisible': [('start_date', '=', False), ('end_date', '=', False)]}"/>
                                     <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}'/>
                                 </div>
-                                <field name="requester_id" options="{'no_create_edit': True, 'no_open': True}"/>
+                                <field name="duration_overtime" readonly="1"/>
+                                <field name="requester_id" readonly="0" widget="many2many_tags"/>
                             </group>
                         </group>
                         <separator string="Description"/>
                         <field name="description" placeholder="Description"/>
                         <group>
-                            <field name="member_ids" widget="many2many_avatar_user" readonly="1" force_save="1"/>
+                            <field name="member_ids" readonly="1" force_save="1" widget="many2many_avatar_employee"/>
                         </group>
                         <notebook>
                             <page string="Booking Overtime">
@@ -88,7 +96,7 @@
                                         <field name="start_date" />
                                         <field name="end_date" />
                                         <field name="duration" string="Duration" width="1"/>
-                                        <field name="booking_time_overtime" width="1"/>
+                                        <field name="booking_time_overtime" width="2"/>
                                         <field name="actual_overtime" width="1"/>
                                         <field name="description"/>
                                         <button name="timesheets_overtime_detail_action" string="Detail" type="object" class="oe_highlight"/>
@@ -107,8 +115,8 @@
                                                 <field name="start_date" />
                                                 <field name="end_date"/>
                                                 <field name="duration" />
-                                                <field name="booking_time_overtime"/>
-                                                <field name="actual_overtime"/>
+                                                <field name="booking_time_overtime" placeholder="Hour..."/>
+                                                <field name="actual_overtime" invisible="1"/>
                                             </group>
                                             <separator string="Description"/>
                                             <field name="description" placeholder="Description..."/>

@@ -17,11 +17,11 @@
             <br></br>
         </template>
 
-        <!-- Submit request overtime -->
-        <template id="submit_request_overtime_template">
+        <!-- Request timesheets overtime -->
+        <template id="request_timesheets_overtime_template">
             <p style="margin: 0px;">
                 <p>Dear <t t-esc="object.requester_id.name"/>,</p>
-                <p style="margin-top: 8px;">There is a Request Overtime Form just has been <b>Submited</b> by <b><t t-esc="object.env.user.name"/>.</b></p>
+                <p style="margin-top: 8px;">There is a Request Overtime Form just has been <b>Requested Overtime</b> by <b><t t-esc="object.env.user.name"/>.</b></p>
             </p>
             <p>Please review and confirm it soon.</p>
             <p>Thank you!</p>
@@ -47,11 +47,11 @@
             </p>
         </template>
 
-        <!-- Request timesheets overtime -->
-        <template id="request_timesheets_overtime_template">
+        <!-- Submit request overtime -->
+        <template id="submit_request_overtime_template">
             <p style="margin: 0px;">
                 <p>Dear <t t-esc="object.requester_id.name"/>,</p>
-                <p style="margin-top: 8px;">There is a Request Overtime Form just has been <b>Requested to Approve Timesheets Overtime</b> by <b><t t-esc="object.env.user.name"/>.</b></p>
+                <p style="margin-top: 8px;">There is a Request Overtime Form just has been <b>Submited Timesheets Overtime</b> by <b><t t-esc="object.env.user.name"/>.</b></p>
             </p>
             <p>Please review and approve it soon.</p>
             <p>Thank you!</p>
