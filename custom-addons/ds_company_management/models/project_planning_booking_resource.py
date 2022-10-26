@@ -17,7 +17,7 @@ class ProjectPlanningBookingResource(models.Model):
                     br.employee_id,
                     pl.member_type,
                     pmt.name AS member_type_name,
-                    pl.role_ids,
+                    pl.planning_role_id,
                     date_trunc('month', br.start_date_month)::date AS months,
                     br.start_date_month,
                     br.end_date_month,

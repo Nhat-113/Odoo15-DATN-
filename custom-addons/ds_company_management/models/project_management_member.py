@@ -14,8 +14,8 @@ class ProjectMemberManagement(models.Model):
     planning_role_id = fields.Many2one('planning.roles', string='Roles')
     email = fields.Char(string='Email')
     number_phone = fields.Char(string='Number Phone')
-    start_date = fields.Date(string='Start Date')
-    end_date = fields.Date(string='End Date')
+    start_date = fields.Date(string='Start')
+    end_date = fields.Date(string='End')
     member_type = fields.Many2one('planning.member.type', string="Member Type")
     effort_rate = fields.Float(string="Effort Rate")
     # salary = fields.Float(string="Salary")
@@ -27,7 +27,7 @@ class ProjectMemberManagement(models.Model):
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
                 SELECT
-                    ROW_NUMBER() OVER(ORDER BY pm.id ASC) AS id,
+                    ROW_NUMBER() OVER(ORDER BY plan.id ASC) AS id,
                     pm.id AS project_management_id,
                     plan.project_id,
                     plan.employee_id,
