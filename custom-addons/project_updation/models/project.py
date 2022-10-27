@@ -271,6 +271,7 @@ class Project(models.Model):
         store=False,
     )
     project_type = fields.Many2one('project.type', string="Project Type", readonly=False, compute='_compute_project_type', store=True)
+    partner_id = fields.Many2one('res.partner', string='Customer', auto_join=True, tracking=True, domain="[('is_company', '=', True)]")
 
     @api.depends('estimation_id', 'estimation_id.project_type_id')
     def _compute_project_type(self):
