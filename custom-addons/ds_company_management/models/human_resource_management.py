@@ -248,7 +248,7 @@ class HumanResourceManagement(models.Model):
         }
     @api.model
     def get_human_resource_free(self):
-        selected_companies = self.get_current_company_value()
+        # selected_companies = self.get_current_company_value()
         cr = self._cr
 		
         sql = ("""SELECT  employee_id, employee_name, company_name, department_name,
@@ -267,9 +267,7 @@ class HumanResourceManagement(models.Model):
 				company_id,
 				start_date_contract,
 				end_date_contract
-
 				FROM human_resource_management 
-				where  company_id in  """ + str(tuple(selected_companies)) + """
 				GROUP BY employee_id, employee_name ,company_name, department_name, company_id, start_date_contract, end_date_contract
 				order by employee_name asc
 					""")

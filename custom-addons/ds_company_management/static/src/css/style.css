@@ -27,7 +27,7 @@ span[name="message_warning"] {
     display: block;
     width: 98%;
     overflow-y: scroll;
-    height: 740px;
+    height:calc(100vh - 141px);
     border-radius: 15px;
     margin: 0 auto;
 }
@@ -86,7 +86,7 @@ span[name="message_warning"] {
 
 #human_resource_table {
     width: 100%;
-    border-bottom: 1px solid;
+    /* border-bottom: 1px solid; */
     margin: 0 auto;
 }
 
@@ -173,7 +173,7 @@ span[name="message_warning"] {
 
 .human_resource_in_top {
     background: #FFFFFF;
-    border-bottom: 0.5px solid;
+    /* border-bottom: 0.5px solid; */
 }
 
 .value_when_search {
@@ -210,7 +210,7 @@ span[name="message_warning"] {
 
 #count_member_of_company {
     position: absolute;
-    margin-top: 64px;
+    margin-top: 62px;
     left: 3%;
 }
 
@@ -236,20 +236,34 @@ span[name="message_warning"] {
     border: navajowhite;
     height: 31px;
     border-radius: 8px;
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 .close-table {
     cursor: pointer;
-    width: 67px;
+    width: 85px;
     position: absolute;
-    top: 9px;
-    right: 16px;
+    top: 15px;
+    right: 15px;
     text-align: center;
     border-radius: 8px;
-    /* padding-right: 11px; */
-    background: rgba(0, 0, 0, 0.75);
-    color: white;
+    background: #efefef;
+    color: black;
+    font-weight: 600;
+    padding: 4px 0;
+    letter-spacing: 0.5px;
+}
+
+.close-table:hover {
+    background: #71639e;
+    color: #FFFFFF;
+}
+
+button.view-member-free:hover {
+    background: #71639e;
+    color: #FFFFFF;
+    text-decoration: none;
+    font-weight: 800;
 }
 
 .title_member_free {
@@ -258,22 +272,32 @@ span[name="message_warning"] {
 /* for desktop screen */
 
 @media only screen and (max-width: 1800px) {
-    .icon_search_human {
-        right: 55px;
+    #count_member_of_company {
+        left: 4%;
     }
+
 }
 
 @media only screen and (max-width: 1600px) {
-    .human_resource_template tbody {
-        height: 510px;
-    }
-    .icon_search_human {
-        right: 65px;
+    #count_member_of_company {
+        left: 4%;
     }
 }
 
 @media only screen and (max-width: 1400px) {
-    .human_resource_template tbody {
-        height: 450px;
+    #count_member_of_company {
+        left: 6%;
+    }
+}
+
+@media only screen and (max-width: 1200px) {
+    #count_member_of_company {
+        left: 7%;
+    }
+}
+
+@media only screen and (max-width: 800px) {
+    #count_member_of_company {
+        left: 8%;
     }
 }
