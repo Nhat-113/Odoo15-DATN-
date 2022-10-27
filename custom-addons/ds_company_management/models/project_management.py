@@ -5,51 +5,7 @@ class ProjectManagement(models.Model):
     _name = "project.management"
     _description = "Project Management"
     _auto = False
-    _rec_name = "project_id"
     
-
-    def _content_compute_total(self):
-        for record in self:
-            record.count_members = record.project_management_history_temp.total_members
-            record.total_salary = record.project_management_history_temp.total_salary
-            record.profit = record.project_management_history_temp.total_profit
-            record.last_update_color = record.project_id.last_update_color
-            if record.revenue != 0:
-                record.profit_margin = (record.profit / record.revenue) * 100
-            else:
-                record.profit_margin = 0
-
-
-    # id = fields.Integer("ID")
-    project_id = fields.Many2one('project.project', string="Project")
-    department_id = fields.Many2one("hr.department", string="Department")
-    user_pm = fields.Many2one('res.users', string="PM")
-    company_id = fields.Many2one('res.company', string="Company")
-    currency_id = fields.Many2one('res.currency', string="Currency")
-    date_start = fields.Date(string='Start')
-    date_end = fields.Date(string='End')
-    status = fields.Char(string='Status')
-    
-    # bonus = fields.Float(string="Bonus")
-    revenue = fields.Float(string="Revenue")
-    project_cost = fields.Float(string="Project Cost")
-    
-    last_update_color = fields.Integer(compute=_content_compute_total)
-    count_members = fields.Float(string='Effort(MM)', compute=_content_compute_total, digits=(12,3))
-    total_salary = fields.Float(string="Salary Cost", compute=_content_compute_total)
-    profit = fields.Float(string="Profit", compute=_content_compute_total)
-    profit_margin = fields.Float(string="Profit Margin (%)",compute=_content_compute_total, digits=(12,2), help="Profit Margin = profit / revenue * 100")
-    
-    member_ids = fields.One2many('project.management.member', 'project_management_id', string="Members")
-    project_expense_values = fields.One2many('project.expense.value', 'project_management_id', string="Project Cost Management")
-    project_management_history = fields.One2many('project.management.history', 'project_management_id', string="Project Management History")
-    project_management_history_temp = fields.One2many('project.history.group.temp', 'project_management_id', string="Project Management History Temp")
-    
-    
-    project_type_id = fields.Many2one("project.type", string="Project Type")
-    
-    user_login = fields.Many2one('res.users', string="User")
-    sub_user_login = fields.Many2one('res.users', string="Sub CEO")
     
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
@@ -184,3 +140,40 @@ class ProjectManagement(models.Model):
 
             ) """ % (self._table)
         )
+       
+
+class ProjectManagementData(models.Model):
+    _name = "project.management.data"
+    _description = "Project Management"
+    _rec_name = "project_id"
+    
+
+    project_id = fields.Many2one('project.project', string="Project")
+    department_id = fields.Many2one("hr.department", string="Department")
+    user_pm = fields.Many2one('res.users', string="PM")
+    company_id = fields.Many2one('res.company', string="Company")
+    currency_id = fields.Many2one('res.currency', string="Currency")
+    date_start = fields.Date(string='Start')
+    date_end = fields.Date(string='End')
+    status = fields.Char(string='Status')
+    
+    # bonus = fields.Float(string="Bonus")
+    revenue = fields.Float(string="Revenue")
+    project_cost = fields.Float(string="Project Cost")
+    
+    last_update_color = fields.Integer(related='project_id.last_update_color', store=False)
+    count_members = fields.Float(string='Effort(MM)', digits=(12,3))
+    total_salary = fields.Float(string="Salary Cost")
+    profit = fields.Float(string="Profit")
+    profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2), help="Profit Margin = profit / revenue * 100")
+    
+    member_ids = fields.One2many('project.management.member.data', 'project_management_id', string="Members")
+    project_expense_values = fields.One2many('project.expense.value', 'project_management_id', string="Project Cost Management")
+    project_management_history = fields.One2many('project.management.history.data', 'project_management_id', string="Project Management History")
+    project_management_history_temp = fields.One2many('project.history.group.temp', 'project_management_id', string="Project Management History Temp")
+    
+    
+    project_type_id = fields.Many2one("project.type", string="Project Type")
+    
+    user_login = fields.Many2one('res.users', string="User")
+    sub_user_login = fields.Many2one('res.users', string="Sub CEO")

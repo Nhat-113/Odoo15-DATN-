@@ -2,8 +2,8 @@
 <odoo>
     <!-- Sidebar filter  -->
     <record id="project_sidebar_filter" model="ir.ui.view">
-        <field name="name">project.management.search</field>
-        <field name="model">project.management</field>
+        <field name="name">project.management.data.search</field>
+        <field name="model">project.management.data</field>
         <field name="arch" type="xml">
             <search>
                 <searchpanel>
@@ -16,7 +16,7 @@
 
     <record id="view_tree_project_management" model="ir.ui.view">
         <field name="name">Project Management List</field>
-        <field name="model">project.management</field>
+        <field name="model">project.management.data</field>
         <field name="arch" type="xml">
             <tree create="0" delete="0" multi_edit="1" sample="1">
                 <!-- <field name="sequence" widget="handle"/> -->
@@ -46,7 +46,7 @@
 
     <record id="view_form_project_management" model="ir.ui.view">
         <field name="name">Project Management Form</field>
-        <field name="model">project.management</field>
+        <field name="model">project.management.data</field>
         <field name="priority">999</field>
         <field name="arch" type="xml">
             <form string="Cost Managements" class="o_form_project_project" edit="0" delete="0" create="0">
@@ -128,7 +128,7 @@
 
     <record id="project_management_action" model="ir.actions.act_window">
         <field name="name">Project Cost Management</field>
-        <field name="res_model">project.management</field>
+        <field name="res_model">project.management.data</field>
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="project_sidebar_filter"/>
         <field name="view_ids" eval="[(5, 0, 0),

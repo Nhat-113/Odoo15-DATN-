@@ -12,3 +12,4 @@ from . import department_project_detail
 from . import dashboard_block
 from . import project_management_member
 from . import project_management_member_detail
+from . import cost_management_upgrade_action

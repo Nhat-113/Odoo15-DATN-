@@ -8,25 +8,6 @@ class ProjectManagementHistory(models.Model):
     _order = "month_start desc"
     
     
-    project_management_id = fields.Many2one('project.management', string="Project Management")
-    currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id)
-    months = fields.Char(string="Month")
-    month_start = fields.Date(string="Start")
-    month_end = fields.Date(string="End")
-    working_day = fields.Float(string="Working day")
-    total_project_expense = fields.Float(string="Project Cost", help="Total Project Expenses By Month")
-    operation_cost = fields.Float(string="Operation Cost", help="Total Operation Cost")
-    average_cost_company = fields.Float(string="Company Avg Cost")
-    average_cost_project = fields.Float(string="Prj Avg Cost")
-    members = fields.Float(string="Effort(MM)", digits=(12,3))
-    all_members = fields.Float(string="Total members", digits=(12,3))
-    
-    total_salary = fields.Float(string="Salary Cost", help="Total salary Employees By Month = SUM(salary_employee * effort_rate)")
-    revenue = fields.Float(string="Revenue", help="Revenue By Month")
-    profit = fields.Float(string="Profit")
-    profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2), help="Profit Margin = profit / revenue * 100")
-    
-    
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
@@ -344,4 +325,27 @@ class ProjectManagementHistory(models.Model):
         )
     
 
-            
+
+class ProjectManagementHistoryData(models.Model):
+    _name = "project.management.history.data"
+    _description = "Project Management History Data"
+    _order = "month_start desc"
+    
+    
+    project_management_id = fields.Many2one('project.management.data', string="Project Management")
+    currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.ref('base.main_company').currency_id)
+    months = fields.Char(string="Month")
+    month_start = fields.Date(string="Start")
+    month_end = fields.Date(string="End")
+    working_day = fields.Float(string="Working day")
+    total_project_expense = fields.Float(string="Project Cost", help="Total Project Expenses By Month")
+    operation_cost = fields.Float(string="Operation Cost", help="Total Operation Cost")
+    average_cost_company = fields.Float(string="Company Avg Cost")
+    average_cost_project = fields.Float(string="Prj Avg Cost")
+    members = fields.Float(string="Effort(MM)", digits=(12,3))
+    all_members = fields.Float(string="Total members", digits=(12,3))
+    
+    total_salary = fields.Float(string="Salary Cost", help="Total salary Employees By Month = SUM(salary_employee * effort_rate)")
+    revenue = fields.Float(string="Revenue", help="Revenue By Month")
+    profit = fields.Float(string="Profit")
+    profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2), help="Profit Margin = profit / revenue * 100")

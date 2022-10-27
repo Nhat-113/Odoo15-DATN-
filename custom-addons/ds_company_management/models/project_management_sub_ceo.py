@@ -8,29 +8,6 @@ class ProjectManagementSubCeo(models.Model):
     _order = "id desc"
     
     
-    def _compute_average_profit_margin(self):
-        for record in self:
-            if record.total_revenue != 0:
-                record.profit_margin = (record.total_profit / record.total_revenue) * 100
-            else:
-                record.profit_margin = 0
-    
-    company_id = fields.Many2one('res.company', string='Company')
-    department_id = fields.Many2one('hr.department', string='Department')
-    months = fields.Char(string="Month")
-    month_start = fields.Date(string="Start")
-    month_end = fields.Date(string="End")
-    total_members = fields.Float(string='Effort(MM)', digits=(12,3))
-    total_salary = fields.Float(string="Salary Cost")
-    total_project_cost = fields.Float(string="Project Cost")
-    total_revenue = fields.Float(string="Revenue")
-    total_profit = fields.Float(string="Profit")
-    profit_margin = fields.Float(string="Profit Margin (%)", compute=_compute_average_profit_margin, digits=(12,2))
-    
-    currency_id = fields.Many2one('res.currency', string="Currency")
-    user_login = fields.Many2one('res.users', string="User")
-    
-    
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
@@ -230,12 +207,36 @@ class ProjectManagementSubCeo(models.Model):
         
         
     
-        
+   
+    
+
+class ProjectManagementSubCeoData(models.Model):
+    _name = 'project.management.subceo.data'
+    _description = 'Project Management Sub CEO Data'
+    _order = "id desc"
+     
+    
+    company_id = fields.Many2one('res.company', string='Company')
+    department_id = fields.Many2one('hr.department', string='Department')
+    months = fields.Char(string="Month")
+    month_start = fields.Date(string="Start")
+    month_end = fields.Date(string="End")
+    total_members = fields.Float(string='Effort(MM)', digits=(12,3))
+    total_salary = fields.Float(string="Salary Cost")
+    total_project_cost = fields.Float(string="Project Cost")
+    total_revenue = fields.Float(string="Revenue")
+    total_profit = fields.Float(string="Profit")
+    profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2))
+    
+    currency_id = fields.Many2one('res.currency', string="Currency")
+    user_login = fields.Many2one('res.users', string="User")
+    
+         
     def get_project_detail(self):
         action = {
             'name': self.department_id.name,
             'type': 'ir.actions.act_window',
-            'res_model': 'department.project.detail',
+            'res_model': 'department.project.detail.data',
             'view_ids': self.env.ref('ds_company_management.department_project_detail_action').id,
             'view_mode': 'tree',
             'domain': [('department_id', '=', self.department_id.id), 

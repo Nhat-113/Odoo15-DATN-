@@ -3,8 +3,8 @@
 
     <!-- Sidebar filter  -->
     <record id="sidebar_filter_department_project_detail" model="ir.ui.view">
-        <field name="name">department.project.detail.search</field>
-        <field name="model">department.project.detail</field>
+        <field name="name">department.project.detail.data.search</field>
+        <field name="model">department.project.detail.data</field>
         <field name="arch" type="xml">
             <search>
                 <searchpanel>
@@ -22,8 +22,8 @@
     </record>
 
     <record id="view_tree_department_project_detail" model="ir.ui.view">
-        <field name="name">department.project.detail.tree</field>
-        <field name="model">department.project.detail</field>
+        <field name="name">department.project.detail.data.tree</field>
+        <field name="model">department.project.detail.data</field>
         <field name="arch" type="xml">
             <tree string="Project Management Detail" default_order="user_pm">
                 <field name="department_id" optional="hide"/>
@@ -50,7 +50,7 @@
 
     <record id="department_project_detail_action" model="ir.actions.act_window">
         <field name="name">Department Project Detail</field>
-        <field name="res_model">department.project.detail</field>
+        <field name="res_model">department.project.detail.data</field>
         <field name="view_mode">tree</field>
         <field name="search_view_id" ref="sidebar_filter_department_project_detail"/>
         <!-- <field name="context">{'search_default_filter_current_year': 1, 'search_default_group_by_department': 1}</field> -->

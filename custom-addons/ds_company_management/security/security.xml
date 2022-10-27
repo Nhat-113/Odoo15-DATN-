@@ -55,42 +55,42 @@
     <!-- Record rule Cost Management -->
     <record id="project_cost_management_div_rule" model="ir.rule">
         <field name="name">Div Manager: Project Cost Management</field>
-        <field name="model_id" ref="model_project_management"/>
+        <field name="model_id" ref="model_project_management_data"/>
         <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids), ('user_login', '=', user.id)]</field>
         <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_div'))]"/>
     </record>
 
     <record id="project_cost_management_subceo_rule" model="ir.rule">
         <field name="name">Sub CEO: Project Cost Management</field>
-        <field name="model_id" ref="model_project_management"/>
+        <field name="model_id" ref="model_project_management_data"/>
         <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids),('sub_user_login', '=', user.id)]</field>
         <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_sub_ceo'))]"/>
     </record>
 
     <record id="project_cost_management_ceo_rule" model="ir.rule">
         <field name="name">CEO: Project Cost Management</field>
-        <field name="model_id" ref="model_project_management"/>
+        <field name="model_id" ref="model_project_management_data"/>
         <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
         <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_ceo'))]"/>
     </record>
 
     <record id="department_cost_management_subceo_rule" model="ir.rule">
         <field name="name">Sub CEO: Department Cost Management</field>
-        <field name="model_id" ref="model_project_management_subceo"/>
+        <field name="model_id" ref="model_project_management_subceo_data"/>
         <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids),('user_login', '=', user.id)]</field>
         <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_sub_ceo'))]"/>
     </record>
 
     <record id="department_cost_management_ceo_rule" model="ir.rule">
         <field name="name">CEO: Department Cost Management</field>
-        <field name="model_id" ref="model_project_management_subceo"/>
+        <field name="model_id" ref="model_project_management_subceo_data"/>
         <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
         <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_ceo'))]"/>
     </record>
 
     <record id="company_cost_management_rule" model="ir.rule">
         <field name="name">CEO: Company Cost Management Multi Company Rule</field>
-        <field name="model_id" ref="model_project_management_ceo"/>
+        <field name="model_id" ref="model_project_management_ceo_data"/>
         <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
         <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_ceo'))]"/>
     </record>

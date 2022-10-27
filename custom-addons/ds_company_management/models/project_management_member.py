@@ -5,23 +5,7 @@ class ProjectMemberManagement(models.Model):
     _description = "Project Member Management"
     _auto = False
 
-    
-    project_management_id = fields.Many2one('project.management', string="Project Management")
 
-    company_id = fields.Many2one('res.company', string='Company')
-    employee_id = fields.Many2one('hr.employee', string="Employee")
-    job_id = fields.Many2one('hr.job', string="Job Position")
-    planning_role_id = fields.Many2one('planning.roles', string='Roles')
-    email = fields.Char(string='Email')
-    number_phone = fields.Char(string='Number Phone')
-    start_date = fields.Date(string='Start')
-    end_date = fields.Date(string='End')
-    member_type = fields.Many2one('planning.member.type', string="Member Type")
-    effort_rate = fields.Float(string="Effort Rate")
-    # salary = fields.Float(string="Salary")
-    
-    member_details = fields.One2many('project.management.member.detail', 'project_members', string="Member detail")
-    
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
@@ -51,11 +35,37 @@ class ProjectMemberManagement(models.Model):
         )
 
 
+    
+    
+class ProjectMemberManagementData(models.Model):
+    _name = "project.management.member.data"
+    _description = "Project Member Management Data"
+    
+    
+    
+    project_management_id = fields.Many2one('project.management', string="Project Management")
+
+    company_id = fields.Many2one('res.company', string='Company')
+    employee_id = fields.Many2one('hr.employee', string="Employee")
+    job_id = fields.Many2one('hr.job', string="Job Position")
+    planning_role_id = fields.Many2one('planning.roles', string='Roles')
+    email = fields.Char(string='Email')
+    number_phone = fields.Char(string='Number Phone')
+    start_date = fields.Date(string='Start')
+    end_date = fields.Date(string='End')
+    member_type = fields.Many2one('planning.member.type', string="Member Type")
+    effort_rate = fields.Float(string="Effort Rate")
+    # salary = fields.Float(string="Salary")
+    
+    member_details = fields.One2many('project.management.member.detail.data', 'project_members', string="Member detail")
+    
+    
+    
     def view_detail_member(self):
         action = {
             'name': self.employee_id.name,
             'type': 'ir.actions.act_window',
-            'res_model': 'project.management.member',
+            'res_model': 'project.management.member.data',
             'res_id': self.id,
             'view_ids': self.env.ref('ds_company_management.view_form_project_management_member').id,
             'view_mode': 'form',

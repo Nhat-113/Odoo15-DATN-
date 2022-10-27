@@ -36,6 +36,7 @@ class GetAPIDataExchangeRate(models.Model):
         self.jpy_convert = self.get_currency_api("JPY")
         self.sgd_convert = self.get_currency_api("SGD")
         self.date_upgrade = datetime.now()
+        self.env['cost.management.upgrade.action'].cost_management_reset_update_data()
         
     def get_currency_api(self, currency):
         data = {}
@@ -55,3 +56,4 @@ class GetAPIDataExchangeRate(models.Model):
     def cron_reset_upgrate_exchange_rate_api(self):
         exchange_rate = self.env['api.exchange.rate'].search([])
         exchange_rate.count_upgrade = 0
+        self.env['cost.management.upgrade.action'].cost_management_reset_update_data()
