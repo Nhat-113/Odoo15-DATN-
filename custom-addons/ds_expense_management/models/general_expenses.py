@@ -135,6 +135,8 @@ class ExpenseManagement(models.Model):
         return  super(ExpenseManagement, self).unlink()
 
 class ExpenseGeneral(models.Model):
+    """ This is Activity Expenses model in UI end user Because server production, data already exists so can't modify model name
+    """
     _name = 'expense.general'
     _description = "General Expense"
     _rec_name = "category_expenses"
@@ -149,6 +151,8 @@ class ExpenseGeneral(models.Model):
     
     
 class ActivityExpense(models.Model):
+    """ This is General Expenses model in UI end user
+    """
     _name = 'expense.activity'
     _description = "Activity Expense"
     _rec_name = "category_expenses"
