@@ -32,29 +32,54 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
     var web_client = require("web.web_client");
     var _t = core._t;
     var QWeb = core.qweb;
+    var backgroundColorRandom = ['#6869AC', '#4CAF50', '#00ACC1', '#FFB300', '#E53935', '#6060EC', '#119989', '#E53935', '#00B981']
 
     var DynamicDashboard = AbstractAction.extend({
         template: "dynamic_bom_dashboard",
         jsLibs: ["/ds_company_management/static/src/js/lib/chart.js"],
 
-        events: {},
+        events: {
+            "click #chart_employee": "swap_menu",
+            "click #chart_project": "swap_menu",
+            "click #chart_revenue": "swap_menu",
+        },
+
+        swap_menu: function(events) {
+            var i, tabcontent, tablinks, targetClass, target;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            target = events.target;
+            targetClass = target.className.includes("btn-chart_employee") ?
+                "data_employee_chart" :
+                target.className.includes("btn-chart_project") ?
+                "chart_project" :
+                "chart_company_revenue";
+            document.querySelector(`.${targetClass}`).removeAttribute("style");
+            events.currentTarget.className += " active";
+        },
 
         init: function(parent, context) {
             this.action_id = context["id"];
             this._super(parent, context);
         },
-
         start: function() {
             var self = this;
             this.set("title", "Dashboard Bom");
             setTimeout(() => {
                 self.projectTypePierChart();
                 self.jobPositionPierChart();
-                self.chartProjectODC();
-                self.chartProjectBase();
-                self.chartProjectInternal();
+                self.chartProjectBill();
+                self.chartProjectNotBill();
+                self.chartProjectNull();
+                self.chartProjectFree();
                 self.chartProjectAvg();
-                self.departmentBarChart();
                 self.contractBarChart();
                 self.payrollDashboard();
             }, 1000);
@@ -89,25 +114,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                             datasets: [{
                                 label: "Project Status Chart",
                                 data: [],
-                                backgroundColor: [
-                                    "rgba(255, 99, 132, 0.2)",
-                                    "rgba(54, 162, 235, 0.2)",
-                                    "rgba(255, 206, 86, 0.2)",
-                                    "rgba(75, 192, 192, 0.2)",
-                                    "rgba(153, 102, 255, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                ],
-                                borderColor: [
-                                    "rgba(255, 99, 132, 1)",
-                                    "rgba(54, 162, 235, 1)",
-                                    "rgba(255, 206, 86, 1)",
-                                    "rgba(75, 192, 192, 1)",
-                                    "rgba(153, 102, 255, 1)",
-                                    "rgba(255, 159, 64, 1)",
-                                ],
+                                backgroundColor: backgroundColorRandom,
+                                borderColor: backgroundColorRandom,
                                 borderWidth: 1,
                             }, ],
                         },
@@ -152,25 +160,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                             datasets: [{
                                 label: "Job Position",
                                 data: [],
-                                backgroundColor: [
-                                    "rgba(255, 99, 132, 0.2)",
-                                    "rgba(54, 162, 235, 0.2)",
-                                    "rgba(255, 206, 86, 0.2)",
-                                    "rgba(75, 192, 192, 0.2)",
-                                    "rgba(153, 102, 255, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                ],
-                                borderColor: [
-                                    "rgba(255, 99, 132, 1)",
-                                    "rgba(54, 162, 235, 1)",
-                                    "rgba(255, 206, 86, 1)",
-                                    "rgba(75, 192, 192, 1)",
-                                    "rgba(153, 102, 255, 1)",
-                                    "rgba(255, 159, 64, 1)",
-                                ],
+                                backgroundColor: backgroundColorRandom,
+                                borderColor: backgroundColorRandom,
                                 borderWidth: 1,
                             }, ],
                         },
@@ -195,7 +186,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     jobPosition.update();
                 });
         },
-        chartProjectODC: function() {
+        chartProjectBill: function() {
             let self = this;
             rpc
                 .query({
@@ -203,7 +194,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_effort_human_resource",
                 })
                 .then(function(data) {
-                    var data_employee = self.valueProjectODC(data);
+                    if (data.length > 0)
+                    {
+                        var data_employee = self.valueProjectBill(data);
+                    }
                     var ele = document.getElementById("chart_ODC");
                     if (!ele) 
                         return
@@ -212,42 +206,12 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     const chartODC = new Chart(ctx, {
                         type: "line",
                         data: {
-                            labels: [
-                                "Jan",
-                                "Feb",
-                                "Mar",
-                                "Apr",
-                                "May",
-                                "Jun",
-                                "Jul",
-                                "Aug",
-                                "Sep",
-                                "Oct",
-                                "Nov",
-                                "Dec",
-                            ],
+                            labels: ["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
                             datasets: [{
-                                label: "Line Chart project ODC",
+                                label: "Avg Effort project bill",
                                 data: [],
-                                backgroundColor: [
-                                    "rgba(255, 99, 132, 0.2)",
-                                    "rgba(54, 162, 235, 0.2)",
-                                    "rgba(255, 206, 86, 0.2)",
-                                    "rgba(75, 192, 192, 0.2)",
-                                    "rgba(153, 102, 255, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                ],
-                                borderColor: [
-                                    "rgba(255, 99, 132, 1)",
-                                    "rgba(54, 162, 235, 1)",
-                                    "rgba(255, 206, 86, 1)",
-                                    "rgba(75, 192, 192, 1)",
-                                    "rgba(153, 102, 255, 1)",
-                                    "rgba(255, 159, 64, 1)",
-                                ],
+                                backgroundColor: ["#6869AC"],
+                                borderColor: ["#6869AC"],
                                 borderWidth: 1,
                             }, ],
                         },
@@ -262,7 +226,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         },
                     });
                     const dataTemp = chartODC.data;
-                    for (let i = 2; i <= Object.keys(data_employee).length; i++) {
+                    if(!data_employee)
+                        return
+                    for (let i = 0; i <= Object.keys(data_employee).length; i++) {
                         dataTemp.datasets[0].data.push(data_employee[i]);
                     }
                     chartODC.data.datasets[0].data = dataTemp.datasets[0].data;
@@ -270,7 +236,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 });
         },
 
-        valueProjectODC: function(arr) {
+        valueProjectBill: function(arr) {
             const dimensions = [arr.length, arr[0].length];
             let arrCheckMonth = new Array();
 
@@ -333,34 +299,38 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
             }
 
             let count_row_array = arr.length;
-            var res = [];
-            var res_2 = [];
-            var res_3 = [];
-            let a = 0;
-            for (let i = 0; i < count_row_array; i++) {
-                for (let j = 0; j <= 14; j++) {
-                    if (arr[i][j] > 0 && arr[i][j] != isNaN) {
-                        res_2[j] = (res_2[j] || 0) + parseFloat(arr[i][j]);
+            var effort_project_bill = [];
+            var avg_effort_project_bill = [];
+            var effort_company = [];
+            for (let i = 0; i < 14; i++) {
+                var set_arr = new Set()
+                for (let j = 0; j < count_row_array; j++) {
+                    if ((arr[j][1] == "Project Base" || arr[j][1] == "ODC") && arr[j][i] >= 0) {
+                        effort_project_bill[i] = (effort_project_bill[i] || 0) + parseFloat(arr[j][i]);
                     }
-
-                    if (arr[i][1] == "ODC" && arr[i][j] > 0 && arr[i][j] != isNaN) {
-                        res[j] = (res[j] || 0) + parseFloat(arr[i][j]);
-                    }
-                    res_3[j] = (res[j] / res_2[j]) * 100;
+                    
+                    if(arr[j][i] >= 0) {
+                        set_arr.add(arr[j][0])
+                    }                   
                 }
-
-                if (!isNaN(parseFloat(arr[i][14]))) a += parseFloat(arr[i][14]);
+                effort_company.push(set_arr.size * 100)
             }
-            res = Array.from(res, (item) => item || 0);
-            res_2 = Array.from(res_2, (item) => item || 0);
-            res_3 = Array.from(res_3, (item) => item || 0);
+            effort_project_bill = Array.from(effort_project_bill, (item) => item || 0);
+
+            effort_project_bill.splice(0, 2);
+            effort_company.splice(0, 2);
+
+           for(let i = 0; i < effort_project_bill.length ; i ++) {
+                avg_effort_project_bill[i] = (effort_project_bill[i] / effort_company[i]) * 100
+           }
 
             var rv = {};
-            for (var i = 0; i <= res_3.length; ++i) rv[i] = res_3[i];
+            for (var i = 0; i <= avg_effort_project_bill.length; ++i) 
+                rv[i] = avg_effort_project_bill[i];
             return rv;
         },
 
-        chartProjectBase: function() {
+        chartProjectNotBill: function() {
             let self = this;
             rpc
                 .query({
@@ -368,7 +338,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_effort_human_resource",
                 })
                 .then(function(data) {
-                    var data_employee = self.valueProjectBase(data);
+                    if (data.length > 0)
+                    {
+                        var data_employee = self.valueProjectNotBill(data);
+                    }
                     var ele = document.getElementById("chart_project_base");
                     if (!ele) 
                         return
@@ -377,42 +350,12 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     const chartProjectBase = new Chart(ctx, {
                         type: "line",
                         data: {
-                            labels: [
-                                "Jan",
-                                "Feb",
-                                "Mar",
-                                "Apr",
-                                "May",
-                                "Jun",
-                                "Jul",
-                                "Aug",
-                                "Sep",
-                                "Oct",
-                                "Nov",
-                                "Dec",
-                            ],
+                            labels: ["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
                             datasets: [{
-                                label: "Line Chart Project Base",
+                                label: "Line Chart Project not Bill",
                                 data: [],
-                                backgroundColor: [
-                                    "rgba(255, 99, 132, 0.2)",
-                                    "rgba(54, 162, 235, 0.2)",
-                                    "rgba(255, 206, 86, 0.2)",
-                                    "rgba(75, 192, 192, 0.2)",
-                                    "rgba(153, 102, 255, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                ],
-                                borderColor: [
-                                    "rgba(255, 99, 132, 1)",
-                                    "rgba(54, 162, 235, 1)",
-                                    "rgba(255, 206, 86, 1)",
-                                    "rgba(75, 192, 192, 1)",
-                                    "rgba(153, 102, 255, 1)",
-                                    "rgba(255, 159, 64, 1)",
-                                ],
+                                backgroundColor: ['#6869AC'],
+                                borderColor: ['#6869AC'],
                                 borderWidth: 1,
                             }, ],
                         },
@@ -427,7 +370,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         },
                     });
                     const dataTemp = chartProjectBase.data;
-                    for (let i = 2; i <= Object.keys(data_employee).length; i++) {
+                    if(!data_employee)
+                        return
+                    for (let i = 0; i <= Object.keys(data_employee).length; i++) {
                         dataTemp.datasets[0].data.push(data_employee[i]);
                     }
                     chartProjectBase.data.datasets[0].data = dataTemp.datasets[0].data;
@@ -435,7 +380,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 });
         },
 
-        valueProjectBase: function(arr) {
+        valueProjectNotBill: function(arr) {
             const dimensions = [arr.length, arr[0].length];
             let arrCheckMonth = new Array();
 
@@ -498,40 +443,36 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
             }
 
             let count_row_array = arr.length;
-            var res = [];
-            var res_2 = [];
-            var res_3 = [];
-            let a = 0;
-            for (let i = 0; i < count_row_array; i++) {
-                for (let j = 0; j <= 14; j++) {
-                    if (arr[i][j] > 0 && arr[i][j] != isNaN) {
-                        res_2[j] = (res_2[j] || 0) + parseFloat(arr[i][j]);
+            var effort_project_not_bill = [];
+            var avg_effort_project_bill = [];
+            var effort_company = [];
+            for (let i = 0; i < 14; i++) {
+                var set_arr = new Set()
+                for (let j = 0; j < count_row_array; j++) {
+                    if ((arr[j][1] == "Internal") && arr[j][i] >= 0) {
+                        effort_project_not_bill[i] = (effort_project_not_bill[i] || 0) + parseFloat(arr[j][i]);
                     }
-
-                    if (
-                        arr[i][1] == "Project Base" &&
-                        arr[i][j] > 0 &&
-                        arr[i][j] != isNaN
-                    ) {
-                        res[j] = (res[j] || 0) + parseFloat(arr[i][j]);
-                    }
-                    res_3[j] = (res[j] / res_2[j]) * 100;
+                    
+                    if(arr[j][i] >= 0) {
+                        set_arr.add(arr[j][0]);
+                    }                   
                 }
-
-                if (!isNaN(parseFloat(arr[i][14]))) a += parseFloat(arr[i][14]);
+                effort_company.push(set_arr.size * 100)
             }
-            res = Array.from(res, (item) => item || 0);
-            res_2 = Array.from(res_2, (item) => item || 0);
-            res_3 = Array.from(res_3, (item) => item || 0);
+            effort_project_not_bill = Array.from(effort_project_not_bill, (item) => item || 0);
+            effort_project_not_bill.splice(0, 2);
+            effort_company.splice(0, 2);
+           for(let i = 0; i < effort_project_not_bill.length ; i ++) {
+                avg_effort_project_bill[i] = (effort_project_not_bill[i] / effort_company[i]) * 100
+           }
 
             var rv = {};
-            for (var i = 0; i <= res_3.length; ++i) 
-                rv[i] = res_3[i];
-
+            for (var i = 0; i <= avg_effort_project_bill.length; ++i) 
+                rv[i] = avg_effort_project_bill[i];
             return rv;
         },
 
-        chartProjectInternal: function() {
+        chartProjectNull: function() {
             let self = this;
             rpc
                 .query({
@@ -539,7 +480,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_effort_human_resource",
                 })
                 .then(function(data) {
-                    var data_employee = self.valueProjectInternal(data);
+                    if (data.length > 0)
+                    {
+                        var data_employee = self.valueProjectNull(data);
+                    }
                     var ele = document.getElementById("chart_project_internal");
                     if (!ele) 
                         return
@@ -548,42 +492,13 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     const chartProjectInternal = new Chart(ctx, {
                         type: "line",
                         data: {
-                            labels: [
-                                "Jan",
-                                "Feb",
-                                "Mar",
-                                "Apr",
-                                "May",
-                                "Jun",
-                                "Jul",
-                                "Aug",
-                                "Sep",
-                                "Oct",
-                                "Nov",
-                                "Dec",
-                            ],
+                            labels: ["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+
                             datasets: [{
-                                label: "Project Internal",
+                                label: "Project Null",
                                 data: [],
-                                backgroundColor: [
-                                    "rgba(255, 99, 132, 0.2)",
-                                    "rgba(54, 162, 235, 0.2)",
-                                    "rgba(255, 206, 86, 0.2)",
-                                    "rgba(75, 192, 192, 0.2)",
-                                    "rgba(153, 102, 255, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                    "rgba(255, 159, 64, 0.2)",
-                                ],
-                                borderColor: [
-                                    "rgba(255, 99, 132, 1)",
-                                    "rgba(54, 162, 235, 1)",
-                                    "rgba(255, 206, 86, 1)",
-                                    "rgba(75, 192, 192, 1)",
-                                    "rgba(153, 102, 255, 1)",
-                                    "rgba(255, 159, 64, 1)",
-                                ],
+                                backgroundColor: ["#6869AC"],
+                                borderColor: ["#6869AC"],
                                 borderWidth: 1,
                             }, ],
                         },
@@ -598,7 +513,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         },
                     });
                     const dataTemp = chartProjectInternal.data;
-                    for (let i = 2; i <= Object.keys(data_employee).length; i++) {
+                    if(!data_employee)
+                        return
+                    for (let i = 0; i <= Object.keys(data_employee).length; i++) {
                         dataTemp.datasets[0].data.push(data_employee[i]);
                     }
                     chartProjectInternal.data.datasets[0].data =
@@ -607,7 +524,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 });
         },
 
-        valueProjectInternal: function(arr) {
+        valueProjectNull: function(arr) {
             const dimensions = [arr.length, arr[0].length];
             let arrCheckMonth = new Array();
 
@@ -670,32 +587,178 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
             }
 
             let count_row_array = arr.length;
-            var res = [];
-            var res_2 = [];
-            var res_3 = [];
-            let a = 0;
-            for (let i = 0; i < count_row_array; i++) {
-                for (let j = 0; j <= 14; j++) {
-                    if (arr[i][j] > 0 && arr[i][j] != isNaN) {
-                        res_2[j] = (res_2[j] || 0) + parseFloat(arr[i][j]);
+            var total_effort_project_null = [];
+            var avg_effort_project_null = [];
+            var effort_company = [];
+            for (let i = 0; i < 14; i++) {
+                var set_arr = new Set()
+                for (let j = 0; j < count_row_array; j++) {
+                    if ((arr[j][1] == null ) && arr[j][i] >= 0) {
+                        total_effort_project_null[i] = (total_effort_project_null[i] || 0) + parseFloat(arr[j][i]);
                     }
-
-                    if (arr[i][1] == "Internal" && arr[i][j] > 0 && arr[i][j] != isNaN) {
-                        res[j] = (res[j] || 0) + parseFloat(arr[i][j]);
-                    }
-                    res_3[j] = (res[j] / res_2[j]) * 100;
+                    
+                    if(arr[j][i] >= 0) {
+                        set_arr.add(arr[j][0])
+                    }                   
                 }
-
-                if (!isNaN(parseFloat(arr[i][14]))) a += parseFloat(arr[i][14]);
+                effort_company.push(set_arr.size * 100)
             }
-            res = Array.from(res, (item) => item || 0);
-            res_2 = Array.from(res_2, (item) => item || 0);
-            res_3 = Array.from(res_3, (item) => item || 0);
+
+            total_effort_project_null = Array.from(total_effort_project_null, (item) => item || 0);
+            total_effort_project_null.splice(0, 2);
+            effort_company.splice(0, 2);
+
+           for(let i = 0; i < total_effort_project_null.length ; i ++) {
+            avg_effort_project_null[i] = (total_effort_project_null[i] / effort_company[i]) * 100
+           }
 
             var rv = {};
-            for (var i = 0; i <= res_3.length; ++i) 
-                rv[i] = res_3[i];
+            for (var i = 0; i <= avg_effort_project_null.length; ++i) 
+                rv[i] = avg_effort_project_null[i];
+            return rv;
+        },
 
+        chartProjectFree: function() {
+            let self = this;
+            rpc
+                .query({
+                    model: "dashboard.block",
+                    method: "get_effort_human_resource",
+                })
+                .then(function(data) {
+                    if (data.length > 0)
+                    {
+                        var data_employee = self.valueProjectFree(data);
+                    }
+                    var ele = document.getElementById("chart_project_free");
+                    if (!ele) 
+                        return
+                    const ctx = ele.getContext("2d");
+
+                    const chartProjectInternal = new Chart(ctx, {
+                        type: "line",
+                        data: {
+                            labels: ["Jan","Feb","Mar", "Apr", "May","Jun", "Jul", "Aug","Sep","Oct","Nov", "Dec",],
+                            datasets: [{
+                                label: "Project Null",
+                                data: [],
+                                backgroundColor: ["#6869AC"],
+                                borderColor: ["#6869AC"],
+                                borderWidth: 1,
+                            }, ],
+                        },
+                        options: {
+                            scales: {
+                                yAxes: {
+                                    ticks: {
+                                        beginAtZero: true,
+                                    },
+                                },
+                            },
+                        },
+                    });
+                    const dataTemp = chartProjectInternal.data;
+                    if(!data_employee)
+                        return
+                    for (let i = 0; i <= Object.keys(data_employee).length; i++) {
+                        dataTemp.datasets[0].data.push(data_employee[i]);
+                    }
+                    chartProjectInternal.data.datasets[0].data =
+                        dataTemp.datasets[0].data;
+                    chartProjectInternal.update();
+                });
+        },
+
+        valueProjectFree: function(arr) {
+            const dimensions = [arr.length, arr[0].length];
+            let arrCheckMonth = new Array();
+
+            arr.forEach((childArr) => {
+                if (childArr[dimensions[1] - 2] != null) {
+                    let arrStartDate = childArr[dimensions[1] - 2].split(",");
+                    let arrEndDate = childArr[dimensions[1] - 1].split(",");
+                    let contractAvailableSet = new Set();
+                    for (let index = 0; index < arrStartDate.length; index++) {
+                        if (
+                            parseInt(arrStartDate[index].split("-")[1]) <
+                            new Date().getFullYear() &&
+                            parseInt(arrEndDate[index].split("-")[1]) == 0
+                        ) {
+                            for (let i = 1; i <= 12; i++) {
+                                contractAvailableSet.add(i);
+                            }
+                        } else if (
+                            parseInt(arrStartDate[index].split("-")[1]) ==
+                            new Date().getFullYear()
+                        ) {
+                            if (
+                                parseInt(arrStartDate[index].split("-")[0]) <=
+                                parseInt(arrEndDate[index].split("-")[0]) &&
+                                parseInt(arrEndDate[index].split("-")[0]) != 0
+                            ) {
+                                for (
+                                    let i = parseInt(arrStartDate[index].split("-")[0]); i <= parseInt(arrEndDate[index].split("-")[0]); i++
+                                ) {
+                                    contractAvailableSet.add(i);
+                                }
+                            } else if (parseInt(arrEndDate[index].split("-")[0]) == 0) {
+                                for (
+                                    let i = parseInt(arrStartDate[index].split("-")[0]); i <= 12; i++
+                                ) {
+                                    contractAvailableSet.add(i);
+                                }
+                            }
+                        }
+                    }
+                    arrCheckMonth.push(contractAvailableSet);
+                } else {
+                    arrCheckMonth.push(new Set());
+                }
+            });
+            for (let index = 0; index < arr.length; index++) {
+                let sum = 0,
+                    cnt = 0;
+
+                for (let i = 2; i <= 13; i++) {
+                    if (!arrCheckMonth[index].has(i - 1)) {
+                        arr[index][i] = -1;
+                    } else {
+                        sum += arr[index][i];
+                        cnt++;
+                    }
+                }
+                arr[index][14] =
+                    cnt > 0 ? Number.parseFloat(sum / cnt).toFixed(2) : "NaN";
+            }
+
+            let count_row_array = arr.length;
+            var effort_project_total = [];
+            var avg_effort_project_not_free = [];
+            var effort_company = [];
+            for (let i = 0; i < 14; i++) {
+                var set_arr = new Set()
+                for (let j = 0; j < count_row_array; j++) {
+                    if (arr[j][i] >= 0) {
+                        effort_project_total[i] = (effort_project_total[i] || 0) + parseFloat(arr[j][i]);
+                    }
+                    
+                    if(arr[j][i] >= 0) {
+                        set_arr.add(arr[j][0])
+                    }                   
+                }
+                effort_company.push(set_arr.size * 100)
+            }
+
+            effort_project_total = Array.from(effort_project_total, (item) => item || 0);
+            effort_project_total.splice(0, 2);
+            effort_company.splice(0, 2);
+
+            for(let i = 0; i < effort_project_total.length ; i ++) {
+                    avg_effort_project_not_free[i] = ( (effort_company[i] - effort_project_total[i]) / effort_company[i] ) * 100
+            }
+            var rv = {};
+            for (var i = 0; i <= avg_effort_project_not_free.length; ++i) 
+                rv[i] = avg_effort_project_not_free[i];
             return rv;
         },
 
@@ -707,29 +770,24 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_effort_human_resource",
                 })
                 .then(function(data) {
-                    var data_employee = self.valueProjectAVG(data);
+                    if (data.length > 0)
+                        {
+                            var data_employee = self.valueProjectAVG(data);
+                        }
                     var ele = document.getElementById("chart_avg_project");
                     if (!ele) 
                         return
                     const ctx = ele.getContext("2d");
 
                     const chartAvgProject = new Chart(ctx, {
-                        type: "line",
+                        type: "pie",
                         data: {
-                            labels: [ "Project ODC", "Project Internal", "Project Base"],
+                            labels: [ "Project No Bill", "Project Bill", "Project Null", "Member free"],
                             datasets: [{
                                 label: "Project Avg",
                                 data: [],
-                                backgroundColor: [
-                                    "rgba(255, 99, 132, 0.2)",
-                                    "rgba(54, 162, 235, 0.2)",
-                                    "rgba(255, 206, 86, 0.2)",
-                                ],
-                                borderColor: [
-                                    "rgba(255, 99, 132, 1)",
-                                    "rgba(54, 162, 235, 1)",
-                                    "rgba(255, 206, 86, 1)",
-                                ],
+                                backgroundColor:backgroundColorRandom ,
+                                borderColor: backgroundColorRandom, 
                                 borderWidth: 1,
                             }, ],
                         },
@@ -744,6 +802,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         },
                     });
                     const dataTemp = chartAvgProject.data;
+                    if(!data_employee)
+                        return
                     for (let i = 0; i <= Object.keys(data_employee).length; i++) {
                         dataTemp.datasets[0].data.push(data_employee[i]);
                     }
@@ -815,53 +875,58 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
             }
 
             let count_row_array = arr.length;
-            var sum_internal = [];
-            var sum_odc = [];
-            var sum_pro_base = [];
-            var sum_total = [];
-            let a = 0;
-            for (let i = 0; i < count_row_array; i++) {
-                for (let j = 0; j < 14; j++) {
-                    if (arr[i][j] > 0 && arr[i][j] != isNaN) {
-                        sum_total[j] = (sum_total[j] || 0) + parseFloat(arr[i][j]);
+            var effort_company = [];
+            var sum_not_bill = [];
+            var sum_bill = [];
+            var sum_null = [];
+
+            for (let i = 0; i < 14; i++) {
+                var set_arr = new Set()
+                for (let j = 0; j < count_row_array; j++) {
+                    if ( (arr[j][1] == "Internal") && arr[j][i] >= 0) {
+                        sum_not_bill[i] = (sum_not_bill[i] || 0) + parseFloat(arr[j][i]);
                     }
 
-                    if (arr[i][1] == "Internal" && arr[i][j] > 0 && arr[i][j] != isNaN) {
-                        sum_internal[j] = (sum_internal[j] || 0) + parseFloat(arr[i][j]);
+                    if ( (arr[j][1] == "ODC" || arr[j][1] == "Project Base") && arr[j][i] >= 0) {
+                        sum_bill[i] = (sum_bill[i] || 0) + parseFloat(arr[j][i]);
                     }
-
-                    if (arr[i][1] == "ODC" && arr[i][j] > 0 && arr[i][j] != isNaN) {
-                        sum_odc[j] = (sum_odc[j] || 0) + parseFloat(arr[i][j]);
+                    if ( (arr[j][1] == null) && arr[j][i] >= 0) {
+                        sum_null[i] = (sum_null[i] || 0) + parseFloat(arr[j][i]);
                     }
-
-                    if (arr[i][1] == "Project Base" && arr[i][j] > 0 && arr[i][j] != isNaN) {
-                        sum_pro_base[j] = (sum_pro_base[j] || 0) + parseFloat(arr[i][j]);
-                    }
+                    
+                    if(arr[j][i] >= 0) {
+                        set_arr.add(arr[j][0])
+                    }                   
                 }
-
-                if (!isNaN(parseFloat(arr[i][14]))) a += parseFloat(arr[i][14]);
+                effort_company.push(set_arr.size * 100)
             }
 
-            sum_internal = Array.from(sum_internal, (item) => item || 0);
-            sum_odc = Array.from(sum_odc, (item) => item || 0);
-            sum_pro_base = Array.from(sum_pro_base, (item) => item || 0);
-            sum_total = Array.from(sum_total, (item) => item || 0);
+            sum_not_bill = Array.from(sum_not_bill, (item) => item || 0);
+            sum_bill = Array.from(sum_bill, (item) => item || 0);
+            sum_null = Array.from(sum_null, (item) => item || 0);
 
-            var sum_value_internal,
-                sum_value_odc,
-                sum_value_pro_base,
-                sum_value_total;
+            sum_not_bill.splice(0, 2)
+            sum_bill.splice(0, 2)
+            sum_null.splice(0, 2)
+            effort_company.splice(0, 2)
 
-            sum_value_internal = sum_internal.reduce((a, b) => a + b, 0);
-            sum_value_odc = sum_odc.reduce((a, b) => a + b, 0);
-            sum_value_pro_base = sum_pro_base.reduce((a, b) => a + b, 0);
-            sum_value_total = sum_total.reduce((a, b) => a + b, 0);
+            effort_company = Array.from(effort_company, (item) => item || 0);
+
+            var sum_value_not_bill, sum_value_bill, sum_value_null, total_effort_company, sum_value_free
+
+            sum_value_not_bill = sum_not_bill.reduce((a, b) => a + b, 0);
+            sum_value_bill = sum_bill.reduce((a, b) => a + b, 0);
+            sum_value_null = sum_null.reduce((a, b) => a + b, 0);
+            total_effort_company = effort_company.reduce((a, b) => a + b, 0);
+            sum_value_free =  total_effort_company -(sum_value_not_bill  + sum_value_bill + sum_value_null);
+
             
-            var effort_avg_odc = (sum_value_odc / sum_value_total) * 100;
-            var effort_avg_internal = (sum_value_internal / sum_value_total) * 100;
-            var effort_avg_pro_base = (sum_value_pro_base / sum_value_total) * 100;
+            var effort_avg_value_not_bill = (sum_value_not_bill / total_effort_company) * 100;
+            var effort_avg_value_bill = (sum_value_bill / total_effort_company) * 100;
+            var effort_avg_value_null = (sum_value_null / total_effort_company) * 100;
+            var effort_avg_sum_value_free = (sum_value_free / total_effort_company) * 100;
 
-            let avg = [effort_avg_odc, effort_avg_internal, effort_avg_pro_base];
+            let avg = [effort_avg_value_not_bill, effort_avg_value_bill, effort_avg_value_null, effort_avg_sum_value_free];
 
             var avgProjectObj = {};
             for (var i = 0; i <= avg.length; ++i)
@@ -912,13 +977,13 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                     type: "linear",
                                     position: "left",
                                     ticks: { beginAtZero: true, color: "rgba(255, 99, 132, 1)" },
-                                    grid: { display: false },
+                                    grid: { display: true },
                                 },
                                 B: {
                                     type: "linear",
                                     position: "right",
                                     ticks: { beginAtZero: true, color: "rgba(54, 162, 235, 1)" },
-                                    grid: { display: false },
+                                    grid: { display: true },
                                 },
                                 x: { ticks: { beginAtZero: true } },
                             },
@@ -941,56 +1006,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 });
         },
 
-        departmentBarChart: function() {
-            rpc
-                .query({
-                    model: "dashboard.block",
-                    method: "get_dept_employee",
-                })
-                .then(function(data) {
-                    const ctx = document.getElementById('department').getContext('2d');
-                    const department = new Chart(ctx, {
-                        type: "bar",
-                        data: {
-                            labels: [],
-                            datasets: [{
-                                label: "Department",
-                                data: [],
-                                backgroundColor: [
-                                    "rgba(255, 99, 132, 0.2)",
-                                    "rgba(54, 162, 235, 0.2)",
-                                    "rgba(255, 206, 86, 0.2)",
-                                ],
-                                borderColor: [
-                                    "rgba(255, 99, 132, 1)",
-                                    "rgba(54, 162, 235, 1)",
-                                    "rgba(255, 206, 86, 1)",
-                                ],
-                                borderWidth: 1,
-                            }, ],
-                        },
-                        options: {
-                            scales: {
-                                yAxes: {
-                                    ticks: {
-                                        beginAtZero: true,
-                                    },
-                                },
-                            },
-                        },
-                    });
-                    const dataTemp = department.data;
-                    for (let i = 0; i < data.length; i++) {
-                        dataTemp.labels.push(data[i].label);
-                        dataTemp.datasets[0].data.push(data[i].value)
-                    }
-                    department.data.labels = dataTemp.labels;
-                    department.data.datasets[0].data = dataTemp.datasets[0].data;
-                    department.update();
-
-                });
-
-        },
+   
         contractBarChart: function() {
             rpc
                 .query({
@@ -998,7 +1014,11 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_contract_type",
                 })
                 .then(function(data) {
-                    const ctx = document.getElementById('contract').getContext('2d');
+                    var ele = document.getElementById('contract')
+                    if (!ele)
+                        return
+                    const ctx =ele.getContext('2d');
+                   
                     const contract = new Chart(ctx, {
                         type: "bar",
                         data: {
@@ -1006,16 +1026,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                             datasets: [{
                                 label: "Contract",
                                 data: [],
-                                backgroundColor: [
-                                    "rgba(255, 99, 132, 0.2)",
-                                    "rgba(54, 162, 235, 0.2)",
-                                    "rgba(255, 206, 86, 0.2)",
-                                ],
-                                borderColor: [
-                                    "rgba(255, 99, 132, 1)",
-                                    "rgba(54, 162, 235, 1)",
-                                    "rgba(255, 206, 86, 1)",
-                                ],
+                                backgroundColor: backgroundColorRandom,
+                                borderColor: backgroundColorRandom,
                                 borderWidth: 1,
                             }, ],
                         },
@@ -1048,21 +1060,20 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_payroll_follow_month",
                 })
                 .then(function(data) {
-                    const ctx = document.getElementById('payroll').getContext('2d');
+                    var ele = document.getElementById('payroll')
+                    if (!ele)
+                        return
+                    const ctx = ele.getContext('2d');
                     const payroll = new Chart(ctx, {
                         type: "line",
                         data: {
                             labels: [],
                             datasets: [{
-                                label: "Payroll ana",
+                                label: "Monthly Salary Statistics",
                                 data: [],
-                                backgroundColor: [
-                                    "rgba(255, 99, 132, 0.2)",
-                                ],
-                                borderColor: [
-                                    "rgba(255, 99, 132, 1)",
-                                ],
-                                borderWidth: 1,
+                                backgroundColor: ['#6869AC'],
+                                borderColor:['#6869AC'],
+                                borderWidth: 0.2,
                             }, ],
                         },
                         options: {

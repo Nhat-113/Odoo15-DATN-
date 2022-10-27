@@ -3,7 +3,7 @@
     border-radius: 16px;
     width: 40%;
 }
-.ele_ment_chart_project_status {
+.ele_ment_chart_project_status, .ele_ment_chart_project_avg {
     width: 50%;
     margin: 0 auto;
 }
@@ -50,7 +50,7 @@
     width: 90%;
     margin-left: 3%;
     overflow-y: scroll;
-    height: calc(90vh - 50px);
+    height: calc(90vh - 20px);
     background-color: #E5E5E5;
 }
 .bom_dashboard_template {
@@ -81,6 +81,9 @@
     border-radius: 16px;
     margin: 13px;
 }
+.chart_payroll {
+    margin: 0 auto;
+}
 .title_chart_department, .title_chart_contract_type, .title_chart_payroll, .title_chart_jobposition {
     font-size: 18px;
     text-align: center;
@@ -91,8 +94,10 @@
 }
 .title_chart_ODC ,.title_chart_base, .title_chart_Internal, .project_status {
     text-align: center;
-    font-size: 18px;
+    font-size: 11px;
     color: #6869AC;
+    font-weight: 700;
+    margin-bottom: 0;
 }
 
 

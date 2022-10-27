@@ -8,63 +8,69 @@
             <div class="wrapper_chart">
                 <div class="left_chart">
                     <div class="button_chart">
-                        <button>chart_employee</button>
-                        <button>chart_project</button>
-                        <button>chart_revenue</button>
+                        <button id="chart_employee" class="btn-chart_employee tablinks active" >chart_employee</button>
+                        <button id="chart_project" class="btn-chart_project tablinks">chart_project</button>
+                        <button id="chart_revenue" class="btn-chart_revenue tablinks">chart_revenue</button>
                     </div>
                 </div>
+
                 <div class="content_chart">
-                    <div class="data_employee_chart"> 
+                    <div class="data_employee_chart tabcontent"> 
                         <div class="chart_postition_employee" >
                             <canvas id="job-position" width="200" height="80" class="canvas job_postition"></canvas>
-                            <p class="title_chart_jobposition">Level in company</p>
-                        </div>
-                        <div class="chart_Department">
-                            <canvas id="department" width="200" height="80" class="canvas job_postition"></canvas>
-                            <p class="title_chart_department">Department</p>
+                            <p class="title_chart_jobposition">Level in company(members)</p>
                         </div>
                         <div class="chart_contract_type">
                             <canvas id="contract" width="200" height="80" class="canvas job_postition"></canvas>
-                            <p class="title_chart_contract_type">Contract Type</p>
+                            <p class="title_chart_contract_type">Contract Type(Members)</p>
                         </div>
                         <div class="chart_payroll">
                             <canvas id="payroll" width="200" height="80" class="canvas job_postition"></canvas>
-                            <p class="title_chart_payroll">Payroll Analytics</p>
+                            <p class="title_chart_payroll">Monthly Salary Statistics(Mil)</p>
                         </div>
                     </div>
     
-                    <div class="chart_project">
+                    <div style="display: none;" class="chart_project tabcontent" >
                         <div class="view_effort_chart">
                             <div class="chart_ODC">
+                                <p class="title_chart_ODC">Effort AVG project Bill</p>
                                 <canvas id="chart_ODC" class="canvas job_postition" width="200" height="100"></canvas>
-                                <p class="title_chart_ODC">Effort AVG project ODC</p>
                             </div>
                             <div class="chart_project_base">
+                                <p class="title_chart_base">Effort AVG project not Bill</p>
                                 <canvas id="chart_project_base" class="canvas job_postition" width="200" height="100"></canvas>
-                                <p class="title_chart_base">Effort AVG project Base</p>
                             </div>
                             <div class="chart_project_internal">
+                                <p class="title_chart_Internal">Effort AVG project null</p>
                                 <canvas id="chart_project_internal" class="canvas job_postition" width="200" height="100"></canvas>
-                                <p class="title_chart_Internal">Effort AVG project Internal</p>
                             </div>
+
                         </div>
 
                         <div class="chart_project_detail">
+                           <div class="chart_project_internal">
+                                <p class="title_chart_Internal">Effort AVG project Free</p>
+                                <canvas id="chart_project_free" class="canvas job_postition" width="200" height="100"></canvas>
+                            </div>
+
                             <div class="chart_avg_project">
-                                <canvas id="chart_avg_project" class="canvas job_postition"></canvas>
-                                    <p class="project_status">Project AVG Effort</p>
+                                <p class="project_status">Project AVG Effort</p>
+                                <div class="ele_ment_chart_project_avg">
+                                    <canvas id="chart_avg_project" class="canvas job_postition"></canvas>
+                                </div>
                             </div>
         
                             <div class="chart_project_status">
+                                <p class="project_status">Project Status</p>
                                 <div class="ele_ment_chart_project_status">
                                     <canvas id="project_status" width="200" height="50" class="canvas job_postition"></canvas>
-                                    <p class="project_status">Project Status</p>
                                 </div>
                             </div>
+                         
                         </div>
+
                     </div>
-    
-                    <div class="chart_company_revenue">
+                    <div style="display: none" class="chart_company_revenue tabcontent">
                         <canvas id="chart_company_revenue" class="canvas job_postition"></canvas>
                     </div>
                 </div>
