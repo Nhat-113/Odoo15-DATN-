@@ -122,7 +122,6 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             })
                 .then(function (res) {
                     if (res["list_human_resource"].length > 0) {
-                        console.log('Before month available: ', res["list_human_resource"]);
                         self.list_human_resource = self.processMonthAvailable(res["list_human_resource"])
                     } else {
                         self.list_human_resource = res["list_human_resource"]
@@ -135,7 +134,6 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             })
                 .then(function (res) {
                     if (res["list_human_resource_free"].length > 0) {
-                        console.log('Before month free: ', res["list_human_resource_free"]);
                         self.list_human_resource_free = self.processMonthAvailableFree(res["list_human_resource_free"])
                     } else {
                         self.list_human_resource_free = res["list_human_resource_free"]
@@ -205,8 +203,6 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 // Average column's index in array is 19
                 arr[index][19] = cnt > 0 ? Number.parseFloat(sum / (cntGreaterThanZero > 0 ? cntGreaterThanZero : 1) ).toFixed(2) : "NaN";
             }
-            console.log('After month available: ', arr);
-
             return arr;
         },
 
@@ -277,7 +273,6 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             for (let i = notFreeEmployeeSet.length - 1; i >= 0; i--) {
                 arrFree.splice(notFreeEmployeeSet[i], 1);
             }
-            console.log('After month free: ', arrFree);
             return arrFree;
         },
 
