@@ -31,6 +31,9 @@ class HrRequestOverTime(models.Model):
     def _get_default_stage_id(self):
         return self.env['hr.request.overtime.stage'].search([], limit=1).id
 
+    def _get_default_approve(self):
+        return self.env.user.employee_id.parent_id.user_id.ids
+
     name = fields.Char("Subject", required=True)
 
     project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True)
@@ -52,8 +55,8 @@ class HrRequestOverTime(models.Model):
                             # domain=lambda self: self._compute_domain_stage(),
                             copy=False, index=True,
                             )
-    requester_id = fields.Many2many('res.users', string='Approvals', required=True, compute='_compute_partner_approvals', readonly=False)
     request_creator_id = fields.Many2one('res.users', string='Info to', required=True, default=lambda self: self.env.user)
+    requester_id = fields.Many2many('res.users', string='Approvals', required=True, default=lambda self: self._get_default_approve(), readonly=False)
     user_id = fields.Many2one('res.users', string='Project Manager', tracking=True, readonly=True, compute='_compute_project_info')
     member_ids = fields.Many2many('hr.employee', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
@@ -118,11 +121,6 @@ class HrRequestOverTime(models.Model):
             item.company_id = item.project_id.company_id or False
             item.start_date_project = item.project_id.date_start
             item.end_date_project = item.project_id.date
-
-    @api.onchange('request_creator_id')
-    def _compute_partner_approvals(self):
-        for record in self:
-            record.requester_id = record.request_creator_id.employee_id.parent_id.user_id.ids or False
 
     @api.depends('start_date', 'end_date')
     def _compute_duration_overtime(self):
