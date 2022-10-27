@@ -302,8 +302,10 @@ class ProjectRevenueValue(models.Model):
             #     self.write({'project_revenue_management_id': [(2, self.id or self.id.origin)]})
                     
         if self.get_year and self.get_month:
-            if int(self.get_year) < self.project_id.date_start.year or int(self.get_year) > self.project_id.date.year or\
-                int(self.get_month) < self.project_id.date_start.month or int(self.get_month) > self.project_id.date.month:
+            if (int(self.get_year) < self.project_id.date_start.year or int(self.get_year) > self.project_id.date.year) \
+                or (int(self.get_year) == self.project_id.date_start.year and int(self.get_month) < self.project_id.date_start.month) \
+                or (int(self.get_year) == self.project_id.date.year and int(self.get_month) > self.project_id.date.month):
+                    
                     if action == True:
                         raise UserError(_('The month "%(month)s/%(year)s" is outside the project implementation period "%(project)s" !',
                                     month = '0' + self.get_month if int(self.get_month) < 10 else self.get_month,
