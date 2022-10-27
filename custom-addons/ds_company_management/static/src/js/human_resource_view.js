@@ -281,6 +281,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             input = document.getElementById("search_input");
             filter = input.value.toUpperCase();
             table = document.getElementById("human_resource_table");
+            if (!table) return;
             tr = table.getElementsByTagName("tr");
             for (i = 1; i < tr.length - 2; i++) {
                 td = tr[i];
@@ -414,6 +415,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
         replace_value_human_resource: function () {
             var table, cell_elements;
             table = document.getElementById('human_resource_table');
+            if (!table) return;
             cell_elements = table.getElementsByTagName('td');
             for (var i = 0, len = cell_elements.length; i < len; i++) {
 
