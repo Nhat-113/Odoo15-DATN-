@@ -22,6 +22,7 @@ class ResUsers(models.Model):
             [
                 ("birthday_date", "=", next_date.day),
                 ("birthday_month", "=", next_date.month),
+                ('active','=',True)
             ]
         )
         return {
@@ -79,6 +80,7 @@ class HrEmployee(models.Model):
             domain = [
                 ("birthday_date", "=", datetime.today().day),
                 ("birthday_month", "=", datetime.today().month),
+                ('active','=',True)
             ]
             emp_template_id = IrConfigParameter.get_param(
                 "employee.emp_wish_template_id"
