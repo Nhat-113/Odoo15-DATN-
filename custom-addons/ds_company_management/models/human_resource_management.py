@@ -168,6 +168,8 @@ class HumanResourceManagement(models.Model):
 							STRING_AGG(
 							(CASE
 								WHEN EXTRACT(MONTH FROM DATE_END) IS NULL THEN 0
+								WHEN EXTRACT(YEAR FROM DATE_END) > EXTRACT(YEAR FROM CURRENT_DATE) 
+									THEN 12
 								ELSE EXTRACT(MONTH FROM DATE_END)
 							END)::TEXT 
 							|| '-' ||
