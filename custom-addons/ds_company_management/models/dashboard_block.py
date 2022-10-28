@@ -143,7 +143,7 @@ class DashboardBlock(models.Model):
                         FROM hr_payslip_line
                         INNER JOIN hr_payslip
                         ON hr_payslip.id=hr_payslip_line.slip_id
-                        Where hr_payslip.company_id IN  """ + str(tuple(company_id)) + """and hr_payslip_line.code = 'NET' or  hr_payslip_line.code = 'NET1' or  hr_payslip_line.code = 'HOUR'
+                        Where hr_payslip.company_id IN  """ + str(tuple(company_id)) + """ and ( hr_payslip_line.code = 'NET' or  hr_payslip_line.code = 'NET1' or  hr_payslip_line.code = 'HOUR' )
                         and  EXTRACT(YEAR FROM hr_payslip.date_from)  = EXTRACT(YEAR FROM NOW())
                         and hr_payslip.state = 'done' 
                         order by  hr_payslip.date_from 

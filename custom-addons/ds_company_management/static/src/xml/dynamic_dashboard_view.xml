@@ -40,19 +40,21 @@
                                 <p class="title_chart_base">Effort AVG project not Bill</p>
                                 <canvas id="chart_project_base" class="canvas job_postition" width="200" height="100"></canvas>
                             </div>
-                            <div class="chart_project_internal">
+                           
+                        </div>
+
+                        <div class="view_effort_chart_2">
+                            <div class="chart_project_null">
                                 <p class="title_chart_Internal">Effort AVG project null</p>
                                 <canvas id="chart_project_internal" class="canvas job_postition" width="200" height="100"></canvas>
                             </div>
-
-                        </div>
-
-                        <div class="chart_project_detail">
-                           <div class="chart_project_internal">
+                            <div class="chart_project_free">
                                 <p class="title_chart_Internal">Effort AVG project Free</p>
                                 <canvas id="chart_project_free" class="canvas job_postition" width="200" height="100"></canvas>
                             </div>
+                        </div>
 
+                        <div class="chart_project_detail">
                             <div class="chart_avg_project">
                                 <p class="project_status">Project AVG Effort</p>
                                 <div class="ele_ment_chart_project_avg">
