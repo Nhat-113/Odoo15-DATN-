@@ -5,35 +5,96 @@
             <field name="name">Company Expense</field>
         </record>
 
+        <!-- Option Role: Div manager -->
+        <record id="div_manager_access_company_expense" model="res.groups">
+            <field name="name">Div Manager</field>
+            <field name="category_id" ref="ds_expense_management.company_expense_access"/>
+        </record>
+
+         <!-- Option Role: Sub CEO -->
+        <record id="subceo_access_company_expense" model="res.groups">
+            <field name="name">Sub CEO</field>
+            <field name="category_id" ref="ds_expense_management.company_expense_access"/>
+            <field name="implied_ids" eval="[(4, ref('ds_expense_management.div_manager_access_company_expense'))]"/>
+        </record>
+
         <!-- Option Role: Administrator -->
         <record id="administrator_access_company_expense" model="res.groups">
             <field name="name">Administrator</field>
             <field name="category_id" ref="ds_expense_management.company_expense_access"/>
-            <field name="implied_ids" eval="[(4, ref('ds_project_estimation.estimation_access_sale_leader'))]"/>
+            <field name="implied_ids" eval="[(4, ref('ds_project_estimation.estimation_access_sale_leader')), (4, ref('ds_expense_management.subceo_access_company_expense'))]"/>
         </record>
 
-        <!-- View General Expense By Company -->
-        <record model="ir.rule" id="access_general_expense_by_company">
-            <field name="name">Company Expense: View General Expense By Company</field>
+
+        <!-- Div manager, SubCeo View General Expense By Company -->
+        <record model="ir.rule" id="div_manager_subceo_access_general_expense_by_company">
+            <field name="name">Company Expense: Div Manager, SubCeo View General Expense By Company</field>
+            <field name="model_id" ref="model_expense_management"/>
+            <field name="domain_force">['|', ('company_id','=',False),('company_id', '=', user.company_id.id), ('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4,ref('ds_expense_management.div_manager_access_company_expense')), (4,ref('ds_expense_management.subceo_access_company_expense'))]"/>
+        </record>
+
+
+        <!-- Administrator View General Expense By Company -->
+        <record model="ir.rule" id="administrator_access_general_expense_by_company">
+            <field name="name">Company Expense: Administrator View General Expense By Company</field>
             <field name="model_id" ref="model_expense_management"/>
             <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4,ref('ds_expense_management.administrator_access_company_expense'))]"/>
         </record>
 
-        <!-- View Project Expense By Company -->
-        <record model="ir.rule" id="access_project_expense_by_company">
-            <field name="name">Company Expense: View Project Expense By Company</field>
+        
+        <!-- Div manager View Project Expense By Company -->
+        <record model="ir.rule" id="div_manager_access_project_expense_by_company">
+            <field name="name">Company Expense: Div Manager View Project Expense By Company</field>
+            <field name="model_id" ref="model_project_expense_management"/>
+            <field name="domain_force">[('user_pm', '=', user.id),('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4,ref('ds_expense_management.div_manager_access_company_expense'))]"/>
+        </record>
+
+
+        <!-- SubCeo View Project Expense By Company -->
+        <record model="ir.rule" id="subceo_access_project_expense_by_company">
+            <field name="name">Company Expense: SubCeo View Project Expense By Company</field>
+            <field name="model_id" ref="model_project_expense_management"/>
+            <field name="domain_force">[('user_subceo', '=', user.login),('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4,ref('ds_expense_management.subceo_access_company_expense'))]"/>
+        </record>
+
+
+        <!-- Administrator View Project Expense By Company -->
+        <record model="ir.rule" id="administrator_access_project_expense_by_company">
+            <field name="name">Company Expense: Administrator View Project Expense By Company</field>
             <field name="model_id" ref="model_project_expense_management"/>
             <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4,ref('ds_expense_management.administrator_access_company_expense'))]"/>
         </record>
 
-         <!-- View Project Revenue By Company -->
-        <record model="ir.rule" id="access_project_revenue_by_company">
-            <field name="name">Company Expense: View Project Revenue By Company</field>
+         <!-- Div manager View Project Revenue By Company -->
+        <record model="ir.rule" id="div_manager_access_project_revenue_by_company">
+            <field name="name">Company Expense: Div Manager View Project Revenue By Company</field>
+            <field name="model_id" ref="model_project_revenue_management"/>
+            <field name="domain_force">[('user_pm', '=', user.id),('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4,ref('ds_expense_management.div_manager_access_company_expense'))]"/>
+        </record>
+
+
+        <!-- SubCeo View Project Revenue By Company -->
+        <record model="ir.rule" id="subceo_access_project_revenue_by_company">
+            <field name="name">Company Expense: SubCeo View Project Revenue By Company</field>
+            <field name="model_id" ref="model_project_revenue_management"/>
+            <field name="domain_force">[('user_subceo', '=', user.login),('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4,ref('ds_expense_management.subceo_access_company_expense'))]"/>
+        </record>
+
+
+         <!-- Administrator View Project Revenue By Company -->
+        <record model="ir.rule" id="administrator_access_project_revenue_by_company">
+            <field name="name">Company Expense: Administrator View Project Revenue By Company</field>
             <field name="model_id" ref="model_project_revenue_management"/>
             <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4,ref('ds_expense_management.administrator_access_company_expense'))]"/>
         </record>
+
     </data>
 </odoo>

@@ -7,7 +7,7 @@
     'category': 'Services/Expenses',
     "version": "15.0.1.0.0",
     "license": "AGPL-3",
-    'depends': ['base', 'project', 'mail', 'web_domain_field', 'ds_project_estimation'],
+    'depends': ['base', 'project', 'mail', 'web_domain_field', 'ds_project_estimation', 'ds_print_contract'],
     "application": True,
     'data': [
         "security/expense_management_security.xml",

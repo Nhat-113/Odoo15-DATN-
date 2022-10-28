@@ -6,9 +6,12 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="project_id"/>
+                <field name="department_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="expense_vnd" sum="Total expense"/>
                 <field name="description"/>
+                <field name="user_subceo" invisible="1"/>
+                <field name="user_pm" invisible="1"/>
                 <field name="currency_vnd" invisible="1"/>
             </tree>
         </field>
@@ -24,6 +27,7 @@
                         <group name="group_left">
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="project_id" domain='get_domain_projects' attrs="{'readonly': [('company_id', '=', False)]}"/>
+                            <field name="department_id" attrs="{'invisible': [('project_id','=',False)]}"/>
                             <label for="start_date" string="Duration" attrs="{'invisible': [('project_id','=',False)]}"/>
                             <div class="o_row" attrs="{'invisible': [('project_id','=',False)]}">
                                 <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}' readonly="1"/>
@@ -49,6 +53,8 @@
                             <field name="currency_sgd" invisible="1"/> -->
                             <field name="currency_vnd" invisible="1"/>
                             <field name="get_currency_name" invisible="1"/>
+                            <field name="user_subceo" invisible="1"/>
+                            <field name="user_pm" invisible="1"/>
                         </group>
                         <separator string="Description"/>
                         <field name="description" placeholder="Description ..."/>
