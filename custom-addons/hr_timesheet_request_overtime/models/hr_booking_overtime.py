@@ -10,15 +10,45 @@ class AccountAnalyticLine(models.Model):
     _inherit = 'account.analytic.line'
 
     type_day_ot = fields.Selection([
-        ('other', 'Other'),
-        ('normal_day', 'Normal Day'),
-        ('weekend', 'Weekend'),
-        ('holiday', 'Holiday'),
-    ], string='Type Day OT', index=True, copy=False, default='normal_day', tracking=True, required=True)
+                                ('other', 'Other'),
+                                ('normal_day', 'Normal Day'),
+                                ('weekend', 'Weekend'),
+                                ('holiday', 'Holiday'),
+                                ], string='Type Day OT', index=True, copy=False, default='normal_day', tracking=True, required=True)
+
+    status_timesheet_overtime = fields.Selection([
+                                        ('draft', 'To Confirm'),
+                                        ('confirm', 'Confirmd'),
+                                        ('refuse', 'Refused'),
+                                        ], default='draft', readonly=False, store=True, tracking=True, compute="reject_timesheet_overtime")
+    reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True)
+    
+    
+    def _readonly_resion_refuse(self):
+        if self.env.user.has_group('ds_ramp_up_recourse.group_task_score_pm') == True:
+            for task in self:
+                task.read_only_reason_refuse = True
+        else:
+            for task in self:
+                task.read_only_reason_refuse = False
+                
+    read_only_reason_refuse = fields.Boolean(compute=_readonly_resion_refuse, store=False)
 
     request_overtime_ids = fields.Many2one('hr.request.overtime', string='Request Overtime', store=True, readonly=True)
     check_request_ot = fields.Boolean('Check Readonly', compute='_compute_request_overtime_id', store=True, default=False)
     check_approval_ot = fields.Boolean('Check Approvals', compute='_compute_request_overtime_id', store=True, default=False)
+
+    @api.depends('reason_reject')
+    def reject_timesheet_overtime(self):
+        for timesheet in self:
+            if timesheet.reason_reject != False:
+                timesheet.status_timesheet_overtime = 'refuse'
+            else:
+                timesheet.status_timesheet_overtime = 'draft'
+
+    def approve_timesheet_overtime(self):
+        for record in self:
+            record.status_timesheet_overtime = 'confirm'
 
     @api.depends('request_overtime_ids.stage_id')
     def _compute_request_overtime_id(self):
@@ -181,7 +211,7 @@ class HrBookingOvertime(models.Model):
             "domain": 
                 [('project_id', '=', self.request_overtime_id.project_id.id),
                 ('employee_id', '=', self.user_id.id), ('type_ot','=','yes'),
-                ('date', '>=' , self.start_date), ('date', '<=' ,self.end_date)]
+                ('date', '>=' , self.start_date), ('date', '<=' ,self.end_date), ('request_overtime_ids.id', '!=' ,False)]
         }
         return action
 
