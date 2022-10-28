@@ -259,7 +259,10 @@ class HrPayslip(models.Model):
                                                                 calendar=contract.resource_calendar_id)
 
             if contract.date_end and contract.date_start <= self.date_from and contract.date_end < self.date_to:
-                unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) - 1
+                if contract.date_end.strftime("%A") == "Sunday" or contract.date_end.strftime("%A") == "Saturday":
+                    unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to))
+                else:
+                    unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) - 1
             elif contract.date_end and contract.date_start > self.date_from and contract.date_end < self.date_to:
                 unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) + len(pd.bdate_range(self.date_from, contract.date_start)) - 2
             elif contract.date_start > self.date_from:
@@ -298,20 +301,24 @@ class HrPayslip(models.Model):
                             contract_final = list_contract[i]
                     elif list_contract[i].date_end == False:
                         contract_final = list_contract[i]
-   
             if contract_firstly == contract:
-                if contract.date_start >= self.date_from and contract.date_start <= self.date_to:
-                    if len(pd.bdate_range(contract.date_start, self.date_to)) <= 14 or len(list_contract) > 1:
+                if contract.date_end:
+                    if contract.date_start >= self.date_from and contract.date_start <= self.date_to:
+                        if len(pd.bdate_range(contract.date_start, self.date_to)) <= 14:
+                            union_fee = 0
+                    elif contract.date_end >= self.date_from and contract.date_end <= self.date_to:
+                        if len(pd.bdate_range(self.date_from, contract.date_end)) <= 14 and len(list_contract) == 1:
+                            union_fee = 0
+
+                    if contract.date_end >= self.date_from and contract.date_end <= self.date_to and len(list_contract) > 1:
                         union_fee = 0
-                elif contract.date_end >= self.date_from and contract.date_end <= self.date_to and len(list_contract) > 1:
-                    union_fee = 0
             elif contract_final == contract:
                 if contract.date_end:
                     if contract.date_end >= self.date_from and contract.date_end <= self.date_to:  
                         if len(pd.bdate_range(self.date_from, contract.date_end)) <= 14:    
                             union_fee = 0
             else:
-                if contract.date_end >= self.date_from and contract.date_end <= self.date_to and len(list_contract) > 2:
+                if contract.date_end and contract.date_end >= self.date_from and contract.date_end <= self.date_to and len(list_contract) > 2:
                     union_fee = 0
 
             if NVKL >= 14:
