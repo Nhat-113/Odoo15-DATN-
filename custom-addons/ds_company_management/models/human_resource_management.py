@@ -282,6 +282,7 @@ class HumanResourceManagement(models.Model):
 				start_date_contract,
 				end_date_contract
 				FROM human_resource_management 
+				where department_name != 'Mirai FnB' or department_name is null
 				GROUP BY employee_id, employee_name ,company_name, department_name, company_id, start_date_contract, end_date_contract
 				order by employee_name asc
 					""")
