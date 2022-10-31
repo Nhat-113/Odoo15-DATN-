@@ -1,0 +1,168 @@
+.ele_ment_chart_project_status, .ele_ment_chart_project_avg {
+    width: 50%;
+    margin: 0 auto;
+}
+.chart_project {
+    display: flex;
+    width: 100%;
+    flex-wrap: nowrap;
+    flex-direction: column;
+}
+.view_effort_chart, .view_effort_chart_2 {
+    display: flex;
+    width: 99%;
+    padding-left: 1%;
+}
+
+.chart_ODC, .chart_project_base, .chart_project_null, .chart_project_free{
+    width: 50%;
+    background: #FFFFFF;
+    border-radius: 16px;
+    margin: 2px;
+}
+.chart_project_detail {
+    margin-top: 0%;
+    display: flex;
+    width: 99.5%;
+    padding-left: 1%;
+
+}
+.chart_avg_project, .chart_project_status {
+    width: 50%;
+    background: #FFFFFF;
+    border-radius: 16px;
+    margin: 2px;
+}
+.header_dashboard {
+    padding: 10px 10px 0px 10px;
+    border-bottom: 1px solid;
+    display: flex;
+    justify-content: space-between;
+}
+.header_dashboard h2 {
+    margin: 0;
+}
+.content_chart {
+    margin: 0 auto;
+    height: auto;
+    margin-top: 4px;
+}
+.bom_dashboard_template {
+    height: 100%;
+}
+.wrapper_chart {
+    display: flex;
+}
+.button_chart {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    margin-bottom: 2px;
+}
+.button_chart > button {
+    margin-left: 10px;
+    border: none;
+    background: #FFFFFF;
+    border-radius: 4px;
+    color: black;
+    font-size: 14px;
+    font-weight: 700;
+}
+.button_chart > .active {
+    background: #F0F0FF;
+    color: #6869AC;
+}
+.data_employee_chart {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+.chart_postition_employee, .chart_contract_type, .chart_payroll{
+    width: 49.5%;
+    background: #FFFFFF;
+    border-radius: 16px;
+    margin: 6px;
+}
+.chart_level_and_contract, .chart_payroll_and_regis {
+    display: flex;
+    width: 100%;
+}
+
+/* .chart_payroll {
+    margin: 0 auto;
+} */
+.title_chart_contract_type, .title_chart_payroll, .title_chart_jobposition {
+    font-size: 14px;
+    text-align: center;
+    font-weight: 700;
+    color: #6869AC;
+    margin: 8px 0 0 27px;
+    float: left;
+}
+.title_chart_company_revenue {
+    float: left;
+    text-align: center;
+    font-size: 17px;
+    color: #6869AC;
+    font-weight: 700;
+    position: absolute;
+    left: 30px;
+}
+.canvas {
+    padding: 15px;
+}
+.title_chart_ODC ,.title_chart_base, .title_chart_Internal, .project_status {
+    float: left;
+    text-align: center;
+    font-size: 11px;
+    color: #6869AC;
+    font-weight: 700;
+    margin: 12px 12px -2px 12px;
+}
+
+.chart_company_revenue {
+    background: #FFFFFF;
+    width: 85%;
+    margin: 0 auto;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    margin-top: 9px;
+}
+.company_revebue_dashboard {
+    background: white;
+    border-radius: 10px;
+}
+.loading-dashboard {
+    color: white;
+    margin: 0 auto;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 48%
+}
+.loading-img-dashboard {
+    -webkit-animation: round_image 1s linear infinite;
+    position: absolute;
+    top: 44%;
+    left: 48.5%;
+}
+
+@media only screen and (max-width: 1400px) {
+    .chart_postition_employee, .chart_contract_type, .chart_payroll {
+        width: 47%;
+    }
+    .data_employee_chart {
+        margin-left: 1%;
+    }
+    .title_chart_contract_type, .title_chart_payroll, .title_chart_jobposition {
+        font-size: 12px;
+        text-align: center;
+        color: #6869AC;
+    }
+    .title_chart_ODC, .title_chart_base, .title_chart_Internal, .project_status {
+        text-align: center;
+        font-size: 12px;
+        color: #6869AC;
+    }
+}

@@ -65,4 +65,17 @@
     <menuitem name="Human Resource Management" id="menu_human_resource_template" 
         parent="ds_company_management.company_management_menu"
         sequence="1" action="action_human_resource_template"/>
+    
+    <record id="action_dynamic_dashboard" model="ir.actions.client">
+        <field name="name">Dashboard BOM</field>
+        <field name="tag">dynamic_bom_dashboard</field>
+    </record>
+
+    <menuitem 
+        name="Dashboards BOM"
+        id="menu_dynamic_dashboard"
+        parent="ds_company_management.company_management_menu"
+        sequence="2"
+        action="action_dynamic_dashboard"
+        groups="ds_company_management.group_company_management_sub_ceo"/>
 </odoo>

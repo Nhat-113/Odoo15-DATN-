@@ -63,6 +63,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 setTimeout(() => {
 
                     var input = document.getElementById("search_input");
+                    if(!input)  
+                         return
                     // Event search in when input onchange
                     input.addEventListener('keyup', self.searchFunction)
                     // after event search run, event compute_avg call again to calculator avg effort 

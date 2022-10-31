@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="dynamic_bom_dashboard">
+            <div class="bom_dashboard_template">
+                <div id="deny-click" style="z-index: 10;
+                                    height: 100%;
+                                    width: 100%;
+                                    position: absolute;
+                                    top: 0px;
+                                    background: rgba(0, 0, 0, 0.75);
+                                    ">
+                        <img src="/ds_company_management/static/src/img/loading.png" class="loading-img-dashboard" id="loading-img-dashboard"></img>
+                        <p class="loading-dashboard">Loading.....</p>
+                </div>
+                <div class="header_dashboard">
+                    <h2>Dashboard BOM</h2>
+                    <div class="left_chart">
+                        <div class="button_chart">
+                            <button id="chart_employee" class="btn-chart_employee tablinks_dashboard active" >HR Dashboard</button>
+                            <button id="chart_project" class="btn-chart_project tablinks_dashboard">Project Dashboard</button>
+                            <button id="chart_revenue" class="btn-chart_revenue tablinks_dashboard">Revenue Dashboard</button>
+                        </div>
+                    </div>
+                </div>
+                    <div class="content_chart">
+                        <div>
+                            <div class="data_employee_chart tabcontent">
+                                <div class="chart_level_and_contract">
+                                    <div class="chart_postition_employee">
+                                        <p class="title_chart_jobposition">Level In Company(Members)</p>
+                                        <canvas id="job-position" width="200" height="80" class="canvas job_postition"></canvas>
+                                    </div>
+                                    <div class="chart_contract_type">
+                                        <p class="title_chart_contract_type">Contract Type(Contracts)</p>
+                                        <canvas id="contract" width="200" height="80" class="canvas job_postition"></canvas>
+                                    </div>
+                                </div> 
+                            
+                                <div class="chart_payroll_and_regis">
+                                    <div class="chart_payroll">
+                                        <p class="title_chart_payroll">Monthly Salary Statistics(Mil)</p>
+                                        <canvas id="payroll" width="200" height="80" class="canvas job_postition"></canvas>
+                                    </div>
+                                    <div class="chart_payroll">
+                                        <p class="title_chart_payroll">Member In/Out(Members)</p>
+                                        <canvas id="payroll" width="200" height="80" class="canvas job_postition"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div>
+                            <div style="display: none;" class="chart_project tabcontent" >
+                                <div class="chart_project_detail">
+                                    <div class="chart_avg_project">
+                                        <p class="project_status">Project AVG Effort In Year(%)</p>
+                                        <div class="ele_ment_chart_project_avg">
+                                            <canvas id="chart_avg_project" class="canvas job_postition"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="chart_project_status">
+                                        <p class="project_status">Project Status (Projects)</p>
+                                        <div class="ele_ment_chart_project_status">
+                                            <canvas id="project_status" width="200" height="50" class="canvas job_postition"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="view_effort_chart">
+                                    <div class="chart_ODC">
+                                        <p class="title_chart_ODC">Monthly Project Billable Statistics(%)</p>
+                                        <canvas id="chart_ODC" class="canvas job_postition" width="200" height="100"></canvas>
+                                    </div>
+                                    <div class="chart_project_base">
+                                        <p class="title_chart_base">Monthly Project Internal Statistics(%)</p>
+                                        <canvas id="chart_project_base" class="canvas job_postition" width="200" height="100"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="view_effort_chart_2">
+                                    <div class="chart_project_null">
+                                        <p class="title_chart_Internal">Monthly Project Null Statistics(%)</p>
+                                        <canvas id="chart_project_internal" class="canvas job_postition" width="200" height="100"></canvas>
+                                    </div>
+                                    <div class="chart_project_free">
+                                        <p class="title_chart_Internal">Monthly Project Avaiable Statistics(%)</p>
+                                        <canvas id="chart_project_free" class="canvas job_postition" width="200" height="100"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="company_revebue_dashboard">
+                            <div style="display: none" class="chart_company_revenue tabcontent">
+                                <div class="element_revenue_chart">
+                                    <p class="title_chart_company_revenue">Company Revenue</p>
+                                    <canvas id="chart_company_revenue" class="canvas job_postition"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>        
+            </div>
+    </t>
+</templates>
