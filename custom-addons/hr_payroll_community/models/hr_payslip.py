@@ -266,7 +266,10 @@ class HrPayslip(models.Model):
             elif contract.date_end and contract.date_start > self.date_from and contract.date_end < self.date_to:
                 unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) + len(pd.bdate_range(self.date_from, contract.date_start)) - 2
             elif contract.date_start > self.date_from:
-                unpaid_working_day = len(pd.bdate_range(self.date_from, contract.date_start)) - 1
+                if contract.date_start.strftime("%A") == "Sunday" or contract.date_start.strftime("%A") == "Saturday":
+                    unpaid_working_day = len(pd.bdate_range(self.date_from, contract.date_start))
+                else:
+                    unpaid_working_day = len(pd.bdate_range(self.date_from, contract.date_start)) - 1
             else:
                 unpaid_working_day = 0
             attendances = {
