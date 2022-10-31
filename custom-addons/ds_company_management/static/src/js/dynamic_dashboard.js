@@ -73,16 +73,21 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
             var self = this;
             this.set("title", "Dashboard Bom");
             setTimeout(() => {
-                self.projectTypePierChart();
                 self.jobPositionPierChart();
+                self.contractBarChart();
+                self.payrollDashboard();
+            }, 1000);
+            setTimeout(() => {
+                self.denyClick();
+            }, 1500);
+            setTimeout(() => {
+                self.projectTypePierChart();
                 self.chartProjectFree();
                 self.chartProjectAvg();
                 self.chartProjectBill();
                 self.chartProjectNotBill();
                 self.chartProjectNull();
-                self.contractBarChart();
-                self.payrollDashboard();
-            }, 1000);
+            }, 2500);
             setTimeout(() => {
                 self.chartCompanyAvg();
             }, 4000);
@@ -96,6 +101,18 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
         },
 
         fetch_data: function() {},
+
+        denyClick: function() {
+            const box = document.getElementById('deny-click');
+                if (!box)
+                    return
+            var  loading_img= document.getElementById('loading-img-dashboard');
+                if (!loading_img)
+                        return
+            loading_img.style.display = "none";
+            box.removeAttribute('style');
+        },
+
         projectTypePierChart: function() {
             rpc
                 .query({
