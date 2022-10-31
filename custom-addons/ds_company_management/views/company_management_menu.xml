@@ -76,5 +76,6 @@
         id="menu_dynamic_dashboard"
         parent="ds_company_management.company_management_menu"
         sequence="2"
-        action="action_dynamic_dashboard"/>
+        action="action_dynamic_dashboard"
+        groups="ds_company_management.group_company_management_sub_ceo"/>
 </odoo>

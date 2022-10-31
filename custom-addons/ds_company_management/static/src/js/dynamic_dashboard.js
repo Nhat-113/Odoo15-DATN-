@@ -50,7 +50,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
             for (i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].style.display = "none";
             }
-            tablinks = document.getElementsByClassName("tablinks");
+            tablinks = document.getElementsByClassName("tablinks_dashboard");
             for (i = 0; i < tablinks.length; i++) {
                 tablinks[i].className = tablinks[i].className.replace(" active", "");
             }
@@ -75,11 +75,11 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
             setTimeout(() => {
                 self.projectTypePierChart();
                 self.jobPositionPierChart();
+                self.chartProjectFree();
+                self.chartProjectAvg();
                 self.chartProjectBill();
                 self.chartProjectNotBill();
                 self.chartProjectNull();
-                self.chartProjectFree();
-                self.chartProjectAvg();
                 self.contractBarChart();
                 self.payrollDashboard();
             }, 1000);
@@ -208,7 +208,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         data: {
                             labels: ["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
                             datasets: [{
-                                label: "Avg Effort project bill",
+                                label: "Project Billable",
                                 data: [],
                                 backgroundColor: ["#6869AC"],
                                 borderColor: ["#6869AC"],
@@ -352,7 +352,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         data: {
                             labels: ["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
                             datasets: [{
-                                label: "Line Chart Project not Bill",
+                                label: "Project Internal",
                                 data: [],
                                 backgroundColor: ['#6869AC'],
                                 borderColor: ['#6869AC'],
@@ -640,7 +640,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         data: {
                             labels: ["Jan","Feb","Mar", "Apr", "May","Jun", "Jul", "Aug","Sep","Oct","Nov", "Dec",],
                             datasets: [{
-                                label: "Project Null",
+                                label: "Project Available",
                                 data: [],
                                 backgroundColor: ["#6869AC"],
                                 borderColor: ["#6869AC"],
@@ -782,7 +782,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     const chartAvgProject = new Chart(ctx, {
                         type: "pie",
                         data: {
-                            labels: [ "Project No Bill", "Project Bill", "Project Null", "Member free"],
+                            labels: [ "Project Internal", "Billable", "Project Null", "Available"],
                             datasets: [{
                                 label: "Project Avg",
                                 data: [],
@@ -957,15 +957,15 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                     label: "Revenue",
                                     data: [],
                                     borderWidth: 1,
-                                    backgroundColor: "rgba(255, 99, 132, 0.2)",
-                                    borderColor: "rgba(255, 99, 132, 1)",
+                                    backgroundColor: "#6869AC",
+                                    borderColor: "#6869AC",
                                 },
                                 {
                                     yAxisID: "B", // <-- the Y axis to use for this data set
                                     label: "Members",
                                     data: [],
-                                    backgroundColor: "rgba(54, 162, 235, 0.2)",
-                                    borderColor: "rgba(54, 162, 235, 1)",
+                                    backgroundColor: "#00ACC1",
+                                    borderColor: "#00ACC1",
                                 },
                             ],
                         },
