@@ -10,6 +10,13 @@ from odoo.exceptions import ValidationError
 class AccountAnalyticLine(models.Model):
     _inherit = 'account.analytic.line'
 
+    pay_type = fields.Selection([
+                                ('full_cash', 'Full Cash'),
+                                ('50:50', 'Cash 5:5 Date Off'),
+                                ('full_day_off', 'Full Date Off'),
+                                ], string='Pay Type', index=True, default="full_day_off", tracking=True, required=True)
+                                # TODO compute date off if select 'Cash 5:5 Date Off' or 'Full Date Off' in time off
+
     type_day_ot = fields.Selection([
                                 ('other', 'Other'),
                                 ('normal_day', 'Normal Day'),
