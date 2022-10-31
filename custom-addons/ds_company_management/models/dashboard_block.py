@@ -95,13 +95,12 @@ class DashboardBlock(models.Model):
         selected_companies = self.get_current_company_value(); 
         cr = self._cr
         cr.execute("""select to_char(month_start, 'Month YYYY') as l_month ,sum(total_revenue)/100000000 as revenue,
-                        sum(total_members) as members from project_management_ceo
+                        sum(total_members) as members from project_management_ceo_data
                          WHERE   extract(year from month_start)  = extract(year from CURRENT_DATE)   and  company_id in  """ + str(tuple(selected_companies)) + """
                         group by month_start""")
         data = cr.fetchall()
         
         return data
-
 
     #get data department type
     @api.model
