@@ -302,16 +302,12 @@ class HrPayslip(models.Model):
                     elif list_contract[i].date_end == False:
                         contract_final = list_contract[i]
             if contract_firstly == contract:
-                if contract.date_end:
                     if contract.date_start >= self.date_from and contract.date_start <= self.date_to:
                         if len(pd.bdate_range(contract.date_start, self.date_to)) <= 14:
                             union_fee = 0
-                    elif contract.date_end >= self.date_from and contract.date_end <= self.date_to:
-                        if len(pd.bdate_range(self.date_from, contract.date_end)) <= 14 and len(list_contract) == 1:
+                    elif contract.date_end and contract.date_end >= self.date_from and contract.date_end <= self.date_to:
+                        if len(list_contract) > 1 or len(pd.bdate_range(self.date_from, contract.date_end)) <= 14 and len(list_contract) == 1:
                             union_fee = 0
-
-                    if contract.date_end >= self.date_from and contract.date_end <= self.date_to and len(list_contract) > 1:
-                        union_fee = 0
             elif contract_final == contract:
                 if contract.date_end:
                     if contract.date_end >= self.date_from and contract.date_end <= self.date_to:  
