@@ -943,54 +943,49 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_revenue_company",
                 })
                 .then(function(data) {
-                    var ele = document.getElementById("chart_company_revenue");
-                    if (!ele) 
+                    var speedCanvas = document.getElementById("chart_company_revenue");
+
+                    if (!speedCanvas) 
                         return
-                    const ctx = ele.getContext("2d");
-
-                    const chartCompanyRevenue = new Chart(ctx, {
-                        type: "line",
-                        data: {
-                            labels: [],
-                            datasets: [{
-                                    yAxisID: "A", // <-- the Y axis to use for this data set
-                                    label: "Revenue",
-                                    data: [],
-                                    borderWidth: 1,
-                                    backgroundColor: "#6869AC",
-                                    borderColor: "#6869AC",
-                                },
-                                {
-                                    yAxisID: "B", // <-- the Y axis to use for this data set
-                                    label: "Members",
-                                    data: [],
-                                    backgroundColor: "#00ACC1",
-                                    borderColor: "#00ACC1",
-                                },
-                            ],
-                        },
-
-                        options: {
-                            responsive: true,
-                            scales: {
-                                A: {
-                                    type: "linear",
-                                    position: "left",
-                                    ticks: { beginAtZero: true, color: "rgba(255, 99, 132, 1)" },
-                                    grid: { display: true },
-                                },
-                                B: {
-                                    type: "linear",
-                                    position: "right",
-                                    ticks: { beginAtZero: true, color: "rgba(54, 162, 235, 1)" },
-                                    grid: { display: true },
-                                },
-                                x: { ticks: { beginAtZero: true } },
-                            },
-                        },
+                    var dataFirst = {
+                        label: "Revenue(Hundred Million)",
+                        data: [],
+                        lineTension: 0,
+                        fill: false,
+                        borderColor: '#6869AC'
+                      };
+                    
+                    var dataSecond = {
+                        label: "Effort (MM)",
+                        data: [],
+                        lineTension: 0,
+                        fill: false,
+                        borderColor: '#00ACC1'
+                      };
+                    
+                    var speedData = {
+                      labels: [],
+                      datasets: [dataFirst, dataSecond]
+                    };
+                    
+                    var chartOptions = {
+                      legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                          boxWidth: 80,
+                          fontColor: 'black'
+                        }
+                      }
+                    };
+                    
+                    var lineChart = new Chart(speedCanvas, {
+                      type: 'line',
+                      data: speedData,
+                      options: chartOptions
                     });
 
-                    const dataTemp = chartCompanyRevenue.data;
+                    const dataTemp = lineChart.data;
 
                     for (let i = 0; i < data.length; i++) {
                         dataTemp.labels.push(data[i][0]);
@@ -998,11 +993,11 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         dataTemp.datasets[1].data.push(data[i][2]);
                     }
 
-                    chartCompanyRevenue.data.labels = dataTemp.labels;
-                    chartCompanyRevenue.data.datasets[0].data = dataTemp.datasets[0].data;
+                    lineChart.data.labels = dataTemp.labels;
+                    lineChart.data.datasets[0].data = dataTemp.datasets[0].data;
 
-                    chartCompanyRevenue.data.datasets[1].data = dataTemp.datasets[1].data;
-                    chartCompanyRevenue.update();
+                    lineChart.data.datasets[1].data = dataTemp.datasets[1].data;
+                    lineChart.update();
                 });
         },
 

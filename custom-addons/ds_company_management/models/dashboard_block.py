@@ -94,9 +94,9 @@ class DashboardBlock(models.Model):
     def get_revenue_company(self):
         selected_companies = self.get_current_company_value(); 
         cr = self._cr
-        cr.execute("""select to_char(month_start, 'Month YYYY') as l_month ,sum(total_revenue)/10000000 as revenue,
+        cr.execute("""select to_char(month_start, 'Month YYYY') as l_month ,sum(total_revenue)/100000000 as revenue,
                         sum(total_members) as members from project_management_ceo
-                        WHERE   to_char(month_start, 'YYYY') = '2022' and  company_id in  """ + str(tuple(selected_companies)) + """
+                         WHERE   extract(year from month_start)  = extract(year from CURRENT_DATE)   and  company_id in  """ + str(tuple(selected_companies)) + """
                         group by month_start""")
         data = cr.fetchall()
         
@@ -139,7 +139,7 @@ class DashboardBlock(models.Model):
         company_id = self.get_current_company_value()
         cr = self._cr
         cr.execute("""SELECT hr_payslip.date_from, hr_payslip.date_to ,
-                        hr_payslip.name, hr_payslip_line.slip_id, hr_payslip.id, hr_payslip_line.amount
+                        hr_payslip.name, hr_payslip_line.slip_id, hr_payslip.id, (hr_payslip_line.amount)/1000000
                         FROM hr_payslip_line
                         INNER JOIN hr_payslip
                         ON hr_payslip.id=hr_payslip_line.slip_id

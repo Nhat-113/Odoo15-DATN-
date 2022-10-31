@@ -83,7 +83,7 @@
                     <div class="company_revebue_dashboard">
                         <div style="display: none" class="chart_company_revenue tabcontent">
                             <div class="element_revenue_chart">
-                                <p class="title_chart_Internal">Company Revenue</p>
+                                <p class="title_chart_company_revenue">Company Revenue</p>
                                 <canvas id="chart_company_revenue" class="canvas job_postition"></canvas>
                             </div>
                         </div>
