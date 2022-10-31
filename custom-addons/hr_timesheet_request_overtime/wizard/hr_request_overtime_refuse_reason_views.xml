@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <form string="Refuse Reason">
                 <group class="oe_title">
-                    <field name="subject_refuse_reason"  placeholder="e.g. Typing refuse reason ... "/>
+                    <field name="subject_refuse_reason" placeholder="e.g. Typing refuse reason ... "/>
                     <field name="request_overtime_ids" invisible="1"/>
                     <field name="request_overtime_ids" invisible="1"/>
                 </group>

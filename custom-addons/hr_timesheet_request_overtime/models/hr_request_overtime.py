@@ -65,10 +65,10 @@ class HrRequestOverTime(models.Model):
     refuse_reason_id = fields.One2many('hr.request.overtime.refuse.reason', 'request_overtime_ids', tracking=True)
     refuse_reason = fields.Char('Refuse Reason', tracking=True)
     
-    submit_flag = fields.Boolean(default=False)
+    submit_flag = fields.Boolean(default=True)
     confirm_flag = fields.Boolean(default=True)
     approve_flag = fields.Boolean(default=True)
-    request_flag = fields.Boolean(default=True)
+    request_flag = fields.Boolean(default=False)
 
     stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draft")
     last_stage = fields.Integer(string="Last stage", default=0)
@@ -136,9 +136,18 @@ class HrRequestOverTime(models.Model):
     @api.constrains('start_date', 'end_date')
     def _validate_plan_overtime(self):
         for record in self:
-            if (record.start_date_project and record.end_date_project) and \
-                (record.start_date < record.start_date_project or record.end_date > record.end_date_project):
+            # Validation Plan Date Overtime must be within the duration of the project
+            if (record.project_id.date_start and record.project_id.date) and \
+                (record.start_date < record.project_id.date_start or record.end_date > record.project_id.date):
                     raise ValidationError(_("Plan Date Overtime must be within the duration of the project."))
+
+            # Validation Plan Date Overtime not overlap in the same project
+            project_request_overtime = self.env['hr.request.overtime'].search([('project_id', '=' ,record.project_id.id),('id','!=' ,record.id)])
+            for item in project_request_overtime:
+                if item.end_date < record.start_date or item.start_date > record.end_date:
+                    return
+                else:
+                    raise ValidationError(_("Plan Date Overtime cannt not overlap in the same project. \nRequest Overtime Duplicate Plan is: {}".format(item.name)))
 
     def action_submit_request_overtime(self):
         self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Submit')]).id
@@ -239,8 +248,8 @@ class HrRequestOverTime(models.Model):
     
     @api.model
     def create(self, vals_list):
-        if 'submit_flag' in vals_list:
-            vals_list['submit_flag']=True
+        if 'request_flag' in vals_list:
+            vals_list['request_flag']=True
 
         return super().create(vals_list)
     

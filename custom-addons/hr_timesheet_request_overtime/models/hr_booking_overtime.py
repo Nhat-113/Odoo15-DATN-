@@ -1,5 +1,6 @@
 
 from datetime import datetime
+from re import S
 from odoo import api, fields, models, _
 import pandas as pd
 import json
@@ -14,15 +15,14 @@ class AccountAnalyticLine(models.Model):
                                 ('normal_day', 'Normal Day'),
                                 ('weekend', 'Weekend'),
                                 ('holiday', 'Holiday'),
-                                ], string='Type Day OT', index=True, copy=False, default='normal_day', tracking=True, required=True)
+                                ], string='Type Day OT', index=True, copy=False, compute="compute_type_overtime_day", tracking=True, required=True)
 
     status_timesheet_overtime = fields.Selection([
                                         ('draft', 'To Confirm'),
-                                        ('confirm', 'Confirmd'),
+                                        ('confirm', 'Confirm'),
                                         ('refuse', 'Refused'),
                                         ], default='draft', readonly=False, store=True, tracking=True, compute="reject_timesheet_overtime")
     reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True)
-    
     
     def _readonly_resion_refuse(self):
         if self.env.user.has_group('ds_ramp_up_recourse.group_task_score_pm') == True:
@@ -37,6 +37,23 @@ class AccountAnalyticLine(models.Model):
     request_overtime_ids = fields.Many2one('hr.request.overtime', string='Request Overtime', store=True, readonly=True)
     check_request_ot = fields.Boolean('Check Readonly', compute='_compute_request_overtime_id', store=True, default=False)
     check_approval_ot = fields.Boolean('Check Approvals', compute='_compute_request_overtime_id', store=True, default=False)
+
+    @api.depends('date', 'type_ot')
+    def compute_type_overtime_day(self):
+        for record in self:
+            date = record.date
+            public_holiday = self.env['resource.calendar.leaves'].search([('calendar_id','=',False),('holiday_id','=',False), 
+            ('date_from','<=',date),('date_to','>=',date)])
+            if record.type_ot == 'yes':
+                if public_holiday:
+                    record.type_day_ot = 'holiday'
+                elif  4 < date.weekday() < 7:
+                    record.type_day_ot = 'weekend'
+                else:
+                    record.type_day_ot = 'normal_day'
+            else:
+                record.type_day_ot = False
+
 
     @api.depends('reason_reject')
     def reject_timesheet_overtime(self):
@@ -55,77 +72,72 @@ class AccountAnalyticLine(models.Model):
         for record in self:
             if record.type_ot=='yes':
                 if record.request_overtime_ids.stage_id.name == 'Submit':
-                    record.write({'check_request_ot' : True})
+                    record.write({'check_request_ot': True})
+                    record.write({'status_timesheet_overtime': 'confirm'})
                 elif record.request_overtime_ids.stage_id.name == 'Approval':
-                    record.write({'check_request_ot' : True})
-                    record.write({'check_approval_ot' : True})
+                    record.write({'check_request_ot': True})
+                    record.write({'check_approval_ot': True})
+                    record.write({'status_timesheet_overtime': 'confirm'})
                 else:
-                    record.write({'check_request_ot' : False})
-                    record.write({'check_approval_ot' : False})
+                    record.write({'check_request_ot': False})
+                    record.write({'check_approval_ot': False})
+                    record.write({'status_timesheet_overtime': 'draft'})
             
             else:
                 record.request_overtime_ids = False
+
+    def action_confirm_all_timesheet_overtime(self):
+        for record in self:
+            record.status_timesheet_overtime = 'confirm'
 
     # Find reqeust overtime for timesheet when type_timesheet = 'type_ot'
     @api.model
     def create(self, vals_list):
         # TODO refactor this function
-        type_timesheet = vals_list.get('type_ot')  
+        type_timesheet = vals_list.get('type_ot') 
+        date = vals_list.get('date')
+        employee = vals_list.get('employee_id')
+        values = {}
+        
         if type_timesheet == 'yes':
-            request_overtime = self.env['hr.request.overtime'].search([('project_id','=',vals_list['project_id']),
-                                                                            ('start_date', '<=', vals_list['date']), ('end_date', '>=' , vals_list['date'])])
-            if request_overtime.stage_id.name not in ['Submit', 'Approval']:
-                user_booking_ids = [item.user_id.id for item in request_overtime.booking_overtime]
-
-                if vals_list['employee_id'] in user_booking_ids:
-                    booking_overtime = self.env['hr.booking.overtime'].search([('request_overtime_id','=', request_overtime.id), ('user_id','=', vals_list['employee_id'])])
-                    
-                    if booking_overtime.start_date <= datetime.strptime(vals_list['date'], '%Y-%m-%d').date() and booking_overtime.end_date >= datetime.strptime(vals_list['date'], '%Y-%m-%d').date():
-                        values = {'request_overtime_ids': request_overtime.id}
-                        vals_list.update(values)
-                    else:
-                        values = {'request_overtime_ids': False}
-                        vals_list.update(values)
-                else:
-                    values = {'request_overtime_ids': False}
-                    vals_list.update(values)
-            else:
-                values = {'request_overtime_ids': False}
-                vals_list.update(values)
-        else:
-            values = {'request_overtime_ids': False}
-            vals_list.update(values)
-
+            booking_overtime = self.env['hr.booking.overtime'].search(
+                                            [('user_id','=', employee),
+                                            ('start_date','<=', date), 
+                                            ('end_date','>=', date)])
+                                            
+            if booking_overtime and booking_overtime.request_overtime_id.stage_id not in ['Submit', 'Approval']:
+                values['request_overtime_ids'] =  booking_overtime.request_overtime_id.id
+            else: 
+                values['request_overtime_ids'] =  False
+        else: 
+            values['request_overtime_ids'] = False
+            
+        vals_list.update(values)
         return super().create(vals_list)
 
-    @api.model
     def write(self, vals):
-        result = super().write(vals)
-        vals = self._check_change_value_timesheet()
-        return super().write(vals)
+        if 'date' in vals:
+            values = self._check_change_value_timesheet(vals['date'])
+            vals.update(values)
 
-    def _check_change_value_timesheet(self):
+        result = super(AccountAnalyticLine, self).write(vals)
+
+        return result
+
+    def _check_change_value_timesheet(self, date):
         # TODO refactor this function
         if self.type_ot == 'yes':
 
-            request_overtime = self.env['hr.request.overtime'].search([('project_id','=',self.project_id.id),
-                                                                            ('start_date', '<=', self.date), ('end_date', '>=' , self.date)])
-                                    
-            if request_overtime.stage_id.name not in ['Submit', 'Approval']:
-                user_booking_ids = [item.user_id.id for item in request_overtime.booking_overtime]
+            booking_overtime = self.env['hr.booking.overtime'].search(
+                                            [('user_id','=', self.employee_id.id),
+                                            ('start_date','<=', date), 
+                                            ('end_date','>=', date)])
 
-                if self.employee_id.id in user_booking_ids:
-                    booking_overtime = self.env['hr.booking.overtime'].search([('request_overtime_id','=', request_overtime.id), ('user_id','=', self.employee_id.id)])
-                    
-                    if booking_overtime.start_date <= self.date and booking_overtime.end_date >= self.date:
-                        return {'request_overtime_ids': request_overtime.id}
-                    else: 
-                        return {'request_overtime_ids': False}
-                else: 
-                    return {'request_overtime_ids': False}
-            else:
+            if booking_overtime and booking_overtime.request_overtime_id.stage_id not in ['Submit', 'Approval']:
+                return {'request_overtime_ids': booking_overtime.request_overtime_id.id}
+            else: 
                 return {'request_overtime_ids': False}
-        else:
+        else: 
             return {'request_overtime_ids': False}
             
 class HrBookingOvertime(models.Model):
@@ -152,7 +164,7 @@ class HrBookingOvertime(models.Model):
                               readonly=True, help="The duration of working overtime in the project", default=0)
 
     booking_time_overtime = fields.Integer(string="Plan Overtime (Hours)",
-                              readonly=False, help="The booking of working overtime in the project", default=False)
+                              readonly=False, help="The booking of working overtime in the project", required=True)
 
     actual_overtime = fields.Integer(string="Actual Overtime",
                               readonly=False, help="The duration actual of working overtime in the project", compute="_compute_actual_overtime")
@@ -218,8 +230,9 @@ class HrBookingOvertime(models.Model):
     @api.depends("request_overtime_id.stage_id")
     def _compute_actual_overtime(self):
         for item in self:
-            list_timesheet_overtime = self.env['account.analytic.line'].search([('project_id', '=', item.request_overtime_id.project_id.id),\
-                ('employee_id', '=', item.user_id.id), ('type_ot','=','yes')])
+            list_timesheet_overtime = self.env['account.analytic.line'].search([('project_id', '=', item.request_overtime_id.project_id.id),
+                ('employee_id', '=', item.user_id.id), ('type_ot','=','yes'),
+                ('date', '>=' , item.start_date), ('date', '<=' ,item.end_date), ('request_overtime_ids','=',item.request_overtime_id.id)])
             
             total_hour_spent_overtime = 0
             for record in list_timesheet_overtime:
