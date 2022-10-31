@@ -73,13 +73,13 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
             var self = this;
             this.set("title", "Dashboard Bom");
             setTimeout(() => {
+                self.denyClick();
+            }, 500);
+            setTimeout(() => {
                 self.jobPositionPierChart();
                 self.contractBarChart();
                 self.payrollDashboard();
             }, 1000);
-            setTimeout(() => {
-                self.denyClick();
-            }, 1500);
             setTimeout(() => {
                 self.projectTypePierChart();
                 self.chartProjectFree();
@@ -90,7 +90,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
             }, 2500);
             setTimeout(() => {
                 self.chartCompanyAvg();
-            }, 4000);
+            }, 3000);
         },
 
         willStart: function() {
@@ -123,6 +123,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     var ele = document.getElementById("project_status");
                     if (!ele) 
                         return
+                    if (Chart.getChart("project_status")){
+                        Chart.getChart("project_status").destroy();
+                    }
                     const ctx = ele.getContext("2d");
                     const project_status = new Chart(ctx, {
                         type: "pie",
@@ -168,6 +171,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     var ele = document.getElementById("job-position");
                     if (!ele) 
                         return
+                    if (Chart.getChart("job-position")){
+                        Chart.getChart("job-position").destroy();
+                    }
                     const ctx = ele.getContext("2d");
                     // Chart.defaults.scales.linear.min = 0;
                     const jobPosition = new Chart(ctx, {
@@ -218,6 +224,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     var ele = document.getElementById("chart_ODC");
                     if (!ele) 
                         return
+                    if (Chart.getChart("chart_ODC")){
+                        Chart.getChart("chart_ODC").destroy();
+                    }
                     const ctx = ele.getContext("2d");
 
                     const chartODC = new Chart(ctx, {
@@ -360,6 +369,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         var data_employee = self.valueProjectNotBill(data);
                     }
                     var ele = document.getElementById("chart_project_base");
+                    if (Chart.getChart("chart_project_base")){
+                        Chart.getChart("chart_project_base").destroy();
+                    }
                     if (!ele) 
                         return
                     const ctx = ele.getContext("2d");
@@ -504,6 +516,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     var ele = document.getElementById("chart_project_internal");
                     if (!ele) 
                         return
+                    if (Chart.getChart("chart_project_internal")){
+                        Chart.getChart("chart_project_internal").destroy();
+                    }
                     const ctx = ele.getContext("2d");
 
                     const chartProjectInternal = new Chart(ctx, {
@@ -650,6 +665,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     var ele = document.getElementById("chart_project_free");
                     if (!ele) 
                         return
+
+                    if (Chart.getChart("chart_project_free")){
+                        Chart.getChart("chart_project_free").destroy();
+                    }
                     const ctx = ele.getContext("2d");
 
                     const chartProjectInternal = new Chart(ctx, {
@@ -794,6 +813,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     var ele = document.getElementById("chart_avg_project");
                     if (!ele) 
                         return
+                    if (Chart.getChart("chart_avg_project")){
+                        Chart.getChart("chart_avg_project").destroy();
+                    }
                     const ctx = ele.getContext("2d");
 
                     const chartAvgProject = new Chart(ctx, {
@@ -961,7 +983,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 })
                 .then(function(data) {
                     var speedCanvas = document.getElementById("chart_company_revenue");
-
+                    if (Chart.getChart("chart_company_revenue")){
+                        Chart.getChart("chart_company_revenue").destroy();
+                    }
                     if (!speedCanvas) 
                         return
                     var dataFirst = {
@@ -1029,6 +1053,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     var ele = document.getElementById('contract')
                     if (!ele)
                         return
+                    if (Chart.getChart("contract")){
+                        Chart.getChart("contract").destroy();
+                    }
                     const ctx =ele.getContext('2d');
                    
                     const contract = new Chart(ctx, {
@@ -1075,6 +1102,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     var ele = document.getElementById('payroll')
                     if (!ele)
                         return
+                    if (Chart.getChart("payroll")){
+                        Chart.getChart("payroll").destroy();
+                    }
                     const ctx = ele.getContext('2d');
                     const payroll = new Chart(ctx, {
                         type: "line",
