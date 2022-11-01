@@ -1,6 +1,4 @@
 
-from datetime import datetime
-from re import S
 from odoo import api, fields, models, _
 import pandas as pd
 import json
@@ -8,7 +6,7 @@ import json
 from odoo.exceptions import ValidationError
 
 class AccountAnalyticLine(models.Model):
-    _inherit = 'account.analytic.line'
+    _inherit = ["account.analytic.line"]
 
     pay_type = fields.Selection([
                                 ('full_cash', 'Full Cash'),
@@ -69,6 +67,44 @@ class AccountAnalyticLine(models.Model):
                 timesheet.status_timesheet_overtime = 'refuse'
             else:
                 timesheet.status_timesheet_overtime = 'draft'
+
+    @api.onchange('reason_reject')
+    def send_mail(self):
+        for task in self:
+            if task.reason_reject != '':
+                self._task_message_auto_subscribe_notify_reject_timesheet({task: task.employee_id for task in task})
+    
+    @api.model
+    def _task_message_auto_subscribe_notify_reject_timesheet(self, users_per_task):
+        # Utility method to send assignation notification upon writing/creation.
+        template_id = self.env['ir.model.data']._xmlid_to_res_id('hr_timesheet_request_overtime.reject_timesheet', raise_if_not_found=False)
+        if not template_id:
+            return
+        view = self.env['ir.ui.view'].browse(template_id)
+        task_model_description = 'Timesheets'
+        for task, users in users_per_task.items():
+            if not users:
+                continue
+            values = {
+                'object': task,
+                'model_description': task_model_description,
+                'access_link': task.env['mail.thread']._notify_get_action_link('view'),
+                'project_name': task.project_id.name,
+                'task_name': task.task_id.display_name,
+                'refuse_reason': task.reason_reject
+            }
+            for user in users:
+                values.update(assignee_name=user.sudo().name)
+                assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
+                assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)
+                task.env['mail.thread'].message_notify(
+                    subject=_('You have been reject timesheet %s', task.name),
+                    body=assignation_msg,
+                    partner_ids=user.user_id.partner_id.ids,
+                    record_name=task.display_name,
+                    email_layout_xmlid='mail.mail_notification_light',
+                    model_description=task_model_description,
+                )
 
     def approve_timesheet_overtime(self):
         for record in self:

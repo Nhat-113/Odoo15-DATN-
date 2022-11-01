@@ -89,5 +89,29 @@
             </p>
         </template>
 
+        <!-- Reject Timesheet Template -->
+        <template id="reject_timesheet">
+            <p style="margin: 0px;">
+                <span>Dear <t t-esc="object.employee_id.display_name"/>,</span><br />
+            </p>
+            <p>
+                <span style="margin-top: 8px;">You have been refuse to the Timesheet: <b><t t-esc="object.display_name"/>.</b></span>
+            </p>
+            <p>
+                <span><b>Timesheet of the project:</b> <t t-esc="project_name"/> </span>
+                <br></br>
+                <span><b>Task</b>: <t t-esc="task_name"/></span>
+                <br></br>
+                <span><b>Refuse Reason</b>: <t t-esc="refuse_reason"/></span>
+            </p>
+            <p>
+                <span>Please discuss with your Project Manager for more information.</span>
+            </p>
+            <p>
+                <span>Thank you. </span>
+            </p>
+        </template>
+
+
     </data>
 </odoo>
