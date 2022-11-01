@@ -29,7 +29,7 @@
                                 <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                             </th>
                             <th class="header_human_table">
-                                Employee
+                                Employee Name
                                 <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                             </th>
                             <th class="header_human_table">
@@ -224,19 +224,19 @@
                         <table id="human_resource_free_table">
                             <tbody class="human_resource_content">
                                 <tr class="header_tabel">
-                                    <th class="human_employee_id header_member_free">
+                                    <th class="human_employee_id header_member_free" >
                                         Employee ID
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
-                                    <th class="header_member_free">
-                                        Employee
+                                    <th class="header_member_free" id="employee_id_free">
+                                        Employe Name
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
-                                    <th class="header_member_free">
+                                    <th class="header_member_free" id="company_name_free">
                                         Company
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
-                                    <th class="header_member_free">
+                                    <th class="header_member_free" id="department_free">
                                         Department
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>

@@ -28,10 +28,12 @@ span[name="message_warning"] {
     width: 98%;
     overflow-y: scroll;
     height:calc(100vh - 141px);
-    border-radius: 15px;
+    margin-top: -25px;
     margin: 0 auto;
 }
-
+#employee_id_free , #company_name_free,  #department_free {
+    padding-left: 8px;
+}
 .human_resource_template thead tr {
     display: block;
 }
@@ -39,10 +41,14 @@ span[name="message_warning"] {
 .human_resource_template td {
     padding: 5px 10px;
     width: 200px;
+    text-align: left;
+
 }
 
 .human_resource_template th {
     width: 200px;
+    text-align: left;
+    padding-left: 8px;
 }
 
 .human_resource_content>tr {
@@ -218,8 +224,12 @@ span[name="message_warning"] {
     position: absolute;
     top: 0px;
     height: 100%;
+    width: 100%;
     background: rgba(0, 0, 0, 0.75);
     display: none;
+}
+#human_resource_free_table {
+    margin: 0 auto;
 }
 
 .human_resource_free_member {

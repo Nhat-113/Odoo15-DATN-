@@ -103,6 +103,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     self.replace_value_human_resource()
                     self.replace_value_human_resource_free()
                     self.compute_avg();
+                    self.hide_value_old_month();
                 }, 500);
             });
         },
@@ -442,7 +443,22 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             for (var i = 0, len = cell_elements_free.length; i < len; i++) {
                 cell_elements_free[i].innerText = (100 - parseFloat(cell_elements_free[i].innerText)).toFixed(2);
             }
-        }
+        },
+        hide_value_old_month: function() {
+            var dateObj = new Date();
+
+            var table = document.getElementById('human_resource_free_table');
+            var month = dateObj.getUTCMonth() + 1;
+            const number_month_in_year = 12;
+            const current_month = (number_month_in_year - month) + 1;
+            for (let i = 0; i < table.rows.length; i++) {
+                var start_month_in_table = 4
+                for (start_month_in_table; start_month_in_table < table.rows[i].cells.length - current_month; start_month_in_table++) {
+                    table.rows[i].cells[start_month_in_table].style.display = "none";
+                }
+            }
+        },
+
     });
 
     core.action_registry.add('human_resource_template', HumanResourceTemplate);
