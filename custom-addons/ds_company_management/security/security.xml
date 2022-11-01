@@ -9,18 +9,19 @@
     <record id="group_company_management_div" model="res.groups">
         <field name="name">Div Manager</field>
         <field name="category_id" ref="module_category_company_management"/>
+        <field name="implied_ids" eval="[(4, ref('ds_expense_management.div_manager_access_company_expense'))]"/>
     </record>
 
     <record id="group_company_management_sub_ceo" model="res.groups">
         <field name="name">Sub CEO</field>
         <field name="category_id" ref="module_category_company_management"/>
-        <field name="implied_ids" eval="[(4, ref('group_company_management_div'))]"/>
+        <field name="implied_ids" eval="[(4, ref('group_company_management_div')), (4, ref('ds_expense_management.subceo_access_company_expense'))]"/>
     </record>
 
     <record id="group_company_management_ceo" model="res.groups">
         <field name="name">CEO</field>
-        <field name="implied_ids" eval="[(4, ref('group_company_management_sub_ceo'))]"/>
         <field name="category_id" ref="module_category_company_management"/>
+        <field name="implied_ids" eval="[(4, ref('group_company_management_sub_ceo')), (4, ref('ds_expense_management.administrator_access_company_expense'))]"/>
     </record>
 
 

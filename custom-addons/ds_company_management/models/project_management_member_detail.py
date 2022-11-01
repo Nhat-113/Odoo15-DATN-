@@ -80,7 +80,7 @@ class ProjectManagementMemberDetail(models.Model):
                 LEFT JOIN hr_payslip_line AS hpl
                     ON hpl.slip_id = hp.id
                     AND hpl.code IN('NET', 'NET1') AND hp.state = 'done'
-                    
+                WHERE ppb.department_name != 'Mirai FnB'
                 ORDER BY project_members, employee_id
 
             )""" % (self._table)

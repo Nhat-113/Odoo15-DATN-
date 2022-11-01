@@ -66,6 +66,7 @@ class ProjectManagementSubCeo(models.Model):
                         hd.company_id
                         
                         FROM hr_department AS hd
+                            WHERE hd.name != 'Mirai FnB'
                 ),
 
                 compute_salary_manager_department AS (

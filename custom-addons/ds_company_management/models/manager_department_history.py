@@ -32,38 +32,39 @@ class ManagerDepartmentHistory(models.Model):
                 ),
 
                 history_manager_department AS (
-                SELECT
-                    hd.company_id,
-                    hd.id AS department_id,
-                    hd.manager_id,
-                    hdh.manager_history_id,
-                    hdh.date_start,
-                    hdh.date_end,
+                    SELECT
+                        hd.company_id,
+                        hd.id AS department_id,
+                        hd.manager_id,
+                        hdh.manager_history_id,
+                        hdh.date_start,
+                        hdh.date_end,
                     
-                    generate_series(
-                            date_trunc('month', 
-                                (CASE
-                                    --- When manager is expired ---
-                                    WHEN hdh.date_start IS NOT NULL
-                                        THEN hdh.date_start::date
-                                    ELSE '1/1/2021'::date
-                                END)
-                            ), 
-                            date_trunc('month', 
-                                (CASE
-                                    --- When manager is expired ---
-                                    WHEN hdh.date_end IS NOT NULL
-                                        THEN hdh.date_end::date
-                                    ELSE (CURRENT_DATE::DATE - interval '1 month')
-                                END)
+                        generate_series(
+                                date_trunc('month',
+                                    (CASE
+                                        --- When manager is expired ---
+                                        WHEN hdh.date_start IS NOT NULL
+                                            THEN hdh.date_start::date
+                                        ELSE '1/1/2021'::date
+                                    END)
+                                ),
+                                date_trunc('month',
+                                    (CASE
+                                        --- When manager is expired ---
+                                        WHEN hdh.date_end IS NOT NULL
+                                            THEN hdh.date_end::date
+                                        ELSE (CURRENT_DATE::DATE - interval '1 month')
+                                    END)
                             
-                            ),	
-                            '1 month'
-                        )::date  AS months
-                    
-                FROM hr_department AS hd
-                LEFT JOIN handling_datetime_department_history AS hdh
-                    ON hd.id = hdh.department_id
+                                ),	
+                                '1 month'
+                            )::date  AS months
+                        
+                    FROM hr_department AS hd
+                    LEFT JOIN handling_datetime_department_history AS hdh
+                        ON hd.id = hdh.department_id
+                    WHERE hd.name != 'Mirai FnB'
                 ),
 
                 history_department_gen_month AS (

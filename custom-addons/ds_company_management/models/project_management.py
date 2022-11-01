@@ -17,6 +17,7 @@ class ProjectManagement(models.Model):
                         pr.id AS project_id,
                         pr.user_id AS user_pm,
                         pr.department_id,
+                        hd.name AS department_name,
                         pr.company_id,
                         pr.date_start,
                         pr.date AS date_end,
@@ -33,8 +34,9 @@ class ProjectManagement(models.Model):
                         END
                         ) AS total_cost
 
-                    FROM
-                        project_project AS pr 
+                    FROM project_project AS pr 
+                    LEFT JOIN hr_department AS hd
+			            ON hd.id = pr.department_id
                     LEFT JOIN estimation_work AS est
                         ON est.id = pr.estimation_id
                     LEFT JOIN project_expense_management AS pem
@@ -52,6 +54,7 @@ class ProjectManagement(models.Model):
                         est.project_type_id,
                         user_pm,
                         pr.department_id,
+                        hd.name,
                         pr.company_id,
                         pr.date_start,
                         date_end,
@@ -109,6 +112,7 @@ class ProjectManagement(models.Model):
                         FROM project_estimation_merged AS pem
                         LEFT JOIN project_revenue_management AS prm
                             ON pem.project_id = prm.project_id
+                        WHERE pem.department_name != 'Mirai FnB'
                     )
                     SELECT
                         ROW_NUMBER() OVER(ORDER BY project_id ASC) AS id,

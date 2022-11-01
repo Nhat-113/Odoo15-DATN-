@@ -14,6 +14,8 @@ class ProjectPlanningBookingResource(models.Model):
                     ROW_NUMBER() OVER(ORDER BY start_date_month ASC) AS id,
                     pp.company_id,
                     pl.project_id,
+                    pp.department_id,
+		            hd.name AS department_name,
                     br.employee_id,
                     pl.member_type,
                     pmt.name AS member_type_name,
@@ -35,6 +37,8 @@ class ProjectPlanningBookingResource(models.Model):
                     ON pmt.id = pl.member_type
                 LEFT JOIN project_project AS pp
                     ON pl.project_id = pp.id
+                LEFT JOIN hr_department AS hd
+		            ON hd.id = pp.department_id
                     
                 LEFT JOIN hr_payslip AS hp
                     ON hp.employee_id = br.employee_id

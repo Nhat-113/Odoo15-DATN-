@@ -10,26 +10,47 @@ class ProjectMemberManagement(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
+                WITH project_planning_department AS (
+                    SELECT
+                        ROW_NUMBER() OVER(ORDER BY plan.id ASC) AS id,
+                        plan.project_id,
+                        plan.employee_id,
+                        pp.department_id,
+                        hd.name AS department_name,
+                        plan.planning_role_id,
+                        plan.start_date,
+                        plan.end_date,
+                        plan.member_type,
+                        plan.effort_rate
+
+                    FROM planning_calendar_resource AS plan 
+                    LEFT JOIN project_project AS pp
+                        ON pp.id = plan.project_id
+                    LEFT JOIN hr_department AS hd
+                        ON hd.id = pp.department_id
+                )
+
                 SELECT
-                    ROW_NUMBER() OVER(ORDER BY plan.id ASC) AS id,
+                    ppd.id,
                     pm.id AS project_management_id,
-                    plan.project_id,
-                    plan.employee_id,
+                    ppd.project_id,
+                    ppd.employee_id,
                     he.company_id,
                     he.job_id,
-                    plan.planning_role_id,
+                    ppd.planning_role_id,
                     he.work_email AS email,
                     he.work_phone AS number_phone,
-                    plan.start_date,
-                    plan.end_date,
-                    plan.member_type,
-                    plan.effort_rate
-
-                FROM planning_calendar_resource AS plan 
+                    ppd.start_date,
+                    ppd.end_date,
+                    ppd.member_type,
+                    ppd.effort_rate
+                FROM project_planning_department AS ppd
                 LEFT JOIN project_management AS pm
-                    ON plan.project_id = pm.project_id
+                        ON ppd.project_id = pm.project_id
                 LEFT JOIN hr_employee AS he
-                    ON he.id = plan.employee_id
+                        ON he.id = ppd.employee_id
+                        
+                WHERE ppd.department_name != 'Mirai FnB'
                         
             )""" % (self._table)
         )

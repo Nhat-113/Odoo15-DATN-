@@ -83,6 +83,7 @@ class ProjectManagementHistory(models.Model):
                         ppb.months,
                         (SUM(ppb.man_month)) AS total_members
                     FROM project_planning_booking AS ppb
+                        WHERE ppb.department_name != 'Mirai FnB'
                     GROUP BY company_id,
                             project_id,
                             months
@@ -96,8 +97,9 @@ class ProjectManagementHistory(models.Model):
                         ppb.months,
                         (SUM(ppb.man_month)) AS total_members
                     FROM project_planning_booking AS ppb
-                    WHERE ppb.member_type_name NOT IN ('Intern', 'intern') 
-                            OR ppb.member_type_name IS NULL
+                    WHERE (ppb.member_type_name NOT IN ('Intern', 'intern') 
+                            OR ppb.member_type_name IS NULL)
+                            AND ppb.department_name != 'Mirai FnB'
                     GROUP BY company_id,
                             project_id,
                             months
@@ -111,8 +113,9 @@ class ProjectManagementHistory(models.Model):
                         months,
                         COUNT(DISTINCT (employee_id)) all_members
                     FROM project_planning_booking AS ppb
-                    WHERE ppb.member_type_name NOT IN ('Intern', 'intern') 
-                            OR ppb.member_type_name IS NULL
+                    WHERE (ppb.member_type_name NOT IN ('Intern', 'intern') 
+                            OR ppb.member_type_name IS NULL)
+                            AND ppb.department_name != 'Mirai FnB'
                     GROUP BY company_id, months
                 ),
 
@@ -148,8 +151,9 @@ class ProjectManagementHistory(models.Model):
                         sum(salary)::NUMERIC(20, 5) AS salary
                         
                     FROM project_planning_booking 
-                    WHERE member_type_name NOT IN('Intern', 'intern')
-                        OR member_type_name IS NULL
+                    WHERE (member_type_name NOT IN('Intern', 'intern')
+                            OR member_type_name IS NULL)
+                        AND department_name != 'Mirai FnB'
                     GROUP BY company_id,
                             project_id,
                             months
