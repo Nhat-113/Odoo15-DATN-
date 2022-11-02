@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <menuitem id="company_management_menu" name="Cost Management" groups="group_company_management_div"/>
+    <menuitem id="company_management_menu" name="Overall Management" groups="group_company_management_div"/>
 
     <!-- <menuitem
         id="human_resource_management"
@@ -12,7 +12,7 @@
 
     <menuitem
         id="cost_management"
-        name="Overall Management"
+        name="Cost Management"
         sequence="2"
         parent="ds_company_management.company_management_menu"/>
 
@@ -58,13 +58,13 @@
         action="exchange_rate_action"/>
 
     <record id="action_human_resource_template" model="ir.actions.client">
-        <field name="name">Human Resource Management</field>
+        <field name="name">HRM</field>
         <field name="tag">human_resource_template</field>
     </record>
     
     <menuitem name="Human Resource Management" id="menu_human_resource_template" 
         parent="ds_company_management.company_management_menu"
-        sequence="1" action="action_human_resource_template"/>
+        sequence="3" action="action_human_resource_template"/>
     
     <record id="action_dynamic_dashboard" model="ir.actions.client">
         <field name="name">Dashboard BOM</field>
@@ -75,7 +75,7 @@
         name="Dashboards BOM"
         id="menu_dynamic_dashboard"
         parent="ds_company_management.company_management_menu"
-        sequence="2"
+        sequence="1"
         action="action_dynamic_dashboard"
         groups="ds_company_management.group_company_management_sub_ceo"/>
 </odoo>
