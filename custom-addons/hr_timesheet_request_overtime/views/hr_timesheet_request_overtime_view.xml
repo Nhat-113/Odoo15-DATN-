@@ -184,11 +184,11 @@
                 <field name="type_day_ot" attrs="{'invisible': [('type_ot', '=', 'no')]}"/>
             </xpath>
             <xpath expr="//field[@name='unit_amount']" position="after">
-                <field name="pay_type"/>
+                <field name="pay_type"  attrs="{'invisible': [('type_ot', '=', 'no')]}"/>
                 <field name="status_timesheet_overtime" string="Status" widget="badge" readonly="1" decoration-info="status_timesheet_overtime == 'draft'" decoration-warning="status_timesheet_overtime in ('refuse')" decoration-success="status_timesheet_overtime == 'confirm'"/>
                 <field name="reason_reject" placeholder="Type Reason Refuse Taskscore..." attrs="{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('read_only_reason_refuse', '=', False)]}"/>
                 <field name="read_only_reason_refuse" invisible="1"/>
-                <button name="approve_timesheet_overtime" string="Approve" icon="fa-thumbs-up" type="object" attrs="{'invisible': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('read_only_reason_refuse', '=', False)]}"/>
+                <button name="approve_timesheet_overtime" string="Confirm" icon="fa-thumbs-up" type="object" attrs="{'invisible': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('read_only_reason_refuse', '=', False)]}"/>
             </xpath>
             <xpath expr="//field[@name='name']" position="before">
                 <!-- invisible 3 field -->

@@ -12,8 +12,7 @@ class AccountAnalyticLine(models.Model):
                                 ('full_cash', 'Full Cash'),
                                 ('50:50', 'Cash 5:5 Date Off'),
                                 ('full_day_off', 'Full Date Off'),
-                                ], string='Pay Type', index=True, default="full_day_off", tracking=True, required=True)
-                                # TODO compute date off if select 'Cash 5:5 Date Off' or 'Full Date Off' in time off
+                                ], string='Pay Type', index=True, default='full_day_off', tracking=True, required=True)
 
     type_day_ot = fields.Selection([
                                 ('other', 'Other'),
@@ -42,6 +41,33 @@ class AccountAnalyticLine(models.Model):
     request_overtime_ids = fields.Many2one('hr.request.overtime', string='Request Overtime', store=True, readonly=True)
     check_request_ot = fields.Boolean('Check Readonly', compute='_compute_request_overtime_id', store=True, default=False)
     check_approval_ot = fields.Boolean('Check Approvals', compute='_compute_request_overtime_id', store=True, default=False)
+
+    def _compute_pay_type_of_timeoff(self):
+        for record in self:
+            if record.request_overtime_ids and record.type_ot == 'yes' and record.request_overtime_ids.stage_id.name=='Approval':
+                pay_type = record.pay_type
+                time_of_type = self.env['hr.leave.type'].search([('company_id','=',record.employee_id.company_id.id),(('name', 'like', 'Nghỉ bù'))])
+                number_of_hours_display = 0
+                if pay_type=='full_day_off':
+                    number_of_hours_display = record.unit_amount
+                elif pay_type=='50:50':
+                    number_of_hours_display = record.unit_amount/2
+                
+                vals = {
+                    'holiday_type': 'employee',
+                    'name': 'Nghỉ bù Overtime',
+                    'holiday_status_id': time_of_type.id,
+                    'employee_id': record.employee_id.id,
+                    'allocation_type': 'regular',
+                    'number_of_hours_display': number_of_hours_display,
+                    'notes': False,
+                    'state': 'validate',
+                    'duration_display': number_of_hours_display
+                    # TODO fix number_of_hours_display
+                }
+                self.env['hr.leave.allocation'].create(vals)
+            else:
+                continue
 
     @api.depends('date', 'type_ot')
     def compute_type_overtime_day(self):
@@ -120,6 +146,7 @@ class AccountAnalyticLine(models.Model):
                 elif record.request_overtime_ids.stage_id.name == 'Approval':
                     record.write({'check_request_ot': True})
                     record.write({'check_approval_ot': True})
+                    record._compute_pay_type_of_timeoff()
                     record.write({'status_timesheet_overtime': 'confirm'})
                 else:
                     record.write({'check_request_ot': False})

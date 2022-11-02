@@ -55,7 +55,7 @@ class HrRequestOverTime(models.Model):
                             # domain=lambda self: self._compute_domain_stage(),
                             copy=False, index=True,
                             )
-    request_creator_id = fields.Many2one('res.users', string='Info to', required=True, default=lambda self: self.env.user)
+    request_creator_id = fields.Many2one('res.users', string='Inform to', required=True, default=lambda self: self.env.user)
     requester_id = fields.Many2many('res.users', string='Approvals', required=True, default=lambda self: self._get_default_approve(), readonly=False)
     user_id = fields.Many2one('res.users', string='Project Manager', tracking=True, readonly=True, compute='_compute_project_info')
     member_ids = fields.Many2many('hr.employee', string='Members',
@@ -149,7 +149,7 @@ class HrRequestOverTime(models.Model):
                 if item.end_date < record.start_date or item.start_date > record.end_date:
                     return
                 else:
-                    raise ValidationError(_("Plan Date Overtime cannt not overlap in the same project. \nRequest Overtime Duplicate Plan is: {}".format(item.name)))
+                    raise ValidationError(_("Plan Date Overtime can not overlap in the same project. \nRequest Overtime Duplicate Plan is: {}".format(item.name)))
 
     def action_submit_request_overtime(self):
         self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Submit')]).id
