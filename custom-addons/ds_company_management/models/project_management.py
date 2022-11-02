@@ -7,7 +7,23 @@ class ProjectManagement(models.Model):
     _auto = False
     
     
+    def handle_remove_department(self):
+        mirai_fnb_department_id = self.env['hr.department'].sudo().search([('name', '=', 'Mirai FnB')])
+        department_ids = self.get_all_department_children(mirai_fnb_department_id.ids, [])
+        department_ids += mirai_fnb_department_id.ids
+        return department_ids
+    
+    def get_all_department_children(self, parent_id, list_departments):
+        child_departments = self.env['hr.department'].sudo().search([('parent_id', 'in', parent_id)])
+        
+        if child_departments:
+            list_departments += child_departments.ids
+            return self.get_all_department_children(child_departments.ids, list_departments)
+        else:
+            return list_departments
+    
     def init(self):
+        department_ids = self.handle_remove_department()
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
@@ -17,7 +33,6 @@ class ProjectManagement(models.Model):
                         pr.id AS project_id,
                         pr.user_id AS user_pm,
                         pr.department_id,
-                        hd.name AS department_name,
                         pr.company_id,
                         pr.date_start,
                         pr.date AS date_end,
@@ -35,8 +50,6 @@ class ProjectManagement(models.Model):
                         ) AS total_cost
 
                     FROM project_project AS pr 
-                    LEFT JOIN hr_department AS hd
-			            ON hd.id = pr.department_id
                     LEFT JOIN estimation_work AS est
                         ON est.id = pr.estimation_id
                     LEFT JOIN project_expense_management AS pem
@@ -54,7 +67,6 @@ class ProjectManagement(models.Model):
                         est.project_type_id,
                         user_pm,
                         pr.department_id,
-                        hd.name,
                         pr.company_id,
                         pr.date_start,
                         date_end,
@@ -112,7 +124,7 @@ class ProjectManagement(models.Model):
                         FROM project_estimation_merged AS pem
                         LEFT JOIN project_revenue_management AS prm
                             ON pem.project_id = prm.project_id
-                        WHERE pem.department_name != 'Mirai FnB'
+                        WHERE pem.department_id NOT IN %s
                     )
                     SELECT
                         ROW_NUMBER() OVER(ORDER BY project_id ASC) AS id,
@@ -142,7 +154,7 @@ class ProjectManagement(models.Model):
                     LEFT JOIN res_currency AS cr
                         ON cr.name = 'VND'
 
-            ) """ % (self._table)
+            ) """ % (self._table, tuple(department_ids))
         )
        
 

@@ -9,6 +9,7 @@ class ProjectManagementSubCeo(models.Model):
     
     
     def init(self):
+        department_ids = self.env['project.management'].handle_remove_department()
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
@@ -66,7 +67,7 @@ class ProjectManagementSubCeo(models.Model):
                         hd.company_id
                         
                         FROM hr_department AS hd
-                            WHERE hd.name != 'Mirai FnB'
+                            WHERE hd.id NOT IN %s
                 ),
 
                 compute_salary_manager_department AS (
@@ -203,7 +204,7 @@ class ProjectManagementSubCeo(models.Model):
                     ON ru.login = rc.user_email
                 ORDER BY company_id, department_id, months
 
-            ) """ % (self._table)
+            ) """ % (self._table, tuple(department_ids))
         )
         
         

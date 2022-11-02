@@ -7,6 +7,7 @@ class ProjectMemberManagement(models.Model):
 
 
     def init(self):
+        department_ids = self.env['project.management'].handle_remove_department()
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
@@ -16,7 +17,6 @@ class ProjectMemberManagement(models.Model):
                         plan.project_id,
                         plan.employee_id,
                         pp.department_id,
-                        hd.name AS department_name,
                         plan.planning_role_id,
                         plan.start_date,
                         plan.end_date,
@@ -26,8 +26,6 @@ class ProjectMemberManagement(models.Model):
                     FROM planning_calendar_resource AS plan 
                     LEFT JOIN project_project AS pp
                         ON pp.id = plan.project_id
-                    LEFT JOIN hr_department AS hd
-                        ON hd.id = pp.department_id
                 )
 
                 SELECT
@@ -50,9 +48,9 @@ class ProjectMemberManagement(models.Model):
                 LEFT JOIN hr_employee AS he
                         ON he.id = ppd.employee_id
                         
-                WHERE ppd.department_name != 'Mirai FnB'
+                WHERE ppd.department_id NOT IN %s
                         
-            )""" % (self._table)
+            )""" % (self._table, tuple(department_ids))
         )
 
 

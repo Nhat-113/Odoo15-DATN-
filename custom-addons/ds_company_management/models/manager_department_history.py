@@ -7,6 +7,7 @@ class ManagerDepartmentHistory(models.Model):
     
     
     def init(self):
+        department_ids = self.env['project.management'].handle_remove_department()
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
@@ -64,7 +65,7 @@ class ManagerDepartmentHistory(models.Model):
                     FROM hr_department AS hd
                     LEFT JOIN handling_datetime_department_history AS hdh
                         ON hd.id = hdh.department_id
-                    WHERE hd.name != 'Mirai FnB'
+                    WHERE hd.id NOT IN %s
                 ),
 
                 history_department_gen_month AS (
@@ -191,5 +192,5 @@ class ManagerDepartmentHistory(models.Model):
                     AND EXTRACT(MONTH FROM gsm.month_start) = EXTRACT(MONTH FROM brm.start_date_month)
                     AND EXTRACT(YEAR FROM gsm.month_start) = EXTRACT(YEAR FROM brm.start_date_month)
 
-            )""" % (self._table)
+            )""" % (self._table, tuple(department_ids))
         )

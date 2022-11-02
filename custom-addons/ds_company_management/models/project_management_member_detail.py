@@ -9,6 +9,7 @@ class ProjectManagementMemberDetail(models.Model):
     
     
     def init(self):
+        department_ids = self.env['project.management'].handle_remove_department()
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
@@ -80,10 +81,10 @@ class ProjectManagementMemberDetail(models.Model):
                 LEFT JOIN hr_payslip_line AS hpl
                     ON hpl.slip_id = hp.id
                     AND hpl.code IN('NET', 'NET1') AND hp.state = 'done'
-                WHERE ppb.department_name != 'Mirai FnB'
+                WHERE ppb.department_id NOT IN %s
                 ORDER BY project_members, employee_id
 
-            )""" % (self._table)
+            )""" % (self._table, tuple(department_ids))
         )
         
         
