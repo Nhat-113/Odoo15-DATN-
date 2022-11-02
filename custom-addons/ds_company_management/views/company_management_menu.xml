@@ -12,7 +12,7 @@
 
     <menuitem
         id="cost_management"
-        name="Cost Management"
+        name="Overall Management"
         sequence="2"
         parent="ds_company_management.company_management_menu"/>
 

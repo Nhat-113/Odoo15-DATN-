@@ -165,6 +165,16 @@ class ManagerDepartmentHistory(models.Model):
                     LEFT JOIN hr_payslip_line AS hpll
                         ON hpll.slip_id = hp.id
                         AND hpll.code IN('BQNC') AND hp.state = 'done'
+                ),
+                
+                project_planning_booking_remove_department_fnb AS (
+                    SELECT
+                        employee_id,
+                        man_month,
+                        start_date_month,
+                        effort_rate_month
+                    FROM project_planning_booking
+                    WHERE department_id NOT IN %s
                 )
 
                 SELECT
@@ -178,19 +188,20 @@ class ManagerDepartmentHistory(models.Model):
                     gsm.working_day_total,
                     gsm.bqnc,
                     gsm.total AS salary_manager,
-                    brm.effort_rate_month,
-                    brm.man_month
+                    ppb.effort_rate_month,
+                    ppb.man_month
                 FROM get_salary_manager AS gsm
-                LEFT JOIN booking_resource_month AS brm
+                LEFT JOIN project_planning_booking_remove_department_fnb AS ppb
+                -- LEFT JOIN booking_resource_month AS brm
                     ON (CASE
                             WHEN gsm.manager_history_id IS NOT NULL
-                                THEN gsm.manager_history_id = brm.employee_id
+                                THEN gsm.manager_history_id = ppb.employee_id
                             ELSE
-                                gsm.manager_id = brm.employee_id
+                                gsm.manager_id = ppb.employee_id
                         END)
 
-                    AND EXTRACT(MONTH FROM gsm.month_start) = EXTRACT(MONTH FROM brm.start_date_month)
-                    AND EXTRACT(YEAR FROM gsm.month_start) = EXTRACT(YEAR FROM brm.start_date_month)
+                    AND EXTRACT(MONTH FROM gsm.month_start) = EXTRACT(MONTH FROM ppb.start_date_month)
+                    AND EXTRACT(YEAR FROM gsm.month_start) = EXTRACT(YEAR FROM ppb.start_date_month)
 
-            )""" % (self._table, tuple(department_ids))
+            )""" % (self._table, tuple(department_ids), tuple(department_ids))
         )

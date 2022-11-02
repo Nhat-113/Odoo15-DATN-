@@ -8,6 +8,7 @@ class ProjectManagementCeo(models.Model):
     
     
     def init(self):
+        department_ids = self.env['project.management'].handle_remove_department()
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
@@ -183,6 +184,16 @@ class ProjectManagementCeo(models.Model):
                             AND hpll.code IN('BQNC') AND hp.state = 'done'
 
                 ),
+                
+                project_planning_booking_remove_department_fnb AS (
+                    SELECT
+                        employee_id,
+                        man_month,
+                        start_date_month,
+                        effort_rate_month
+                    FROM project_planning_booking
+                    WHERE department_id NOT IN %s
+                ),
 
                 compute_salary_subceo AS (
                     SELECT 
@@ -205,8 +216,8 @@ class ProjectManagementCeo(models.Model):
                     -- 	gs.working_day_total,
                     -- 	gs.total,
                     -- 	gs.bqnc,
-                    -- 	brm.effort_rate_month,
-                    -- 	brm.man_month,
+                    -- 	ppb.effort_rate_month,
+                    -- 	ppb.man_month,
                         
                     -- 	mdh.manager_id AS manager_department,
                     -- 	mdh.manager_history_id AS old_manager_department,
@@ -223,10 +234,10 @@ class ProjectManagementCeo(models.Model):
                             ELSE
                                 (CASE
                                     -- when manager company doesn't join project ---
-                                    WHEN brm.man_month IS NULL
+                                    WHEN ppb.man_month IS NULL
                                         THEN (gs.working_day::NUMERIC(10,5) / gs.working_day_total)
                                     ELSE
-                                        (gs.working_day::NUMERIC(10,5) / gs.working_day_total) - brm.man_month
+                                        (gs.working_day::NUMERIC(10,5) / gs.working_day_total) - ppb.man_month
                                 END)
                         END) AS remaining_members,
                         
@@ -245,17 +256,17 @@ class ProjectManagementCeo(models.Model):
                                     --- when the manager quits in the middle of the month ---
                                     WHEN gs.working_day <> gs.working_day_total
                                         THEN (CASE
-                                                WHEN brm.effort_rate_month IS NULL
+                                                WHEN ppb.effort_rate_month IS NULL
                                                     THEN COALESCE(NULLIF(gs.bqnc, NULL), 0) * gs.working_day
                                                 ELSE
-                                                    COALESCE(NULLIF(gs.bqnc, NULL), 0) * gs.working_day * (100 - brm.effort_rate_month) / 100
+                                                    COALESCE(NULLIF(gs.bqnc, NULL), 0) * gs.working_day * (100 - ppb.effort_rate_month) / 100
                                             END)
                                     ELSE
                                         (CASE
-                                            WHEN brm.effort_rate_month IS NULL
+                                            WHEN ppb.effort_rate_month IS NULL
                                                 THEN COALESCE(NULLIF(gs.total, NULL), 0)
                                             ELSE
-                                                COALESCE(NULLIF(gs.total, NULL), 0) * (100 - brm.effort_rate_month) / 100
+                                                COALESCE(NULLIF(gs.total, NULL), 0) * (100 - ppb.effort_rate_month) / 100
                                         END)
                                 END)
                         END) AS remaining_salary
@@ -264,16 +275,16 @@ class ProjectManagementCeo(models.Model):
                     LEFT JOIN get_salary_manager_company AS gs
                         ON gs.company_id = cms.company_id
                         AND gs.month_start_date = cms.month_start
-                    LEFT JOIN booking_resource_month AS brm
+                    LEFT JOIN project_planning_booking_remove_department_fnb AS ppb
                         ON (CASE
                                 WHEN gs.old_manager_id IS NOT NULL
-                                    THEN gs.old_manager_id = brm.employee_id
+                                    THEN gs.old_manager_id = ppb.employee_id
                                 ELSE
-                                    gs.manager_id = brm.employee_id
+                                    gs.manager_id = ppb.employee_id
                             END)
 
-                        AND EXTRACT(MONTH FROM gs.month_start_date) = EXTRACT(MONTH FROM brm.start_date_month)
-                        AND EXTRACT(YEAR FROM gs.month_start_date) = EXTRACT(YEAR FROM brm.start_date_month)
+                        AND EXTRACT(MONTH FROM gs.month_start_date) = EXTRACT(MONTH FROM ppb.start_date_month)
+                        AND EXTRACT(YEAR FROM gs.month_start_date) = EXTRACT(YEAR FROM ppb.start_date_month)
                     LEFT JOIN manager_department_history AS mdh
                         ON (CASE
                                 WHEN mdh.manager_history_id IS NOT NULL
@@ -369,7 +380,7 @@ class ProjectManagementCeo(models.Model):
                     ON he.work_email = rc.user_email
                 LEFT JOIN res_currency AS rcu
 	                ON rcu.name = 'VND'
-            ) """ % (self._table)
+            ) """ % (self._table, tuple(department_ids))
         )
         
     
