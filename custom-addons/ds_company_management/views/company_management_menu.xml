@@ -58,11 +58,11 @@
         action="exchange_rate_action"/>
 
     <record id="action_human_resource_template" model="ir.actions.client">
-        <field name="name">HRM</field>
+        <field name="name">Human Resource Management</field>
         <field name="tag">human_resource_template</field>
     </record>
     
-    <menuitem name="Human Resource Management" id="menu_human_resource_template" 
+    <menuitem name="HRM" id="menu_human_resource_template" 
         parent="ds_company_management.company_management_menu"
         sequence="3" action="action_human_resource_template"/>
     
@@ -72,7 +72,7 @@
     </record>
 
     <menuitem 
-        name="Dashboards BOM"
+        name="BOM Dashboard"
         id="menu_dynamic_dashboard"
         parent="ds_company_management.company_management_menu"
         sequence="1"
