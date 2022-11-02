@@ -8,7 +8,6 @@ class ProjectManagementCeo(models.Model):
     
     
     def init(self):
-        department_ids = self.env['project.management'].handle_remove_department()
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
@@ -192,7 +191,7 @@ class ProjectManagementCeo(models.Model):
                         start_date_month,
                         effort_rate_month
                     FROM project_planning_booking
-                    WHERE department_id NOT IN %s
+                    WHERE department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                 ),
 
                 compute_salary_subceo AS (
@@ -380,7 +379,7 @@ class ProjectManagementCeo(models.Model):
                     ON he.work_email = rc.user_email
                 LEFT JOIN res_currency AS rcu
 	                ON rcu.name = 'VND'
-            ) """ % (self._table, tuple(department_ids))
+            ) """ % (self._table)
         )
         
     

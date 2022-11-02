@@ -9,7 +9,6 @@ class ProjectManagementHistory(models.Model):
     
     
     def init(self):
-        department_ids = self.env['project.management'].handle_remove_department()
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
@@ -84,7 +83,7 @@ class ProjectManagementHistory(models.Model):
                         ppb.months,
                         (SUM(ppb.man_month)) AS total_members
                     FROM project_planning_booking AS ppb
-                        WHERE ppb.department_id NOT IN %s
+                        WHERE ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                     GROUP BY company_id,
                             project_id,
                             months
@@ -100,7 +99,7 @@ class ProjectManagementHistory(models.Model):
                     FROM project_planning_booking AS ppb
                     WHERE (ppb.member_type_name NOT IN ('Intern', 'intern') 
                             OR ppb.member_type_name IS NULL)
-                            AND ppb.department_id NOT IN %s
+                            AND ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                     GROUP BY company_id,
                             project_id,
                             months
@@ -116,7 +115,7 @@ class ProjectManagementHistory(models.Model):
                     FROM project_planning_booking AS ppb
                     WHERE (ppb.member_type_name NOT IN ('Intern', 'intern') 
                             OR ppb.member_type_name IS NULL)
-                            AND ppb.department_id NOT IN %s
+                            AND ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                     GROUP BY company_id, months
                 ),
 
@@ -154,7 +153,7 @@ class ProjectManagementHistory(models.Model):
                     FROM project_planning_booking 
                     WHERE (member_type_name NOT IN('Intern', 'intern')
                             OR member_type_name IS NULL)
-                        AND department_id NOT IN %s
+                        AND department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                     GROUP BY company_id,
                             project_id,
                             months
@@ -326,7 +325,7 @@ class ProjectManagementHistory(models.Model):
                 FROM compute_project_revenue AS cpr
                 ORDER BY company_id, project_id,  month_start
 
-            )""" % (self._table, tuple(department_ids), tuple(department_ids), tuple(department_ids), tuple(department_ids))
+            )""" % (self._table)
         )
     
 

@@ -7,7 +7,6 @@ class ProjectMemberManagement(models.Model):
 
 
     def init(self):
-        department_ids = self.env['project.management'].handle_remove_department()
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
@@ -48,9 +47,9 @@ class ProjectMemberManagement(models.Model):
                 LEFT JOIN hr_employee AS he
                         ON he.id = ppd.employee_id
                         
-                WHERE ppd.department_id NOT IN %s
+                WHERE ppd.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                         
-            )""" % (self._table, tuple(department_ids))
+            )""" % (self._table)
         )
 
 

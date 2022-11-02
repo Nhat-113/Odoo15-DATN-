@@ -25,7 +25,6 @@ class ProjectManagement(models.Model):
             return list_departments
     
     def init(self):
-        department_ids = self.handle_remove_department()
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
@@ -126,7 +125,7 @@ class ProjectManagement(models.Model):
                         FROM project_estimation_merged AS pem
                         LEFT JOIN project_revenue_management AS prm
                             ON pem.project_id = prm.project_id
-                        WHERE pem.department_id NOT IN %s
+                        WHERE pem.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                     )
                     SELECT
                         ROW_NUMBER() OVER(ORDER BY project_id ASC) AS id,
@@ -156,7 +155,7 @@ class ProjectManagement(models.Model):
                     LEFT JOIN res_currency AS cr
                         ON cr.name = 'VND'
 
-            ) """ % (self._table, tuple(department_ids))
+            ) """ % (self._table)
         )
        
 

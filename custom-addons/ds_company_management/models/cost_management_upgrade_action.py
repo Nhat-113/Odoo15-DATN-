@@ -1,12 +1,41 @@
-from odoo import models, api
+from odoo import models, fields, api
+
+
+class DepartmentMiraiFnb(models.Model):
+    _name = 'department.mirai.fnb'
+    _Description = 'Table is store id data department Mirai FnB'
+        
+    department_id = fields.Many2one('hr.department', string='Department Mirai Fnb')
 
 
 class UpgradeAction(models.Model):
     _name = 'cost.management.upgrade.action'
     
     
+    def handle_remove_department(self):
+        mirai_fnb_department_id = self.env['hr.department'].sudo().search([('name', '=', 'Mirai FnB')])
+        department_ids = self.get_all_department_children(mirai_fnb_department_id.ids, [])
+        department_ids += mirai_fnb_department_id.ids
+        return department_ids
+    
+    def get_all_department_children(self, parent_id, list_departments):
+        child_departments = self.env['hr.department'].sudo().search([('parent_id', 'in', parent_id)])
+        
+        if child_departments:
+            list_departments += child_departments.ids
+            return self.get_all_department_children(child_departments.ids, list_departments)
+        else:
+            return list_departments
+    
+    
     @api.model
     def cost_management_reset_update_data(self):
+        department_ids = self.handle_remove_department()
+        self.env['department.mirai.fnb'].sudo().search([]).unlink()
+        if len(department_ids) > 0:
+            for record in department_ids:
+                self.env['department.mirai.fnb'].create({'department_id': record})
+
         user_update = str(self.env.user.id)
         all_query = self.query_project_management(user_update) +\
                     self.query_project_management_history(user_update) +\
