@@ -193,6 +193,8 @@ class DashboardBlock(models.Model):
 						LEFT OUTER JOIN hr_department ON hr_employee.department_id = hr_department.id 
                         Where  EXTRACT(YEAR FROM hr_payslip.date_from)  = EXTRACT(YEAR FROM NOW())
                         AND ( hr_payslip_line.code = 'NET' OR  hr_payslip_line.code = 'NET1' OR  hr_payslip_line.code = 'HOUR' )
+                        AND ( hr_payslip_line.code = 'NET' OR  hr_payslip_line.code = 'NET1' OR  hr_payslip_line.code = 'HOUR' )
+                        AND hr_payslip.state = 'done' 
                         AND hr_payslip.company_id IN  """ + str(tuple(company_id)) + """ """
                        
         sql += sql_domain_for_department  

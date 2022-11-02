@@ -72,7 +72,7 @@
     </record>
 
     <menuitem 
-        name="Dashboards BOM"
+        name="BOM Dashboards"
         id="menu_dynamic_dashboard"
         parent="ds_company_management.company_management_menu"
         sequence="1"

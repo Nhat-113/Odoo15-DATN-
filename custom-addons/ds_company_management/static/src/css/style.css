@@ -61,11 +61,18 @@ span[name="message_warning"] {
     top: 0;
 }
 
+.human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(4) {
+    position: sticky;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+}
 .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(2) {
     position: sticky;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: -3px;
+    background: #eee !important;
 }
 
 .AVG_colum {
@@ -115,9 +122,9 @@ span[name="message_warning"] {
     background: aquamarine !important;
 }
 
-.Avg_effort_member {
+.Avg_effort_member, .total_member_avai-2 {
     background: #eee !important;
-    color: #495057;
+    color: cadetblue;
     font-weight: 900;
 }
 
@@ -141,10 +148,6 @@ span[name="message_warning"] {
     line-height: 22px;
 }
 
-.td_value_none {
-    padding: 0 !important;
-    width: 10px !important;
-}
 
 .search_textbox {
     width: 45.45%;
