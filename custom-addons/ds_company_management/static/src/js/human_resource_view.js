@@ -353,7 +353,6 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 // avg = (total effort( > 0 and another N/A  )) / total members in column with effort another N/A 
                 total_row.cells[j].innerText = parseFloat(final / count_compute_available_member).toFixed(2);
             }
-
         },
 
         compute_available_member_res_rate: function (colNumber) {
