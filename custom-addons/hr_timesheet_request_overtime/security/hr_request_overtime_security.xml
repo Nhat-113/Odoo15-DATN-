@@ -26,11 +26,18 @@
             <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_projmanager'))]"/>
         </record>
 
+        <!-- Option Role: HR -->
+        <record id="request_overtime_access_officer" model="res.groups">
+            <field name="name">Officer</field>
+            <field name="category_id" ref="module_category_services_overtime"/>
+            <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_director'))]"/>
+        </record>
+
         <!-- Option Role: Administrator -->
         <record id="request_overtime_access_admin" model="res.groups">
             <field name="name">Administrator</field>
             <field name="category_id" ref="module_category_services_overtime"/>
-            <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_director'))]"/>
+            <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_officer'))]"/>
         </record>
 
     </data>

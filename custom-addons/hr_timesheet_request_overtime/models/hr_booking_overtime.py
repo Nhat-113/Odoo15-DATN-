@@ -19,7 +19,7 @@ class AccountAnalyticLine(models.Model):
                                 ('normal_day', 'Normal Day'),
                                 ('weekend', 'Weekend'),
                                 ('holiday', 'Holiday'),
-                                ], string='Type Day OT', index=True, copy=False, compute="compute_type_overtime_day", tracking=True, required=True)
+                                ], string='Type Day', index=True, copy=False, compute="compute_type_overtime_day", tracking=True, required=True, store=True)
 
     status_timesheet_overtime = fields.Selection([
                                         ('draft', 'To Confirm'),
@@ -29,7 +29,7 @@ class AccountAnalyticLine(models.Model):
     reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True)
     
     def _readonly_resion_refuse(self):
-        if self.env.user.has_group('ds_ramp_up_recourse.group_task_score_pm') == True:
+        if self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_projmanager') == True:
             for task in self:
                 task.read_only_reason_refuse = True
         else:
@@ -46,7 +46,7 @@ class AccountAnalyticLine(models.Model):
         for record in self:
             if record.request_overtime_ids and record.type_ot == 'yes' and record.request_overtime_ids.stage_id.name=='Approval':
                 pay_type = record.pay_type
-                time_of_type = self.env['hr.leave.type'].search([('company_id','=',record.employee_id.company_id.id),(('name', 'like', 'Nghỉ bù'))])
+                time_of_type = self.env['hr.leave.type'].search([('company_id','=',record.employee_id.company_id.id),('name', 'like', 'Nghỉ bù')])
                 number_of_hours_display = 0
                 if pay_type=='full_day_off':
                     number_of_hours_display = record.unit_amount
@@ -69,13 +69,13 @@ class AccountAnalyticLine(models.Model):
             else:
                 continue
 
-    @api.depends('date', 'type_ot')
+    @api.onchange('date', 'type_ot', 'type_day_ot')
     def compute_type_overtime_day(self):
         for record in self:
             date = record.date
             public_holiday = self.env['resource.calendar.leaves'].search([('calendar_id','=',False),('holiday_id','=',False), 
             ('date_from','<=',date),('date_to','>=',date)])
-            if record.type_ot == 'yes':
+            if record.type_day_ot != 'other':
                 if public_holiday:
                     record.type_day_ot = 'holiday'
                 elif  4 < date.weekday() < 7:
@@ -83,8 +83,7 @@ class AccountAnalyticLine(models.Model):
                 else:
                     record.type_day_ot = 'normal_day'
             else:
-                record.type_day_ot = False
-
+                record.type_day_ot = 'other'
 
     @api.depends('reason_reject')
     def reject_timesheet_overtime(self):
@@ -290,6 +289,7 @@ class HrBookingOvertime(models.Model):
             "type": "ir.actions.act_window",
             "res_model": "account.analytic.line",
             "views": [[self.env.ref('hr_timesheet.hr_timesheet_line_tree').id, "tree"]],
+            "context": {"create": False, "edit": False, "delete": False},
             "domain": 
                 [('project_id', '=', self.request_overtime_id.project_id.id),
                 ('employee_id', '=', self.user_id.id), ('type_ot','=','yes'),

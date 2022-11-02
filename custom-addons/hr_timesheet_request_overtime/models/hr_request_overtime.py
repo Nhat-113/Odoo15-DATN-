@@ -27,7 +27,6 @@ class HrRequestOverTime(models.Model):
     _description = "Hr Request Overtime"
     _order = "id DESC"
 
-    @api.model
     def _get_default_stage_id(self):
         return self.env['hr.request.overtime.stage'].search([], limit=1).id
 
@@ -70,7 +69,7 @@ class HrRequestOverTime(models.Model):
     approve_flag = fields.Boolean(default=True)
     request_flag = fields.Boolean(default=False)
 
-    stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draft")
+    stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draft", store=True)
     last_stage = fields.Integer(string="Last stage", default=0)
     
     def action_refuse_reason(self):
@@ -194,30 +193,45 @@ class HrRequestOverTime(models.Model):
         for record in self:
             record.stage_name = record.stage_id.name
             if record.stage_id.name =="Draft":
-                self.confirm_flag = True
-                self.submit_flag = True
-                self.request_flag = True
-                self.approve_flag = True
+                vals = {
+                'confirm_flag': True,
+                'submit_flag': True,
+                'request_flag': True,
+                'approve_flag': True,
+                }
+                self.write(vals)
             if record.stage_id.name == "Request":
-                self.submit_flag =True
-                self.confirm_flag = True
-                self.request_flag = False
-                self.approve_flag = True
+                vals = {
+                'confirm_flag': True,
+                'submit_flag': True,
+                'request_flag': False,
+                'approve_flag': True,
+                }
+                self.write(vals)
             if record.stage_id.name == "Confirm":
-                self.submit_flag =True
-                self.confirm_flag = False
-                self.request_flag = True
-                self.approve_flag = True
+                vals = {
+                'confirm_flag': False,
+                'submit_flag': True,
+                'request_flag': True,
+                'approve_flag': True,
+                }
+                self.write(vals)
             if record.stage_id.name == "Submit":
-                self.submit_flag =False
-                self.confirm_flag = True
-                self.request_flag = True
-                self.approve_flag = True
+                vals = {
+                'confirm_flag': True,
+                'submit_flag': False,
+                'request_flag': True,
+                'approve_flag': True,
+                }
+                self.write(vals)
             if record.stage_id.name == "Approval":
-                self.submit_flag =True
-                self.confirm_flag = True
-                self.request_flag = True
-                self.approve_flag = False
+                vals = {
+                'confirm_flag': True,
+                'submit_flag': True,
+                'request_flag': True,
+                'approve_flag': False,
+                }
+                self.write(vals)
 
     @api.model
     def _send_message_auto_subscribe_notify_request_overtime(self, users_per_task, mail_template, subject_template):

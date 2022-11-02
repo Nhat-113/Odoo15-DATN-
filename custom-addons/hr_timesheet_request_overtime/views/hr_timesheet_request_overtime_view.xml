@@ -30,12 +30,12 @@
                     <field name='request_flag' invisible="1"/>
                     <field name='approve_flag' invisible="1"/>
                     <button string="Request" name="action_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('request_flag', '!=', True), ('stage_name', '!=', 'Draft')]}"/>
-                    <button string="Confirm" name="action_confirm_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('confirm_flag', '!=', True), ('stage_name', '!=', 'Request')]}"/>
-                    <button string="Submit" name="action_submit_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('submit_flag', '!=', True), ('stage_name', '!=', 'Confirm')]}" />
-                    <button string="Approval" name="action_approve_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('approve_flag', '!=', True), ('stage_name', '!=', 'Submit')]}"/>
-                    <button string="Refuse" name="action_refuse_reason" type="object" attrs="{'invisible': [('active', '=', False)]}" data-hotkey="x" />
-                    <button string="Restore" name="toggle_active" type="object" attrs="{'invisible': [('active', '=', True)]}" data-hotkey="z"/>
-                    <field name="stage_id" widget="statusbar" options="{'clickable': '1'}" attrs="{'invisible': [('active', '=', False)]}" />
+                    <button string="Confirm" groups="hr_timesheet_request_overtime.request_overtime_access_director" name="action_confirm_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('confirm_flag', '!=', True), ('stage_name', '!=', 'Request')]}"/>
+                    <button string="Submit" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="action_submit_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('submit_flag', '!=', True), ('stage_name', '!=', 'Confirm')]}" />
+                    <button string="Approval" groups="hr_timesheet_request_overtime.request_overtime_access_director" name="action_approve_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', ('approve_flag', '!=', True), ('stage_name', '!=', 'Submit')]}"/>
+                    <button string="Refuse" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="action_refuse_reason" type="object" attrs="{'invisible': [('active', '=', False)]}" data-hotkey="x" />
+                    <button string="Restore" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="toggle_active" type="object" attrs="{'invisible': [('active', '=', True)]}" data-hotkey="z"/>
+                    <field name="stage_id" widget="statusbar" options="{'clickable': '1'}" attrs="{'invisible': [('active', '=', False)]}"/>
                 </header>
                 <sheet>
                     <field name='stage_name' invisible="1"/>
@@ -69,7 +69,7 @@
                                 <field name="request_creator_id" options="{'no_create_edit': True, 'no_open': True}"/>
                             </group>
                             <group name="group_right">
-                                <label for="start_date" string="Plan Date Overtime"/>
+                                <label for="start_date" string="Plan"/>
                                 <div name="end_date" class="o_row">
                                     <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}'/>
                                     <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon" title="Arrow"/>
@@ -184,7 +184,7 @@
                 <field name="type_day_ot" attrs="{'invisible': [('type_ot', '=', 'no')]}"/>
             </xpath>
             <xpath expr="//field[@name='unit_amount']" position="after">
-                <field name="pay_type"  attrs="{'invisible': [('type_ot', '=', 'no')]}"/>
+                <field name="pay_type" attrs="{'invisible': [('type_ot', '=', 'no')]}"/>
                 <field name="status_timesheet_overtime" string="Status" widget="badge" readonly="1" decoration-info="status_timesheet_overtime == 'draft'" decoration-warning="status_timesheet_overtime in ('refuse')" decoration-success="status_timesheet_overtime == 'confirm'"/>
                 <field name="reason_reject" placeholder="Type Reason Refuse Taskscore..." attrs="{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('read_only_reason_refuse', '=', False)]}"/>
                 <field name="read_only_reason_refuse" invisible="1"/>
