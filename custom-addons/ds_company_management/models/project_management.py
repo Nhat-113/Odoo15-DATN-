@@ -12,7 +12,7 @@ class ProjectManagement(models.Model):
         department_ids = self.get_all_department_children(mirai_fnb_department_id.ids, [])
         department_ids += mirai_fnb_department_id.ids
         if len(department_ids) == 0:
-            department_ids.append(0)
+            department_ids += [0, 0]
         return department_ids
     
     def get_all_department_children(self, parent_id, list_departments):
