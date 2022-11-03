@@ -81,6 +81,10 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     var th = document.querySelectorAll('th.header_human_table')
                     var avgRow = document.getElementById('avg-row');
                     var totalRow = document.getElementById('total-row');
+                    var totalEffortAll = document.getElementById('total-effort-all-res-rate');
+                    var totalRowMember = document.getElementById('total-row-member-of-company');
+
+
                     th.forEach(th => th.addEventListener('click', (() => {
                         let table = th.closest('tbody');
                         Array.from(table.querySelectorAll('tr.detail'))
@@ -89,6 +93,9 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                         // append 2 this row in last row
                         table.appendChild(avgRow);
                         table.appendChild(totalRow);
+                        table.appendChild(totalEffortAll);
+                        table.appendChild(totalRowMember);
+
                     })));
 
                     // sort table member free
@@ -415,7 +422,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     // var employee_id_before = table.rows[i].cells[1].innerText;
                     // var employee_id_after = table.rows[i+1].cells[1].innerText;                  
 
-                    if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee)) {
+                    if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) && thisNumber > 0) {
                         count_row += 1;
                         listId.push(id_employee);
                     }

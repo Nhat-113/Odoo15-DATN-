@@ -168,7 +168,7 @@
                             </tr>
                         </t>
                         <tr id="avg-row" class="Avg_effort_member">
-                            <th scope="row" class="td_value_none">Avg Effort Members</th>
+                            <th scope="row" class="td_value_none">Average res rate</th>
                             <td class="td_value_none"></td>
                             <td class="td_value human_employee_id" type="string" ></td>
                             <td class="td_value" type="string"></td>
@@ -212,7 +212,7 @@
                             <td class="td_value" type="string"></td>
                         </tr>
 
-                        <tr id="total-memeber-company" class="total_member_avai-2">
+                        <tr id="total-effort-all-res-rate" class="total_member_avai-2">
                             <th scope="row">All Res Rate</th>
                             <td class="td_value human_employee_id" type="string"></td>
                             <td class="td_value" type="string"></td>
@@ -235,7 +235,7 @@
                             <td class="td_value" type="string"></td>
                         </tr>
 
-                        <tr id="total-row-2" class="total_member_avai_company" style="display:none">
+                        <tr id="total-row-member-of-company" class="total_member_avai_company" style="display:none">
                             <th scope="row">Total Members Company</th>
                             <td class="td_value human_employee_id" type="string"></td>
                             <td class="td_value" type="string"></td>
