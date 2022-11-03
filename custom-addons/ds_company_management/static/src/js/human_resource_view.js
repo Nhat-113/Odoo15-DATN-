@@ -99,6 +99,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     })));
 
                     // sort table member free
+                    var lastRowFreeTable = document.getElementById('bottom_table');
+
                     var th = document.querySelectorAll('th.header_member_free')
                     var avgRow = document.getElementById('avg-row');
                     var totalRow = document.getElementById('total-row');
@@ -107,6 +109,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                         Array.from(table.querySelectorAll('tr.detail'))
                             .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
                             .forEach(tr => table.appendChild(tr));
+                            table.appendChild(lastRowFreeTable);
                         // append 2 this row in last row
                     })));
 
@@ -115,6 +118,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     self.compute_avg();
                     // self.hide_value_old_month();
                     self.compute_avg_all_res_rate();
+                    self.compute_avg_all_avai_rate();
                 }, 500);
             });
         },
@@ -317,13 +321,13 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             const row_value_member = 4;
             const row_value_effort = 3;
 
-            var tbody = document.querySelector("tbody");
+            var tbody = document.getElementById("human_reource_tbody");
             var total_row = tbody.rows[tbody.rows.length - row_value_member];
             var total_available_member = tbody.rows[tbody.rows.length - row_value_effort];
             var count_compute_available_member = 0;
             var howManyCols = tbody.rows[1].cells.length;
             var total_member_company = document.getElementById("count_member_of_company");
-
+            var arrEffortCompany = []
             // Start compute in column number seven
             for (var j = 7; j < howManyCols - 1; j++) {
                 count_compute_available_member = self.compute_available_member(j);
@@ -331,13 +335,14 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 // count_number_row = self.compute_count_number_row(j);
                 total_available_member.cells[j].innerText = count_compute_available_member;
                 final = self.computeTableColumnTotal(j);
-
+                arrEffortCompany.push(final);
                 // avg = (total effort( > 0 and another N/A  )) / total members in column with effort another N/A 
                 total_row.cells[j].innerText = parseFloat(final / count_compute_available_member).toFixed(2);
             }
             //count members of company with value from second column
             total_member_company.innerText = String(self.compute_member_company() + ' Members');
 
+            return arrEffortCompany;
         },
 
         compute_avg_all_res_rate: function () {
@@ -345,7 +350,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var final = 0;
             const row_value_effort = 1;
             const row_value_member = 2;
-            var tbody = document.querySelector("tbody");
+            var tbody = document.getElementById("human_reource_tbody");
             var total_row = tbody.rows[tbody.rows.length - row_value_member];
             var total_available_member = tbody.rows[tbody.rows.length -row_value_effort];
             var count_compute_available_member = 0;
@@ -360,7 +365,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 final = self.computeTableColumnTotal(j);
                 // avg = (total effort( > 0 and another N/A  )) / total members in column with effort another N/A 
                 total_row.cells[j].innerText = parseFloat(final / count_compute_available_member).toFixed(2);
-            }
+            }   
+         
         },
 
         compute_available_member_res_rate: function (colNumber) {
@@ -521,6 +527,53 @@ odoo.define('human_resource_template.Dashboard', function (require) {
         //         }
         //     }
         // },
+
+
+        // //compute avavai label rate
+        computeTableColumnTotalFree: function (colNumber) {
+            var table = document.getElementById("human_resource_free_table");
+            let result = 0;
+            // const number_rows_not_count = 4;
+            var howManyRows = 0;
+            try {
+                var howManyRows = table.rows.length;
+                for (var i = 1; i < howManyRows - 1; i++) {
+                    let row = table.rows[i];
+                    let parent_style = row.cells[colNumber].parentElement.style.display
+                    var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);
+                    if (parent_style != 'none' && !isNaN(thisNumber) && thisNumber > 0) {
+                        result = result + thisNumber;
+                    }
+                }
+            } finally {
+                return result;
+            }
+        },
+        compute_avg_all_avai_rate: function () {
+            let self = this;
+            var final = 0;
+            var tbody = document.getElementById("tbody_free_table");
+            const number_column_calcu_in_table = 1
+            var total_available_member = tbody.rows[tbody.rows.length - number_column_calcu_in_table];
+
+            var howManyCols = tbody.rows[1].cells.length;
+            var arrFreeEffort = [];
+            var arrEffortHuman = self.compute_avg();
+            var avgEffortInFreeTable = []
+
+            //start calculator effort from  Fifth column => j = 5
+            for (var j = 5 ; j < howManyCols; j++) {
+                final = self.computeTableColumnTotalFree(j);
+                arrFreeEffort.push(final);
+            }
+
+            for (let i = 0 ; i < arrFreeEffort.length ;i++ ) {
+                avgEffortInFreeTable[i] = arrFreeEffort[i] /  arrEffortHuman[i]
+                //column start replace value from number four
+                total_available_member.cells[i+4].innerText = avgEffortInFreeTable[i].toFixed(2);
+            }
+        },
+
 
     });
 

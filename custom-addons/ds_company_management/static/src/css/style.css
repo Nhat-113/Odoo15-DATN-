@@ -286,11 +286,26 @@ button.view-member-free:hover {
 .title_member_free {
     padding: 10px 19px;
 }
+.bottom_tabel {
+    position: sticky;
+    left: 0;
+    right: 0;
+    bottom: 0px;
+    background: #eee !important;
+    padding: 16px;
+    margin: 0 auto;
+    height: 35px;
+    color: cadetblue;
+    font-weight: 800;
+}
 /* for desktop screen */
 
 @media only screen and (max-width: 1800px) {
     #count_member_of_company {
         left: 4%;
+    }
+    .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(4) {
+        bottom: 38px;
     }
 
 }
@@ -305,11 +320,17 @@ button.view-member-free:hover {
     #count_member_of_company {
         left: 6%;
     }
+    .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(4) {
+        bottom: 37px;
+    }
 }
 
 @media only screen and (max-width: 1200px) {
     #count_member_of_company {
         left: 7%;
+    }
+    .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(4) {
+        bottom: 40px;
     }
 }
 

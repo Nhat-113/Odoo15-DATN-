@@ -2,7 +2,7 @@
 <templates id="template" xml:space="preserve">
     <t t-name="dynamic_bom_dashboard">
             <div class="bom_dashboard_template">
-                <div id="deny-click" style="z-index: 10;
+                <!-- <div id="deny-click" style="z-index: 10;
                                     height: 100%;
                                     width: 100%;
                                     position: absolute;
@@ -11,7 +11,7 @@
                                     ">
                         <img src="/ds_company_management/static/src/img/loading.png" class="loading-img-dashboard" id="loading-img-dashboard"></img>
                         <p class="loading-dashboard">Loading.....</p>
-                </div>
+                </div> -->
                 <div class="header_dashboard">
                     <h2>Dashboard BOM</h2>
                     <div class="left_chart">
