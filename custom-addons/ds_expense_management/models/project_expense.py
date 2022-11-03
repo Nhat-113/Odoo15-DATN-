@@ -17,6 +17,9 @@ class ProjectExpense(models.Model):
     
     company_id = fields.Many2one('res.company', string="Company", required=True, default=lambda self: self.env.company, tracking=True)
     project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True)
+    department_id = fields.Many2one("hr.department", string="Department", related='project_id.department_id', store=True)
+    user_pm = fields.Many2one('res.users', string="Div manager", related='department_id.manager_id.user_id', store=True)
+    user_subceo = fields.Char(string='Sub CEO email', store=True, related='company_id.user_email')
     start_date = fields.Date(string="Start date", related='project_id.date_start', store=True)
     end_date = fields.Date(string="End date", related='project_id.date', store=True)
     total_expenses = fields.Monetary(string="Total Expense", currency_field='currency_id', compute='_compute_total_expense', store=True)
@@ -106,7 +109,7 @@ class ProjectExpense(models.Model):
     #             record.expense_vnd = 0
     
             
-    @api.depends('project_expense_value_ids.total_expenses')
+    @api.depends('project_expense_value_ids.total_expenses', 'project_expense_value_ids.expense_vnd')
     def _compute_total_expense(self):
         for record in self:
             total_revenue_curr = 0
@@ -154,7 +157,7 @@ class ProjectExpenseValue(models.Model):
     description = fields.Text(string="Description")
     
     exchange_rate = fields.Float(string="Exchange Rate")
-    expense_vnd = fields.Monetary(string="Total Revenue (VND)", currency_field='currency_vnd')
+    expense_vnd = fields.Monetary(string="Total Revenue (VND)", currency_field='currency_vnd', compute='_compute_total_expense', store=True)
     currency_vnd = fields.Many2one('res.currency', string="VND Currency", related='project_expense_management_id.currency_vnd', readonly=True)   
     
     
@@ -167,12 +170,15 @@ class ProjectExpenseValue(models.Model):
     def _validate_duration_project_expense(self):
         self.validate_project_expense_content(action = False)
         
-    @api.onchange('exchange_rate', 'total_expenses', 'project_expense_management_id.currency_id')
-    def _compute_total_revenue(self):
-        if self.currency_id.name == 'VND':
-            self.expense_vnd = self.total_expenses
-        else:
-            self.expense_vnd = self.total_expenses * self.exchange_rate
+    @api.depends('exchange_rate', 'total_expenses', 'project_expense_management_id.currency_id')
+    def _compute_total_expense(self):
+        for record in self:
+            # if record.project_expense_management_id.currency_id:
+            #     record.currency_id = record.project_expense_management_id.currency_id
+            if record.currency_id.name == 'VND':
+                record.expense_vnd = record.total_expenses
+            else:
+                record.expense_vnd = record.total_expenses * record.exchange_rate
 
 
     def validate_project_expense_content(self, action):

@@ -9,7 +9,7 @@
     'company': 'Dsoft',
     'maintainer': '',
     'website': "",
-    'depends': ['hr', 'base', 'project', 'web_domain_field', 'ds_project_planning'],
+    'depends': ['hr', 'base', 'project', 'web_domain_field', 'ds_project_planning', 'sale_timesheet'],
     'data': [
         'views/project_view.xml',
         'views/report_timesheet_templates_update.xml',

@@ -3,8 +3,8 @@
 
     <!-- Sidebar filter  -->
     <record id="project_sidebar_filter_ceo" model="ir.ui.view">
-        <field name="name">project.management.ceo.search</field>
-        <field name="model">project.management.ceo</field>
+        <field name="name">project.management.ceo.data.search</field>
+        <field name="model">project.management.ceo.data</field>
         <field name="arch" type="xml">
             <search>
                 <searchpanel>
@@ -29,8 +29,8 @@
     </record>
 
     <record id="view_tree_project_management_ceo" model="ir.ui.view">
-        <field name="name">project.management.ceo.tree</field>
-        <field name="model">project.management.ceo</field>
+        <field name="name">project.management.ceo.data.tree</field>
+        <field name="model">project.management.ceo.data</field>
         <field name="arch" type="xml">
             <tree string="Project Management CEO" default_order="company_id, month_start desc">
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -53,7 +53,7 @@
 
     <record id="project_management_ceo_action" model="ir.actions.act_window">
         <field name="name">Company Cost Management</field>
-        <field name="res_model">project.management.ceo</field>
+        <field name="res_model">project.management.ceo.data</field>
         <field name="view_mode">tree</field>
         <field name="search_view_id" ref="project_sidebar_filter_ceo"/>
         <field name="context">{'search_default_filter_current_year_ceo': 1, 'search_default_group_by_company_ceo': 1}</field>

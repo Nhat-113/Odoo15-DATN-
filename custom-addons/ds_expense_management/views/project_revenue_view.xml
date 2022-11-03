@@ -6,9 +6,12 @@
         <field name="arch" type="xml">
             <tree default_order="project_id desc">
                 <field name="project_id"/>
+                <field name="department_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="revenue_vnd" sum="Total revenue"/>
                 <field name="description"/>
+                <field name="user_subceo" invisible="1"/>
+                <field name="user_pm" invisible="1"/>
                 <field name="currency_vnd" invisible="1"/>
             </tree>
         </field>
@@ -21,6 +24,7 @@
             <form duplicate="0">
                 <header>
                     <button string="Compute Sheet" class="oe_highlight"
+                            groups="ds_expense_management.administrator_access_company_expense"
                             name="action_update_value" type="object"/>
                 </header>
                 <sheet>
@@ -42,6 +46,7 @@
                         <group name="group_left">
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="project_id" domain='get_domain_projects' attrs="{'readonly': [('company_id', '=', False)]}"/>
+                            <field name="department_id" attrs="{'invisible': [('project_id','=',False)]}"/>
                             <label for="start_date" string="Duration" attrs="{'invisible': [('project_id','=',False)]}"/>
                             <div class="o_row" attrs="{'invisible': [('project_id','=',False)]}">
                                 <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}'/>
@@ -80,6 +85,8 @@
                             <field name="get_currency_name" invisible="1" force_save="1"/>
                             <field name="check_estimation" invisible="1" force_save="1"/>
                             <field name="estimation_id" invisible="1"/>
+                            <field name="user_pm" invisible="1"/>
+                            <field name="user_subceo" invisible="1"/>
                             
                         </group>
                         <!-- <div class="table_exchange_rate">

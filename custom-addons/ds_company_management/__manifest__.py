@@ -42,10 +42,12 @@
             '/ds_company_management/static/src/css/bom_dashboard.css',
             '/ds_company_management/static/src/js/lib/chart.js',
             '/ds_company_management/static/src/js/dynamic_dashboard.js',
+            '/ds_company_management/static/src/js/cost_management_update_data.js',
         ],
         'web.assets_qweb': [
             'ds_company_management/static/src/xml/human_resource_view.xml',
             'ds_company_management/static/src/xml/dynamic_dashboard_view.xml',
+            'ds_company_management/static/src/xml/cost_management_update_data_view.xml',
         ],
     },
 

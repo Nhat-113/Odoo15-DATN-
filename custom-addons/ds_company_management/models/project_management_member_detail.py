@@ -5,28 +5,7 @@ class ProjectManagementMemberDetail(models.Model):
     _name = 'project.management.member.detail'
     _auto = False
     _order = 'month_start desc'
-    
-    employee_id = fields.Many2one('hr.employee', string="Employee")
-    currency_id = fields.Many2one('res.currency', string="Currency")
-    member_type = fields.Many2one('planning.member.type', string='Member Type')
-    
-    month_start = fields.Date(string="Start")
-    month_end = fields.Date(string="End")
-    effort_rate = fields.Float(string="Effort Rate(%)")
-    working_day = fields.Float(string="Working day")
-    man_month = fields.Float(string="Man month")
-    total_members = fields.Float(string="Effort(MM)", digits=(12,3))
-    months = fields.Char(string="Month")
-    
-    average_cost_company = fields.Float(string="Company Avg Cost")
-    average_cost_project = fields.Float(string="Prj Avg Cost")
-    
-    salary = fields.Monetary(string="Salary")
-    profit = fields.Monetary(string="Profit")
-    average_profit = fields.Monetary(string="Avg profit")
-    
-    currency_id = fields.Many2one('res.currency', string="Currency")
-    project_members = fields.Many2one('project.management.member', string="Project members")
+
     
     
     def init(self):
@@ -101,8 +80,36 @@ class ProjectManagementMemberDetail(models.Model):
                 LEFT JOIN hr_payslip_line AS hpl
                     ON hpl.slip_id = hp.id
                     AND hpl.code IN('NET', 'NET1') AND hp.state = 'done'
-                    
+                WHERE ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                 ORDER BY project_members, employee_id
 
             )""" % (self._table)
         )
+        
+        
+class ProjectManagementMemberDetailData(models.Model):
+    _name = 'project.management.member.detail.data'
+    _order = 'month_start desc'
+    
+    
+        
+    employee_id = fields.Many2one('hr.employee', string="Employee")
+    currency_id = fields.Many2one('res.currency', string="Currency")
+    month_start = fields.Date(string="Start")
+    month_end = fields.Date(string="End")
+    effort_rate = fields.Float(string="Effort Rate(%)")
+    working_day = fields.Float(string="Working day")
+    man_month = fields.Float(string="Man month")
+    total_members = fields.Float(string="Effort(MM)", digits=(12,3))
+    months = fields.Char(string="Month")
+    
+    average_cost_company = fields.Float(string="Company Avg Cost")
+    average_cost_project = fields.Float(string="Prj Avg Cost")
+    
+    salary = fields.Monetary(string="Salary")
+    profit = fields.Monetary(string="Profit")
+    average_profit = fields.Monetary(string="Avg profit")
+    
+    currency_id = fields.Many2one('res.currency', string="Currency")
+    project_members = fields.Many2one('project.management.member', string="Project members")
+    

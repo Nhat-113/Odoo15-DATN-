@@ -2,8 +2,8 @@
 <odoo>
   
     <record id="view_tree_project_management_member" model="ir.ui.view">
-        <field name="name">project.management.member.tree</field>
-        <field name="model">project.management.member</field>
+        <field name="name">project.management.member.data.tree</field>
+        <field name="model">project.management.member.data</field>
         <field name="arch" type="xml">
             <tree edit="0" delete="0" create="0">
                 <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
@@ -22,8 +22,8 @@
     </record>
 
     <record id="view_form_project_management_member" model="ir.ui.view">
-        <field name="name">project.management.member.form</field>
-        <field name="model">project.management.member</field>
+        <field name="name">project.management.member.data.form</field>
+        <field name="model">project.management.member.data</field>
         <field name="arch" type="xml">
             <form edit="0" delete="0" create="0">
                 <sheet>

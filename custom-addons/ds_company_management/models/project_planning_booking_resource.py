@@ -14,6 +14,7 @@ class ProjectPlanningBookingResource(models.Model):
                     ROW_NUMBER() OVER(ORDER BY start_date_month ASC) AS id,
                     pp.company_id,
                     pl.project_id,
+                    pp.department_id,
                     br.employee_id,
                     pl.member_type,
                     pmt.name AS member_type_name,

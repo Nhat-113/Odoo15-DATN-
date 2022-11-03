@@ -231,6 +231,8 @@ class HrPayslip(models.Model):
             tz = timezone(calendar.tz)
             day_leave_intervals = contract.employee_id.list_leaves(day_from, day_to,
                                                                    calendar=contract.resource_calendar_id)
+            
+            NVKL = 0
             for day, hours, leave in day_leave_intervals:
                 holiday = leave.holiday_id
                 current_leave_struct = leaves.setdefault(holiday.holiday_status_id, {
@@ -249,17 +251,25 @@ class HrPayslip(models.Model):
                 )
                 if work_hours:
                     current_leave_struct['number_of_days'] += hours / work_hours
+                    if holiday.holiday_status_id.code == 'NVKL':
+                        NVKL += hours / work_hours
 
             # compute worked days
             work_data = contract.employee_id.get_work_days_data(day_from, day_to,
                                                                 calendar=contract.resource_calendar_id)
 
             if contract.date_end and contract.date_start <= self.date_from and contract.date_end < self.date_to:
-                unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) - 1
-            elif contract.date_end and contract.date_start > self.date_from and contract.date_end >= self.date_to:
-                unpaid_working_day = len(pd.bdate_range(self.date_from, contract.date_start)) - 1
+                if contract.date_end.strftime("%A") == "Sunday" or contract.date_end.strftime("%A") == "Saturday":
+                    unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to))
+                else:
+                    unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) - 1
             elif contract.date_end and contract.date_start > self.date_from and contract.date_end < self.date_to:
                 unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to)) + len(pd.bdate_range(self.date_from, contract.date_start)) - 2
+            elif contract.date_start > self.date_from:
+                if contract.date_start.strftime("%A") == "Sunday" or contract.date_start.strftime("%A") == "Saturday":
+                    unpaid_working_day = len(pd.bdate_range(self.date_from, contract.date_start))
+                else:
+                    unpaid_working_day = len(pd.bdate_range(self.date_from, contract.date_start)) - 1
             else:
                 unpaid_working_day = 0
             attendances = {
@@ -280,6 +290,49 @@ class HrPayslip(models.Model):
                 'contract_id': contract.id,
             }
 
+            list_contract = contract.employee_id.contract_ids
+            contract_firstly = list_contract[0]
+            contract_final = list_contract[0]
+            union_fee = contract.union_fee
+            if len(list_contract) > 1:
+                for i in range(1, len(list_contract)):
+                    if list_contract[i].date_start < contract_firstly.date_start:
+                        contract_firstly = list_contract[i]
+
+                    if list_contract[i].date_end and contract_final.date_end:
+                        if list_contract[i].date_end > contract_final.date_end:
+                            contract_final = list_contract[i]
+                    elif list_contract[i].date_end == False:
+                        contract_final = list_contract[i]
+            if contract_firstly == contract:
+                    if contract.date_start >= self.date_from and contract.date_start <= self.date_to:
+                        if len(pd.bdate_range(contract.date_start, self.date_to)) <= 14:
+                            union_fee = 0
+                    elif contract.date_end and contract.date_end >= self.date_from and contract.date_end <= self.date_to:
+                        if len(list_contract) > 1 or len(pd.bdate_range(self.date_from, contract.date_end)) <= 14 and len(list_contract) == 1:
+                            union_fee = 0
+            elif contract_final == contract:
+                if contract.date_end:
+                    if contract.date_end >= self.date_from and contract.date_end <= self.date_to:  
+                        if len(pd.bdate_range(self.date_from, contract.date_end)) <= 14:    
+                            union_fee = 0
+            else:
+                if contract.date_end and contract.date_end >= self.date_from and contract.date_end <= self.date_to and len(list_contract) > 2:
+                    union_fee = 0
+
+            if NVKL >= 14:
+                union_fee = 0
+
+            union = {
+                'name': _("Phí công đoàn"),
+                'sequence': 55,
+                'code': 'PCD',
+                'number_of_days': union_fee,
+                'contract_id': contract.id,
+            }
+
+            if union_fee > 0:
+                res.append(union)
             res.append(attendances)
             if unpaid_working_day > 0:
                 res.append(unpaid)
@@ -651,7 +704,7 @@ class HrPayslipWorkedDays(models.Model):
     payslip_id = fields.Many2one('hr.payslip', string='Pay Slip', required=True, ondelete='cascade', index=True, help="Payslip")
     sequence = fields.Integer(required=True, index=True, default=10, help="Sequence")
     code = fields.Char(required=True, help="The code that can be used in the salary rules")
-    number_of_days = fields.Float(string='Number of Days', help="Number of days worked")
+    number_of_days = fields.Float(string='Amount', help="Number of days worked")
     number_of_hours = fields.Float(string='Number of Hours', help="Number of hours worked")
     contract_id = fields.Many2one('hr.contract', string='Contract', required=True,
                                   help="The contract for which applied this input")

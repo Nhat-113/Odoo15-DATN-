@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template id="turning_performance_update_data" xml:space="preserve">
+  <t t-extend="ListView.buttons">
+    <t t-jquery="button.o_list_export_xlsx" t-operation="before">
+      <button t-if="widget.modelName == 'project.management.data' 
+                  || widget.modelName == 'project.management.subceo.data' 
+                  || widget.modelName == 'project.management.ceo.data'
+                  || widget.modelName == 'department.project.detail.data'" 
+        class="btn btn-primary upgrade_data-button" type="button">Compute</button>
+    </t>
+  </t>
+</template>

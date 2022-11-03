@@ -6,24 +6,6 @@ class DepartmentProjectDetail(models.Model):
     _auto = False
     
     
-    project_management_id = fields.Many2one('project.management', string="Project Management")
-    company_id = fields.Many2one('res.company', string='Company')
-    project_id = fields.Many2one('project.project', string="Project")
-    department_id = fields.Many2one('hr.department', string='Department')
-    user_pm = fields.Many2one('res.users', string="PM")
-    currency_id = fields.Many2one('res.currency', string="Currency")
-    months = fields.Char(string="Month")
-    month_start = fields.Date(string="Start")
-    month_end = fields.Date(string="End")
-    working_day = fields.Float(string="Working Day")
-    total_members = fields.Float(string='Effort(MM)', digits=(12,3))
-    total_salary = fields.Float(string="Salary Cost")
-    total_project_cost = fields.Float(string="Project Cost")
-    total_revenue = fields.Float(string="Revenue")
-    total_profit = fields.Float(string="Profit")
-    profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2), help="Profit Margin = profit / revenue * 100")
-    
-    
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
@@ -56,11 +38,33 @@ class DepartmentProjectDetail(models.Model):
         
         
     
+class DepartmentProjectDetailData(models.Model):
+    _name = 'department.project.detail.data'
+
+        
+    project_management_id = fields.Many2one('project.management.data', string="Project Management")
+    company_id = fields.Many2one('res.company', string='Company')
+    project_id = fields.Many2one('project.project', string="Project")
+    department_id = fields.Many2one('hr.department', string='Department')
+    user_pm = fields.Many2one('res.users', string="PM")
+    currency_id = fields.Many2one('res.currency', string="Currency")
+    months = fields.Char(string="Month")
+    month_start = fields.Date(string="Start")
+    month_end = fields.Date(string="End")
+    working_day = fields.Float(string="Working Day")
+    total_members = fields.Float(string='Effort(MM)', digits=(12,3))
+    total_salary = fields.Float(string="Salary Cost")
+    total_project_cost = fields.Float(string="Project Cost")
+    total_revenue = fields.Float(string="Revenue")
+    total_profit = fields.Float(string="Profit")
+    profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2), help="Profit Margin = profit / revenue * 100")
+    
+    
     def get_detail_project_management(self):
         action = {
             # 'name': self.project_id.name,
             'type': 'ir.actions.act_window',
-            'res_model': 'project.management',
+            'res_model': 'project.management.data',
             'res_id': self.project_management_id.id,
             'view_ids': self.env.ref('ds_company_management.view_form_project_management').id,
             'view_mode': 'form'

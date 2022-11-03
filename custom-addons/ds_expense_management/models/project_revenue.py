@@ -19,6 +19,9 @@ class ProjectRevenue(models.Model):
     
     company_id = fields.Many2one('res.company', string="Company", required=True, default=lambda self: self.env.company, tracking=True)
     project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True)
+    department_id = fields.Many2one("hr.department", string="Department", related='project_id.department_id', store=True)
+    user_pm = fields.Many2one('res.users', string="Div manager", related='department_id.manager_id.user_id', store=True)
+    user_subceo = fields.Char(string='Sub CEO email', store=True, related='company_id.user_email')
     estimation_id = fields.Many2one('estimation.work', string="Estimation", related='project_id.estimation_id', store=True)
     
     start_date = fields.Date(string="Start date", related='project_id.date_start', store=True)
@@ -151,7 +154,7 @@ class ProjectRevenue(models.Model):
     #             record.revenue_vnd = 0
 
         
-    @api.depends('project_revenue_value_ids.revenue_project')
+    @api.depends('project_revenue_value_ids.revenue_project', 'project_revenue_value_ids.revenue_vnd')
     def _compute_total_revenue(self):
         for record in self:
             total_revenue_curr = 0
@@ -266,7 +269,7 @@ class ProjectRevenueValue(models.Model):
     description = fields.Text(string="Description")
     
     exchange_rate = fields.Float(string="Exchange Rate")
-    revenue_vnd = fields.Monetary(string="Total Revenue (VND)", currency_field='currency_vnd')
+    revenue_vnd = fields.Monetary(string="Total Revenue (VND)", currency_field='currency_vnd', compute='_compute_total_revenue', store=True)
     currency_vnd = fields.Many2one('res.currency', string="VND Currency", related='project_revenue_management_id.currency_vnd', readonly=True)   
     
     project_id = fields.Many2one('project.project', string="Project", related="project_revenue_management_id.project_id", store=True)
@@ -284,12 +287,13 @@ class ProjectRevenueValue(models.Model):
             if record.project_id:
                 record._validate_content(action = False)
             
-    @api.onchange('exchange_rate', 'revenue_project', 'project_revenue_management_id.currency_id')
+    @api.depends('exchange_rate', 'revenue_project', 'project_revenue_management_id.currency_id')
     def _compute_total_revenue(self):
-        if self.currency_id.name == 'VND':
-            self.revenue_vnd = self.revenue_project
-        else:
-            self.revenue_vnd = self.revenue_project * self.exchange_rate
+        for record in self:
+            if record.currency_id.name == 'VND':
+                record.revenue_vnd = record.revenue_project
+            else:
+                record.revenue_vnd = record.revenue_project * record.exchange_rate
        
         
 

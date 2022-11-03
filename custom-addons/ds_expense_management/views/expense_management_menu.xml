@@ -34,11 +34,11 @@
             action="management_expense_action"/>
 
 
+            <!-- groups="ds_expense_management.div_manager_access_company_expense" -->
     <menuitem
             id="project_expense_management"
             name="Project Cost"
             sequence="2"
-            groups="ds_expense_management.administrator_access_company_expense"
             parent="ds_expense_management.expense_management_menu" 
             action="project_expense_management_action"/>
 
