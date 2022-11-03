@@ -96,7 +96,7 @@
                                         <field name="start_date" />
                                         <field name="end_date" />
                                         <field name="duration" string="Duration" width="1"/>
-                                        <field name="booking_time_overtime" width="2"/>
+                                        <field name="booking_time_overtime" width="2" required="1"/>
                                         <field name="actual_overtime" width="1"/>
                                         <field name="description"/>
                                         <button name="timesheets_overtime_detail_action" string="Detail" type="object" class="oe_highlight"/>
@@ -115,7 +115,7 @@
                                                 <field name="start_date" />
                                                 <field name="end_date"/>
                                                 <field name="duration" />
-                                                <field name="booking_time_overtime" placeholder="Hour..."/>
+                                                <field name="booking_time_overtime" placeholder="Hour..." required="1"/>
                                                 <field name="actual_overtime" invisible="1"/>
                                             </group>
                                             <separator string="Description"/>
@@ -235,5 +235,17 @@
            action = records.action_confirm_all_timesheet_overtime()
         </field>
     </record>
+
+    <!-- <record id="inherit_request_overtime_form_view" model="ir.ui.view">
+        <field name="name">hr.request.overtime.form.booking</field>
+        <field name="model">hr.request.overtime</field>
+        <field name="inherit_id" ref="hr_timesheet_request_overtime.hr_request_overtime_view_form"/>
+        <field name="groups_id" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_user'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page/field[@name='booking_overtime']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+        </field>
+    </record> -->
 
 </odoo>

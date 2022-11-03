@@ -36,8 +36,8 @@ class HrRequestOverTime(models.Model):
     name = fields.Char("Subject", required=True)
 
     project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True)
-    start_date_project = fields.Date(string="Start Date", required=False,store=True, compute='_compute_project_info')
-    end_date_project = fields.Date(string="End Date", required=False, store=True, compute='_compute_project_info')
+    start_date_project = fields.Date(string="Start Date", required=False)
+    end_date_project = fields.Date(string="End Date", required=False)
     
     start_date = fields.Date(string="Start Date", required=True, tracking=True, store=True)
     end_date = fields.Date(string="End Date", required=True, tracking=True, store=True)
@@ -115,7 +115,7 @@ class HrRequestOverTime(models.Model):
             record.member_ids = self.member_ids = self.env['hr.employee'].search(
             [('id', 'in', user_ids)])
 
-    @api.onchange('project_id')
+    @api.depends('project_id')
     def _compute_project_info(self):
         for item in self:
             item.user_id = item.project_id.user_id or False
@@ -192,7 +192,7 @@ class HrRequestOverTime(models.Model):
     def _get_stage_name(self):
         for record in self:
             record.stage_name = record.stage_id.name
-            if record.stage_id.name =="Draft":
+            if record.stage_id.name == "Draft":
                 vals = {
                 'confirm_flag': True,
                 'submit_flag': True,

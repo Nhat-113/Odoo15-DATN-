@@ -29,7 +29,7 @@ class AccountAnalyticLine(models.Model):
     reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True)
     
     def _readonly_resion_refuse(self):
-        if self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_projmanager') == True:
+        if self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_user') == True:
             for task in self:
                 task.read_only_reason_refuse = True
         else:
@@ -88,7 +88,7 @@ class AccountAnalyticLine(models.Model):
     @api.depends('reason_reject')
     def reject_timesheet_overtime(self):
         for timesheet in self:
-            if timesheet.reason_reject != False:
+            if timesheet.reason_reject != "":
                 timesheet.status_timesheet_overtime = 'refuse'
             else:
                 timesheet.status_timesheet_overtime = 'draft'
@@ -174,10 +174,10 @@ class AccountAnalyticLine(models.Model):
                                             ('start_date','<=', date), 
                                             ('end_date','>=', date)])
                                             
-            if booking_overtime and booking_overtime.request_overtime_id.stage_id not in ['Submit', 'Approval']:
+            if booking_overtime and booking_overtime.request_overtime_id.stage_id.name not in ['Submit', 'Approval']:
                 values['request_overtime_ids'] =  booking_overtime.request_overtime_id.id
             else: 
-                values['request_overtime_ids'] =  False
+                values['request_overtime_ids'] = False
         else: 
             values['request_overtime_ids'] = False
             
@@ -202,7 +202,7 @@ class AccountAnalyticLine(models.Model):
                                             ('start_date','<=', date), 
                                             ('end_date','>=', date)])
 
-            if booking_overtime and booking_overtime.request_overtime_id.stage_id not in ['Submit', 'Approval']:
+            if booking_overtime and booking_overtime.request_overtime_id.stage_id.name not in ['Submit', 'Approval']:
                 return {'request_overtime_ids': booking_overtime.request_overtime_id.id}
             else: 
                 return {'request_overtime_ids': False}
@@ -233,7 +233,7 @@ class HrBookingOvertime(models.Model):
                               readonly=True, help="The duration of working overtime in the project", default=0)
 
     booking_time_overtime = fields.Integer(string="Plan Overtime (Hours)",
-                              readonly=False, help="The booking of working overtime in the project", required=True)
+                              readonly=False, help="The booking of working overtime in the project", required=True, default=0)
 
     actual_overtime = fields.Integer(string="Actual Overtime",
                               readonly=False, help="The duration actual of working overtime in the project", compute="_compute_actual_overtime")
@@ -289,7 +289,7 @@ class HrBookingOvertime(models.Model):
             "type": "ir.actions.act_window",
             "res_model": "account.analytic.line",
             "views": [[self.env.ref('hr_timesheet.hr_timesheet_line_tree').id, "tree"]],
-            "context": {"create": False, "edit": False, "delete": False},
+            "context": {"create": False, "edit": True, "delete": False},
             "domain": 
                 [('project_id', '=', self.request_overtime_id.project_id.id),
                 ('employee_id', '=', self.user_id.id), ('type_ot','=','yes'),
