@@ -37,7 +37,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
     var web_client = require('web.web_client');
     var _t = core._t;
     var QWeb = core.qweb;
-    
+    const number_rows_not_count = 4;
+
     var HumanResourceTemplate = AbstractAction.extend({
         template: 'Human_resource',
         jsLibs: ["ds_company_management/static/src/js/lib/table2excel.js"],
@@ -307,7 +308,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             let self = this;
             var final = 0;
             const row_value_member = 4;
-            const row_value_effort = 4;
+            const row_value_effort = 3;
 
             var tbody = document.querySelector("tbody");
             var total_row = tbody.rows[tbody.rows.length - row_value_member];
@@ -359,7 +360,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var table = document.getElementById("human_resource_table");
             var howManyRows = 0;
             let count_row = 0;
-            const number_rows_not_count = 4;
+            // const number_rows_not_count = 4;
             let listId = [];
             try {
                 var howManyRows = table.rows.length;
@@ -381,7 +382,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
         computeTableColumnTotal: function (colNumber) {
             var table = document.getElementById("human_resource_table");
             let result = 0;
-            const number_rows_not_count = 4;
+            // const number_rows_not_count = 4;
             var howManyRows = 0;
             try {
                 var howManyRows = table.rows.length;
@@ -402,10 +403,11 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var table = document.getElementById("human_resource_table");
             var howManyRows = 0;
             let count_row = 0;
+            // const number_rows_not_count = 4
             let listId = [];
             try {
                 var howManyRows = table.rows.length;
-                for (var i = 1; i < howManyRows - 2; i++) {
+                for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
                     let row = table.rows[i];
                     let id_employee = table.rows[i].cells[1].innerText;
                     let parent_style = row.cells[colNumber].parentElement.style.display;
@@ -431,7 +433,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             let listId = [];
             try {
                 var howManyRows = table.rows.length;
-                for (var i = 1; i < howManyRows - 2; i++) {
+                for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
                     let row = table.rows[i];
                     let id_employee = table.rows[i].cells[1].innerText;
                     let parent_style = row.cells[colNumber].parentElement.style.display;
