@@ -330,15 +330,15 @@
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = (inputs.TOT1 and inputs.TOT1.amount or 0)</field>            
+            <field name="amount_python_compute">result = (worked_days.TOT1 and worked_days.TOT1.number_of_days or 0)</field>            
         </record>
 
         <!-- input lương ot -->
-        <record id="hr_rule_input_tot1" model="hr.rule.input">
+        <!-- <record id="hr_rule_input_tot1" model="hr.rule.input">
             <field name="name">Thời Gian OT 100% Lương (Giờ)</field>
             <field name="code">TOT1</field>
             <field name="input_id" ref="hr_payroll_community.hr_rule_tot1"/>            
-        </record>
+        </record> -->
         <!-- kết thúc -->
 
         <record id="hr_rule_tot2" model="hr.salary.rule">
@@ -348,15 +348,15 @@
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = (inputs.TOT2 and inputs.TOT2.amount or 0)</field>            
+            <field name="amount_python_compute">result = (worked_days.TOT2 and worked_days.TOT2.number_of_days or 0)</field>            
         </record>
 
         <!-- input lương ot -->
-        <record id="hr_rule_input_tot2" model="hr.rule.input">
+        <!-- <record id="hr_rule_input_tot2" model="hr.rule.input">
             <field name="name">Thời Gian OT 150% Lương (Giờ)</field>
             <field name="code">TOT2</field>
             <field name="input_id" ref="hr_payroll_community.hr_rule_tot2"/>            
-        </record>
+        </record> -->
         <!-- kết thúc -->
 
         <record id="hr_rule_tot3" model="hr.salary.rule">
@@ -366,15 +366,15 @@
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = (inputs.TOT3 and inputs.TOT3.amount or 0)</field>            
+            <field name="amount_python_compute">result = (worked_days.TOT3 and worked_days.TOT3.number_of_days or 0)</field>            
         </record>
 
         <!-- input lương ot -->
-        <record id="hr_rule_input_tot3" model="hr.rule.input">
+        <!-- <record id="hr_rule_input_tot3" model="hr.rule.input">
             <field name="name">Thời Gian OT 200% Lương (Giờ)</field>
             <field name="code">TOT3</field>
             <field name="input_id" ref="hr_payroll_community.hr_rule_tot3"/>            
-        </record>
+        </record> -->
         <!-- kết thúc -->
 
         <record id="hr_rule_tot4" model="hr.salary.rule">
@@ -384,25 +384,25 @@
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = (inputs.TOT4 and inputs.TOT4.amount or 0)</field>            
+            <field name="amount_python_compute">result = (worked_days.TOT4 and worked_days.TOT4.number_of_days or 0)</field>            
         </record>
 
         <!-- input lương ot -->
-        <record id="hr_rule_input_tot4" model="hr.rule.input">
+        <!-- <record id="hr_rule_input_tot4" model="hr.rule.input">
             <field name="name">Thời Gian OT 300% Lương (Giờ)</field>
             <field name="code">TOT4</field>
             <field name="input_id" ref="hr_payroll_community.hr_rule_tot4"/>            
-        </record>
+        </record> -->
         <!-- kết thúc -->
 
         <record id="hr_rule_lot" model="hr.salary.rule">
-            <field name="name">Lương OT (VND) = (9)/8*(6) + (11 -1 )/8*1.5*(6) + (11)/8*2*(6) + (12)/8*3*(6)</field>
+            <field name="name">Lương OT (VND) = (9)/8*(6) + (10)/8*1.5*(6) + (11)/8*2*(6) + (12)/8*3*(6)</field>
             <field name="sequence" eval="13"/>
             <field name="code">OT</field>
             <field name="category_id" ref="hr_payroll_community.BS"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((inputs.TOT1 and inputs.TOT1.amount or 0)/8 * BQNC) + ((inputs.TOT2 and inputs.TOT2.amount or 0)/8 * BQNC * 1.5) + ((inputs.TOT3 and inputs.TOT3.amount or 0)/8 * BQNC * 2) + ((inputs.TOT4 and inputs.TOT4.amount or 0)/8 * BQNC * 3)</field>            
+            <field name="amount_python_compute">result = ((worked_days.TOT1 and worked_days.TOT1.number_of_days or 0)/8 * BQNC) + ((worked_days.TOT2 and worked_days.TOT2.number_of_days or 0)/8 * BQNC * 1.5) + ((worked_days.TOT3 and worked_days.TOT3.number_of_days or 0)/8 * BQNC * 2) + ((worked_days.TOT4 and worked_days.TOT4.number_of_days or 0)/8 * BQNC * 3)</field>            
         </record>
 
 
@@ -459,7 +459,7 @@
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((inputs.TOT2 and inputs.TOT2.amount or 0)/8 * BQNC * 0.5) + ((inputs.TOT3 and inputs.TOT3.amount or 0)/8 * BQNC * 1) + ((inputs.TOT4 and inputs.TOT4.amount or 0)/8 * BQNC * 2)</field>           
+            <field name="amount_python_compute">result = ((worked_days.TOT2 and worked_days.TOT2.number_of_days or 0)/8 * BQNC * 0.5) + ((worked_days.TOT3 and worked_days.TOT3.number_of_days or 0)/8 * BQNC * 1) + ((worked_days.TOT4 and worked_days.TOT4.number_of_days or 0)/8 * BQNC * 2)</field>           
         </record>
 
         <record id="hr_rule_otct_gross" model="hr.salary.rule">
@@ -469,7 +469,7 @@
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = ((inputs.TOT2 and inputs.TOT2.amount or 0)/8 * BQNC * 0.5) + ((inputs.TOT3 and inputs.TOT3.amount or 0)/8 * BQNC * 1) + ((inputs.TOT4 and inputs.TOT4.amount or 0)/8 * BQNC * 2)</field>           
+            <field name="amount_python_compute">result = ((worked_days.TOT2 and worked_days.TOT2.number_of_days or 0)/8 * BQNC * 0.5) + ((worked_days.TOT3 and worked_days.TOT3.number_of_days or 0)/8 * BQNC * 1) + ((worked_days.TOT4 and worked_days.TOT4.number_of_days or 0)/8 * BQNC * 2)</field>           
         </record>
 
         <record id="hr_rule_ttntt" model="hr.salary.rule">
@@ -479,7 +479,7 @@
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = TL + KBS + (inputs.LBN and inputs.LBN.amount or 0) - LTU - PCD + (((inputs.TOT1 and inputs.TOT1.amount or 0)/8 * BQNC) + ((inputs.TOT2 and inputs.TOT2.amount or 0)/8 * BQNC * 1.5) + ((inputs.TOT3 and inputs.TOT3.amount or 0)/8 * BQNC * 2) + ((inputs.TOT4 and inputs.TOT4.amount or 0)/8 * BQNC * 3))</field>           
+            <field name="amount_python_compute">result = TL + KBS + (inputs.LBN and inputs.LBN.amount or 0) - LTU - PCD + OT</field>           
         </record>
 
         <record id="hr_rule_ttntt_gross" model="hr.salary.rule">
@@ -489,7 +489,7 @@
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = TL + KBS + (inputs.LBN and inputs.LBN.amount or 0) + (((inputs.TOT1 and inputs.TOT1.amount or 0)/8 * BQNC) + ((inputs.TOT2 and inputs.TOT2.amount or 0)/8 * BQNC * 1.5) + ((inputs.TOT3 and inputs.TOT3.amount or 0)/8 * BQNC * 2) + ((inputs.TOT4 and inputs.TOT4.amount or 0)/8 * BQNC * 3))</field>           
+            <field name="amount_python_compute">result = TL + KBS + (inputs.LBN and inputs.LBN.amount or 0) + OT</field>           
         </record>
 
         <record id="hr_rule_bh1" model="hr.salary.rule">

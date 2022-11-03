@@ -257,7 +257,17 @@ class HrPayslip(models.Model):
             # compute worked days
             work_data = contract.employee_id.get_work_days_data(day_from, day_to,
                                                                 calendar=contract.resource_calendar_id)
+            attendances = {
+                'name': _("Ngày làm việc bình thường được trả 100%"),
+                'sequence': 1,
+                'code': 'WORK100',
+                'number_of_days': work_data['days'],
+                # 'number_of_hours': work_data['hours'],
+                'contract_id': contract.id,
+            }
 
+
+            #tính ngày nằm ngoài hợp đồng
             if contract.date_end and contract.date_start <= self.date_from and contract.date_end < self.date_to:
                 if contract.date_end.strftime("%A") == "Sunday" or contract.date_end.strftime("%A") == "Saturday":
                     unpaid_working_day = len(pd.bdate_range(contract.date_end, self.date_to))
@@ -272,14 +282,6 @@ class HrPayslip(models.Model):
                     unpaid_working_day = len(pd.bdate_range(self.date_from, contract.date_start)) - 1
             else:
                 unpaid_working_day = 0
-            attendances = {
-                'name': _("Ngày làm việc bình thường được trả 100%"),
-                'sequence': 1,
-                'code': 'WORK100',
-                'number_of_days': work_data['days'],
-                # 'number_of_hours': work_data['hours'],
-                'contract_id': contract.id,
-            }
 
             unpaid = {
                 'name': _("Ngày nằm ngoài hợp đồng"),
@@ -290,6 +292,7 @@ class HrPayslip(models.Model):
                 'contract_id': contract.id,
             }
 
+            # tính Phí công đoàn
             list_contract = contract.employee_id.contract_ids
             contract_firstly = list_contract[0]
             contract_final = list_contract[0]
@@ -328,11 +331,82 @@ class HrPayslip(models.Model):
                 'contract_id': contract.id,
             }
 
+            #tính thu nhập OT
+            time_ots = self.env['account.analytic.line'].search([
+                            ('date', '>=', self.date_from), ('date', '<=', self.date_to), 
+                            ('type_ot', '=', 'yes'), ('employee_id', '=', self.employee_id.id),
+                            ('check_approval_ot', '=', True), ('pay_type', '!=', 'full_day_off')])
+            
+            total_ot_normal = 0
+            total_ot_weekend = 0
+            total_ot_holiday = 0
+            total_ot_other = 0
+            for time_ot in time_ots:
+                if time_ot.pay_type == 'full_cash':
+                    if time_ot.type_day_ot == 'normal_day':
+                        total_ot_normal += time_ot.unit_amount
+                    elif time_ot.type_day_ot == 'weekend':
+                        total_ot_weekend += time_ot.unit_amount
+                    elif time_ot.type_day_ot == 'other':
+                        total_ot_other += time_ot.unit_amount
+                    else:
+                        total_ot_holiday += time_ot.unit_amount
+                else:
+                    if time_ot.type_day_ot == 'normal_day':
+                        total_ot_normal += time_ot.unit_amount/2
+                    elif time_ot.type_day_ot == 'weekend':
+                        total_ot_weekend += time_ot.unit_amount/2
+                    elif time_ot.type_day_ot == 'other':
+                        total_ot_other += time_ot.unit_amount/2
+                    else:
+                        total_ot_holiday += time_ot.unit_amount/2
+            
+            time_ot_other = {
+                'name': _("Thời Gian OT 100% Lương (Giờ)"),
+                'sequence': 6,
+                'code': 'TOT1',
+                'number_of_days': total_ot_other,
+                'contract_id': contract.id,
+            }
+
+            time_ot_normal = {
+                'name': _("Thời Gian OT 150% Lương (Giờ)"),
+                'sequence': 7,
+                'code': 'TOT2',
+                'number_of_days': total_ot_normal,
+                'contract_id': contract.id,
+            }
+
+            time_ot_weekend = {
+                'name': _("Thời Gian OT 200% Lương (Giờ)"),
+                'sequence': 8,
+                'code': 'TOT3',
+                'number_of_days': total_ot_weekend,
+                'contract_id': contract.id,
+            }
+
+            time_ot_holiday = {
+                'name': _("Thời Gian OT 300% Lương (Giờ)"),
+                'sequence': 9,
+                'code': 'TOT4',
+                'number_of_days': total_ot_holiday,
+                'contract_id': contract.id, 
+            }
+
+
             if union_fee > 0:
                 res.append(union)
             res.append(attendances)
             if unpaid_working_day > 0:
                 res.append(unpaid)
+            if total_ot_other > 0:
+                res.append(time_ot_other)
+            if total_ot_normal > 0:    
+                res.append(time_ot_normal)
+            if total_ot_weekend > 0:
+                res.append(time_ot_weekend)
+            if total_ot_holiday > 0:
+                res.append(time_ot_holiday)
             res.extend(leaves.values())
         return res
 
@@ -668,10 +742,10 @@ class HrPayslipLine(models.Model):
     employee_id = fields.Many2one('hr.employee', string='Employee', required=True, help="Employee")
     # category_id = fields.Many2one(related='salary_rule_id.category_id', string='Category', required=True)
     contract_id = fields.Many2one('hr.contract', string='Contract', required=True, index=True, help="Contract")
-    rate = fields.Float(string='Rate (%)', digits=dp.get_precision('Payroll Rate'), default=100.0)
-    amount = fields.Float(digits=dp.get_precision('Payroll'))
-    quantity = fields.Float(digits=dp.get_precision('Payroll'), default=1.0)
-    total = fields.Float(compute='_compute_total', string='Total', help="Total", digits=dp.get_precision('Payroll'), store=True)
+    rate = fields.Float(string='Rate (%)', default=100.0)
+    amount = fields.Float(string='Amount')
+    quantity = fields.Float(default=1.0)
+    total = fields.Float(compute='_compute_total', string='Total', help="Total", store=True)
 
     @api.depends('quantity', 'amount', 'rate')
     def _compute_total(self):
