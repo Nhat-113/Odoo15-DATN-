@@ -31,6 +31,7 @@
         "data/gen_project_cron.xml",
         "wizard/message_wizard_views.xml",
         "views/export_estimation_view.xml",
+        "views/estimation_totalcost_customize_view.xml",
         "views/project_views.xml"
 
     ],
