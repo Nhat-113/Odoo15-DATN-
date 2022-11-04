@@ -37,6 +37,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
     var web_client = require('web.web_client');
     var _t = core._t;
     var QWeb = core.qweb;
+    const number_rows_not_count = 4;
 
     var HumanResourceTemplate = AbstractAction.extend({
         template: 'Human_resource',
@@ -69,6 +70,17 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     input.addEventListener('keyup', self.searchFunction)
                     // after event search run, event compute_avg call again to calculator avg effort 
                     input.addEventListener('keyup', () => self.compute_avg())
+                    input.addEventListener('keyup', () => self.compute_avg_all_res_rate())
+
+
+                    // Event filter  in when selection onchange
+                    var selection = document.getElementById("countriesDropdown");
+                    if(!selection)  
+                        return
+                    selection.addEventListener('change', self.searchFunction)
+                    selection.addEventListener('change', () => self.compute_avg())
+                    selection.addEventListener('change', () => self.compute_avg_all_res_rate())
+  
                     // compute avg effort member in table when render DOM element
 
                     //sort table
@@ -78,6 +90,10 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     var th = document.querySelectorAll('th.header_human_table')
                     var avgRow = document.getElementById('avg-row');
                     var totalRow = document.getElementById('total-row');
+                    var totalEffortAll = document.getElementById('total-effort-all-res-rate');
+                    var totalRowMember = document.getElementById('total-row-member-of-company');
+
+
                     th.forEach(th => th.addEventListener('click', (() => {
                         let table = th.closest('tbody');
                         Array.from(table.querySelectorAll('tr.detail'))
@@ -86,9 +102,14 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                         // append 2 this row in last row
                         table.appendChild(avgRow);
                         table.appendChild(totalRow);
+                        table.appendChild(totalEffortAll);
+                        table.appendChild(totalRowMember);
+
                     })));
 
                     // sort table member free
+                    var lastRowFreeTable = document.getElementById('bottom_table');
+
                     var th = document.querySelectorAll('th.header_member_free')
                     var avgRow = document.getElementById('avg-row');
                     var totalRow = document.getElementById('total-row');
@@ -97,12 +118,16 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                         Array.from(table.querySelectorAll('tr.detail'))
                             .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
                             .forEach(tr => table.appendChild(tr));
+                            table.appendChild(lastRowFreeTable);
                         // append 2 this row in last row
                     })));
 
                     self.replace_value_human_resource()
                     self.replace_value_human_resource_free()
                     self.compute_avg();
+                    // self.hide_value_old_month();
+                    self.compute_avg_all_res_rate();
+                    self.compute_avg_all_avai_rate();
                 }, 500);
             });
         },
@@ -278,36 +303,104 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             return arrFree;
         },
 
-        searchFunction: function (e) {
+        searchFunction: function(e) {
+            const value_row_not_search = 4
+            let selection = document.getElementById("countriesDropdown");
+            let filterSelection = selection.value.toUpperCase();
+
             var input, filter, table, tr, td, i, txtValue;
             input = document.getElementById("search_input");
             filter = input.value.toUpperCase();
+
             table = document.getElementById("human_resource_table");
             if (!table) return;
-            tr = table.getElementsByTagName("tr");
-            for (i = 1; i < tr.length - 2; i++) {
+            tr = table.getElementsByTagName("tr");  
+
+            for (i = 1; i < tr.length - value_row_not_search; i++) {
                 td = tr[i];
-                if (td) {
+
+                // project ALL in human
+                if (filterSelection == 'ALL') {
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = '';
+                        } else {
+                            tr[i].style.display = 'none';
+                        }
+                    }
+                }
+                // project INTERNAL
+                if (filterSelection == 'PROJECT INTERNAL') {
                     txtValue = td.textContent || td.innerText;
                     if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = '';
+                    }                           
+                    if (txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1 || txtValue.toUpperCase().indexOf(filter) <= -1) {
+                        tr[i].style.display = 'none';
+                    } 
+                    // else if (txtValue.toUpperCase().indexOf(filter) <= -1) {
+                    //     tr[i].style.display = 'none';
+                    // }
+                }
+
+                // project BILLABLE
+                if (filterSelection == 'PROJECT BILLABLE') {
+                    txtValue = td.textContent || td.innerText;
+                    if ((txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1) && txtValue.toUpperCase().indexOf(filter) > -1) {
                         tr[i].style.display = '';
                     } else {
                         tr[i].style.display = 'none';
                     }
                 }
             }
+
+            // if (filterSelection == 'INTERNAL') {
+            //         for (i = 1; i < tr.length - value_row_not_search; i++) {
+            //             td = tr[i];
+            //             if (td) {
+            //                 txtValue = td.textContent || td.innerText;
+            //                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            //                     tr[i].style.display = '';
+            //                 }                           
+            //                 if ((txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1)) {
+            //                     tr[i].style.display = 'none';
+            //                 } 
+            //                 else if (txtValue.toUpperCase().indexOf(filter) <= -1) {
+            //                     tr[i].style.display = 'none';
+            //                 }
+                           
+            //             }
+            //         }
+            // }
+            // if (filterSelection == 'PROJECT BILLABLE') {
+            //     for (i = 1; i < tr.length - value_row_not_search; i++) {
+            //         td = tr[i];
+            //         if (td) {
+            //             txtValue = td.textContent || td.innerText;
+            //             if ((txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1) && txtValue.toUpperCase().indexOf(filter) > -1) {
+            //                 tr[i].style.display = '';
+            //             } else {
+            //                 tr[i].style.display = 'none';
+            //             }
+            //         }
+            //     }
+            // }
         },
 
         compute_avg: function () {
             let self = this;
             var final = 0;
-            var tbody = document.querySelector("tbody");
-            var total_row = tbody.rows[tbody.rows.length - 2];
-            var total_available_member = tbody.rows[tbody.rows.length - 1];
+            const row_value_member = 4;
+            const row_value_effort = 3;
+
+            var tbody = document.getElementById("human_reource_tbody");
+            var total_row = tbody.rows[tbody.rows.length - row_value_member];
+            var total_available_member = tbody.rows[tbody.rows.length - row_value_effort];
             var count_compute_available_member = 0;
             var howManyCols = tbody.rows[1].cells.length;
             var total_member_company = document.getElementById("count_member_of_company");
-
+            var arrEffortCompany = []
             // Start compute in column number seven
             for (var j = 7; j < howManyCols - 1; j++) {
                 count_compute_available_member = self.compute_available_member(j);
@@ -315,22 +408,71 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 // count_number_row = self.compute_count_number_row(j);
                 total_available_member.cells[j].innerText = count_compute_available_member;
                 final = self.computeTableColumnTotal(j);
-
+                arrEffortCompany.push(final);
                 // avg = (total effort( > 0 and another N/A  )) / total members in column with effort another N/A 
                 total_row.cells[j].innerText = parseFloat(final / count_compute_available_member).toFixed(2);
             }
             //count members of company with value from second column
             total_member_company.innerText = String(self.compute_member_company() + ' Members');
 
+            return arrEffortCompany;
         },
+
+        compute_avg_all_res_rate: function () {
+            let self = this;
+            var final = 0;
+            const row_value_effort = 1;
+            const row_value_member = 2;
+            var tbody = document.getElementById("human_reource_tbody");
+            var total_row = tbody.rows[tbody.rows.length - row_value_member];
+            var total_available_member = tbody.rows[tbody.rows.length -row_value_effort];
+            var count_compute_available_member = 0;
+            var howManyCols = tbody.rows[1].cells.length;
+
+            // Start compute in column number seven
+            for (var j = 7; j < howManyCols - 1; j++) {
+                count_compute_available_member = self.compute_available_member_res_rate(j);
+
+                // count_number_row = self.compute_count_number_row(j);
+                total_available_member.cells[j].innerText = count_compute_available_member;
+                final = self.computeTableColumnTotal(j);
+                // avg = (total effort( > 0 and another N/A  )) / total members in column with effort another N/A 
+                total_row.cells[j].innerText = parseFloat(final / count_compute_available_member).toFixed(2);
+            }   
+         
+        },
+
+        compute_available_member_res_rate: function (colNumber) {
+            var table = document.getElementById("human_resource_table");
+            var howManyRows = 0;
+            let count_row = 0;
+            // const number_rows_not_count = 4;
+            let listId = [];
+            try {
+                var howManyRows = table.rows.length;
+                for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
+                    // let row = table.rows[i];
+                    let id_employee = table.rows[i].cells[1].innerText;
+                    var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);         
+                    
+                    if (!isNaN(thisNumber) && !listId.includes(id_employee)) {
+                        count_row += 1;
+                        listId.push(id_employee);
+                    }
+                }
+            } finally {
+                return count_row;
+            }
+        },  
 
         computeTableColumnTotal: function (colNumber) {
             var table = document.getElementById("human_resource_table");
             let result = 0;
+            // const number_rows_not_count = 4;
             var howManyRows = 0;
             try {
                 var howManyRows = table.rows.length;
-                for (var i = 1; i < howManyRows - 2; i++) {
+                for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
                     let row = table.rows[i];
                     let parent_style = row.cells[colNumber].parentElement.style.display
                     var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);
@@ -347,10 +489,11 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var table = document.getElementById("human_resource_table");
             var howManyRows = 0;
             let count_row = 0;
+            // const number_rows_not_count = 4
             let listId = [];
             try {
                 var howManyRows = table.rows.length;
-                for (var i = 1; i < howManyRows - 2; i++) {
+                for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
                     let row = table.rows[i];
                     let id_employee = table.rows[i].cells[1].innerText;
                     let parent_style = row.cells[colNumber].parentElement.style.display;
@@ -358,7 +501,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     // var employee_id_before = table.rows[i].cells[1].innerText;
                     // var employee_id_after = table.rows[i+1].cells[1].innerText;                  
 
-                    if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee)) {
+                    if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) && thisNumber > 0) {
                         count_row += 1;
                         listId.push(id_employee);
                     }
@@ -376,7 +519,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             let listId = [];
             try {
                 var howManyRows = table.rows.length;
-                for (var i = 1; i < howManyRows - 2; i++) {
+                for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
                     let row = table.rows[i];
                     let id_employee = table.rows[i].cells[1].innerText;
                     let parent_style = row.cells[colNumber].parentElement.style.display;
@@ -442,7 +585,117 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             for (var i = 0, len = cell_elements_free.length; i < len; i++) {
                 cell_elements_free[i].innerText = (100 - parseFloat(cell_elements_free[i].innerText)).toFixed(2);
             }
-        }
+        },
+        // hide_value_old_month: function() {
+        //     var dateObj = new Date();
+
+        //     var table = document.getElementById('human_resource_free_table');
+        //     var month = dateObj.getUTCMonth() + 1;
+        //     const number_month_in_year = 12;
+        //     const current_month = (number_month_in_year - month) + 1;
+        //     for (let i = 0; i < table.rows.length; i++) {
+        //         var start_month_in_table = 4
+        //         for (start_month_in_table; start_month_in_table < table.rows[i].cells.length - current_month; start_month_in_table++) {
+        //             table.rows[i].cells[start_month_in_table].style.display = "none";
+        //         }
+        //     }
+        // },
+
+
+        // //compute avavai label rate
+        computeTableColumnTotalFree: function (colNumber) {
+            var table = document.getElementById("human_resource_free_table");
+            let result = 0;
+            // const number_rows_not_count = 4;
+            var howManyRows = 0;
+            try {
+                var howManyRows = table.rows.length;
+                for (var i = 1; i < howManyRows - 1; i++) {
+                    let row = table.rows[i];
+                    let parent_style = row.cells[colNumber].parentElement.style.display
+                    var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);
+                    if (parent_style != 'none' && !isNaN(thisNumber) && thisNumber > 0) {
+                        result = result + thisNumber;
+                    }
+                }
+            } finally {
+                return result;
+            }
+        },
+        compute_avg_all_avai_rate: function () {
+            let self = this;
+            var final = 0;
+            var tbody = document.getElementById("tbody_free_table");
+            const number_column_calcu_in_table = 1
+            var total_available_member = tbody.rows[tbody.rows.length - number_column_calcu_in_table];
+
+            var howManyCols = tbody.rows[1].cells.length;
+            var arrFreeEffort = [];
+            var arrEffortHuman = self.compute_avg();
+            var avgEffortInFreeTable = []
+
+            //start calculator effort from  Fifth column => j = 5
+            for (var j = 5 ; j < howManyCols; j++) {
+                final = self.computeTableColumnTotalFree(j);
+                arrFreeEffort.push(final);
+            }
+
+            for (let i = 0 ; i < arrFreeEffort.length ;i++ ) {
+                avgEffortInFreeTable[i] = arrFreeEffort[i] /  arrEffortHuman[i]
+                //column start replace value from number four
+                total_available_member.cells[i+4].innerText = avgEffortInFreeTable[i].toFixed(2);
+            }
+        },
+
+        
+        // filterTable : function () {
+        //     var input, filter, table, tr, td, i, txtValue;
+        //     const value_row_not_search = 4
+        //     input = document.getElementById("countriesDropdown");
+        //     filter = input.value.toUpperCase();
+        //     table = document.getElementById("human_resource_table");
+        //         if (!table) return;
+        //     tr = table.getElementsByTagName("tr");
+            
+        //     if (filter == 'ALL') {
+        //         for (i = 1; i < tr.length - value_row_not_search; i++) 
+        //         {
+        //             tr[i].style.display = '';
+        //         }
+        //     }
+
+        //     if (filter ==  'PROJECT BILLABLE')  {
+        //         for (i = 1; i < tr.length - value_row_not_search; i++) {
+        //             td = tr[i];
+        //             if (td) {
+        //                 txtValue = td.textContent || td.innerText;
+        //                 if (txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1){
+        //                     tr[i].style.display = '';
+        //                 } 
+        //                 else {
+        //                     tr[i].style.display = 'none';
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     if (filter ==  'INTERNAL')  {
+        //         for (i = 1; i < tr.length - value_row_not_search; i++) {
+        //             td = tr[i];
+        //             if (td) {
+        //                 txtValue = td.textContent || td.innerText;
+        //                 if (txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1){
+        //                     tr[i].style.display = 'none';
+        //                 } 
+        //                 else {
+        //                     tr[i].style.display = '';
+        //                 }
+        //             }
+        //         }
+        //     }
+               
+        // },
+
+
     });
 
     core.action_registry.add('human_resource_template', HumanResourceTemplate);

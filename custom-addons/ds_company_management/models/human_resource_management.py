@@ -42,6 +42,7 @@ class HumanResourceManagement(models.Model):
 					COMPANY_ID,
 					DEPARTMENT_ID,
 					EMPLOYEE_ID,
+					PROJECT_DEPARTMENT_ID,
 					DEPARTMENT_MANAGER_PROJECT_ID,
 					START_DATE_CONTRACT,
 					END_DATE_CONTRACT
@@ -55,6 +56,7 @@ class HumanResourceManagement(models.Model):
 					)::TEXT AS YEAR_OF_PROJECT,
 					PP.NAME AS PROJECT_NAME,
 					(SELECT NAME FROM PROJECT_TYPE PT WHERE PT.ID = PP.PROJECT_TYPE) AS PROJECT_TYPE_NAME,
+					(SELECT ID FROM HR_DEPARTMENT HD WHERE HD.ID = PP.DEPARTMENT_ID) AS PROJECT_DEPARTMENT_ID,
 					CASE 
 						WHEN (EXTRACT(MONTH FROM BRM.START_DATE_MONTH) IS NULL) THEN 0
 						WHEN (PP.ID = (SELECT PCR2.PROJECT_ID FROM PUBLIC.PLANNING_CALENDAR_RESOURCE PCR2 WHERE BRM.BOOKING_ID=PCR2.ID)) THEN
@@ -201,7 +203,7 @@ class HumanResourceManagement(models.Model):
 										LEFT JOIN PUBLIC.ESTIMATION_WORK AS EW ON PP.ESTIMATION_ID=EW.ID
 					WHERE ((EXTRACT(YEAR FROM BRM.START_DATE_MONTH) IS NULL) OR ((EXTRACT(YEAR FROM BRM.START_DATE_MONTH) = EXTRACT(YEAR FROM NOW())) AND (EXTRACT(MONTH FROM BRM.START_DATE_MONTH) BETWEEN 1 AND 12))) AND (EXTRACT(MONTH FROM (SELECT(MIN( HC1.DATE_START)) FROM HR_CONTRACT AS HC1 WHERE HC1.EMPLOYEE_ID=EMP.ID)) IS NOT NULL)
 				) AS X
-				GROUP BY EMPLOYEE_NAME, COMPANY_NAME, DEPARTMENT_NAME, PROJECT_NAME, PROJECT_TYPE_NAME, YEAR_OF_PROJECT, COMPANY_MANAGER_USER_ID, DEPARTMENT_MANAGER_USER_ID, COMPANY_PROJECT_ID, COMPANY_ID, DEPARTMENT_ID, EMPLOYEE_ID, DEPARTMENT_MANAGER_PROJECT_ID, START_DATE_CONTRACT, END_DATE_CONTRACT
+				GROUP BY EMPLOYEE_NAME, COMPANY_NAME, DEPARTMENT_NAME, PROJECT_NAME, PROJECT_TYPE_NAME, YEAR_OF_PROJECT, COMPANY_MANAGER_USER_ID, DEPARTMENT_MANAGER_USER_ID, COMPANY_PROJECT_ID, COMPANY_ID, DEPARTMENT_ID, EMPLOYEE_ID, PROJECT_DEPARTMENT_ID, DEPARTMENT_MANAGER_PROJECT_ID, START_DATE_CONTRACT, END_DATE_CONTRACT
 
                 )
         """ % (self._table)
@@ -233,11 +235,14 @@ class HumanResourceManagement(models.Model):
     def get_list_human_resource(self):
         user_id_login = self.env.user.id
         selected_companies = self.get_current_company_value();
+        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
         # div_manager_department_id =  self.env.user.employee_ids.department_id.id
         cr = self._cr
 	
         sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ' or company_project_id in ' + str(tuple(selected_companies)) + ')'
         sql_domain_for_role = ''
+        sql_domain_for_department_emp = ' AND (human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
+        sql_domain_for_department_proj = ' AND (human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
 
         if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
             sql_domain_for_role = ''
@@ -253,6 +258,8 @@ class HumanResourceManagement(models.Model):
         sql = ("""select * from human_resource_management """)
         sql += sql_domain_for_company
         sql += sql_domain_for_role
+        sql += sql_domain_for_department_emp
+        sql += sql_domain_for_department_proj
 
         cr.execute(sql)
         list_human_resource = cr.fetchall()

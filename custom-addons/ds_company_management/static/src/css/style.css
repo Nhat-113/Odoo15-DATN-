@@ -28,10 +28,12 @@ span[name="message_warning"] {
     width: 98%;
     overflow-y: scroll;
     height:calc(100vh - 141px);
-    border-radius: 15px;
+    margin-top: -25px;
     margin: 0 auto;
 }
-
+#employee_id_free , #company_name_free,  #department_free {
+    padding-left: 8px;
+}
 .human_resource_template thead tr {
     display: block;
 }
@@ -39,10 +41,14 @@ span[name="message_warning"] {
 .human_resource_template td {
     padding: 5px 10px;
     width: 200px;
+    text-align: left;
+
 }
 
 .human_resource_template th {
     width: 200px;
+    text-align: left;
+    padding-left: 8px;
 }
 
 .human_resource_content>tr {
@@ -55,11 +61,18 @@ span[name="message_warning"] {
     top: 0;
 }
 
+.human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(4) {
+    position: sticky;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+}
 .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(2) {
     position: sticky;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: -3px;
+    background: #eee !important;
 }
 
 .AVG_colum {
@@ -109,9 +122,9 @@ span[name="message_warning"] {
     background: aquamarine !important;
 }
 
-.Avg_effort_member {
+.Avg_effort_member, .total_member_avai-2 {
     background: #eee !important;
-    color: #495057;
+    color: #31871c;
     font-weight: 900;
 }
 
@@ -135,10 +148,6 @@ span[name="message_warning"] {
     line-height: 22px;
 }
 
-.td_value_none {
-    padding: 0 !important;
-    width: 10px !important;
-}
 
 .search_textbox {
     width: 45.45%;
@@ -218,8 +227,12 @@ span[name="message_warning"] {
     position: absolute;
     top: 0px;
     height: 100%;
+    width: 100%;
     background: rgba(0, 0, 0, 0.75);
     display: none;
+}
+#human_resource_free_table {
+    margin: 0 auto;
 }
 
 .human_resource_free_member {
@@ -273,11 +286,40 @@ button.view-member-free:hover {
 .title_member_free {
     padding: 10px 19px;
 }
+.bottom_tabel {
+    position: sticky;
+    left: 0;
+    right: 0;
+    bottom: 0px;
+    background: #eee !important;
+    padding: 16px;
+    margin: 0 auto;
+    height: 35px;
+    color: #31871c;
+    font-weight: 800;
+}
+#countriesDropdown {
+    position: absolute;
+    top: 100px;
+    right: 35.5%;
+    border: navajowhite;
+    text-decoration: none;
+    background: #f8f9fa;
+    color: black;
+    height: 32px;
+    padding: 0px 4px;
+    width: 10%;
+    border-radius: 0;
+    font-weight: 700;
+}
 /* for desktop screen */
 
 @media only screen and (max-width: 1800px) {
     #count_member_of_company {
         left: 4%;
+    }
+    .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(4) {
+        bottom: 38px;
     }
 
 }
@@ -292,11 +334,17 @@ button.view-member-free:hover {
     #count_member_of_company {
         left: 6%;
     }
+    .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(4) {
+        bottom: 37px;
+    }
 }
 
 @media only screen and (max-width: 1200px) {
     #count_member_of_company {
         left: 7%;
+    }
+    .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(4) {
+        bottom: 40px;
     }
 }
 

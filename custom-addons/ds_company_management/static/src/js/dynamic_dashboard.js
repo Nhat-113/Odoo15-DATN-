@@ -72,9 +72,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
         start: function() {
             var self = this;
             this.set("title", "Dashboard Bom");
-            setTimeout(() => {
-                self.denyClick();
-            }, 500);
+            // setTimeout(() => {
+            //     self.denyClick();
+            // }, 500);
             setTimeout(() => {
                 self.jobPositionPierChart();
                 self.contractBarChart();
@@ -102,16 +102,16 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
 
         fetch_data: function() {},
 
-        denyClick: function() {
-            const box = document.getElementById('deny-click');
-                if (!box)
-                    return
-            var  loading_img= document.getElementById('loading-img-dashboard');
-                if (!loading_img)
-                        return
-            loading_img.style.display = "none";
-            box.removeAttribute('style');
-        },
+        // denyClick: function() {
+        //     const box = document.getElementById('deny-click');
+        //         if (!box)
+        //             return
+        //     var  loading_img= document.getElementById('loading-img-dashboard');
+        //         if (!loading_img)
+        //                 return
+        //     loading_img.style.display = "none";
+        //     box.removeAttribute('style');
+        // },
 
         projectTypePierChart: function() {
             rpc
