@@ -1,3 +1,4 @@
+import calendar
 from datetime import date
 import json
 from random import randint
@@ -380,7 +381,29 @@ class Project(models.Model):
                 [('id', 'in', user_ids)]
             )
 
-    
+    @api.constrains('date', 'date_start')
+    def check_edit_time(self):
+        for project in self:
+            list_dates = []
+
+            project_revenues = self.env['project.revenue.value'].search([('project_id', '=', project.id)])
+            for project_revenue in project_revenues:
+                list_dates.append(date(int(project_revenue.get_year), int(project_revenue.get_month), 1))
+                list_dates.append(date(int(project_revenue.get_year),int(project_revenue.get_month), 
+                        calendar.monthrange(int(project_revenue.get_year), int(project_revenue.get_month))[1]))
+            
+            project_expenses = self.env['project.expense.value'].search([('project_id', '=', project.id)])
+            for project_expense in project_expenses:
+                list_dates.append(project_expense.expense_date)
+
+            date_firstly = min(list_dates)
+            date_final = max(list_dates)
+
+            if project.date_start > date_firstly or project.date < date_final:
+               raise UserError(_('Invalid time. Cannot set duration of project outside the time set in Company Expenses (%(start)s --> %(end)s).',
+                                    start=date_firstly, end=date_final))
+
+
 class ProjectUpdate(models.Model):
     _inherit = 'project.update'
 
