@@ -72,6 +72,15 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     input.addEventListener('keyup', () => self.compute_avg())
                     input.addEventListener('keyup', () => self.compute_avg_all_res_rate())
 
+
+                    // Event filter  in when selection onchange
+                    var selection = document.getElementById("countriesDropdown");
+                    if(!selection)  
+                        return
+                    selection.addEventListener('change', self.filterTable)
+                    selection.addEventListener('change', () => self.compute_avg())
+                    selection.addEventListener('change', () => self.compute_avg_all_res_rate())
+  
                     // compute avg effort member in table when render DOM element
 
                     //sort table
@@ -572,6 +581,54 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 //column start replace value from number four
                 total_available_member.cells[i+4].innerText = avgEffortInFreeTable[i].toFixed(2);
             }
+        },
+
+        
+        filterTable : function () {
+            var input, filter, table, tr, td, i, txtValue;
+            const value_row_not_search = 4
+            input = document.getElementById("countriesDropdown");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("human_resource_table");
+                if (!table) return;
+            tr = table.getElementsByTagName("tr");
+            
+            if (filter == 'ALL') {
+                for (i = 1; i < tr.length - value_row_not_search; i++) 
+                {
+                    tr[i].style.display = '';
+                }
+            }
+
+            if (filter ==  'PROJECT BILLABLE')  {
+                for (i = 1; i < tr.length - value_row_not_search; i++) {
+                    td = tr[i];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1){
+                            tr[i].style.display = '';
+                        } 
+                        else {
+                            tr[i].style.display = 'none';
+                        }
+                    }
+                }
+            }
+            if (filter ==  'INTERNAL')  {
+                for (i = 1; i < tr.length - value_row_not_search; i++) {
+                    td = tr[i];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1){
+                            tr[i].style.display = 'none';
+                        } 
+                        else {
+                            tr[i].style.display = '';
+                        }
+                    }
+                }
+            }
+               
         },
 
 

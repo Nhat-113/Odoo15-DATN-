@@ -298,6 +298,19 @@ button.view-member-free:hover {
     color: cadetblue;
     font-weight: 800;
 }
+#countriesDropdown {
+    position: absolute;
+    top: 100px;
+    right: 35.5%;
+    border: navajowhite;
+    text-decoration: none;
+    background: #71639e;
+    color: #FFFFFF;
+    height: 32px;
+    padding: 0px 16px;
+    width: 10%;
+    border-radius: 0;
+}
 /* for desktop screen */
 
 @media only screen and (max-width: 1800px) {
