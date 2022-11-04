@@ -16,7 +16,7 @@
                             <select id="countriesDropdown">
                                 <option>All</option>
                                 <option>Project Billable</option>
-                                <option>Internal</option>
+                                <option>Project Internal</option>
                             </select>
                         </div>
                         

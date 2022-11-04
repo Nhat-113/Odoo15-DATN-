@@ -124,7 +124,7 @@ span[name="message_warning"] {
 
 .Avg_effort_member, .total_member_avai-2 {
     background: #eee !important;
-    color: cadetblue;
+    color: #31871c;
     font-weight: 900;
 }
 
@@ -295,7 +295,7 @@ button.view-member-free:hover {
     padding: 16px;
     margin: 0 auto;
     height: 35px;
-    color: cadetblue;
+    color: #31871c;
     font-weight: 800;
 }
 #countriesDropdown {
@@ -304,12 +304,13 @@ button.view-member-free:hover {
     right: 35.5%;
     border: navajowhite;
     text-decoration: none;
-    background: #71639e;
-    color: #FFFFFF;
+    background: #f8f9fa;
+    color: black;
     height: 32px;
-    padding: 0px 16px;
+    padding: 0px 4px;
     width: 10%;
     border-radius: 0;
+    font-weight: 700;
 }
 /* for desktop screen */
 
