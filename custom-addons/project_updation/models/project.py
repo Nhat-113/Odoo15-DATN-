@@ -389,8 +389,6 @@ class Project(models.Model):
             project_revenues = self.env['project.revenue.value'].search([('project_id', '=', project.id)])
             for project_revenue in project_revenues:
                 list_dates.append(date(int(project_revenue.get_year), int(project_revenue.get_month), 1))
-                list_dates.append(date(int(project_revenue.get_year),int(project_revenue.get_month), 
-                        calendar.monthrange(int(project_revenue.get_year), int(project_revenue.get_month))[1]))
             
             project_expenses = self.env['project.expense.value'].search([('project_id', '=', project.id)])
             for project_expense in project_expenses:
