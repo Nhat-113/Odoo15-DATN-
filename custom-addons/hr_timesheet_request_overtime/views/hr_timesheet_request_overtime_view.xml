@@ -22,7 +22,7 @@
         <field name="name">hr.request.overtime.view.form</field>
         <field name="model">hr.request.overtime</field>
         <field name="arch" type="xml">
-            <form string="Request Overtime - Form">
+            <form string="Request Overtime - Form" duplicate="0">
                 <header>
                     <field name='submit_flag' invisible="1"/>
                     <field name='stage_name' invisible="1"/>
@@ -236,18 +236,6 @@
         </field>
     </record>
 
-    <!-- <record id="inherit_request_overtime_form_view" model="ir.ui.view">
-        <field name="name">hr.request.overtime.form.booking</field>
-        <field name="model">hr.request.overtime</field>
-        <field name="inherit_id" ref="hr_timesheet_request_overtime.hr_request_overtime_view_form"/>
-        <field name="groups_id" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_user'))]"/>
-        <field name="arch" type="xml">
-            <xpath expr="//notebook/page/field[@name='booking_overtime']" position="attributes">
-                <attribute name="readonly">0</attribute>
-            </xpath>
-        </field>
-    </record> -->
-
     <record id="view_request_overtime_search" model="ir.ui.view">
         <field name="name">request.overtime.filter</field>
         <field name="model">hr.request.overtime</field>
@@ -260,15 +248,10 @@
                 <field name="project_id"/>
                 <field name="user_id"/>
                 <field name="member_ids"/>
-                <field name="start_date"/>
-                <field name="end_date"/>
-                <field name="company_id"/>
-                <field name="description"/>
                 <field name="stage_id"/>
                 <!-- <filter string="Task not Star" name="filter_not_star" domain="[('task_score', '=', '0')]"/> -->
                 <group expand="0" string="Group By">
                     <filter string="Project" name="group_by_project" context="{'group_by': 'project_id'}"/>
-                    <filter string="Company" name="group_by_company" context="{'group_by':'company_id'}"/>
                     <filter string="Stage" name="group_by_stage" context="{'group_by': 'stage_id'}" />
                 </group>
             </search>

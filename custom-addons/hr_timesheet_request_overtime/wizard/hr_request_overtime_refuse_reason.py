@@ -36,7 +36,7 @@ class OvertimeGetRefuseReason(models.TransientModel):
                 'object': task,
                 'model_description': "Request",
                 'refuse_reason': self.subject_refuse_reason,
-                'access_link': task._notify_get_action_link('view'),
+                'access_link': task._notify_get_action_link_request('view'),
             }
             for user in users:
                 values.update(assignee_name=user.sudo().name)

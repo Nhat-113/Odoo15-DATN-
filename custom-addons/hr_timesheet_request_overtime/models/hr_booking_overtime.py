@@ -166,18 +166,21 @@ class AccountAnalyticLine(models.Model):
         type_timesheet = vals_list.get('type_ot') 
         date = vals_list.get('date')
         employee = vals_list.get('employee_id')
+        project_id = vals_list.get('project_id')
         values = {}
         
         if type_timesheet == 'yes':
+            # TODO check lai truong hop search ra nhieu hon 1 booking, CASE nay booking phai la duy nhat
             booking_overtime = self.env['hr.booking.overtime'].search(
                                             [('user_id','=', employee),
                                             ('start_date','<=', date), 
-                                            ('end_date','>=', date)])
-                                            
-            if booking_overtime and booking_overtime.request_overtime_id.stage_id.name not in ['Submit', 'Approval']:
-                values['request_overtime_ids'] =  booking_overtime.request_overtime_id.id
-            else: 
-                values['request_overtime_ids'] = False
+                                            ('end_date','>=', date),
+                                            ('project_id','=', project_id)])
+            for booking in booking_overtime:
+                if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approval']:
+                    values['request_overtime_ids'] =  booking.request_overtime_id.id
+                else: 
+                    values['request_overtime_ids'] = False
         else: 
             values['request_overtime_ids'] = False
             
@@ -214,6 +217,7 @@ class HrBookingOvertime(models.Model):
     _inherit=['mail.thread']
 
     request_overtime_id = fields.Many2one('hr.request.overtime', string='Booking Overtime', readonly=False)
+    project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True, compute='_compute_stage')
     
     user_id = fields.Many2one(
         'hr.employee', string='Member', required=True, help="Member name assgin overtime")
@@ -257,10 +261,23 @@ class HrBookingOvertime(models.Model):
             if record.start_date < record.request_overtime_id.start_date or record.end_date > record.request_overtime_id.end_date:
                 raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime."))
 
+    @api.constrains('booking_time_overtime')
+    def _check_value_plan_overtime(self):
+        for record in self:
+            if record.booking_time_overtime > 999 or record.booking_time_overtime <= 0:
+                raise ValidationError(_('Please enter value plan Overtime between 1-999 (hour).'))
+            
+            # TODO Validation time OT khong vuot qua so gio tuong ung voi Duration
+            # if record.duration:
+            #     range_hour_plan = record.duration*8
+            # if record.booking_time_overtime > range_hour_plan:
+            #     raise ValidationError(_('Validation time OT khong vuot qua so gio tuong ung voi Duration'))
+
     @api.onchange("request_overtime_id.stage_id")
     def _compute_stage(self):
         for item in self:
             item.read_stage = item.request_overtime_id.stage_id.name
+            item.project_id = item.request_overtime_id.project_id
 
 
     @api.depends('start_date', 'end_date')
@@ -333,7 +350,7 @@ class HrBookingOvertime(models.Model):
                 'assign_name': task.user_id.name,
                 'object': task.request_overtime_id,
                 'model_description': "Plan Overtime",
-                'access_link': task._notify_get_action_link('view'),
+                'access_link': task.request_overtime_id._notify_get_action_link_request('view'),
             }
             for user in users:
                 values.update(assignee_name=user.sudo().name)

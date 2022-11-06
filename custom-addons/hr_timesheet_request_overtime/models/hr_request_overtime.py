@@ -1,3 +1,6 @@
+import hashlib
+import hmac
+from werkzeug import urls
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 import pandas as pd
@@ -44,7 +47,7 @@ class HrRequestOverTime(models.Model):
     duration_overtime = fields.Integer(compute='_compute_duration_overtime', string="Duration ( Working day )",
                               readonly=True, help="The duration of working overtime in the project", default=0)
 
-    company_id = fields.Many2one('res.company', string="Company", required=True, readonly=True, compute='_compute_project_info', store=True)
+    company_id = fields.Many2one('res.company', string="Company", required=True, readonly=True, compute='_compute_project_info')
     description = fields.Text(string="Description", tracking=True)
     stage_id = fields.Many2one('hr.request.overtime.stage', 'Stage', ondelete='restrict',
                             default=_get_default_stage_id, 
@@ -246,7 +249,7 @@ class HrRequestOverTime(models.Model):
             values = {
                 'object': task,
                 'model_description': "Request",
-                'access_link': task._notify_get_action_link('view'),
+                'access_link': task._notify_get_action_link_request('view'),
             }
             
             for user in users:
@@ -261,6 +264,46 @@ class HrRequestOverTime(models.Model):
                     email_layout_xmlid = 'mail.mail_notification_light',
                     model_description = "Request Overtime",
                 )
+
+    @api.model
+    def _notify_encode_link_request(self, base_link, params):
+        secret = self.env['ir.config_parameter'].sudo().get_param('database.secret')
+        token = '%s?%s' % (base_link, ' '.join('%s=%s' % (key, params[key]) for key in sorted(params)))
+        hm = hmac.new(secret.encode('utf-8'), token.encode('utf-8'), hashlib.sha1).hexdigest()
+        return hm
+
+    def _notify_get_action_link_request(self, link_type, **kwargs):
+        """ Prepare link to an action: view document, follow document, ... """
+        params = {
+            'model': kwargs.get('model', self._name),
+            'res_id': kwargs.get('res_id', self.ids and self.ids[0] or False),
+        }
+        # whitelist accepted parameters: action (deprecated), token (assign), access_token
+        # (view), auth_signup_token and auth_login (for auth_signup support)
+        params.update(dict(
+            (key, value)
+            for key, value in kwargs.items()
+            if key in ('action', 'token', 'access_token', 'auth_signup_token', 'auth_login')
+        ))
+
+        if link_type in ['view', 'assign', 'follow', 'unfollow']:
+            base_link = '/mail/%s' % link_type
+        elif link_type == 'controller':
+            controller = kwargs.get('controller')
+            params.pop('model')
+            base_link = '%s' % controller
+        else:
+            return ''
+
+        if link_type not in ['view']:
+            token = self._notify_encode_link_request(base_link, params)
+            params['token'] = token
+
+        link = '%s?%s' % (base_link, urls.url_encode(params))
+        if self:
+            link = self.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')]).value + link
+
+        return link
     
     @api.model
     def create(self, vals_list):
