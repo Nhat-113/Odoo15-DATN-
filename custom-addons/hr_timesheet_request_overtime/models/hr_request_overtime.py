@@ -41,10 +41,10 @@ class HrRequestOverTime(models.Model):
     
     start_date = fields.Date(string="Start Date", required=True, tracking=True, store=True)
     end_date = fields.Date(string="End Date", required=True, tracking=True, store=True)
-    duration_overtime = fields.Integer(compute='_compute_duration_overtime', string="Duration (Working day)",
+    duration_overtime = fields.Integer(compute='_compute_duration_overtime', string="Duration ( Working day )",
                               readonly=True, help="The duration of working overtime in the project", default=0)
 
-    company_id = fields.Many2one('res.company', string="Company", required=True, readonly=True, compute='_compute_project_info')
+    company_id = fields.Many2one('res.company', string="Company", required=True, readonly=True, compute='_compute_project_info', store=True)
     description = fields.Text(string="Description", tracking=True)
     stage_id = fields.Many2one('hr.request.overtime.stage', 'Stage', ondelete='restrict',
                             default=_get_default_stage_id, 
@@ -60,7 +60,7 @@ class HrRequestOverTime(models.Model):
     member_ids = fields.Many2many('hr.employee', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
     booking_overtime = fields.One2many('hr.booking.overtime', 'request_overtime_id', string='Booking Overtime')
-    active = fields.Boolean(string='Invisible Refuse Button', default=True)
+    active = fields.Boolean(string='Invisible Refuse Button', default=True, store=True)
     refuse_reason_id = fields.One2many('hr.request.overtime.refuse.reason', 'request_overtime_ids', tracking=True)
     refuse_reason = fields.Char('Refuse Reason', tracking=True)
     

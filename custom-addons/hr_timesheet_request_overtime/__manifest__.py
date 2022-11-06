@@ -16,6 +16,12 @@
                 'hr_timesheet',
                 'mail', 'project_updation'],
 
+    'assets': {
+        'web.assets_backend': [
+            '/hr_timesheet_request_overtime/static/src/css/style.css',
+        ],
+    },
+
     "development_status": "Alpha",
 
     "data": [

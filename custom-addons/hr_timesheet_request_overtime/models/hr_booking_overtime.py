@@ -25,7 +25,7 @@ class AccountAnalyticLine(models.Model):
                                         ('draft', 'To Confirm'),
                                         ('confirm', 'Confirm'),
                                         ('refuse', 'Refused'),
-                                        ], default='draft', readonly=False, store=True, tracking=True, compute="reject_timesheet_overtime")
+                                        ], default='draft', readonly=False, store=False, tracking=True, compute="reject_timesheet_overtime")
     reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True)
     
     def _readonly_resion_refuse(self):
@@ -88,9 +88,9 @@ class AccountAnalyticLine(models.Model):
     @api.depends('reason_reject')
     def reject_timesheet_overtime(self):
         for timesheet in self:
-            if timesheet.reason_reject != "":
+            if timesheet.reason_reject != "" and timesheet.reason_reject != False:
                 timesheet.status_timesheet_overtime = 'refuse'
-            else:
+            elif timesheet.reason_reject == "" or timesheet.reason_reject == False:
                 timesheet.status_timesheet_overtime = 'draft'
 
     @api.onchange('reason_reject')

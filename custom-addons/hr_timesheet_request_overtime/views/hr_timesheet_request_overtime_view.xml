@@ -248,4 +248,31 @@
         </field>
     </record> -->
 
+    <record id="view_request_overtime_search" model="ir.ui.view">
+        <field name="name">request.overtime.filter</field>
+        <field name="model">hr.request.overtime</field>
+        <field name="arch" type="xml">
+            <search string="Search Request Overtime">
+                <filter string="Request Refuse" name="filter_refuse_request" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Approvals" name="filter_approvals_request" domain="[('stage_id.name', '=', 'Approval')]"/>
+                <field name="active"/>
+                <field name="project_id"/>
+                <field name="user_id"/>
+                <field name="member_ids"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="company_id"/>
+                <field name="description"/>
+                <field name="stage_id"/>
+                <!-- <filter string="Task not Star" name="filter_not_star" domain="[('task_score', '=', '0')]"/> -->
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_by_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Company" name="group_by_company" context="{'group_by':'company_id'}"/>
+                    <filter string="Stage" name="group_by_stage" context="{'group_by': 'stage_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
 </odoo>

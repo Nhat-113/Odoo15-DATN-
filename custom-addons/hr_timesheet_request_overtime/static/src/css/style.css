@@ -1,0 +1,6 @@
+
+.duration_overtime_unit::after {
+    content: "Working day";
+    font-weight: bold;
+    margin-left: 10px;
+}
