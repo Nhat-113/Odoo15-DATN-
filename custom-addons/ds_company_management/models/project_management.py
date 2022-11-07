@@ -38,7 +38,7 @@ class ProjectManagement(models.Model):
                         pr.date_start,
                         pr.date AS date_end,
                         pr.last_update_status AS status,
-                        est.project_type_id,
+                        pr.project_type AS project_type_id,
                         est.currency_id,
                         ec.name AS est_currency_name,
                         pem.expense_vnd AS project_cost,
@@ -176,7 +176,7 @@ class ProjectManagementData(models.Model):
     
     # bonus = fields.Float(string="Bonus")
     revenue = fields.Float(string="Revenue")
-    project_cost = fields.Float(string="Project Cost")
+    project_cost = fields.Float(string="Prj Expenses")
     
     last_update_color = fields.Integer(related='project_id.last_update_color', store=False)
     count_members = fields.Float(string='Effort(MM)', digits=(12,3))

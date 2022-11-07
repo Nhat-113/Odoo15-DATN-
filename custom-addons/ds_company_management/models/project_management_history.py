@@ -342,7 +342,7 @@ class ProjectManagementHistoryData(models.Model):
     month_start = fields.Date(string="Start")
     month_end = fields.Date(string="End")
     working_day = fields.Float(string="Working day")
-    total_project_expense = fields.Float(string="Project Cost", help="Total Project Expenses By Month")
+    total_project_expense = fields.Float(string="Prj Expenses", help="Total Project Expenses By Month")
     operation_cost = fields.Float(string="Operation Cost", help="Total Operation Cost")
     average_cost_company = fields.Float(string="Company Avg Cost")
     average_cost_project = fields.Float(string="Prj Avg Cost")

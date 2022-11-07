@@ -395,7 +395,7 @@ class ProjectManagementCeoData(models.Model):
     month_end = fields.Date(string="End")
     total_members = fields.Float(string='Effort(MM)', digits=(12,3))
     total_salary = fields.Float(string="Salary Cost")
-    total_project_cost = fields.Float(string="Project Cost")
+    total_project_cost = fields.Float(string="Prj Expenses")
     total_revenue = fields.Float(string="Revenue")
     total_profit = fields.Float(string="Profit")
     profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2))

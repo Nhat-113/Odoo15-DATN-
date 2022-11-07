@@ -6,7 +6,7 @@
                   || widget.modelName == 'project.management.subceo.data' 
                   || widget.modelName == 'project.management.ceo.data'
                   || widget.modelName == 'department.project.detail.data'" 
-        class="btn btn-primary upgrade_data-button" type="button">Compute</button>
+        class="btn btn-primary upgrade_data-button" type="button">Update Calculation</button>
     </t>
   </t>
 </template>
