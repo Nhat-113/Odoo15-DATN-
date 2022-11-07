@@ -641,7 +641,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             }
 
             for (let i = 0 ; i < arrFreeEffort.length ;i++ ) {
-                avgEffortInFreeTable[i] = arrFreeEffort[i] /  arrEffortHuman[i]
+                avgEffortInFreeTable[i] = (arrFreeEffort[i] /  arrEffortHuman[i]) * 100
                 //column start replace value from number four
                 total_available_member.cells[i+4].innerText = avgEffortInFreeTable[i].toFixed(2);
             }

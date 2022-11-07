@@ -177,7 +177,7 @@
                             </tr>
                         </t>
                         <tr id="avg-row" class="Avg_effort_member">
-                            <th scope="row" class="td_value_none">Average Res Rate</th>
+                            <th scope="row" class="td_value_none">Average Res Rate (%)</th>
                             <td class="td_value_none"></td>
                             <td class="td_value human_employee_id" type="string" ></td>
                             <td class="td_value" type="string"></td>
@@ -222,7 +222,7 @@
                         </tr>
 
                         <tr id="total-effort-all-res-rate" class="total_member_avai-2">
-                            <th scope="row">All Res Rate</th>
+                            <th scope="row">All Res Rate (%)</th>
                             <td class="td_value human_employee_id" type="string"></td>
                             <td class="td_value" type="string"></td>
                             <td class="td_value" type="string"></td>
@@ -399,7 +399,7 @@
                                     </tr>
                                 </t>
                                 <tr class="bottom_tabel" id="bottom_table">
-                                    <th>Available Rate</th>
+                                    <th>Available Rate (%)</th>
                                     <td></td>
                                     <td></td>
                                     <td></td>

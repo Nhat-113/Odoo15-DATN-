@@ -48,7 +48,6 @@ span[name="message_warning"] {
 .human_resource_template th {
     width: 200px;
     text-align: left;
-    padding-left: 8px;
 }
 
 .human_resource_content>tr {
@@ -65,7 +64,7 @@ span[name="message_warning"] {
     position: sticky;
     left: 0;
     right: 0;
-    bottom: 24px;
+    bottom: 38px;
 }
 .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(2) {
     position: sticky;
@@ -336,6 +335,10 @@ button.view-member-free:hover {
     }
     .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(4) {
         bottom: 37px;
+        font-size: 10px;
+    }
+    .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(2) {
+        font-size: 10px;
     }
 }
 

@@ -269,9 +269,16 @@ class HumanResourceManagement(models.Model):
         }
     @api.model
     def get_human_resource_free(self):
-        # selected_companies = self.get_current_company_value()
+        selected_companies = self.get_current_company_value()
+        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
         cr = self._cr
+        sql_domain_for_company = 'where  company_id in ' +  str(tuple(selected_companies)) 
 		
+        sql_domain_for_department_emp = ' AND (human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
+        sql_domain_for_department_proj = ' AND (human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
+        sql_domain_for_group_by = 'GROUP BY employee_id, employee_name ,company_name, department_name, company_id, start_date_contract, end_date_contract order by employee_name asc'
+
+
         sql = ("""SELECT  employee_id, employee_name, company_name, department_name,
 				SUM (month1 ) as month1,
 				SUM (month2) as month2,
@@ -289,10 +296,12 @@ class HumanResourceManagement(models.Model):
 				start_date_contract,
 				end_date_contract
 				FROM human_resource_management 
-				where department_name != 'Mirai FnB' or department_name is null
-				GROUP BY employee_id, employee_name ,company_name, department_name, company_id, start_date_contract, end_date_contract
-				order by employee_name asc
 					""")
+        sql += sql_domain_for_company
+        sql += sql_domain_for_department_emp
+        sql += sql_domain_for_department_proj
+        sql += sql_domain_for_group_by
+
         cr.execute(sql)
 
         list_human_resource_free = cr.fetchall()
