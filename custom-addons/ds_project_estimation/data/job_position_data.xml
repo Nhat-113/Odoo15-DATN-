@@ -5,31 +5,37 @@
             <field name="sequence" eval="1" />
             <field name="job_position">Developer</field>
             <field name="description">Developer</field>
+            <field name="check_default">True</field>
         </record>
         <record id="job_position_data_designer" model="config.job.position">
             <field name="sequence" eval="2" />
             <field name="job_position">Designer</field>
             <field name="description">Designer</field>
+            <field name="check_default">True</field>
         </record>
         <record id="job_position_data_tester" model="config.job.position">
             <field name="sequence" eval="3" />
             <field name="job_position">Tester</field>
             <field name="description">Tester</field>
+            <field name="check_default">True</field>
         </record>
         <record id="job_position_data_comter" model="config.job.position">
             <field name="sequence" eval="4" />
             <field name="job_position">Comtor</field>
             <field name="description">Comtor</field>
+            <field name="check_default">True</field>
         </record>
         <record id="job_position_data_brse" model="config.job.position">
             <field name="sequence" eval="5" />
             <field name="job_position">Brse</field>
             <field name="description">Brse</field>
+            <field name="check_default">True</field>
         </record>
         <record id="job_position_data_project_manager" model="config.job.position">
             <field name="sequence" eval="6" />
             <field name="job_position">Project manager</field>
             <field name="description">Project manager</field>
+            <field name="check_default">True</field>
         </record>
     </data>
 </odoo>

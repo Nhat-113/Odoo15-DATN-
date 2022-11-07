@@ -8,6 +8,7 @@
                 <field name='sequence' />
                 <field name="job_position" />
                 <field name="description" />
+                <field name="check_default" invisible="1"/>
             </tree>
         </field>
     </record>

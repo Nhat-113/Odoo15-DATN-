@@ -7,7 +7,7 @@ div[name="add_lines_resource_effort"],
 div[name="add_lines_summary_totalcost"],
 div[name="module_summarys"],
 div[name="module_effort_activity"] {
-    pointer-events: none !important;
+    /* pointer-events: none !important; */
 }
 div[name="add_lines_resource_effort"] table thead tr th:first-child::after {
     content: '';

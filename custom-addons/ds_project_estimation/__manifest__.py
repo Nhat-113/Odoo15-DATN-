@@ -20,6 +20,8 @@
         "data/cost_rate_data.xml",
         "data/estimation_status_data.xml",
         "views/estimation_menu.xml",
+        "views/estimation_totalcost_customize_view.xml",
+        "views/resource_planing_customize_view.xml",
         "views/gantt_resource_planning.xml",
         "views/work_view.xml",
         "views/estimation_sequence.xml",
@@ -31,7 +33,6 @@
         "data/gen_project_cron.xml",
         "wizard/message_wizard_views.xml",
         "views/export_estimation_view.xml",
-        "views/estimation_totalcost_customize_view.xml",
         "views/project_views.xml"
 
     ],
