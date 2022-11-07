@@ -1,7 +1,10 @@
 
+import datetime
 from odoo import api, fields, models, _
 import pandas as pd
 import json
+from datetime import datetime
+from datetime import timedelta
 
 from odoo.exceptions import ValidationError
 
@@ -10,7 +13,7 @@ class AccountAnalyticLine(models.Model):
 
     pay_type = fields.Selection([
                                 ('full_cash', 'Full Cash'),
-                                ('50:50', 'Cash 5:5 Date Off'),
+                                ('half_cash_half_dayoff', 'Cash 5:5 Date Off'),
                                 ('full_day_off', 'Full Date Off'),
                                 ], string='Pay Type', index=True, default='full_day_off', tracking=True, required=True)
 
@@ -25,7 +28,7 @@ class AccountAnalyticLine(models.Model):
                                         ('draft', 'To Confirm'),
                                         ('confirm', 'Confirm'),
                                         ('refuse', 'Refused'),
-                                        ], default='draft', readonly=False, store=False, tracking=True, compute="reject_timesheet_overtime")
+                                        ], default='draft', readonly=False, store=True, tracking=True, compute="reject_timesheet_overtime")
     reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True)
     
     def _readonly_resion_refuse(self):
@@ -42,32 +45,6 @@ class AccountAnalyticLine(models.Model):
     check_request_ot = fields.Boolean('Check Readonly', compute='_compute_request_overtime_id', store=True, default=False)
     check_approval_ot = fields.Boolean('Check Approvals', compute='_compute_request_overtime_id', store=True, default=False)
 
-    def _compute_pay_type_of_timeoff(self):
-        for record in self:
-            if record.request_overtime_ids and record.type_ot == 'yes' and record.request_overtime_ids.stage_id.name=='Approval':
-                pay_type = record.pay_type
-                time_of_type = self.env['hr.leave.type'].search([('company_id','=',record.employee_id.company_id.id),('name', 'like', 'Nghỉ bù')])
-                number_of_hours_display = 0
-                if pay_type=='full_day_off':
-                    number_of_hours_display = record.unit_amount
-                elif pay_type=='50:50':
-                    number_of_hours_display = record.unit_amount/2
-                
-                vals = {
-                    'holiday_type': 'employee',
-                    'name': 'Nghỉ bù Overtime',
-                    'holiday_status_id': time_of_type.id,
-                    'employee_id': record.employee_id.id,
-                    'allocation_type': 'regular',
-                    'number_of_hours_display': number_of_hours_display,
-                    'notes': False,
-                    'state': 'validate',
-                    'duration_display': number_of_hours_display
-                    # TODO fix number_of_hours_display
-                }
-                self.env['hr.leave.allocation'].create(vals)
-            else:
-                continue
 
     @api.onchange('date', 'type_ot', 'type_day_ot')
     def compute_type_overtime_day(self):
@@ -88,9 +65,9 @@ class AccountAnalyticLine(models.Model):
     @api.depends('reason_reject')
     def reject_timesheet_overtime(self):
         for timesheet in self:
-            if timesheet.reason_reject != "" and timesheet.reason_reject != False:
+            if timesheet.reason_reject != False:
                 timesheet.status_timesheet_overtime = 'refuse'
-            elif timesheet.reason_reject == "" or timesheet.reason_reject == False:
+            else:
                 timesheet.status_timesheet_overtime = 'draft'
 
     @api.onchange('reason_reject')
@@ -133,7 +110,40 @@ class AccountAnalyticLine(models.Model):
 
     def approve_timesheet_overtime(self):
         for record in self:
-            record.status_timesheet_overtime = 'confirm'
+            record.write({'status_timesheet_overtime': 'confirm'})
+
+    def _compute_pay_type_of_timeoff(self):
+        for record in self:
+            if record.request_overtime_ids and record.type_ot == 'yes' and record.request_overtime_ids.stage_id.name=='Approval':
+                pay_type = record.pay_type
+                time_of_type = self.env['hr.leave.type'].search([('company_id','=',record.employee_id.company_id.id),('name', 'like', 'Nghỉ bù')])
+                number_of_hours_display = 0
+                if pay_type=='full_day_off':
+                    number_of_hours_display = record.unit_amount
+                elif pay_type=='half_cash_half_dayoff':
+                    number_of_hours_display = record.unit_amount/2
+
+                number_of_days = number_of_hours_display/8
+                
+                vals = {
+                    'holiday_type': 'employee',
+                    'name': 'Nghỉ bù Overtime',
+                    'holiday_status_id': time_of_type.id,
+                    'employee_id': record.employee_id.id,
+                    'allocation_type': 'regular',
+                    'date_from': datetime.now(), 
+                    'date_to': datetime.now() + timedelta(days=30),
+                    'number_of_days': number_of_days, 
+                    'number_of_hours_display': number_of_hours_display,
+                    'notes': False,
+                    'state': 'validate',
+                    'duration_display': number_of_hours_display,
+                    'multi_employee': False, 
+                    # TODO fix number_of_hours_display
+                }
+                self.env['hr.leave.allocation'].create(vals)
+            else:
+                continue
 
     @api.depends('request_overtime_ids.stage_id')
     def _compute_request_overtime_id(self):
@@ -145,6 +155,7 @@ class AccountAnalyticLine(models.Model):
                 elif record.request_overtime_ids.stage_id.name == 'Approval':
                     record.write({'check_request_ot': True})
                     record.write({'check_approval_ot': True})
+                    # Compute time off 'nghi bu' when change status Approvals
                     record._compute_pay_type_of_timeoff()
                     record.write({'status_timesheet_overtime': 'confirm'})
                 else:
@@ -154,6 +165,7 @@ class AccountAnalyticLine(models.Model):
             
             else:
                 record.request_overtime_ids = False
+
 
     def action_confirm_all_timesheet_overtime(self):
         for record in self:
