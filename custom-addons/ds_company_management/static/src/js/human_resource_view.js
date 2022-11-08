@@ -72,6 +72,11 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     input.addEventListener('keyup', () => self.compute_avg())
                     input.addEventListener('keyup', () => self.compute_avg_all_res_rate())
 
+                    var input_available_list = document.getElementById("search_input_avai");
+                    if(!input_available_list)  
+                         return
+                    // Event search in when input onchange
+                    input_available_list.addEventListener('keyup', self.searchFunctionAvaiList);
 
                     // Event filter  in when selection onchange
                     var selection = document.getElementById("countriesDropdown");
@@ -81,7 +86,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     selection.addEventListener('change', () => self.compute_avg())
                     selection.addEventListener('change', () => self.compute_avg_all_res_rate())
   
-                    // compute avg effort member in table when render DOM element
+                    // compute avg effort member in table when render DOM element   
 
                     //sort table
                     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
@@ -387,6 +392,28 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             //     }
             // }
         },
+        searchFunctionAvaiList: function(e) {
+            const value_row_not_search = 1;
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("search_input_avai");
+            filter = input.value.toUpperCase();
+
+            table = document.getElementById("human_resource_free_table");
+            if (!table) return;
+            tr = table.getElementsByTagName("tr");  
+
+            for (i = 1; i < tr.length - value_row_not_search; i++) {
+                td = tr[i];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = '';
+                    } else {
+                        tr[i].style.display = 'none';
+                    }
+                }
+            }
+        },
 
         compute_avg: function () {
             let self = this;
@@ -413,7 +440,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 total_row.cells[j].innerText = parseFloat(final / count_compute_available_member).toFixed(2);
             }
             //count members of company with value from second column
-            total_member_company.innerText = String(self.compute_member_company() + ' Members');
+            total_member_company.innerText = String( 'Current Month Active Members: ' +  self.compute_member_company());
 
             return arrEffortCompany;
         },
@@ -684,7 +711,11 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             }
 
             for (let i = 0 ; i < arrFreeEffort.length ;i++ ) {
-                avgEffortInFreeTable[i] = (arrFreeEffort[i] /  arrEffortHuman[i]) * 100
+                if( arrEffortHuman[i] == 0) {
+                    avgEffortInFreeTable[i] = 0;
+                }
+                else 
+                    avgEffortInFreeTable[i] = (arrFreeEffort[i] /  arrEffortHuman[i]) * 100;
                 //column start replace value from number four
                 total_available_member.cells[i+4].innerText = avgEffortInFreeTable[i].toFixed(2);
             }
