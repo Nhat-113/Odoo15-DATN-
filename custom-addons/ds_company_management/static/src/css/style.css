@@ -131,7 +131,7 @@ span[name="message_warning"] {
     background: #FAFAFA;
 }
 
-.total_member_avai {
+.total_member_avai, .total_member_avai_company {
     display: none;
 }
 

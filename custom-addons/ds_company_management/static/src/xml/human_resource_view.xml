@@ -244,7 +244,7 @@
                             <td class="td_value" type="string"></td>
                         </tr>
 
-                        <tr id="total-row-member-of-company" class="total_member_avai_company" style="display:none">
+                        <tr id="total-row-member-of-company" class="total_member_avai_company">
                             <th scope="row">Total Members Company</th>
                             <td class="td_value human_employee_id" type="string"></td>
                             <td class="td_value" type="string"></td>
@@ -312,7 +312,7 @@
                                         March
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
-                                    <th>
+                                    <th class="header_member_free">
                                         April
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
