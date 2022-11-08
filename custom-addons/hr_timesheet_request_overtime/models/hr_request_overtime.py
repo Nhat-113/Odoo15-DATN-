@@ -69,6 +69,7 @@ class HrRequestOverTime(models.Model):
     refuse_reason_id = fields.One2many('hr.request.overtime.refuse.reason', 'request_overtime_ids', tracking=True)
     refuse_reason = fields.Char('Refuse Reason', tracking=True)
     
+    
     submit_flag = fields.Boolean(default=True)
     confirm_flag = fields.Boolean(default=True)
     approve_flag = fields.Boolean(default=True)

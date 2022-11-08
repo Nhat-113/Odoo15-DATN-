@@ -1,10 +1,9 @@
 
-import datetime
 from odoo import api, fields, models, _
 import pandas as pd
 import json
 from datetime import datetime
-from datetime import timedelta
+from datetime import date
 
 from odoo.exceptions import ValidationError
 
@@ -131,7 +130,7 @@ class AccountAnalyticLine(models.Model):
                     'holiday_status_id': time_of_type.id,
                     'employee_id': record.employee_id.id,
                     'date_from': datetime.now(), 
-                    'date_to': datetime.now() + timedelta(days=30),
+                    'date_to': date(date.today().year, 12, 31),
                     'number_of_days': number_of_days, 
                     'number_of_hours_display': number_of_hours_display,
                     'notes': False,
