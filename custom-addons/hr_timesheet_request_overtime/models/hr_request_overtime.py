@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import json
 from werkzeug import urls
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
@@ -39,15 +40,17 @@ class HrRequestOverTime(models.Model):
     name = fields.Char("Subject", required=True)
 
     project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True)
-    start_date_project = fields.Date(string="Start Date", required=False)
-    end_date_project = fields.Date(string="End Date", required=False)
+    get_domain_projects = fields.Char(string='Domain Project', readonly=True, store=False, compute='_get_domain_project')
+    start_date_project = fields.Date(string="Start date", related='project_id.date_start', store=True)
+    end_date_project = fields.Date(string="End date", related='project_id.date', store=True)
+    user_id = fields.Many2one(string='Project Manager', related='project_id.user_id', readonly=True)
     
     start_date = fields.Date(string="Start Date", required=True, tracking=True, store=True)
     end_date = fields.Date(string="End Date", required=True, tracking=True, store=True)
-    duration_overtime = fields.Integer(compute='_compute_duration_overtime', string="Duration ( Working day )",
+    duration_overtime = fields.Integer(compute='_compute_duration_overtime', string="Duration (Working day)",
                               readonly=True, help="The duration of working overtime in the project", default=0)
 
-    company_id = fields.Many2one('res.company', string="Company", required=True, readonly=True, compute='_compute_project_info')
+    company_id = fields.Many2one('res.company', string="Company", required=True, default=lambda self: self.env.company)
     description = fields.Text(string="Description", tracking=True)
     stage_id = fields.Many2one('hr.request.overtime.stage', 'Stage', ondelete='restrict',
                             default=_get_default_stage_id, 
@@ -57,9 +60,8 @@ class HrRequestOverTime(models.Model):
                             # domain=lambda self: self._compute_domain_stage(),
                             copy=False, index=True,
                             )
-    request_creator_id = fields.Many2one('res.users', string='Inform to', required=True, default=lambda self: self.env.user)
+    request_creator_id = fields.Many2one('res.users', string='Inform to', default=lambda self: self.env.user)
     requester_id = fields.Many2many('res.users', string='Approvals', required=True, default=lambda self: self._get_default_approve(), readonly=False)
-    user_id = fields.Many2one('res.users', string='Project Manager', tracking=True, readonly=True, compute='_compute_project_info')
     member_ids = fields.Many2many('hr.employee', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
     booking_overtime = fields.One2many('hr.booking.overtime', 'request_overtime_id', string='Booking Overtime')
@@ -75,6 +77,17 @@ class HrRequestOverTime(models.Model):
     stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draft", store=True)
     last_stage = fields.Integer(string="Last stage", default=0)
     
+    @api.depends('company_id')
+    def _get_domain_project(self):
+        for record in self:
+            project = self.search([('company_id', '=', record.company_id.id), ('id', '!=', record.id or record.id.origin)])
+            if project:
+                project_ids = [item.project_id.id for item in project]
+            else:
+                project_ids = []
+            record.get_domain_projects = json.dumps([('company_id', '=', record.company_id.id), 
+                                                    ('id', 'not in', project_ids if len(project_ids) > 0 else [False])])
+
     def action_refuse_reason(self):
         return {
             'type': 'ir.actions.act_window',
@@ -117,14 +130,6 @@ class HrRequestOverTime(models.Model):
                 user.id for user in record.booking_overtime.user_id]
             record.member_ids = self.member_ids = self.env['hr.employee'].search(
             [('id', 'in', user_ids)])
-
-    @api.depends('project_id')
-    def _compute_project_info(self):
-        for item in self:
-            item.user_id = item.project_id.user_id or False
-            item.company_id = item.project_id.company_id or False
-            item.start_date_project = item.project_id.date_start
-            item.end_date_project = item.project_id.date
 
     @api.depends('start_date', 'end_date')
     def _compute_duration_overtime(self):
@@ -170,7 +175,10 @@ class HrRequestOverTime(models.Model):
         # Send mail confirm (from director to pm)
         mail_template = "hr_timesheet_request_overtime.confirm_request_overtime_template"
         subject_template = "Confirm Request Overtime"
+        # Send mail for Inform-to
         self._send_message_auto_subscribe_notify_request_overtime({self: item.request_creator_id for item in self}, mail_template, subject_template)
+        # Send mail for PM
+        self._send_message_auto_subscribe_notify_request_overtime({self: item.user_id for item in self}, mail_template, subject_template)
 
     def action_request_overtime(self):
         self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Request')]).id
@@ -188,7 +196,10 @@ class HrRequestOverTime(models.Model):
         # Send mail approvals request overtime (from director to pm)
         mail_template = "hr_timesheet_request_overtime.approvals_request_overtime_template"
         subject_template = "Approvals Request Timesheets Overtime"
+        # Send mail for Inform-to
         self._send_message_auto_subscribe_notify_request_overtime({self: item.request_creator_id for item in self}, mail_template, subject_template)
+        # Send mail for PM
+        self._send_message_auto_subscribe_notify_request_overtime({self: item.user_id for item in self}, mail_template, subject_template)
 
     # TODO Fix this, refator code
     @api.depends('stage_id')
