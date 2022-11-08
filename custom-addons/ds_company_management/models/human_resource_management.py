@@ -247,9 +247,10 @@ class HumanResourceManagement(models.Model):
         if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
             sql_domain_for_role = ''
 
-        elif self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and \
-                self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
-            sql_domain_for_role = ' or company_manager_user_id = ' + str(user_id_login)
+        elif self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
+            sql_domain_for_company = sql_domain_for_company[:-1]
+            sql_domain_for_company  += ' or company_manager_user_id = ' + str(user_id_login)  + ')'
+            sql_domain_for_role = ''
 
         elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
                 self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
