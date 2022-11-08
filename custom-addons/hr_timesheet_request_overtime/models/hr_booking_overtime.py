@@ -130,7 +130,6 @@ class AccountAnalyticLine(models.Model):
                     'name': 'Nghỉ bù Overtime',
                     'holiday_status_id': time_of_type.id,
                     'employee_id': record.employee_id.id,
-                    'allocation_type': 'regular',
                     'date_from': datetime.now(), 
                     'date_to': datetime.now() + timedelta(days=30),
                     'number_of_days': number_of_days, 
@@ -200,24 +199,26 @@ class AccountAnalyticLine(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
-        if 'date' in vals:
-            values = self._check_change_value_timesheet(vals['date'])
-            vals.update(values)
-
+        values = self._check_change_value_timesheet(vals)
+        vals.update(values)
         result = super(AccountAnalyticLine, self).write(vals)
 
         return result
 
-    def _check_change_value_timesheet(self, date):
+    def _check_change_value_timesheet(self, vals):
         # TODO refactor this function
         if self.type_ot == 'yes':
+            if 'date' in vals:
+                date = vals['date']
+            else:
+                date =  self.date
 
             booking_overtime = self.env['hr.booking.overtime'].search(
                                             [('user_id','=', self.employee_id.id),
                                             ('start_date','<=', date), 
                                             ('end_date','>=', date)])
 
-            if booking_overtime and booking_overtime.request_overtime_id.stage_id.name not in ['Submit', 'Approval']:
+            if booking_overtime and booking_overtime.request_overtime_id.stage_id.name not in ['Submit', 'Approval'] or self.request_overtime_ids.id:
                 return {'request_overtime_ids': booking_overtime.request_overtime_id.id}
             else: 
                 return {'request_overtime_ids': False}
@@ -248,10 +249,10 @@ class HrBookingOvertime(models.Model):
     duration = fields.Integer(compute='_compute_duration', string="Duration (Working day)",
                               readonly=True, help="The duration of working overtime in the project", default=0)
 
-    booking_time_overtime = fields.Integer(string="Plan Overtime (Hours)",
+    booking_time_overtime = fields.Float(string="Plan (Hours)",
                               readonly=False, help="The booking of working overtime in the project", required=True, default=0)
 
-    actual_overtime = fields.Integer(string="Actual Overtime",
+    actual_overtime = fields.Float(string="Actual Overtime",
                               readonly=False, help="The duration actual of working overtime in the project", compute="_compute_actual_overtime")
     
     inactive = fields.Boolean(string="Inactive Member", default=False, store=True)
