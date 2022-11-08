@@ -535,15 +535,58 @@ odoo.define('human_resource_template.Dashboard', function (require) {
         },
 
         export_excel: function () {
-            Table2Excel.extend((cell, cellText) => {
-                return $(cell).attr('type') == 'string' ? {
-                    t: 's',
-                    v: cellText
-                } : null;
-            });
+            // Table2Excel.extend((cell, cellText) => {
+            //     return $(cell).attr('type') == 'string' ? {
+            //         t: 's',
+            //         v: cellText
+            //     } : null;
+            // });
 
-            var table2excel = new Table2Excel();
-            table2excel.export(document.querySelectorAll("#human_resource_table"));
+            // var table2excel = new Table2Excel();
+            // // let table_to_exp = document.getElementById("human_resource_table").not("tr .total_member_avai_company");
+            // let table_to_exp_2 = $("table #human_resource_table td").not("tr .total_member_avai_company")
+
+            // // console.log(`table_to_exp`, table_to_exp);
+
+            // // let tr_exp = table_to_exp.querySelectorAll("tr");
+
+            // table2excel.export(table_to_exp_2);
+            
+            var result = [];
+            var table =  document.getElementById("human_resource_table")
+            var rows = table.rows;
+            var cells, arrTemp;
+          
+            for (var i=0, iLen=rows.length; i<iLen; i++) {
+                cells = rows[i].cells;
+                arrTemp = [];
+                if(rows[i].style.display != 'none') {
+                    for (var j = 0, jLen = cells.length; j < jLen; j++) {
+                        arrTemp.push(cells[j].textContent.replace(/\n/g,'').replace(/\r/g,' ').trim());
+                    }
+                }
+              result.push(arrTemp);
+            }
+
+            let dataExport = [];
+
+            for(let i=0; i <  result.length ; i ++) {
+                if (result[i].length > 0) {
+                    dataExport.push(result[i]);
+                } 
+            }
+            var csvContent = ""
+            dataExport.forEach(function(RowItem, RowIndex) {
+                RowItem.forEach(function(ColItem, ColIndex) {
+                csvContent += ColItem + ',';
+                });
+                csvContent += "\r\n";
+            });
+            var ele = document.createElement("A");
+            ele.setAttribute("href",  "data:text/csv;charset=utf-8,%EF%BB%BF"+ encodeURI(csvContent) );
+            ele.setAttribute("download","human_resource.csv");
+            document.body.appendChild(ele);
+            ele.click();
         },
 
         view_effort_member_free: function () {
