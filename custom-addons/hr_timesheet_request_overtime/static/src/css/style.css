@@ -4,3 +4,7 @@
     font-weight: bold;
     margin-left: 10px;
 }
+
+.over_duration > tbody > tr:nth-child(2) > td > label{
+    width: 150px !important;
+}

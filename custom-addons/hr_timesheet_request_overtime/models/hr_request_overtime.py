@@ -81,13 +81,12 @@ class HrRequestOverTime(models.Model):
     @api.depends('company_id')
     def _get_domain_project(self):
         for record in self:
-            project = self.search([('company_id', '=', record.company_id.id), ('id', '!=', record.id or record.id.origin)])
+            project = self.env['project.project'].search([('company_id', '=', record.company_id.id)])
             if project:
-                project_ids = [item.project_id.id for item in project]
+                project_ids = [item.id for item in project]
             else:
                 project_ids = []
-            record.get_domain_projects = json.dumps([('company_id', '=', record.company_id.id), 
-                                                    ('id', 'not in', project_ids if len(project_ids) > 0 else [False])])
+            record.get_domain_projects = json.dumps([('company_id', '=', record.company_id.id), ('id', 'in', project_ids)])
 
     def action_refuse_reason(self):
         return {
