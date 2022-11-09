@@ -114,8 +114,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     })));
                     //sort name in tale
 
-                    const getCellValueNameEmployee = (tr, idx) => tr.children[idx].innerText.slice(tr.children[idx].innerText.lastIndexOf(' ') + 1).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                                                                    || tr.children[idx].textContent.slice(tr.children[idx].innerText.lastIndexOf(' ') + 1).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    const getCellValueNameEmployee = (tr, idx) => tr.children[idx].innerText.slice(tr.children[idx].innerText.lastIndexOf(' ') + 1).toUpperCase()
+                                                                    || tr.children[idx].textContent.slice(tr.children[idx].innerText.lastIndexOf(' ') + 1).toUpperCase();
                     const comparerNameEmployee = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))
                         (getCellValueNameEmployee(asc ? a : b, idx), getCellValueNameEmployee(asc ? b : a, idx));
 
