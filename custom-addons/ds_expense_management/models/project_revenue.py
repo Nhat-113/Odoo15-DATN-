@@ -47,6 +47,9 @@ class ProjectRevenue(models.Model):
     # revenue_sgd = fields.Monetary(string="Total Revenue", currency_field='currency_sgd', store=True, readonly=True)
     revenue_vnd = fields.Monetary(string="Total Revenue", currency_field='currency_vnd', store=True, readonly=True)
     
+    total_commission = fields.Monetary(string="Total Commission", compute='_compute_total_revenue', store=True, currency_field='currency_vnd')
+    total_revenue_remaining = fields.Monetary(string="Total Revenue Remaining", compute='_compute_total_revenue', store=True, currency_field='currency_vnd')
+    
     get_currency_name = fields.Char(string='Currency Name', readonly=True, related='currency_id.name',store=True)
     get_domain_projects = fields.Char(string='Domain Project', readonly=True, store=False, compute='_get_domain_project')
     check_estimation = fields.Boolean(string="Check estimation", default=False, store=True)
@@ -116,52 +119,19 @@ class ProjectRevenue(models.Model):
             self.currency_id = self.env.ref('base.main_company').currency_id
             self.currency_estimation_id = self.env.ref('base.main_company').currency_id
 
-    # @api.depends('revenue_project', 'rounding_usd_input', 'rounding_jpy_input', 'rounding_sgd_input', 'currency_id')
-    # def _convert_currency_revenue(self):
-    #     for record in self:
-    #         # record.get_currency_name = record.currency_id.name
-    #         if record.revenue_project != 0.0:
-    #             if record.currency_id.name == 'VND':
-    #                 record.revenue_vnd = record.revenue_project
-    #                 if record.rounding_usd_input != 0.0:
-    #                     record.revenue_usd = record.revenue_project / record.rounding_usd_input
-    #                 else:
-    #                     record.revenue_usd = 0
-    #                 if record.rounding_jpy_input != 0.0:
-    #                     record.revenue_jpy = record.revenue_project / record.rounding_jpy_input
-    #                 else:
-    #                     record.revenue_jpy = 0
-    #                 if record.rounding_sgd_input != 0.0:
-    #                     record.revenue_sgd = record.revenue_project / record.rounding_sgd_input
-    #                 else:
-    #                     record.revenue_sgd = 0 
-                        
-    #             elif record.currency_id.name == 'JPY':   
-    #                 record.revenue_jpy = record.revenue_project
-    #                 record.revenue_vnd = record.revenue_project * record.rounding_jpy_input
-                
-    #             elif record.currency_id.name == 'SGD':
-    #                 record.revenue_sgd = record.revenue_project
-    #                 record.revenue_vnd = record.revenue_project * record.rounding_sgd_input
-                    
-    #             else:
-    #                 record.revenue_usd = record.revenue_project
-    #                 record.revenue_vnd = record.revenue_project * record.rounding_usd_input
-    #         else:
-    #             record.revenue_usd = 0
-    #             record.revenue_jpy = 0
-    #             record.revenue_sgd = 0
-    #             record.revenue_vnd = 0
-
         
     @api.depends('project_revenue_value_ids.revenue_project', 'project_revenue_value_ids.revenue_vnd')
     def _compute_total_revenue(self):
         for record in self:
             total_revenue_curr = 0
             total_revenue_vnd = 0
+            total_comission = 0
+            total_revenue_remaining = 0
             for item in record.project_revenue_value_ids:
                 total_revenue_curr += item.revenue_project
                 total_revenue_vnd += item.revenue_vnd
+                total_comission += item.result_commission
+                total_revenue_remaining += item.result_revenue
             
             if not record.id and record.estimation_id and record.estimation_id.stage.type == 'completed' and self.check_restore_data == False:
                 if self.get_currency_name != self.currency_estimation_id.name:
@@ -176,6 +146,8 @@ class ProjectRevenue(models.Model):
             else:
                 record.revenue_project = total_revenue_curr
                 record.revenue_vnd = total_revenue_vnd
+                record.total_commission = total_comission
+                record.total_revenue_remaining = total_revenue_remaining
             
             
     @api.onchange('project_revenue_value_ids')
@@ -269,8 +241,12 @@ class ProjectRevenueValue(models.Model):
     description = fields.Text(string="Description")
     
     exchange_rate = fields.Float(string="Exchange Rate")
-    revenue_vnd = fields.Monetary(string="Total Revenue (VND)", currency_field='currency_vnd', compute='_compute_total_revenue', store=True)
+    revenue_vnd = fields.Monetary(string="Total Revenue", currency_field='currency_vnd', compute='_compute_total_revenue', store=True)
     currency_vnd = fields.Many2one('res.currency', string="VND Currency", related='project_revenue_management_id.currency_vnd', readonly=True)   
+    
+    commission_percents = fields.Float(string='Commission Rate (%)')
+    result_commission = fields.Monetary(string="Commission", compute='_compute_commission_percentage', store=True, currency_field='currency_vnd')
+    result_revenue = fields.Monetary(string="Revenue Remaining", compute='_compute_commission_percentage', store=True, currency_field='currency_vnd')
     
     project_id = fields.Many2one('project.project', string="Project", related="project_revenue_management_id.project_id", store=True)
     currency_id = fields.Many2one('res.currency', string="Currency", related='project_revenue_management_id.currency_id', store=True)
@@ -318,3 +294,10 @@ class ProjectRevenueValue(models.Model):
                     #     self.write({'project_revenue_management_id': [(2, self.id or self.id.origin)]})
             else:
                 self.sort_date = datetime.strptime(('01' + '/' + self.get_month + '/' + self.get_year), '%d/%m/%Y')
+
+
+    @api.depends('commission_percents', 'revenue_vnd')
+    def _compute_commission_percentage(self):
+        for record in self:
+            record.result_commission = record.revenue_vnd * record.commission_percents / 100
+            record.result_revenue = record.revenue_vnd - record.result_commission

@@ -15,7 +15,7 @@
     </record>
 
     <record id="project_expense_management_action" model="ir.actions.act_window">
-        <field name="name">Project Cost</field>
+        <field name="name">Project Expenses</field>
         <field name="res_model">project.expense.management</field>
         <field name="view_mode">tree,form</field>
     </record>
@@ -37,7 +37,7 @@
             <!-- groups="ds_expense_management.div_manager_access_company_expense" -->
     <menuitem
             id="project_expense_management"
-            name="Project Cost"
+            name="Project Expenses"
             sequence="2"
             parent="ds_expense_management.expense_management_menu" 
             action="project_expense_management_action"/>
