@@ -92,6 +92,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
                     const comparer = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))
                         (getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+                        
                     var th = document.querySelectorAll('th.header_human_table')
                     var avgRow = document.getElementById('avg-row');
                     var totalRow = document.getElementById('total-row');
@@ -111,6 +112,28 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                         table.appendChild(totalRowMember);
 
                     })));
+                    //sort name in tale
+
+                    const getCellValueNameEmployee = (tr, idx) => tr.children[idx].innerText.slice(tr.children[idx].innerText.lastIndexOf(' ') + 1).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                                                                    || tr.children[idx].textContent.slice(tr.children[idx].innerText.lastIndexOf(' ') + 1).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    const comparerNameEmployee = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))
+                        (getCellValueNameEmployee(asc ? a : b, idx), getCellValueNameEmployee(asc ? b : a, idx));
+
+                    var th_name = document.querySelectorAll('th.header_human_table_name')
+                    
+                    th_name.forEach(th_name => th_name.addEventListener('click', (() => {
+                        let table = th_name.closest('tbody');
+                        Array.from(table.querySelectorAll('tr.detail'))
+                            .sort(comparerNameEmployee(Array.from(th_name.parentNode.children).indexOf(th_name), window.asc = !window.asc))
+                            .forEach(tr => table.appendChild(tr));
+                        // append 2 th_nameis row in last row
+                        table.appendChild(avgRow);
+                        table.appendChild(totalRow);
+                        table.appendChild(totalEffortAll);
+                        table.appendChild(totalRowMember);
+
+                    })));
+
 
                     // sort table member free
                     var lastRowFreeTable = document.getElementById('bottom_table');
@@ -125,6 +148,18 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                             .forEach(tr => table.appendChild(tr));
                             table.appendChild(lastRowFreeTable);
                         // append 2 this row in last row
+                    })));
+
+
+                    //sort name in table free
+                    var th_name = document.querySelectorAll('th.header_member_free_name')
+                    th_name.forEach(th_name => th_name.addEventListener('click', (() => {
+                        let table = th_name.closest('tbody');
+                        Array.from(table.querySelectorAll('tr.detail'))
+                            .sort(comparerNameEmployee(Array.from(th_name.parentNode.children).indexOf(th_name), window.asc = !window.asc))
+                            .forEach(tr => table.appendChild(tr));
+                        // append last row th_name is row in last row
+                        table.appendChild(lastRowFreeTable);
                     })));
 
                     self.replace_value_human_resource()
@@ -645,15 +680,15 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             // change position name of employee 
 
             //get all td have name employee
-            var name_employee = table.querySelectorAll('td.name_employee');
-            for (var i = 0, len = name_employee.length; i < len; i++) {
-                //get name of employee is last word 
-                let text_replace  = name_employee[i].innerText.slice(name_employee[i].innerText.lastIndexOf(' ') + 1)
-                // replace name of employee
-                let name_employee_replace  = name_employee[i].innerText.replace(text_replace, '')
-                // add name to first 
-                name_employee[i].innerText = text_replace + ' ' + name_employee_replace
-            }
+            // var name_employee = table.querySelectorAll('td.name_employee');
+            // for (var i = 0, len = name_employee.length; i < len; i++) {
+            //     //get name of employee is last word 
+            //     let text_replace  = name_employee[i].innerText.slice(name_employee[i].innerText.lastIndexOf(' ') + 1)
+            //     // replace name of employee
+            //     let name_employee_replace  = name_employee[i].innerText.replace(text_replace, '')
+            //     // add name to first 
+            //     name_employee[i].innerText = text_replace + ' ' + name_employee_replace
+            // }
         },
 
         replace_value_human_resource_free: function () {

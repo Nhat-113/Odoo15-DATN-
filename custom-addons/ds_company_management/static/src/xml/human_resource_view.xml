@@ -37,7 +37,7 @@
                                 Employee ID
                                 <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                             </th>
-                            <th class="header_human_table">
+                            <th class="header_human_table_name">
                                 Employee Name
                                 <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                             </th>
@@ -288,7 +288,7 @@
                                         Employee ID
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
-                                    <th class="header_member_free" id="employee_id_free">
+                                    <th class="header_member_free_name" id="employee_id_free">
                                         Employee Name
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
