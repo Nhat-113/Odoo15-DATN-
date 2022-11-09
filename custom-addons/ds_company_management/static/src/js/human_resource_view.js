@@ -115,7 +115,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     //sort name in tale
 
                     const getCellValueNameEmployee = (tr, idx) => tr.children[idx].innerText.slice(tr.children[idx].innerText.lastIndexOf(' ') + 1)
-                                                                    || tr.children[idx].textContent.slice(tr.children[idx].innerText.lastIndexOf(' ') + 1);
+                                                                    || tr.children[idx].textContent.slice(tr.children[idx].textContent.lastIndexOf(' ') + 1);
                     const comparerNameEmployee = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))
                         (getCellValueNameEmployee(asc ? a : b, idx), getCellValueNameEmployee(asc ? b : a, idx));
 
@@ -126,7 +126,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                         Array.from(table.querySelectorAll('tr.detail'))
                             .sort(comparerNameEmployee(Array.from(th_name.parentNode.children).indexOf(th_name), window.asc = !window.asc))
                             .forEach(tr => table.appendChild(tr));
-                        // append 2 th_nameis row in last row
+                        // append 2 th_name is row in last row
                         table.appendChild(avgRow);
                         table.appendChild(totalRow);
                         table.appendChild(totalEffortAll);
@@ -138,13 +138,13 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     // sort table member free
                     var lastRowFreeTable = document.getElementById('bottom_table');
 
-                    var th = document.querySelectorAll('th.header_member_free')
+                    var th_2 = document.querySelectorAll('th.header_member_free')
                     var avgRow = document.getElementById('avg-row');
                     var totalRow = document.getElementById('total-row');
-                    th.forEach(th => th.addEventListener('click', (() => {
-                        let table = th.closest('tbody');
+                    th_2.forEach(th_2 => th_2.addEventListener('click', (() => {
+                        let table = th_2.closest('tbody');
                         Array.from(table.querySelectorAll('tr.detail'))
-                            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
+                            .sort(comparer(Array.from(th_2.parentNode.children).indexOf(th_2), window.asc = !window.asc))
                             .forEach(tr => table.appendChild(tr));
                             table.appendChild(lastRowFreeTable);
                         // append 2 this row in last row
