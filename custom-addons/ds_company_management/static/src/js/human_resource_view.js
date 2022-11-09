@@ -72,6 +72,11 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     input.addEventListener('keyup', () => self.compute_avg())
                     input.addEventListener('keyup', () => self.compute_avg_all_res_rate())
 
+                    var input_available_list = document.getElementById("search_input_avai");
+                    if(!input_available_list)  
+                         return
+                    // Event search in when input onchange
+                    input_available_list.addEventListener('keyup', self.searchFunctionAvaiList);
 
                     // Event filter  in when selection onchange
                     var selection = document.getElementById("countriesDropdown");
@@ -81,12 +86,13 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     selection.addEventListener('change', () => self.compute_avg())
                     selection.addEventListener('change', () => self.compute_avg_all_res_rate())
   
-                    // compute avg effort member in table when render DOM element
+                    // compute avg effort member in table when render DOM element   
 
                     //sort table
                     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
                     const comparer = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))
                         (getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+                        
                     var th = document.querySelectorAll('th.header_human_table')
                     var avgRow = document.getElementById('avg-row');
                     var totalRow = document.getElementById('total-row');
@@ -106,20 +112,54 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                         table.appendChild(totalRowMember);
 
                     })));
+                    //sort name in tale
+
+                    const getCellValueNameEmployee = (tr, idx) => tr.children[idx].innerText.slice(tr.children[idx].innerText.lastIndexOf(' ') + 1)
+                                                                    || tr.children[idx].textContent.slice(tr.children[idx].textContent.lastIndexOf(' ') + 1);
+                    const comparerNameEmployee = (idx, asc) => (a, b) => ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))
+                        (getCellValueNameEmployee(asc ? a : b, idx), getCellValueNameEmployee(asc ? b : a, idx));
+
+                    var th_name = document.querySelectorAll('th.header_human_table_name')
+                    
+                    th_name.forEach(th_name => th_name.addEventListener('click', (() => {
+                        let table = th_name.closest('tbody');
+                        Array.from(table.querySelectorAll('tr.detail'))
+                            .sort(comparerNameEmployee(Array.from(th_name.parentNode.children).indexOf(th_name), window.asc = !window.asc))
+                            .forEach(tr => table.appendChild(tr));
+                        // append 2 th_name is row in last row
+                        table.appendChild(avgRow);
+                        table.appendChild(totalRow);
+                        table.appendChild(totalEffortAll);
+                        table.appendChild(totalRowMember);
+
+                    })));
+
 
                     // sort table member free
                     var lastRowFreeTable = document.getElementById('bottom_table');
 
-                    var th = document.querySelectorAll('th.header_member_free')
+                    var th_2 = document.querySelectorAll('th.header_member_free')
                     var avgRow = document.getElementById('avg-row');
                     var totalRow = document.getElementById('total-row');
-                    th.forEach(th => th.addEventListener('click', (() => {
-                        let table = th.closest('tbody');
+                    th_2.forEach(th_2 => th_2.addEventListener('click', (() => {
+                        let table = th_2.closest('tbody');
                         Array.from(table.querySelectorAll('tr.detail'))
-                            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), window.asc = !window.asc))
+                            .sort(comparer(Array.from(th_2.parentNode.children).indexOf(th_2), window.asc = !window.asc))
                             .forEach(tr => table.appendChild(tr));
                             table.appendChild(lastRowFreeTable);
                         // append 2 this row in last row
+                    })));
+
+
+                    //sort name in table free
+                    var th_name = document.querySelectorAll('th.header_member_free_name')
+                    th_name.forEach(th_name => th_name.addEventListener('click', (() => {
+                        let table = th_name.closest('tbody');
+                        Array.from(table.querySelectorAll('tr.detail'))
+                            .sort(comparerNameEmployee(Array.from(th_name.parentNode.children).indexOf(th_name), window.asc = !window.asc))
+                            .forEach(tr => table.appendChild(tr));
+                        // append last row th_name is row in last row
+                        table.appendChild(lastRowFreeTable);
                     })));
 
                     self.replace_value_human_resource()
@@ -387,6 +427,28 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             //     }
             // }
         },
+        searchFunctionAvaiList: function(e) {
+            const value_row_not_search = 1;
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("search_input_avai");
+            filter = input.value.toUpperCase();
+
+            table = document.getElementById("human_resource_free_table");
+            if (!table) return;
+            tr = table.getElementsByTagName("tr");  
+
+            for (i = 1; i < tr.length - value_row_not_search; i++) {
+                td = tr[i];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = '';
+                    } else {
+                        tr[i].style.display = 'none';
+                    }
+                }
+            }
+        },
 
         compute_avg: function () {
             let self = this;
@@ -413,7 +475,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 total_row.cells[j].innerText = parseFloat(final / count_compute_available_member).toFixed(2);
             }
             //count members of company with value from second column
-            total_member_company.innerText = String(self.compute_member_company() + ' Members');
+            total_member_company.innerText = String( 'Current Month Active Members: ' +  self.compute_member_company());
 
             return arrEffortCompany;
         },
@@ -535,15 +597,58 @@ odoo.define('human_resource_template.Dashboard', function (require) {
         },
 
         export_excel: function () {
-            Table2Excel.extend((cell, cellText) => {
-                return $(cell).attr('type') == 'string' ? {
-                    t: 's',
-                    v: cellText
-                } : null;
-            });
+            // Table2Excel.extend((cell, cellText) => {
+            //     return $(cell).attr('type') == 'string' ? {
+            //         t: 's',
+            //         v: cellText
+            //     } : null;
+            // });
 
-            var table2excel = new Table2Excel();
-            table2excel.export(document.querySelectorAll("#human_resource_table"));
+            // var table2excel = new Table2Excel();
+            // // let table_to_exp = document.getElementById("human_resource_table").not("tr .total_member_avai_company");
+            // let table_to_exp_2 = $("table #human_resource_table td").not("tr .total_member_avai_company")
+
+            // // console.log(`table_to_exp`, table_to_exp);
+
+            // // let tr_exp = table_to_exp.querySelectorAll("tr");
+
+            // table2excel.export(table_to_exp_2);
+            
+            var result = [];
+            var table =  document.getElementById("human_resource_table")
+            var rows = table.rows;
+            var cells, arrTemp;
+          
+            for (var i=0, iLen=rows.length; i<iLen; i++) {
+                cells = rows[i].cells;
+                arrTemp = [];
+                if(rows[i].style.display != 'none') {
+                    for (var j = 0, jLen = cells.length; j < jLen; j++) {
+                        arrTemp.push(cells[j].textContent.replace(/\n/g,'').replace(/\r/g,' ').trim());
+                    }
+                }
+              result.push(arrTemp);
+            }
+
+            let dataExport = [];
+
+            for(let i=0; i <  result.length ; i ++) {
+                if (result[i].length > 0) {
+                    dataExport.push(result[i]);
+                } 
+            }
+            var csvContent = ""
+            dataExport.forEach(function(RowItem, RowIndex) {
+                RowItem.forEach(function(ColItem, ColIndex) {
+                csvContent += ColItem + ',';
+                });
+                csvContent += "\r\n";
+            });
+            var ele = document.createElement("A");
+            ele.setAttribute("href",  "data:text/csv;charset=utf-8,%EF%BB%BF"+ encodeURI(csvContent) );
+            ele.setAttribute("download","human_resource.csv");
+            document.body.appendChild(ele);
+            ele.click();
         },
 
         view_effort_member_free: function () {
@@ -571,6 +676,19 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     cell_elements[i].innerText = "0";
                 }
             }
+
+            // change position name of employee 
+
+            //get all td have name employee
+            // var name_employee = table.querySelectorAll('td.name_employee');
+            // for (var i = 0, len = name_employee.length; i < len; i++) {
+            //     //get name of employee is last word 
+            //     let text_replace  = name_employee[i].innerText.slice(name_employee[i].innerText.lastIndexOf(' ') + 1)
+            //     // replace name of employee
+            //     let name_employee_replace  = name_employee[i].innerText.replace(text_replace, '')
+            //     // add name to first 
+            //     name_employee[i].innerText = text_replace + ' ' + name_employee_replace
+            // }
         },
 
         replace_value_human_resource_free: function () {
@@ -641,7 +759,11 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             }
 
             for (let i = 0 ; i < arrFreeEffort.length ;i++ ) {
-                avgEffortInFreeTable[i] = arrFreeEffort[i] /  arrEffortHuman[i]
+                if( arrEffortHuman[i] == 0) {
+                    avgEffortInFreeTable[i] = 0;
+                }
+                else 
+                    avgEffortInFreeTable[i] = (arrFreeEffort[i] /  arrEffortHuman[i]) * 100;
                 //column start replace value from number four
                 total_available_member.cells[i+4].innerText = avgEffortInFreeTable[i].toFixed(2);
             }

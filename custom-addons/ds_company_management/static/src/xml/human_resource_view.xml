@@ -37,7 +37,7 @@
                                 Employee ID
                                 <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                             </th>
-                            <th class="header_human_table">
+                            <th class="header_human_table_name">
                                 Employee Name
                                 <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                             </th>
@@ -117,7 +117,7 @@
                                 <td class="td_value human_employee_id" type="string">
                                     <t t-esc="list_human_resource[25]"/>
                                 </td>
-                                <td class="td_value" type="string">
+                                <td class="td_value name_employee" type="string">
                                     <t t-esc="list_human_resource[1]"/>
                                 </td>
                                 <td class="td_value" type="string">
@@ -177,7 +177,7 @@
                             </tr>
                         </t>
                         <tr id="avg-row" class="Avg_effort_member">
-                            <th scope="row" class="td_value_none">Average Res Rate</th>
+                            <th scope="row" class="td_value_none">Average Res Rate (%)</th>
                             <td class="td_value_none"></td>
                             <td class="td_value human_employee_id" type="string" ></td>
                             <td class="td_value" type="string"></td>
@@ -222,7 +222,7 @@
                         </tr>
 
                         <tr id="total-effort-all-res-rate" class="total_member_avai-2">
-                            <th scope="row">All Res Rate</th>
+                            <th scope="row">All Res Rate (%)</th>
                             <td class="td_value human_employee_id" type="string"></td>
                             <td class="td_value" type="string"></td>
                             <td class="td_value" type="string"></td>
@@ -244,7 +244,7 @@
                             <td class="td_value" type="string"></td>
                         </tr>
 
-                        <tr id="total-row-member-of-company" class="total_member_avai_company" style="display:none">
+                        <tr id="total-row-member-of-company" class="total_member_avai_company">
                             <th scope="row">Total Members Company</th>
                             <td class="td_value human_employee_id" type="string"></td>
                             <td class="td_value" type="string"></td>
@@ -272,9 +272,13 @@
             <div class="back-ground-free" id ="back-ground">
                 <div class="human_resource_free_member">
                     <div class="human_resource_template">
-                        <div>
+                        <div class="header_table_free_avai">
                             <h3 class="title_member_free"><p>Available Resource</p></h3>
                             <div class="close-table" id="close-table">Close</div>
+                            <div class="search_textbox_free">
+                                <input type="text" id="search_input_avai" placeholder="Search ..." />
+                                <i title="Search..." role="img" aria-label="Search..." class="o_searchview_icon icon_search_list_free fa fa-search"></i>
+                            </div>
                         </div>
                         <table id="human_resource_free_table">
                             <tbody class="human_resource_content" id="tbody_free_table"> 
@@ -284,8 +288,8 @@
                                         Employee ID
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
-                                    <th class="header_member_free" id="employee_id_free">
-                                        Employe Name
+                                    <th class="header_member_free_name" id="employee_id_free">
+                                        Employee Name
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
                                     <th class="header_member_free" id="company_name_free">
@@ -308,7 +312,7 @@
                                         March
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
-                                    <th>
+                                    <th class="header_member_free">
                                         April
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
@@ -399,7 +403,7 @@
                                     </tr>
                                 </t>
                                 <tr class="bottom_tabel" id="bottom_table">
-                                    <th>Available Rate</th>
+                                    <th>Available Rate (%)</th>
                                     <td></td>
                                     <td></td>
                                     <td></td>
