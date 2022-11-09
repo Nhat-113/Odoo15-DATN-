@@ -23,6 +23,8 @@ class DepartmentProjectDetail(models.Model):
                     pmh.members AS total_members,
                     pmh.total_salary,
                     pmh.revenue AS total_revenue,
+                    pmh.total_commission,
+                    pmh.total_avg_operation_project,
                     pmh.profit AS total_profit,
                     pmh.profit_margin,
                     pmh.currency_id,
@@ -56,6 +58,8 @@ class DepartmentProjectDetailData(models.Model):
     total_salary = fields.Float(string="Salary Cost")
     total_project_cost = fields.Float(string="Prj Expenses")
     total_revenue = fields.Float(string="Revenue")
+    total_avg_operation_project = fields.Float(string="Total Avg Operation Project")
+    total_commission = fields.Float(string="Commission")
     total_profit = fields.Float(string="Profit")
     profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2), help="Profit Margin = profit / revenue * 100")
     

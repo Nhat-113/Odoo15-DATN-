@@ -53,6 +53,7 @@ class ProjectManagementHistory(models.Model):
                         phm.revenue AS total_cost,
                         phm.revenue_from,
                         prv.revenue_vnd,
+                        (COALESCE(NULLIF(prv.result_commission, NULL), 0))::NUMERIC(20, 4) AS result_commission,
 
                         --- Generate month_start & month_end from generate month
                         (CASE WHEN EXTRACT(MONTH FROM phm.months) = EXTRACT(MONTH FROM phm.date_start) 
@@ -200,6 +201,7 @@ class ProjectManagementHistory(models.Model):
                         
                         gmp.total_cost,
                         gmp.revenue_from,
+                        gmp.result_commission,
                         gmp.revenue_vnd,
                         (COALESCE(NULLIF(cts.salary, NULL), 0)) AS total_salary,
                         (COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)) AS total_project_expense,
@@ -211,8 +213,8 @@ class ProjectManagementHistory(models.Model):
                         (CASE 
                             WHEN cni.all_members = 0 OR cni.all_members IS NULL
                                 THEN 0
-                            ELSE (COALESCE(NULLIF(em.total_expenses, NULL), 0)) / cni.all_members::numeric(10, 4)
-                        END)::numeric(20, 4) AS average_cost_company
+                            ELSE (COALESCE(NULLIF(em.total_expenses, NULL), 0)) / cni.all_members::NUMERIC(10, 4)
+                        END)::NUMERIC(20, 4) AS average_cost_company
                         
                         
                     FROM generate_month_project AS gmp
@@ -251,13 +253,13 @@ class ProjectManagementHistory(models.Model):
                 project_compute_average_cost_project AS (
                     SELECT *, 
                         
-                            ((pcv.working_day::decimal / pcv.total_working_day)::numeric(6, 4)) AS duration_month,
+                            ((pcv.working_day::decimal / pcv.total_working_day)::NUMERIC(6, 4)) AS duration_month,
                             
                             (CASE 
                                 WHEN pcv.members_project_not_intern = 0 OR pcv.total_project_expense = 0
                                     THEN pcv.average_cost_company
-                                ELSE (pcv.average_cost_company + (pcv.total_project_expense::decimal / pcv.members_project_not_intern))
-                            END)::numeric(20, 4) AS average_cost_project
+                                ELSE (pcv.average_cost_company + ((pcv.total_project_expense::decimal + pcv.result_commission ) / pcv.members_project_not_intern))
+                            END)::NUMERIC(20, 4) AS average_cost_project
 
                     FROM project_compute_value_by_month AS pcv
                     
@@ -299,6 +301,7 @@ class ProjectManagementHistory(models.Model):
                             ELSE
                                 pac.total_cost
                         END) AS revenue,
+                        pac.result_commission AS total_commission,
                         rc.id AS currency_id
                     FROM project_compute_average_cost_project AS pac
                     LEFT JOIN project_total_duration_month AS pdm
@@ -309,10 +312,12 @@ class ProjectManagementHistory(models.Model):
 
                 SELECT 
                         *,
+                        (cpr.average_cost_company * cpr.members_project_not_intern)::NUMERIC(20, 4) AS total_avg_operation_project,
                         (CONCAT((EXTRACT(YEAR FROM cpr.month_start))::text, ' ', TO_CHAR(cpr.month_start, 'Month'))) AS months,
                         (cpr.revenue - (cpr.members_project_not_intern 
                                         * cpr.average_cost_project 
-                                        + cpr.total_salary)
+                                        + cpr.total_salary
+                                        + cpr.total_commission)
                         ) AS profit,
                         (CASE
                             WHEN cpr.revenue = 0
@@ -346,8 +351,10 @@ class ProjectManagementHistoryData(models.Model):
     operation_cost = fields.Float(string="Operation Cost", help="Total Operation Cost")
     average_cost_company = fields.Float(string="Company Avg Cost")
     average_cost_project = fields.Float(string="Prj Avg Cost")
-    members = fields.Float(string="Effort(MM)", digits=(12,3))
+    members = fields.Float(string="Effort (MM)", digits=(12,3))
     all_members = fields.Float(string="Total members", digits=(12,3))
+    total_avg_operation_project = fields.Float(string="Total Avg Operation Project")
+    total_commission = fields.Float(string="Commission")
     
     total_salary = fields.Float(string="Salary Cost", help="Total salary Employees By Month = SUM(salary_employee * effort_rate)")
     revenue = fields.Float(string="Revenue", help="Revenue By Month")

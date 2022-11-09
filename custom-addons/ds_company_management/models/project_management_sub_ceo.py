@@ -14,17 +14,18 @@ class ProjectManagementSubCeo(models.Model):
             CREATE OR REPLACE VIEW %s AS (
                 WITH project_history_department AS (
                     SELECT
-                            pm.company_id,
-                            pm.department_id,
-                            -- get first day of month ---
-                            (date_trunc('month', pmh.month_start))::date AS month_start,
-                            pmh.members,
-                            pmh.total_project_expense AS project_cost,
-                            pmh.profit,
-                            pmh.total_salary AS salary_cost,
-                            pmh.revenue,
-                            pmh.average_cost_company,
-                            pmh.currency_id
+                        pm.company_id,
+                        pm.department_id,
+                        -- get first day of month ---
+                        (date_trunc('month', pmh.month_start))::date AS month_start,
+                        pmh.members,
+                        pmh.total_project_expense AS project_cost,
+                        pmh.profit,
+                        pmh.total_salary AS salary_cost,
+                        pmh.revenue,
+                        pmh.total_commission,
+                        pmh.average_cost_company,
+                        pmh.currency_id
 
                     FROM project_management AS pm
                     RIGHT JOIN project_management_history AS pmh
@@ -40,6 +41,7 @@ class ProjectManagementSubCeo(models.Model):
                                 (SUM (phd.members)) AS members,
                                 (SUM (phd.project_cost)) AS project_cost,
                                 (SUM (phd.revenue)) AS revenue,
+                                (SUM (phd.total_commission)) AS total_commission,
                                 (SUM (phd.salary_cost)) AS salary_cost,
                                 (SUM (phd.profit)) AS profit,
                                 phd.average_cost_company,
@@ -183,6 +185,7 @@ class ProjectManagementSubCeo(models.Model):
                     COALESCE(NULLIF(phdg.members,		NULL), 0) + csg.remaining_member  AS total_members,
                     COALESCE(NULLIF(phdg.project_cost,	NULL), 0)  AS total_project_cost,
                     COALESCE(NULLIF(phdg.revenue, 		NULL), 0)  AS total_revenue,
+                    COALESCE(NULLIF(phdg.total_commission, NULL), 0)  AS total_commission,
                     COALESCE(NULLIF(phdg.salary_cost, 	NULL), 0) + csg.remaining_salary_manager AS total_salary,
                     COALESCE(NULLIF(phdg.profit, 		NULL), 0) - csg.remaining_salary_manager AS total_profit,
                     COALESCE(
@@ -226,6 +229,7 @@ class ProjectManagementSubCeoData(models.Model):
     total_salary = fields.Float(string="Salary Cost")
     total_project_cost = fields.Float(string="Prj Expenses")
     total_revenue = fields.Float(string="Revenue")
+    total_commission = fields.Float(string="Commission")
     total_profit = fields.Float(string="Profit")
     profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2))
     

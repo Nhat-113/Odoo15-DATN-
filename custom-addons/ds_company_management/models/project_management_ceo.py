@@ -20,6 +20,7 @@ class ProjectManagementCeo(models.Model):
                         (SUM(pms.total_salary)) AS total_salary,
                         (SUM(pms.total_project_cost)) AS total_project_cost,
                         (SUM(pms.total_revenue)) AS total_revenue,
+                        (SUM(pms.total_commission)) AS total_commission,
                         (SUM(pms.total_profit)) AS total_profit,
                         pms.currency_id
                         
@@ -221,6 +222,7 @@ class ProjectManagementCeo(models.Model):
                     -- 	mdh.manager_id AS manager_department,
                     -- 	mdh.manager_history_id AS old_manager_department,
                         cms.total_revenue,
+                        cms.total_commission,
                         cms.total_members,
                         cms.total_salary,
                         cms.total_project_cost,
@@ -314,6 +316,7 @@ class ProjectManagementCeo(models.Model):
                         css.month_start,
                         css.month_end,
                         css.total_revenue,
+                        css.total_commission,
                         css.total_members,
                         css.total_salary,
                         css.total_project_cost,
@@ -328,6 +331,7 @@ class ProjectManagementCeo(models.Model):
                         css.month_start,
                         css.month_end,
                         css.total_revenue,
+                        css.total_commission,
                         css.total_members,
                         css.total_project_cost,
                         css.total_salary,
@@ -342,6 +346,7 @@ class ProjectManagementCeo(models.Model):
                         month_start,
                         month_end,
                         total_revenue,
+                        total_commission,
                         total_project_cost,
                         (total_members + SUM(remaining_members)) AS total_members,
                         (total_salary + SUM(remaining_salary)) AS total_salary,
@@ -353,6 +358,7 @@ class ProjectManagementCeo(models.Model):
                         month_start,
                         month_end,
                         total_revenue,
+                        total_commission,
                         total_members,
                         total_project_cost,
                         total_salary,
@@ -367,6 +373,7 @@ class ProjectManagementCeo(models.Model):
                     cm.month_start,
                     cm.month_end,
                     cm.total_revenue,
+                    cm.total_commission,
                     cm.total_members,
                     cm.total_project_cost,
                     cm.total_salary,
@@ -397,6 +404,7 @@ class ProjectManagementCeoData(models.Model):
     total_salary = fields.Float(string="Salary Cost")
     total_project_cost = fields.Float(string="Prj Expenses")
     total_revenue = fields.Float(string="Revenue")
+    total_commission = fields.Float(string="Commission")
     total_profit = fields.Float(string="Profit")
     profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2))
     currency_id = fields.Many2one('res.currency', string="Currency")

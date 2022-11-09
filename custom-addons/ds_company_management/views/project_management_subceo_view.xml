@@ -45,6 +45,7 @@
                 <field name="total_salary" sum="Total Salary Cost" widget="monetary"/>
                 <field name="total_project_cost" sum="Total Prj Expenses" widget="monetary"/>
                 <field name="total_revenue" sum="Total Revenue" widget="monetary"/>
+                <field name="total_commission" sum="Total commission" widget="monetary"/>
                 <field name="total_profit" sum="Total Profit" widget="monetary"/>
                 <field name="profit_margin" avg="Average profit margin" width="116px"/>
                 <field name="currency_id" invisible="1"/>

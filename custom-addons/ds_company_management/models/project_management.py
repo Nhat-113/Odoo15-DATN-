@@ -7,23 +7,6 @@ class ProjectManagement(models.Model):
     _auto = False
     
     
-    def handle_remove_department(self):
-        mirai_fnb_department_id = self.env['hr.department'].sudo().search([('name', '=', 'Mirai FnB')])
-        department_ids = self.get_all_department_children(mirai_fnb_department_id.ids, [])
-        department_ids += mirai_fnb_department_id.ids
-        if len(department_ids) == 0:
-            department_ids += [0, 0]
-        return department_ids
-    
-    def get_all_department_children(self, parent_id, list_departments):
-        child_departments = self.env['hr.department'].sudo().search([('parent_id', 'in', parent_id)])
-        
-        if child_departments:
-            list_departments += child_departments.ids
-            return self.get_all_department_children(child_departments.ids, list_departments)
-        else:
-            return list_departments
-    
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
@@ -120,7 +103,8 @@ class ProjectManagement(models.Model):
                                 WHEN pem.total_cost <> 0 
                                     THEN 'estimation'
                                 ELSE 'null'
-                            END) AS revenue_from
+                            END) AS revenue_from,
+                            prm.total_commission::NUMERIC(20, 4)
 
                         FROM project_estimation_merged AS pem
                         LEFT JOIN project_revenue_management AS prm
@@ -139,6 +123,7 @@ class ProjectManagement(models.Model):
                         pmc.status,
                         pmc.project_cost,
                         pmc.revenue,
+                        pmc.total_commission,
                         pmc.revenue_from,
                         he.user_id AS user_login,
                         ru.id AS sub_user_login,
@@ -176,6 +161,7 @@ class ProjectManagementData(models.Model):
     
     # bonus = fields.Float(string="Bonus")
     revenue = fields.Float(string="Revenue")
+    total_commission = fields.Float(string="Total Commission")
     project_cost = fields.Float(string="Prj Expenses")
     
     last_update_color = fields.Integer(related='project_id.last_update_color', store=False)
