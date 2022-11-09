@@ -74,6 +74,7 @@ class HrRequestOverTime(models.Model):
     confirm_flag = fields.Boolean(default=True)
     approve_flag = fields.Boolean(default=True)
     request_flag = fields.Boolean(default=False)
+    read_only_project = fields.Boolean(default=False)
 
     stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draft", store=True)
     last_stage = fields.Integer(string="Last stage", default=0)
@@ -145,6 +146,8 @@ class HrRequestOverTime(models.Model):
     @api.constrains('start_date', 'end_date')
     def _validate_plan_overtime(self):
         for record in self:
+            if record.start_date > record.end_date:
+                raise ValidationError(_("Start Date must be greater than End Date"))
             # Validation Plan Date Overtime must be within the duration of the project
             if (record.project_id.date_start and record.project_id.date) and \
                 (record.start_date < record.project_id.date_start or record.end_date > record.project_id.date):
@@ -320,6 +323,8 @@ class HrRequestOverTime(models.Model):
     def create(self, vals_list):
         if 'request_flag' in vals_list:
             vals_list['request_flag']=True
+            
+        vals_list.update({'read_only_project': True})
 
         return super().create(vals_list)
     

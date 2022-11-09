@@ -270,8 +270,15 @@ class HrBookingOvertime(models.Model):
     @api.constrains('start_date', 'end_date')
     def _validation_date_time(self):
         for record in self:
+            if record.start_date > record.end_date:
+                raise ValidationError(_("Start Date must be greater than End Date"))
             if record.start_date < record.request_overtime_id.start_date or record.end_date > record.request_overtime_id.end_date:
                 raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime."))
+            # Validation Plan Hour (1 day = 24 hour)
+            limit_hour = ((record.end_date - record.start_date).days + 1)*24
+            if record.booking_time_overtime > limit_hour:
+                raise ValidationError(_("Plan Hour must be less {} (Hour).".format(limit_hour)))
+
 
     @api.constrains('booking_time_overtime')
     def _check_value_plan_overtime(self):
