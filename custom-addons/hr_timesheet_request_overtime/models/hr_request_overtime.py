@@ -60,8 +60,8 @@ class HrRequestOverTime(models.Model):
                             # domain=lambda self: self._compute_domain_stage(),
                             copy=False, index=True,
                             )
-    request_creator_id = fields.Many2one('res.users', string='Inform to', default=lambda self: self.env.user)
-    requester_id = fields.Many2many('res.users', string='Approvals', required=True, default=lambda self: self._get_default_approve(), readonly=False)
+    request_creator_id = fields.Many2many('res.users', 'hr_request_overtime_res_users_inform_rel', string='Inform to', default=False)
+    requester_id = fields.Many2many('res.users', 'hr_request_overtime_res_users_rel', string='Approvals', required=True, default=lambda self: self._get_default_approve(), readonly=False, )
     member_ids = fields.Many2many('hr.employee', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
     booking_overtime = fields.One2many('hr.booking.overtime', 'request_overtime_id', string='Booking Overtime')

@@ -9,7 +9,7 @@
                 <field name="project_id"/>
                 <field name="user_id"/>
                 <field name="member_ids" widget="many2many_avatar_employee"/>
-                <field name="request_creator_id" widget="many2one_avatar" optional="hide"/>
+                <field name="request_creator_id" optional="hide"/>
                 <field name="start_date"/>
                 <field name="end_date"/>
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -68,7 +68,7 @@
                                 </div>
                                 <field name="user_id" string="Project Manager" widget="many2one_avatar_user" domain="[('share', '=', False)]" width="2" attrs="{'invisible': [('project_id','=',False)]}"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
-                                <field name="request_creator_id" options="{'no_create_edit': True, 'no_open': True}"/>
+                                <field name="request_creator_id" options="{'no_create_edit': True, 'no_open': True}" widget="many2many_tags"/>
                             </group>
                             <group name="group_right" class="over_duration">
                                 <label for="start_date" string="Plan"/>
