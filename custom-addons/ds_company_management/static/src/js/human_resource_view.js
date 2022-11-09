@@ -641,6 +641,19 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     cell_elements[i].innerText = "0";
                 }
             }
+
+            // change position name of employee 
+
+            //get all td have name employee
+            var name_employee = table.querySelectorAll('td.name_employee');
+            for (var i = 0, len = name_employee.length; i < len; i++) {
+                //get name of employee is last word 
+                let text_replace  = name_employee[i].innerText.slice(name_employee[i].innerText.lastIndexOf(' ') + 1)
+                // replace name of employee
+                let name_employee_replace  = name_employee[i].innerText.replace(text_replace, '')
+                // add name to first 
+                name_employee[i].innerText = text_replace + ' ' + name_employee_replace
+            }
         },
 
         replace_value_human_resource_free: function () {

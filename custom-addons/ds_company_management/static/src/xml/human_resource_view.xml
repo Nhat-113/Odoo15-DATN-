@@ -117,7 +117,7 @@
                                 <td class="td_value human_employee_id" type="string">
                                     <t t-esc="list_human_resource[25]"/>
                                 </td>
-                                <td class="td_value" type="string">
+                                <td class="td_value name_employee" type="string">
                                     <t t-esc="list_human_resource[1]"/>
                                 </td>
                                 <td class="td_value" type="string">
@@ -289,7 +289,7 @@
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
                                     <th class="header_member_free" id="employee_id_free">
-                                        Employe Name
+                                        Employee Name
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
                                     <th class="header_member_free" id="company_name_free">
