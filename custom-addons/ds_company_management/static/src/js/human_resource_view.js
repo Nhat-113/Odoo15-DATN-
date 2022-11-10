@@ -482,7 +482,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
 
         compute_avg_all_res_rate: function () {
             let self = this;
-            var final = 0;
+            var effort_rate_company = 0;
             const row_value_effort = 1;
             const row_value_member = 2;
             var tbody = document.getElementById("human_reource_tbody");
@@ -490,17 +490,19 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var total_available_member = tbody.rows[tbody.rows.length -row_value_effort];
             var count_compute_available_member = 0;
             var howManyCols = tbody.rows[1].cells.length;
-
+            let array_effort_rate_company = [];
             // Start compute in column number seven
             for (var j = 7; j < howManyCols - 1; j++) {
                 count_compute_available_member = self.compute_available_member_res_rate(j);
 
                 // count_number_row = self.compute_count_number_row(j);
                 total_available_member.cells[j].innerText = count_compute_available_member;
-                final = self.computeTableColumnTotal(j);
+                effort_rate_company = self.computeTableColumnTotal(j);
                 // avg = (total effort( > 0 and another N/A  )) / total members in column with effort another N/A 
-                total_row.cells[j].innerText = parseFloat(final / count_compute_available_member).toFixed(2);
+                total_row.cells[j].innerText = parseFloat(effort_rate_company / count_compute_available_member).toFixed(2);
+                array_effort_rate_company.push(effort_rate_company);
             }   
+            return array_effort_rate_company;
          
         },
 
@@ -645,8 +647,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 csvContent += "\r\n";
             });
             var ele = document.createElement("A");
-            ele.setAttribute("href",  "data:text/csv;charset=utf-8,%EF%BB%BF"+ encodeURI(csvContent) );
-            ele.setAttribute("download","human_resource.csv");
+            ele.setAttribute("href",  "data:application/xls;charset=utf-8,%EF%BB%BF"+ encodeURI(csvContent) );
+            ele.setAttribute("download","human_resource.xls");
             document.body.appendChild(ele);
             ele.click();
         },
@@ -758,12 +760,13 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 arrFreeEffort.push(final);
             }
 
+            let data_array_effort_res_rate = self.compute_avg_all_res_rate()
             for (let i = 0 ; i < arrFreeEffort.length ;i++ ) {
                 if( arrEffortHuman[i] == 0) {
                     avgEffortInFreeTable[i] = 0;
                 }
                 else 
-                    avgEffortInFreeTable[i] = (arrFreeEffort[i] /  arrEffortHuman[i]) * 100;
+                    avgEffortInFreeTable[i] = ( arrFreeEffort[i] /  (data_array_effort_res_rate[i] + arrFreeEffort[i]) ) * 100 ;
                 //column start replace value from number four
                 total_available_member.cells[i+4].innerText = avgEffortInFreeTable[i].toFixed(2);
             }
