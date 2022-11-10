@@ -215,12 +215,12 @@ class AccountAnalyticLine(models.Model):
             booking_overtime = self.env['hr.booking.overtime'].search(
                                             [('user_id','=', self.employee_id.id),
                                             ('start_date','<=', date), 
-                                            ('end_date','>=', date)])
-
-            if booking_overtime and booking_overtime.request_overtime_id.stage_id.name not in ['Submit', 'Approval'] or self.request_overtime_ids.id:
-                return {'request_overtime_ids': booking_overtime.request_overtime_id.id}
-            else: 
-                return {'request_overtime_ids': False}
+                                            ('end_date','>=', date), ('project_id','=', self.project_id.id)])
+            for booking in booking_overtime:
+                if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approval'] or self.request_overtime_ids.id:
+                    return {'request_overtime_ids': booking.request_overtime_id.id}
+                else: 
+                    return {'request_overtime_ids': False}
         else: 
             return {'request_overtime_ids': False}
             
@@ -261,7 +261,10 @@ class HrBookingOvertime(models.Model):
     @api.depends('start_date')
     def _compute_user_id_domain(self):
         for record in self:
-            user_ids = record.request_overtime_id.project_id.planning_calendar_resources.employee_id.ids
+            try:
+                user_ids = record.request_overtime_id.project_id.planning_calendar_resources.employee_id.ids
+            except:
+                user_ids = []
             user_ids.append(self._uid)
             record.user_id_domain = json.dumps(
                 [('id', 'in', user_ids)]

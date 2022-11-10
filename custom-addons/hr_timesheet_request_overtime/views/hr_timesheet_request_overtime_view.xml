@@ -30,7 +30,7 @@
                     <field name='confirm_flag' invisible="1"/>
                     <field name='request_flag' invisible="1"/>
                     <field name='approve_flag' invisible="1"/>
-                    <button string="Request" name="action_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('request_flag', '!=', True), ('stage_name', '!=', 'Draft'), ('active', '=', False)]}"/>
+                    <button string="Request" name="action_request_overtime" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('request_flag', '!=', True), ('stage_name', '!=', 'Draft'), ('active', '=', False)]}"/>
                     <button string="Confirm" groups="hr_timesheet_request_overtime.request_overtime_access_director" name="action_confirm_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('confirm_flag', '!=', True), ('stage_name', '!=', 'Request'), ('active', '=', False)]}"/>
                     <button string="Submit" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="action_submit_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('submit_flag', '!=', True), ('stage_name', '!=', 'Confirm'), ('active', '=', False)]}" />
                     <button string="Approval" groups="hr_timesheet_request_overtime.request_overtime_access_director" name="action_approve_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('approve_flag', '!=', True), ('stage_name', '!=', 'Submit'), ('active', '=', False)]}"/>
@@ -90,7 +90,7 @@
                         </group>
                         <notebook>
                             <page string="Booking Overtime">
-                                <field name="booking_overtime" colspan="4" nolabel="1" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}">
+                                <field name="booking_overtime" colspan="4" nolabel="1" attrs="{'readonly':[('active', '=', False)]}">
                                     <tree string="Assign Members">
                                         <field name="user_id_domain" invisible="1"/>
                                         <field name="read_stage" invisible="1"/>
