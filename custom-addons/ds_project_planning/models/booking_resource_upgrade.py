@@ -403,7 +403,7 @@ class BookingResourceMonth(models.Model):
                     if day.start_date_day < day_expired and day.start_date_day >= month.start_date_month and day.end_date_day <= month.end_date_month:
                         effort_total_used += day.effort_rate_day
 
-                if effort_total_edited <= effort_total_used:
+                if effort_total_edited < effort_total_used:
                     raise UserError('Cannot edit effort rate less than total effort used')
 
             
