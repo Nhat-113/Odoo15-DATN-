@@ -268,6 +268,7 @@ class HrRequestOverTime(models.Model):
             
             for user in users:
                 values.update(assignee_name=user.sudo().name)
+                values.update({'dear_name': user.display_name})
                 assignation_msg = view._render(values, engine='ir.qweb', minimal_qcontext=True)
                 assignation_msg = self.env['mail.render.mixin']._replace_local_links(assignation_msg)                 
                 task.message_notify(

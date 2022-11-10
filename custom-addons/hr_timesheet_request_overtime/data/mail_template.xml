@@ -4,7 +4,7 @@
         <!-- Refuse reason -->
         <template id="refuse_request_overtime_template">
             <p style="margin: 0px;">
-                <p>Dear <t t-esc="object.request_creator_id.name"/>,</p>
+                <p>Dear <t t-esc="dear_name"/>,</p>
                 <p style="margin-top: 8px;"><b>Request Overtime Form</b> you create has been <b>Rejected</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
                 <p style="margin-top: 8px;"><b>Refuse Reason: </b> <t t-esc="refuse_reason"/> </p>
             </p>
@@ -20,7 +20,7 @@
         <!-- Request timesheets overtime -->
         <template id="request_timesheets_overtime_template">
             <p style="margin: 0px;">
-                <p>Dear <t t-esc="object.requester_id.name"/>,</p>
+                <p>Dear <t t-esc="dear_name"/>,</p>
                 <p style="margin-top: 8px;">There is a Request Overtime Form just has been <b>Requested Overtime</b> by <b><t t-esc="object.env.user.name"/>.</b></p>
             </p>
             <p>Please review and confirm it soon.</p>
@@ -35,7 +35,7 @@
         <!-- Confirm request overtime -->
         <template id="confirm_request_overtime_template">
             <p style="margin: 0px;">
-                <p>Dear <t t-esc="object.request_creator_id.name"/>,</p>
+                <p>Dear <t t-esc="dear_name"/>,</p>
                 <p style="margin-top: 8px;"><b>Request Overtime Form</b> you create has been <b>Confirmed</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
             </p>
             <p>Now, you can start overtime plan.</p>
@@ -50,7 +50,7 @@
         <!-- Submit request overtime -->
         <template id="submit_request_overtime_template">
             <p style="margin: 0px;">
-                <p>Dear <t t-esc="object.requester_id.name"/>,</p>
+                <p>Dear <t t-esc="dear_name"/>,</p>
                 <p style="margin-top: 8px;">There is a Request Overtime Form just has been <b>Submited Timesheets Overtime</b> by <b><t t-esc="object.env.user.name"/>.</b></p>
             </p>
             <p>Please review and approve it soon.</p>
@@ -65,7 +65,7 @@
         <!-- Approvals Request overtime -->
         <template id="approvals_request_overtime_template">
             <p style="margin: 0px;">
-                <p>Dear <t t-esc="object.request_creator_id.name"/>,</p>
+                <p>Dear <t t-esc="dear_name"/>,</p>
                 <p style="margin-top: 8px;"><b>Request Overtime Form</b> you create has been <b>Approved</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
             </p>
             <p>Thank you!</p>
