@@ -127,10 +127,22 @@ class HrRequestOverTime(models.Model):
     def _add_booking_overtime(self):
         # update member_ids list
         for record in self:
-            user_ids = [
-                user.id for user in record.booking_overtime.user_id]
-            record.member_ids = self.member_ids = self.env['hr.employee'].search(
-            [('id', 'in', user_ids)])
+            if len(record.booking_overtime) > 0:
+                new_booking_overtime = record.booking_overtime[-1] or False
+                # Validation assigned member
+                if new_booking_overtime.user_id.id in record.booking_overtime[:-1].user_id.ids:
+                    raise ValidationError(_('The request overtime has duplicate members assigned (%(name)s).', name=record.booking_overtime[-1].user_id.name))
+                else:
+                    user_ids = [user.id for user in record.booking_overtime.user_id]
+                    record.member_ids = self.env['hr.employee'].search([('id', 'in', user_ids)])
+
+                # Validation date time
+                if new_booking_overtime.start_date > new_booking_overtime.end_date:
+                    raise ValidationError(_("Start Date must be smaller than End Date"))
+
+                if new_booking_overtime.start_date < new_booking_overtime.request_overtime_id.start_date or new_booking_overtime.end_date > new_booking_overtime.request_overtime_id.end_date:
+                    raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime."))
+        
 
     @api.depends('start_date', 'end_date')
     def _compute_duration_overtime(self):
@@ -147,7 +159,7 @@ class HrRequestOverTime(models.Model):
     def _validate_plan_overtime(self):
         for record in self:
             if record.start_date > record.end_date:
-                raise ValidationError(_("Start Date must be greater than End Date"))
+                raise ValidationError(_("Start Date must be smaller than End Date"))
             # Validation Plan Date Overtime must be within the duration of the project
             if (record.project_id.date_start and record.project_id.date) and \
                 (record.start_date < record.project_id.date_start or record.end_date > record.project_id.date):

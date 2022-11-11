@@ -13,6 +13,7 @@ class OvertimeGetRefuseReason(models.TransientModel):
         subject_template = "Reject Request Overtime: %s" % self.request_overtime_ids.display_name
         mail_template = "hr_timesheet_request_overtime.refuse_request_overtime_template"
         self._send_message_auto_subscribe_notify_refuse_request_overtime({item: item.request_creator_id for item in self.request_overtime_ids}, mail_template, subject_template)
+        self._send_message_auto_subscribe_notify_refuse_request_overtime({item: item.user_id for item in self.request_overtime_ids}, mail_template, subject_template)
         self.request_overtime_ids.write({'active': False, "refuse_reason": str(self.subject_refuse_reason)})
 
         self.request_overtime_ids.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Draft')]).id

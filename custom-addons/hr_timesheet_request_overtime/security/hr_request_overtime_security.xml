@@ -52,7 +52,7 @@
         <record model="ir.rule" id="pm_view_request_overtime">
             <field name="name">Request Overtime: PM View Request Overtime</field>
             <field name="model_id" ref="model_hr_request_overtime"/>
-            <field name="domain_force">['|', ('user_id', '=', user.id), ('request_creator_id', '=', user.id) ]</field>
+            <field name="domain_force">['|', '|', ('user_id', '=', user.id), ('request_creator_id', '=', user.id), ('requester_id', '=', user.id)]</field>
             <field name="groups" eval="[(4,ref('hr_timesheet_request_overtime.request_overtime_access_projmanager'))]"/>
         </record>
 

@@ -69,7 +69,7 @@
                                 </div>
                                 <field name="user_id" string="Project Manager" widget="many2one_avatar_user" domain="[('share', '=', False)]" width="2" attrs="{'invisible': [('project_id','=',False)]}"/>
                                 <field name="company_id" groups="base.group_multi_company" attrs="{'readonly': [('read_only_project','=', True)]}"/>
-                                <field name="request_creator_id" options="{'no_create_edit': True, 'no_open': True}" widget="many2many_tags"  attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
+                                <field name="request_creator_id" options="{'no_create_edit': True, 'no_open': True}" widget="many2many_tags" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
                             </group>
                             <group name="group_right" class="over_duration">
                                 <label for="start_date" string="Plan" />
@@ -80,7 +80,7 @@
                                     <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}' attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
                                 </div>
                                 <field name="duration_overtime" readonly="1"/>
-                                <field name="requester_id" readonly="0" widget="many2many_tags"  attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}" />
+                                <field name="requester_id" readonly="0" widget="many2many_tags" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}" />
                             </group>
                         </group>
                         <separator string="Description"/>
@@ -90,14 +90,15 @@
                         </group>
                         <notebook>
                             <page string="Booking Overtime">
-                                <field name="booking_overtime" colspan="4" nolabel="1" attrs="{'readonly':[('active', '=', False)]}">
+                                <field name="booking_overtime" colspan="4" nolabel="1" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}">
                                     <tree string="Assign Members">
+                                        <field name="read_stage" invisible="1"/>
                                         <field name="user_id_domain" invisible="1"/>
                                         <field name="read_stage" invisible="1"/>
                                         <field name="inactive" invisible='1'/>
                                         <field name="user_id" widget="many2one_avatar" options="{'no_create': True}" width="1" domain="user_id_domain"/>
-                                        <field name="start_date" />
-                                        <field name="end_date" />
+                                        <field name="start_date"/>
+                                        <field name="end_date"/>
                                         <field name="duration" string="Duration" width="1"/>
                                         <field name="booking_time_overtime" width="2" required="1"/>
                                         <field name="actual_overtime" width="1"/>
@@ -108,6 +109,7 @@
                                         <header>
                                         </header>
                                         <sheet>
+                                            <field name="read_stage" invisible="1"/>
                                             <div class="oe_title" style="width: 500px">
                                                 <h1>
                                                     <field name="user_id_domain" invisible="1"/>
@@ -186,11 +188,12 @@
                 <field name="type_day_ot" attrs="{'invisible': [('type_ot', '=', 'no')]}"/>
             </xpath>
             <xpath expr="//field[@name='unit_amount']" position="after">
-                <field name="pay_type" attrs="{'invisible': [('type_ot', '=', 'no')]}"/>
-                <field name="status_timesheet_overtime" string="Status" widget="badge" readonly="1" decoration-info="status_timesheet_overtime == 'draft'" decoration-warning="status_timesheet_overtime in ('refuse')" decoration-success="status_timesheet_overtime == 'confirm'"/>
-                <field name="reason_reject" placeholder="Type Reason Refuse Taskscore..." attrs="{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('read_only_reason_refuse', '=', False)]}"/>
                 <field name="read_only_reason_refuse" invisible="1"/>
-                <button name="approve_timesheet_overtime" string="Confirm" icon="fa-thumbs-up" type="object" attrs="{'invisible': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('read_only_reason_refuse', '=', False)]}"/>
+                <field name="pay_type" attrs="{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('read_only_reason_refuse', '=', True)]}"/>
+                <field name="status_timesheet_overtime" string="Status" widget="badge" readonly="1" decoration-info="status_timesheet_overtime == 'draft'" decoration-warning="status_timesheet_overtime in ('refuse')" decoration-success="status_timesheet_overtime == 'confirm'"/>
+                <field name="reason_reject" placeholder="Type Reason Refuse Taskscore..." attrs="{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('read_only_reason_refuse', '=', True)]}"/>
+                <field name="invisible_button_confirm" invisible="1"/>
+                <button name="approve_timesheet_overtime" string="Confirm" icon="fa-thumbs-up" type="object" attrs="{'invisible': ['|','|', ('status_timesheet_overtime', '=', 'confirm'), ('read_only_reason_refuse', '=', True), ('invisible_button_confirm', '=', True)]}"/>
             </xpath>
             <xpath expr="//field[@name='name']" position="before">
                 <!-- invisible 3 field -->

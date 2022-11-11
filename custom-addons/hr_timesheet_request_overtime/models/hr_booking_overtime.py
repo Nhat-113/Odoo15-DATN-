@@ -14,33 +14,37 @@ class AccountAnalyticLine(models.Model):
                                 ('full_cash', 'Full Cash'),
                                 ('half_cash_half_dayoff', 'Cash 5:5 Date Off'),
                                 ('full_day_off', 'Full Date Off'),
-                                ], string='Pay Type', index=True, default='full_day_off', tracking=True, required=True)
+                                ], string='Pay Type', index=True, tracking=True, default=False)
 
     type_day_ot = fields.Selection([
                                 ('other', 'Other'),
                                 ('normal_day', 'Normal Day'),
                                 ('weekend', 'Weekend'),
                                 ('holiday', 'Holiday'),
-                                ], string='Type Day', index=True, copy=False, compute="compute_type_overtime_day", tracking=True, required=True, store=True)
+                                ], string='Type Day', index=True, copy=False, compute="compute_type_overtime_day", tracking=True, required=True, store=True, default=False)
 
     status_timesheet_overtime = fields.Selection([
                                         ('draft', 'To Confirm'),
                                         ('confirm', 'Confirm'),
                                         ('refuse', 'Refused'),
                                         ], default='draft', readonly=False, store=True, tracking=True, compute="reject_timesheet_overtime")
-    reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True)
+    reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True, default=False)
+    invisible_button_confirm = fields.Boolean(default=False, help="Check invisible button Confirm")
     
     def _readonly_resion_refuse(self):
-        if self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_user') == True:
-            for task in self:
-                task.read_only_reason_refuse = True
+        if self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_user') == True and \
+            self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_projmanager') == False:
+            for record in self:
+                record.read_only_reason_refuse = True
+                record.invisible_button_confirm = True
         else:
-            for task in self:
-                task.read_only_reason_refuse = False
+            for record in self:
+                record.read_only_reason_refuse = False
+                record.invisible_button_confirm = False
                 
     read_only_reason_refuse = fields.Boolean(compute=_readonly_resion_refuse, store=False)
 
-    request_overtime_ids = fields.Many2one('hr.request.overtime', string='Request Overtime', store=True, readonly=True)
+    request_overtime_ids = fields.Many2one('hr.request.overtime', string='Request Overtime', store=True, readonly=True, default=False)
     check_request_ot = fields.Boolean('Check Readonly', compute='_compute_request_overtime_id', store=True, default=False)
     check_approval_ot = fields.Boolean('Check Approvals', compute='_compute_request_overtime_id', store=True, default=False)
 
@@ -60,6 +64,12 @@ class AccountAnalyticLine(models.Model):
                     record.type_day_ot = 'normal_day'
             else:
                 record.type_day_ot = 'other'
+            
+            if record.type_ot == "no":
+                record.pay_type = False
+            elif record.pay_type == False:
+                record.pay_type = "full_day_off"
+
 
     @api.depends('reason_reject')
     def reject_timesheet_overtime(self):
@@ -69,6 +79,7 @@ class AccountAnalyticLine(models.Model):
             else:
                 timesheet.status_timesheet_overtime = 'draft'
 
+    # Send mail reject timesheet OT
     @api.onchange('reason_reject')
     def send_mail(self):
         for task in self:
@@ -148,19 +159,22 @@ class AccountAnalyticLine(models.Model):
         for record in self:
             if record.type_ot=='yes':
                 if record.request_overtime_ids.stage_id.name == 'Submit':
-                    record.write({'check_request_ot': True})
-                    record.write({'status_timesheet_overtime': 'confirm'})
+                    record.check_request_ot = True
+                    record.status_timesheet_overtime = 'confirm'
                 elif record.request_overtime_ids.stage_id.name == 'Approval':
-                    record.write({'check_request_ot': True})
-                    record.write({'check_approval_ot': True})
+                    record.check_request_ot = True
+                    record.check_approval_ot = True
                     # Compute time off 'nghi bu' when change status Approvals
                     record._compute_pay_type_of_timeoff()
-                    record.write({'status_timesheet_overtime': 'confirm'})
+                    record.status_timesheet_overtime = 'confirm'
                 else:
-                    record.write({'check_request_ot': False})
-                    record.write({'check_approval_ot': False})
-                    record.write({'status_timesheet_overtime': 'draft'})
-            
+                    record.check_request_ot = False
+                    record.check_approval_ot = False
+                    
+                    # Reset status timesheets OT when refuse
+                    if record.request_overtime_ids.active == False:
+                        record.status_timesheet_overtime = 'draft'
+
             else:
                 record.request_overtime_ids = False
 
@@ -172,7 +186,6 @@ class AccountAnalyticLine(models.Model):
     # Find reqeust overtime for timesheet when type_timesheet = 'type_ot'
     @api.model
     def create(self, vals_list):
-        # TODO refactor this function
         type_timesheet = vals_list.get('type_ot') 
         date = vals_list.get('date')
         employee = vals_list.get('employee_id')
@@ -198,24 +211,23 @@ class AccountAnalyticLine(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
-        values = self._check_change_value_timesheet(vals)
+        values = self._check_change_value_timesheet(vals) or {}
         vals.update(values)
         result = super(AccountAnalyticLine, self).write(vals)
 
         return result
 
     def _check_change_value_timesheet(self, vals):
-        # TODO refactor this function
-        if self.type_ot == 'yes':
-            if 'date' in vals:
-                date = vals['date']
-            else:
-                date =  self.date
+        type_timesheet = vals.get('type_ot')  or self.type_ot
+        date = vals.get('date') or self.date
+        employee = vals.get('employee_id') or self.employee_id.id
 
+        if type_timesheet == 'yes':
             booking_overtime = self.env['hr.booking.overtime'].search(
-                                            [('user_id','=', self.employee_id.id),
+                                            [('user_id','=', employee),
                                             ('start_date','<=', date), 
-                                            ('end_date','>=', date), ('project_id','=', self.project_id.id)])
+                                            ('end_date','>=', date), 
+                                            ('project_id','=', self.project_id.id)])
             for booking in booking_overtime:
                 if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approval'] or self.request_overtime_ids.id:
                     return {'request_overtime_ids': booking.request_overtime_id.id}
@@ -256,7 +268,7 @@ class HrBookingOvertime(models.Model):
     
     inactive = fields.Boolean(string="Inactive Member", default=False, store=True)
     description = fields.Text("Description", translate=True)
-    read_stage = fields.Char(string="Read Stage request overtime", compute="_compute_stage")
+    read_stage = fields.Char(string="Read Stage request overtime", compute="_compute_stage", store=True)
 
     @api.depends('start_date')
     def _compute_user_id_domain(self):
@@ -265,36 +277,21 @@ class HrBookingOvertime(models.Model):
                 user_ids = record.request_overtime_id.project_id.planning_calendar_resources.employee_id.ids
             except:
                 user_ids = []
-            user_ids.append(self._uid)
             record.user_id_domain = json.dumps(
                 [('id', 'in', user_ids)]
             )
-
-    @api.constrains('start_date', 'end_date')
-    def _validation_date_time(self):
-        for record in self:
-            if record.start_date > record.end_date:
-                raise ValidationError(_("Start Date must be greater than End Date"))
-            if record.start_date < record.request_overtime_id.start_date or record.end_date > record.request_overtime_id.end_date:
-                raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime."))
-            # Validation Plan Hour (1 day = 24 hour)
-            limit_hour = ((record.end_date - record.start_date).days + 1)*24
-            if record.booking_time_overtime > limit_hour:
-                raise ValidationError(_("Plan Hour must be less {} (Hour).".format(limit_hour)))
-
 
     @api.constrains('booking_time_overtime')
     def _check_value_plan_overtime(self):
         for record in self:
             if record.booking_time_overtime > 999 or record.booking_time_overtime <= 0:
-                raise ValidationError(_('Please enter value plan Overtime between 1-999 (hour).'))
-            
-            # TODO Validation time OT khong vuot qua so gio tuong ung voi Duration
-            # if record.duration:
-            #     range_hour_plan = record.duration*8
-            # if record.booking_time_overtime > range_hour_plan:
-            #     raise ValidationError(_('Validation time OT khong vuot qua so gio tuong ung voi Duration'))
+                raise ValidationError(_('Please enter value Plan Hour between 1-999 (hour).'))
 
+            # Validation Plan Hour (1 day = 24 hour)
+            limit_hour = ((record.end_date - record.start_date).days + 1)*24
+            if record.booking_time_overtime > limit_hour:
+                raise ValidationError(_("Plan Hour must be less {} (Hour).".format(limit_hour)))
+            
     @api.onchange("request_overtime_id.stage_id")
     def _compute_stage(self):
         for item in self:
