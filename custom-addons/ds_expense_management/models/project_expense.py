@@ -128,19 +128,20 @@ class ProjectExpense(models.Model):
         # if project_costs != 0:
         #    raise UserError(_('The project cost "%(project)s" already exists!', project = self.project_id.name))
         # else:
-        if self.project_id:
-            get_datas = self.env['project.expense.value'].search([('project_expense_management_id', 'in', [self.id or self.id.origin, False]),
-                                                                ('project_id', '=', self.project_id.id)])
+        if self.id or self.id.origin:
+            if self.project_id:
+                get_datas = self.env['project.expense.value'].search([('project_expense_management_id', '=', self.id or self.id.origin),
+                                                                    ('project_id', '=', self.project_id.id)])
+                
+                self.project_expense_value_ids = get_datas
+                for record in self.project_expense_value_ids:
+                    if record.expense_date > self.project_id.date or record.expense_date < self.project_id.date_start:
+                        record.write({'project_expense_management_id': [(2, self.id or self.id.origin)]})
             
-            self.project_expense_value_ids = get_datas
-            for record in self.project_expense_value_ids:
-                if record.expense_date > self.project_id.date or record.expense_date < self.project_id.date_start:
-                    record.write({'project_expense_management_id': [(2, self.id or self.id.origin)]})
-        
-        else:
-            department_expense_db = self.env['project.expense.value'].search([('project_expense_management_id', 'in', [self.id or self.id.origin, False]),
-                                                                ('department_id', '=', self.department_id.id)])
-            self.project_expense_value_ids = department_expense_db
+            else:
+                department_expense_db = self.env['project.expense.value'].search([('project_expense_management_id', '=', self.id or self.id.origin),
+                                                                    ('department_id', '=', self.department_id.id)])
+                self.project_expense_value_ids = department_expense_db
                     
                     
     @api.constrains('department_id')
@@ -177,7 +178,7 @@ class ProjectExpenseValue(models.Model):
     
     exchange_rate = fields.Float(string="Exchange Rate")
     expense_vnd = fields.Monetary(string="Total Revenue (VND)", currency_field='currency_vnd', compute='_compute_total_expense', store=True)
-    currency_vnd = fields.Many2one('res.currency', string="VND Currency", related='project_expense_management_id.currency_vnd', readonly=True)   
+    currency_vnd = fields.Many2one('res.currency', string="VND Currency", related='project_expense_management_id.currency_vnd', readonly=True, store=True)   
     
     
     @api.onchange('expense_date')

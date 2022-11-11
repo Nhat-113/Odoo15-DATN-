@@ -301,3 +301,13 @@ class ProjectRevenueValue(models.Model):
         for record in self:
             record.result_commission = record.revenue_vnd * record.commission_percents / 100
             record.result_revenue = record.revenue_vnd - record.result_commission
+            
+            
+    @api.constrains('commission_percents', 'exchange_rate')
+    def _validate_value_input(self):
+        for record in self:
+            if record.exchange_rate <= 0 and record.currency_id.name != 'VND':
+               raise UserError('Exchange rate must be greater than zero!')
+
+            if record.commission_percents < 0 or record.commission_percents > 500:
+               raise UserError("The Commission Percentage shouldn't be between 0 and 500!")
