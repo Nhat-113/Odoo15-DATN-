@@ -21,6 +21,8 @@ class ProjectManagement(models.Model):
                         pr.date_start,
                         pr.date AS date_end,
                         pr.last_update_status AS status,
+                        pr.stage_id,
+                        pps.name AS stage_name,
                         pr.project_type AS project_type_id,
                         est.currency_id,
                         ec.name AS est_currency_name,
@@ -42,6 +44,8 @@ class ProjectManagement(models.Model):
                         ON ec.id = est.currency_id
                     LEFT JOIN estimation_status AS es
                         ON es.id = est.stage
+                    LEFT JOIN project_project_stage AS pps
+		                ON pps.id = pr.stage_id
                     WHERE (EXTRACT(MONTH FROM pr.date_start) < EXTRACT(MONTH FROM CURRENT_DATE)
                         AND EXTRACT(YEAR FROM pr.date_start) = EXTRACT(YEAR FROM CURRENT_DATE))
                         OR EXTRACT(YEAR FROM pr.date_start) < EXTRACT(YEAR FROM CURRENT_DATE)
@@ -55,6 +59,8 @@ class ProjectManagement(models.Model):
                         pr.date_start,
                         date_end,
                         status,
+                        stage_id,
+                        stage_name,
                         est.stage,
                         est.total_cost,
                         est.currency_id,
@@ -73,6 +79,8 @@ class ProjectManagement(models.Model):
                             pem.date_start,
                             pem.date_end,
                             pem.status,
+                            pem.stage_id,
+                            pem.stage_name,
                             --- Handling when value is null ---
                             (SELECT COALESCE(NULLIF(pem.project_cost, NULL), 0)) AS project_cost,
 
@@ -121,6 +129,8 @@ class ProjectManagement(models.Model):
                         pmc.date_start,
                         pmc.date_end,
                         pmc.status,
+                        pmc.stage_id,
+                        pmc.stage_name,
                         pmc.project_cost,
                         pmc.revenue,
                         pmc.total_commission,
@@ -158,6 +168,8 @@ class ProjectManagementData(models.Model):
     date_start = fields.Date(string='Start')
     date_end = fields.Date(string='End')
     status = fields.Char(string='Status')
+    stage_id = fields.Many2one('project.project.stage', string="Stage")
+    stage_name = fields.Char(string='Stage Name')
     
     # bonus = fields.Float(string="Bonus")
     revenue = fields.Float(string="Revenue")

@@ -16,6 +16,7 @@ class DepartmentProjectDetail(models.Model):
                     pmh.company_id,
                     pm.user_pm,
                     (CONCAT((EXTRACT(YEAR FROM pmh.month_start))::text, ' ', TO_CHAR(pmh.month_start, 'Month'))) AS months,
+                    pmh.months_domain,
                     pmh.month_start,
                     pmh.month_end,
                     pmh.working_day,
@@ -51,6 +52,7 @@ class DepartmentProjectDetailData(models.Model):
     user_pm = fields.Many2one('res.users', string="PM")
     currency_id = fields.Many2one('res.currency', string="Currency")
     months = fields.Char(string="Month")
+    months_domain = fields.Date(string="Month domain")
     month_start = fields.Date(string="Start")
     month_end = fields.Date(string="End")
     working_day = fields.Float(string="Working Day")

@@ -37,6 +37,7 @@
                 <field name="profit" sum="Total Profit" widget="monetary"/>
                 <field name="profit_margin" avg="Average profit margin" width="116px"/>
                 <field name="last_update_color" invisible="1"/>
+                <field name="stage_id" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
                 <field name="user_login" invisible="1"/>
                 <field name="sub_user_login" invisible="1"/>

@@ -246,6 +246,6 @@ class ProjectManagementSubCeoData(models.Model):
             'view_mode': 'tree',
             'domain': [('department_id', '=', self.department_id.id), 
                        ('company_id', '=', self.company_id.id),
-                       ('month_start', 'in', [self.month_start, self.month_end])]
+                       ('months_domain', 'in', [self.month_start, self.month_end])]
         }
         return action
