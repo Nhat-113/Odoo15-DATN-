@@ -254,7 +254,6 @@
                 <field name="user_id"/>
                 <field name="member_ids"/>
                 <field name="stage_id"/>
-                <!-- <filter string="Task not Star" name="filter_not_star" domain="[('task_score', '=', '0')]"/> -->
                 <group expand="0" string="Group By">
                     <filter string="Project" name="group_by_project" context="{'group_by': 'project_id'}"/>
                     <filter string="Stage" name="group_by_stage" context="{'group_by': 'stage_id'}" />

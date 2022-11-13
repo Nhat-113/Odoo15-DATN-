@@ -206,12 +206,19 @@ class AccountAnalyticLine(models.Model):
                     values['request_overtime_ids'] = False
         else: 
             values['request_overtime_ids'] = False
+        
+        # Update pay type of OT:
+        if 'pay_type' not in values and type_timesheet == "no":
+                vals_list.update({'pay_type': False})
+        else: 
+            vals_list.update({'pay_type': 'full_day_off'})
+
             
         vals_list.update(values)
         return super().create(vals_list)
 
     def write(self, vals):
-        values = self._check_change_value_timesheet(vals) or {}
+        values = self._check_change_value_timesheet(vals)
         vals.update(values)
         result = super(AccountAnalyticLine, self).write(vals)
 
@@ -235,13 +242,15 @@ class AccountAnalyticLine(models.Model):
                     return {'request_overtime_ids': False}
         else: 
             return {'request_overtime_ids': False}
+
+        return {'request_overtime_ids': False}
             
 class HrBookingOvertime(models.Model):
     _name = "hr.booking.overtime"
     _inherit=['mail.thread']
 
     request_overtime_id = fields.Many2one('hr.request.overtime', string='Booking Overtime', readonly=False)
-    project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True, compute='_compute_stage')
+    project_id = fields.Many2one('hr.request.overtime', related='request_overtime_id.project_id', string="Project", required=True)
     
     user_id = fields.Many2one(
         'hr.employee', string='Member', required=True, help="Member name assgin overtime")

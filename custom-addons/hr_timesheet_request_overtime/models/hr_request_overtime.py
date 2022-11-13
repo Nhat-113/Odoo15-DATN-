@@ -64,11 +64,13 @@ class HrRequestOverTime(models.Model):
     requester_id = fields.Many2many('res.users', 'hr_request_overtime_res_users_rel', string='Approvals', required=True, default=lambda self: self._get_default_approve(), readonly=False, )
     member_ids = fields.Many2many('hr.employee', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
+    
+    member_ids_user = fields.Many2many('res.users', 'hr_request_overtime_member_ids_users_rel', compute='_compute_member_ids_user', store=True)
     booking_overtime = fields.One2many('hr.booking.overtime', 'request_overtime_id', string='Booking Overtime')
     active = fields.Boolean(string='Invisible Refuse Button', default=True, store=True)
     refuse_reason_id = fields.One2many('hr.request.overtime.refuse.reason', 'request_overtime_ids', tracking=True)
     refuse_reason = fields.Char('Refuse Reason', tracking=True)
-    
+
     
     submit_flag = fields.Boolean(default=True)
     confirm_flag = fields.Boolean(default=True)
@@ -78,6 +80,12 @@ class HrRequestOverTime(models.Model):
 
     stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draft", store=True)
     last_stage = fields.Integer(string="Last stage", default=0)
+
+    @api.depends('member_ids')
+    def _compute_member_ids_user(self):
+        for record in self:
+            record.member_ids_user = record.member_ids.user_id.ids
+
     
     @api.depends('company_id')
     def _get_domain_project(self):
@@ -129,12 +137,10 @@ class HrRequestOverTime(models.Model):
         for record in self:
             if len(record.booking_overtime) > 0:
                 new_booking_overtime = record.booking_overtime[-1] or False
+
                 # Validation assigned member
                 if new_booking_overtime.user_id.id in record.booking_overtime[:-1].user_id.ids:
                     raise ValidationError(_('The request overtime has duplicate members assigned (%(name)s).', name=record.booking_overtime[-1].user_id.name))
-                else:
-                    user_ids = [user.id for user in record.booking_overtime.user_id]
-                    record.member_ids = self.env['hr.employee'].search([('id', 'in', user_ids)])
 
                 # Validation date time
                 if new_booking_overtime.start_date > new_booking_overtime.end_date:
@@ -143,6 +149,8 @@ class HrRequestOverTime(models.Model):
                 if new_booking_overtime.start_date < new_booking_overtime.request_overtime_id.start_date or new_booking_overtime.end_date > new_booking_overtime.request_overtime_id.end_date:
                     raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime."))
         
+            user_ids = [user.id for user in record.booking_overtime.user_id]
+            record.member_ids = self.env['hr.employee'].search([('id', 'in', user_ids)])
 
     @api.depends('start_date', 'end_date')
     def _compute_duration_overtime(self):
