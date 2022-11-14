@@ -137,6 +137,8 @@ class HrRequestOverTime(models.Model):
         for record in self:
             if len(record.booking_overtime) > 0:
                 new_booking_overtime = record.booking_overtime[-1] or False
+                if not new_booking_overtime.request_overtime_id.start_date or not new_booking_overtime.request_overtime_id.end_date:
+                    raise ValidationError(_("Please update plan (start date and end date) for Request Overtime."))
 
                 # Validation assigned member
                 if new_booking_overtime.user_id.id in record.booking_overtime[:-1].user_id.ids:
@@ -166,6 +168,10 @@ class HrRequestOverTime(models.Model):
     @api.constrains('start_date', 'end_date')
     def _validate_plan_overtime(self):
         for record in self:
+            # Raise if project missing plan
+            if not record.project_id.date_start or not record.project_id.date:
+                raise ValidationError(_("Please update plan (start date and end date) for Project."))
+
             if record.start_date > record.end_date:
                 raise ValidationError(_("Start Date must be smaller than End Date"))
             # Validation Plan Date Overtime must be within the duration of the project
