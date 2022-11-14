@@ -333,7 +333,7 @@ class ProjectManagementHistory(models.Model):
                             ((pcv.working_day::decimal / pcv.total_working_day)::NUMERIC(6, 4)) AS duration_month,
                             
                             (CASE 
-                                WHEN pcv.members_project_not_intern = 0 OR pcv.total_project_expense = 0
+                                WHEN pcv.members_project_not_intern = 0
                                     THEN pcv.average_cost_company
                                 ELSE (pcv.average_cost_company + ((pcv.total_project_expense::decimal + pcv.result_commission ) / pcv.members_project_not_intern))
                             END)::NUMERIC(20, 4) AS average_cost_project
