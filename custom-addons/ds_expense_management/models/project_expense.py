@@ -97,7 +97,7 @@ class ProjectExpense(models.Model):
             project_expenses = self.search([('company_id', '=', record.company_id.id), ('id', '!=', record.id or record.id.origin)])
             project_ids = project_expenses.project_id.ids
             record.get_domain_projects = json.dumps([('company_id', '=', record.company_id.id), 
-                                                ('department_id', 'in', [False, record.department_id.id]),
+                                                ('department_id', 'in', record.department_id.ids),
                                                 ('id', 'not in', project_ids if len(project_ids) > 0 else [False])])
               
         
