@@ -174,6 +174,7 @@ class ManagerDepartmentHistory(models.Model):
                         effort_rate_month
                     FROM project_planning_booking
                     WHERE department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                        OR department_id IS NULL
                 )
 
                 SELECT

@@ -15,6 +15,11 @@ span[name="rounding_sgd_input"]::after {
     padding-right: 45px;
     font-weight: bold !important;
 }
+
+.custom_table_view .o_td_label{
+    white-space: nowrap;
+}
+
 /* 
 .table_exchange_rate {
     margin-top: 14px;

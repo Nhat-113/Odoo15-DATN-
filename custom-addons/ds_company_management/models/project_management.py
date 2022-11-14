@@ -7,23 +7,6 @@ class ProjectManagement(models.Model):
     _auto = False
     
     
-    def handle_remove_department(self):
-        mirai_fnb_department_id = self.env['hr.department'].sudo().search([('name', '=', 'Mirai FnB')])
-        department_ids = self.get_all_department_children(mirai_fnb_department_id.ids, [])
-        department_ids += mirai_fnb_department_id.ids
-        if len(department_ids) == 0:
-            department_ids += [0, 0]
-        return department_ids
-    
-    def get_all_department_children(self, parent_id, list_departments):
-        child_departments = self.env['hr.department'].sudo().search([('parent_id', 'in', parent_id)])
-        
-        if child_departments:
-            list_departments += child_departments.ids
-            return self.get_all_department_children(child_departments.ids, list_departments)
-        else:
-            return list_departments
-    
     def init(self):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
@@ -38,7 +21,9 @@ class ProjectManagement(models.Model):
                         pr.date_start,
                         pr.date AS date_end,
                         pr.last_update_status AS status,
-                        est.project_type_id,
+                        pr.stage_id,
+                        pps.name AS stage_name,
+                        pr.project_type AS project_type_id,
                         est.currency_id,
                         ec.name AS est_currency_name,
                         pem.expense_vnd AS project_cost,
@@ -59,6 +44,8 @@ class ProjectManagement(models.Model):
                         ON ec.id = est.currency_id
                     LEFT JOIN estimation_status AS es
                         ON es.id = est.stage
+                    LEFT JOIN project_project_stage AS pps
+		                ON pps.id = pr.stage_id
                     WHERE (EXTRACT(MONTH FROM pr.date_start) < EXTRACT(MONTH FROM CURRENT_DATE)
                         AND EXTRACT(YEAR FROM pr.date_start) = EXTRACT(YEAR FROM CURRENT_DATE))
                         OR EXTRACT(YEAR FROM pr.date_start) < EXTRACT(YEAR FROM CURRENT_DATE)
@@ -72,6 +59,8 @@ class ProjectManagement(models.Model):
                         pr.date_start,
                         date_end,
                         status,
+                        stage_id,
+                        stage_name,
                         est.stage,
                         est.total_cost,
                         est.currency_id,
@@ -90,6 +79,8 @@ class ProjectManagement(models.Model):
                             pem.date_start,
                             pem.date_end,
                             pem.status,
+                            pem.stage_id,
+                            pem.stage_name,
                             --- Handling when value is null ---
                             (SELECT COALESCE(NULLIF(pem.project_cost, NULL), 0)) AS project_cost,
 
@@ -120,12 +111,14 @@ class ProjectManagement(models.Model):
                                 WHEN pem.total_cost <> 0 
                                     THEN 'estimation'
                                 ELSE 'null'
-                            END) AS revenue_from
+                            END) AS revenue_from,
+                            prm.total_commission::NUMERIC(20, 4)
 
                         FROM project_estimation_merged AS pem
                         LEFT JOIN project_revenue_management AS prm
                             ON pem.project_id = prm.project_id
-                        WHERE pem.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                        WHERE pem.department_id NOT IN (SELECT department_id FROM department_mirai_fnb) 
+                            OR pem.department_id IS NULL
                     )
                     SELECT
                         ROW_NUMBER() OVER(ORDER BY project_id ASC) AS id,
@@ -137,8 +130,11 @@ class ProjectManagement(models.Model):
                         pmc.date_start,
                         pmc.date_end,
                         pmc.status,
+                        pmc.stage_id,
+                        pmc.stage_name,
                         pmc.project_cost,
                         pmc.revenue,
+                        pmc.total_commission,
                         pmc.revenue_from,
                         he.user_id AS user_login,
                         ru.id AS sub_user_login,
@@ -173,10 +169,13 @@ class ProjectManagementData(models.Model):
     date_start = fields.Date(string='Start')
     date_end = fields.Date(string='End')
     status = fields.Char(string='Status')
+    stage_id = fields.Many2one('project.project.stage', string="Stage")
+    stage_name = fields.Char(string='Stage Name')
     
     # bonus = fields.Float(string="Bonus")
     revenue = fields.Float(string="Revenue")
-    project_cost = fields.Float(string="Project Cost")
+    total_commission = fields.Float(string="Total Commission")
+    project_cost = fields.Float(string="Prj Expenses")
     
     last_update_color = fields.Integer(related='project_id.last_update_color', store=False)
     count_members = fields.Float(string='Effort(MM)', digits=(12,3))

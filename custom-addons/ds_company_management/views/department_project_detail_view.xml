@@ -36,10 +36,12 @@
                 <field name="working_day"/>
                 <field name="total_members" sum="Total Members"/>
                 <field name="total_salary" sum="Total Salary Cost" widget="monetary"/>
-                <field name="total_project_cost" sum="Total Project Cost" widget="monetary"/>
+                <field name="total_project_cost" sum="Total Prj Expenses" widget="monetary"/>
                 <field name="total_revenue" sum="Total Revenue" widget="monetary"/>
+                <field name="total_commission" sum="Total commission" widget="monetary"/>
                 <field name="total_profit" sum="Total Profit" widget="monetary"/>
                 <field name="profit_margin" avg="Average profit margin" width="126px"/>
+                <field name="total_avg_operation_project" sum="Total average cost project all member" optional="hide" widget="monetary"/>
                 <field name="currency_id" invisible="1"/>
                 <field name="project_management_id" invisible="1"/>
                 <button name="get_detail_project_management" type="object" string="Detail" class="btn btn-primary"/>

@@ -1,3 +1,4 @@
+import calendar
 from datetime import date
 import json
 from random import randint
@@ -270,22 +271,35 @@ class Project(models.Model):
         readonly=True,
         store=False,
     )
-    project_type = fields.Many2one('project.type', string="Project Type", readonly=False, compute='_compute_project_type', store=True, required=True)
+    project_type = fields.Many2one('project.type', string="Project Type", readonly=False, store=True, required=True, tracking=True)
     partner_id = fields.Many2one('res.partner', string='Customer', auto_join=True, tracking=True, domain="[('is_company', '=', True)]")
+    
+    check_estimation = fields.Char(string='Check estimation')
 
-    @api.depends('estimation_id', 'estimation_id.project_type_id')
-    def _compute_project_type(self):
-        for record in self:
-            if record.estimation_id.project_type_id.id:
-                record.project_type = record.estimation_id.project_type_id.id
-            else:
-                record.project_type = False
+    # @api.depends('estimation_id', 'estimation_id.project_type_id')
+    # def _compute_project_type(self):
+    #     for record in self:
+    #         if record.estimation_id.project_type_id.id:
+    #             record.project_type = record.estimation_id.project_type_id.id
+    #         else:
+    #             record.project_type = False
 
-    @api.constrains('project_type')
-    def _validation_project_type(self):
-        for record in self:
-            if record.estimation_id.project_type_id.id and record.project_type.id != record.estimation_id.project_type_id.id:
-                raise UserError ('Project Type of Project does not match with Project Type of Estimation')
+    # @api.constrains('project_type')
+    # def _validation_project_type(self):
+    #     for record in self:
+    #         if record.estimation_id.project_type_id.id and record.project_type.id != record.estimation_id.project_type_id.id:
+    #             raise UserError ('Project Type of Project does not match with Project Type of Estimation')
+    
+    @api.onchange('estimation_id')
+    def get_project_type(self):
+        if self.estimation_id:
+            self.project_type = self.estimation_id.project_type_id
+            self.check_estimation = self.estimation_id.number
+        else:
+            self.check_estimation = False
+            project_db = self.search([('id', '=', self.id or self.id.origin)])
+            if project_db:
+                self.project_type = project_db.project_type
 
 
     @api.depends('last_update_status')
@@ -380,7 +394,28 @@ class Project(models.Model):
                 [('id', 'in', user_ids)]
             )
 
-    
+    @api.constrains('date', 'date_start')
+    def check_edit_time(self):
+        for project in self:
+            list_dates = []
+
+            project_revenues = self.env['project.revenue.value'].sudo().search([('project_id', '=', project.id)])
+            for project_revenue in project_revenues:
+                list_dates.append(date(int(project_revenue.get_year), int(project_revenue.get_month), 1))
+            
+            project_expenses = self.env['project.expense.value'].sudo().search([('project_id', '=', project.id), ('project_expense_management_id', '!=', False)])
+            for project_expense in project_expenses:
+                list_dates.append(project_expense.expense_date)
+
+            if len(list_dates) > 0:
+                date_firstly = min(list_dates)
+                date_final = max(list_dates)
+
+                if project.date_start > date_firstly or project.date < date_final:
+                    raise UserError(_('Invalid time. Cannot set duration of project outside the time set in Company Expenses (%(start)s --> %(end)s).',
+                                            start=date_firstly, end=date_final))
+
+
 class ProjectUpdate(models.Model):
     _inherit = 'project.update'
 

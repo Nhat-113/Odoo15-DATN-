@@ -5,9 +5,9 @@
         <field name="model">project.expense.management</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="project_id"/>
-                <field name="department_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
+                <field name="department_id"/>
+                <field name="project_id"/>
                 <field name="expense_vnd" sum="Total expense"/>
                 <field name="description"/>
                 <field name="user_subceo" invisible="1"/>
@@ -25,9 +25,9 @@
                 <sheet>
                     <group name="group_top">
                         <group name="group_left">
-                            <field name="company_id" groups="base.group_multi_company"/>
-                            <field name="project_id" domain='get_domain_projects' attrs="{'readonly': [('company_id', '=', False)]}"/>
-                            <field name="department_id" attrs="{'invisible': [('project_id','=',False)]}"/>
+                            <field name="company_id" groups="base.group_multi_company" options="{'m2o_dialog': False,'no_create': True, 'no_open': True}"/>
+                            <field name="department_id" options="{'m2o_dialog': False,'no_create': True, 'no_open': True}"/>
+                            <field name="project_id" domain='get_domain_projects' attrs="{'readonly': [('company_id', '=', False)]}" options="{'m2o_dialog': False,'no_create': True, 'no_open': True}"/>
                             <label for="start_date" string="Duration" attrs="{'invisible': [('project_id','=',False)]}"/>
                             <div class="o_row" attrs="{'invisible': [('project_id','=',False)]}">
                                 <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}' readonly="1"/>
@@ -51,6 +51,7 @@
                             <!-- <field name="currency_usd" invisible="1"/>
                             <field name="currency_jpy" invisible="1"/>
                             <field name="currency_sgd" invisible="1"/> -->
+                            <field name="name_alias" invisible="1"/>
                             <field name="currency_vnd" invisible="1"/>
                             <field name="get_currency_name" invisible="1"/>
                             <field name="user_subceo" invisible="1"/>
@@ -82,6 +83,7 @@
                                                             'readonly': [('parent.get_currency_name', '!=', 'VND')]}"/>
 
                                     <field name="description"/>
+                                    <field name="department_id" invisible="1"/>
                                     <field name="project_id" invisible="1"/>
                                     <field name="currency_id" invisible="1"/>
                                     <field name="currency_vnd" invisible="1"/>

@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 import json
 
 
@@ -7,17 +7,18 @@ class ProjectExpense(models.Model):
     _name = "project.expense.management"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Project Expense Management"
-    _rec_name = "project_id"
+    _rec_name = "name_alias"
     _order = "project_id DESC"
     
     
     def _get_default_currency(self, type_currency):
         return self.env['res.currency'].search([('name', '=', type_currency)])
 
+    name_alias = fields.Char(string="Name Alias", compute='_compute_name_alias', store=True)
     
     company_id = fields.Many2one('res.company', string="Company", required=True, default=lambda self: self.env.company, tracking=True)
-    project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True)
-    department_id = fields.Many2one("hr.department", string="Department", related='project_id.department_id', store=True)
+    project_id = fields.Many2one('project.project', string="Project",  tracking=True)
+    department_id = fields.Many2one("hr.department", string="Department", required=True, store=True, readonly=False, domain="[('company_id', '=', company_id)]")
     user_pm = fields.Many2one('res.users', string="Div manager", related='department_id.manager_id.user_id', store=True)
     user_subceo = fields.Char(string='Sub CEO email', store=True, related='company_id.user_email')
     start_date = fields.Date(string="Start date", related='project_id.date_start', store=True)
@@ -47,67 +48,67 @@ class ProjectExpense(models.Model):
     
     
     
-    @api.depends('company_id')
+    # Remove option in filters, group by from dropdown Search action in formview
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        field_disable = ['user_pm', 'name_alias', 'user_subceo', 'currency_vnd', 'currency_id', 'get_currency_name']
+        result = super(ProjectExpense, self).fields_get(allfields, attributes=attributes)
+        
+        for field in field_disable:
+            if field in result:
+                result[field].update({
+                    'selectable': False,
+                    'exportable': False,
+                    'searchable': False,
+                    'sortable': False
+                })
+          
+        return result
+    
+    
+    @api.depends('department_id', 'project_id')
+    def _compute_name_alias(self):
+        for record in self:
+            if record.project_id:
+                record.name_alias = record.project_id.name
+            else:
+                record.name_alias = record.department_id.name
+                
+                
+    @api.onchange('department_id')
+    def _validate_project_department(self):
+        if self.department_id:
+            if self.project_id:
+                if self.project_id.department_id.id not in [self.department_id.id, False]:
+                    self.project_id = False
+                    self.project_expense_value_ids = False
+                
+            else:
+                expense_db = self.env['project.expense.value'].search([('project_expense_management_id', '=', self.id or self.id.origin), 
+                                                                       ('department_id', '=', self.department_id.id),
+                                                                       ('project_id', 'in', [False])])
+                self.project_expense_value_ids = expense_db
+                
+    
+    
+    @api.depends('company_id', 'department_id')
     def _get_domain_project(self):
         for record in self:
             project_expenses = self.search([('company_id', '=', record.company_id.id), ('id', '!=', record.id or record.id.origin)])
-            if project_expenses:
-                project_ids = [item.project_id.id for item in project_expenses]
-            else:
-                project_ids = []
+            project_ids = project_expenses.project_id.ids
             record.get_domain_projects = json.dumps([('company_id', '=', record.company_id.id), 
-                                                    ('id', 'not in', project_ids if len(project_ids) > 0 else [False])])
+                                                ('department_id', 'in', record.department_id.ids),
+                                                ('id', 'not in', project_ids if len(project_ids) > 0 else [False])])
               
         
     @api.onchange('company_id')
     def _compute_project_company(self):
-        if self.project_id.company_id.id != self.company_id.id:
-            self.project_id = False
-            self.project_expense_value_ids = False
+        if self.company_id and self.department_id:
+            if self.department_id.company_id.id not in [self.company_id.id, False]:
+                self.department_id = False
+                self.project_id = False
+                self.project_expense_value_ids = False
               
-    
-    # @api.depends('total_expenses', 'rounding_usd_input', 'rounding_jpy_input', 'rounding_sgd_input', 'currency_id')
-    # def _convert_currency_revenue(self):
-    #     for record in self:
-    #         # record.get_currency_name = record.currency_id.name
-    #         if record.total_expenses != 0.0:
-    #             if record.currency_id.name == 'VND':
-    #                 record.expense_vnd = record.total_expenses
-    #                 if record.rounding_usd_input != 0.0:
-    #                     record.expense_usd = record.total_expenses / record.rounding_usd_input
-    #                 else:
-    #                     record.expense_usd = 0
-    #                 if record.rounding_jpy_input != 0.0:
-    #                     record.expense_jpy = record.total_expenses / record.rounding_jpy_input
-    #                 else:
-    #                     record.expense_jpy = 0
-    #                 if record.rounding_sgd_input != 0.0:
-    #                     record.expense_sgd = record.total_expenses / record.rounding_sgd_input
-    #                 else:
-    #                     record.expense_sgd = 0 
-                        
-    #             elif record.currency_id.name == 'JPY':   
-    #                 record.expense_jpy = record.total_expenses
-    #                 record.expense_vnd = record.total_expenses * record.rounding_jpy_input
-    #                 # if record.rounding_usd_input != 0:
-    #                 #     record.expense_usd = record.expense_vnd / record.rounding_usd_input
-    #                 # else:
-    #                 #     record.expense_usd = 0
-                    
-    #             elif record.currency_id.name == 'SGD':
-    #                 record.expense_sgd = record.total_expenses
-    #                 record.expense_vnd = record.total_expenses * record.rounding_sgd_input
-                    
-    #             else:
-    #                 record.expense_usd = record.total_expenses
-    #                 record.expense_vnd = record.total_expenses * record.rounding_usd_input
-    #                 # record.expense_jpy = record.expense_vnd * record.rounding_jpy_input
-    #         else:
-    #             record.expense_usd = 0
-    #             record.expense_jpy = 0
-    #             record.expense_sgd = 0
-    #             record.expense_vnd = 0
-    
             
     @api.depends('project_expense_value_ids.total_expenses', 'project_expense_value_ids.expense_vnd')
     def _compute_total_expense(self):
@@ -127,13 +128,32 @@ class ProjectExpense(models.Model):
         # if project_costs != 0:
         #    raise UserError(_('The project cost "%(project)s" already exists!', project = self.project_id.name))
         # else:
-        get_datas = self.env['project.expense.value'].search([('project_expense_management_id', 'in', [self.id or self.id.origin, False]),
-                                                            ('project_id', '=', self.project_id.id)])
-        
-        self.project_expense_value_ids = get_datas
-        for record in self.project_expense_value_ids:
-            if record.expense_date > self.project_id.date or record.expense_date < self.project_id.date_start:
-                record.write({'project_expense_management_id': [(2, self.id or self.id.origin)]})
+        if self.id or self.id.origin:
+            if self.project_id:
+                get_datas = self.env['project.expense.value'].search([('project_expense_management_id', '=', self.id or self.id.origin),
+                                                                    ('project_id', '=', self.project_id.id)])
+                
+                self.project_expense_value_ids = get_datas
+                for record in self.project_expense_value_ids:
+                    if record.expense_date > self.project_id.date or record.expense_date < self.project_id.date_start:
+                        record.write({'project_expense_management_id': [(2, self.id or self.id.origin)]})
+            
+            else:
+                department_expense_db = self.env['project.expense.value'].search([('project_expense_management_id', '=', self.id or self.id.origin),
+                                                                    ('department_id', '=', self.department_id.id)])
+                self.project_expense_value_ids = department_expense_db
+                    
+                    
+    @api.constrains('department_id', 'project_id')
+    def validate_department_unique(self):
+        for record in self:
+            if not record.project_id:
+                department_expenses = self.search([('company_id', '=', record.company_id.id), 
+                                                ('project_id', 'in', [False]), 
+                                                ('department_id', '=', record.department_id.id),
+                                                ('id', '!=', record.id or record.id.origin)])
+                if department_expenses:
+                    raise ValidationError(_('Department expenses "%s" already exists!', record.department_id.name))
                     
                     
     def unlink(self):
@@ -149,6 +169,7 @@ class ProjectExpenseValue(models.Model):
     
     project_expense_management_id = fields.Many2one('project.expense.management', string="Project Expense Management")
     project_id = fields.Many2one('project.project', string="Project", related='project_expense_management_id.project_id', store=True)
+    department_id = fields.Many2one("hr.department", string="Department", store=True, related='project_expense_management_id.department_id')
     currency_id = fields.Many2one('res.currency', string="Currency", related='project_expense_management_id.currency_id', store=True)
     
     name = fields.Char(string="Expense name", required=True)
@@ -158,7 +179,7 @@ class ProjectExpenseValue(models.Model):
     
     exchange_rate = fields.Float(string="Exchange Rate")
     expense_vnd = fields.Monetary(string="Total Revenue (VND)", currency_field='currency_vnd', compute='_compute_total_expense', store=True)
-    currency_vnd = fields.Many2one('res.currency', string="VND Currency", related='project_expense_management_id.currency_vnd', readonly=True)   
+    currency_vnd = fields.Many2one('res.currency', string="VND Currency", related='project_expense_management_id.currency_vnd', readonly=True, store=True)   
     
     
     @api.onchange('expense_date')

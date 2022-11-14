@@ -33,11 +33,12 @@ class UpgradeAction(models.Model):
         department_ids = self.handle_remove_department()
         self.env['department.mirai.fnb'].sudo().search([]).unlink()
         if len(department_ids) > 0:
-            for record in department_ids:
-                self.env['department.mirai.fnb'].create({'department_id': record})
-
+            for dp_id in department_ids:
+                self.env['department.mirai.fnb'].create({'department_id': dp_id})
+                
         user_update = str(self.env.user.id)
-        all_query = self.query_project_management(user_update) +\
+        all_query = self.query_delete_project_expense_value_generate() +\
+                    self.query_project_management(user_update) +\
                     self.query_project_management_history(user_update) +\
                     self.query_project_management_member(user_update) +\
                     self.query_project_management_member_detail(user_update) +\
@@ -48,12 +49,52 @@ class UpgradeAction(models.Model):
         self.env.cr.execute(all_query)
         
         # get default project_management_id for project cost management [Company expense]
-        project_expenses = self.env['project.expense.value'].sudo().search([])
+        project_expenses = self.env['project.expense.value'].sudo().search([('project_id', '!=', False)])
+        project_managements = self.env['project.management.data'].sudo().search([('project_id', 'in', project_expenses.project_id.ids)])
+        
+        department_expenses = self.env['project.expense.value'].sudo().search([('project_id', '=', False)])
+        project_departments = self.env['project.management.data'].sudo().search([('department_id', 'in', department_expenses.department_id.ids)]) #, ('stage_name', '!=', 'Done')
         for record in project_expenses:
-            record.project_management_id = self.env['project.management.data'].search([('project_id', '=', record.project_id.id)]).id
+            for pm in project_managements:
+                if record.project_id.id == pm.project_id.id:
+                    record.project_management_id = pm.id
+                    
+        for pm in project_departments:
+            for expense in department_expenses:
+                if expense.expense_date >= pm.project_id.date_start and expense.expense_date <= pm.project_id.date:
+                    cnt = self.compute_count_project_department_expense(project_departments, expense.expense_date)
+                    # cnt = sum(1 for prj in project_departments if expense.expense_date >= prj.project_id.date_start and expense.expense_date <= prj.project_id.date)
+                    vals = {
+                        'name': expense.name,
+                        'expense_date': expense.expense_date,
+                        'total_expenses': expense.total_expenses / cnt,
+                        'exchange_rate': expense.exchange_rate,                    
+                        'expense_vnd': expense.exchange_rate * expense.total_expenses / cnt
+                    }
+                    
+                    vals_update = {
+                        'project_management_id': pm.id,
+                        'currency_id': expense.currency_id.id,
+                        'currency_vnd': expense.currency_vnd.id,
+                        'project_id': pm.project_id.id,
+                        'department_id': pm.department_id.id
+                    }
+                    
+                    #because project_expense_value, fields in vals_update using related with project_expense_management,
+                    # so can't create them -> using write method to update them
+                    result = self.env['project.expense.value'].sudo().create(vals)
+                    result.sudo().write(vals_update)
+        
         return
         # return {'type': 'ir.actions.client', 'tag': 'reload'}
-    
+        
+        
+    def compute_count_project_department_expense(self, projects, expense_date):
+        cnt = 0
+        for prj in projects:
+            if expense_date >= prj.project_id.date_start and expense_date <= prj.project_id.date:
+                cnt += 1
+        return cnt
 
     def query_project_management(self, user_update):
         return """
@@ -72,11 +113,14 @@ class UpgradeAction(models.Model):
                         date_start, 
                         date_end, 
                         status, 
+                        stage_id,
+                        stage_name,
                         count_members, 
                         total_salary, 
                         profit, 
                         project_cost, 
                         revenue, 
+                        total_commission,
                         profit_margin,
                         create_uid, 
                         write_uid, 
@@ -96,11 +140,21 @@ class UpgradeAction(models.Model):
                     pm.date_start,
                     pm.date_end,
                     pm.status,
+                    stage_id,
+                    stage_name,
                     phg.total_members AS count_members,
                     phg.total_salary AS total_salary,
                     phg.total_profit AS profit,
-                    pm.project_cost,
+                    --(CASE
+                        --WHEN pdc.counts = 0 OR pdc.counts IS NULL OR pdc.total_project_expense IS NULL
+                            --THEN pm.project_cost
+                        --ELSE
+                            --(pm.project_cost + (pdc.total_project_expense / pdc.counts))
+                    --end) project_cost,
+                    
+                    pdc.total_project_expense AS project_cost,
                     pm.revenue,
+                    pm.total_commission,
                     (CASE
                         WHEN pm.revenue = 0
                             THEN 0
@@ -113,7 +167,18 @@ class UpgradeAction(models.Model):
 
                 FROM project_management AS pm
                 LEFT JOIN project_history_group_temp AS phg
-                    ON phg.project_management_id = pm.id;
+                    ON phg.project_management_id = pm.id
+                LEFT JOIN (
+                            SELECT
+                                project_id,
+                                sum(total_project_expense) AS total_project_expense
+
+                            FROM project_management_history
+                            GROUP BY project_id
+                    
+                    ) AS pdc
+	                ON pdc.project_id = pm.project_id;
+                    
        
             """
            
@@ -127,6 +192,7 @@ class UpgradeAction(models.Model):
                         project_management_id,
                         currency_id,
                         months,
+                        months_domain,
                         month_start,
                         month_end,
                         working_day,
@@ -134,10 +200,12 @@ class UpgradeAction(models.Model):
                         operation_cost,
                         average_cost_company,
                         average_cost_project,
+                        total_avg_operation_project,
                         members,
                         all_members,
                         total_salary,
                         revenue,
+                        total_commission,
                         profit,
                         profit_margin,
                         create_uid,
@@ -150,6 +218,7 @@ class UpgradeAction(models.Model):
                     project_management_id,
                     currency_id,
                     months,
+                    months_domain,
                     month_start,
                     month_end,
                     working_day,
@@ -157,10 +226,12 @@ class UpgradeAction(models.Model):
                     operation_cost,
                     average_cost_company,
                     average_cost_project,
+                    total_avg_operation_project,
                     members,
                     all_members,
                     total_salary,
                     revenue,
+                    total_commission,
                     profit,
                     profit_margin,
                     """ + user_update + """,
@@ -281,6 +352,7 @@ class UpgradeAction(models.Model):
                         user_pm,
                         currency_id,
                         months,
+                        months_domain,
                         month_start,
                         month_end,
                         working_day,
@@ -288,6 +360,8 @@ class UpgradeAction(models.Model):
                         total_salary,
                         total_project_cost,
                         total_revenue,
+                        total_commission,
+                        total_avg_operation_project,
                         total_profit,
                         profit_margin,
                         create_uid,
@@ -304,6 +378,7 @@ class UpgradeAction(models.Model):
                     user_pm,
                     currency_id,
                     months,
+                    months_domain,
                     month_start,
                     month_end,
                     working_day,
@@ -311,6 +386,8 @@ class UpgradeAction(models.Model):
                     total_salary,
                     total_project_cost,
                     total_revenue,
+                    total_commission,
+                    total_avg_operation_project,
                     total_profit,
                     profit_margin,
                     """ + user_update + """,
@@ -338,6 +415,7 @@ class UpgradeAction(models.Model):
                         total_salary,
                         total_project_cost,
                         total_revenue,
+                        total_commission,
                         total_profit,
                         profit_margin,
                         user_login,
@@ -358,6 +436,7 @@ class UpgradeAction(models.Model):
                     total_salary,
                     total_project_cost,
                     total_revenue,
+                    total_commission,
                     total_profit,
                     (CASE
                         WHEN total_revenue = 0
@@ -390,6 +469,7 @@ class UpgradeAction(models.Model):
                         total_salary,
                         total_project_cost,
                         total_revenue,
+                        total_commission,
                         total_profit,
                         profit_margin,
                         create_uid,
@@ -409,6 +489,7 @@ class UpgradeAction(models.Model):
                     total_salary,
                     total_project_cost,
                     total_revenue,
+                    total_commission,
                     total_profit,
                     (CASE
                         WHEN total_revenue = 0
@@ -421,4 +502,11 @@ class UpgradeAction(models.Model):
                     CURRENT_DATE
                 FROM project_management_ceo;
        
+            """
+            
+            
+    def query_delete_project_expense_value_generate(self):
+        return """
+            DELETE FROM project_expense_value 
+                    WHERE project_expense_management_id IS NULL;
             """

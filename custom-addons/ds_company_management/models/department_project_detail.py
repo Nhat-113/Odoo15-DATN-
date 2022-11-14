@@ -16,6 +16,7 @@ class DepartmentProjectDetail(models.Model):
                     pmh.company_id,
                     pm.user_pm,
                     (CONCAT((EXTRACT(YEAR FROM pmh.month_start))::text, ' ', TO_CHAR(pmh.month_start, 'Month'))) AS months,
+                    pmh.months_domain,
                     pmh.month_start,
                     pmh.month_end,
                     pmh.working_day,
@@ -23,6 +24,8 @@ class DepartmentProjectDetail(models.Model):
                     pmh.members AS total_members,
                     pmh.total_salary,
                     pmh.revenue AS total_revenue,
+                    pmh.total_commission,
+                    pmh.total_avg_operation_project,
                     pmh.profit AS total_profit,
                     pmh.profit_margin,
                     pmh.currency_id,
@@ -49,13 +52,16 @@ class DepartmentProjectDetailData(models.Model):
     user_pm = fields.Many2one('res.users', string="PM")
     currency_id = fields.Many2one('res.currency', string="Currency")
     months = fields.Char(string="Month")
+    months_domain = fields.Date(string="Month domain")
     month_start = fields.Date(string="Start")
     month_end = fields.Date(string="End")
     working_day = fields.Float(string="Working Day")
     total_members = fields.Float(string='Effort(MM)', digits=(12,3))
     total_salary = fields.Float(string="Salary Cost")
-    total_project_cost = fields.Float(string="Project Cost")
+    total_project_cost = fields.Float(string="Prj Expenses")
     total_revenue = fields.Float(string="Revenue")
+    total_avg_operation_project = fields.Float(string="Total Avg Operation Project")
+    total_commission = fields.Float(string="Commission")
     total_profit = fields.Float(string="Profit")
     profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2), help="Profit Margin = profit / revenue * 100")
     
