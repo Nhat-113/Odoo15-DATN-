@@ -90,7 +90,8 @@ class ProjectManagementHistory(models.Model):
                         ppb.months,
                         (SUM(ppb.man_month)) AS total_members
                     FROM project_planning_booking AS ppb
-                        WHERE ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                        WHERE ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb) 
+                            OR ppb.department_id IS NULL
                     GROUP BY company_id,
                             project_id,
                             months
@@ -106,7 +107,8 @@ class ProjectManagementHistory(models.Model):
                     FROM project_planning_booking AS ppb
                     WHERE (ppb.member_type_name NOT IN ('Intern', 'intern') 
                             OR ppb.member_type_name IS NULL)
-                            AND ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                            AND (ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                                    OR ppb.department_id IS NULL)
                     GROUP BY company_id,
                             project_id,
                             months
@@ -122,7 +124,8 @@ class ProjectManagementHistory(models.Model):
                     FROM project_planning_booking AS ppb
                     WHERE (ppb.member_type_name NOT IN ('Intern', 'intern') 
                             OR ppb.member_type_name IS NULL)
-                            AND ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                            AND (ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                                OR ppb.department_id IS NULL)
                     GROUP BY company_id, months
                 ),
 
@@ -213,7 +216,8 @@ class ProjectManagementHistory(models.Model):
                     FROM project_planning_booking 
                     WHERE (member_type_name NOT IN('Intern', 'intern')
                             OR member_type_name IS NULL)
-                        AND department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                        AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                            OR department_id IS NULL)
                     GROUP BY company_id,
                             project_id,
                             months
@@ -389,8 +393,7 @@ class ProjectManagementHistory(models.Model):
                         (CONCAT((EXTRACT(YEAR FROM cpr.month_start))::text, ' ', TO_CHAR(cpr.month_start, 'Month'))) AS months,
                         (cpr.revenue - (cpr.members_project_not_intern 
                                         * cpr.average_cost_project 
-                                        + cpr.total_salary
-                                        + cpr.total_commission)
+                                        + cpr.total_salary)
                         ) AS profit,
                         (CASE
                             WHEN cpr.revenue = 0

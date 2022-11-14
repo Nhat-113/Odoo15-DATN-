@@ -47,7 +47,8 @@ class ProjectMemberManagement(models.Model):
                 LEFT JOIN hr_employee AS he
                         ON he.id = ppd.employee_id
                         
-                WHERE ppd.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                WHERE ppd.department_id NOT IN (SELECT department_id FROM department_mirai_fnb) 
+                    OR ppd.department_id IS NULL
                         
             )""" % (self._table)
         )

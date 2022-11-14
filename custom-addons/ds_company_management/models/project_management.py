@@ -117,7 +117,8 @@ class ProjectManagement(models.Model):
                         FROM project_estimation_merged AS pem
                         LEFT JOIN project_revenue_management AS prm
                             ON pem.project_id = prm.project_id
-                        WHERE pem.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                        WHERE pem.department_id NOT IN (SELECT department_id FROM department_mirai_fnb) 
+                            OR pem.department_id IS NULL
                     )
                     SELECT
                         ROW_NUMBER() OVER(ORDER BY project_id ASC) AS id,
