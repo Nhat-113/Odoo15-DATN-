@@ -144,15 +144,16 @@ class ProjectExpense(models.Model):
                 self.project_expense_value_ids = department_expense_db
                     
                     
-    @api.constrains('department_id')
+    @api.constrains('department_id', 'project_id')
     def validate_department_unique(self):
         for record in self:
-            department_expenses = self.search([('company_id', '=', record.company_id.id), 
-                                              ('project_id', 'in', [False]), 
-                                              ('department_id', '=', record.department_id.id),
-                                              ('id', '!=', record.id or record.id.origin)])
-            if department_expenses and not record.project_id:
-                raise ValidationError(_('Department expenses "%s" already exists!', record.department_id.name))
+            if not record.project_id:
+                department_expenses = self.search([('company_id', '=', record.company_id.id), 
+                                                ('project_id', 'in', [False]), 
+                                                ('department_id', '=', record.department_id.id),
+                                                ('id', '!=', record.id or record.id.origin)])
+                if department_expenses:
+                    raise ValidationError(_('Department expenses "%s" already exists!', record.department_id.name))
                     
                     
     def unlink(self):
