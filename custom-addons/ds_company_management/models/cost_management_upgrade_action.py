@@ -67,9 +67,9 @@ class UpgradeAction(models.Model):
                     vals = {
                         'name': expense.name,
                         'expense_date': expense.expense_date,
-                        'expense_vnd': expense.expense_vnd / cnt,
-                        'total_expenses': expense.expense_vnd / cnt,
-                        'exchange_rate': expense.exchange_rate                    
+                        'total_expenses': expense.total_expenses / cnt,
+                        'exchange_rate': expense.exchange_rate,                    
+                        'expense_vnd': expense.exchange_rate * expense.total_expenses / cnt
                     }
                     
                     vals_update = {
