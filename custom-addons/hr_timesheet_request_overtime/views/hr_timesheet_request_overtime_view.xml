@@ -121,6 +121,7 @@
                                                 <field name="end_date"/>
                                                 <field name="booking_time_overtime" placeholder="Hour..." required="1"/>
                                                 <field name="actual_overtime" invisible="1"/>
+                                                <field name="duration" string="Duration" width="1" invisible="1"/>
                                                 <field name="project_id" invisible="1"/>
                                             </group>
                                             <separator string="Description"/>
