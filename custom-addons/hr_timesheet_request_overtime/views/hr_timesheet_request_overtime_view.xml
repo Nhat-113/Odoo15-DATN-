@@ -99,7 +99,7 @@
                                         <field name="user_id" widget="many2one_avatar" options="{'no_create': True}" width="1" domain="user_id_domain"/>
                                         <field name="start_date"/>
                                         <field name="end_date"/>
-                                        <field name="duration" string="Duration" width="1"/>
+                                        <field name="duration" string="Duration" width="1" force_save="1"/>
                                         <field name="booking_time_overtime" width="2" required="1"/>
                                         <field name="actual_overtime" width="1"/>
                                         <field name="description"/>

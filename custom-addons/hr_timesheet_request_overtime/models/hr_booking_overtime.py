@@ -266,7 +266,7 @@ class HrBookingOvertime(models.Model):
     end_date = fields.Date(string='End Date', readonly=False, required=True,
                            help="Date on which the member finished overtime on project")
 
-    duration = fields.Integer(compute='_compute_duration', string="Duration (Working day)",
+    duration = fields.Integer(string="Duration (Working day)",
                               readonly=True, help="The duration of working overtime in the project", default=0)
 
     booking_time_overtime = fields.Float(string="Plan (Hours)",
@@ -308,7 +308,7 @@ class HrBookingOvertime(models.Model):
             item.project_id = item.request_overtime_id.project_id
 
 
-    @api.depends('start_date', 'end_date')
+    @api.onchange('start_date', 'end_date')
     def _compute_duration(self):
         """ Calculates duration working time"""
         for record in self:
@@ -326,6 +326,11 @@ class HrBookingOvertime(models.Model):
                     record.duration = working_days if working_days > 0 else 1
                 else:
                     record.duration = 1
+
+            # Raise with datetime not in plan
+            if record.start_date < record.request_overtime_id.start_date or record.end_date > record.request_overtime_id.end_date:
+                    raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime."))
+
 
     def timesheets_overtime_detail_action(self):
         name_view = self.user_id.name
