@@ -27,7 +27,7 @@ span[name="message_warning"] {
     display: block;
     width: 98%;
     overflow-y: scroll;
-    height:calc(100vh - 141px);
+    height:calc(64vh - 141px);
     margin-top: -25px;
     margin: 0 auto;
 }
@@ -334,6 +334,19 @@ button.view-member-free:hover {
     flex-direction: column;
     align-content: space-between;
     justify-content: flex-end;
+}
+.human_resource_template #over-view-table {
+    display: block;
+    overflow-y: scroll;
+    margin-top: -25px;
+    margin: 0 auto;
+    height: auto;
+}
+#over-view-table .over-header {
+    background: #eee !important;
+}
+#over-view-table > tr:nth-child(odd) {
+    background: #FAFAFA;
 }
 /* for desktop screen */
 
