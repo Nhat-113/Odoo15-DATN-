@@ -143,23 +143,6 @@ class HrRequestOverTime(models.Model):
         user_ids = [user.id for user in self.booking_overtime.user_id]
         self.member_ids = self.env['hr.employee'].search([('id', 'in', user_ids)])
 
-    @api.constrains('booking_overtime', 'booking_overtime.date_start', 'booking_overtime.end_date')
-    def validation_booking_member(self):
-        for record in self:
-            if len(record.booking_overtime) > 0:
-                new_booking_overtime = record.booking_overtime[-1]
-
-                if new_booking_overtime.start_date > new_booking_overtime.end_date:
-                    raise ValidationError(_("Start Date must be smaller than End Date."))
-
-                if not new_booking_overtime.request_overtime_id.start_date or not new_booking_overtime.request_overtime_id.end_date:
-                    raise ValidationError(_("Please update plan (start date and end date) for Request Overtime."))
-
-                if new_booking_overtime.start_date < new_booking_overtime.request_overtime_id.start_date or new_booking_overtime.end_date > new_booking_overtime.request_overtime_id.end_date:
-                    raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime."))
-
-                
-                
     @api.depends('start_date', 'end_date')
     def _compute_duration_overtime(self):
         """ Calculates duration working time"""
@@ -171,20 +154,23 @@ class HrRequestOverTime(models.Model):
             else:
                 record.duration_overtime = 1
 
-    @api.constrains('start_date', 'end_date')
+    @api.onchange('start_date', 'end_date')
     def _validate_plan_overtime(self):
-        for record in self:
+        if self.end_date and self.start_date:
             # Raise if project missing plan
-            if not record.project_id.date_start or not record.project_id.date:
+            if not self.project_id.date_start or not self.project_id.date:
                 raise ValidationError(_("Please update plan (start date and end date) for Project."))
 
-            if record.start_date > record.end_date:
+            if self.start_date > self.end_date:
                 raise ValidationError(_("Start Date must be smaller than End Date"))
 
             # Validation Plan Date Overtime must be within the duration of the project
-            if (record.start_date < record.project_id.date_start or record.end_date > record.project_id.date):
+            if (self.start_date < self.project_id.date_start or self.end_date > self.project_id.date):
                     raise ValidationError(_("Plan Date Overtime must be within the duration of the project."))
 
+    @api.constrains('start_date', 'end_date')
+    def _validate_plan_overtime(self):
+        for record in self:
             # Validation Plan Date Overtime not overlap in the same project
             project_request_overtime = self.env['hr.request.overtime'].search([('project_id', '=' ,record.project_id.id),('id','!=' ,record.id)])
             for item in project_request_overtime:

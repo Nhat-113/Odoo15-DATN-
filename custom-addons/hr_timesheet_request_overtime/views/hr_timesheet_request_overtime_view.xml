@@ -56,7 +56,7 @@
                         <group >
                             <field name="active" invisible="1"/>
                             <group name="group_left">
-                                <field name="refuse_reason" attrs="{'invisible': [('active', '=', True)]}" readonly="1"/>
+                                <field name="refuse_reason" attrs="{'invisible': [('active', '=', True)]}" readonly="1" style="color:Red"/>
                                 <field name="read_only_project" invisible="1"/>
                                 <field name="project_id" domain='get_domain_projects' attrs="{'readonly': ['|', ('company_id', '=', False), ('read_only_project','=', True)]}" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}"/>
                                 <field name="get_domain_projects" invisible="1"/>

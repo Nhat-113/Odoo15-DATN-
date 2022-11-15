@@ -51,24 +51,23 @@ class AccountAnalyticLine(models.Model):
 
     @api.onchange('date', 'type_ot', 'type_day_ot')
     def compute_type_overtime_day(self):
-        for record in self:
-            date = record.date
-            public_holiday = self.env['resource.calendar.leaves'].search([('calendar_id','=',False),('holiday_id','=',False), 
-            ('date_from','<=',date),('date_to','>=',date)])
-            if record.type_day_ot != 'other':
-                if public_holiday:
-                    record.type_day_ot = 'holiday'
-                elif  4 < date.weekday() < 7:
-                    record.type_day_ot = 'weekend'
-                else:
-                    record.type_day_ot = 'normal_day'
+        date = self.date
+        public_holiday = self.env['resource.calendar.leaves'].search([('calendar_id','=',False),('holiday_id','=',False), 
+        ('date_from','<=',date),('date_to','>=',date)])
+        if self.type_day_ot != 'other':
+            if public_holiday:
+                self.type_day_ot = 'holiday'
+            elif  4 < date.weekday() < 7:
+                self.type_day_ot = 'weekend'
             else:
-                record.type_day_ot = 'other'
-            
-            if record.type_ot == "no":
-                record.pay_type = False
-            elif record.pay_type == False:
-                record.pay_type = "full_day_off"
+                self.type_day_ot = 'normal_day'
+        else:
+            self.type_day_ot = 'other'
+        
+        if self.type_ot == "no":
+            self.pay_type = False
+        elif self.pay_type == False:
+            self.pay_type = "full_day_off"
 
 
     @api.depends('reason_reject')
@@ -262,9 +261,9 @@ class HrBookingOvertime(models.Model):
     )
 
     start_date = fields.Date(string='Start Date', readonly=False, required=True, help="Date on which the member started working overtime on project",
-                             default=fields.Date.today)
+                             default=fields.Date.today, store=True)
     end_date = fields.Date(string='End Date', readonly=False, required=True,
-                           help="Date on which the member finished overtime on project")
+                           help="Date on which the member finished overtime on project", store=True)
 
     duration = fields.Integer(string="Duration (Working day)",
                               readonly=True, help="The duration of working overtime in the project", default=1, store=True, compute="_compute_duration")
@@ -290,25 +289,11 @@ class HrBookingOvertime(models.Model):
                 [('id', 'in', user_ids)]
             )
 
-    @api.constrains('booking_time_overtime')
-    def _check_value_plan_overtime(self):
-        for record in self:
-            if record.end_date < record.start_date:
-                raise ValidationError(_("Start Date must be smaller than End Date"))
-
-            if record.booking_time_overtime > 999 or record.booking_time_overtime <= 0:
-                raise ValidationError(_('Please enter value Plan Hour between 1-999 (hour).'))
-
-            # Validation Plan Hour (1 day = 24 hour)
-            limit_hour = ((record.end_date - record.start_date).days + 1)*24
-            if record.booking_time_overtime > limit_hour:
-                raise ValidationError(_("Plan Hour must be less {} (Hour).".format(limit_hour)))
             
     @api.onchange("request_overtime_id.stage_id")
     def _compute_stage(self):
-        for item in self:
-            item.read_stage = item.request_overtime_id.stage_id.name
-            item.project_id = item.request_overtime_id.project_id.id
+        self.read_stage = self.request_overtime_id.stage_id.name
+        self.project_id = self.request_overtime_id.project_id.id
 
 
     @api.depends('start_date', 'end_date')
@@ -322,26 +307,44 @@ class HrBookingOvertime(models.Model):
             else:
                 record.duration = 1
             
-    @api.constrains('start_date', 'end_date')
-    def _validation_duration(self):
+    @api.constrains('booking_time_overtime')
+    def _check_value_plan_overtime(self):
         for record in self:
+            if record.end_date and record.start_date:
+                if record.end_date < record.start_date:
+                    raise ValidationError(_("Start Date must be smaller than End Date"))
+
+                if record.booking_time_overtime > 999 or record.booking_time_overtime <= 0:
+                    raise ValidationError(_('Please enter value Plan Hour between 1-999 (hour).'))
+
+                # Validation Plan Hour (1 day = 24 hour)
+                limit_hour = ((record.end_date - record.start_date).days + 1)*24
+                if record.booking_time_overtime > limit_hour:
+                    raise ValidationError(_("Plan Hour must be less {} (Hour).".format(limit_hour)))
+
+    @api.onchange('start_date', 'end_date')
+    def _validation_duration(self):
         # Raise with datetime not in plan
+        if self.end_date and self.start_date:
             # Validation date time
-            if record.start_date > record.end_date:
+            if self.start_date > self.end_date:
                 raise ValidationError(_("Start Date must be smaller than End Date."))
+
+            if not self.request_overtime_id.start_date or not self.request_overtime_id.end_date:
+                    raise ValidationError(_("Please update plan (start date and end date) for Request Overtime."))
                 
-            if (record.start_date and record.end_date)\
-                and (record.start_date < record.request_overtime_id.start_date or record.end_date > record.request_overtime_id.end_date):
+            if (self.start_date < self.request_overtime_id.start_date or self.end_date > self.request_overtime_id.end_date):
                     raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime."))
 
-            # Validation assigned member
-            member_same_booking = self.env['hr.booking.overtime'].search([('request_overtime_id','=', record.request_overtime_id.id), ('user_id','=', record.user_id.id), ('id','!=', record.id)])
-            if member_same_booking:
-                for booking in member_same_booking:
+            # Validation assigned member duplicate plan
+            member_booking = self.request_overtime_id.booking_overtime[:-1]
+            if member_booking:
+                for booking in member_booking:
                     # Validation
-                    if (record.start_date <= booking.start_date and record.end_date >= booking.start_date) or\
-                            (record.start_date <= booking.end_date and record.end_date >= booking.end_date) or\
-                            (record.start_date >= booking.start_date and record.end_date <= booking.end_date):
+                    if (self.user_id.id==booking.user_id.id) and \
+                        ((self.start_date <= booking.start_date and self.end_date >= booking.start_date) or\
+                            (self.start_date <= booking.end_date and self.end_date >= booking.end_date) or\
+                                (self.start_date >= booking.start_date and self.end_date <= booking.end_date)):
                         raise ValidationError(_("The user is booking OT for this day, please re-check."))
 
 
