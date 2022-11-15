@@ -31,7 +31,7 @@ class DashboardBlock(models.Model):
     @api.model
     def get_position_employee(self):
         selected_companies = self.get_current_company_value(); 
-        id_all_mirai_department = self.env['project.management'].handle_remove_department()
+        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
 
         cr = self._cr
         sql = """SELECT  hr_job.name, count(*)  FROM hr_employee
@@ -57,7 +57,7 @@ class DashboardBlock(models.Model):
     @api.model
     def get_project_status(self):
         selected_companies = self.get_current_company_value(); 
-        id_all_mirai_department = self.env['project.management'].handle_remove_department()
+        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
 
         cr = self._cr
         sql = """SELECT last_update_status, count(*)  FROM project_project WHERE  company_id IN  """ + str(tuple(selected_companies)) + """ """
@@ -83,7 +83,7 @@ class DashboardBlock(models.Model):
         cr = self._cr
         
         sql_domain_for_company = 'WHERE ( company_id IN ' + str(tuple(selected_companies)) + ' OR company_project_id in ' + str(tuple(selected_companies)) + ')'
-        id_all_mirai_department = self.env['project.management'].handle_remove_department()
+        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
 
         sql_domain_for_department = ' AND (human_resource_management.department_id NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )' 
         # sql_domain_for_project_department = ' and (human_resource_management.department_id not in ' + str(tuple(id_all_mirai_department)) + ' or human_resource_management.department_id is null )' 
@@ -133,7 +133,7 @@ class DashboardBlock(models.Model):
     @api.model
     def get_contract_type(self):
 
-        id_all_mirai_department = self.env['project.management'].handle_remove_department()
+        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
         selected_companies = self.get_current_company_value(); 
         
         cr = self._cr
@@ -177,7 +177,7 @@ class DashboardBlock(models.Model):
         #                 order by  hr_payslip.date_from 
         
         company_id = self.get_current_company_value()
-        id_all_mirai_department = self.env['project.management'].handle_remove_department()
+        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
 
         sql_domain_for_department = ' AND ( hr_employee.department_id NOT IN ' + str(tuple(id_all_mirai_department)) +  ' OR hr_employee.department_id is null )' 
         sql_order_by =  ' ORDER BY  hr_payslip.date_from '
