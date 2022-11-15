@@ -45,25 +45,41 @@ class ExpenseManagement(models.Model):
     description = fields.Char(string="Expense Name", required=True, tracking=True)
     total_expenses = fields.Float(string="Total Expenses", store=True, compute="_compute_total_expense_by_month", tracking=True)
     
-    company_id = fields.Many2one('res.company', string="Company", default=lambda self: self.env.company, tracking=True)
+    company_id = fields.Many2many('res.company', 'general_expenses_company_rel', string="Companies", default=lambda self: self.env.company, required=True)
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.main_company').currency_id, tracking=True)
     
     expense_generals = fields.One2many('expense.general', 'expense_management_id', string="General Expense")
     expenses_activities= fields.One2many('expense.activity', 'expense_management_id', string="Activity Expense")
     
     
+    def write(self, vals):
+        if 'company_id' in vals:
+            #tracking many2many field
+            company_before = self._get_company_name(self.company_id)
+            companies = self.env['res.company'].search([('id', 'in', vals['company_id'][0][-1])])
+            company_after = self._get_company_name(companies)
+            if company_before == '':
+                company_before = 'None'
+            if company_after == '':
+                company_after = 'None'
+            message = "Company: " + company_before + " --> " + company_after
+            self.message_post(body=message)
+            
+        result = super(ExpenseManagement, self).write(vals)
+        return result
+    
+    
     @api.onchange('get_month', 'get_year')
     def _validate_get_month(self):
         if self.get_month and self.get_year:
-            datas = self.search([('id', '!=', self.id or self.id.origin), ('company_id', '=', self.company_id.id), ('get_year', '=', self.get_year)])
-            selections = []
+            datas = self.search([('id', '!=', self.id or self.id.origin), ('company_id', 'in', self.company_id.ids), ('get_year', '=', self.get_year)])
             check = False
             if datas:
                 for item in datas:
                     if self.get_month == item.get_month:
                         raise UserError(_('The operation cost month "%(month)s/%(year)s" of %(company)s already exist !',
                                             month = '0' + self.get_month if int(self.get_month) < 10 else self.get_month,
-                                            year = self.get_year, company = self.company_id.name))
+                                            year = self.get_year, company = self._get_company_name(self.company_id)))
                     else:
                         check = True
                 if check == True:
@@ -71,6 +87,21 @@ class ExpenseManagement(models.Model):
             else:
                 self.sort_date = datetime.strptime(('01' + '/' + self.get_month + '/' + self.get_year), '%d/%m/%Y')
 
+
+    def _get_company_name(self, companies):
+        if len(companies) == 1:
+            return companies.name
+        else:
+            company_name = ''
+            cnt = 0
+            for record in companies:
+                cnt += 1
+                rel = ''
+                if cnt <= len(companies) - 1:
+                    rel += ', '
+                company_name += record.name + rel
+                
+            return company_name
             
     @api.depends('expense_generals', 'expenses_activities')
     def _compute_total_expense_by_month(self):
@@ -105,7 +136,7 @@ class ExpenseManagement(models.Model):
     def _check_month_copy(self, new_record_id, next_month, next_year):
         global COUNT_RECURSIVES
         datas = self.search([('id', '!=', new_record_id), 
-                            ('company_id', '=', self.company_id.id), 
+                            ('company_id', 'in', self.company_id.ids), 
                             ('get_year', '=', str(next_year)), 
                             ('get_month', '=', str(next_month))])
         if not datas:

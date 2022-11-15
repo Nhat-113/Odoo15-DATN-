@@ -8,7 +8,7 @@
                 <field name="description"/>
                 <field name="sort_date" invisible="1"/>
                 <field name="total_expenses" sum="Total Expenses" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="company_id" widget="many2many_tags" groups="base.group_multi_company"/>
                 <field name="currency_id" optional="hide"/>
             </tree>
         </field>
@@ -23,7 +23,7 @@
                     <group name="group_top">
                         <group name="group_left">
                             <field name="description" placeholder="e.x: August's expenses"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="company_id" widget="many2many_tags" groups="base.group_multi_company"/>
                             <field name="total_expenses" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             <field name="sort_date" invisible="1"/>
                             <field name="currency_id" invisible="1"/>
