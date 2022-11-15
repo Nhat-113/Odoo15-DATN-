@@ -71,12 +71,15 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     // after event search run, event compute_avg call again to calculator avg effort 
                     input.addEventListener('keyup', () => self.compute_avg())
                     input.addEventListener('keyup', () => self.compute_avg_all_res_rate())
+                    input.addEventListener('keyup', () => self.value_table_over_view())
 
                     var input_available_list = document.getElementById("search_input_avai");
                     if(!input_available_list)  
                          return
                     // Event search in when input onchange
                     input_available_list.addEventListener('keyup', self.searchFunctionAvaiList);
+                    input_available_list.addEventListener('keyup', () => self.value_table_over_view());
+
 
                     // Event filter  in when selection onchange
                     var selection = document.getElementById("countriesDropdown");
@@ -85,6 +88,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     selection.addEventListener('change', self.searchFunction)
                     selection.addEventListener('change', () => self.compute_avg())
                     selection.addEventListener('change', () => self.compute_avg_all_res_rate())
+                    selection.addEventListener('change', () => self.value_table_over_view())
+
   
                     // compute avg effort member in table when render DOM element   
 
@@ -429,7 +434,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             // }
         },
         searchFunctionAvaiList: function(e) {
-            const value_row_not_search = 1;
+            const value_row_not_search = 3;
             var input, filter, table, tr, td, i, txtValue;
             input = document.getElementById("search_input_avai");
             filter = input.value.toUpperCase();
@@ -476,13 +481,12 @@ odoo.define('human_resource_template.Dashboard', function (require) {
 
 
             var howManyCols = tbody.rows[1].cells.length;
-            var total_member_company = document.getElementById("count_member_of_company");
             var arrEffortCompany = []
             // Start compute in column number seven
             for (var j = 7; j < howManyCols - 1; j++) {
                 //compute member available company
                 count_compute_available_member = self.compute_available_member(j);
-                count_compute_member = self.compute_available_member_res_rate(j);
+                count_compute_member = self.compute_member_when_search(j);
 
                 arrMemberFollowMonth.push(count_compute_member);
 
@@ -508,7 +512,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             }
             
             //count members of company with value from second column
-            total_member_company.innerText = String( 'Current Month Active Members: ' +  self.compute_member_company());
+            // total_member_company.innerText = String( 'Current Month Active Members: ' +  self.compute_member_company());
 
             return [arrEffortCompany, arrMemberFollowMonth, 
                     arrMemberBillFollowMonth, arrMemberInterFollowMonth,
@@ -558,6 +562,33 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                         count_row += 1;
                         listId.push(id_employee);
                     }
+                }
+            } finally {
+                return count_row;
+            }
+        },  
+
+        compute_member_when_search: function (colNumber) {
+            var table = document.getElementById("human_resource_table");
+            var howManyRows = 0;
+            let count_row = 0;
+            // const number_rows_not_count = 4
+            let listId = [];
+            try {
+                var howManyRows = table.rows.length;
+                for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
+                    let row = table.rows[i];
+                    let id_employee = table.rows[i].cells[1].innerText;
+                    let parent_style = row.cells[colNumber].parentElement.style.display;
+                    var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);
+                    // var employee_id_before = table.rows[i].cells[1].innerText;
+                    // var employee_id_after = table.rows[i+1].cells[1].innerText;                  
+
+                    if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) && thisNumber >= 0) {
+                        count_row += 1;
+                        listId.push(id_employee);
+                    }
+
                 }
             } finally {
                 return count_row;
@@ -679,27 +710,6 @@ odoo.define('human_resource_template.Dashboard', function (require) {
         },
 
 
-        compute_member_company: function (colNumber = 1) {
-            var table = document.getElementById("human_resource_table");
-            var howManyRows = 0;
-            let count_members_of_company = 0;
-            let listId = [];
-            try {
-                var howManyRows = table.rows.length;
-                for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
-                    let row = table.rows[i];
-                    let id_employee = table.rows[i].cells[1].innerText;
-                    let parent_style = row.cells[colNumber].parentElement.style.display;
-
-                    if (parent_style != 'none' && !listId.includes(id_employee)) {
-                        count_members_of_company += 1
-                        listId.push(id_employee);
-                    }
-                }
-            } finally {
-                return count_members_of_company;
-            }
-        },
 
         export_excel: function () {
             // Table2Excel.extend((cell, cellText) => {
@@ -827,13 +837,14 @@ odoo.define('human_resource_template.Dashboard', function (require) {
 
         // //compute avavai label rate
         computeTableColumnTotalFree: function (colNumber) {
+            console.log('a');
             var table = document.getElementById("human_resource_free_table");
             let result = 0;
             // const number_rows_not_count = 4;
             var howManyRows = 0;
             try {
                 var howManyRows = table.rows.length;
-                for (var i = 1; i < howManyRows - 1; i++) {
+                for (var i = 1; i < howManyRows - 3; i++) {
                     let row = table.rows[i];
                     let parent_style = row.cells[colNumber].parentElement.style.display
                     var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);
@@ -851,7 +862,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var final = 0;
             var member_free = 0;
             var tbody = document.getElementById("tbody_free_table");
-            const number_column_calcu_in_table = 1
+            const number_column_calcu_in_table = 3
             var total_available_member = tbody.rows[tbody.rows.length - number_column_calcu_in_table];
 
             var howManyCols = tbody.rows[1].cells.length;
@@ -890,7 +901,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     let id_employee = table.rows[i].cells[1].innerText;
                     let parent_style = row.cells[colNumber].parentElement.style.display;
                     var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);
-                    if (parent_style != 'none' && !listId.includes(id_employee) &&  !isNaN(thisNumber)) {
+                    if (parent_style != 'none' && !listId.includes(id_employee) &&  !isNaN(thisNumber) && thisNumber > 0) {
                         count_members_of_company += 1
                         listId.push(id_employee);
                     }
@@ -908,29 +919,38 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             let textAverageUsageRate = document.getElementsByClassName('value-member-aver-usage');
 
             let textBillableHeadCount = document.getElementsByClassName('bill-able-headcounts');
-            var  count_member_billable = this.compute_avg()[2];
+            var count_member_billable = this.compute_avg()[2];
             let textBillableHeadCountRate = document.getElementsByClassName('bill-able-avg');
-            var  compute_effort_billable = this.compute_avg()[4];
+            var compute_effort_billable = this.compute_avg()[4];
 
 
             let textInternalHeadCount = document.getElementsByClassName('internal-headcounts');
             var count_member_internal = this.compute_avg()[3];
             let textInternalHeadCountRate = document.getElementsByClassName('internal-headcounts-avg');
             var compute_effort_internal = this.compute_avg()[5];
-            let children = document.querySelectorAll('.Avg_effort_member .td_value');
+            let element_avg_eff = document.querySelectorAll('.Avg_effort_member .td_value');
             let value_aver = [];
+         
 
             let textAvailableHeadCount = document.getElementsByClassName('available-headcounts');
             var count_member_available = this.compute_avg_all_avai_rate()[0];
-            console.log('count_member_available', count_member_available);
             let textAvailableHeadCountRate = document.getElementsByClassName('available-headcounts-avg');
             var compute_effort_member_available = this.compute_avg_all_avai_rate()[1];
-            console.log('compute_effort_member_available', compute_effort_member_available);
 
-            //replace text of 
-            for(let i = 0; i < children.length ; i ++  ) {
-                if (children[i].innerText != '' ) {
-                    value_aver.push(children[i].innerText);
+            var TodayDate = new Date();
+            var current_month = TodayDate.getMonth();
+            var total_member_company = document.getElementById("count_member_of_company");
+            total_member_company.innerText = String( 'Current Month Active Members: ' +  count_member_filter[current_month] );
+
+            var total_effort = []
+            for (let i = 0; i < count_member_filter.length; i ++)  {
+                total_effort.push(count_member_filter[i] * 100)
+            }
+            console.log('total_effort', total_effort);
+            //add value in over view table 
+            for(let i = 0; i < element_avg_eff.length ; i ++  ) {
+                if (element_avg_eff[i].innerText != '' ) {
+                    value_aver.push(element_avg_eff[i].innerText);
                 }
             }
             for(let i = 0 ; i < textCountMember.length; i++ ){
@@ -944,14 +964,14 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 textBillableHeadCount[i].innerText = count_member_billable[i];
             }
             for(let i = 0 ; i < textBillableHeadCountRate.length; i++ ){
-                textBillableHeadCountRate[i].innerText = compute_effort_billable[i];
+                textBillableHeadCountRate[i].innerText = ( (compute_effort_billable[i] / total_effort[i]) * 100 ).toFixed(2) ;
             }
 
             for(let i = 0 ; i < textInternalHeadCount.length; i++ ){
                 textInternalHeadCount[i].innerText = count_member_internal[i];
             }
             for(let i = 0 ; i < textInternalHeadCountRate.length; i++ ){
-                textInternalHeadCountRate[i].innerText = compute_effort_internal[i];
+                textInternalHeadCountRate[i].innerText = ((compute_effort_internal[i] / total_effort[i]) * 100 ).toFixed(2) ;
             }
 
             for(let i = 0 ; i < textAvailableHeadCount.length; i++ ){

@@ -46,7 +46,6 @@
                         <th>Nov</th>
                         <th>Dec</th>
                         </tr>
-
                         <tr>
                             <td>Member Count</td>
                             <td t-foreach="12" t-as="i" class="value-member-count">
@@ -80,18 +79,6 @@
                         <tr>
                             <td>Internal Headcounts Rate (%)</td>
                             <td t-foreach="12" t-as="i" class="internal-headcounts-avg">
-                                <t t-esc="i"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Avaiable Headcounts</td>
-                            <td t-foreach="12" t-as="i" class="available-headcounts">
-                                <t t-esc="i"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Avaiable Headcounts Rate (%)</td>
-                            <td t-foreach="12" t-as="i" class="available-headcounts-avg">
                                 <t t-esc="i"/>
                             </td>
                         </tr>
@@ -477,6 +464,24 @@
                                     <td></td>
                                     <td></td>
                                     <td t-foreach="12" t-as="i" class="value-available-rate">
+                                        <t t-esc="i"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Avaiable Headcounts</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td t-foreach="12" t-as="i" class="available-headcounts">
+                                        <t t-esc="i"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Avaiable Headcounts Rate (%)</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td t-foreach="12" t-as="i" class="available-headcounts-avg">
                                         <t t-esc="i"/>
                                     </td>
                                 </tr>
