@@ -250,7 +250,7 @@ class HrBookingOvertime(models.Model):
     _inherit=['mail.thread']
 
     request_overtime_id = fields.Many2one('hr.request.overtime', string='Booking Overtime', readonly=False)
-    project_id = fields.Many2one('hr.request.overtime', related='request_overtime_id.project_id', string="Project", required=True)
+    project_id = fields.Many2one('hr.request.overtime', string="Project")
     
     user_id = fields.Many2one(
         'hr.employee', string='Member', required=True, help="Member name assgin overtime")
@@ -267,7 +267,7 @@ class HrBookingOvertime(models.Model):
                            help="Date on which the member finished overtime on project")
 
     duration = fields.Integer(string="Duration (Working day)",
-                              readonly=True, help="The duration of working overtime in the project", default=0)
+                              readonly=True, help="The duration of working overtime in the project", default=0, store=True)
 
     booking_time_overtime = fields.Float(string="Plan (Hours)",
                               readonly=False, help="The booking of working overtime in the project", required=True, default=0)
@@ -305,7 +305,7 @@ class HrBookingOvertime(models.Model):
     def _compute_stage(self):
         for item in self:
             item.read_stage = item.request_overtime_id.stage_id.name
-            item.project_id = item.request_overtime_id.project_id
+            item.project_id = item.request_overtime_id.project_id.id
 
 
     @api.onchange('start_date', 'end_date')
@@ -328,7 +328,8 @@ class HrBookingOvertime(models.Model):
                     record.duration = 1
 
             # Raise with datetime not in plan
-            if record.start_date < record.request_overtime_id.start_date or record.end_date > record.request_overtime_id.end_date:
+            if (record.start_date and record.end_date)\
+             and (record.start_date < record.request_overtime_id.start_date or record.end_date > record.request_overtime_id.end_date):
                     raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime."))
 
 

@@ -35,11 +35,11 @@ class HrRequestOverTime(models.Model):
         return self.env['hr.request.overtime.stage'].search([], limit=1).id
 
     def _get_default_approve(self):
-        return self.env.user.employee_id.parent_id.user_id.ids
+        return self.env.user.employee_id.parent_id.user_id.id
 
-    name = fields.Char("Subject", required=True)
+    name = fields.Char("Subject", required=True, tracking=True)
 
-    project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True)
+    project_id = fields.Many2one('project.project', string="Project", required=True, tracking=True, store=True)
     get_domain_projects = fields.Char(string='Domain Project', readonly=True, store=False, compute='_get_domain_project')
     start_date_project = fields.Date(string="Start date", related='project_id.date_start', store=True)
     end_date_project = fields.Date(string="End date", related='project_id.date', store=True)
@@ -60,13 +60,13 @@ class HrRequestOverTime(models.Model):
                             # domain=lambda self: self._compute_domain_stage(),
                             copy=False, index=True,
                             )
-    request_creator_id = fields.Many2many('res.users', 'hr_request_overtime_res_users_inform_rel', string='Inform to', default=False)
-    requester_id = fields.Many2many('res.users', 'hr_request_overtime_res_users_rel', string='Approvals', required=True, default=lambda self: self._get_default_approve(), readonly=False, )
+    request_creator_id = fields.Many2many('res.users', 'hr_request_overtime_res_users_inform_rel', string='Inform to', default=False, tracking=True, store=True)
+    requester_id = fields.Many2one('res.users', string='Approvals', required=True, default=lambda self: self._get_default_approve(), readonly=False, tracking=True, store=True)
     member_ids = fields.Many2many('hr.employee', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
     
-    member_ids_user = fields.Many2many('res.users', 'hr_request_overtime_member_ids_users_rel', compute='_compute_member_ids_user', store=True)
-    booking_overtime = fields.One2many('hr.booking.overtime', 'request_overtime_id', string='Booking Overtime')
+    member_ids_user = fields.Many2many('res.users', 'hr_request_overtime_member_ids_users_rel', compute='_compute_member_ids_user', store=True, tracking=True)
+    booking_overtime = fields.One2many('hr.booking.overtime', 'request_overtime_id', string='Booking Overtime', store=True, tracking=True)
     active = fields.Boolean(string='Invisible Refuse Button', default=True, store=True)
     refuse_reason_id = fields.One2many('hr.request.overtime.refuse.reason', 'request_overtime_ids', tracking=True)
     refuse_reason = fields.Char('Refuse Reason', tracking=True)
@@ -90,11 +90,17 @@ class HrRequestOverTime(models.Model):
     @api.depends('company_id')
     def _get_domain_project(self):
         for record in self:
-            project = self.env['project.project'].search([('company_id', '=', record.company_id.id)])
+            if self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_director') == True and \
+                self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_projmanager') == True:
+                    project = self.env['project.project'].search([('company_id', '=', record.company_id.id)])
+            else:
+                project = self.env['project.project'].search([('company_id', '=', record.company_id.id), '|', ('user_id', '=',self.env.user.id), ('member_ids','=',self.env.user.employee_id.id)])
+            
             if project:
                 project_ids = [item.id for item in project]
             else:
                 project_ids = []
+            
             record.get_domain_projects = json.dumps([('company_id', '=', record.company_id.id), ('id', 'in', project_ids)])
 
     def action_refuse_reason(self):

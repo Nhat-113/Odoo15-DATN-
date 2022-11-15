@@ -9,7 +9,7 @@
                 <field name="project_id"/>
                 <field name="user_id"/>
                 <field name="member_ids" widget="many2many_avatar_employee"/>
-                <field name="request_creator_id" optional="hide"/>
+                <field name="request_creator_id" invisible="1" optional="hide"/>
                 <field name="start_date"/>
                 <field name="end_date"/>
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -56,7 +56,7 @@
                         <group >
                             <field name="active" invisible="1"/>
                             <group name="group_left">
-                                <field name="refuse_reason" attrs="{'invisible': [('active', '=', True)]}"/>
+                                <field name="refuse_reason" attrs="{'invisible': [('active', '=', True)]}" readonly="1"/>
                                 <field name="read_only_project" invisible="1"/>
                                 <field name="project_id" domain='get_domain_projects' attrs="{'readonly': ['|', ('company_id', '=', False), ('read_only_project','=', True)]}" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}"/>
                                 <field name="get_domain_projects" invisible="1"/>
@@ -69,7 +69,7 @@
                                 </div>
                                 <field name="user_id" string="Project Manager" widget="many2one_avatar_user" domain="[('share', '=', False)]" width="2" attrs="{'invisible': [('project_id','=',False)]}"/>
                                 <field name="company_id" groups="base.group_multi_company" attrs="{'readonly': [('read_only_project','=', True)]}"/>
-                                <field name="request_creator_id" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" widget="many2many_tags" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
+                                <field name="request_creator_id" invisible="1" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" widget="many2many_tags" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
                             </group>
                             <group name="group_right" class="over_duration">
                                 <label for="start_date" string="Plan" />
@@ -80,7 +80,7 @@
                                     <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}' attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
                                 </div>
                                 <field name="duration_overtime" readonly="1"/>
-                                <field name="requester_id" readonly="0" widget="many2many_tags" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}"/>
+                                <field name="requester_id" readonly="0" widget="many2one_avatar_user" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}"/>
                             </group>
                         </group>
                         <separator string="Description"/>
@@ -121,6 +121,7 @@
                                                 <field name="end_date"/>
                                                 <field name="booking_time_overtime" placeholder="Hour..." required="1"/>
                                                 <field name="actual_overtime" invisible="1"/>
+                                                <field name="project_id" invisible="1"/>
                                             </group>
                                             <separator string="Description"/>
                                             <field name="description" placeholder="Description..."/>
