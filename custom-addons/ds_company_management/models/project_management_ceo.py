@@ -30,7 +30,20 @@ class ProjectManagementCeo(models.Model):
                             pms.month_end,
                             pms.currency_id
                 ),
-                
+                compute_max_duration_company AS (
+                    SELECT
+                        (CASE
+                            WHEN max(sort_date) < CURRENT_DATE::DATE
+                                THEN (date_trunc('month',CURRENT_DATE))::DATE
+                            ELSE max(sort_date)
+                        END) AS max_months,
+                        pp.company_id
+                    FROM project_revenue_value AS prv
+                    LEFT JOIN project_project AS pp
+                        ON pp.id = prv.project_id
+                    GROUP BY pp.company_id
+                ),
+
                 handling_datetime_company_history AS (
                     SELECT
                         hch.id,
@@ -45,11 +58,17 @@ class ProjectManagementCeo(models.Model):
                         
                         (CASE
                             WHEN hch.date_end IS NULL
-                                THEN (date_trunc('month', CURRENT_DATE::DATE) + interval '1 month - 1 day')::date
+                                THEN (CASE
+                                        WHEN cm.max_months IS NULL
+                                            THEN (date_trunc('month', CURRENT_DATE::DATE) + interval '1 month - 1 day')::date
+                                        ELSE (cm.max_months + interval '1 month - 1 day')::date
+                                    END)
                             ELSE
                                 hch.date_end::date
                         END) AS date_end
                     FROM hr_company_history AS hch
+                    LEFT JOIN compute_max_duration_company AS cm
+                        ON cm.company_id = hch.company_id
                 ),
                 history_manager_company AS (
                     SELECT
@@ -71,8 +90,10 @@ class ProjectManagementCeo(models.Model):
                                         (CASE
                                             --- When manager is expired ---
                                             WHEN hdc.date_end IS NOT NULL
-                                                    THEN hdc.date_end::date
-                                            ELSE (CURRENT_DATE::DATE - interval '1 month')
+                                                THEN hdc.date_end::date
+                                            WHEN cm.max_months IS NOT NULL
+                                                THEN cm.max_months
+                                            ELSE CURRENT_DATE::DATE
                                         END)
                                 
                                 ),	
@@ -82,6 +103,8 @@ class ProjectManagementCeo(models.Model):
                     FROM res_company AS rc
                     LEFT JOIN handling_datetime_company_history AS hdc
                         ON hdc.company_id = rc.id
+                    LEFT JOIN compute_max_duration_company AS cm
+                        ON cm.company_id = rc.id
                     LEFT JOIN hr_employee AS he
                         ON rc.user_email = he.work_email
                 ),
@@ -182,9 +205,8 @@ class ProjectManagementCeo(models.Model):
                     LEFT JOIN hr_payslip_line AS hpll
                             ON hpll.slip_id = hp.id
                             AND hpll.code IN('BQNC') AND hp.state = 'done'
-
                 ),
-                
+
                 project_planning_booking_remove_department_fnb AS (
                     SELECT
                         employee_id,
@@ -213,6 +235,7 @@ class ProjectManagementCeo(models.Model):
                     -- 	gs.month_end_date,
                         cms.month_start,
                         cms.month_end,
+                    -- 	dh.salary_manager,
                     -- 	gs.working_day,
                     -- 	gs.working_day_total,
                     -- 	gs.total,
@@ -365,7 +388,7 @@ class ProjectManagementCeo(models.Model):
                         total_salary,
                         total_profit
                 )
-                
+
                 SELECT
                     cm.id,
                     cm.company_id,
@@ -386,7 +409,7 @@ class ProjectManagementCeo(models.Model):
                 LEFT JOIN hr_employee AS he
                     ON he.work_email = rc.user_email
                 LEFT JOIN res_currency AS rcu
-	                ON rcu.name = 'VND'
+                    ON rcu.name = 'VND'
             ) """ % (self._table)
         )
         
