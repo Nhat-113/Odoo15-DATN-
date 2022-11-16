@@ -31,6 +31,7 @@
             "data/hr_request_overtime_data.xml",
             "data/mail_template.xml",
             "views/hr_timesheet_menu_view.xml",
-            "views/hr_timesheet_request_overtime_view.xml"
+            "views/hr_timesheet_request_overtime_view.xml",
+            "views/hr_timesheet_reporting_overtime.xml"
             ],
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="search_report_timesheet_overtime" model="ir.ui.view">
+            <field name="name">report.timesheet.overtime.search.tree</field>
+            <field name="model">account.analytic.line</field>
+            <field name="arch" type="xml">
+                <search string="Report">
+                    <field name="date" string="Date"/>
+                    <field name="project_id" string="Project"/>
+                    <field name="task_id" string="Task"/>
+                    <field name="employee_id" string="Employee"/>
+                    <field name="type_day_ot" string="Type OT"/>
+                    <field name="pay_type" string="Pay Type OT"/>
+                    <filter string="Employee" name="group_by_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Project" name="group_by_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Task" name="group_by_task" context="{'group_by': 'task_id'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by': 'date'}"/>
+                    <filter string="Type OT" name="group_by_type_ot" context="{'group_by': 'type_day_ot'}"/>
+                    <filter string="Pay Type OT" name="group_by_pay_type" context="{'group_by': 'pay_type'}"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="hr_timesheet_reporting_overtime_action" model="ir.actions.act_window">
+            <field name="name">Approval Statistics</field>
+            <field name="res_model">account.analytic.line</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[('type_ot','=','yes'),
+                                ('check_approval_ot','=',True),
+                                ('request_overtime_ids.id', '!=' ,False)]</field>
+            <field name="search_view_id" ref="search_report_timesheet_overtime"/>
+            <field name="context">{"create": False, "edit": False, "delete": False, "group_by": "date"}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No record approved. Let's create one!
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+            id="hr_timesheet_reporting_overtime_menu"
+            name="Approval Statistics"
+            parent="hr_timesheet_request_overtime.menu_timesheets_approvals"
+            action="hr_timesheet_reporting_overtime_action"
+            groups = "hr_timesheet_request_overtime.request_overtime_access_officer"
+            sequence="3"/>
+    </data>
+</odoo>

@@ -199,7 +199,7 @@ class AccountAnalyticLine(models.Model):
                                             ('end_date','>=', date),
                                             ('project_id','=', project_id)])
             for booking in booking_overtime:
-                if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approval']:
+                if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approval'] and booking.request_overtime_id.active==True:
                     values['request_overtime_ids'] =  booking.request_overtime_id.id
                 else: 
                     values['request_overtime_ids'] = False
@@ -233,9 +233,10 @@ class AccountAnalyticLine(models.Model):
                                             [('user_id','=', employee),
                                             ('start_date','<=', date), 
                                             ('end_date','>=', date), 
-                                            ('project_id','=', self.project_id.id)])
+                                            ('project_id','=', self.project_id.id),
+                                            ])
             for booking in booking_overtime:
-                if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approval'] or self.request_overtime_ids.id:
+                if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approval'] or self.request_overtime_ids.id and booking.request_overtime_id.active==True:
                     return {'request_overtime_ids': booking.request_overtime_id.id}
                 else: 
                     return {'request_overtime_ids': False}
@@ -345,7 +346,7 @@ class HrBookingOvertime(models.Model):
                         ((self.start_date <= booking.start_date and self.end_date >= booking.start_date) or\
                             (self.start_date <= booking.end_date and self.end_date >= booking.end_date) or\
                                 (self.start_date >= booking.start_date and self.end_date <= booking.end_date)):
-                        raise ValidationError(_("The user is booking OT for this day, please re-check."))
+                        raise ValidationError(_("The user is booked OT on this date, please recheck."))
 
 
     def timesheets_overtime_detail_action(self):

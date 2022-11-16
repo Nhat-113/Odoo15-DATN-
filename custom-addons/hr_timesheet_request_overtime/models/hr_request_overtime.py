@@ -346,4 +346,9 @@ class HrRequestOverTime(models.Model):
         vals_list.update({'read_only_project': True})
 
         return super().create(vals_list)
+
+    def unlink(self):
+        for record in self:
+            record.booking_overtime.unlink()
+        return super().unlink()
     
