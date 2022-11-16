@@ -270,15 +270,27 @@ class HumanResourceManagement(models.Model):
         }
     @api.model
     def get_human_resource_free(self):
+        user_id_login = self.env.user.id
         selected_companies = self.get_current_company_value()
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
         cr = self._cr
-        sql_domain_for_company = 'where  company_id in ' +  str(tuple(selected_companies)) 
-		
+        sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ' or company_project_id in ' + str(tuple(selected_companies)) + ')'
+        # sql_domain_for_role = ''
         sql_domain_for_department_emp = ' AND (human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
         sql_domain_for_department_proj = ' AND (human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
         sql_domain_for_group_by = 'GROUP BY employee_id, employee_name ,company_name, department_name, company_id, start_date_contract, end_date_contract order by employee_name asc'
 
+        # if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
+        #     # sql_domain_for_role = ''
+
+        if self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
+            sql_domain_for_company = sql_domain_for_company[:-1]
+            sql_domain_for_company  += ' or company_manager_user_id = ' + str(user_id_login)  + ')'
+            # sql_domain_for_role = ''
+
+        # elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
+        #         self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
+        #     # sql_domain_for_role = ''		
 
         sql = ("""SELECT  employee_id, employee_name, company_name, department_name,
 				SUM (month1 ) as month1,
@@ -299,6 +311,7 @@ class HumanResourceManagement(models.Model):
 				FROM human_resource_management 
 					""")
         sql += sql_domain_for_company
+        # sql += sql_domain_for_role
         sql += sql_domain_for_department_emp
         sql += sql_domain_for_department_proj
         sql += sql_domain_for_group_by

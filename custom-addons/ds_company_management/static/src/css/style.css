@@ -27,7 +27,7 @@ span[name="message_warning"] {
     display: block;
     width: 98%;
     overflow-y: scroll;
-    height:calc(100vh - 141px);
+    height:calc(64vh - 71px);
     margin-top: -25px;
     margin: 0 auto;
 }
@@ -48,6 +48,7 @@ span[name="message_warning"] {
 .human_resource_template th {
     width: 200px;
     text-align: left;
+    padding-left: 5px;
 }
 
 .human_resource_content>tr {
@@ -131,9 +132,9 @@ span[name="message_warning"] {
     background: #FAFAFA;
 }
 
-.total_member_avai, .total_member_avai_company {
+/* .total_member_avai, .total_member_avai_company {
     display: none;
-}
+} */
 
 .export_excel {
     margin: 0px 0px 6px 20px;
@@ -233,6 +234,10 @@ span[name="message_warning"] {
 #human_resource_free_table {
     margin: 20px 0 auto;
 }
+#human_resource_free_table > tbody {
+    height: calc(98vh - 141px);
+}
+
 
 .human_resource_free_member {
     position: relative;
@@ -289,13 +294,44 @@ button.view-member-free:hover {
     position: sticky;
     left: 0;
     right: 0;
-    bottom: 0px;
+    bottom: 117px;
     background: #eee !important;
     padding: 16px;
     margin: 0 auto;
     height: 35px;
     color: #31871c;
     font-weight: 800;
+}
+#bottom_avai_headcount {
+    position: sticky;
+    left: 0;
+    right: 0;
+    bottom: 68px;
+    background: #eee !important;
+    padding: 16px;
+    margin: 0 auto;
+    height: 35px;
+    color: #31871c;
+    font-weight: 800;
+}
+#bottom_avai_headcount_rate {
+    position: sticky;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    background: #eee !important;
+    padding: 16px;
+    margin: 0 auto;
+    height: 35px;
+    color: #31871c;
+    font-weight: 800;
+}
+.value-over {
+    color: #31871c;
+    font-weight: 800;
+}
+.title-avai-head-count .title-avai-head-count-rate {
+    font-weight: bold !important;
 }
 #countriesDropdown {
     position: absolute;
@@ -335,6 +371,21 @@ button.view-member-free:hover {
     align-content: space-between;
     justify-content: flex-end;
 }
+.human_resource_template #over-view-table {
+    display: block;
+    height: calc(43vh - 141px);
+}
+#over-view-table .over-header {
+    background: #eee !important;
+    position: sticky;
+    top: 0;
+}
+#over-view-table > tr > td:first-child {
+    font-weight: 700;
+}
+#over-view-table > tr:nth-child(odd) {
+    background: #FAFAFA;
+}
 /* for desktop screen */
 
 @media only screen and (max-width: 1800px) {
@@ -370,6 +421,14 @@ button.view-member-free:hover {
     .human_resource_template #human_resource_table .human_resource_content tr:nth-last-child(2) {
         font-size: 10px;
     }
+    .human_resource_template #over-view-table {
+        display: block;
+        height: calc(55vh - 95px);
+    }
+    .human_resource_template tbody {
+        height: calc(46vh - 71px);
+    }
+   
 }
 
 @media only screen and (max-width: 1200px) {
