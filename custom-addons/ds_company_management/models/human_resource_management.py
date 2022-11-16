@@ -230,12 +230,32 @@ class HumanResourceManagement(models.Model):
         if len(cookies_cids) == 1:
             cookies_cids.append(0)
         return cookies_cids
+
+    def handle_remove_department_sp(self):
+        support_d_soft_department_id =self.env['hr.department'].sudo().search([('name', 'in', ['Support D-Soft',  'Support mTech'])])
+
+        department_ids = self.get_all_department_children(support_d_soft_department_id.ids,  [])
+        department_ids += support_d_soft_department_id.ids
+
+        return department_ids
+		
+    def get_all_department_children(self, parent_id,  list_departments):
+        child_departments = self.env['hr.department'].sudo().search([('parent_id', 'in', parent_id)])
+
+        if child_departments:
+            list_departments += child_departments.ids		
+            return self.get_all_department_children(child_departments.ids, list_departments)
+        else:
+            return list_departments
+
     # function get data human resource
     @api.model
     def get_list_human_resource(self):
         user_id_login = self.env.user.id
-        selected_companies = self.get_current_company_value();
-        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
+        selected_companies = self.get_current_company_value()
+        id_depart_sp = self.handle_remove_department_sp()
+		
+        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()		
         # div_manager_department_id =  self.env.user.employee_ids.department_id.id
         cr = self._cr
 	
