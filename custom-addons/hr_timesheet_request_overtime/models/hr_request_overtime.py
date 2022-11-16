@@ -155,6 +155,20 @@ class HrRequestOverTime(models.Model):
                         (new_booking_member.start_date <= booking.end_date and new_booking_member.end_date >= booking.end_date) or\
                             (new_booking_member.start_date >= booking.start_date and new_booking_member.end_date <= booking.end_date)):
                     raise ValidationError(_("The user is booked OT on this date, please recheck."))
+    
+    @api.constrains('booking_overtime')
+    def _check_duplicate_booking_member_constrains(self):
+        for record in self:
+            if len(record.booking_overtime)>0:
+                new_booking_member = record.booking_overtime[-1]
+                current_booking = record.booking_overtime[:-1]
+                for booking in current_booking:
+                    # Validation
+                    if (new_booking_member.user_id.id==booking.user_id.id) and \
+                        ((new_booking_member.start_date <= booking.start_date and new_booking_member.end_date >= booking.start_date) or\
+                            (new_booking_member.start_date <= booking.end_date and new_booking_member.end_date >= booking.end_date) or\
+                                (new_booking_member.start_date >= booking.start_date and new_booking_member.end_date <= booking.end_date)):
+                        raise ValidationError(_("The user is booked OT on this date, please recheck."))
 
     @api.depends('start_date', 'end_date')
     def _compute_duration_overtime(self):
