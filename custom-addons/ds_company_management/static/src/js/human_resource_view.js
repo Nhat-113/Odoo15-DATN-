@@ -1011,7 +1011,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
 
             //replace value
             for(let i = 0 ; i < textCountMember.length; i++ ){
-                textCountMember[i].innerText = count_member_in_company_when_search[i];
+                textCountMember[i].innerText = count_member_filter[i];
             }
             for(let i = 0 ; i <   textAverageUsageRate.length;  i++ ){
                 textAverageUsageRate[i].innerText = value_aver[i];
