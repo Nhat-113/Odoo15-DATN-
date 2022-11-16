@@ -33,50 +33,50 @@
                     <tbody id="over-view-table" >
                         <tr class="over-header">
                         <th></th>
-                        <th>Jan</th>
-                        <th>Feb</th>
-                        <th>Mar</th>
-                        <th>Apr</th>
+                        <th>January</th>
+                        <th>February</th>
+                        <th>March</th>
+                        <th>April</th>
                         <th>May</th>
-                        <th>Jun</th>
-                        <th>Jul</th>
-                        <th>Aug</th>
-                        <th>Sep</th>
-                        <th>Oct</th>
-                        <th>Nov</th>
-                        <th>Dec</th>
+                        <th>June</th>
+                        <th>July</th>
+                        <th>August</th>
+                        <th>September</th>
+                        <th>October</th>
+                        <th>November</th>
+                        <th>December</th>
                         </tr>
-                        <tr>
+                        <tr class="value-over">
                             <td>Member Count</td>
                             <td t-foreach="12" t-as="i" class="value-member-count">
                                 <t t-esc="i"/>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="value-over">
                             <td>Average Usage Rate (%)</td>
                             <td t-foreach="12" t-as="i" class="value-member-aver-usage">
                                 <t t-esc="i"/>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="value-over">
                             <td>Billable Headcounts </td>
                             <td t-foreach="12" t-as="i" class="bill-able-headcounts">
                                 <t t-esc="i"/>
                             </td>
                         </tr>
-                        <tr>
-                        <td>Billable Headcounts Rates (%)</td>
-                        <td t-foreach="12" t-as="i" class="bill-able-avg">
-                            <t t-esc="i"/>
-                        </td>
+                        <tr class="value-over">
+                            <td>Billable Headcounts Rates (%)</td>
+                            <td t-foreach="12" t-as="i" class="bill-able-avg">
+                                <t t-esc="i"/>
+                            </td>
                         </tr>
-                        <tr>
+                        <tr class="value-over">
                             <td>Internal Headcounts</td>
                             <td t-foreach="12" t-as="i" class="internal-headcounts">
                                 <t t-esc="i"/>
                             </td>
                         </tr>
-                        <tr>
+                        <tr class="value-over">
                             <td>Internal Headcounts Rate (%)</td>
                             <td t-foreach="12" t-as="i" class="internal-headcounts-avg">
                                 <t t-esc="i"/>

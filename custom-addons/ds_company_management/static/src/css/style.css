@@ -326,6 +326,10 @@ button.view-member-free:hover {
     color: #31871c;
     font-weight: 800;
 }
+.value-over {
+    color: #31871c;
+    font-weight: 800;
+}
 .title-avai-head-count .title-avai-head-count-rate {
     font-weight: bold !important;
 }
@@ -419,7 +423,10 @@ button.view-member-free:hover {
     }
     .human_resource_template #over-view-table {
         display: block;
-        height: calc(55vh - 141px);
+        height: calc(55vh - 95px);
+    }
+    .human_resource_template tbody {
+        height: calc(46vh - 71px);
     }
    
 }

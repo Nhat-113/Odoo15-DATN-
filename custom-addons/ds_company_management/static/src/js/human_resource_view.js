@@ -142,7 +142,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
 
                     // sort table member free
                     var lastRowFreeTable = document.getElementById('bottom_table');
-
+                    var row_table_not_sort = document.getElementById('bottom_avai_headcount');
+                    var row_table_not_sort_2 = document.getElementById('bottom_avai_headcount_rate');
                     var th_2 = document.querySelectorAll('th.header_member_free')
                     var avgRow = document.getElementById('avg-row');
                     var totalRow = document.getElementById('total-row');
@@ -152,6 +153,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                             .sort(comparer(Array.from(th_2.parentNode.children).indexOf(th_2), window.asc = !window.asc))
                             .forEach(tr => table.appendChild(tr));
                             table.appendChild(lastRowFreeTable);
+                            table.appendChild(row_table_not_sort);
+                            table.appendChild(row_table_not_sort_2);
                         // append 2 this row in last row
                     })));
 
@@ -973,11 +976,22 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 textInternalHeadCountRate[i].innerText = ((compute_effort_internal[i] / total_effort[i]) * 100 ).toFixed(2) ;
             }
 
+
+            // value member company in human
+            let element_member_company = document.querySelectorAll('#total-row-member-of-company .td_value');
+            let total_element_member_company = [];
+
+            for (let i = 0; i < element_member_company.length; i++) {
+                if (element_member_company[i].innerText != '' ) {
+                    total_element_member_company.push(element_member_company[i].innerText);
+                }
+            }
+
             for(let i = 0 ; i < textAvailableHeadCount.length; i++ ){
                 textAvailableHeadCount[i].innerText = count_member_available[i];
             }
             for(let i = 0 ; i < textAvailableHeadCountRate.length; i++ ){
-                textAvailableHeadCountRate[i].innerText = ( ( count_member_available[i] / count_member_filter[i] ) * 100  ).toFixed(2) ;
+                textAvailableHeadCountRate[i].innerText = ( ( compute_effort_member_available[i] / (total_element_member_company[i] * 100  )) * 100  ).toFixed(2) ;
             }
         },
 
