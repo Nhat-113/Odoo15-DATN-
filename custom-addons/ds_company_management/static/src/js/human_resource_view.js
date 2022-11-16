@@ -168,6 +168,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                             .forEach(tr => table.appendChild(tr));
                         // append last row th_name is row in last row
                         table.appendChild(lastRowFreeTable);
+                        table.appendChild(row_table_not_sort);
+                        table.appendChild(row_table_not_sort_2);
                     })));
 
                     self.replace_value_human_resource()
