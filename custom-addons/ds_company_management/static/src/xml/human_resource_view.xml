@@ -232,7 +232,7 @@
                                 </td>
                             </tr>
                         </t>
-                        <tr id="avg-row" class="Avg_effort_member">
+                        <tr id="avg-row" class="Avg_effort_member" style="display:none">
                             <th scope="row" class="td_value_none">Average Res Rate (%)</th>
                             <td class="td_value_none"></td>
                             <td class="td_value human_employee_id" type="string" ></td>
@@ -254,7 +254,7 @@
                             <td class="td_value" type="string"></td>
                             <td class="td_value" type="string"></td>
                         </tr>
-                        <tr id="total-row" class="total_member_avai">
+                        <tr id="total-row" class="total_member_avai" style="display:none">
                             <th scope="row">Total Members</th>
                             <td class="td_value human_employee_id" type="string"></td>
                             <td class="td_value" type="string"></td>
@@ -277,7 +277,7 @@
                             <td class="td_value" type="string"></td>
                         </tr>
 
-                        <tr id="total-effort-all-res-rate" class="total_member_avai-2">
+                        <tr id="total-effort-all-res-rate" class="total_member_avai-2" style="display:none">
                             <th scope="row">All Res Rate (%)</th>
                             <td class="td_value human_employee_id" type="string"></td>
                             <td class="td_value" type="string"></td>
@@ -300,7 +300,7 @@
                             <td class="td_value" type="string"></td>
                         </tr>
 
-                        <tr id="total-row-member-of-company" class="total_member_avai_company">
+                        <tr id="total-row-member-of-company" class="total_member_avai_company" style="display:none">
                             <th scope="row">Total Members Company</th>
                             <td class="td_value human_employee_id" type="string"></td>
                             <td class="td_value" type="string"></td>
@@ -458,7 +458,7 @@
                                         </td>
                                     </tr>
                                 </t>
-                                <tr class="bottom_tabel" id="bottom_table">
+                                <tr class="bottom_tabel" id="bottom_table" style="display:none">
                                     <th>Available Rate (%)</th>
                                     <td></td>
                                     <td></td>
@@ -467,8 +467,8 @@
                                         <t t-esc="i"/>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>Avaiable Headcounts</td>
+                                <tr id="bottom_avai_headcount">
+                                    <td class="title-avai-head-count">Available Headcounts</td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -476,8 +476,8 @@
                                         <t t-esc="i"/>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>Avaiable Headcounts Rate (%)</td>
+                                <tr id='bottom_avai_headcount_rate'>
+                                    <td class="title-avai-head-count-rate">Available Headcounts Rate (%)</td>
                                     <td></td>
                                     <td></td>
                                     <td></td>

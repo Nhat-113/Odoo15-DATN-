@@ -627,6 +627,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
                     let row = table.rows[i];
                     let parent_style = row.cells[colNumber].parentElement.style.display;
+                    // project type is column number six 
                     let project_type = table.rows[i].cells[6].innerText;
 
                     var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);
@@ -837,7 +838,6 @@ odoo.define('human_resource_template.Dashboard', function (require) {
 
         // //compute avavai label rate
         computeTableColumnTotalFree: function (colNumber) {
-            console.log('a');
             var table = document.getElementById("human_resource_free_table");
             let result = 0;
             // const number_rows_not_count = 4;
@@ -946,7 +946,6 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             for (let i = 0; i < count_member_filter.length; i ++)  {
                 total_effort.push(count_member_filter[i] * 100)
             }
-            console.log('total_effort', total_effort);
             //add value in over view table 
             for(let i = 0; i < element_avg_eff.length ; i ++  ) {
                 if (element_avg_eff[i].innerText != '' ) {
@@ -978,7 +977,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 textAvailableHeadCount[i].innerText = count_member_available[i];
             }
             for(let i = 0 ; i < textAvailableHeadCountRate.length; i++ ){
-                textAvailableHeadCountRate[i].innerText = compute_effort_member_available[i];
+                textAvailableHeadCountRate[i].innerText = ( ( count_member_available[i] / count_member_filter[i] ) * 100  ).toFixed(2) ;
             }
         },
 
