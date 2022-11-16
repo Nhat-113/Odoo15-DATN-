@@ -308,12 +308,12 @@ class HrBookingOvertime(models.Model):
             else:
                 record.duration = 1
             
-    @api.constrains('booking_time_overtime')
+    @api.constrains('booking_time_overtime','start_date', 'end_date')
     def _check_value_plan_overtime(self):
         for record in self:
             if record.end_date and record.start_date:
                 if record.end_date < record.start_date:
-                    raise ValidationError(_("Start Date must be smaller than End Date"))
+                    raise ValidationError(_("The Start Date must be smaller than the End Date."))
 
                 if record.booking_time_overtime > 999 or record.booking_time_overtime <= 0:
                     raise ValidationError(_('Please enter value Plan Hour between 1-999 (hour).'))
@@ -322,32 +322,13 @@ class HrBookingOvertime(models.Model):
                 limit_hour = ((record.end_date - record.start_date).days + 1)*24
                 if record.booking_time_overtime > limit_hour:
                     raise ValidationError(_("Plan Hour must be less {} (Hour).".format(limit_hour)))
+            
+                if (record.start_date < record.request_overtime_id.start_date or record.end_date > record.request_overtime_id.end_date):
+                        raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime."))
 
-    @api.onchange('start_date', 'end_date')
-    def _validation_duration(self):
-        # Raise with datetime not in plan
-        if self.end_date and self.start_date:
-            # Validation date time
-            if self.start_date > self.end_date:
-                raise ValidationError(_("Start Date must be smaller than End Date."))
-
-            if not self.request_overtime_id.start_date or not self.request_overtime_id.end_date:
-                    raise ValidationError(_("Please update plan (start date and end date) for Request Overtime."))
-                
-            if (self.start_date < self.request_overtime_id.start_date or self.end_date > self.request_overtime_id.end_date):
-                    raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime."))
-
-            # Validation assigned member duplicate plan
-            member_booking = self.request_overtime_id.booking_overtime[:-1]
-            if member_booking:
-                for booking in member_booking:
-                    # Validation
-                    if (self.user_id.id==booking.user_id.id) and \
-                        ((self.start_date <= booking.start_date and self.end_date >= booking.start_date) or\
-                            (self.start_date <= booking.end_date and self.end_date >= booking.end_date) or\
-                                (self.start_date >= booking.start_date and self.end_date <= booking.end_date)):
-                        raise ValidationError(_("The user is booked OT on this date, please recheck."))
-
+                # Validation date time
+                if not self.request_overtime_id.start_date or not self.request_overtime_id.end_date:
+                        raise ValidationError(_("Please update plan (start date and end date) for Request Overtime."))
 
     def timesheets_overtime_detail_action(self):
         name_view = self.user_id.name

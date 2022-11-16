@@ -143,6 +143,19 @@ class HrRequestOverTime(models.Model):
         user_ids = [user.id for user in self.booking_overtime.user_id]
         self.member_ids = self.env['hr.employee'].search([('id', 'in', user_ids)])
 
+    @api.onchange('booking_overtime')
+    def _check_duplicate_booking_member(self):
+        if len(self.booking_overtime)>0:
+            new_booking_member = self.booking_overtime[-1]
+            current_booking = self.booking_overtime[:-1]
+            for booking in current_booking:
+                # Validation
+                if (new_booking_member.user_id.id==booking.user_id.id) and \
+                    ((new_booking_member.start_date <= booking.start_date and new_booking_member.end_date >= booking.start_date) or\
+                        (new_booking_member.start_date <= booking.end_date and new_booking_member.end_date >= booking.end_date) or\
+                            (new_booking_member.start_date >= booking.start_date and new_booking_member.end_date <= booking.end_date)):
+                    raise ValidationError(_("The user is booked OT on this date, please recheck."))
+
     @api.depends('start_date', 'end_date')
     def _compute_duration_overtime(self):
         """ Calculates duration working time"""
@@ -162,7 +175,7 @@ class HrRequestOverTime(models.Model):
                 raise ValidationError(_("Please update plan (start date and end date) for Project."))
 
             if self.start_date > self.end_date:
-                raise ValidationError(_("Start Date must be smaller than End Date"))
+                raise ValidationError(_("The Start Date must be smaller than the End Date"))
 
             # Validation Plan Date Overtime must be within the duration of the project
             if (self.start_date < self.project_id.date_start or self.end_date > self.project_id.date):
