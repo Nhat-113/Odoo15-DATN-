@@ -503,7 +503,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 arrEffortBillFollowMonth.push(effortBillFollowMonth);
 
                 //compute member internal in company
-                count_compute_available_member_internal = self.compute_available_member_billable(j).count_internal_member;
+                count_compute_available_member_internal = self.compute_available_member_internal(j).count_internal_member;
                 arrMemberInterFollowMonth.push(count_compute_available_member_internal);
                 effortInternalFollowMonth =  self.computeTableColumnBillable(j).effortInternal;
                 arrEffortInternalFollowMonth.push(effortInternalFollowMonth);
@@ -700,7 +700,45 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                         count_billable_member += 1;
                         listId.push(id_employee);
                     }
-                    if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) && thisNumber > 0 && project_type == 'Internal') {
+
+                    // if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) && thisNumber > 0 &&  (project_type != 'ODC' || project_type != 'Project Base')) {
+                    //     count_internal_member += 1;
+                    //     listId.push(id_employee);
+                    // }
+
+                }
+            } finally {
+                return {
+                    count_billable_member: count_billable_member, 
+                    // count_internal_member: count_internal_member
+                };
+            }
+        },
+
+        compute_available_member_internal: function (colNumber) {
+            var table = document.getElementById("human_resource_table");
+            var howManyRows = 0;
+            // let count_billable_member = 0;
+            let count_internal_member = 0;
+
+            // const number_rows_not_count = 4
+            let listId = [];
+            try {
+                var howManyRows = table.rows.length;
+                for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
+                    let row = table.rows[i];
+                    let id_employee = table.rows[i].cells[1].innerText;
+                    let project_type = table.rows[i].cells[6].innerText;
+                    let parent_style = row.cells[colNumber].parentElement.style.display;
+                    var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);
+          
+                    // if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) && thisNumber > 0 && (project_type == 'ODC' || project_type == 'Project Base')) {
+                    //     count_billable_member += 1;
+                    //     console.log(`a`);
+                    //     listId.push(id_employee);
+                    // }
+
+                    if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) && thisNumber > 0 &&  (project_type == 'Internal')) {
                         count_internal_member += 1;
                         listId.push(id_employee);
                     }
@@ -708,13 +746,12 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 }
             } finally {
                 return {
-                    count_billable_member: count_billable_member, 
+                    // count_billable_member: count_billable_member, 
                     count_internal_member: count_internal_member
                 };
                 // return count_billable_member, count_internal_member;
             }
         },
-
 
 
         export_excel: function () {
@@ -957,8 +994,24 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     value_aver.push(element_avg_eff[i].innerText);
                 }
             }
+
+            //get value when search in tr total member 
+            let count_member_in_company = document.querySelectorAll('#total-row .td_value');
+            // console.log('count_member_in_company', count_member_in_company);
+            //
+            let count_member_in_company_when_search = [];
+
+            //push for array
+            for (let i = 0; i < count_member_in_company.length; i++) {
+                if (count_member_in_company[i].innerText != '' ) {
+                    // push data in array if has value
+                    count_member_in_company_when_search.push(count_member_in_company[i].innerText);
+                }
+            }
+
+            //replace value
             for(let i = 0 ; i < textCountMember.length; i++ ){
-                textCountMember[i].innerText = count_member_filter[i];
+                textCountMember[i].innerText = count_member_in_company_when_search[i];
             }
             for(let i = 0 ; i <   textAverageUsageRate.length;  i++ ){
                 textAverageUsageRate[i].innerText = value_aver[i];
