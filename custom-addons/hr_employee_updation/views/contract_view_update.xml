@@ -18,4 +18,21 @@
             </xpath>
         </field>
     </record>
+
+
+    <record id="action_ds_contract_inactive" model="ir.actions.act_window">
+        <field name="name">Contract Inactive</field>
+        <field name="res_model">hr.contract</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('active', '=', False)]</field>
+    </record>
+    
+    <menuitem
+    id="ds_contract_inactive"
+    name="Contract Inactive"
+    parent="hr.menu_human_resources_configuration"
+    groups="base.group_no_one"
+    action="action_ds_contract_inactive"
+    sequence="1"/>
+    
 </odoo>
