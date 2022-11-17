@@ -56,11 +56,32 @@ class ProjectManagementSubCeo(models.Model):
                                 phd.currency_id
                 ),
 
+                --- compute max duration for generate month for department by revenue management of company expense
+                compute_max_duration_department AS (
+                    SELECT
+                        (CASE
+                            WHEN max(sort_date) < CURRENT_DATE::DATE
+                                THEN (date_trunc('month',CURRENT_DATE))::DATE
+                            ELSE max(sort_date)
+                        END) AS max_months,
+                        pp.department_id
+                    FROM project_revenue_value AS prv
+                    LEFT JOIN project_project AS pp
+                        ON pp.id = prv.project_id
+                    GROUP BY pp.department_id
+                ),
+
                 department_by_month AS (
                     SELECT
                         generate_series(
                                 date_trunc('month', '1/1/2021'::date), 
-                                date_trunc('month', CURRENT_DATE - interval '1 month'),
+                                date_trunc('month', 
+                                    (CASE
+										WHEN cm.max_months IS NULL
+											THEN (date_trunc('month',CURRENT_DATE))::DATE
+										ELSE cm.max_months
+									END)
+                                ),
                                 '1 month'
                         )::date AS months,
                         hd.id AS department_id,
@@ -68,7 +89,9 @@ class ProjectManagementSubCeo(models.Model):
                         hd.company_id
                         
                         FROM hr_department AS hd
-                            WHERE hd.id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                        LEFT JOIN compute_max_duration_department AS cm
+                            ON cm.department_id = hd.id
+                        WHERE hd.id NOT IN (SELECT department_id FROM department_mirai_fnb)
                 ),
 
                 compute_salary_manager_department AS (
