@@ -223,6 +223,39 @@ class ProjectManagementHistory(models.Model):
                             months
 
                 ),
+                
+                expense_management_join_company AS (
+                    SELECT
+                        em.id,
+                        em.get_month,
+                        em.get_year,
+                        em.total_expenses,
+                        rel.res_company_id
+                    FROM expense_management AS em
+                    LEFT JOIN general_expenses_company_rel AS rel
+                        ON rel.expense_management_id = em.id
+                ),
+                    
+                expense_management_count_company AS (
+                    SELECT
+                        expense_management_id,
+                        COUNT(res_company_id) AS counts
+
+                    FROM general_expenses_company_rel
+                    GROUP BY expense_management_id
+                ),
+
+                expense_management_multiple_company AS (
+                    SELECT
+                        emj.get_month,
+                        emj.get_year,
+                        emj.total_expenses,
+                        emj.res_company_id,
+                        emc.counts
+                    FROM expense_management_join_company AS emj
+                    LEFT JOIN expense_management_count_company AS emc
+                        ON emc.expense_management_id = emj.id
+                ),
 
                 --- Compute total cost, working day, member by month ---
                 project_compute_value_by_month AS (
@@ -275,7 +308,7 @@ class ProjectManagementHistory(models.Model):
                                 / ccd.counts
                             )
                         END) AS total_project_expense,
-                        (COALESCE(NULLIF(em.total_expenses, NULL), 0)) AS operation_cost,
+                        (COALESCE(NULLIF(em.total_expenses / em.counts, NULL), 0)) AS operation_cost,
                         (COALESCE(NULLIF(pcm.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project,
                         (COALESCE(NULLIF(pni.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project_not_intern,
                         (COALESCE(NULLIF(cni.all_members, NULL), 0)) AS all_members,
@@ -300,8 +333,8 @@ class ProjectManagementHistory(models.Model):
                         --AND EXTRACT(YEAR FROM ccd.months) = EXTRACT(YEAR FROM gmp.month_start)
                         -- AND gmp.stage_name != 'Done'
                         
-                    LEFT JOIN expense_management AS em
-                        ON em.company_id = gmp.company_id
+                    LEFT JOIN expense_management_multiple_company AS em
+                        ON em.res_company_id = gmp.company_id
                         AND em.get_month::int = EXTRACT(MONTH FROM gmp.month_start)
                         AND em.get_year::int = EXTRACT(YEAR FROM gmp.month_start)
                         
@@ -405,7 +438,7 @@ class ProjectManagementHistory(models.Model):
                         END) AS profit_margin,
                         date_trunc('month', cpr.month_start)::DATE AS months_domain
                 FROM compute_project_revenue AS cpr
-                ORDER BY company_id, project_id,  month_start
+                ORDER BY company_id, project_id, month_start
 
             )""" % (self._table)
         )
