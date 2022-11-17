@@ -12,12 +12,14 @@
     'data': [
         "security/expense_management_security.xml",
         "security/ir.model.access.csv",
-        "views/expense_management_menu.xml",
         "views/category_expense_view.xml",
         "views/general_expense_view.xml",
         "views/project_expense_view.xml",
         "views/project_project_view.xml",
         "views/project_revenue_view.xml",
+        "views/project_expense_statistical.xml",
+        "views/project_revenue_statistical.xml",
+        "views/expense_management_menu.xml",
     ],
     'assets': {
         'web.assets_backend': [

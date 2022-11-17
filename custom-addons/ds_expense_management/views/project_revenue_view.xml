@@ -144,6 +144,8 @@
                                         <field name="result_commission" sum="Total Commission" widget="monetary"/>
                                         <field name="result_revenue" sum="Total Revenue Remaining" widget="monetary"/>
                                         <field name="description" />
+                                        <field name="company_id" invisible="1"/>
+                                        <field name="department_id" invisible="1"/>
                                         <field name="project_id" force_save="1" invisible="1"/>
                                         <field name="sort_date" force_save="1" invisible="1"/>
                                         <field name="currency_id" invisible="1"/>

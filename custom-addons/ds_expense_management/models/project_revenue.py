@@ -1,5 +1,5 @@
 from odoo import fields, models, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from datetime import datetime
 import json, babel.numbers
 
@@ -57,6 +57,23 @@ class ProjectRevenue(models.Model):
     
     project_revenue_value_ids = fields.One2many('project.revenue.value', 'project_revenue_management_id', string='Project Revenue Value')
 
+    
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        field_disable = ['user_pm', 'user_subceo', 'currency_vnd', 'currency_id', 'check_restore_data',
+                         'check_estimation', 'get_currency_name', 'currency_estimation_id']
+        result = super(ProjectRevenue, self).fields_get(allfields, attributes=attributes)
+
+        for field in field_disable:
+            if field in result:
+                result[field].update({
+                    'selectable': False,
+                    'exportable': False,
+                    'searchable': False,
+                    'sortable': False
+                })
+          
+        return result
     
     
     @api.depends('company_id')
@@ -215,7 +232,8 @@ class ProjectRevenue(models.Model):
                     
 class ProjectRevenueValue(models.Model):
     _name = 'project.revenue.value'
-    _order = 'sort_date desc'
+    _rec_name = "project_id"
+    _order = 'company_id desc, department_id desc, project_id desc, sort_date desc'
     
     
     def _get_years(self):
@@ -249,7 +267,29 @@ class ProjectRevenueValue(models.Model):
     result_revenue = fields.Monetary(string="Revenue Remaining", compute='_compute_commission_percentage', store=True, currency_field='currency_vnd')
     
     project_id = fields.Many2one('project.project', string="Project", related="project_revenue_management_id.project_id", store=True)
+    company_id = fields.Many2one('res.company', string="Company", related="project_revenue_management_id.company_id", store=True)
+    department_id = fields.Many2one("hr.department", string="Department", related="project_revenue_management_id.department_id", store=True)
     currency_id = fields.Many2one('res.currency', string="Currency", related='project_revenue_management_id.currency_id', store=True)
+    
+    user_pm = fields.Many2one('res.users', string="Div manager", related='project_revenue_management_id.user_pm', store=True)
+    user_subceo = fields.Char(string='Sub CEO email', related='project_revenue_management_id.user_subceo', store=True)
+    
+    
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        field_disable = ['user_pm', 'user_subceo', 'currency_vnd', 'currency_id', 'sort_date', 'project_revenue_management_id']
+        result = super(ProjectRevenueValue, self).fields_get(allfields, attributes=attributes)
+
+        for field in field_disable:
+            if field in result:
+                result[field].update({
+                    'selectable': False,
+                    'exportable': False,
+                    'searchable': False,
+                    'sortable': False
+                })
+          
+        return result
     
     
     @api.onchange('get_month', 'get_year')
@@ -266,6 +306,9 @@ class ProjectRevenueValue(models.Model):
     @api.depends('exchange_rate', 'revenue_project', 'project_revenue_management_id.currency_id')
     def _compute_total_revenue(self):
         for record in self:
+            if record.revenue_project < 0:
+                raise ValidationError("The revenue must be greater than zero!")
+            
             if record.currency_id.name == 'VND':
                 record.revenue_vnd = record.revenue_project
             else:

@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <record id="expense_management_action_upgrade" model="ir.actions.server">
+        <field name="name">Upgrade old data</field>
+        <field name="model_id" ref="model_expense_management"/>
+        <field name="binding_model_id" ref="model_expense_management"/>
+        <field name="state">code</field>
+        <field name="binding_view_types">list</field>
+        <field name="code">action = records.action_update_group_old_data()</field>
+    </record>
+
     <record id="expense_management_view_tree" model="ir.ui.view">
         <field name="name">expense.management.tree</field>
         <field name="model">expense.management</field>
@@ -10,6 +20,7 @@
                 <field name="total_expenses" sum="Total Expenses" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 <field name="company_id" widget="many2many_tags" groups="base.group_multi_company"/>
                 <field name="currency_id" optional="hide"/>
+                <field name="user_subceo" widget="many2many_tags" invisible="1"/>
             </tree>
         </field>
     </record>
@@ -27,6 +38,7 @@
                             <field name="total_expenses" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             <field name="sort_date" invisible="1"/>
                             <field name="currency_id" invisible="1"/>
+                            <field name="user_subceo" widget="many2many_tags" force_save="1" invisible="1"/>
                         </group>
                         <group name="group_right">
                             <div class="o_row">
