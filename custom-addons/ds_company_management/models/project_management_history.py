@@ -316,7 +316,7 @@ class ProjectManagementHistory(models.Model):
                         (CASE 
                             WHEN cni.all_members = 0 OR cni.all_members IS NULL
                                 THEN 0
-                            ELSE (COALESCE(NULLIF(em.total_expenses, NULL), 0)) / cni.all_members::NUMERIC(10, 4)
+                            ELSE (COALESCE(NULLIF(em.total_expenses / em.counts, NULL), 0)) / cni.all_members::NUMERIC(10, 4)
                         END)::NUMERIC(20, 4) AS average_cost_company
                         
                         

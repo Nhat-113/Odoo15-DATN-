@@ -10,7 +10,22 @@ class ManagerDepartmentHistory(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
-                WITH handling_datetime_department_history AS (
+                --- compute max duration for generate month for department by revenue management of company expense
+                WITH compute_max_duration_department AS (
+                    SELECT
+                        (CASE
+                            WHEN max(sort_date) < CURRENT_DATE::DATE
+                                THEN (date_trunc('month',CURRENT_DATE))::DATE
+                            ELSE max(sort_date)
+                        END) AS max_months,
+                        pp.department_id
+                    FROM project_revenue_value AS prv
+                    LEFT JOIN project_project AS pp
+                        ON pp.id = prv.project_id
+                    GROUP BY pp.department_id
+                ),
+
+                handling_datetime_department_history AS (
                     SELECT
                         hdh.id,
                         hdh.department_id,
@@ -24,11 +39,17 @@ class ManagerDepartmentHistory(models.Model):
                         
                         (CASE
                             WHEN hdh.date_end IS NULL
-                                THEN (date_trunc('month', CURRENT_DATE::DATE) + interval '1 month - 1 day')::date
+                                THEN (CASE
+                                        WHEN cm.max_months IS NULL
+                                            THEN (date_trunc('month', CURRENT_DATE::DATE) + interval '1 month - 1 day')::date
+                                        ELSE (cm.max_months + interval '1 month - 1 day')::date
+                                    END)
                             ELSE
                                 hdh.date_end::date
                         END) AS date_end
                     FROM hr_department_history AS hdh
+                    LEFT JOIN compute_max_duration_department AS cm
+                        ON cm.department_id = hdh.department_id
                 ),
 
                 history_manager_department AS (
@@ -54,7 +75,9 @@ class ManagerDepartmentHistory(models.Model):
                                         --- When manager is expired ---
                                         WHEN hdh.date_end IS NOT NULL
                                             THEN hdh.date_end::date
-                                        ELSE (CURRENT_DATE::DATE - interval '1 month')
+                                        WHEN cm.max_months IS NOT NULL
+                                            THEN cm.max_months
+                                        ELSE CURRENT_DATE::DATE
                                     END)
                             
                                 ),	
@@ -64,6 +87,8 @@ class ManagerDepartmentHistory(models.Model):
                     FROM hr_department AS hd
                     LEFT JOIN handling_datetime_department_history AS hdh
                         ON hd.id = hdh.department_id
+                    LEFT JOIN compute_max_duration_department AS cm
+                        ON cm.department_id = hd.id
                     WHERE hd.id NOT IN (SELECT department_id FROM department_mirai_fnb)
                 ),
 
@@ -83,52 +108,49 @@ class ManagerDepartmentHistory(models.Model):
                             ELSE (SELECT date_trunc('month', hmd.months) + interval '1 month - 1 day')::date
                         END) AS month_end,
                             
-                        (SELECT date_trunc('month', hmd.months) + interval '1 month - 1 day')::date AS month_end_date
+                        (date_trunc('month', hmd.months) + interval '1 month - 1 day')::date AS month_end_date
 
                     FROM history_manager_department AS hmd
-
                 ),
 
-
                 compute_working_day AS (
-                SELECT
-                    hdgm.company_id,
-                    hdgm.department_id,
-                    hdgm.manager_id,
-                    hdgm.manager_history_id,
-                    hdgm.month_start,
-                    hdgm.month_end,
-                    hdgm.months AS month_start_date,
-                    hdgm.month_end_date,
+                    SELECT
+                        hdgm.company_id,
+                        hdgm.department_id,
+                        hdgm.manager_id,
+                        hdgm.manager_history_id,
+                        hdgm.month_start,
+                        hdgm.month_end,
+                        hdgm.months AS month_start_date,
+                        hdgm.month_end_date,
 
-                    (SELECT COUNT(*)
-                        FROM (
-                            SELECT dd, 
-                                    EXTRACT(DOW FROM dd) AS dw
-                            FROM generate_series(
-                                    hdgm.month_start, 
-                                    hdgm.month_end, 
-                                    interval '1 day'
-                            ) AS dd 
-                        ) AS days
-                        WHERE dw NOT IN (6,0)
-                    ) AS working_day,
-                    
-                    (SELECT COUNT(*)
-                        FROM (
-                            SELECT dd, 
-                                    EXTRACT(DOW FROM dd) AS dw
-                            FROM generate_series(
-                                    hdgm.months, 
-                                    hdgm.month_end_date, 
-                                    interval '1 day'
-                            ) AS dd 
-                        ) AS days
-                        WHERE dw NOT IN (6,0)
-                    ) AS working_day_total
-                    
-                    
-                FROM history_department_gen_month AS hdgm
+                        (SELECT COUNT(*)
+                            FROM (
+                                SELECT dd, 
+                                        EXTRACT(DOW FROM dd) AS dw
+                                FROM generate_series(
+                                        hdgm.month_start, 
+                                        hdgm.month_end, 
+                                        interval '1 day'
+                                ) AS dd 
+                            ) AS days
+                            WHERE dw NOT IN (6,0)
+                        ) AS working_day,
+                        
+                        (SELECT COUNT(*)
+                            FROM (
+                                SELECT dd, 
+                                        EXTRACT(DOW FROM dd) AS dw
+                                FROM generate_series(
+                                        hdgm.months, 
+                                        hdgm.month_end_date, 
+                                        interval '1 day'
+                                ) AS dd 
+                            ) AS days
+                            WHERE dw NOT IN (6,0)
+                        ) AS working_day_total
+                        
+                    FROM history_department_gen_month AS hdgm
                     
                 ),
 
@@ -165,7 +187,7 @@ class ManagerDepartmentHistory(models.Model):
                         ON hpll.slip_id = hp.id
                         AND hpll.code IN('BQNC') AND hp.state = 'done'
                 ),
-                
+
                 project_planning_booking_remove_department_fnb AS (
                     SELECT
                         employee_id,
