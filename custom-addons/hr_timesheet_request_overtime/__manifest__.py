@@ -19,6 +19,7 @@
     'assets': {
         'web.assets_backend': [
             '/hr_timesheet_request_overtime/static/src/css/style.css',
+            '/hr_timesheet_request_overtime/static/src/js/basic_view.js',
         ],
     },
 

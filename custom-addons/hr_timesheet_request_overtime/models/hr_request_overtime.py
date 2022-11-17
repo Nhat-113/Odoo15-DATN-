@@ -35,7 +35,8 @@ class HrRequestOverTime(models.Model):
         return self.env['hr.request.overtime.stage'].search([], limit=1).id
 
     def _get_default_approve(self):
-        return self.env.user.employee_id.parent_id.user_id.id
+        representative = self.env['res.users'].search([('email','=',self.env.company.user_email)])
+        return representative.id
 
     name = fields.Char("Subject", required=True, tracking=True)
 
@@ -143,7 +144,7 @@ class HrRequestOverTime(models.Model):
         user_ids = [user.id for user in self.booking_overtime.user_id]
         self.member_ids = self.env['hr.employee'].search([('id', 'in', user_ids)])
 
-    @api.onchange('booking_overtime')
+    @api.onchange('booking_overtime','start_date', 'end_date')
     def _check_duplicate_booking_member(self):
         if len(self.booking_overtime)>0:
             new_booking_member = self.booking_overtime[-1]
@@ -156,20 +157,6 @@ class HrRequestOverTime(models.Model):
                             (new_booking_member.start_date >= booking.start_date and new_booking_member.end_date <= booking.end_date)):
                     raise ValidationError(_("The user is booked OT on this date, please recheck."))
     
-    @api.constrains('booking_overtime')
-    def _check_duplicate_booking_member_constrains(self):
-        for record in self:
-            if len(record.booking_overtime)>0:
-                new_booking_member = record.booking_overtime[-1]
-                current_booking = record.booking_overtime[:-1]
-                for booking in current_booking:
-                    # Validation
-                    if (new_booking_member.user_id.id==booking.user_id.id) and \
-                        ((new_booking_member.start_date <= booking.start_date and new_booking_member.end_date >= booking.start_date) or\
-                            (new_booking_member.start_date <= booking.end_date and new_booking_member.end_date >= booking.end_date) or\
-                                (new_booking_member.start_date >= booking.start_date and new_booking_member.end_date <= booking.end_date)):
-                        raise ValidationError(_("The user is booked OT on this date, please recheck."))
-
     @api.depends('start_date', 'end_date')
     def _compute_duration_overtime(self):
         """ Calculates duration working time"""
@@ -202,9 +189,14 @@ class HrRequestOverTime(models.Model):
             project_request_overtime = self.env['hr.request.overtime'].search([('project_id', '=' ,record.project_id.id),('id','!=' ,record.id)])
             for item in project_request_overtime:
                 if item.end_date < record.start_date or item.start_date > record.end_date:
-                    return
+                    continue
                 else:
                     raise ValidationError(_("Plan Date Overtime can not overlap in the same project. \nRequest Overtime Duplicate Plan is: {}".format(item.name)))
+
+            for booking in record.booking_overtime:
+                if not (booking.start_date >= record.start_date and booking.end_date <= record.end_date):
+                    raise ValidationError(_("Booking Plan Date Overtime for Member must be within the duration of the Request Overtime.")) 
+
 
     def action_submit_request_overtime(self):
         self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Submit')]).id
