@@ -65,7 +65,7 @@
                             </td>
                         </tr>
                         <tr class="value-over">
-                            <td>Billable Headcounts Rates (%)</td>
+                            <td>Billable Headcounts Rate (%)</td>
                             <td t-foreach="12" t-as="i" class="bill-able-avg">
                                 <t t-esc="i"/>
                             </td>
@@ -195,7 +195,7 @@
                                     <t t-esc="list_human_resource[6]"/>
                                 </td> -->
 
-                                <td t-foreach="list_human_resource.slice(8,-11)" t-as="i" type="string"  class="td_value">
+                                <td t-foreach="list_human_resource.slice(7,-12)" t-as="i" type="string"  class="td_value">
                                     <t t-esc="i" />
                                 </td>
                                 <!-- <td class="td_value" type="string">
