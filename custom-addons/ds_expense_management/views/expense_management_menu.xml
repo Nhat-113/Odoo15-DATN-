@@ -15,13 +15,13 @@
     </record>
 
     <record id="project_expense_management_action" model="ir.actions.act_window">
-        <field name="name">Project Expenses</field>
+        <field name="name">Expenses</field>
         <field name="res_model">project.expense.management</field>
         <field name="view_mode">tree,form</field>
     </record>
 
     <record id="project_expense_statistical_action" model="ir.actions.act_window">
-        <field name="name">Project Expenses Statistical</field>
+        <field name="name">Statistics</field>
         <field name="res_model">project.expense.value</field>
         <field name="view_mode">tree</field>
         <field name="domain">[('project_expense_management_id', '!=', False)]</field>
@@ -30,13 +30,13 @@
     </record>
 
     <record id="project_revenue_management_action" model="ir.actions.act_window">
-        <field name="name">Project Revenues</field>
+        <field name="name">Revenue</field>
         <field name="res_model">project.revenue.management</field>
         <field name="view_mode">tree,form</field>
     </record>
 
     <record id="project_revenue_statistical_action" model="ir.actions.act_window">
-        <field name="name">Project Revenues Statistical</field>
+        <field name="name">Statistics</field>
         <field name="res_model">project.revenue.value</field>
         <field name="view_mode">tree</field>
         <field name="search_view_id" ref="project_revenue_search_filter"/>
@@ -60,7 +60,7 @@
 
     <menuitem
             id="project_expense_management"
-            name="Project Expenses"
+            name="Expenses"
             sequence="1"
             parent="ds_expense_management.project_expense_parent" 
             action="project_expense_management_action"/>
@@ -68,7 +68,7 @@
     
     <menuitem
             id="project_expense_statistical"
-            name="Project Expenses Statistical"
+            name="Statistics"
             sequence="2"
             parent="ds_expense_management.project_expense_parent" 
             action="project_expense_statistical_action"/>
@@ -82,7 +82,7 @@
     
     <menuitem
             id="project_revenue_management"
-            name="Project Revenues"
+            name="Revenue"
             sequence="1"
             parent="ds_expense_management.project_revenue_parent" 
             action="project_revenue_management_action"/>
@@ -90,7 +90,7 @@
 
     <menuitem
             id="project_revenue_statistical"
-            name="Project Revenues Statistical"
+            name="Statistics"
             sequence="2"
             parent="ds_expense_management.project_revenue_parent" 
             action="project_revenue_statistical_action"/>
