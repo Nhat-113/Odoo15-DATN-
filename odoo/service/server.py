@@ -440,7 +440,7 @@ class ThreadedServer(CommonServer):
 
                 registries = odoo.modules.registry.Registry.registries
                 _logger.debug('cron%d polling for jobs', number)
-Trainee                for db_name, registry in registries.d.items():
+                for db_name, registry in registries.d.items():
                     if registry.ready:
                         thread = threading.currentThread()
                         thread.start_time = time.time()
