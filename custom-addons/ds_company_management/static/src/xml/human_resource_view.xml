@@ -6,7 +6,7 @@
         <div class="main_content_hmrc">
             <div class="human_resource_in_top">
                 <div class="header_human_resource">
-                    <h2 class="title_human_resource">Human Resource Management</h2>
+                    <h2 class="title_human_resource">Human Resource Management IT</h2>
                     <div class="search_textbox">
                         <input type="text" id="search_input" placeholder="Search ..." />
                         <i title="Search..." role="img" aria-label="Search..." class="o_searchview_icon icon_search_human fa fa-search"></i>
@@ -176,7 +176,10 @@
                                 <td class="td_value name_employee" type="string">
                                     <t t-esc="list_human_resource[1]"/>
                                 </td>
-                                <td class="td_value" type="string">
+                                <td t-foreach="list_human_resource.slice(2,-25)" t-as="i" type="string"  class="td_value">
+                                    <t t-esc="i" />
+                                </td>
+                                <!-- <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[2]"/>
                                 </td>
                                 <td class="td_value" type="string">
@@ -187,11 +190,15 @@
                                 </td>
                                 <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[5]"/>
-                                </td>
+                                </td> -->
                                 <!-- <td class="td_value">
                                     <t t-esc="list_human_resource[6]"/>
                                 </td> -->
-                                <td class="td_value" type="string">
+
+                                <td t-foreach="list_human_resource.slice(8,-11)" t-as="i" type="string"  class="td_value">
+                                    <t t-esc="i" />
+                                </td>
+                                <!-- <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[7]"/>
                                 </td>
                                 <td class="td_value" type="string">
@@ -226,7 +233,7 @@
                                 </td>
                                 <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[18]"/>
-                                </td>
+                                </td> -->
                                 <td class="AVG_colum" type="string">
                                     <t t-esc="list_human_resource[19]"/>
                                 </td>
@@ -420,7 +427,10 @@
                                         <td class="td_value_department" type="string">
                                             <t t-esc="list_human_resource_free[3]"/>
                                         </td>
-                                        <td class="td_value" type="string">
+                                        <td t-foreach="list_human_resource_free.slice(4,-3)" t-as="i" type="string"  class="td_value">
+                                            <t t-esc="i" />
+                                        </td>
+                                        <!-- <td class="td_value" type="string">
                                             <t t-esc="list_human_resource_free[4]"/>
                                         </td>
                                         <td class="td_value" type="string">
@@ -455,7 +465,7 @@
                                         </td>
                                         <td class="td_value" type="string">
                                             <t t-esc="list_human_resource_free[15]"/>
-                                        </td>
+                                        </td> -->
                                     </tr>
                                 </t>
                                 <tr class="bottom_tabel" id="bottom_table" style="display:none">

@@ -62,26 +62,26 @@
         <field name="tag">human_resource_template</field>
     </record>
     
-    <record id="action_human_resource_template" model="ir.actions.client">
-        <field name="name">Human Resource Management</field>
-        <field name="tag">human_resource_template</field>
+    <record id="action_human_resource_template_support" model="ir.actions.client">
+        <field name="name">Human Resource Management Support</field>
+        <field name="tag">human_resource_template_support</field>
     </record>
-    
+
     <menuitem
         id="hrm_over_view"
         name="HRM"
         sequence="3"
         parent="ds_company_management.company_management_menu"/>
 
-    <menuitem name="HRM IT" id="menu_human_resource_template" 
+    <menuitem name="IT" id="menu_human_resource_template" 
         parent="ds_company_management.hrm_over_view"
         sequence="1"
         action="action_human_resource_template"/>
 
-    <menuitem name="HRM BO" id="menu_human_resource_template_2" 
+    <menuitem name="Support" id="menu_human_resource_template_support" 
         parent="ds_company_management.hrm_over_view"
         sequence="2"
-        action="action_human_resource_template"/>
+        action="action_human_resource_template_support"/>
     
     <record id="action_dynamic_dashboard" model="ir.actions.client">
         <field name="name">Dashboard BOM</field>
