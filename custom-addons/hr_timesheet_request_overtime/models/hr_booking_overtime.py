@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 from datetime import date
 
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 class AccountAnalyticLine(models.Model):
     _inherit = ["account.analytic.line"]
@@ -27,7 +27,8 @@ class AccountAnalyticLine(models.Model):
                                         ('draft', 'To Confirm'),
                                         ('confirm', 'Confirm'),
                                         ('refuse', 'Refused'),
-                                        ], default='draft', readonly=False, store=True, tracking=True, compute="reject_timesheet_overtime")
+                                        ('approved', 'Approved'),
+                                        ], default='draft', readonly=True, store=True, tracking=True, compute="reject_timesheet_overtime")
     reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True, default=False)
     invisible_button_confirm = fields.Boolean(default=False, help="Check invisible button Confirm")
     
@@ -51,23 +52,24 @@ class AccountAnalyticLine(models.Model):
 
     @api.onchange('date', 'type_ot', 'type_day_ot')
     def compute_type_overtime_day(self):
-        date = self.date
-        public_holiday = self.env['resource.calendar.leaves'].search([('calendar_id','=',False),('holiday_id','=',False), 
-        ('date_from','<=',date),('date_to','>=',date)])
-        if self.type_day_ot != 'other':
-            if public_holiday:
-                self.type_day_ot = 'holiday'
-            elif  4 < date.weekday() < 7:
-                self.type_day_ot = 'weekend'
+        for record in self:
+            date = record.date
+            public_holiday = record.env['resource.calendar.leaves'].search([('calendar_id','=',False),('holiday_id','=',False), 
+            ('date_from','<=',date),('date_to','>=',date)])
+            if record.type_day_ot != 'other':
+                if public_holiday:
+                    record.type_day_ot = 'holiday'
+                elif  4 < date.weekday() < 7:
+                    record.type_day_ot = 'weekend'
+                else:
+                    record.type_day_ot = 'normal_day'
             else:
-                self.type_day_ot = 'normal_day'
-        else:
-            self.type_day_ot = 'other'
-        
-        if self.type_ot == "no":
-            self.pay_type = False
-        elif self.pay_type == False:
-            self.pay_type = "full_day_off"
+                record.type_day_ot = 'other'
+            
+            if record.type_ot == "no":
+                record.pay_type = False
+            elif record.pay_type == False:
+                record.pay_type = "full_day_off"
 
 
     @api.depends('reason_reject')
@@ -123,9 +125,14 @@ class AccountAnalyticLine(models.Model):
 
     def _compute_pay_type_of_timeoff(self):
         for record in self:
-            if record.request_overtime_ids and record.type_ot == 'yes' and record.request_overtime_ids.stage_id.name=='Approval':
+            if record.request_overtime_ids and record.type_ot == 'yes' and\
+                    record.request_overtime_ids.stage_id.name=='Approval' and\
+                        record.pay_type in ['full_day_off', 'half_cash_half_dayoff']:
+                
                 pay_type = record.pay_type
                 time_of_type = self.env['hr.leave.type'].search([('company_id','=',record.employee_id.company_id.id),('name', 'like', 'Nghỉ bù')])
+                if len(time_of_type)==0:
+                    raise ValidationError(_("Please Create Time Of Types: Nghỉ bù."))
                 number_of_hours_display = 0
                 if pay_type=='full_day_off':
                     number_of_hours_display = record.unit_amount
@@ -165,7 +172,7 @@ class AccountAnalyticLine(models.Model):
                     record.check_approval_ot = True
                     # Compute time off 'nghi bu' when change status Approvals
                     record._compute_pay_type_of_timeoff()
-                    record.status_timesheet_overtime = 'confirm'
+                    record.status_timesheet_overtime = 'approved'
                 else:
                     record.check_request_ot = False
                     record.check_approval_ot = False
@@ -244,6 +251,12 @@ class AccountAnalyticLine(models.Model):
             return {'request_overtime_ids': False}
 
         return {'request_overtime_ids': False}
+
+    def unlink(self):
+        for record in self:
+            if record.status_timesheet_overtime == 'approved' and record.env.user.has_group('hr_timesheet.group_timesheet_manager') == False:
+                raise UserError(_("Can not delete Timesheet Approved!")) 
+        return super().unlink()
             
 class HrBookingOvertime(models.Model):
     _name = "hr.booking.overtime"

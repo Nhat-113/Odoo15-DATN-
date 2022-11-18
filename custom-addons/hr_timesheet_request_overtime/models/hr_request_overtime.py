@@ -3,7 +3,7 @@ import hmac
 import json
 from werkzeug import urls
 from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 import pandas as pd
 
 
@@ -146,16 +146,40 @@ class HrRequestOverTime(models.Model):
 
     @api.onchange('booking_overtime','start_date', 'end_date')
     def _check_duplicate_booking_member(self):
-        if len(self.booking_overtime)>0:
-            new_booking_member = self.booking_overtime[-1]
-            current_booking = self.booking_overtime[:-1]
-            for booking in current_booking:
-                # Validation
-                if (new_booking_member.user_id.id==booking.user_id.id) and \
-                    ((new_booking_member.start_date <= booking.start_date and new_booking_member.end_date >= booking.start_date) or\
-                        (new_booking_member.start_date <= booking.end_date and new_booking_member.end_date >= booking.end_date) or\
-                            (new_booking_member.start_date >= booking.start_date and new_booking_member.end_date <= booking.end_date)):
-                    raise ValidationError(_("The user is booked OT on this date, please recheck."))
+        check_values = {}
+        self.common_check_dupplicate(check_values)
+        if len(self.booking_overtime)>0 and check_values['booking'] == True:
+            warning = {
+                        'warning': {
+                            'title': 'Warning!',
+                            'message': 'The user is booked OT on this date, please recheck.'
+                            }
+                        }
+            return warning
+    
+    def common_check_dupplicate(self, check_values):
+        for record in self:
+            if len(record.booking_overtime)>0:
+                # new_booking_member = record.booking_overtime[-1]
+                current_booking = record.booking_overtime
+                check_values['booking'] = False
+                for index, booking in enumerate(current_booking):
+                    for old_booking in current_booking[index+1:]:
+                    # Validation
+                        if (old_booking.user_id.id==booking.user_id.id) and \
+                            ((old_booking.start_date <= booking.start_date and old_booking.end_date >= booking.start_date) or\
+                                (old_booking.start_date <= booking.end_date and old_booking.end_date >= booking.end_date) or\
+                                    (old_booking.start_date >= booking.start_date and old_booking.end_date <= booking.end_date)):
+                            check_values['booking'] = True
+
+    
+    def write(self, vals):
+        res = super().write(vals)
+        check_values = {}
+        self.common_check_dupplicate(check_values)
+        if len(self.booking_overtime)>0 and check_values['booking'] == True:
+            raise ValidationError(_("The user is booked OT on this date, please recheck."))
+        return res
     
     @api.depends('start_date', 'end_date')
     def _compute_duration_overtime(self):
@@ -368,6 +392,9 @@ class HrRequestOverTime(models.Model):
 
     def unlink(self):
         for record in self:
+            if record.stage_id.name == "Approval" and record.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_admin') == False:
+                raise UserError(_("Can not delete Request Approved!")) 
             record.booking_overtime.unlink()
         return super().unlink()
+
     
