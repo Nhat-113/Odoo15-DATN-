@@ -164,12 +164,13 @@ class ProjectExpense(models.Model):
 class ProjectExpenseValue(models.Model):
     _name = 'project.expense.value'
     _rec_name = "name"
-    _order = "expense_date DESC"
+    _order = "company_id desc, department_id desc, project_id desc, expense_date desc"
     
     
     project_expense_management_id = fields.Many2one('project.expense.management', string="Project Expense Management")
     project_id = fields.Many2one('project.project', string="Project", related='project_expense_management_id.project_id', store=True)
     department_id = fields.Many2one("hr.department", string="Department", store=True, related='project_expense_management_id.department_id')
+    company_id = fields.Many2one('res.company', string="Company", related="project_expense_management_id.company_id", store=True)
     currency_id = fields.Many2one('res.currency', string="Currency", related='project_expense_management_id.currency_id', store=True)
     
     name = fields.Char(string="Expense name", required=True)
@@ -178,8 +179,28 @@ class ProjectExpenseValue(models.Model):
     description = fields.Text(string="Description")
     
     exchange_rate = fields.Float(string="Exchange Rate")
-    expense_vnd = fields.Monetary(string="Total Revenue (VND)", currency_field='currency_vnd', compute='_compute_total_expense', store=True)
+    expense_vnd = fields.Monetary(string="Total Expense (VND)", currency_field='currency_vnd', compute='_compute_total_expense', store=True)
     currency_vnd = fields.Many2one('res.currency', string="VND Currency", related='project_expense_management_id.currency_vnd', readonly=True, store=True)   
+    
+    user_pm = fields.Many2one('res.users', string="Div manager", related='project_expense_management_id.user_pm', store=True)
+    user_subceo = fields.Char(string='Sub CEO email', related='project_expense_management_id.user_subceo', store=True)
+    
+    
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        field_disable = ['user_pm', 'user_subceo', 'currency_vnd', 'currency_id', 'project_expense_management_id']
+        result = super(ProjectExpenseValue, self).fields_get(allfields, attributes=attributes)
+
+        for field in field_disable:
+            if field in result:
+                result[field].update({
+                    'selectable': False,
+                    'exportable': False,
+                    'searchable': False,
+                    'sortable': False
+                })
+          
+        return result
     
     
     @api.onchange('expense_date')
@@ -214,3 +235,9 @@ class ProjectExpenseValue(models.Model):
                     else:
                         raise UserError(_('The date "%(date)s" is outside the project implementation period "%(project)s" !',
                                         date = self.expense_date, project = self.project_id.name))
+                        
+                        
+    @api.onchange('total_expenses')
+    def _validate_expense_value_input(self):
+        if self.total_expenses < 0:
+            raise ValidationError("The expense must be greater than zero!")

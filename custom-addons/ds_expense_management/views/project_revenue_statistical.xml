@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sidebar filter  -->
+    <record id="project_revenue_search_filter" model="ir.ui.view">
+        <field name="name">project.revenue.value.search</field>
+        <field name="model">project.revenue.value</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="company_id"/>
+                <field name="department_id"/>
+                <field name="project_id"/>
+
+                <searchpanel>
+                    <field name="company_id" icon="fa-building" enable_counters="1"/>
+                    <field name="department_id" icon="fa-building" enable_counters="1"/>
+                    <field name="project_id" icon="fa-folder" enable_counters="1"/>
+                </searchpanel>
+
+                <filter string="Current Year" name="project_revenue_filter_current_year" domain="[
+                    ('get_year', '&gt;=', (context_today().year)),
+                    ('get_year', '&lt;=', (context_today().year))]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Company" name="project_revenue_group_by_company" context="{'group_by': 'company_id'}"/>
+                    <separator orientation="vertical" />
+                    <filter string="Department" name="project_revenue_group_by_department" context="{'group_by': 'department_id'}"/>
+                    <separator orientation="vertical" />
+                    <filter string="Project" name="project_revenue_group_by_project" context="{'group_by': 'project_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+    <record id="project_revenue_statistical_view_tree" model="ir.ui.view">
+        <field name="name">project.revenue.value.tree</field>
+        <field name="model">project.revenue.value</field>
+        <field name="arch" type="xml">
+            <tree edit="0" create="0" delete="0" duplicate="0">
+                <field name="company_id" optional="hide"/>
+                <field name="department_id" optional="hide"/>
+                <field name="project_id"/>
+                <field name="get_month" width="72px"/>
+                <field name="get_year" width="50px"/>
+                <field name="revenue_vnd" sum="Total Revenue" widget="monetary"/>
+                <field name="commission_percents" />
+                <field name="result_commission" sum="Total Commission" widget="monetary"/>
+                <field name="result_revenue" sum="Total Revenue Remaining" widget="monetary"/>
+                <field name="description" />
+                <field name="sort_date" invisible="1"/>
+                <field name="currency_vnd" invisible="1"/>
+                <field name="user_pm" invisible="1"/>
+                <field name="user_subceo" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

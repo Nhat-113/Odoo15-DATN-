@@ -83,6 +83,7 @@
                                                             'readonly': [('parent.get_currency_name', '!=', 'VND')]}"/>
 
                                     <field name="description"/>
+                                    <field name="company_id" invisible="1"/>
                                     <field name="department_id" invisible="1"/>
                                     <field name="project_id" invisible="1"/>
                                     <field name="currency_id" invisible="1"/>

@@ -46,11 +46,29 @@ class ExpenseManagement(models.Model):
     total_expenses = fields.Float(string="Total Expenses", store=True, compute="_compute_total_expense_by_month", tracking=True)
     
     company_id = fields.Many2many('res.company', 'general_expenses_company_rel', string="Companies", default=lambda self: self.env.company, required=True)
+    user_subceo = fields.Many2many('res.users', string="Sub CEO", store=True)
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.main_company').currency_id, tracking=True)
     
     expense_generals = fields.One2many('expense.general', 'expense_management_id', string="General Expense")
     expenses_activities= fields.One2many('expense.activity', 'expense_management_id', string="Activity Expense")
     
+    
+    
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        field_disable = ['user_subceo', 'currency_id', 'sort_date']
+        result = super(ExpenseManagement, self).fields_get(allfields, attributes=attributes)
+
+        for field in field_disable:
+            if field in result:
+                result[field].update({
+                    'selectable': False,
+                    'exportable': False,
+                    'searchable': False,
+                    'sortable': False
+                })
+          
+        return result
     
     def write(self, vals):
         if 'company_id' in vals:
@@ -68,6 +86,27 @@ class ExpenseManagement(models.Model):
         result = super(ExpenseManagement, self).write(vals)
         return result
     
+    
+    @api.onchange('company_id')
+    def _compute_get_subceo_access_right(self):
+        if self.company_id:
+            emails = []
+            for record in self.company_id:
+                emails.append(record.user_email)
+            users = self.env['res.users'].sudo().search([('login', 'in', emails)])
+            self.user_subceo = users
+        
+    
+    def action_update_group_old_data(self):
+        for record in self:
+            if record.company_id:
+                emails = []
+                for item in record.company_id:
+                    emails.append(item.user_email)
+                users = self.env['res.users'].sudo().search([('login', 'in', emails)])
+                record.user_subceo = users
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
+        
     
     @api.onchange('get_month', 'get_year')
     def _validate_get_month(self):
