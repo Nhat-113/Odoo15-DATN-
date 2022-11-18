@@ -40,7 +40,7 @@
                 </header>
                 <sheet>
                     <field name='stage_name' invisible="1"/>
-                    <field name='active' invisible="1"/>1500
+                    <field name='active' invisible="1"/>
                     <field name='approve_flag' invisible="1"/>
                     <widget name="web_ribbon" title="REFUSED" bg_color="bg-danger" attrs="{'invisible':[('active', '=', True)]}"/>
                     <widget name="web_ribbon" title="APPROVED" bg_color="bg-success" attrs="{'invisible':[ '|','|', ('approve_flag', '=', True), ('stage_name', '!=', 'Approval'), ('active', '=', False)]}"/>
