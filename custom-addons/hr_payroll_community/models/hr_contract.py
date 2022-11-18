@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class HrContract(models.Model):
@@ -34,6 +35,7 @@ class HrContract(models.Model):
     other_allowance = fields.Monetary(compute='_other_allowance_total', string="Other Allowance", readonly=True, help="Other allowances = Non-Taxable Allowances + Taxable Allowances")
     non_taxable_allowance = fields.Monetary(string="Non-Taxable Allowance", help="Non-Taxable Allowances")
     taxable_allowance = fields.Monetary(string="Taxable Allowance", help="Taxable Allowances")
+    percent_prob_contract = fields.Float('Probationary Contract', store=True, default=85)
 
     @api.depends('non_taxable_allowance', 'taxable_allowance')
     def _other_allowance_total(self):
@@ -67,6 +69,12 @@ class HrContract(models.Model):
             else:
 
                 contract[code] = 0.0
+
+    @api.constrains('percent_prob_contract')
+    def check_validate_percent_prob(self):
+        for contract in self:
+            if contract.percent_prob_contract <= 0 or contract.percent_prob_contract > 100:
+               raise UserError('Percent must not be less than 0 and greater than 100')
                 
 
 class HrContractAdvandageTemplate(models.Model):

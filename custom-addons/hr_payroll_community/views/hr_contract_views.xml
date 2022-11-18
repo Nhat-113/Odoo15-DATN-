@@ -114,6 +114,14 @@
                         <span>/ month</span>
                     </div>
                 </group>
+                <group string="Other" name="group_right">
+                    <label for="percent_prob_contract" attrs="{'invisible': [('contract_document_type', '!=', 'probationary')]}"/>
+                    <div class="o_row" attrs="{'invisible': [('contract_document_type', '!=', 'probationary')]}">
+
+                        <field name="percent_prob_contract" nolabel="1" attrs="{'required': [('contract_document_type', '=', 'probationary')]}"/>
+                        <span>(%)</span>
+                    </div>
+                </group>
             </xpath>
             <xpath expr="//group[@name='salary']" position="after">
                 <group name="salary">
