@@ -25,7 +25,9 @@ class ProjectPlanningBookingResource(models.Model):
                     br.man_month,
                     br.effort_rate_month,
                     hpl.total,
-	                ((COALESCE(NULLIF(hpl.total, NULL), 0)) * (COALESCE(NULLIF(br.effort_rate_month, NULL), 0)) / 100 ) AS salary,
+                    hplbh.total AS bhxh,
+	                hpltt.total AS ttncn,
+	                ((COALESCE(NULLIF(hpl.total + hplbh.total + hpltt.total, NULL), 0)) * (COALESCE(NULLIF(br.effort_rate_month, NULL), 0)) / 100 ) AS salary,
                     pl.inactive,
                     pl.inactive_date
                     
@@ -41,9 +43,17 @@ class ProjectPlanningBookingResource(models.Model):
                     ON hp.employee_id = br.employee_id
                     AND EXTRACT (MONTH FROM br.start_date_month) = EXTRACT (MONTH FROM hp.date_from)
                     AND EXTRACT (YEAR FROM br.start_date_month) = EXTRACT (YEAR FROM hp.date_from)
-                LEFT JOIN hr_payslip_line hpl
+                LEFT JOIN hr_payslip_line AS hpl
                     ON hp.id = hpl.slip_id
                     AND hpl.code IN('NET', 'NET1') 
+                    AND hp.state = 'done'
+                LEFT JOIN hr_payslip_line AS hplbh
+                    ON hp.id = hplbh.slip_id
+                    AND hplbh.code = 'BH'
+                    AND hp.state = 'done'
+                LEFT JOIN hr_payslip_line AS hpltt
+                    ON hp.id = hpltt.slip_id
+                    AND hpltt.code IN('TTNCN', 'TTNCN1')  
                     AND hp.state = 'done'
             )""" % (self._table)
         )

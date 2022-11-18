@@ -205,7 +205,8 @@ class ProjectManagementHistory(models.Model):
                             expense_date,
                             total_project_expense
                 ),
-
+                
+                --- Compute total salary employee & revenue project by month ---
                 compute_total_salary_employee AS (
                     SELECT
                         company_id,
@@ -359,7 +360,6 @@ class ProjectManagementHistory(models.Model):
                         AND EXTRACT(YEAR FROM cni.months) = EXTRACT(YEAR FROM gmp.month_start)
                 ),
 
-                --- Compute total salary employee & revenue project by month ---
                 project_compute_average_cost_project AS (
                     SELECT *, 
                         

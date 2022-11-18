@@ -41,7 +41,7 @@ class ProjectManagementMemberDetail(models.Model):
                     (CASE
                         WHEN pmt.name IN('intern', 'Intern')
                             THEN 0
-                        ELSE hpl.total * ppb.effort_rate_month / 100
+                        ELSE (hpl.total + hplbh.total + hpltt.total) * ppb.effort_rate_month / 100
                     END) AS salary,
                     
                     (CASE
@@ -59,7 +59,6 @@ class ProjectManagementMemberDetail(models.Model):
                     pmh.currency_id
                     
                 FROM project_planning_booking AS ppb
-
                 RIGHT JOIN project_management_member AS pmm
                     ON pmm.employee_id = ppb.employee_id
                     AND pmm.project_id = ppb.project_id
@@ -79,7 +78,17 @@ class ProjectManagementMemberDetail(models.Model):
                     AND EXTRACT(YEAR FROM hp.date_from) = EXTRACT(YEAR FROM ppb.start_date_month)
                 LEFT JOIN hr_payslip_line AS hpl
                     ON hpl.slip_id = hp.id
-                    AND hpl.code IN('NET', 'NET1') AND hp.state = 'done'
+                    AND hpl.code IN('NET', 'NET1') 
+                    AND hp.state = 'done'
+                LEFT JOIN hr_payslip_line AS hplbh
+                    ON hp.id = hplbh.slip_id
+                    AND hplbh.code = 'BH'
+                    AND hp.state = 'done'
+                LEFT JOIN hr_payslip_line AS hpltt
+                    ON hp.id = hpltt.slip_id
+                    AND hpltt.code IN('TTNCN', 'TTNCN1')  
+                    AND hp.state = 'done'
+                    
                 WHERE ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb) 
                     OR ppb.department_id IS NULL
                 ORDER BY project_members, employee_id

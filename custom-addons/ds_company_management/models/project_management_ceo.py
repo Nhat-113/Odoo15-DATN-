@@ -129,7 +129,7 @@ class ProjectManagementCeo(models.Model):
                             ELSE (SELECT date_trunc('month', hmc.months) + interval '1 month - 1 day')::date
                         END) AS month_end,
                                 
-                        (SELECT date_trunc('month', hmc.months) + interval '1 month - 1 day')::date AS month_end_date
+                        (date_trunc('month', hmc.months) + interval '1 month - 1 day')::date AS month_end_date
                         
                     FROM history_manager_company AS hmc
                 ),
@@ -187,7 +187,9 @@ class ProjectManagementCeo(models.Model):
                         cw.working_day,
                         cw.working_day_total,
                         hpl.total,
-                        hpll.total AS bqnc
+                        hpll.total AS bqnc,
+                        hplbh.total AS bhxh,
+                        hpltt.total AS ttncn
                     FROM compute_working_day_manager AS cw
                     LEFT JOIN hr_payslip AS hp
                         ON (CASE
@@ -201,10 +203,20 @@ class ProjectManagementCeo(models.Model):
                         
                     LEFT JOIN hr_payslip_line AS hpl
                             ON hpl.slip_id = hp.id
-                            AND hpl.code IN('NET', 'NET1') AND hp.state = 'done'
+                            AND hpl.code IN('NET', 'NET1') 
+                            AND hp.state = 'done'
                     LEFT JOIN hr_payslip_line AS hpll
                             ON hpll.slip_id = hp.id
-                            AND hpll.code IN('BQNC') AND hp.state = 'done'
+                            AND hpll.code IN('BQNC') 
+                            AND hp.state = 'done'
+                    LEFT JOIN hr_payslip_line AS hplbh
+                        ON hp.id = hplbh.slip_id
+                        AND hplbh.code = 'BH'
+                        AND hp.state = 'done'
+                    LEFT JOIN hr_payslip_line AS hpltt
+                        ON hp.id = hpltt.slip_id
+                        AND hpltt.code IN('TTNCN', 'TTNCN1')  
+                        AND hp.state = 'done'
                 ),
 
                 project_planning_booking_remove_department_fnb AS (
@@ -272,7 +284,7 @@ class ProjectManagementCeo(models.Model):
                                         -- when manager company is manager department and doesn't join project but only work for half a month ---
                                         WHEN mdh.working_day <> mdh.working_day_total AND mdh.effort_rate_month IS NULL
                                             THEN
-                                                COALESCE(NULLIF(mdh.salary_manager, NULL), 0) - (COALESCE(NULLIF(mdh.bqnc, NULL), 0) * mdh.working_day)
+                                                COALESCE(NULLIF(mdh.salary_manager + mdh.bhxh + mdh.ttncn, NULL), 0) - (COALESCE(NULLIF(mdh.bqnc + (mdh.bhxh + mdh.ttncn) / mdh.working_day_total, NULL), 0) * mdh.working_day)
                                         ELSE
                                             0
                                     END)
@@ -282,16 +294,16 @@ class ProjectManagementCeo(models.Model):
                                     WHEN gs.working_day <> gs.working_day_total
                                         THEN (CASE
                                                 WHEN ppb.effort_rate_month IS NULL
-                                                    THEN COALESCE(NULLIF(gs.bqnc, NULL), 0) * gs.working_day
+                                                    THEN COALESCE(NULLIF(gs.bqnc + (gs.bhxh + gs.ttncn) / gs.working_day_total, NULL), 0) * gs.working_day
                                                 ELSE
-                                                    COALESCE(NULLIF(gs.bqnc, NULL), 0) * gs.working_day * (100 - ppb.effort_rate_month) / 100
+                                                    COALESCE(NULLIF(gs.bqnc + (gs.bhxh + gs.ttncn) / gs.working_day_total, NULL), 0) * gs.working_day * (100 - ppb.effort_rate_month) / 100
                                             END)
                                     ELSE
                                         (CASE
                                             WHEN ppb.effort_rate_month IS NULL
-                                                THEN COALESCE(NULLIF(gs.total, NULL), 0)
+                                                THEN COALESCE(NULLIF(gs.total + gs.bhxh + gs.ttncn, NULL), 0)
                                             ELSE
-                                                COALESCE(NULLIF(gs.total, NULL), 0) * (100 - ppb.effort_rate_month) / 100
+                                                COALESCE(NULLIF(gs.total + gs.bhxh + gs.ttncn, NULL), 0) * (100 - ppb.effort_rate_month) / 100
                                         END)
                                 END)
                         END) AS remaining_salary

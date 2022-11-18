@@ -167,7 +167,9 @@ class ManagerDepartmentHistory(models.Model):
                         cw.working_day,
                         cw.working_day_total,
                         hpl.total,
-                        hpll.total AS bqnc
+                        hpll.total AS bqnc,
+                        hplbh.total AS bhxh,
+		                hpltt.total AS ttncn
                         
                     FROM compute_working_day AS cw
                     LEFT JOIN hr_payslip AS hp
@@ -182,10 +184,20 @@ class ManagerDepartmentHistory(models.Model):
                         AND EXTRACT(YEAR FROM hp.date_from) = EXTRACT(YEAR FROM cw.month_start)
                     LEFT JOIN hr_payslip_line AS hpl
                         ON hpl.slip_id = hp.id
-                        AND hpl.code IN('NET', 'NET1') AND hp.state = 'done'
+                        AND hpl.code IN('NET', 'NET1') 
+                        AND hp.state = 'done'
                     LEFT JOIN hr_payslip_line AS hpll
                         ON hpll.slip_id = hp.id
-                        AND hpll.code IN('BQNC') AND hp.state = 'done'
+                        AND hpll.code IN('BQNC') 
+                        AND hp.state = 'done'
+                    LEFT JOIN hr_payslip_line AS hplbh
+                        ON hp.id = hplbh.slip_id
+                        AND hplbh.code = 'BH'
+                        AND hp.state = 'done'
+                    LEFT JOIN hr_payslip_line AS hpltt
+                        ON hp.id = hpltt.slip_id
+                        AND hpltt.code IN('TTNCN', 'TTNCN1')  
+                        AND hp.state = 'done'
                 ),
 
                 project_planning_booking_remove_department_fnb AS (
@@ -209,6 +221,8 @@ class ManagerDepartmentHistory(models.Model):
                     gsm.working_day,
                     gsm.working_day_total,
                     gsm.bqnc,
+                    gsm.bhxh,
+	                gsm.ttncn,
                     gsm.total AS salary_manager,
                     ppb.effort_rate_month,
                     ppb.man_month
