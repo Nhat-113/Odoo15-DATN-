@@ -936,9 +936,10 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var howManyRows = 0;
             let count_members_of_company = 0;
             let listId = [];
+            const number_rows_not_count_avai_resource = 3;
             try {
                 var howManyRows = table.rows.length;
-                for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
+                for (var i = 1; i < howManyRows - number_rows_not_count_avai_resource; i++) {
                     let row = table.rows[i];
                     let id_employee = table.rows[i].cells[1].innerText;
                     let parent_style = row.cells[colNumber].parentElement.style.display;
