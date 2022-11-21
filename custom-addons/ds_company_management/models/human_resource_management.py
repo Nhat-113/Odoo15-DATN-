@@ -363,8 +363,8 @@ class HumanResourceManagement(models.Model):
         sql_domain_for_company = ''
 
         sql_domain_for_role = ''
-        sql_domain_for_department_emp = ' AND (human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
-        sql_domain_for_department_proj = ' AND (human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
+        sql_domain_for_department_emp = ' AND ( human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
+        sql_domain_for_department_proj = ' AND ( human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
 
         if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
             sql_domain_for_role = ''
@@ -380,7 +380,7 @@ class HumanResourceManagement(models.Model):
         elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
                 self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
             sql_domain_for_company = ''
-            sql_domain_for_role = ' where (department_manager_user_id != ' + str(user_id_login) + ' and department_manager_project_id = ' + str(user_id_login) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
+            sql_domain_for_role = ' where ( (department_manager_user_id != ' + str(user_id_login) + 'or  department_manager_user_id is null  )' + ' and department_manager_project_id = ' + str(user_id_login) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
         sql = ("""select * from human_resource_management """)
         sql += sql_domain_for_company
