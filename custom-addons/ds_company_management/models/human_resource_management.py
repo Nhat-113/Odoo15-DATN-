@@ -418,7 +418,9 @@ class HumanResourceManagement(models.Model):
 
         elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
                 self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
-            sql_domain_for_role = ''		
+            sql_domain_for_company = ''
+            sql_domain_for_role = ' where (department_manager_user_id = ' + str(user_id_login) +  ')'
+
 
         sql = ("""SELECT  employee_id, employee_name, company_name, department_name,
 				SUM (month1 ) as month1,
