@@ -43,7 +43,7 @@
             name="Approved Statistics"
             parent="hr_timesheet_request_overtime.menu_timesheets_approvals"
             action="hr_timesheet_reporting_overtime_action"
-            groups = "hr_timesheet_request_overtime.request_overtime_access_officer"
+            groups = "hr_timesheet_request_overtime.request_overtime_access_director"
             sequence="3"/>
     </data>
 </odoo>
