@@ -320,8 +320,13 @@ class HumanResourceManagement(models.Model):
         sql_domain_for_company = ''
 
         sql_domain_for_role = ''
-        sql_domain_for_department_emp = ' AND (human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
-        sql_domain_for_department_proj = ' AND (human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
+        if len(id_all_mirai_department) == 0: 
+            sql_domain_for_department_emp = ''
+            sql_domain_for_department_proj = ''
+        else: 
+            id_all_mirai_department.append(0)
+            sql_domain_for_department_emp = ' AND (human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
+            sql_domain_for_department_proj = ' AND (human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
 
         if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
             sql_domain_for_role = ''
@@ -363,8 +368,14 @@ class HumanResourceManagement(models.Model):
         sql_domain_for_company = ''
 
         sql_domain_for_role = ''
-        sql_domain_for_department_emp = ' AND ( human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
-        sql_domain_for_department_proj = ' AND ( human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
+
+        if len(id_all_mirai_department) == 0: 
+            sql_domain_for_department_emp = ''
+            sql_domain_for_department_proj = ''
+        else :
+            id_all_mirai_department.append(0)
+            sql_domain_for_department_emp = ' AND ( human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
+            sql_domain_for_department_proj = ' AND ( human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
 
         if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
             sql_domain_for_role = ''
@@ -404,8 +415,14 @@ class HumanResourceManagement(models.Model):
         sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ')'
 
         sql_domain_for_role = ''
-        sql_domain_for_department_emp = ' AND (human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
-        sql_domain_for_department_proj = ' AND (human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
+        if len(id_all_mirai_department) == 0: 
+            sql_domain_for_department_emp = ''
+            sql_domain_for_department_proj = ''
+        else:
+            id_all_mirai_department.append(0)
+            sql_domain_for_department_emp = ' AND (human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
+            sql_domain_for_department_proj = ' AND (human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
+
         sql_domain_for_group_by = 'GROUP BY employee_id, employee_name ,company_name, department_name, company_id, start_date_contract, end_date_contract order by employee_name asc'
 
         if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
