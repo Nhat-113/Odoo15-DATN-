@@ -1,4 +1,4 @@
-odoo.define('human_resource_template.Dashboard', function (require) {
+odoo.define('human_resource_template_support.Dashboard', function (require) {
     "use strict";
 
     const ActionMenus = require("web.ActionMenus");
@@ -39,8 +39,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
     var QWeb = core.qweb;
     const number_rows_not_count = 4;
 
-    var HumanResourceTemplate = AbstractAction.extend({
-        template: 'Human_resource',
+    var HumanResourceTemplateSupport = AbstractAction.extend({
+        template: 'Human_resource_support',
         jsLibs: ["ds_company_management/static/src/js/lib/table2excel.js"],
         events: {
 
@@ -52,7 +52,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
         init: function (parent, context) {
             this.action_id = context['id'];
             this._super(parent, context);
-            this.list_human_resource = [];
+            this.list_human_resource_support = [];
             this.list_human_resource_free = [];
         },
 
@@ -196,13 +196,13 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             let self = this;
             var def1 = this._rpc({
                 model: "human.resource.management",
-                method: "get_list_human_resource",
+                method: "get_list_human_resource_support",
             })
                 .then(function (res) {
-                    if (res["list_human_resource"].length > 0) {
-                        self.list_human_resource = self.processMonthAvailable(res["list_human_resource"])
+                    if (res["list_human_resource_support"].length > 0) {
+                        self.list_human_resource_support = self.processMonthAvailable(res["list_human_resource_support"])
                     } else {
-                        self.list_human_resource = res["list_human_resource"]
+                        self.list_human_resource_support = res["list_human_resource_support"]
                     }
                 });
 
@@ -936,10 +936,9 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var howManyRows = 0;
             let count_members_of_company = 0;
             let listId = [];
-            const number_rows_not_count_avai_resource = 3;
             try {
                 var howManyRows = table.rows.length;
-                for (var i = 1; i < howManyRows - number_rows_not_count_avai_resource; i++) {
+                for (var i = 1; i < howManyRows - number_rows_not_count; i++) {
                     let row = table.rows[i];
                     let id_employee = table.rows[i].cells[1].innerText;
                     let parent_style = row.cells[colNumber].parentElement.style.display;
@@ -1050,59 +1049,9 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                 textAvailableHeadCountRate[i].innerText = ( ( compute_effort_member_available[i] / (total_element_member_company[i] * 100  )) * 100  ).toFixed(2) ;
             }
         },
-
-        
-        // filterTable : function () {
-        //     var input, filter, table, tr, td, i, txtValue;
-        //     const value_row_not_search = 4
-        //     input = document.getElementById("countriesDropdown");
-        //     filter = input.value.toUpperCase();
-        //     table = document.getElementById("human_resource_table");
-        //         if (!table) return;
-        //     tr = table.getElementsByTagName("tr");
-            
-        //     if (filter == 'ALL') {
-        //         for (i = 1; i < tr.length - value_row_not_search; i++) 
-        //         {
-        //             tr[i].style.display = '';
-        //         }
-        //     }
-
-        //     if (filter ==  'PROJECT BILLABLE')  {
-        //         for (i = 1; i < tr.length - value_row_not_search; i++) {
-        //             td = tr[i];
-        //             if (td) {
-        //                 txtValue = td.textContent || td.innerText;
-        //                 if (txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1){
-        //                     tr[i].style.display = '';
-        //                 } 
-        //                 else {
-        //                     tr[i].style.display = 'none';
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     if (filter ==  'INTERNAL')  {
-        //         for (i = 1; i < tr.length - value_row_not_search; i++) {
-        //             td = tr[i];
-        //             if (td) {
-        //                 txtValue = td.textContent || td.innerText;
-        //                 if (txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1){
-        //                     tr[i].style.display = 'none';
-        //                 } 
-        //                 else {
-        //                     tr[i].style.display = '';
-        //                 }
-        //             }
-        //         }
-        //     }
-               
-        // },
-
-
     });
 
-    core.action_registry.add('human_resource_template', HumanResourceTemplate);
+    core.action_registry.add('human_resource_template_support', HumanResourceTemplateSupport);
 
-    return HumanResourceTemplate;
+    return HumanResourceTemplateSupport;
 });

@@ -38,6 +38,7 @@
         'web.assets_backend': [
             '/ds_company_management/static/src/css/style.css',
             '/ds_company_management/static/src/js/human_resource_view.js',
+            '/ds_company_management/static/src/js/human_resource_view_support.js',
             'ds_company_management/static/src/js/lib/table2excel.js',
             '/ds_company_management/static/src/css/bom_dashboard.css',
             '/ds_company_management/static/src/js/lib/chart.js',
@@ -46,6 +47,7 @@
         ],
         'web.assets_qweb': [
             'ds_company_management/static/src/xml/human_resource_view.xml',
+            'ds_company_management/static/src/xml/human_resource_support_view.xml',
             'ds_company_management/static/src/xml/dynamic_dashboard_view.xml',
             'ds_company_management/static/src/xml/cost_management_update_data_view.xml',
         ],

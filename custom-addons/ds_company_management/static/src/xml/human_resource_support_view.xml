@@ -2,17 +2,17 @@
 <templates id="template" xml:space="preserve">
     <meta charset="utf-8"/>
     <meta name="viewport" content="initial-scale=1"/>
-    <t t-name="Human_resource">
+    <t t-name="Human_resource_support">
         <div class="main_content_hmrc">
             <div class="human_resource_in_top">
                 <div class="header_human_resource">
-                    <h2 class="title_human_resource">Human Resource Management IT</h2>
+                    <h2 class="title_human_resource">Human Resource Management Support</h2>
                     <div class="search_textbox">
                         <input type="text" id="search_input" placeholder="Search ..." />
                         <i title="Search..." role="img" aria-label="Search..." class="o_searchview_icon icon_search_human fa fa-search"></i>
 
                         <div class="selection-box">
-                            <button class="view-member-free" >Available Resource</button>
+                            <!-- <button class="view-member-free" >Available Resource</button> -->
                             <select id="countriesDropdown">
                                 <option>All</option>
                                 <option>Project Billable</option>
@@ -167,20 +167,20 @@
                             </th>
 
                         </tr>
-                        <t t-foreach="widget.list_human_resource" t-as="list_human_resource">
+                        <t t-foreach="widget.list_human_resource_support" t-as="list_human_resource_support">
                             <tr class="detail">
                                 <td class="td_value_none"></td>
                                 <td class="td_value human_employee_id" type="string">
-                                    <t t-esc="list_human_resource[25]"/>
+                                    <t t-esc="list_human_resource_support[25]"/>
                                 </td>
                                 <td class="td_value name_employee" type="string">
-                                    <t t-esc="list_human_resource[1]"/>
+                                    <t t-esc="list_human_resource_support[1]"/>
                                 </td>
-                                <td t-foreach="list_human_resource.slice(2,-25)" t-as="i" type="string"  class="td_value">
+                                <td t-foreach="list_human_resource_support.slice(2,-25)" t-as="i" type="string"  class="td_value">
                                     <t t-esc="i" />
                                 </td>
                                 <!-- <td class="td_value" type="string">
-                                    <t t-esc="list_human_resource[2]"/>
+                                    <t t-esc="get_list_human_resource_support[2]"/>
                                 </td>
                                 <td class="td_value" type="string">
                                     <t t-esc="list_human_resource[3]"/>
@@ -195,7 +195,7 @@
                                     <t t-esc="list_human_resource[6]"/>
                                 </td> -->
 
-                                <td t-foreach="list_human_resource.slice(7,-12)" t-as="i" type="string"  class="td_value">
+                                <td t-foreach="list_human_resource_support.slice(7, -12)" t-as="i" type="string"  class="td_value">
                                     <t t-esc="i" />
                                 </td>
                                 <!-- <td class="td_value" type="string">
@@ -235,7 +235,7 @@
                                     <t t-esc="list_human_resource[18]"/>
                                 </td> -->
                                 <td class="AVG_colum" type="string">
-                                    <t t-esc="list_human_resource[19]"/>
+                                    <t t-esc="list_human_resource_support[19]"/>
                                 </td>
                             </tr>
                         </t>
@@ -430,42 +430,6 @@
                                         <td t-foreach="list_human_resource_free.slice(4,-3)" t-as="i" type="string"  class="td_value">
                                             <t t-esc="i" />
                                         </td>
-                                        <!-- <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[4]"/>
-                                        </td>
-                                        <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[5]"/>
-                                        </td>
-                                        <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[6]"/>
-                                        </td>                                 
-                                        <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[7]"/>
-                                        </td>
-                                        <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[8]"/>
-                                        </td>
-                                        <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[9]"/>
-                                        </td>
-                                        <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[10]"/>
-                                        </td>
-                                        <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[11]"/>
-                                        </td>
-                                        <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[12]"/>
-                                        </td>
-                                        <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[13]"/>
-                                        </td>
-                                        <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[14]"/>
-                                        </td>
-                                        <td class="td_value" type="string">
-                                            <t t-esc="list_human_resource_free[15]"/>
-                                        </td> -->
                                     </tr>
                                 </t>
                                 <tr class="bottom_tabel" id="bottom_table" style="display:none">
