@@ -413,15 +413,15 @@
             <field name="category_id" ref="hr_payroll_community.DED"/>
             <field name="condition_select">none</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = (inputs.LTU and inputs.LTU.amount or 0)</field>            
+            <field name="amount_python_compute">result = (worked_days.LTU and worked_days.LTU.number_of_days or 0)</field>            
         </record>
 
         <!-- input lương tạm ứng -->
-        <record id="hr_rule_input_ltu" model="hr.rule.input">
+        <!-- <record id="hr_rule_input_ltu" model="hr.rule.input">
             <field name="name">Khấu trừ (VND)</field>
             <field name="code">LTU</field>
             <field name="input_id" ref="hr_payroll_community.hr_rule_ltu"/>            
-        </record>
+        </record> -->
         <!-- kết thúc -->
 
         <record id="hr_rule_kbs" model="hr.salary.rule">

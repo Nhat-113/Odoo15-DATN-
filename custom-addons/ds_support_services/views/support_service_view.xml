@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_request_service_tree" model="ir.ui.view">
+        <field name="name">view.request.service.tree</field>
+        <field name="model">support.services</field>
+        <field name="arch" type="xml">
+            <search string="Support Service">
+                <field name='name'/>
+                <field name='status'/>
+                <field name='category'/>
+                <field name='requester_id'/>
+                <group expand="0" string="Status">
+                    <filter string="Request" name="request" domain="[('flag_status', '=', 'request')]"/>
+                    <filter string="Approval" name="approval" domain="[('flag_status', '=', 'approval')]"/>
+                    <filter string="Done" name="done" domain="[('flag_status', '=', 'done')]"/>
+                </group>
+                <separator/>
+                <group expand="0" string="Status">
+                    <filter string="Team Building" name="team_building" domain="[('flag_category', '=', 'team_building')]"/>
+                    <filter string="Tạm ứng Lương" name="tam_ung_luong" domain="[('flag_category', '=', 'tam_ung_luong')]"/>
+                    <filter string="IT Helpdesk" name="it_helpdesk" domain="[('flag_category', '=', 'it_helpdesk')]"/>
+                    <filter string="Open Projects" name="open_projects" domain="[('flag_category', '=', 'open_projects')]"/>
+                    <filter string="Other" name="other" domain="[('flag_category', '=', 'other')]"/>
+                </group>
+                <group expand="0" string="Group By">
+                    <filter string="Requester" name="requester" context="{'group_by': 'requester_id'}"/>
+                    <separator/>
+                    <filter name="status_group" string="Status" context="{'group_by':'status'}"/>
+                    <separator/>
+                    <filter string="Date Request" name="date_request" context="{'group_by': 'date_request'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_tree_support_service" model="ir.ui.view">
+        <field name="name">Support Service List</field>
+        <field name="model">support.services</field>
+        <field name="arch" type="xml">
+            <tree create="1" delete="1" multi_edit="0" sample="1">
+                <field name='flag_status' invisible='1'/>
+                <field name="name" class="font-weight-bold"/>
+                <field name="requester_id"/>
+                <field name="date_request"/>
+                <field name="category"/>
+                <field name="description"/>
+                <field name="status" widget="badge" decoration-warning="flag_status == 'request'" decoration-info="flag_status == 'done'" decoration-success="flag_status == 'approval'"/>
+                <field name="flag_category" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_form_support_service" model="ir.ui.view">
+        <field name="name">Support Service Form</field>
+        <field name="model">support.services</field>
+        <field name="arch" type="xml">
+            <form string="Support Service - Form" duplicate="0">
+                <header>
+                    <field name="status" widget="statusbar" domain="domain_status" readonly="1"/>
+                    <button string="Request" name="action_request_service" type="object" class="btn-primary" attrs="{'invisible': ['|', ('flag_status', '!=', 'draft'), ('active', '=', False)]}" />
+                    <button string="Approve" name="action_approve_service" type="object" class="btn-primary" attrs="{'invisible': ['|', ('flag_status', '!=', 'request'), ('flag_category', 'in', ['it_helpdesk', 'open_projects', 'other']), ('flag_payment', '=', 'no_cost')]}" groups="ds_support_services.support_service_sub_ceo"/>
+                    <button string="Done" id="action_done_service_hr_have_cost" name="action_done_service" type="object" class="btn-primary" attrs="{'invisible': [('flag_status', '!=', 'approval')]}" groups="ds_support_services.support_service_hr"/>
+                    <button string="Done" id='action_done_service_hr_no_cost' name="action_done_service" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('flag_status', '!=', 'request'), ('flag_payment', '=', 'have_cost'), ('flag_category', 'in', ['team_building', 'tam_ung_luong', 'open_projects'])]}" groups="ds_support_services.support_service_hr"/>
+                    <button string="Create Project" id='action_done_service_project' name="action_create_project_service" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('flag_status', '!=', 'request'), ('flag_payment', '=', 'have_cost'), ('flag_category', '!=', 'open_projects')]}" groups="ds_support_services.support_service_hr"/>
+                    <button string="Done" id='action_done_service_it' name="action_done_service" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', '|', ('flag_category', '=', 'open_projects'), ('flag_status', '!=', 'request'), ('check_role_it', '=', False), ('flag_payment', '=', 'have_cost')]}" groups="ds_support_services.support_service_it"/>
+                    <button string="Refuse" name="action_refuse_reason" type="object" attrs="{'invisible': ['|', ('active', '=', False), ('flag_status', '!=', 'request')]}" data-hotkey="x" groups="ds_support_services.support_service_sub_ceo"/>
+                    <button string="Restore" name="toggle_active" type="object" attrs="{'invisible': [('active', '=', True)]}" data-hotkey="z" groups="ds_support_services.support_service_sub_ceo"/>
+                    <button string="Set to Draft" name="action_set_to_draft" type="object" attrs="{'invisible': [('flag_status', '!=', 'request')]}" groups="ds_support_services.support_service_users"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="REFUSED" bg_color="bg-danger" attrs="{'invisible':[('active', '=', True)]}"/>
+                    <widget name="web_ribbon" title="DONE" bg_color="bg-info" attrs="{'invisible':[ '|', ('flag_status', '!=', 'done'), ('active', '=', False)]}"/>
+                    <widget name="web_ribbon" title="APPROVAL" bg_color="bg-success" attrs="{'invisible':[ '|', ('flag_status', '!=', 'approval'), ('active', '=', False)]}"/>
+                    <sheet>
+                        <field name='active' invisible="1"/>
+                        <field name='check_role_it' invisible="1"/>
+                        <group>
+                            <div class="oe_title">
+                                <label for="name" class="oe_edit_only" />
+                                <h1>
+                                    <field class="title_support_service" name="name" placeholder="e.g. Request service for ... " attrs="{'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                                </h1>
+                            </div>
+                        </group>
+                        <label for="refuse_reason" class="refuse_css_support_service" attrs="{'invisible':[('active', '=', True)]}"/>
+                        <field name='refuse_reason' class="refuse_css_support_service" attrs="{'invisible':[('active', '=', True)]}" readonly="1"/>
+                        <group string="Generate">
+                            <group name="group_left">
+                                <field name="requester_id" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                                <field name="date_request" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                            </group>
+                            <group name="group_right">
+                                <field name="domain_category" invisible="1"/>
+                                <field name="category" domain="domain_category" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                                <field name="approval" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" widget="many2one_avatar_user" 
+                                    attrs="{'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')], 
+                                    'required': ['|', ('flag_category', 'in', ['team_building', 'tam_ung_luong']), 
+                                    ('flag_payment', '=', 'have_cost')], 'invisible': [('flag_category', 'in', 
+                                    ['it_helpdesk', 'open_projects', 'other']), ('flag_payment', '=', 'no_cost')]}"/>
+                                <field name="send_to" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" widget="many2many_tags" attrs="{'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                            </group>
+                        </group>
+                        <group string='Detail'>
+                            <group name="group_left">
+                                <field name="flag_status" invisible="1"/>
+                                <field name="domain_status" invisible="1"/>
+                                <field name="flag_payment" invisible="1"/>
+                                <field name="payment" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', 'not in', ['it_helpdesk', 'other'])], 'required': [('flag_category', 'in', ['it_helpdesk', 'other'])], 'readonly': [('flag_status', 'in', ['approval', 'done'])]}"/>
+                                <field name="flag_category" invisible="1"/>
+                                <field name="project_id" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', '!=', 'team_building')], 'required': [('flag_category', '=', 'team_building')], 'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                                <field name="project_name" attrs="{'invisible': [('flag_category', '!=', 'open_projects')], 'required': [('flag_category', '=', 'open_projects')], 'readonly': [('flag_status', '!', 'draft')]}"/>
+                                <field name="project_type" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', '!=', 'open_projects')], 'required': [('flag_category', '=', 'open_projects')], 'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                                <field name="currency_vnd" invisible="1"/>
+                                <field name="amount" widget="monetary" attrs="{'invisible': [('flag_category', 'not in', ['team_building', 'tam_ung_luong'])], 'required': [('flag_category', 'in', ['team_building', 'tam_ung_luong'])], 'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                            </group>
+                            <group name="group_right">
+                                <field name="project_pm" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', '!=', 'open_projects')], 'required': [('flag_category', '=', 'open_projects')], 'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                                <field name="company_id" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', 'not in', ['team_building', 'tam_ung_luong'])], 'required': [('flag_category', 'in', ['team_building', 'tam_ung_luong'])], 'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                                <field name="company_project" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', '!=', 'open_projects')], 'required': [('flag_category', '=', 'open_projects')], 'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                            </group>
+                        </group>
+                        <separator string="Description"/>
+                        <field name="description" placeholder="Description" attrs="{'required': [('flag_category', 'in', ['it_helpdesk', 'other'])], 'readonly': ['|', ('active', '=', False), ('flag_status', '!=', 'draft')]}"/>
+                    </sheet>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids" options="{'post_refresh': 'always'}"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="support_service_action" model="ir.actions.act_window">
+        <field name="name">Support Service</field>
+        <field name="res_model">support.services</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_request_service_tree"/>
+        <field name="groups_id" eval="[(4, ref('ds_support_services.support_service_users'))]"/>
+    </record>
+</odoo>

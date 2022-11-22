@@ -1,0 +1,89 @@
+<odoo>
+    <data>
+
+        <record id="support_service_access_ds" model="ir.module.category">
+            <field name="name">Support Services</field>
+        </record>
+
+        <record id="support_service_users" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="support_service_access_ds"/>
+        </record>
+
+        <record id="base.group_user" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('ds_support_services.support_service_users'))]"/>
+        </record>
+
+        <record id="support_service_it" model="res.groups">
+            <field name="name">IT</field>
+            <field name="category_id" ref="support_service_access_ds"/>
+            <field name="implied_ids" eval="[(4, ref('ds_support_services.support_service_users'))]"/>
+        </record>
+
+        <record id="support_service_pm" model="res.groups">
+            <field name="name">PM</field>
+            <field name="category_id" ref="support_service_access_ds"/>
+            <field name="implied_ids" eval="[(4, ref('ds_support_services.support_service_it'))]"/>
+        </record>
+
+        <record id="support_service_sub_ceo" model="res.groups">
+            <field name="name">Sub CEO</field>
+            <field name="category_id" ref="support_service_access_ds"/>
+            <field name="implied_ids" eval="[(4, ref('ds_support_services.support_service_pm'))]"/>
+        </record>
+
+        <record id="support_service_hr" model="res.groups">
+            <field name="name">Officer</field>
+            <field name="category_id" ref="support_service_access_ds"/>
+            <field name="implied_ids" eval="[(4, ref('ds_support_services.support_service_sub_ceo'))]"/>
+        </record>
+
+        <record id="support_service_ceo" model="res.groups">
+            <field name="name">CEO</field>
+            <field name="category_id" ref="support_service_access_ds"/>
+            <field name="implied_ids" eval="[(4, ref('ds_support_services.support_service_hr'))]"/>
+        </record>
+
+        <record id="support_service_admin" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="support_service_access_ds"/>
+            <field name="implied_ids" eval="[(4, ref('ds_support_services.support_service_ceo'))]"/>
+        </record>
+
+        <record model="ir.rule" id="support_service_users_rule">
+            <field name="name">Support Service User: Only then can see self</field>
+            <field name="model_id" ref="model_support_services"/>
+            <field name="domain_force">[('requester_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4,ref('support_service_users'))]"/>
+        </record>
+
+        <record model="ir.rule" id="support_service_pm_rule">
+            <field name="name">Support Service PM: Only then can see self</field>
+            <field name="model_id" ref="model_support_services"/>
+            <field name="domain_force">[('requester_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4,ref('support_service_pm'))]"/>
+        </record>
+
+        <record model="ir.rule" id="support_service_manager_rule">
+            <field name="name">Support Service Manager</field>
+            <field name="model_id" ref="model_support_services"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4,ref('support_service_sub_ceo'))]"/>
+        </record>
+
+        <record model="ir.rule" id="support_service_it_rule">
+            <field name="name">Support Service IT</field>
+            <field name="model_id" ref="model_support_services"/>
+            <field name="domain_force">[('flag_category', 'in', ['it_helpdesk', 'other']), ('send_to', 'in', user.id)]</field>
+            <field name="groups" eval="[(4,ref('support_service_it'))]"/>
+        </record>
+
+        <record id="support_service_comp_rule" model="ir.rule">
+            <field name="name">Support Service multi company rule</field>
+            <field name="model_id" ref="model_support_services"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+
+
+    </data>
+</odoo>

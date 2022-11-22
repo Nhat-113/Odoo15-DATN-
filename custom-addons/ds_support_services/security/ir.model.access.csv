@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+ds_support_services.access_ds_support_service_user,support.service.user,ds_support_services.model_support_services,,1,1,1,1
+ds_support_services.access_ds_support_service_configuration,support.service.configuration,ds_support_services.model_department_it_hr,,1,1,0,0
+ds_support_services.access_ds_support_service_category,support.service.category,ds_support_services.model_category_support_service,,1,0,0,0
+ds_support_services.access_ds_support_service_refuse,support.service.refuse,ds_support_services.model_hr_request_service_refuse_reason,,1,1,1,1
+ds_support_services.access_ds_support_service_payment,support.service.payment,ds_support_services.model_payment_support_service,,1,0,0,0
+ds_support_services.access_ds_support_service_status,support.service.status,ds_support_services.model_status_support_service,,1,0,0,0
