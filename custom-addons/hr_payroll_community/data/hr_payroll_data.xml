@@ -493,7 +493,7 @@
         </record>
 
         <record id="hr_rule_bh1" model="hr.salary.rule">
-            <field name="name">BHYT, BHXH, BHTN (VND) = (1) * 32%</field>
+            <field name="name">BHYT, BHXH, BHTN (VND)</field>
             <field name="sequence" eval="19"/>
             <field name="code">BH</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -504,29 +504,29 @@
         </record>
 
         <record id="hr_rule_bh" model="hr.salary.rule">
-            <field name="name">BHYT, BHXH, BHTN (VND) = (1) * 32%</field>
+            <field name="name">BHYT, BHXH, BHTN (VND)</field>
             <field name="sequence" eval="19"/>
             <field name="code">BH</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field>
             <field name="condition_python">result = (worked_days.NVKL and worked_days.NVKL.number_of_days or 0) &lt; 14</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.wage * 0.32</field>
+            <field name="amount_python_compute">result = contract.wage * ((inputs.PBH and inputs.PBH.amount or 0)/100)</field>
         </record>
 
         <record id="hr_rule_bhmirai" model="hr.salary.rule">
-            <field name="name">BHYT, BHXH, BHTN (VND) = (1) * 10.5%</field>
+            <field name="name">BHYT, BHXH, BHTN (VND)</field>
             <field name="sequence" eval="19"/>
             <field name="code">BH</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
             <field name="condition_select">python</field>
             <field name="condition_python">result = (worked_days.NVKL and worked_days.NVKL.number_of_days or 0) &lt; 14</field> 
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.wage * 0.105</field>
+            <field name="amount_python_compute">result = contract.wage * ((inputs.PBH and inputs.PBH.amount or 0)/100)</field>
         </record>
 
         <record id="hr_rule_bhmirai1" model="hr.salary.rule">
-            <field name="name">BHYT, BHXH, BHTN (VND) = (1) * 10.5%</field>
+            <field name="name">BHYT, BHXH, BHTN (VND)</field>
             <field name="sequence" eval="19"/>
             <field name="code">BH</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
