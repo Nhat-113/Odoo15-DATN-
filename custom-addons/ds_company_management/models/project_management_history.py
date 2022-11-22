@@ -269,6 +269,37 @@ class ProjectManagementHistory(models.Model):
                             total_project_expense
                 ),
 
+                compute_project_department_expense AS (
+                    SELECT
+                        cpd.department_id,
+                        cpd.expense_date,
+                        date_trunc('month', cpd.expense_date)::DATE AS months,
+                        ccd.counts,
+                        cpd.project_id,
+                        (CASE
+                            WHEN ccd.counts = 0
+                                THEN cpd.total_project_expense
+                            ELSE cpd.total_project_expense / ccd.counts
+                        END) AS total_project_expense
+                    
+                    FROM compute_count_department_expense_value AS ccd
+                    RIGHT JOIN compare_project_department_expense AS cpd
+                        ON cpd.department_id = ccd.department_id
+                        AND cpd.expense_date = ccd.expense_date
+                ),
+
+                compute_department_project_expense_group AS (
+                    SELECT
+                        project_id,
+                        months,
+                        SUM(total_project_expense) AS total_project_expense
+                    
+                    FROM compute_project_department_expense
+                    WHERE project_id IS NOT NULL
+                    GROUP BY project_id, months
+                ),
+
+
                 --- Compute total salary employee & revenue project by month ---
                 compute_total_salary_employee AS (
                     SELECT
@@ -391,14 +422,9 @@ class ProjectManagementHistory(models.Model):
                         gmp.result_commission,
                         gmp.revenue_vnd,
                         (COALESCE(NULLIF(cts.salary, NULL), 0)) AS total_salary,
-                        (CASE
-                            WHEN ccd.counts = 0 OR ccd.counts IS NULL
-                                THEN COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)
-                            ELSE( COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)
-                                + COALESCE(NULLIF(ccd.total_project_expense, NULL), 0)
-                                / ccd.counts
-                            )
-                        END) AS total_project_expense,
+                        (COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)
+                            + COALESCE(NULLIF(cdp.total_project_expense, NULL), 0)
+                        ) AS total_project_expense,
                         (COALESCE(NULLIF(em.total_expenses / em.counts, NULL), 0)) AS operation_cost,
                         (COALESCE(NULLIF(pcm.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project,
                         (COALESCE(NULLIF(pni.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project_not_intern,
@@ -427,11 +453,11 @@ class ProjectManagementHistory(models.Model):
                         AND EXTRACT(MONTH FROM pevt.months) = EXTRACT(MONTH FROM gmp.month_start)
                         AND EXTRACT(YEAR FROM pevt.months) = EXTRACT(YEAR FROM gmp.month_start)
                         
-                    LEFT JOIN compute_count_department_expense_value AS ccd
-                        ON ccd.department_id = gmp.department_id
-                        AND ccd.expense_date BETWEEN gmp.month_start AND gmp.month_end
-                        --AND EXTRACT(MONTH FROM ccd.months) = EXTRACT(MONTH FROM gmp.month_start)
-                        --AND EXTRACT(YEAR FROM ccd.months) = EXTRACT(YEAR FROM gmp.month_start)
+                    LEFT JOIN compute_department_project_expense_group AS cdp
+                        ON cdp.project_id = gmp.project_id
+                        -- AND ccd.expense_date BETWEEN gmp.month_start AND gmp.month_end
+                        AND EXTRACT(MONTH FROM cdp.months) = EXTRACT(MONTH FROM gmp.month_start)
+                        AND EXTRACT(YEAR FROM cdp.months) = EXTRACT(YEAR FROM gmp.month_start)
                         -- AND gmp.stage_name != 'Done'
                         
                     LEFT JOIN expense_management_multiple_company AS em
