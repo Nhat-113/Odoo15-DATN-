@@ -160,22 +160,22 @@
                 <field name="type_day_ot" attrs="{'invisible': [('type_ot', '=', 'no')]}"/>
             </xpath>
             <xpath expr="//field[@name='unit_amount']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='date']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='employee_id']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='type_ot']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='type_day_ot']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='name']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
         </field>
     </record>
@@ -191,11 +191,13 @@
             </xpath>
             <xpath expr="//field[@name='unit_amount']" position="after">
                 <field name="read_only_reason_refuse" invisible="1"/>
+                <field name="invisible_button_approved" invisible="1"/>
                 <field name="pay_type" attrs="{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('read_only_reason_refuse', '=', True)]}"/>
                 <field name="status_timesheet_overtime" string="Status" widget="badge" readonly="1" decoration-info="status_timesheet_overtime == 'draft'" decoration-warning="status_timesheet_overtime in ('refuse')" decoration-success="status_timesheet_overtime == 'confirm'"/>
                 <field name="reason_reject" placeholder="Type Reason Refuse Taskscore..." attrs="{'readonly': ['|','|', ('status_timesheet_overtime', '=', 'confirm'),('status_timesheet_overtime', '=', 'approved'), ('read_only_reason_refuse', '=', True)]}"/>
                 <field name="invisible_button_confirm" invisible="1"/>
-                <button name="approve_timesheet_overtime" string="Confirm" icon="fa-thumbs-up" type="object" attrs="{'invisible': ['|','|','|', ('status_timesheet_overtime', '=', 'confirm'), ('status_timesheet_overtime', '=', 'approved'),('read_only_reason_refuse', '=', True), ('invisible_button_confirm', '=', True)]}"/>
+                <button name="confirm_timesheet_overtime" string="Confirm" icon="fa-thumbs-up" type="object" attrs="{'invisible': ['|','|','|', ('status_timesheet_overtime', '=', 'confirm'), ('status_timesheet_overtime', '=', 'approved'),('read_only_reason_refuse', '=', True), ('invisible_button_confirm', '=', True)]}"/>
+                <button name="approved_timesheet_overtime" string="Approved" icon="fa-thumbs-up" type="object" attrs="{'invisible': [('invisible_button_approved', '=', False)]}"/>
             </xpath>
             <xpath expr="//field[@name='name']" position="before">
                 <!-- invisible 3 field -->
@@ -204,31 +206,31 @@
                 <field name="check_approval_ot" optional="hide"/>
             </xpath>
             <xpath expr="//field[@name='unit_amount']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='date']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='employee_id']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='project_id']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='task_id']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='type_ot']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='type_day_ot']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='name']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='pay_type']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', '=', 'confirm'), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
         </field>
     </record>
@@ -240,6 +242,17 @@
         <field name="state">code</field>
         <field name="code">
            action = records.action_confirm_all_timesheet_overtime()
+        </field>
+    </record>
+
+    <record model="ir.actions.server" id="action_approved_all_timesheet_overtime">
+        <field name="name">Approval All</field>
+        <field name="model_id" ref="model_account_analytic_line"/>
+        <field name="binding_model_id" ref="model_account_analytic_line"/>
+        <field name="groups_id" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_director'))]"/>
+        <field name="state">code</field>
+        <field name="code">
+           action = records.action_approved_all_timesheet_overtime()
         </field>
     </record>
 

@@ -42,7 +42,16 @@ class AccountAnalyticLine(models.Model):
             for record in self:
                 record.read_only_reason_refuse = False
                 record.invisible_button_confirm = False
+
+    @api.depends('status_timesheet_overtime')
+    def _compute_invisible_button_approved(self):
+        for record in self:
+            if record.status_timesheet_overtime == 'confirm' and self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_director') == True:
+                record.invisible_button_approved = True
+            else:
+                record.invisible_button_approved = False
                 
+    invisible_button_approved = fields.Boolean(default=False, help="Check invisible button Approved", compute="_compute_invisible_button_approved", store=False)
     read_only_reason_refuse = fields.Boolean(compute=_readonly_resion_refuse, store=False)
 
     request_overtime_ids = fields.Many2one('hr.request.overtime', string='Request Overtime', store=True, readonly=True, default=False)
@@ -119,9 +128,13 @@ class AccountAnalyticLine(models.Model):
                     model_description=task_model_description,
                 )
 
-    def approve_timesheet_overtime(self):
+    def confirm_timesheet_overtime(self):
         for record in self:
             record.write({'status_timesheet_overtime': 'confirm'})
+
+    def approved_timesheet_overtime(self):
+        for record in self:
+            record.write({'status_timesheet_overtime': 'approved'})
 
     def _compute_pay_type_of_timeoff(self):
         for record in self:
@@ -188,6 +201,11 @@ class AccountAnalyticLine(models.Model):
     def action_confirm_all_timesheet_overtime(self):
         for record in self:
             record.status_timesheet_overtime = 'confirm'
+
+    def action_approved_all_timesheet_overtime(self):
+        for record in self:
+            record.status_timesheet_overtime = 'approved'
+            record.check_approval_ot = True
 
     # Find reqeust overtime for timesheet when type_timesheet = 'type_ot'
     @api.model
