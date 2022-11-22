@@ -30,11 +30,12 @@
                     <field name='confirm_flag' invisible="1"/>
                     <field name='request_flag' invisible="1"/>
                     <field name='approve_flag' invisible="1"/>
+                    <field name='invisible_button_refuse' invisible="1"/>
                     <button string="Request" name="action_request_overtime" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('request_flag', '!=', True), ('stage_name', '!=', 'Draft'), ('active', '=', False)]}"/>
                     <button string="Confirm" groups="hr_timesheet_request_overtime.request_overtime_access_director" name="action_confirm_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('confirm_flag', '!=', True), ('stage_name', '!=', 'Request'), ('active', '=', False)]}"/>
                     <button string="Submit" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="action_submit_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('submit_flag', '!=', True), ('stage_name', '!=', 'Confirm'), ('active', '=', False)]}" />
-                    <button string="Approval" groups="hr_timesheet_request_overtime.request_overtime_access_director" name="action_approve_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('approve_flag', '!=', True), ('stage_name', '!=', 'Submit'), ('active', '=', False)]}"/>
-                    <button string="Refuse" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="action_refuse_reason" type="object" attrs="{'invisible': [('active', '=', False)]}" data-hotkey="x" />
+                    <button string="Approved" groups="hr_timesheet_request_overtime.request_overtime_access_director" name="action_approve_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('approve_flag', '!=', True), ('stage_name', '!=', 'Submit'), ('active', '=', False)]}"/>
+                    <button string="Refuse" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="action_refuse_reason" type="object" attrs="{'invisible': [('invisible_button_refuse','=',True)]}" data-hotkey="x" />
                     <button string="Restore" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="toggle_active" type="object" attrs="{'invisible': [('active', '=', True)]}" data-hotkey="z"/>
                     <field name="stage_id" widget="statusbar" attrs="{'invisible': [('active', '=', False)], 'readonly':[('active', '=', True)] }"/>
                 </header>
@@ -230,7 +231,7 @@
                 <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='pay_type']" position="attributes">
-                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['approved']), ('check_request_ot' ,'=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
             </xpath>
         </field>
     </record>
@@ -263,7 +264,7 @@
             <search string="Search Request Overtime">
                 <filter string="Request Refuse" name="filter_refuse_request" domain="[('active', '=', False)]"/>
                 <separator/>
-                <filter string="Approvals" name="filter_approvals_request" domain="[('stage_id.name', '=', 'Approval')]"/>
+                <filter string="Approved" name="filter_approvals_request" domain="[('stage_id.name', '=', 'Approved')]"/>
                 <field name="active"/>
                 <field name="project_id"/>
                 <field name="user_id"/>

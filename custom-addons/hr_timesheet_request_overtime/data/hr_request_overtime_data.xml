@@ -19,7 +19,7 @@
             <field name="sequence">4</field>
         </record>
         <record model="hr.request.overtime.stage" id="stage_overtime_job5">
-            <field name="name">Approval</field>
+            <field name="name">Approved</field>
             <field name="sequence">5</field>
         </record>
 

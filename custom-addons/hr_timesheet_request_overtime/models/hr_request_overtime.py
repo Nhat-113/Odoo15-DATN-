@@ -62,7 +62,7 @@ class HrRequestOverTime(models.Model):
                             copy=False, index=True,
                             )
     request_creator_id = fields.Many2many('res.users', 'hr_request_overtime_res_users_inform_rel', string='Inform to', default=False, tracking=True, store=True)
-    requester_id = fields.Many2one('res.users', string='Approvals', required=True, default=lambda self: self._get_default_approve(), readonly=False, tracking=True, store=True)
+    requester_id = fields.Many2one('res.users', string='Approver', required=True, default=lambda self: self._get_default_approve(), readonly=False, tracking=True, store=True)
     member_ids = fields.Many2many('hr.employee', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
     
@@ -81,6 +81,15 @@ class HrRequestOverTime(models.Model):
 
     stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draft", store=True)
     last_stage = fields.Integer(string="Last stage", default=0)
+
+    def _compute_invisible_button_refuse(self):
+        for record in self:
+            if (record.active==True and record.stage_name != 'Approved') or (record.active==True and record.stage_name == 'Approved' and record.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_director') == True):
+                record.invisible_button_refuse = False
+            else:
+                record.invisible_button_refuse = True
+                
+    invisible_button_refuse = fields.Boolean(default=False, help="Check invisible button Approved", compute="_compute_invisible_button_refuse", store=False)
 
     @api.depends('member_ids')
     def _compute_member_ids_user(self):
@@ -254,7 +263,7 @@ class HrRequestOverTime(models.Model):
         self._send_message_auto_subscribe_notify_request_overtime({self: item.requester_id for item in self}, mail_template, subject_template)
 
     def action_approve_request_overtime(self):
-        self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Approval')]).id
+        self.stage_id = self.env['hr.request.overtime.stage'].search([('name', '=', 'Approved')]).id
         self.approve_flag = False
 
         # Send mail approvals request overtime (from director to pm)
@@ -302,7 +311,7 @@ class HrRequestOverTime(models.Model):
                 'approve_flag': True,
                 }
                 self.write(vals)
-            if record.stage_id.name == "Approval":
+            if record.stage_id.name == "Approved":
                 vals = {
                 'confirm_flag': True,
                 'submit_flag': True,
@@ -392,7 +401,7 @@ class HrRequestOverTime(models.Model):
 
     def unlink(self):
         for record in self:
-            if record.stage_id.name == "Approval" and record.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_admin') == False:
+            if record.stage_id.name == "Approved" and record.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_admin') == False:
                 raise UserError(_("Can not delete Request Approved!")) 
             record.booking_overtime.unlink()
         return super().unlink()

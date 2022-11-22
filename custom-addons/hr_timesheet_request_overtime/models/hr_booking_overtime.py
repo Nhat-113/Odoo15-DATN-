@@ -2,7 +2,7 @@
 from odoo import api, fields, models, _
 import pandas as pd
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from datetime import date
 
 from odoo.exceptions import ValidationError, UserError
@@ -62,13 +62,13 @@ class AccountAnalyticLine(models.Model):
     @api.onchange('date', 'type_ot', 'type_day_ot')
     def compute_type_overtime_day(self):
         for record in self:
-            date = record.date
+            date = datetime.combine(record.date, datetime.min.time()) - timedelta(hours = 7)
             public_holiday = record.env['resource.calendar.leaves'].search([('calendar_id','=',False),('holiday_id','=',False), 
             ('date_from','<=',date),('date_to','>=',date)])
             if record.type_day_ot != 'other':
                 if public_holiday:
                     record.type_day_ot = 'holiday'
-                elif  4 < date.weekday() < 7:
+                elif  4 <= date.weekday() < 6:
                     record.type_day_ot = 'weekend'
                 else:
                     record.type_day_ot = 'normal_day'
@@ -139,7 +139,7 @@ class AccountAnalyticLine(models.Model):
     def _compute_pay_type_of_timeoff(self):
         for record in self:
             if record.request_overtime_ids and record.type_ot == 'yes' and\
-                    record.request_overtime_ids.stage_id.name=='Approval' and\
+                    record.request_overtime_ids.stage_id.name=='Approved' and\
                         record.pay_type in ['full_day_off', 'half_cash_half_dayoff']:
                 
                 pay_type = record.pay_type
@@ -180,7 +180,7 @@ class AccountAnalyticLine(models.Model):
                 if record.request_overtime_ids.stage_id.name == 'Submit':
                     record.check_request_ot = True
                     record.status_timesheet_overtime = 'confirm'
-                elif record.request_overtime_ids.stage_id.name == 'Approval':
+                elif record.request_overtime_ids.stage_id.name == 'Approved':
                     record.check_request_ot = True
                     record.check_approval_ot = True
                     # Compute time off 'nghi bu' when change status Approvals
@@ -224,7 +224,7 @@ class AccountAnalyticLine(models.Model):
                                             ('end_date','>=', date),
                                             ('project_id','=', project_id)])
             for booking in booking_overtime:
-                if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approval'] and booking.request_overtime_id.active==True:
+                if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approved'] and booking.request_overtime_id.active==True:
                     values['request_overtime_ids'] =  booking.request_overtime_id.id
                 else: 
                     values['request_overtime_ids'] = False
@@ -261,7 +261,7 @@ class AccountAnalyticLine(models.Model):
                                             ('project_id','=', self.project_id.id),
                                             ])
             for booking in booking_overtime:
-                if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approval'] or self.request_overtime_ids.id and booking.request_overtime_id.active==True:
+                if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approved'] or self.request_overtime_ids.id and booking.request_overtime_id.active==True:
                     return {'request_overtime_ids': booking.request_overtime_id.id}
                 else: 
                     return {'request_overtime_ids': False}
