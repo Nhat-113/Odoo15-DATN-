@@ -34,7 +34,7 @@
         <template id="approvals_request_service_template_user">
             <p style="margin: 0px;">
                 <p>Dear <t t-esc="object.requester_id.name"/>,</p>
-                <p style="margin-top: 8px;"><b>Request Service Form</b> you create has been <b>Approved</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
+                <p style="margin-top: 8px;"><b>Request Service Form</b> that you created has been <b>Approved</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
             </p>
             <p>Thank you!</p>
             <p style="padding-top: 24px; padding-bottom: 16px;">

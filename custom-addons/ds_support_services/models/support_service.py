@@ -104,10 +104,12 @@ class SupportServices(models.Model):
             elif record.category.type_category == 'it_helpdesk':
                 if record.payment.type_payment == 'no_cost':
                     record.send_to = it_help if len(it_help) > 0 else False
+                    record.approval = False
                 elif record.payment.type_payment == 'have_cost':
                     record.approval = sub_ceo
                     record.send_to = it_help if len(it_help) > 0 else False
             elif record.category.type_category == 'open_projects':
+                record.approval = False
                 record.send_to = open_prj if len(open_prj) > 0 else False
             else:
                 record.send_to = False
