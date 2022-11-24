@@ -21,7 +21,7 @@ class AccountAnalyticLine(models.Model):
                                 ('normal_day', 'Normal Day'),
                                 ('weekend', 'Weekend'),
                                 ('holiday', 'Holiday'),
-                                ], string='Type Day', index=True, copy=False, compute="compute_type_overtime_day", tracking=True, required=True, store=True, default=False)
+                                ], string='Type Day', index=True, copy=False, compute="compute_type_overtime_day", tracking=True, required=True, store=False, default=False)
 
     status_timesheet_overtime = fields.Selection([
                                         ('draft', 'To Confirm'),
@@ -310,7 +310,7 @@ class HrBookingOvertime(models.Model):
     description = fields.Text("Description", translate=True)
     read_stage = fields.Char(string="Read Stage request overtime", compute="_compute_stage", store=True)
 
-    @api.depends('start_date')
+    @api.depends('project_id')
     def _compute_user_id_domain(self):
         for record in self:
             try:

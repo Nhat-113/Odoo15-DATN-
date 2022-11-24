@@ -44,7 +44,7 @@
                     <field name='active' invisible="1"/>
                     <field name='approve_flag' invisible="1"/>
                     <widget name="web_ribbon" title="REFUSED" bg_color="bg-danger" attrs="{'invisible':[('active', '=', True)]}"/>
-                    <widget name="web_ribbon" title="APPROVED" bg_color="bg-success" attrs="{'invisible':[ '|','|', ('approve_flag', '=', True), ('stage_name', '!=', 'Approval'), ('active', '=', False)]}"/>
+                    <widget name="web_ribbon" title="APPROVED" bg_color="bg-success" attrs="{'invisible':[ '|','|', ('approve_flag', '=', True), ('stage_name', '!=', 'Approved'), ('active', '=', False)]}"/>
                     <sheet>
                         <group>
                             <div class="oe_title" style="width: 1500px">
@@ -247,7 +247,7 @@
     </record>
 
     <record model="ir.actions.server" id="action_approved_all_timesheet_overtime">
-        <field name="name">Approval All</field>
+        <field name="name">Approved All</field>
         <field name="model_id" ref="model_account_analytic_line"/>
         <field name="binding_model_id" ref="model_account_analytic_line"/>
         <field name="groups_id" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_director'))]"/>

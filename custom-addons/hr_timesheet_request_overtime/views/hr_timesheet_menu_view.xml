@@ -15,7 +15,7 @@
 
         <menuitem
             id="hr_timesheet_request_overtime_menu"
-            name="Request Over Time"
+            name="Request Overtime"
             parent="menu_timesheets_approvals"
             action="hr_request_overtime_action"
             sequence="2"/>
