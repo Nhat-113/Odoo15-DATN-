@@ -20,7 +20,7 @@
         <template id="request_service_template">
             <p style="margin: 0px;">
                 <p>Dear <t t-esc="dear"/>,</p>
-                <p style="margin-top: 8px;">There is a Request Service Form just has been <b>Requested Service</b> by <b><t t-esc="object.env.user.name"/>.</b></p>
+                <p style="margin-top: 8px;">There is a Request Service Form "<b><t t-esc="object.name"/></b>" just has been created by <b><t t-esc="object.env.user.name"/>.</b></p>
             </p>
             <p>Please review and confirm it soon.</p>
             <p>Thank you!</p>
@@ -47,7 +47,7 @@
         <template id="approvals_request_service_template_send_to">
             <p style="margin: 0px;">
                 <p>Dear <t t-esc="dear"/>,</p>
-                <p style="margin-top: 8px;"><b>Request Service Form</b> by <t t-esc="object.requester_id.name"/> create has been <b>Approved</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
+                <p style="margin-top: 8px;"><b>Request Service Form</b> is created by <t t-esc="object.requester_id.name"/> has been <b>Approved</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
             </p>
             <p>Thank you!</p>
             <p style="padding-top: 24px; padding-bottom: 16px;">

@@ -15,7 +15,7 @@ class ServiceGetRefuseReason(models.TransientModel):
         self.request_service_ids.write({
                                     'active': False, 
                                     'refuse_reason': str(self.subject_refuse_reason),
-                                    'status': 'draft'
+                                    'status': self.env['status.support.service'].search([('type_status', '=', 'draft')]).id
                                     })
 
     @api.model
