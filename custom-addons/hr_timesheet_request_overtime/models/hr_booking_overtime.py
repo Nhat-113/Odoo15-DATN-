@@ -21,7 +21,7 @@ class AccountAnalyticLine(models.Model):
                                 ('normal_day', 'Normal Day'),
                                 ('weekend', 'Weekend'),
                                 ('holiday', 'Holiday'),
-                                ], string='Type Day', index=True, copy=False, compute="compute_type_overtime_day", tracking=True, required=True, store=False, default=False)
+                                ], string='Type Day', index=True, copy=False, compute="compute_type_overtime_day", tracking=True, required=True, store=True, default=False)
 
     status_timesheet_overtime = fields.Selection([
                                         ('draft', 'To Confirm'),
