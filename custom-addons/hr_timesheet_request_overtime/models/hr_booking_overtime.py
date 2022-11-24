@@ -14,7 +14,7 @@ class AccountAnalyticLine(models.Model):
                                 ('full_cash', 'Full Cash'),
                                 ('half_cash_half_dayoff', 'Cash 5:5 Date Off'),
                                 ('full_day_off', 'Full Date Off'),
-                                ], string='Pay Type', index=True, tracking=True, default=False)
+                                ], string='Pay Type', index=True, tracking=True, compute='_compute_pay_type', store=True)
 
     type_day_ot = fields.Selection([
                                 ('other', 'Other'),
@@ -59,7 +59,7 @@ class AccountAnalyticLine(models.Model):
     check_approval_ot = fields.Boolean('Check Approvals', compute='_compute_request_overtime_id', store=True, default=False)
 
 
-    @api.onchange('date', 'type_ot', 'type_day_ot')
+    @api.onchange('date', 'type_ot', 'type_day_ot', 'pay_type')
     def compute_type_overtime_day(self):
         for record in self:
             date = datetime.combine(record.date, datetime.min.time()) - timedelta(hours = 7)
@@ -75,11 +75,14 @@ class AccountAnalyticLine(models.Model):
             else:
                 record.type_day_ot = 'other'
             
-            if record.type_ot == "no":
+    @api.depends('type_ot', 'pay_type')
+    def _compute_pay_type(self):
+        for record in self:
+            if record.type_ot == "yes":
+                if record.pay_type == False:
+                    record.pay_type = 'full_day_off'
+            else:
                 record.pay_type = False
-            elif record.pay_type == False:
-                record.pay_type = "full_day_off"
-
 
     @api.depends('reason_reject')
     def reject_timesheet_overtime(self):
