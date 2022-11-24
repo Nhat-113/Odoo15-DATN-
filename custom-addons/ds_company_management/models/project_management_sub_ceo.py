@@ -250,7 +250,7 @@ class ProjectManagementSubCeoData(models.Model):
     months = fields.Char(string="Month")
     month_start = fields.Date(string="Start")
     month_end = fields.Date(string="End")
-    total_members = fields.Float(string='Effort(MM)', digits=(12,3))
+    total_members = fields.Float(string='Effort (MM)', digits=(12,3))
     total_salary = fields.Float(string="Salary Cost")
     total_project_cost = fields.Float(string="Prj Expenses")
     total_revenue = fields.Float(string="Revenue")

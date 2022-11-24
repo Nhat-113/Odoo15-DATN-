@@ -425,7 +425,7 @@ class ProjectManagementHistory(models.Model):
                         (COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)
                             + COALESCE(NULLIF(cdp.total_project_expense, NULL), 0)
                         ) AS total_project_expense,
-                        (COALESCE(NULLIF(em.total_expenses / em.counts, NULL), 0)) AS operation_cost,
+                        (COALESCE(NULLIF(em.total_expenses, NULL), 0)) AS operation_cost,
                         (COALESCE(NULLIF(pcm.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project,
                         (COALESCE(NULLIF(pni.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project_not_intern,
                     -- 	(COALESCE(NULLIF(cni.all_members, NULL), 0)) AS all_members,
@@ -440,9 +440,9 @@ class ProjectManagementHistory(models.Model):
                                 THEN 0
                             ELSE (CASE
                                     WHEN em.counts > 1
-                                        THEN COALESCE(NULLIF(em.total_expenses / em.counts, NULL), 0) / ctm.all_members::NUMERIC(10, 4)
+                                        THEN COALESCE(NULLIF(em.total_expenses, NULL), 0) / ctm.all_members::NUMERIC(10, 4)
                                     ELSE
-                                        COALESCE(NULLIF(em.total_expenses / em.counts, NULL), 0) / cni.all_members::NUMERIC(10, 4)
+                                        COALESCE(NULLIF(em.total_expenses, NULL), 0) / cni.all_members::NUMERIC(10, 4)
                                 END)
                         END)::NUMERIC(20, 4) AS average_cost_company
                         

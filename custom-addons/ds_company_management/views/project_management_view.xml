@@ -97,7 +97,7 @@
                                     <field name="members" sum="Total members"/>
                                     <field name="total_salary" sum="Total salary" widget="monetary"/>
                                     <field name="total_project_expense" sum="Total project expense" widget="monetary"/>
-                                    <field name="operation_cost" sum="Total operation cost" optional="show" widget="monetary"/>
+                                    <field name="operation_cost" sum="Total operation cost" optional="show" widget="monetary" invisible="1"/>
                                     <field name="profit" sum="Total profit" widget="monetary"/>
                                     <field name="profit_margin" avg="Average profit margin" width="116px"/>
                                     <field name="all_members" sum="Total all members" optional="hide"/>

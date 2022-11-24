@@ -9,7 +9,7 @@ class ProjectHistoryGroup(models.Model):
     project_management_id = fields.Many2one('project.management', string="Project Management")
     company_id = fields.Many2one('res.company', string="Company")
     project_id = fields.Many2one('project.project', string="Project")
-    total_members = fields.Float(string='Effort(MM)', digits=(12,3))
+    total_members = fields.Float(string='Effort (MM)', digits=(12,3))
     total_salary = fields.Float(string="Salary Cost")
     total_profit = fields.Float(string="Profit")
     currency_id = fields.Many2one('res.currency', string="Currency")

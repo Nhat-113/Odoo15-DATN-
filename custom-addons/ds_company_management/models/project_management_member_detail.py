@@ -41,7 +41,7 @@ class ProjectManagementMemberDetail(models.Model):
                     (CASE
                         WHEN pmt.name IN('intern', 'Intern')
                             THEN 0
-                        ELSE (hpl.total + hplbh.total + hpltt.total) * ppb.effort_rate_month / 100
+                        ELSE ppb.salary
                     END) AS salary,
                     
                     (CASE
@@ -71,27 +71,8 @@ class ProjectManagementMemberDetail(models.Model):
                     AND EXTRACT(MONTH FROM pmh.month_start) = EXTRACT(MONTH FROM ppb.start_date_month) 
                     AND EXTRACT(YEAR FROM pmh.month_start) = EXTRACT(YEAR FROM ppb.start_date_month) 
                     
-                --- Get salary from payroll ---
-                LEFT JOIN hr_payslip AS hp
-                    ON hp.employee_id = ppb.employee_id
-                    AND EXTRACT(MONTH FROM hp.date_from) = EXTRACT(MONTH FROM ppb.start_date_month) 
-                    AND EXTRACT(YEAR FROM hp.date_from) = EXTRACT(YEAR FROM ppb.start_date_month)
-                LEFT JOIN hr_payslip_line AS hpl
-                    ON hpl.slip_id = hp.id
-                    AND hpl.code IN('NET', 'NET1') 
-                    AND hp.state = 'done'
-                LEFT JOIN hr_payslip_line AS hplbh
-                    ON hp.id = hplbh.slip_id
-                    AND hplbh.code = 'BH'
-                    AND hp.state = 'done'
-                LEFT JOIN hr_payslip_line AS hpltt
-                    ON hp.id = hpltt.slip_id
-                    AND hpltt.code IN('TTNCN', 'TTNCN1')  
-                    AND hp.state = 'done'
-                    
                 WHERE ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb) 
                     OR ppb.department_id IS NULL
-                ORDER BY project_members, employee_id
 
             )""" % (self._table)
         )
@@ -107,10 +88,10 @@ class ProjectManagementMemberDetailData(models.Model):
     currency_id = fields.Many2one('res.currency', string="Currency")
     month_start = fields.Date(string="Start")
     month_end = fields.Date(string="End")
-    effort_rate = fields.Float(string="Effort Rate(%)")
+    effort_rate = fields.Float(string="Effort Rate (%)")
     working_day = fields.Float(string="Working day")
     man_month = fields.Float(string="Man month")
-    total_members = fields.Float(string="Effort(MM)", digits=(12,3))
+    total_members = fields.Float(string="Effort (MM)", digits=(12,3))
     months = fields.Char(string="Month")
     
     average_cost_company = fields.Float(string="Company Avg Cost")
