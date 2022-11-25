@@ -62,6 +62,8 @@ class ProjectManagementMemberDetail(models.Model):
                 RIGHT JOIN project_management_member AS pmm
                     ON pmm.employee_id = ppb.employee_id
                     AND pmm.project_id = ppb.project_id
+                    AND ppb.start_booking BETWEEN pmm.start_date AND pmm.end_date
+	                AND ppb.end_booking BETWEEN pmm.start_date AND pmm.end_date
                     
                 LEFT JOIN planning_member_type AS pmt
                     ON pmt.id = pmm.member_type

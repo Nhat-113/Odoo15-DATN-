@@ -53,7 +53,9 @@ class ProjectPlanningBookingResource(models.Model):
                     hmp.ttncn,
                     ((COALESCE(NULLIF(hmp.total + hmp.bhxh + hmp.ttncn, NULL), 0)) * (COALESCE(NULLIF(br.effort_rate_month, NULL), 0)) / 100 ) AS salary,
                     pl.inactive,
-                    pl.inactive_date
+                    pl.inactive_date,
+                    pl.start_date AS start_booking,
+	                pl.end_date AS end_booking
                     
                 FROM booking_resource_month AS br
                 LEFT JOIN planning_calendar_resource AS pl
