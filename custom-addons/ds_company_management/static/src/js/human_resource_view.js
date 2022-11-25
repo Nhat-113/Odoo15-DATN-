@@ -755,6 +755,31 @@ odoo.define('human_resource_template.Dashboard', function (require) {
 
 
         export_excel: function () {
+            Table2Excel.extend((cell, cellText) => {
+                return $(cell).attr('type') == 'string' ? {
+                    t: 's',
+                    v: cellText
+                } : null;
+            });
+
+            var table2excel = new Table2Excel();
+
+            var myTableHuman = document.getElementsByTagName("table")[1];
+
+            var myCloneTable = myTableHuman.cloneNode(true);
+
+            var element_none = myCloneTable.querySelectorAll('tr');
+
+            for (let i = 0; i < element_none.length; i++) {
+                if (element_none[i].style.display == 'none') {
+                    element_none[i].remove();
+                }
+            }
+            document.body.appendChild(myCloneTable);
+
+            table2excel.export(myCloneTable);
+
+            myCloneTable.remove();
             // Table2Excel.extend((cell, cellText) => {
             //     return $(cell).attr('type') == 'string' ? {
             //         t: 's',
@@ -772,41 +797,41 @@ odoo.define('human_resource_template.Dashboard', function (require) {
 
             // table2excel.export(table_to_exp_2);
             
-            var result = [];
-            var table =  document.getElementById("human_resource_table")
-            var rows = table.rows;
-            var cells, arrTemp;
+            // var result = [];
+            // var table =  document.getElementById("human_resource_table")
+            // var rows = table.rows;
+            // var cells, arrTemp;
           
-            for (var i=0, iLen=rows.length; i<iLen; i++) {
-                cells = rows[i].cells;
-                arrTemp = [];
-                if(rows[i].style.display != 'none') {
-                    for (var j = 0, jLen = cells.length; j < jLen; j++) {
-                        arrTemp.push(cells[j].textContent.replace(/\n/g,'').replace(/\r/g,' ').trim());
-                    }
-                }
-              result.push(arrTemp);
-            }
+            // for (var i=0, iLen=rows.length; i<iLen; i++) {
+            //     cells = rows[i].cells;
+            //     arrTemp = [];
+            //     if(rows[i].style.display != 'none') {
+            //         for (var j = 0, jLen = cells.length; j < jLen; j++) {
+            //             arrTemp.push(cells[j].textContent.replace(/\n/g,'').replace(/\r/g,' ').trim());
+            //         }
+            //     }
+            //   result.push(arrTemp);
+            // }
 
-            let dataExport = [];
+            // let dataExport = [];
 
-            for(let i=0; i <  result.length ; i ++) {
-                if (result[i].length > 0) {
-                    dataExport.push(result[i]);
-                } 
-            }
-            var csvContent = ""
-            dataExport.forEach(function(RowItem, RowIndex) {
-                RowItem.forEach(function(ColItem, ColIndex) {
-                csvContent += ColItem + ',';
-                });
-                csvContent += "\r\n";
-            });
-            var ele = document.createElement("A");
-            ele.setAttribute("href",  "data:application/xls;charset=utf-8,%EF%BB%BF"+ encodeURI(csvContent) );
-            ele.setAttribute("download","human_resource.xls");
-            document.body.appendChild(ele);
-            ele.click();
+            // for(let i=0; i <  result.length ; i ++) {
+            //     if (result[i].length > 0) {
+            //         dataExport.push(result[i]);
+            //     } 
+            // }
+            // var csvContent = ""
+            // dataExport.forEach(function(RowItem, RowIndex) {
+            //     RowItem.forEach(function(ColItem, ColIndex) {
+            //     csvContent += ColItem + ',';
+            //     });
+            //     csvContent += "\r\n";
+            // });
+            // var ele = document.createElement("A");
+            // ele.setAttribute("href",  "data:application/xls;charset=utf-8,%EF%BB%BF"+ encodeURI(csvContent) );
+            // ele.setAttribute("download","human_resource.xls");
+            // document.body.appendChild(ele);
+            // ele.click();
         },
 
         view_effort_member_free: function () {
@@ -1032,16 +1057,11 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             for(let i = 0 ; i < textBillableHeadCount.length; i++ ){
                 textBillableHeadCount[i].innerText = count_member_billable[i];
             }
-            for(let i = 0 ; i < textBillableHeadCountRate.length; i++ ){
-                textBillableHeadCountRate[i].innerText = ( (compute_effort_billable[i] / total_effort[i]) * 100 ).toFixed(2) ;
-            }
 
             for(let i = 0 ; i < textInternalHeadCount.length; i++ ){
                 textInternalHeadCount[i].innerText = count_member_internal[i];
             }
-            for(let i = 0 ; i < textInternalHeadCountRate.length; i++ ){
-                textInternalHeadCountRate[i].innerText = ((compute_effort_internal[i] / total_effort[i]) * 100 ).toFixed(2) ;
-            }
+          
 
 
             // value member company in human
@@ -1056,6 +1076,12 @@ odoo.define('human_resource_template.Dashboard', function (require) {
 
             for(let i = 0 ; i < textAvailableHeadCount.length; i++ ){
                 textAvailableHeadCount[i].innerText = count_member_available[i];
+            }
+            for(let i = 0 ; i < textInternalHeadCountRate.length; i++ ){
+                textInternalHeadCountRate[i].innerText = ((compute_effort_internal[i] / (total_element_member_company[i] * 100  )) * 100 ).toFixed(2) ;
+            }
+            for(let i = 0 ; i < textBillableHeadCountRate.length; i++ ){
+                textBillableHeadCountRate[i].innerText = ( (compute_effort_billable[i] / (total_element_member_company[i] * 100  )) * 100 ).toFixed(2) ;
             }
             for(let i = 0 ; i < textAvailableHeadCountRate.length; i++ ){
                 textAvailableHeadCountRate[i].innerText = ( ( compute_effort_member_available[i] / (total_element_member_company[i] * 100  )) * 100  ).toFixed(2) ;
