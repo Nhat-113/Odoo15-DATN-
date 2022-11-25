@@ -971,7 +971,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var count_member_internal = this.compute_avg()[3];
             let textInternalHeadCountRate = document.getElementsByClassName('internal-headcounts-avg');
             var compute_effort_internal = this.compute_avg()[5];
-            let element_avg_eff = document.querySelectorAll('.Avg_effort_member .td_value');
+            let element_avg_eff = document.querySelectorAll('#total-effort-all-res-rate .td_value');
             let value_aver = [];
          
 
@@ -1009,10 +1009,21 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     count_member_in_company_when_search.push(count_member_in_company[i].innerText);
                 }
             }
+            let selection = document.getElementById("countriesDropdown");
+            let filterSelection = selection.value.toUpperCase();
 
             //replace value
             for(let i = 0 ; i < textCountMember.length; i++ ){
-                textCountMember[i].innerText = count_member_filter[i];
+                //with filter PROJECT BILLABLE value count member = member bill have effort > 0
+                if (filterSelection == 'PROJECT BILLABLE' ) {
+                    textCountMember[i].innerText = count_member_billable[i];
+                }
+                //with filter PROJECT INTERNAL value count member = member bill have effort > 0
+                else if (filterSelection == 'PROJECT INTERNAL' ) {
+                    textCountMember[i].innerText = count_member_internal[i];
+                }
+                else 
+                    textCountMember[i].innerText = count_member_filter[i];
             }
             for(let i = 0 ; i <   textAverageUsageRate.length;  i++ ){
                 textAverageUsageRate[i].innerText = value_aver[i];
