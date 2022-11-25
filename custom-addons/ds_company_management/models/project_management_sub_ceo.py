@@ -105,6 +105,8 @@ class ProjectManagementSubCeo(models.Model):
                         mdh.working_day,
                         mdh.working_day_total,
                         mdh.bqnc,
+                        mdh.bhxh,
+                        mdh.ttncn,
                         mdh.salary_manager,
                         mdh.effort_rate_month,
                         mdh.man_month,
@@ -123,16 +125,16 @@ class ProjectManagementSubCeo(models.Model):
                                                     THEN (CASE
                                                             --- when manager doesn't booked ---
                                                             WHEN mdh.effort_rate_month IS NULL
-                                                                THEN mdh.bqnc * mdh.working_day
+                                                                THEN (mdh.bqnc + (mdh.bhxh + mdh.ttncn) / mdh.working_day_total) * mdh.working_day
                                                             ELSE
-                                                                mdh.bqnc * mdh.working_day * (100 - mdh.effort_rate_month) / 100
+                                                                (mdh.bqnc + (mdh.bhxh + mdh.ttncn) / mdh.working_day_total) * mdh.working_day * (100 - mdh.effort_rate_month) / 100
                                                         END)
                                                 ELSE 
                                                     (CASE
                                                         WHEN mdh.effort_rate_month IS NULL
-                                                            THEN mdh.salary_manager
+                                                            THEN mdh.salary_manager + mdh.bhxh + mdh.ttncn
                                                         ELSE
-                                                            mdh.salary_manager *((100 - mdh.effort_rate_month )/ 100)
+                                                            (mdh.salary_manager + mdh.bhxh + mdh.ttncn) *((100 - mdh.effort_rate_month )/ 100)
                                                     END)
                                             END)
                                     END)
@@ -146,9 +148,9 @@ class ProjectManagementSubCeo(models.Model):
                                         (CASE
                                             --- when manager doesn't booked ---
                                             WHEN mdh.effort_rate_month IS NULL
-                                                THEN mdh.salary_manager
+                                                THEN mdh.salary_manager + mdh.bhxh + mdh.ttncn
                                             ELSE
-                                                mdh.salary_manager * ((100 - mdh.effort_rate_month) / 100)
+                                                (mdh.salary_manager + mdh.bhxh + mdh.ttncn) * ((100 - mdh.effort_rate_month) / 100)
                                         END)
                                 
                                 END)
@@ -248,7 +250,7 @@ class ProjectManagementSubCeoData(models.Model):
     months = fields.Char(string="Month")
     month_start = fields.Date(string="Start")
     month_end = fields.Date(string="End")
-    total_members = fields.Float(string='Effort(MM)', digits=(12,3))
+    total_members = fields.Float(string='Effort (MM)', digits=(12,3))
     total_salary = fields.Float(string="Salary Cost")
     total_project_cost = fields.Float(string="Prj Expenses")
     total_revenue = fields.Float(string="Revenue")

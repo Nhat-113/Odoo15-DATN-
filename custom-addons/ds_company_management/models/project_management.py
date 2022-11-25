@@ -179,7 +179,7 @@ class ProjectManagementData(models.Model):
     project_cost = fields.Float(string="Prj Expenses")
     
     last_update_color = fields.Integer(related='project_id.last_update_color', store=False)
-    count_members = fields.Float(string='Effort(MM)', digits=(12,3))
+    count_members = fields.Float(string='Effort (MM)', digits=(12,3))
     total_salary = fields.Float(string="Salary Cost")
     profit = fields.Float(string="Profit")
     profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2), help="Profit Margin = profit / revenue * 100")
