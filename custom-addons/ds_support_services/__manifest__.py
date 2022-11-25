@@ -30,7 +30,8 @@
     ],
     'assets': {
         'web.assets_backend': [
-           '/ds_support_services/static/src/css/style.css'
+           '/ds_support_services/static/src/css/style.css',
+           '/ds_support_services/static/src/js/basic_view.js'
         ],
         'web.assets_qweb': [
 

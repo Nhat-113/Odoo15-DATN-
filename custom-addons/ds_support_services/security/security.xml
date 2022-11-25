@@ -67,7 +67,7 @@
         <record model="ir.rule" id="support_service_manager_rule">
             <field name="name">Support Service Manager</field>
             <field name="model_id" ref="model_support_services"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="domain_force">[('company_id.user_email', '=', user.login)]</field>
             <field name="groups" eval="[(4,ref('support_service_sub_ceo'))]"/>
         </record>
 
@@ -76,6 +76,13 @@
             <field name="model_id" ref="model_support_services"/>
             <field name="domain_force">[('flag_category', 'in', ['it_helpdesk', 'other']), ('send_to', 'in', user.id)]</field>
             <field name="groups" eval="[(4,ref('support_service_it'))]"/>
+        </record>
+
+        <record model="ir.rule" id="support_service_officer_rule">
+            <field name="name">Support Service Officer</field>
+            <field name="model_id" ref="model_support_services"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4,ref('support_service_hr'))]"/>
         </record>
 
         <record id="support_service_comp_rule" model="ir.rule">

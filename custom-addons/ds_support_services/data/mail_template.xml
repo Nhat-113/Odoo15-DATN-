@@ -5,7 +5,7 @@
         <template id="refuse_request_service_template">
             <p style="margin: 0px;">
                 <p>Dear <t t-esc="object.requester_id.name"/>,</p>
-                <p style="margin-top: 8px;"><b>Request Service Form</b> you create has been <b>Rejected</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
+                <p style="margin-top: 8px;"><b>Request <t t-esc="object.category.name"/></b> you create has been <b>Rejected</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
                 <p style="margin-top: 8px;"><b>Refuse Reason: </b> <t t-esc="refuse_reason"/> </p>
             </p>
             <p>Thank you!</p>
@@ -20,7 +20,7 @@
         <template id="request_service_template">
             <p style="margin: 0px;">
                 <p>Dear <t t-esc="dear"/>,</p>
-                <p style="margin-top: 8px;">There is a Request Service Form "<b><t t-esc="object.name"/></b>" just has been created by <b><t t-esc="object.env.user.name"/>.</b></p>
+                <p style="margin-top: 8px;">There is a Request <t t-esc="object.category.name"/> "<b><t t-esc="object.name"/></b>" just has been created by <b><t t-esc="object.env.user.name"/>.</b></p>
             </p>
             <p>Please review and confirm it soon.</p>
             <p>Thank you!</p>
@@ -34,7 +34,7 @@
         <template id="approvals_request_service_template_user">
             <p style="margin: 0px;">
                 <p>Dear <t t-esc="object.requester_id.name"/>,</p>
-                <p style="margin-top: 8px;"><b>Request Service Form</b> that you created has been <b>Approved</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
+                <p style="margin-top: 8px;"><b>Request <t t-esc="object.category.name"/></b> that you created has been <b>Approved</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
             </p>
             <p>Thank you!</p>
             <p style="padding-top: 24px; padding-bottom: 16px;">
@@ -47,7 +47,7 @@
         <template id="approvals_request_service_template_send_to">
             <p style="margin: 0px;">
                 <p>Dear <t t-esc="dear"/>,</p>
-                <p style="margin-top: 8px;"><b>Request Service Form</b> is created by <t t-esc="object.requester_id.name"/> has been <b>Approved</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
+                <p style="margin-top: 8px;"><b>Request <t t-esc="object.category.name"/></b> is created by <t t-esc="object.requester_id.name"/> has been <b>Approved</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
             </p>
             <p>Thank you!</p>
             <p style="padding-top: 24px; padding-bottom: 16px;">
@@ -60,7 +60,7 @@
         <template id="done_request_service_template">
             <p style="margin: 0px;">
                 <p>Dear <t t-esc="object.requester_id.name"/>,</p>
-                <p style="margin-top: 8px;"><b>Request Service Form</b> you create has been <b>Done</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
+                <p style="margin-top: 8px;"><b>Request <t t-esc="object.category.name"/></b> you create has been <b>Done</b> by <b><t t-esc="object.env.user.name"/></b>.</p>
             </p>
             <p>Thank you!</p>
             <p style="padding-top: 24px; padding-bottom: 16px;">

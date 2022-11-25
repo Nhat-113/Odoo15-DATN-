@@ -1,5 +1,4 @@
 from odoo import api, models, _
-from ...hr_payroll_community.models.hr_payslip import HrPayslip
 
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
@@ -15,7 +14,7 @@ class HrPayslip(models.Model):
             if self.employee_id.user_id.id:
                 total_tam_ung = 0
                 luong_tam_ungs = self.env['support.services'].search([
-                    ('flag_category', '=', 'tam_ung_luong'),
+                    ('flag_category', '=', 'salary_advance'),
                     ('requester_id', '=', self.employee_id.user_id.id),
                     ('date_request', '>=', self.date_from),
                     ('date_request', '<=', self.date_to),

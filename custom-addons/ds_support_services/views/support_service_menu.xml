@@ -9,7 +9,16 @@
 
         <menuitem name="Configuration" id="configuration_service"
         parent="ds_support_services.support_service_menu" 
-        sequence="2" action="config_action"
+        sequence="2" groups="support_service_hr"/>
+
+        <menuitem name="HR_IT" id="configuration_service_hr_it"
+        parent="ds_support_services.configuration_service" 
+        sequence="1" action="config_action"
+        groups="support_service_hr"/>
+
+        <menuitem name="Category" id="configuration_service_category"
+        parent="ds_support_services.configuration_service" 
+        sequence="2" action="config_action_category"
         groups="support_service_hr"/>
 
     </data>

@@ -8,8 +8,8 @@
         </record>
 
         <record id="category_tam_ung" model="category.support.service">
-            <field name="name">Tạm ứng lương</field>
-            <field name="type_category">tam_ung_luong</field>
+            <field name="name">Salary Advance</field>
+            <field name="type_category">salary_advance</field>
         </record>
 
         <record id="category_it_helpdesk" model="category.support.service">

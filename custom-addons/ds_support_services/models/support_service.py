@@ -25,13 +25,13 @@ class SupportServices(models.Model):
     project_pm = fields.Many2one('res.users', string='Project Manager', tracking=True, default=lambda self: self.env.user)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
     company_project = fields.Many2one('res.company', string='Company Project')
-    approval = fields.Many2one('res.users', string='Approval', tracking=True, required=False, readonly=False)
+    approval = fields.Many2one('res.users', string='Approver', tracking=True, required=False, readonly=False)
     send_to = fields.Many2many('res.users', string='Send To', tracking=True, required=True, readonly=False)
     amount = fields.Monetary(string='Amount', tracking=True, currency_field='currency_vnd')
     status = fields.Many2one('status.support.service', string="Status", default=lambda self: self.env['status.support.service'].search([('type_status', '=', 'draft')]).id)
-    domain_status = fields.Char(string="Category domain", readonly=True, store=False, compute='_compute_domain_status')
+    domain_status = fields.Char(string="Status domain", readonly=True, store=False, compute='_compute_domain_status')
     flag_status = fields.Char(string="Status Flag", readonly=True, store=True, compute='_compute_flag_status')
-    category = fields.Many2one('category.support.service', string="Category", required=True, default=lambda self: self.env['category.support.service'].search([('type_category', '=', 'tam_ung_luong')]).id)
+    category = fields.Many2one('category.support.service', string="Category", required=True, default=lambda self: self.env['category.support.service'].search([('type_category', '=', 'salary_advance')]).id)
     domain_category = fields.Char(string="Category domain", readonly=True, store=False, compute='_compute_domain_category')
     flag_category = fields.Char(string="Category Flag", readonly=True, store=True, compute='_compute_flag_category')
     active = fields.Boolean(default=True)
@@ -39,6 +39,9 @@ class SupportServices(models.Model):
     payment = fields.Many2one('payment.support.service', string="Payment", required=True, default=lambda self: self.env['payment.support.service'].search([('type_payment', '=', 'no_cost')]).id)
     flag_payment = fields.Char(string="Payment Flag", readonly=True, store=True, compute='_compute_flag_payment')
     check_role_it = fields.Boolean(default=False, compute='compute_check_role_it')
+    check_role_officer = fields.Boolean(default=False, compute='compute_check_role_officer')
+    domain_company_id = fields.Char(string="Company domain", readonly=True, store=False, compute='_compute_domain_company')
+    check_invisible_approve = fields.Boolean(default=False, compute='compute_check_check_invisible_approve')
 
     @api.depends('category')
     def compute_check_role_it(self):
@@ -48,6 +51,23 @@ class SupportServices(models.Model):
                 request.check_role_it = True
             else:
                 request.check_role_it = False
+    
+    @api.depends('category', 'payment', 'status')
+    def compute_check_check_invisible_approve(self):
+        for request in self:
+            if request.status.type_status != 'request' or \
+                request.payment.type_payment == 'no_cost' and request.category.type_category in ['it_helpdesk', 'open_projects', 'other']:
+                request.check_invisible_approve = True
+            else:
+                request.check_invisible_approve = False
+
+    @api.depends('name', 'approval','category')
+    def compute_check_role_officer(self):
+        for request in self:
+            if request.env.user.has_group('ds_support_services.support_service_sub_ceo') == True:
+                request.check_role_officer = True
+            else:
+                request.check_role_officer = False
 
     @api.onchange('name')
     def _compute_domain_category(self):
@@ -55,7 +75,12 @@ class SupportServices(models.Model):
             if record.env.user.has_group('ds_support_services.support_service_pm') == True:
                 record.domain_category = json.dumps([('type_category', '!=', False)])
             else:
-                record.domain_category = json.dumps([('type_category', 'in', ['tam_ung_luong', 'it_helpdesk', 'other'])])
+                record.domain_category = json.dumps([('type_category', 'in', ['salary_advance', 'it_helpdesk', 'other'])])
+
+    @api.depends('requester_id')
+    def _compute_domain_company(self):
+        for record in self:
+            record.domain_company_id = json.dumps([('id', 'in', record.requester_id.company_ids.ids)])
 
     @api.onchange('category', 'payment')
     def _compute_domain_status(self):
@@ -98,7 +123,7 @@ class SupportServices(models.Model):
             for IT_user_id in IT_user_ids:
                 it_help.append(IT_user_id)
 
-            if record.category.type_category in ['team_building', 'tam_ung_luong']:
+            if record.category.type_category in ['team_building', 'salary_advance']:
                 record.approval = sub_ceo
                 record.send_to = building if len(building) > 0 else False
             elif record.category.type_category == 'it_helpdesk':
@@ -219,12 +244,6 @@ class SupportServices(models.Model):
         for request in self:
             request.write(
                 {'active': True})
-    
-    def action_set_to_draft(self):
-        for request in self:
-            request.write({
-                'status': self.env['status.support.service'].search([('type_status', '=', 'draft')]).id
-            })
 
     def unlink(self):
         for request in self:
@@ -235,7 +254,7 @@ class SupportServices(models.Model):
     @api.constrains('amount')
     def check_amount_validate(self):
         for request in self:
-            if request.amount <= 0 and request.category.type_category in ['team_building', 'tam_ung_luong']:
+            if request.amount <= 0 and request.category.type_category in ['team_building', 'salary_advance']:
                raise UserError('Amount cannot be less than or equal to 0')
 
     @api.constrains('date_request')
@@ -244,6 +263,22 @@ class SupportServices(models.Model):
             if request.date_request > date.today() and request.env.user.has_group('ds_support_services.support_service_hr') == False:
                 raise UserError('Date Request cannot be before current date')
         
+    @api.constrains('amount')
+    def check_amount_advance_salary(self):
+        for request in self:
+            if request.requester_id.employee_id.id and request.category.type_category == 'salary_advance': 
+                contract = self.env['hr.contract'].search([
+                    ('employee_id', '=', request.requester_id.employee_id.id),
+                    ('date_start', '<=', request.date_request),
+                    ('active', '=', True),
+                    ('state', 'in', ['draft','open']),
+                    '|', ('date_end', '>=', request.date_request),
+                    ('date_end', '=', False)
+                    ])
+                if len(contract)>0 and request.amount > (contract[0].wage + contract[0].taxable_allowance + contract[0].non_taxable_allowance)*2:
+                   raise UserError('Do not input amount more than 2 months salary')
+                elif len(contract)==0:
+                   raise UserError('No advance without a contract')
 
 
 class DepartmentItHr(models.Model):

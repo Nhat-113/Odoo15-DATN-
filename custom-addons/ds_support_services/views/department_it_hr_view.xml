@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="view_tree_configuration" model="ir.ui.view">
-        <field name="name">Configuration List</field>
+        <field name="name">HR_IT List</field>
         <field name="model">department.it.hr</field>
         <field name="arch" type="xml">
             <tree create="0" delete="0" multi_edit="1" sample="1" editable='top'>
@@ -12,8 +12,25 @@
     </record>
 
     <record id="config_action" model="ir.actions.act_window">
-        <field name="name">Configuration</field>
+        <field name="name">HR_IT</field>
         <field name="res_model">department.it.hr</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="view_tree_configuration_category" model="ir.ui.view">
+        <field name="name">Category List</field>
+        <field name="model">category.support.service</field>
+        <field name="arch" type="xml">
+            <tree create="1" delete="1" edit="1" multi_edit="1" sample="1" editable='top'>
+                <field name="name" readonly="0"/>
+                <field name="type_category" attrs="{'readonly': [('type_category', 'in', ['team_building', 'salary_advance', 'it_helpdesk', 'open_projects', 'other'])]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="config_action_category" model="ir.actions.act_window">
+        <field name="name">Category</field>
+        <field name="res_model">category.support.service</field>
         <field name="view_mode">tree</field>
     </record>
 </odoo>

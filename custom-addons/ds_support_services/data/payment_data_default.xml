@@ -3,12 +3,12 @@
     <data noupdate="1">
 
         <record id="payment_no_cost" model="payment.support.service">
-            <field name="name">No Cost</field>
+            <field name="name">No</field>
             <field name="type_payment">no_cost</field>
         </record>
 
         <record id="payment_have_cost" model="payment.support.service">
-            <field name="name">Have Cost</field>
+            <field name="name">Yes</field>
             <field name="type_payment">have_cost</field>
         </record>
     
