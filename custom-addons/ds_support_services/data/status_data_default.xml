@@ -21,6 +21,16 @@
             <field name="name">Done</field>
             <field name="type_status">done</field>
         </record>
+
+        <record id="status_refuse" model="status.support.service">
+            <field name="name">Refused</field>
+            <field name="type_status">refuse</field>
+        </record>
+
+        <record id="status_repaid" model="status.support.service">
+            <field name="name">Repaid</field>
+            <field name="type_status">repaid</field>
+        </record>
     
     </data>
 </odoo>

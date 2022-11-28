@@ -41,7 +41,9 @@ class SupportServices(models.Model):
     check_role_it = fields.Boolean(default=False, compute='compute_check_role_it')
     check_role_officer = fields.Boolean(default=False, compute='compute_check_role_officer')
     domain_company_id = fields.Char(string="Company domain", readonly=True, store=False, compute='_compute_domain_company')
-    check_invisible_approve = fields.Boolean(default=False, compute='compute_check_check_invisible_approve')
+    check_invisible_approve = fields.Boolean(default=False, compute='compute_check_invisible_approve')
+    check_invisible_field_approver = fields.Boolean(default=False, compute='compute_check_invisible_field_approver')
+    payroll_service_id = fields.One2many('payroll.support.service', 'support_service_id')
 
     @api.depends('category')
     def compute_check_role_it(self):
@@ -53,13 +55,21 @@ class SupportServices(models.Model):
                 request.check_role_it = False
     
     @api.depends('category', 'payment', 'status')
-    def compute_check_check_invisible_approve(self):
+    def compute_check_invisible_approve(self):
         for request in self:
-            if request.status.type_status != 'request' or \
-                request.payment.type_payment == 'no_cost' and request.category.type_category in ['it_helpdesk', 'open_projects', 'other']:
+            if request.payment.type_payment == 'no_cost' and request.category.type_category in ['it_helpdesk', 'open_projects', 'other']:
                 request.check_invisible_approve = True
             else:
                 request.check_invisible_approve = False
+
+    @api.depends('category', 'payment', 'status')
+    def compute_check_invisible_field_approver(self):
+        for request in self:
+            if request.category.type_category == 'open_projects' or \
+                request.payment.type_payment == 'no_cost' and request.category.type_category in ['it_helpdesk', 'other']:
+                request.check_invisible_field_approver = True
+            else:
+                request.check_invisible_field_approver = False
 
     @api.depends('name', 'approval','category')
     def compute_check_role_officer(self):
@@ -68,6 +78,11 @@ class SupportServices(models.Model):
                 request.check_role_officer = True
             else:
                 request.check_role_officer = False
+                if request.category.type_category in ['team_building', 'salary_advance'] or \
+                request.payment.type_payment == 'have_cost' and request.category.type_category in ['it_helpdesk', 'other']:
+                    request.approval = request.get_user_sub_ceo()
+                else:
+                    request.approval = False
 
     @api.onchange('name')
     def _compute_domain_category(self):
@@ -87,8 +102,16 @@ class SupportServices(models.Model):
         for record in self:
             if record.category.type_category in ['open_projects', 'it_helpdesk', 'other'] and record.payment.type_payment == 'no_cost':
                 record.domain_status = json.dumps([('type_status', 'in', ['draft', 'request', 'done'])])
+            elif record.status.type_status != 'refuse':
+                if record.category.type_category == 'salary_advance':
+                    record.domain_status = json.dumps([('type_status', '!=', 'refuse')])
+                else:
+                    record.domain_status = json.dumps([('type_status', 'not in', ['refuse', 'repaid'])])
             else:
-                record.domain_status = json.dumps([('type_status', '!=', False)])
+                if record.category.type_category == 'salary_advance':
+                    record.domain_status = json.dumps([('type_status', '!=', False)])
+                else:
+                    record.domain_status = json.dumps([('type_status', '!=', 'repaid')])
 
     @api.depends('category')
     def _compute_flag_category(self):
@@ -163,16 +186,21 @@ class SupportServices(models.Model):
 
         # Send mail submit (from pm to director)
         mail_template = "ds_support_services.request_service_template"
-        subject_template = "Submit Request Service"
+        mail_template_no_payment = "ds_support_services.request_service_template_no_payment"
+        subject_template = "["+self.category.name+"] Submit Request Service"
 
-        self._send_message_auto_subscribe_notify_request_service(self.approval , mail_template, subject_template)
+        if self.category.type_category in ['team_building', 'salary_advance'] or \
+            self.payment.type_payment == 'have_cost' and self.category.type_category in ['it_helpdesk', 'other']:
+                self._send_message_auto_subscribe_notify_request_service(self.approval , mail_template, subject_template)
+        else:
+            self._send_message_auto_subscribe_notify_request_service(self.send_to , mail_template_no_payment, subject_template)
     
     def action_approve_service(self):
         self.status = self.env['status.support.service'].search([('type_status', '=', 'approval')]).id
 
         mail_template_user = "ds_support_services.approvals_request_service_template_user"
         mail_template_send_to = "ds_support_services.approvals_request_service_template_send_to"
-        subject_template = "Submit Approve Service"
+        subject_template = "["+self.category.name+"] Submit Approved Service"
 
         self._send_message_auto_subscribe_notify_request_service(self.requester_id, mail_template_user, subject_template)
         self._send_message_auto_subscribe_notify_request_service(self.send_to, mail_template_send_to, subject_template)
@@ -181,7 +209,19 @@ class SupportServices(models.Model):
         self.status = self.env['status.support.service'].search([('type_status', '=', 'done')]).id
 
         mail_template = "ds_support_services.done_request_service_template"
-        subject_template = "Submit Done Service"
+        subject_template = "["+self.category.name+"] Submit Done Service"
+
+        self._send_message_auto_subscribe_notify_request_service(self.requester_id , mail_template, subject_template)
+
+    def action_repaid_service(self):
+        total_advance_payroll = sum([advance.amount for advance in self.payroll_service_id])
+        if self.amount != total_advance_payroll:
+           raise UserError('Cannot click repaid when the advance payment has not been paid in full')
+
+        self.status = self.env['status.support.service'].search([('type_status', '=', 'repaid')]).id
+
+        mail_template = "ds_support_services.repaid_request_service_template"
+        subject_template = "["+self.category.name+"] Submit Repaid Service"
 
         self._send_message_auto_subscribe_notify_request_service(self.requester_id , mail_template, subject_template)
 
@@ -196,7 +236,7 @@ class SupportServices(models.Model):
         })
 
         mail_template = "ds_support_services.create_project_request_service_template"
-        subject_template = "Submit Done Service"
+        subject_template = "["+self.category.name+"] Submit Done Service"
 
         self._send_message_auto_subscribe_notify_request_service(self.requester_id , mail_template, subject_template)
 
@@ -243,7 +283,7 @@ class SupportServices(models.Model):
     def toggle_active(self):
         for request in self:
             request.write(
-                {'active': True})
+                {'status': self.env['status.support.service'].search([('type_status', '=', 'draft')]).id})
 
     def unlink(self):
         for request in self:
@@ -267,7 +307,7 @@ class SupportServices(models.Model):
     def check_amount_advance_salary(self):
         for request in self:
             if request.requester_id.employee_id.id and request.category.type_category == 'salary_advance': 
-                contract = self.env['hr.contract'].search([
+                contract = self.env['hr.contract'].sudo().search([
                     ('employee_id', '=', request.requester_id.employee_id.id),
                     ('date_start', '<=', request.date_request),
                     ('active', '=', True),

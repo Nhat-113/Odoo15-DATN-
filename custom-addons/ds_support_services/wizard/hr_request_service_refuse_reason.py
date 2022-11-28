@@ -9,13 +9,12 @@ class ServiceGetRefuseReason(models.TransientModel):
     subject_refuse_reason = fields.Char(string="Refuse Reason", required=True)
 
     def action_refuse_reason_apply(self):
-        subject_template = "Reject Request Service: %s" % self.request_service_ids.display_name
+        subject_template = "["+self.request_service_ids.category.name+"] Reject Request Service: %s" % self.request_service_ids.display_name
         mail_template = "ds_support_services.refuse_request_service_template"
         self._send_message_auto_subscribe_notify_refuse_request_service({item: item.requester_id for item in self.request_service_ids}, mail_template, subject_template)
         self.request_service_ids.write({
-                                    'active': False, 
                                     'refuse_reason': str(self.subject_refuse_reason),
-                                    'status': self.env['status.support.service'].search([('type_status', '=', 'draft')]).id
+                                    'status': self.env['status.support.service'].search([('type_status', '=', 'refuse')]).id
                                     })
 
     @api.model

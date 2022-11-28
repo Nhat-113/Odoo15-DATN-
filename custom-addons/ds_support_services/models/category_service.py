@@ -31,3 +31,28 @@ class StatusSupportService(models.Model):
 
     name = fields.Char('Status')
     type_status = fields.Char('Type')
+
+
+class PayrollSupportService(models.Model):
+    _name = "payroll.support.service"
+
+    name = fields.Char('Name')
+    amount = fields.Float('Amount (VND)')
+    support_service_id = fields.Many2one('support.services', string='Support Service')
+
+
+    @api.constrains('amount')
+    def check_amount_validation(self):
+        for record in self:
+            if record.amount <= 0:
+                raise UserError('Amount cannot be less than or equal to 0')
+            else:
+                payroll_services = self.env['payroll.support.service'].search([
+                    ('support_service_id', '=', record.support_service_id.id),
+                    ('id', '!=', record.id)
+                    ])
+                
+                total_amount = sum([payroll.amount for payroll in payroll_services])
+                if record.amount + total_amount > record.support_service_id.amount:
+                   raise UserError(_('The total amount cannot be greater than the advance (%(advance)s).', advance=record.support_service_id.amount))
+              
