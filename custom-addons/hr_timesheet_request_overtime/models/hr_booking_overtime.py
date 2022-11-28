@@ -150,10 +150,13 @@ class AccountAnalyticLine(models.Model):
                 if len(time_of_type)==0:
                     raise ValidationError(_("Please Create Time Of Types: Nghỉ bù."))
                 number_of_hours_display = 0
-                if pay_type=='full_day_off':
-                    number_of_hours_display = record.unit_amount
-                elif pay_type=='half_cash_half_dayoff':
-                    number_of_hours_display = record.unit_amount/2
+                               
+                type_date = {'other':1, 'normal_day':1.5, 'weekend':2, 'holiday':3}
+
+                if pay_type == 'full_day_off':
+                    number_of_hours_display = record.unit_amount * type_date[record.type_day_ot]
+                elif pay_type == 'half_cash_half_dayoff':
+                    number_of_hours_display = record.unit_amount/2 * type_date[record.type_day_ot]
 
                 number_of_days = number_of_hours_display/8
                 
