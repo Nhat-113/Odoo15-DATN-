@@ -755,58 +755,68 @@ odoo.define('human_resource_template_support.Dashboard', function (require) {
 
 
         export_excel: function () {
-            // Table2Excel.extend((cell, cellText) => {
-            //     return $(cell).attr('type') == 'string' ? {
-            //         t: 's',
-            //         v: cellText
-            //     } : null;
-            // });
+            Table2Excel.extend((cell, cellText) => {
+                return $(cell).attr('type') == 'string' ? {
+                    t: 's',
+                    v: cellText
+                } : null;
+            });
 
-            // var table2excel = new Table2Excel();
-            // // let table_to_exp = document.getElementById("human_resource_table").not("tr .total_member_avai_company");
-            // let table_to_exp_2 = $("table #human_resource_table td").not("tr .total_member_avai_company")
-
-            // // console.log(`table_to_exp`, table_to_exp);
-
-            // // let tr_exp = table_to_exp.querySelectorAll("tr");
-
-            // table2excel.export(table_to_exp_2);
+            var table2excel = new Table2Excel();
             
-            var result = [];
-            var table =  document.getElementById("human_resource_table")
-            var rows = table.rows;
-            var cells, arrTemp;
-          
-            for (var i=0, iLen=rows.length; i<iLen; i++) {
-                cells = rows[i].cells;
-                arrTemp = [];
-                if(rows[i].style.display != 'none') {
-                    for (var j = 0, jLen = cells.length; j < jLen; j++) {
-                        arrTemp.push(cells[j].textContent.replace(/\n/g,'').replace(/\r/g,' ').trim());
-                    }
-                }
-              result.push(arrTemp);
-            }
+            var myTableHuman = document.getElementsByTagName("table")[1];
+            
+            var myCloneTable = myTableHuman.cloneNode(true);
 
-            let dataExport = [];
+            var element_none = myCloneTable.querySelectorAll('tr');
 
-            for(let i=0; i <  result.length ; i ++) {
-                if (result[i].length > 0) {
-                    dataExport.push(result[i]);
+            for (let i = 0 ; i < element_none.length ; i ++ ) {
+                if (element_none[i].style.display ==  'none') {
+                    element_none[i].remove();
                 } 
             }
-            var csvContent = ""
-            dataExport.forEach(function(RowItem, RowIndex) {
-                RowItem.forEach(function(ColItem, ColIndex) {
-                csvContent += ColItem + ',';
-                });
-                csvContent += "\r\n";
-            });
-            var ele = document.createElement("A");
-            ele.setAttribute("href",  "data:application/xls;charset=utf-8,%EF%BB%BF"+ encodeURI(csvContent) );
-            ele.setAttribute("download","human_resource.xls");
-            document.body.appendChild(ele);
-            ele.click();
+            document.body.appendChild(myCloneTable);
+
+            table2excel.export(myCloneTable);
+            
+            myCloneTable.remove();
+            
+            
+            // var result = [];
+            // var table =  document.getElementById("human_resource_table")
+            // var rows = table.rows;
+            // var cells, arrTemp;
+          
+            // for (var i=0, iLen=rows.length; i<iLen; i++) {
+            //     cells = rows[i].cells;
+            //     arrTemp = [];
+            //     if(rows[i].style.display != 'none') {
+            //         for (var j = 0, jLen = cells.length; j < jLen; j++) {
+            //             arrTemp.push(cells[j].textContent.replace(/\n/g,'').replace(/\r/g,' ').trim());
+            //         }
+            //     }
+            //   result.push(arrTemp);
+            // }
+
+            // let dataExport = [];
+
+            // for(let i=0; i <  result.length ; i ++) {
+            //     if (result[i].length > 0) {
+            //         dataExport.push(result[i]);
+            //     } 
+            // }
+            // var csvContent = ""
+            // dataExport.forEach(function(RowItem, RowIndex) {
+            //     RowItem.forEach(function(ColItem, ColIndex) {
+            //     csvContent += ColItem + ',';
+            //     });
+            //     csvContent += "\r\n";
+            // });
+            // var ele = document.createElement("A");
+            // ele.setAttribute("href",  "data:application/xls;charset=utf-8,%EF%BB%BF"+ encodeURI(csvContent) );
+            // ele.setAttribute("download","human_resource.xls");
+            // document.body.appendChild(ele);
+            // ele.click();
         },
 
         view_effort_member_free: function () {
@@ -970,7 +980,7 @@ odoo.define('human_resource_template_support.Dashboard', function (require) {
             var count_member_internal = this.compute_avg()[3];
             let textInternalHeadCountRate = document.getElementsByClassName('internal-headcounts-avg');
             var compute_effort_internal = this.compute_avg()[5];
-            let element_avg_eff = document.querySelectorAll('.Avg_effort_member .td_value');
+            let element_avg_eff = document.querySelectorAll('#total-effort-all-res-rate .td_value');
             let value_aver = [];
          
 
@@ -984,6 +994,15 @@ odoo.define('human_resource_template_support.Dashboard', function (require) {
             var total_member_company = document.getElementById("count_member_of_company");
             total_member_company.innerText = String( 'Current Month Active Members: ' +  count_member_filter[current_month] );
 
+                // value member company in human
+                let element_member_company = document.querySelectorAll('#total-row-member-of-company .td_value');
+                let total_element_member_company = [];
+    
+                for (let i = 0; i < element_member_company.length; i++) {
+                    if (element_member_company[i].innerText != '' ) {
+                        total_element_member_company.push(element_member_company[i].innerText);
+                    }
+                }
             var total_effort = []
             for (let i = 0; i < count_member_filter.length; i ++)  {
                 total_effort.push(count_member_filter[i] * 100)
@@ -1010,9 +1029,22 @@ odoo.define('human_resource_template_support.Dashboard', function (require) {
             }
 
             //replace value
+            let selection = document.getElementById("countriesDropdown");
+            let filterSelection = selection.value.toUpperCase();
+
             for(let i = 0 ; i < textCountMember.length; i++ ){
-                textCountMember[i].innerText = count_member_filter[i];
+                //with filter PROJECT BILLABLE value count member = member bill have effort > 0
+                if (filterSelection == 'PROJECT BILLABLE' ) {
+                    textCountMember[i].innerText = count_member_billable[i];
+                }
+                //with filter PROJECT INTERNAL value count member = member bill have effort > 0
+                else if (filterSelection == 'PROJECT INTERNAL' ) {
+                    textCountMember[i].innerText = count_member_internal[i];
+                }
+                else 
+                    textCountMember[i].innerText = count_member_filter[i];
             }
+
             for(let i = 0 ; i <   textAverageUsageRate.length;  i++ ){
                 textAverageUsageRate[i].innerText = value_aver[i];
             }
@@ -1021,26 +1053,16 @@ odoo.define('human_resource_template_support.Dashboard', function (require) {
                 textBillableHeadCount[i].innerText = count_member_billable[i];
             }
             for(let i = 0 ; i < textBillableHeadCountRate.length; i++ ){
-                textBillableHeadCountRate[i].innerText = ( (compute_effort_billable[i] / total_effort[i]) * 100 ).toFixed(2) ;
+                textBillableHeadCountRate[i].innerText = ( (compute_effort_billable[i] / (total_element_member_company[i] * 100 )) * 100 ).toFixed(2) ;
             }
 
             for(let i = 0 ; i < textInternalHeadCount.length; i++ ){
                 textInternalHeadCount[i].innerText = count_member_internal[i];
             }
             for(let i = 0 ; i < textInternalHeadCountRate.length; i++ ){
-                textInternalHeadCountRate[i].innerText = ((compute_effort_internal[i] / total_effort[i]) * 100 ).toFixed(2) ;
+                textInternalHeadCountRate[i].innerText = ((compute_effort_internal[i] / (total_element_member_company[i] * 100 )) * 100 ).toFixed(2) ;
             }
 
-
-            // value member company in human
-            let element_member_company = document.querySelectorAll('#total-row-member-of-company .td_value');
-            let total_element_member_company = [];
-
-            for (let i = 0; i < element_member_company.length; i++) {
-                if (element_member_company[i].innerText != '' ) {
-                    total_element_member_company.push(element_member_company[i].innerText);
-                }
-            }
 
             for(let i = 0 ; i < textAvailableHeadCount.length; i++ ){
                 textAvailableHeadCount[i].innerText = count_member_available[i];
