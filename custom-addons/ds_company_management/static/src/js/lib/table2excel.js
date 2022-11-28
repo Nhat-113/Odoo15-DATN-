@@ -321,7 +321,8 @@
 	      });
 
 	      var blob = new Blob([convert(data)], { type: 'application/octet-stream' });
-	      (0, _filesaver.saveAs)(blob, fileName + '.xlsx');
+	    //   (0, _filesaver.saveAs)(blob, fileName + '.xlsx');
+	      (0, _filesaver.saveAs)(blob, 'Human Resource Report' + '.xlsx');
 	    }
 	  }]);
 	  return Table2Excel;
