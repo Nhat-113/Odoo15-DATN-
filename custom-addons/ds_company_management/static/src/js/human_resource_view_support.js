@@ -966,6 +966,8 @@ odoo.define('human_resource_template_support.Dashboard', function (require) {
         value_table_over_view: function() {
             // let self = this;
             var  count_member_filter = this.compute_avg()[1];
+            var  compute_effort_filter = this.compute_avg()[0];
+
             let textCountMember = document.getElementsByClassName('value-member-count');
 
             let textAverageUsageRate = document.getElementsByClassName('value-member-aver-usage');
@@ -1046,7 +1048,7 @@ odoo.define('human_resource_template_support.Dashboard', function (require) {
             }
 
             for(let i = 0 ; i <   textAverageUsageRate.length;  i++ ){
-                textAverageUsageRate[i].innerText = value_aver[i];
+                textAverageUsageRate[i].innerText = ( compute_effort_filter[i] / count_member_filter[i] ).toFixed(2) ;
             }
 
             for(let i = 0 ; i < textBillableHeadCount.length; i++ ){
