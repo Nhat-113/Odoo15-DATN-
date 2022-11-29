@@ -28,7 +28,7 @@ class AccountAnalyticLine(models.Model):
                                         ('confirm', 'Confirm'),
                                         ('refuse', 'Refused'),
                                         ('approved', 'Approved'),
-                                        ], default='draft', store=True, tracking=True)
+                                        ], default='draft', store=True, tracking=True, compute="reject_timesheet_overtime")
     reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True, default=False)
     invisible_button_confirm = fields.Boolean(default=False, help="Check invisible button Confirm")
     
@@ -84,7 +84,7 @@ class AccountAnalyticLine(models.Model):
             else:
                 record.pay_type = False
 
-    @api.onchange('reason_reject')
+    @api.depends('reason_reject')
     def reject_timesheet_overtime(self):
         for timesheet in self:
             if timesheet.reason_reject != False:
