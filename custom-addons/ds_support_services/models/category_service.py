@@ -36,8 +36,8 @@ class StatusSupportService(models.Model):
 class PayrollSupportService(models.Model):
     _name = "payroll.support.service"
 
-    name = fields.Char('Name')
-    amount = fields.Float('Amount (VND)')
+    name = fields.Char('Name', required=True, tracking=True)
+    amount = fields.Float('Amount (VND)', required=True, tracking=True)
     support_service_id = fields.Many2one('support.services', string='Support Service')
 
 
@@ -55,4 +55,19 @@ class PayrollSupportService(models.Model):
                 total_amount = sum([payroll.amount for payroll in payroll_services])
                 if record.amount + total_amount > record.support_service_id.amount:
                    raise UserError(_('The total amount cannot be greater than the advance (%(advance)s).', advance=record.support_service_id.amount))
-              
+
+    @api.constrains('name', 'amount')
+    def send_mail_log_repaid(self):
+        for record in self:
+            mail_template = "ds_support_services.create_repaid_service_template"
+            subject_template = "["+record.support_service_id.category.name+"] Log Repaid"
+
+            record.support_service_id._send_message_auto_subscribe_notify_request_service(record.support_service_id.requester_id , mail_template, subject_template)
+
+    def unlink(self):
+        for record in self:
+            mail_template = "ds_support_services.delete_repaid_service_template"
+            subject_template = "["+record.support_service_id.category.name+"] Delete Log Repaid"
+
+            record.support_service_id._send_message_auto_subscribe_notify_request_service(record.support_service_id.requester_id , mail_template, subject_template)
+        return super().unlink()          

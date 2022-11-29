@@ -17,7 +17,7 @@ class SupportServices(models.Model):
     name = fields.Char("Subject", required=True)
     currency_vnd = fields.Many2one('res.currency', string="VND Currency", default=lambda self: self._get_default_currency('VND'), readonly=True)  
     project_id = fields.Many2one('project.project', string="Project", tracking=True)
-    date_request = fields.Date(string="Date Request", required=True, default=fields.Date.today)
+    date_request = fields.Date(string="Date Request", required=True, tracking=True, default=fields.Date.today)
     description = fields.Text(string="Description", tracking=True)
     requester_id = fields.Many2one('res.users', string='Requester', required=True, tracking=True, default=lambda self: self.env.user)
     project_name = fields.Char('Project Name')
@@ -28,15 +28,15 @@ class SupportServices(models.Model):
     approval = fields.Many2one('res.users', string='Approver', tracking=True, required=False, readonly=False)
     send_to = fields.Many2many('res.users', string='Send To', tracking=True, required=True, readonly=False)
     amount = fields.Monetary(string='Amount', tracking=True, currency_field='currency_vnd')
-    status = fields.Many2one('status.support.service', string="Status", default=lambda self: self.env['status.support.service'].search([('type_status', '=', 'draft')]).id)
+    status = fields.Many2one('status.support.service', tracking=True, string="Status", default=lambda self: self.env['status.support.service'].search([('type_status', '=', 'draft')]).id)
     domain_status = fields.Char(string="Status domain", readonly=True, store=False, compute='_compute_domain_status')
     flag_status = fields.Char(string="Status Flag", readonly=True, store=True, compute='_compute_flag_status')
-    category = fields.Many2one('category.support.service', string="Category", required=True, default=lambda self: self.env['category.support.service'].search([('type_category', '=', 'salary_advance')]).id)
+    category = fields.Many2one('category.support.service',tracking=True, string="Category", required=True, default=lambda self: self.env['category.support.service'].search([('type_category', '=', 'salary_advance')]).id)
     domain_category = fields.Char(string="Category domain", readonly=True, store=False, compute='_compute_domain_category')
     flag_category = fields.Char(string="Category Flag", readonly=True, store=True, compute='_compute_flag_category')
     active = fields.Boolean(default=True)
     refuse_reason = fields.Char(string='Refuse Reason:', tracking=True)
-    payment = fields.Many2one('payment.support.service', string="Payment", required=True, default=lambda self: self.env['payment.support.service'].search([('type_payment', '=', 'no_cost')]).id)
+    payment = fields.Many2one('payment.support.service', string="Payment", tracking=True, required=True, default=lambda self: self.env['payment.support.service'].search([('type_payment', '=', 'no_cost')]).id)
     flag_payment = fields.Char(string="Payment Flag", readonly=True, store=True, compute='_compute_flag_payment')
     check_role_it = fields.Boolean(default=False, compute='compute_check_role_it')
     check_role_officer = fields.Boolean(default=False, compute='compute_check_role_officer')
@@ -44,6 +44,7 @@ class SupportServices(models.Model):
     check_invisible_approve = fields.Boolean(default=False, compute='compute_check_invisible_approve')
     check_invisible_field_approver = fields.Boolean(default=False, compute='compute_check_invisible_field_approver')
     payroll_service_id = fields.One2many('payroll.support.service', 'support_service_id')
+    check_readonly_field_payroll = fields.Boolean(default=False, compute='compute_check_readonly_field_payroll')
 
     @api.depends('category')
     def compute_check_role_it(self):
@@ -83,6 +84,14 @@ class SupportServices(models.Model):
                     request.approval = request.get_user_sub_ceo()
                 else:
                     request.approval = False
+
+    @api.depends('name', 'approval','category')
+    def compute_check_readonly_field_payroll(self):
+        for request in self:
+            if request.env.user.has_group('ds_support_services.support_service_hr') == False:
+                request.check_readonly_field_payroll = True
+            else:
+                request.check_readonly_field_payroll = False
 
     @api.onchange('name')
     def _compute_domain_category(self):
@@ -216,7 +225,7 @@ class SupportServices(models.Model):
     def action_repaid_service(self):
         total_advance_payroll = sum([advance.amount for advance in self.payroll_service_id])
         if self.amount != total_advance_payroll:
-           raise UserError('Cannot click repaid when the advance payment has not been paid in full')
+           raise UserError('Cannot click repaid when the advance payment has not been fully paid')
 
         self.status = self.env['status.support.service'].search([('type_status', '=', 'repaid')]).id
 

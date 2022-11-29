@@ -45,7 +45,7 @@
                 <field name="date_request"/>
                 <field name="category"/>
                 <field name="description"/>
-                <field name="status" widget="badge" decoration-danger="flag_status == 'refuse'" decoration-warning="flag_status == 'request'" decoration-info="flag_status == 'done'" decoration-success="flag_status == 'approval'"/>
+                <field name="status" widget="badge" decoration-primary="flag_status == 'repaid'" decoration-danger="flag_status == 'refuse'" decoration-warning="flag_status == 'request'" decoration-info="flag_status == 'done'" decoration-success="flag_status == 'approval'"/>
                 <field name="flag_category" invisible="1"/>
             </tree>
         </field>
@@ -72,6 +72,7 @@
                     <widget name="web_ribbon" title="REFUSED" bg_color="bg-danger" attrs="{'invisible':[('flag_status', '!=', 'refuse')]}"/>
                     <widget name="web_ribbon" title="DONE" bg_color="bg-info" attrs="{'invisible':[('flag_status', '!=', 'done')]}"/>
                     <widget name="web_ribbon" title="APPROVED" bg_color="bg-success" attrs="{'invisible':[('flag_status', '!=', 'approval')]}"/>
+                    <widget name="web_ribbon" title="REPAID" bg_color="bg-primary" attrs="{'invisible':[('flag_status', '!=', 'repaid')]}"/>
                     <sheet>
                         <field name='active' invisible="1"/>
                         <field name='check_role_it' invisible="1"/>
@@ -98,7 +99,7 @@
                                 <field name="domain_category" invisible="1"/>
                                 <field name="check_role_officer" invisible="1"/>
                                 <field name="category" domain="domain_category" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'readonly': [('flag_status', '!=', 'draft')]}"/>
-                                <field name="approval" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" widget="many2one_avatar_user" 
+                                <field name="approval" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}"
                                     attrs="{'readonly': ['|', ('check_role_officer', '=', False), ('flag_status', '!=', 'draft')], 
                                     'required': ['|', ('flag_category', 'in', ['team_building', 'salary_advance']), 
                                     ('flag_payment', '=', 'have_cost')], 'invisible': [('check_invisible_field_approver', '=', True)]}"/>
@@ -108,17 +109,18 @@
                         <group string='Detail'>
                             <group name="group_left">
                                 <field name="flag_status" invisible="1"/>
+                                <field name="check_readonly_field_payroll" invisible="1"/>
                                 <field name="domain_status" invisible="1"/>
                                 <field name="flag_payment" invisible="1"/>
                                 <field name="payment" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', 'not in', ['it_helpdesk', 'other'])], 'required': [('flag_category', 'in', ['it_helpdesk', 'other'])], 'readonly': [('flag_status', 'in', ['approval', 'done'])]}"/>
                                 <field name="flag_category" invisible="1"/>
-                                <field name="project_id" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', '!=', 'team_building')], 'required': [('flag_category', '=', 'team_building')], 'readonly': [('flag_status', '!=', 'draft')]}"/>
                                 <field name="project_name" attrs="{'invisible': [('flag_category', '!=', 'open_projects')], 'required': [('flag_category', '=', 'open_projects')], 'readonly': [('flag_status', '!=', 'draft')]}"/>
                                 <field name="project_type" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', '!=', 'open_projects')], 'required': [('flag_category', '=', 'open_projects')], 'readonly': [('flag_status', '!=', 'draft')]}"/>
                                 <field name="currency_vnd" invisible="1"/>
                                 <field name="amount" widget="monetary" attrs="{'invisible': [('flag_category', 'not in', ['team_building', 'salary_advance'])], 'required': [('flag_category', 'in', ['team_building', 'salary_advance'])], 'readonly': [('flag_status', '!=', 'draft')]}"/>
                             </group>
                             <group name="group_right">
+                                <field name="project_id" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', '!=', 'team_building')], 'required': [('flag_category', '=', 'team_building')], 'readonly': [('flag_status', '!=', 'draft')]}"/>
                                 <field name="project_pm" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', '!=', 'open_projects')], 'required': [('flag_category', '=', 'open_projects')], 'readonly': [('flag_status', '!=', 'draft')]}"/>
                                 <field name="company_project" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_category', '!=', 'open_projects')], 'required': [('flag_category', '=', 'open_projects')], 'readonly': [('flag_status', '!=', 'draft')]}"/>
                             </group>
@@ -127,9 +129,9 @@
                         <field name="description" placeholder="Description" attrs="{'required': [('flag_category', 'in', ['it_helpdesk', 'other'])], 'readonly': [('flag_status', '!=', 'draft')]}"/>
                         <notebook attrs="{'invisible': ['|', ('flag_category', '!=', 'salary_advance'), ('flag_status', 'not in', ['done', 'repaid'])]}">
                             <page string="Log Repaid" attrs="{'invisible': ['|', ('flag_category', '!=', 'salary_advance'), ('flag_status', 'not in', ['done', 'repaid'])]}">
-                                <field name="payroll_service_id" colspan="4" attrs="{'readonly': [('flag_status','=', 'repaid')]}">
+                                <field name="payroll_service_id" colspan="4" attrs="{'readonly': ['|', ('flag_status','=', 'repaid'), ('check_readonly_field_payroll', '=', True)]}">
                                     <tree string="Payroll" delete="1" editable="top" create="1">
-                                        <field name="name"/>
+                                        <field name="name" width="350px"/>
                                         <field name="amount"/>
                                     </tree>
                                 </field>
