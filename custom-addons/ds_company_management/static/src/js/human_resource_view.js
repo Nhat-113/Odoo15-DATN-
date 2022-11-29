@@ -996,7 +996,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var count_member_internal = this.compute_avg()[3];
             let textInternalHeadCountRate = document.getElementsByClassName('internal-headcounts-avg');
             var compute_effort_internal = this.compute_avg()[5];
-            let element_avg_eff = document.querySelectorAll('#total-effort-all-res-rate .td_value');
+            let element_avg_eff = document.querySelectorAll('.Avg_effort_member .td_value');
             let value_aver = [];
          
 
