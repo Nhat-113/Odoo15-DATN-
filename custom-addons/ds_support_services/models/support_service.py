@@ -297,20 +297,20 @@ class SupportServices(models.Model):
     def unlink(self):
         for request in self:
             if request.env.user.has_group('ds_support_services.support_service_admin') == False and request.status.type_status in ['approval', 'done']:
-                raise UserError('You cannot delete a request service which is Approval or Done')
+                raise UserError('You cannot delete a request service which is Approval or Done.')
         return super().unlink()
     
     @api.constrains('amount')
     def check_amount_validate(self):
         for request in self:
             if request.amount <= 0 and request.category.type_category in ['team_building', 'salary_advance']:
-               raise UserError('Amount cannot be less than or equal to 0')
+               raise UserError('Amount cannot be less than or equal to 0.')
 
     @api.constrains('date_request')
     def check_date_request_validate(self):
         for request in self:
-            if request.date_request > date.today() and request.env.user.has_group('ds_support_services.support_service_hr') == False:
-                raise UserError('Date Request cannot be before current date')
+            if request.date_request < date.today() and request.env.user.has_group('ds_support_services.support_service_hr') == False:
+                raise UserError('Request date cannot be earlier than today.')
         
     @api.constrains('amount')
     def check_amount_advance_salary(self):

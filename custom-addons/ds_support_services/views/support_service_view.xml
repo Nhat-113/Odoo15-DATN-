@@ -18,7 +18,7 @@
                 <separator/>
                 <group expand="0" string="Status">
                     <filter string="Team Building" name="team_building" domain="[('flag_category', '=', 'team_building')]"/>
-                    <filter string="Tạm ứng Lương" name="salary_advance" domain="[('flag_category', '=', 'salary_advance')]"/>
+                    <filter string="Salary Advance" name="salary_advance" domain="[('flag_category', '=', 'salary_advance')]"/>
                     <filter string="IT Helpdesk" name="it_helpdesk" domain="[('flag_category', '=', 'it_helpdesk')]"/>
                     <filter string="Open Projects" name="open_projects" domain="[('flag_category', '=', 'open_projects')]"/>
                     <filter string="Other" name="other" domain="[('flag_category', '=', 'other')]"/>
