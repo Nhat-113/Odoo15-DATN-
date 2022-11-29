@@ -982,6 +982,8 @@ odoo.define('human_resource_template.Dashboard', function (require) {
         value_table_over_view: function() {
             // let self = this;
             var  count_member_filter = this.compute_avg()[1];
+            var  compute_effort_filter = this.compute_avg()[0];
+
             let textCountMember = document.getElementsByClassName('value-member-count');
 
             let textAverageUsageRate = document.getElementsByClassName('value-member-aver-usage');
@@ -996,7 +998,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
             var count_member_internal = this.compute_avg()[3];
             let textInternalHeadCountRate = document.getElementsByClassName('internal-headcounts-avg');
             var compute_effort_internal = this.compute_avg()[5];
-            let element_avg_eff = document.querySelectorAll('#total-effort-all-res-rate .td_value');
+            let element_avg_eff = document.querySelectorAll('.Avg_effort_member .td_value');
             let value_aver = [];
          
 
@@ -1051,7 +1053,7 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     textCountMember[i].innerText = count_member_filter[i];
             }
             for(let i = 0 ; i <   textAverageUsageRate.length;  i++ ){
-                textAverageUsageRate[i].innerText = value_aver[i];
+                textAverageUsageRate[i].innerText = ( compute_effort_filter[i] / count_member_filter[i] ).toFixed(2) ;
             }
 
             for(let i = 0 ; i < textBillableHeadCount.length; i++ ){
