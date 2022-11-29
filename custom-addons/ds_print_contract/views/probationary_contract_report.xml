@@ -263,7 +263,7 @@
                                                         <t t-if="not e.other_allowance"> 0 </t>
                                                     </t>
                                                 </span>VNĐ/tháng
-                                                <span class="font-italic">trong đó mức lương thử việc là 85% thu nhập thực nhận</span>
+                                                <span class="font-italic">trong đó mức lương thử việc là <span t-field="e.percent_prob_contract"/>% thu nhập thực nhận</span>
                                             </p>
                                             <p>-	Hình thức trả lương: Được trả 01 lần vào ngày 02 hàng tháng. Nếu trùng vào ngày nghỉ thì sẽ trả vào ngày làm việc đầu tiên tiếp theo.</p>
                                             <p>-	Các chế độ phúc lợi khác: theo quy định của Công ty.</p>
