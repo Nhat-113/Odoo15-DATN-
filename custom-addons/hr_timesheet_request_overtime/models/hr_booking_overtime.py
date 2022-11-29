@@ -14,21 +14,21 @@ class AccountAnalyticLine(models.Model):
                                 ('full_cash', 'Full Cash'),
                                 ('half_cash_half_dayoff', 'Cash 5:5 Date Off'),
                                 ('full_day_off', 'Full Date Off'),
-                                ], string='Pay Type', index=True, tracking=True, compute='_compute_pay_type', store=True)
+                                ], string='Pay Type', index=True, default=False)
 
     type_day_ot = fields.Selection([
                                 ('other', 'Other'),
                                 ('normal_day', 'Normal Day'),
                                 ('weekend', 'Weekend'),
                                 ('holiday', 'Holiday'),
-                                ], string='Type Day', index=True, copy=False, compute="compute_type_overtime_day", tracking=True, required=True, store=True, default=False)
+                                ], string='Type Day', index=True, copy=False, default=False)
 
     status_timesheet_overtime = fields.Selection([
                                         ('draft', 'To Confirm'),
                                         ('confirm', 'Confirm'),
                                         ('refuse', 'Refused'),
                                         ('approved', 'Approved'),
-                                        ], default='draft', readonly=True, store=True, tracking=True, compute="reject_timesheet_overtime")
+                                        ], default='draft', store=True, tracking=True)
     reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True, default=False)
     invisible_button_confirm = fields.Boolean(default=False, help="Check invisible button Confirm")
     
@@ -75,7 +75,7 @@ class AccountAnalyticLine(models.Model):
             else:
                 record.type_day_ot = 'other'
             
-    @api.depends('type_ot', 'pay_type')
+    @api.onchange('type_ot')
     def _compute_pay_type(self):
         for record in self:
             if record.type_ot == "yes":
@@ -84,7 +84,7 @@ class AccountAnalyticLine(models.Model):
             else:
                 record.pay_type = False
 
-    @api.depends('reason_reject')
+    @api.onchange('reason_reject')
     def reject_timesheet_overtime(self):
         for timesheet in self:
             if timesheet.reason_reject != False:
@@ -196,10 +196,6 @@ class AccountAnalyticLine(models.Model):
                     record.check_request_ot = False
                     record.check_approval_ot = False
                     
-                    # Reset status timesheets OT when refuse
-                    if record.request_overtime_ids.active == False:
-                        record.status_timesheet_overtime = 'draft'
-
             else:
                 record.request_overtime_ids = False
 
@@ -250,9 +246,7 @@ class AccountAnalyticLine(models.Model):
     def write(self, vals):
         values = self._check_change_value_timesheet(vals)
         vals.update(values)
-        result = super(AccountAnalyticLine, self).write(vals)
-
-        return result
+        return super(AccountAnalyticLine, self).write(vals)
 
     def _check_change_value_timesheet(self, vals):
         type_timesheet = vals.get('type_ot')  or self.type_ot

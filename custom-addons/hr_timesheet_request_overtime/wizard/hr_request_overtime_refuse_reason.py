@@ -21,6 +21,8 @@ class OvertimeGetRefuseReason(models.TransientModel):
         self.request_overtime_ids.confirm_flag = True
         self.request_overtime_ids.request_flag = True
         self.request_overtime_ids.approve_flag = True
+    
+        self.env['account.analytic.line'].search([('request_overtime_ids','=',self.request_overtime_ids.id)]).write({'status_timesheet_overtime':'draft'})
 
     @api.model
     def _send_message_auto_subscribe_notify_refuse_request_overtime(self, users_per_task, mail_template, subject_template):
