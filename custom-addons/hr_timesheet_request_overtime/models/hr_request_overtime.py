@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 import hmac
 import json
@@ -68,6 +69,7 @@ class HrRequestOverTime(models.Model):
     
     member_ids_user = fields.Many2many('res.users', 'hr_request_overtime_member_ids_users_rel', compute='_compute_member_ids_user', store=True, tracking=True)
     booking_overtime = fields.One2many('hr.booking.overtime', 'request_overtime_id', string='Booking Overtime', store=True, tracking=True)
+    timesheet_overtime_id = fields.One2many('account.analytic.line', 'request_overtime_ids')
     active = fields.Boolean(string='Invisible Refuse Button', default=True, store=True)
     refuse_reason_id = fields.One2many('hr.request.overtime.refuse.reason', 'request_overtime_ids', tracking=True)
     refuse_reason = fields.Char('Refuse Reason', tracking=True)

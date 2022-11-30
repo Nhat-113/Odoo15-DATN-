@@ -22,7 +22,11 @@ class OvertimeGetRefuseReason(models.TransientModel):
         self.request_overtime_ids.request_flag = True
         self.request_overtime_ids.approve_flag = True
     
-        self.env['account.analytic.line'].search([('request_overtime_ids','=',self.request_overtime_ids.id)]).write({'status_timesheet_overtime':'draft'})
+        for record in self.env['account.analytic.line'].search([('request_overtime_ids','=',self.request_overtime_ids.id)]):
+            record.write({  'status_timesheet_overtime': 'draft',
+                            'payment_month': str(datetime.strptime(record.date, '%Y-%m-%d').month),
+                            'payment_flag': False   },
+                            )
 
     @api.model
     def _send_message_auto_subscribe_notify_refuse_request_overtime(self, users_per_task, mail_template, subject_template):

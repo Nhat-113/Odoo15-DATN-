@@ -31,7 +31,25 @@ class AccountAnalyticLine(models.Model):
                                         ], default='draft', store=True, tracking=True, compute="reject_timesheet_overtime")
     reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True, default=False)
     invisible_button_confirm = fields.Boolean(default=False, help="Check invisible button Confirm")
-    
+
+    payment_month = fields.Selection([
+                                ('1', 'Month 1'),
+                                ('2', 'Month 2'),
+                                ('3', 'Month 3'),
+                                ('4', 'Month 4'),
+                                ('5', 'Month 5'),
+                                ('6', 'Month 6'),
+                                ('7', 'Month 7'),
+                                ('8', 'Month 8'),
+                                ('9', 'Month 9'),
+                                ('10', 'Month 10'),
+                                ('11', 'Month 11'),
+                                ('12', 'Month 12'),
+                                    ],
+                                    string="Payment Month", 
+                                    help="Payment month when approved timesheet OT by Director", readonly=False, default=False)
+    payment_flag = fields.Boolean(default=False, help="Check payment")
+
     def _readonly_resion_refuse(self):
         if self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_user') == True and \
             self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_projmanager') == False:
@@ -137,7 +155,8 @@ class AccountAnalyticLine(models.Model):
 
     def approved_timesheet_overtime(self):
         for record in self:
-            record.write({'status_timesheet_overtime': 'approved'})
+            record.write({  'status_timesheet_overtime': 'approved',
+                            })
 
     def _compute_pay_type_of_timeoff(self):
         for record in self:
@@ -148,7 +167,7 @@ class AccountAnalyticLine(models.Model):
                 pay_type = record.pay_type
                 time_of_type = self.env['hr.leave.type'].search([('company_id','=',record.employee_id.company_id.id),('name', 'like', 'Nghỉ bù')])
                 if len(time_of_type)==0:
-                    raise ValidationError(_("Please Create Time Of Types: Nghỉ bù."))
+                    raise ValidationError(_("Please Create Time Off Types: Nghỉ bù."))
                 number_of_hours_display = 0
                                
                 type_date = {'other':1, 'normal_day':1.5, 'weekend':2, 'holiday':3}
@@ -183,10 +202,10 @@ class AccountAnalyticLine(models.Model):
     def _compute_request_overtime_id(self):
         for record in self:
             if record.type_ot=='yes':
-                if record.request_overtime_ids.stage_id.name == 'Submit':
+                if record.request_overtime_ids.stage_id.name == 'Submit' and not record.payment_flag:
                     record.check_request_ot = True
                     record.status_timesheet_overtime = 'confirm'
-                elif record.request_overtime_ids.stage_id.name == 'Approved':
+                elif record.request_overtime_ids.stage_id.name == 'Approved' and not record.payment_flag:
                     record.check_request_ot = True
                     record.check_approval_ot = True
                     # Compute time off 'nghi bu' when change status Approvals
@@ -199,24 +218,26 @@ class AccountAnalyticLine(models.Model):
             else:
                 record.request_overtime_ids = False
 
-
     def action_confirm_all_timesheet_overtime(self):
         for record in self:
             record.status_timesheet_overtime = 'confirm'
 
     def action_approved_all_timesheet_overtime(self):
+        current_month = datetime.today().month
         for record in self:
             record.status_timesheet_overtime = 'approved'
+            record.write({  'status_timesheet_overtime': 'approved',
+                            })
             record.check_approval_ot = True
 
-    # Find reqeust overtime for timesheet when type_timesheet = 'type_ot'
+    # Find request overtime for timesheet when type_timesheet = 'type_ot'
     @api.model
     def create(self, vals_list):
         type_timesheet = vals_list.get('type_ot') 
         date = vals_list.get('date')
         employee = vals_list.get('employee_id')
         project_id = vals_list.get('project_id')
-        values = {}
+        values = {'payment_month': str(datetime.strptime(date, '%Y-%m-%d').month)}
         
         if type_timesheet == 'yes':
             # TODO check lai truong hop search ra nhieu hon 1 booking, CASE nay booking phai la duy nhat
@@ -228,8 +249,11 @@ class AccountAnalyticLine(models.Model):
             for booking in booking_overtime:
                 if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approved'] and booking.request_overtime_id.active==True:
                     values['request_overtime_ids'] =  booking.request_overtime_id.id
-                else: 
-                    values['request_overtime_ids'] = False
+                elif booking.request_overtime_id.stage_id.name in ['Submit', 'Approved']: 
+                    values['request_overtime_ids'] =  booking.request_overtime_id.id
+                    values['payment_month'] = False
+                    values['status_timesheet_overtime'] = 'draft'
+                    values['payment_flag'] = True
         else: 
             values['request_overtime_ids'] = False
         
@@ -263,8 +287,10 @@ class AccountAnalyticLine(models.Model):
             for booking in booking_overtime:
                 if booking and booking.request_overtime_id.stage_id.name not in ['Submit', 'Approved'] or self.request_overtime_ids.id and booking.request_overtime_id.active==True:
                     return {'request_overtime_ids': booking.request_overtime_id.id}
-                else: 
-                    return {'request_overtime_ids': False}
+                elif booking.request_overtime_id.stage_id.name in ['Submit', 'Approved']: 
+                    return {'request_overtime_ids': booking.request_overtime_id.id,
+                            'payment_month' : False,
+                            'status_timesheet_overtime' : 'draft'}
         else: 
             return {'request_overtime_ids': False}
 
