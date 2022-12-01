@@ -201,6 +201,7 @@
             <xpath expr="//field[@name='unit_amount']" position="after">
                 <field name="read_only_reason_refuse" invisible="1"/>
                 <field name="invisible_button_approved" invisible="1"/>
+                <field name="hr_leave_allocation_id" invisible="1"/>
                 <field name="pay_type" force_save="1" attrs="{'readonly': ['|', '|',('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('read_only_reason_refuse', '=', True), ('type_ot','=','no')]}"/>
                 <field name="status_timesheet_overtime" string="Status" force_save = "1" readonly="1"
                             decoration-info="status_timesheet_overtime == 'confirm'" 

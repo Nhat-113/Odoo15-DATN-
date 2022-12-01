@@ -7,6 +7,19 @@ from datetime import date
 
 from odoo.exceptions import ValidationError, UserError
 
+class HolidaysAllocation(models.Model):
+    """ Allocation Requests Access specifications: similar to leave requests """
+    _inherit = "hr.leave.allocation"
+    _description = "Time Off Allocation"
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_correct_states(self):
+        state_description_values = {elem[0]: elem[1] for elem in self._fields['state']._description_selection(self.env)}
+        for holiday in self.filtered(lambda holiday: holiday.state not in ['draft', 'cancel', 'confirm']):
+            if holiday.env.user.has_group('hr_timesheet.group_timesheet_manager') == False:
+                raise UserError(_('You cannot delete an allocation request which is in %s state.') % (state_description_values.get(holiday.state),))
+
+    
 class AccountAnalyticLine(models.Model):
     _inherit = ["account.analytic.line"]
 
@@ -31,6 +44,8 @@ class AccountAnalyticLine(models.Model):
                                         ], default='draft', store=True, tracking=True, compute="reject_timesheet_overtime")
     reason_reject = fields.Char(string="Reason Refuse", help="Type Reason Reject Why Reject Task Score", readonly=False, tracking=True, default=False)
     invisible_button_confirm = fields.Boolean(default=False, help="Check invisible button Confirm")
+    hr_leave_allocation_id = fields.Many2one('hr.leave.allocation', store=True, default=False)
+
 
     payment_month = fields.Selection([
                                 ('1', 'Month 1'),
@@ -189,7 +204,7 @@ class AccountAnalyticLine(models.Model):
 
     def _compute_pay_type_of_timeoff(self):
         for record in self:
-            if record.request_overtime_ids and record.type_ot == 'yes' and\
+            if record.type_ot == 'yes' and\
                 record.status_timesheet_overtime != 'approved' and\
                         record.pay_type in ['full_day_off', 'half_cash_half_dayoff']:
                 
@@ -224,7 +239,8 @@ class AccountAnalyticLine(models.Model):
                     'multi_employee': False, 
                     # TODO fix number_of_hours_display
                 }
-                self.env['hr.leave.allocation'].create(vals)
+                hr_leave_allocation_id = self.env['hr.leave.allocation'].create(vals)
+                record.hr_leave_allocation_id = hr_leave_allocation_id.id
             else:
                 continue
 
@@ -297,7 +313,8 @@ class AccountAnalyticLine(models.Model):
     def unlink(self):
         for record in self:
             if record.status_timesheet_overtime == 'approved' and record.env.user.has_group('hr_timesheet.group_timesheet_manager') == False:
-                raise UserError(_("Can not delete Timesheet Approved!")) 
+                raise UserError(_("Can not delete Timesheet Approved!"))
+            record.hr_leave_allocation_id.sudo().unlink()
         return super().unlink()
             
 class HrBookingOvertime(models.Model):
