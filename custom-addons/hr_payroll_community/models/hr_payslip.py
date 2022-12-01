@@ -333,9 +333,9 @@ class HrPayslip(models.Model):
 
             #tính thu nhập OT
             time_ots = self.env['account.analytic.line'].search([
-                            ('date', '>=', self.date_from), ('date', '<=', self.date_to), 
+                            ('payment_month', '=', str(self.date_from.month)), ('get_year_tb', '=', str(self.date_from.year)), 
                             ('type_ot', '=', 'yes'), ('employee_id', '=', self.employee_id.id),
-                            ('check_approval_ot', '=', True), ('pay_type', '!=', 'full_day_off')])
+                            ('status_timesheet_overtime', '=', 'approved'), ('pay_type', '!=', 'full_day_off')])
             
             total_ot_normal = 0
             total_ot_weekend = 0
