@@ -1,0 +1,15 @@
+<odoo>
+    <data noupdate="0">
+
+        <record id="activity_expense" model="expense.support.service">
+            <field name="name">Activity Expenses</field>
+            <field name="type_expense">activity_expense</field>
+        </record>
+
+        <record id="general_expense" model="expense.support.service">
+            <field name="name">General Expenses</field>
+            <field name="type_expense">general_expense</field>
+        </record>
+    
+    </data>
+</odoo>

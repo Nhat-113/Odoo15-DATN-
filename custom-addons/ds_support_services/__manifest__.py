@@ -13,7 +13,8 @@
                 'mail', 
                 'base',
                 'project',
-                'web_domain_field'
+                'web_domain_field',
+                'ds_expense_management'
     ],
     'data': [
         'security/security.xml',
@@ -26,7 +27,10 @@
         'data/category_data_default.xml',
         'wizard/hr_request_service_refuse_reason_views.xml',
         'data/payment_data_default.xml',
-        'data/status_data_default.xml'
+        'data/status_data_default.xml',
+        'data/cost_type_data_default.xml',
+        'data/expense_data_default.xml',
+
     ],
     'assets': {
         'web.assets_backend': [

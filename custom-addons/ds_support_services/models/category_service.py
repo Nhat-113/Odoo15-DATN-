@@ -70,4 +70,18 @@ class PayrollSupportService(models.Model):
             subject_template = "["+record.support_service_id.category.name+"] Delete Log Repaid"
 
             record.support_service_id._send_message_auto_subscribe_notify_request_service(record.support_service_id.requester_id , mail_template, subject_template)
-        return super().unlink()          
+        return super().unlink()
+
+class CostSupportService(models.Model):
+    _name = "cost.support.service"
+
+    name = fields.Char('Cost Type')
+    type_cost = fields.Char('Type')
+    
+
+class ExpenseSupportService(models.Model):
+    _name = "expense.support.service"
+
+    name = fields.Char('Expense')
+    type_expense = fields.Char('Type')
+              

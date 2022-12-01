@@ -5,3 +5,23 @@
 .title_support_service {
    width: 40em !important;
 }
+
+.label_month_team_building{
+   padding-right: 18.2%;
+   border-right: 1px solid #ddd;
+   font-weight: bold !important;
+}
+
+#get_month_team_building_2{
+   display: flex;
+}
+#get_month_team_building_2 > select {
+   width: 100px;
+   margin-left: 3px;
+}
+#get_month_team_building_2 > span:first-child {
+   padding-right: 10px;
+}
+.team_building {
+   display: flex !important;
+}

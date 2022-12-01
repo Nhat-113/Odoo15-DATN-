@@ -4,6 +4,10 @@ import json
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
+LIST_MONTHS = [('1', 'January'), ('2', 'February'), ('3', 'March'), ('4', 'April'),
+            ('5', 'May'), ('6', 'June'), ('7', 'July'), ('8', 'August'), 
+            ('9', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')]
+
 class SupportServices(models.Model):
     _name = "support.services"
     _inherit = ['mail.thread', 'mail.activity.mixin']
@@ -13,6 +17,19 @@ class SupportServices(models.Model):
 
     def _get_default_currency(self, type_currency):
         return self.env['res.currency'].search([('name', '=', type_currency)])
+
+    def _get_years(self):
+        year_list = []
+        for i in range(date.today().year - 10, date.today().year + 10):
+            year_list.append((str(i), str(i)))
+        return year_list
+
+    def _get_year_defaults(self):
+        return str(date.today().year)
+    
+    def _get_month_defaults(self):
+        return str(date.today().month)
+
 
     name = fields.Char("Subject", required=True)
     currency_vnd = fields.Many2one('res.currency', string="VND Currency", default=lambda self: self._get_default_currency('VND'), readonly=True)  
@@ -45,6 +62,22 @@ class SupportServices(models.Model):
     check_invisible_field_approver = fields.Boolean(default=False, compute='compute_check_invisible_field_approver')
     payroll_service_id = fields.One2many('payroll.support.service', 'support_service_id')
     check_readonly_field_payroll = fields.Boolean(default=False, compute='compute_check_readonly_field_payroll')
+    cost_type = fields.Many2one('cost.support.service', tracking=True, string="Cost Type")
+    flag_cost = fields.Char(string="Status Flag", readonly=True, store=True, compute='_compute_flag_cost_type')
+    department_id = fields.Many2one('hr.department', string="Department", tracking=True)
+    amount_it_other = fields.Monetary(string='Amount', tracking=True, currency_field='currency_vnd')
+    check_invisible_project_id = fields.Boolean(default=False, compute='compute_check_invisible_project_id')
+    get_month_tb = fields.Selection(selection=LIST_MONTHS, default=_get_month_defaults, string="Month", required=True, tracking=True)
+    get_year_tb = fields.Selection(selection=_get_years, default=_get_year_defaults, string='Year', required=True, tracking=True)
+    member_team_building = fields.One2many('booking.team.building', 'support_service_id', string='Member')
+    member_ids = fields.Many2many('hr.employee', string='Members',
+                                  help="All members has been assigned to the project", tracking=True)
+    company_ids = fields.Many2many('res.company', string='Companies')
+    expense_type = fields.Many2one('expense.support.service', tracking=True, string="Expense Type")
+    category_expense = fields.Many2one('expense.general.category', tracking=True, string="Expense Category")
+    domain_department_id = fields.Char(string="Department domain", readonly=True, store=False, compute='_compute_domain_department')
+    domain_project_id = fields.Char(string="Project domain", readonly=True, store=False, compute='_compute_domain_project')
+    
 
     @api.depends('category')
     def compute_check_role_it(self):
@@ -54,6 +87,18 @@ class SupportServices(models.Model):
                 request.check_role_it = True
             else:
                 request.check_role_it = False
+
+    
+
+    @api.onchange('member_team_building')
+    def add_booking_team_building(self):
+        employee_ids = [employee.id for employee in self.member_team_building.employee_id]
+        self.member_ids = self.env['hr.employee'].search([('id', 'in', employee_ids)])
+
+        amount_tb = 0
+        for member in self.member_team_building:
+            amount_tb += member.amount
+        self.amount = amount_tb
     
     @api.depends('category', 'payment', 'status')
     def compute_check_invisible_approve(self):
@@ -71,6 +116,21 @@ class SupportServices(models.Model):
                 request.check_invisible_field_approver = True
             else:
                 request.check_invisible_field_approver = False
+
+    @api.depends('category', 'payment', 'status', 'cost_type')
+    def compute_check_invisible_project_id(self):
+        for request in self:
+            if request.category.type_category == 'team_building' or \
+                request.category.type_category in ['it_helpdesk', 'other'] and request.cost_type.type_cost == 'cost_project':
+                request.check_invisible_project_id = False
+            else:
+                request.check_invisible_project_id = True
+    
+    @api.onchange('project_id', 'category')
+    def set_member_team_building(self):
+        for request in self:
+            if request.category.type_category == 'team_building':
+                request.member_team_building = False
 
     @api.depends('name', 'approval','category')
     def compute_check_role_officer(self):
@@ -106,6 +166,16 @@ class SupportServices(models.Model):
         for record in self:
             record.domain_company_id = json.dumps([('id', 'in', record.requester_id.company_ids.ids)])
 
+    @api.depends('company_id')
+    def _compute_domain_department(self):
+        for record in self:
+            record.domain_department_id = json.dumps([('company_id', '=', record.company_id.id)])
+
+    @api.depends('company_id')
+    def _compute_domain_project(self):
+        for record in self:
+            record.domain_project_id = json.dumps([('company_id', '=', record.company_id.id)])
+
     @api.onchange('category', 'payment')
     def _compute_domain_status(self):
         for record in self:
@@ -131,6 +201,11 @@ class SupportServices(models.Model):
     def _compute_flag_status(self):
         for record in self:
             record.flag_status= record.status.type_status
+    
+    @api.depends('cost_type')
+    def _compute_flag_cost_type(self):
+        for record in self:
+            record.flag_cost= record.cost_type.type_cost
 
     @api.depends('payment')
     def _compute_flag_payment(self):
@@ -220,6 +295,11 @@ class SupportServices(models.Model):
         mail_template = "ds_support_services.done_request_service_template"
         subject_template = "["+self.category.name+"] Submit Done Service"
 
+        if self.amount_it_other <= 0 and self.category.type_category in ['it_helpdesk', 'other'] and self.payment.type_payment == 'have_cost':
+            raise UserError('Amount cannot be less than or equal to 0.')
+        
+        self.generate_company_expense()
+
         self._send_message_auto_subscribe_notify_request_service(self.requester_id , mail_template, subject_template)
 
     def action_repaid_service(self):
@@ -296,8 +376,9 @@ class SupportServices(models.Model):
 
     def unlink(self):
         for request in self:
-            if request.env.user.has_group('ds_support_services.support_service_admin') == False and request.status.type_status in ['approval', 'done']:
+            if request.env.user.has_group('ds_support_services.support_service_admin') == False and request.status.type_status in ['approval', 'done', 'repaid']:
                 raise UserError('You cannot delete a request service which is Approval or Done.')
+            request.member_team_building.unlink()
         return super().unlink()
     
     @api.constrains('amount')
@@ -328,6 +409,138 @@ class SupportServices(models.Model):
                    raise UserError('Do not input amount more than 2 months salary')
                 elif len(contract)==0:
                    raise UserError('No advance without a contract')
+    
+    def generate_company_expense(self):
+        for request in self:
+            if request.category.type_category in ['it_helpdesk','other'] and request.payment.type_payment == 'have_cost':
+                if request.cost_type.type_cost == 'cost_general':
+                    generate_expense = self.env['expense.management'].search([
+                            ('company_id', 'in', request.company_ids.ids),
+                            ('get_month', '=', str(request.date_request.month)),
+                            ('get_year', '=', str(request.date_request.year))
+                        ])
+                    if len(generate_expense) == 1:
+                        expense_management_id = generate_expense
+                    elif len(generate_expense) == 0:
+                        generate_expense_new = self.env['expense.management'].create({
+                            'description': str(request.date_request.month)+'/'+ str(request.date_request.year),
+                            'get_month': str(request.date_request.month),
+                            'get_year': str(request.date_request.year),
+                            'company_id': request.company_ids.ids,
+                        })
+                        expense_management_id = generate_expense_new
+
+
+                    if request.expense_type.type_expense == 'activity_expense':
+                        self.env['expense.general'].create({
+                            'expense_management_id': expense_management_id.id,
+                            'category_expenses': request.category_expense.id,
+                            'total_expenses': request.amount_it_other,
+                            'description': request.name
+                        })
+                    else:
+                        self.env['expense.activity'].create({
+                            'expense_management_id': expense_management_id.id,
+                            'category_expenses': request.category_expense.id,
+                            'total_expenses': request.amount_it_other,
+                            'description': request.name
+                        })
+                elif request.cost_type.type_cost == 'cost_department':
+                    department_expense = self.env['project.expense.management'].search([
+                            ('company_id', '=', request.company_id.id),
+                            ('department_id', '=', request.department_id.id),
+                            ('project_id', '=', False),
+                        ])
+                    if len(department_expense) == 1:
+                        department_expense_management_id = department_expense
+                    else:
+                        department_expense_new = self.env['project.expense.management'].create({
+                            'company_id': request.company_id.id,
+                            'department_id': request.department_id.id,
+                            'project_id': False
+                        })
+                        department_expense_management_id = department_expense_new
+
+
+                    if department_expense_management_id.currency_id.name == 'VND':
+                        self.env['project.expense.value'].create({
+                            'project_expense_management_id': department_expense_management_id.id,
+                            'name': request.name,
+                            'expense_date': request.date_request,
+                            'total_expenses': request.amount_it_other,
+                            'expense_vnd': request.amount_it_other
+                        })
+                    else:
+                        self.env['project.expense.value'].create({
+                            'project_expense_management_id': department_expense_management_id.id,
+                            'name': request.name,
+                            'expense_date': request.date_request,
+                            'expense_vnd': request.amount_it_other
+                        })
+                else:
+                    project_expense = self.env['project.expense.management'].search([
+                            ('company_id', '=', request.company_id.id),
+                            ('department_id', '=', request.project_id.department_id.id),
+                            ('project_id', '=', request.project_id.id),
+                        ])
+                    if len(project_expense) == 1:
+                        project_expense_management_id = project_expense
+                    elif len(project_expense) == 0:
+                        project_expense_new = self.env['project.expense.management'].create({
+                            'company_id': request.company_id.id,
+                            'department_id': request.project_id.department_id.id,
+                            'project_id': request.project_id.id
+                        })
+                        project_expense_management_id = project_expense_new
+
+                    
+                    if project_expense_management_id.currency_id.name == 'VND':
+                        self.env['project.expense.value'].create({
+                            'project_expense_management_id': project_expense_management_id.id,
+                            'name': request.name,
+                            'expense_date': request.date_request,
+                            'total_expenses': request.amount_it_other,
+                            'expense_vnd': request.amount_it_other
+                        })
+                    else:
+                        self.env['project.expense.value'].create({
+                            'project_expense_management_id': project_expense_management_id.id,
+                            'name': request.name,
+                            'expense_date': request.date_request,
+                            'expense_vnd': request.amount_it_other
+                        })
+            elif request.category.type_category == 'team_building':
+                project_expense = self.env['project.expense.management'].search([
+                            ('company_id', '=', request.company_id.id),
+                            ('department_id', '=', request.project_id.department_id.id),
+                            ('project_id', '=', request.project_id.id),
+                        ])
+                if len(project_expense) == 1:
+                    project_expense_management_id = project_expense
+                elif len(project_expense) == 0:
+                    project_expense_new = self.env['project.expense.management'].create({
+                        'company_id': request.company_id.id,
+                        'department_id': request.project_id.department_id.id,
+                        'project_id': request.project_id.id
+                    })
+                    project_expense_management_id = project_expense_new
+
+                
+                if project_expense_management_id.currency_id.name == 'VND':
+                    self.env['project.expense.value'].create({
+                        'project_expense_management_id': project_expense_management_id.id,
+                        'name': request.name,
+                        'expense_date': request.date_request,
+                        'total_expenses': request.amount,
+                        'expense_vnd': request.amount
+                    })
+                else:
+                    self.env['project.expense.value'].create({
+                        'project_expense_management_id': project_expense_management_id.id,
+                        'name': request.name,
+                        'expense_date': request.date_request,
+                        'expense_vnd': request.amount
+                    })
 
 
 class DepartmentItHr(models.Model):
