@@ -23,5 +23,10 @@
             <field name="sequence">5</field>
         </record>
 
+        <record model="hr.request.overtime.stage" id="stage_overtime_job6">
+            <field name="name">Refuse</field>
+            <field name="sequence">6</field>
+        </record>
+
     </data>
 </odoo>

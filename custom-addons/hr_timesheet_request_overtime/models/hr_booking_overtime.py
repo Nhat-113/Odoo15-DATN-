@@ -12,7 +12,7 @@ class AccountAnalyticLine(models.Model):
 
     pay_type = fields.Selection([
                                 ('full_cash', 'Full Cash'),
-                                ('half_cash_half_dayoff', 'Cash 5:5 Date Off'),
+                                ('half_cash_half_dayoff', 'Cash 5:5 Day Off'),
                                 ('full_day_off', 'Full Date Off'),
                                 ], string='Pay Type', index=True, default=False)
 
@@ -211,7 +211,8 @@ class AccountAnalyticLine(models.Model):
                 vals = {
                     'holiday_type': 'employee',
                     'name': 'Nghỉ bù Overtime',
-                    'holiday_status_id': time_of_type.id,
+                    # Mac dinh lay nghi bu dau tien
+                    'holiday_status_id': time_of_type[0].id,
                     'employee_id': record.employee_id.id,
                     'date_from': datetime.now(), 
                     'date_to': date(date.today().year, 12, 31),

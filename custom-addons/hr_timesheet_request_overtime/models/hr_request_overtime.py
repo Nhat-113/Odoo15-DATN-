@@ -54,7 +54,7 @@ class HrRequestOverTime(models.Model):
 
     company_id = fields.Many2one('res.company', string="Company", required=True, default=lambda self: self.env.company)
     description = fields.Text(string="Description", tracking=True)
-    stage_id = fields.Many2one('hr.request.overtime.stage', 'Stage', ondelete='restrict',
+    stage_id = fields.Many2one('hr.request.overtime.stage', 'Status', ondelete='restrict',
                             default=_get_default_stage_id, 
                             store=True, readonly=False,
                             group_expand='_read_group_stage_ids',
@@ -62,6 +62,8 @@ class HrRequestOverTime(models.Model):
                             # domain=lambda self: self._compute_domain_stage(),
                             copy=False, index=True,
                             )
+    domain_stage = fields.Char(string='Domain view stage', compute="_compute_domain_stage")
+
     request_creator_id = fields.Many2many('res.users', 'hr_request_overtime_res_users_inform_rel', string='Inform to', default=False, tracking=True, store=True)
     requester_id = fields.Many2one('res.users', string='Approver', required=True, default=lambda self: self._get_default_approve(), readonly=False, tracking=True, store=True)
     member_ids = fields.Many2many('hr.employee', string='Members',
@@ -83,6 +85,14 @@ class HrRequestOverTime(models.Model):
 
     stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draft", store=True)
     last_stage = fields.Integer(string="Last stage", default=0)
+
+    @api.onchange('stage_id')
+    def _compute_domain_stage(self):
+        for record in self:
+            if record.stage_id.name == 'Refuse':
+                record.domain_stage = json.dumps([('name', 'in', ['Draft','Request','Confirm','Submit', 'Approved', 'Refuse'])])
+            else:
+                record.domain_stage = json.dumps([('name', 'in', ['Draft','Request','Confirm','Submit', 'Approved'])])
 
     def _compute_invisible_button_refuse(self):
         for record in self:

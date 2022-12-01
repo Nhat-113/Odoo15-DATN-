@@ -14,7 +14,12 @@
                 <field name="end_date"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="description"/>
-                <field name="stage_id" widget="badge"/>
+                <field name="stage_name" invisible="1"/>
+                <field name="stage_id" widget="badge"   decoration-warning = " stage_name == 'Request' "
+                                                        decoration-primary = " stage_name == 'Confirm' "
+                                                        decoration-info = " stage_name == 'Submit' "
+                                                        decoration-success = " stage_name == 'Approved' "
+                                                        decoration-danger = " stage_name == 'Refuse' "/>
             </tree>
         </field>
     </record>
@@ -37,7 +42,8 @@
                     <button string="Approved" groups="hr_timesheet_request_overtime.request_overtime_access_director" name="action_approve_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('approve_flag', '!=', True), ('stage_name', '!=', 'Submit'), ('active', '=', False)]}"/>
                     <button string="Refuse" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="action_refuse_reason" type="object" attrs="{'invisible': [('invisible_button_refuse','=',True)]}" data-hotkey="x" />
                     <button string="Restore" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="toggle_active" type="object" attrs="{'invisible': [('active', '=', True)]}" data-hotkey="z"/>
-                    <field name="stage_id" widget="statusbar" attrs="{'invisible': [('active', '=', False)], 'readonly':[('active', '=', True)] }"/>
+                    <field name='domain_stage' invisible="1"/>
+                    <field name="stage_id" widget="statusbar" attrs="{'invisible': [('active', '=', False)], 'readonly':[('active', '=', True)] }" domain="domain_stage"/>
                 </header>
                 <sheet>
                     <field name='stage_name' invisible="1"/>
