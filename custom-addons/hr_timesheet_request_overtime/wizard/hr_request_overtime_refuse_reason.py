@@ -27,6 +27,8 @@ class OvertimeGetRefuseReason(models.TransientModel):
                             'payment_month': str(record.date.month),
                             'payment_flag': False   },
                             )
+            record.check_approval_ot = False
+            record.check_request_ot = False
 
     @api.model
     def _send_message_auto_subscribe_notify_refuse_request_overtime(self, users_per_task, mail_template, subject_template):

@@ -59,7 +59,7 @@ class AccountAnalyticLine(models.Model):
     def _get_year_defaults(self):
         return str(date.today().year)
         
-    get_year_tb = fields.Selection(selection=_get_years, default=_get_year_defaults, string='Year', required=True, tracking=True)
+    get_year_tb = fields.Selection(selection=_get_years, default=_get_year_defaults, string='Payment Year', required=True, tracking=True)
 
     def _readonly_resion_refuse(self):
         if self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_user') == True and \
@@ -164,7 +164,7 @@ class AccountAnalyticLine(models.Model):
     def confirm_timesheet_overtime(self):
         for record in self:
             record.write({'status_timesheet_overtime': 'confirm'})
-            record.check_approval_ot = True
+            record.check_request_ot = True
 
     def approved_timesheet_overtime(self):
         for record in self:
@@ -176,10 +176,9 @@ class AccountAnalyticLine(models.Model):
         for record in self:
             if record.status_timesheet_overtime != 'approved':
                 record.status_timesheet_overtime = 'confirm'
-                record.check_approval_ot = True
+                record.check_request_ot = True
 
     def action_approved_all_timesheet_overtime(self):
-        current_month = datetime.today().month
         for record in self:
             record._compute_pay_type_of_timeoff()
             record.check_approval_ot = True

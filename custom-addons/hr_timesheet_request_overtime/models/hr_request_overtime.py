@@ -284,7 +284,7 @@ class HrRequestOverTime(models.Model):
         for record in self.timesheet_overtime_id:
             if record.status_timesheet_overtime != 'approved':
                 record._compute_pay_type_of_timeoff()
-                record.status_timesheet_overtime = 'confirm'
+                record.status_timesheet_overtime = 'approved'
                 record.check_approval_ot = True
 
     # TODO Fix this, refator code
