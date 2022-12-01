@@ -1,6 +1,6 @@
 
 from odoo import api, fields, models, _
-
+from datetime import datetime
 class OvertimeGetRefuseReason(models.TransientModel):
     _name = 'hr.request.overtime.refuse.reason'
     _description = 'Get Refuse Reason'
@@ -24,7 +24,7 @@ class OvertimeGetRefuseReason(models.TransientModel):
     
         for record in self.env['account.analytic.line'].search([('request_overtime_ids','=',self.request_overtime_ids.id)]):
             record.write({  'status_timesheet_overtime': 'draft',
-                            'payment_month': str(datetime.strptime(record.date, '%Y-%m-%d').month),
+                            'payment_month': str(record.date.month),
                             'payment_flag': False   },
                             )
 

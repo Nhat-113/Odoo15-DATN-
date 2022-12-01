@@ -50,6 +50,17 @@ class AccountAnalyticLine(models.Model):
                                     help="Payment month when approved timesheet OT by Director", readonly=False, default=False)
     payment_flag = fields.Boolean(default=False, help="Check payment")
 
+    def _get_years(self):
+        year_list = []
+        for i in range(date.today().year - 10, date.today().year + 10):
+            year_list.append((str(i), str(i)))
+        return year_list
+
+    def _get_year_defaults(self):
+        return str(date.today().year)
+        
+    get_year_tb = fields.Selection(selection=_get_years, default=_get_year_defaults, string='Year', required=True, tracking=True)
+
     def _readonly_resion_refuse(self):
         if self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_user') == True and \
             self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_projmanager') == False:
@@ -73,8 +84,8 @@ class AccountAnalyticLine(models.Model):
     read_only_reason_refuse = fields.Boolean(compute=_readonly_resion_refuse, store=False)
 
     request_overtime_ids = fields.Many2one('hr.request.overtime', string='Request Overtime', store=True, readonly=True, default=False)
-    check_request_ot = fields.Boolean('Check Readonly', compute='_compute_request_overtime_id', store=True, default=False)
-    check_approval_ot = fields.Boolean('Check Approvals', compute='_compute_request_overtime_id', store=True, default=False)
+    check_request_ot = fields.Boolean('Check Readonly', store=True, default=False)
+    check_approval_ot = fields.Boolean('Check Approvals', store=True, default=False)
 
 
     @api.onchange('date', 'type_ot', 'type_day_ot', 'pay_type')
@@ -149,19 +160,38 @@ class AccountAnalyticLine(models.Model):
                     model_description=task_model_description,
                 )
 
+
     def confirm_timesheet_overtime(self):
         for record in self:
             record.write({'status_timesheet_overtime': 'confirm'})
+            record.check_approval_ot = True
 
     def approved_timesheet_overtime(self):
         for record in self:
+            record._compute_pay_type_of_timeoff()
+            record.check_approval_ot = True
             record.write({  'status_timesheet_overtime': 'approved',
                             })
+    def action_confirm_all_timesheet_overtime(self):
+        for record in self:
+            if record.status_timesheet_overtime != 'approved':
+                record.status_timesheet_overtime = 'confirm'
+                record.check_approval_ot = True
+
+    def action_approved_all_timesheet_overtime(self):
+        current_month = datetime.today().month
+        for record in self:
+            record._compute_pay_type_of_timeoff()
+            record.check_approval_ot = True
+            record.status_timesheet_overtime = 'approved'
+            record.write({  'status_timesheet_overtime': 'approved',
+                            })
+            record.check_approval_ot = True
 
     def _compute_pay_type_of_timeoff(self):
         for record in self:
             if record.request_overtime_ids and record.type_ot == 'yes' and\
-                    record.request_overtime_ids.stage_id.name=='Approved' and\
+                record.status_timesheet_overtime != 'approved' and\
                         record.pay_type in ['full_day_off', 'half_cash_half_dayoff']:
                 
                 pay_type = record.pay_type
@@ -197,38 +227,6 @@ class AccountAnalyticLine(models.Model):
                 self.env['hr.leave.allocation'].create(vals)
             else:
                 continue
-
-    @api.depends('request_overtime_ids.stage_id')
-    def _compute_request_overtime_id(self):
-        for record in self:
-            if record.type_ot=='yes':
-                if record.request_overtime_ids.stage_id.name == 'Submit' and not record.payment_flag:
-                    record.check_request_ot = True
-                    record.status_timesheet_overtime = 'confirm'
-                elif record.request_overtime_ids.stage_id.name == 'Approved' and not record.payment_flag:
-                    record.check_request_ot = True
-                    record.check_approval_ot = True
-                    # Compute time off 'nghi bu' when change status Approvals
-                    record._compute_pay_type_of_timeoff()
-                    record.status_timesheet_overtime = 'approved'
-                else:
-                    record.check_request_ot = False
-                    record.check_approval_ot = False
-                    
-            else:
-                record.request_overtime_ids = False
-
-    def action_confirm_all_timesheet_overtime(self):
-        for record in self:
-            record.status_timesheet_overtime = 'confirm'
-
-    def action_approved_all_timesheet_overtime(self):
-        current_month = datetime.today().month
-        for record in self:
-            record.status_timesheet_overtime = 'approved'
-            record.write({  'status_timesheet_overtime': 'approved',
-                            })
-            record.check_approval_ot = True
 
     # Find request overtime for timesheet when type_timesheet = 'type_ot'
     @api.model

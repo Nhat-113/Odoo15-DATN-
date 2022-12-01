@@ -205,6 +205,7 @@
                 <field name="invisible_button_confirm" invisible="1"/>
                 <field name="payment_month" attrs="{'invisible': [('invisible_button_confirm', '=', 'True')], 'readonly': [('status_timesheet_overtime', 'in', ['approved'])]}" />
                 <field name="payment_flag" invisible="1"/>
+                <field name="get_year_tb" attrs="{'invisible': [('invisible_button_confirm', '=', 'True')], 'readonly': [('status_timesheet_overtime', 'in', ['approved'])]}" />
                 <field name="reason_reject" placeholder="Type Reason Refuse Taskscore..." attrs="{'readonly': ['|','|', ('status_timesheet_overtime', '=', 'confirm'),('status_timesheet_overtime', '=', 'approved'), ('read_only_reason_refuse', '=', True)]}"/>
                 <button name="confirm_timesheet_overtime" string="Confirm" icon="fa-thumbs-up" type="object" attrs="{'invisible': ['|','|','|', ('status_timesheet_overtime', '=', 'confirm'), ('status_timesheet_overtime', '=', 'approved'),('read_only_reason_refuse', '=', True), ('invisible_button_confirm', '=', True)]}"/>
                 <button name="approved_timesheet_overtime" string="Approved" icon="fa-thumbs-up" type="object" attrs="{'invisible': [('invisible_button_approved', '=', False)]}"/>
