@@ -29,7 +29,7 @@ class HrRequestOverTime(models.Model):
     _name = "hr.request.overtime"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    _description = "Hr Request Overtime"
+    _description = "Request Overtime"
     _order = "id DESC"
 
     def _get_default_stage_id(self):

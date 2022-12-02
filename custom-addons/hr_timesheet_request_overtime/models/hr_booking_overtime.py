@@ -63,7 +63,7 @@ class AccountAnalyticLine(models.Model):
                                 ('12', 'Month 12'),
                                     ],
                                     string="Payment Month", 
-                                    help="Payment month when approved timesheet OT by Director", readonly=False, default=_get_month_defaults, required=True)
+                                    help="Payment month when approved timesheet OT by Director", readonly=False, default=_get_month_defaults)
     payment_flag = fields.Boolean(default=False, help="Check payment")
 
     def _get_years(self):
@@ -75,7 +75,7 @@ class AccountAnalyticLine(models.Model):
     def _get_year_defaults(self):
         return str(date.today().year)
         
-    get_year_tb = fields.Selection(selection=_get_years, default=_get_year_defaults, string='Payment Year', required=True, tracking=True)
+    get_year_tb = fields.Selection(selection=_get_years, default=_get_year_defaults, string='Payment Year', tracking=True)
 
     def _readonly_resion_refuse(self):
         if self.env.user.has_group('hr_timesheet_request_overtime.request_overtime_access_user') == True and \
