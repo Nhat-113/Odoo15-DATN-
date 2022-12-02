@@ -46,7 +46,8 @@ class AccountAnalyticLine(models.Model):
     invisible_button_confirm = fields.Boolean(default=False, help="Check invisible button Confirm")
     hr_leave_allocation_id = fields.Many2one('hr.leave.allocation', store=True, default=False)
 
-
+    def _get_month_defaults(self):
+        return str(date.today().month)
     payment_month = fields.Selection([
                                 ('1', 'Month 1'),
                                 ('2', 'Month 2'),
@@ -62,7 +63,7 @@ class AccountAnalyticLine(models.Model):
                                 ('12', 'Month 12'),
                                     ],
                                     string="Payment Month", 
-                                    help="Payment month when approved timesheet OT by Director", readonly=False, default=False)
+                                    help="Payment month when approved timesheet OT by Director", readonly=False, default=_get_month_defaults, required=True)
     payment_flag = fields.Boolean(default=False, help="Check payment")
 
     def _get_years(self):
@@ -142,7 +143,25 @@ class AccountAnalyticLine(models.Model):
         for task in self:
             if task.reason_reject != '':
                 self._task_message_auto_subscribe_notify_reject_timesheet({task: task.employee_id for task in task})
-    
+
+    @api.onchange('pay_type', 'type_day_ot','payment_month', 'get_year_tb')
+    def write_when_onchange(self):
+        self.env['account.analytic.line'].search([('id', '=', self.id or self.id.origin)]).write({'pay_type': self.pay_type})
+        self.env['account.analytic.line'].search([('id', '=', self.id or self.id.origin)]).write({'type_day_ot': self.type_day_ot})
+        self.env['account.analytic.line'].search([('id', '=', self.id or self.id.origin)]).write({'payment_month': self.payment_month})
+        self.env['account.analytic.line'].search([('id', '=', self.id or self.id.origin)]).write({'get_year_tb': self.get_year_tb})
+
+
+    def validation_month_year(self):
+        current_month = datetime.now().month
+        current_year = datetime.now().year
+
+        if int(self.get_year_tb) < current_year:
+            raise ValidationError(_("Please enter Payment Year >= Current Year (%s).") % current_year)
+
+        elif int(self.get_year_tb) == current_year and int(self.payment_month) < current_month:
+            raise ValidationError(_("Payment Month cannot be less than Current Month (%s).") % current_month)
+
     @api.model
     def _task_message_auto_subscribe_notify_reject_timesheet(self, users_per_task):
         # Utility method to send assignation notification upon writing/creation.
@@ -175,26 +194,29 @@ class AccountAnalyticLine(models.Model):
                     model_description=task_model_description,
                 )
 
-
     def confirm_timesheet_overtime(self):
-        for record in self:
-            record.write({'status_timesheet_overtime': 'confirm'})
-            record.check_request_ot = True
+        self.validation_month_year()
+        
+        self.status_timesheet_overtime = 'confirm'
+        self.check_request_ot = True
 
     def approved_timesheet_overtime(self):
         for record in self:
+            record.validation_month_year()
             record._compute_pay_type_of_timeoff()
             record.check_approval_ot = True
             record.write({  'status_timesheet_overtime': 'approved',
                             })
     def action_confirm_all_timesheet_overtime(self):
         for record in self:
+            record.validation_month_year()
             if record.status_timesheet_overtime != 'approved':
                 record.status_timesheet_overtime = 'confirm'
                 record.check_request_ot = True
 
     def action_approved_all_timesheet_overtime(self):
         for record in self:
+            record.validation_month_year()
             record._compute_pay_type_of_timeoff()
             record.check_approval_ot = True
             record.status_timesheet_overtime = 'approved'
