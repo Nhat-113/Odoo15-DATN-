@@ -34,6 +34,8 @@
         'views/report_contributionregister_templates.xml',
         'views/report_payslip_templates.xml',
         'views/report_payslipdetails_templates.xml',
+        'data/hr_percent_data.xml',
+        'views/hr_percent_bhxh_view.xml'
     ],
     'demo': ['data/hr_payroll_demo.xml'],
     'license': 'AGPL-3',

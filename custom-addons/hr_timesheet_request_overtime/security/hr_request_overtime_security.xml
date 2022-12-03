@@ -1,0 +1,98 @@
+<odoo>
+    <data>
+
+        <record model="ir.module.category" id="module_category_services_overtime">
+            <field name="name">Timesheet Overtime</field>
+            <field name="parent_id" ref="base.module_category_services"/>
+        </record>
+
+        <!-- Option Role: User -->
+        <record id="request_overtime_access_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="module_category_services_overtime"/>
+        </record>
+
+        <!-- Option Role: PM -->
+        <record id="request_overtime_access_projmanager" model="res.groups">
+            <field name="name">Project Manager</field>
+            <field name="category_id" ref="module_category_services_overtime"/>
+            <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_user'))]"/>
+        </record>
+
+        <!-- Option Role: Officer -->
+        <record id="request_overtime_access_officer" model="res.groups">
+            <field name="name">Officer</field>
+            <field name="category_id" ref="module_category_services_overtime"/>
+            <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_projmanager'))]"/>
+        </record>
+
+        <!-- Option Role: Director -->
+        <record id="request_overtime_access_director" model="res.groups">
+            <field name="name">Director</field>
+            <field name="category_id" ref="module_category_services_overtime"/>
+            <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_officer'))]"/>
+        </record>
+
+        <!-- Option Role: Administrator -->
+        <record id="request_overtime_access_admin" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="module_category_services_overtime"/>
+            <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_director'))]"/>
+        </record>
+
+        <record id="base.group_user" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_user'))]"/>
+        </record>
+
+        <!-- User view request overtime -->
+        <record model="ir.rule" id="user_view_request_overtime">
+            <field name="name">Request Overtime: User View Request Overtime</field>
+            <field name="model_id" ref="model_hr_request_overtime"/>
+            <field name="domain_force">[('company_id', 'in', company_ids), 
+                                        '|', '|', '|', ('user_id','=',user.id), 
+                                        ('requester_id', '=', user.id),
+                                        ('request_creator_id', '=', user.id),
+                                        ('member_ids_user', '=', user.id)
+                                        ]</field>
+            <field name="groups" eval="[(4,ref('hr_timesheet_request_overtime.request_overtime_access_user'))]"/>
+        </record>
+
+        <!-- PM view request overtime -->
+        <record model="ir.rule" id="pm_view_request_overtime">
+            <field name="name">Request Overtime: PM View Request Overtime</field>
+            <field name="model_id" ref="model_hr_request_overtime"/>
+            <field name="domain_force">[('company_id', 'in', company_ids), 
+                                        '|', '|', '|', ('user_id','=',user.id), 
+                                        ('requester_id', '=', user.id),
+                                        ('request_creator_id', '=', user.id), 
+                                        ('member_ids_user', '=', user.id)]</field>
+            <field name="groups" eval="[(4,ref('hr_timesheet_request_overtime.request_overtime_access_projmanager'))]"/>
+        </record>
+
+        <!-- Director view request overtime -->
+        <record model="ir.rule" id="director_view_request_overtime">
+            <field name="name">Request Overtime: Director View Request Overtime</field>
+            <field name="model_id" ref="model_hr_request_overtime"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4,ref('hr_timesheet_request_overtime.request_overtime_access_director'))]"/>
+        </record>
+
+        <!-- Officer view request overtime -->
+        <record model="ir.rule" id="hr_view_request_overtime">
+            <field name="name">Request Overtime: Officer View Request Overtime</field>
+            <field name="model_id" ref="model_hr_request_overtime"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4,ref('hr_timesheet_request_overtime.request_overtime_access_officer'))]"/>
+        </record>
+
+        <!-- Administrator view request overtime -->
+        <record model="ir.rule" id="administrator_view_request_overtime">
+            <field name="name">Request Overtime: Administrator View Request Overtime</field>
+            <field name="model_id" ref="model_hr_request_overtime"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4,ref('hr_timesheet_request_overtime.request_overtime_access_admin'))]"/>
+        </record>
+
+
+    </data>
+</odoo>

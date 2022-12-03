@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_request_overtime_view_tree" model="ir.ui.view">
+        <field name="name">hr.request.overtime.tree</field>
+        <field name="model">hr.request.overtime</field>
+        <field name="arch" type="xml">
+            <tree string="Request Overtime" multi_edit="1" sample="1">
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="user_id"/>
+                <field name="member_ids" widget="many2many_avatar_employee"/>
+                <field name="request_creator_id" invisible="1" optional="hide"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="description"/>
+                <field name="stage_name" invisible="1"/>
+                <field name="stage_id" widget="badge"   decoration-warning = " stage_name == 'Request' "
+                                                        decoration-primary = " stage_name == 'Confirm' "
+                                                        decoration-info = " stage_name == 'Submit' "
+                                                        decoration-success = " stage_name == 'Approved' "
+                                                        decoration-danger = " stage_name == 'Refuse' "/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_request_overtime_view_form" model="ir.ui.view">
+        <field name="name">hr.request.overtime.view.form</field>
+        <field name="model">hr.request.overtime</field>
+        <field name="arch" type="xml">
+            <form string="Request Overtime - Form" duplicate="0">
+                <header>
+                    <field name='submit_flag' invisible="1"/>
+                    <field name='stage_name' invisible="1"/>
+                    <field name='confirm_flag' invisible="1"/>
+                    <field name='request_flag' invisible="1"/>
+                    <field name='approve_flag' invisible="1"/>
+                    <field name='invisible_button_refuse' invisible="1"/>
+                    <button string="Request" name="action_request_overtime" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('request_flag', '!=', True), ('stage_name', '!=', 'Draft'), ('active', '=', False)]}"/>
+                    <button string="Confirm" groups="hr_timesheet_request_overtime.request_overtime_access_director" name="action_confirm_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('confirm_flag', '!=', True), ('stage_name', '!=', 'Request'), ('active', '=', False)]}"/>
+                    <button string="Submit" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="action_submit_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('submit_flag', '!=', True), ('stage_name', '!=', 'Confirm'), ('active', '=', False)]}" />
+                    <button string="Approved" groups="hr_timesheet_request_overtime.request_overtime_access_director" name="action_approve_request_overtime" type="object" class="btn-primary" attrs="{'invisible': ['|', '|', ('approve_flag', '!=', True), ('stage_name', '!=', 'Submit'), ('active', '=', False)]}"/>
+                    <button string="Refuse" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="action_refuse_reason" type="object" attrs="{'invisible': [('invisible_button_refuse','=',True)]}" data-hotkey="x" />
+                    <button string="Restore" groups="hr_timesheet_request_overtime.request_overtime_access_projmanager" name="toggle_active" type="object" attrs="{'invisible': [('active', '=', True)]}" data-hotkey="z"/>
+                    <field name='domain_stage' invisible="1"/>
+                    <field name="stage_id" widget="statusbar" attrs="{'invisible': [('active', '=', False)], 'readonly':[('active', '=', True)] }" domain="domain_stage"/>
+                </header>
+                <sheet>
+                    <field name='stage_name' invisible="1"/>
+                    <field name='active' invisible="1"/>
+                    <field name='approve_flag' invisible="1"/>
+                    <widget name="web_ribbon" title="REFUSED" bg_color="bg-danger" attrs="{'invisible':[('active', '=', True)]}"/>
+                    <widget name="web_ribbon" title="APPROVED" bg_color="bg-success" attrs="{'invisible':[ '|','|', ('approve_flag', '=', True), ('stage_name', '!=', 'Approved'), ('active', '=', False)]}"/>
+                    <sheet>
+                        <group>
+                            <div class="oe_title" style="width: 1500px">
+                                <label for="name" class="oe_edit_only" attrs="{'readonly': [('read_only_project','=', True)]}"/>
+                                <h1>
+                                    <field name="name" class="title_subject" placeholder="e.g. Request overtime for project ... " attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
+                                </h1>
+                            </div>
+                        </group>
+                        <group >
+                            <field name="active" invisible="1"/>
+                            <group name="group_left">
+                                <field name="refuse_reason" attrs="{'invisible': [('active', '=', True)]}" readonly="1" style="color:Red"/>
+                                <field name="read_only_project" invisible="1"/>
+                                <field name="project_id" domain='get_domain_projects' attrs="{'readonly': ['|', ('company_id', '=', False), ('read_only_project','=', True)]}" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}"/>
+                                <field name="get_domain_projects" invisible="1"/>
+                                <label for="start_date" string="Dates" attrs="{'invisible': [('project_id','=',False)]}"/>
+                                <div name="end_date" class="o_row">
+                                    <field name="start_date_project" widget="daterange" options='{"related_end_date": "end_date"}' attrs="{'invisible': [('project_id','=',False)]}"/>
+                                    <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon" title="Arrow" attrs="{'invisible': [('project_id','=',False)]}"/>
+                                    <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow" attrs="{'invisible': [('start_date', '=', False), ('end_date', '=', False)]}"/>
+                                    <field name="end_date_project" widget="daterange" options='{"related_start_date": "start_date"}' attrs="{'invisible': [('project_id','=',False)]}"/>
+                                </div>
+                                <field name="user_id" string="Project Manager" widget="many2one_avatar_user" domain="[('share', '=', False)]" width="2" attrs="{'invisible': [('project_id','=',False)]}"/>
+                                <field name="company_id" groups="base.group_multi_company" attrs="{'readonly': [('read_only_project','=', True)]}"/>
+                                <field name="request_creator_id" invisible="1" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" widget="many2many_tags" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
+                            </group>
+                            <group name="group_right" class="over_duration">
+                                <label for="start_date" string="Plan" />
+                                <div name="end_date" class="o_row">
+                                    <field name="start_date" widget="daterange" options='{"related_end_date": "end_date"}' attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
+                                    <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon" title="Arrow"/>
+                                    <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow" attrs="{'invisible': [('start_date', '=', False), ('end_date', '=', False)]}"/>
+                                    <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}' attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
+                                </div>
+                                <field name="duration_overtime" readonly="1"/>
+                                <field name="requester_id" readonly="0" widget="many2one_avatar_user" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}"/>
+                            </group>
+                        </group>
+                        <separator string="Description"/>
+                        <field name="description" placeholder="Description"/>
+                        <group>
+                            <field name="member_ids" readonly="1" force_save="1" widget="many2many_avatar_employee"/>
+                        </group>
+                        <notebook>
+                            <page string="Booking Overtime">
+                                <field name="booking_overtime" force_save="1" colspan="4" nolabel="1" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}">
+                                    <tree string="Assign Members">
+                                        <field name="read_stage" invisible="1"/>
+                                        <field name="user_id_domain" invisible="1"/>
+                                        <field name="read_stage" invisible="1"/>
+                                        <field name="inactive" invisible='1'/>
+                                        <field name="user_id" widget="many2one_avatar" options="{'no_create': True}" width="1" domain="user_id_domain"/>
+                                        <field name="start_date" force_save="1"/>
+                                        <field name="end_date" force_save="1"/>
+                                        <field name="duration" string="Duration" width="1" force_save="1"/>
+                                        <field name="booking_time_overtime" width="2" required="1"/>
+                                        <field name="actual_overtime" width="1"/>
+                                        <field name="description"/>
+                                        <button name="timesheets_overtime_detail_action" string="More" type="object" class="oe_highlight"/>
+                                    </tree>
+                                    <form>
+                                        <header>
+                                        </header>
+                                        <sheet>
+                                            <field name="read_stage" invisible="1"/>
+                                            <div class="oe_title" style="width: 500px">
+                                                <h1>
+                                                    <field name="user_id_domain" invisible="1"/>
+                                                    <field name="user_id" domain="user_id_domain" widget="many2one_avatar" class="o_text_overflow" placeholder="Member Name" options="{'no_create': True}" />
+                                                </h1>
+                                            </div>
+                                            <group col="4">
+                                                <field name="start_date" />
+                                                <field name="end_date"/>
+                                                <field name="booking_time_overtime" placeholder="Hour..." required="1"/>
+                                                <field name="actual_overtime" invisible="1"/>
+                                                <field name="duration" string="Duration" width="1" invisible="1"/>
+                                                <field name="project_id" invisible="1"/>
+                                            </group>
+                                            <separator string="Description"/>
+                                            <field name="description" placeholder="Description..."/>
+                                        </sheet>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids" options="{'post_refresh': 'always'}"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- Inherit Timesheets task -->
+    <record id="view_task_form_timesheet_ot_inhit" model="ir.ui.view">
+        <field name="name">view.task.form.timesheet.inhit</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='employee_id']" position="after">
+                <!-- invisible 3 field nay -->
+                <field name="request_overtime_ids" optional="hide"/>
+                <field name="check_request_ot" optional="hide"/>
+                <field name="check_approval_ot" optional="hide"/>
+                <field name="payment_month" invisible="1"/>
+                <field name="payment_flag" invisible="1"/>
+                <field name="status_timesheet_overtime" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='type_ot']" position="after">
+                <field name="type_day_ot" attrs="{'invisible': [('type_ot', '=', 'no')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='unit_amount']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='employee_id']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='type_ot']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='type_day_ot']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm','approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- inherit Timesheets -->
+    <record id="hr_timesheet_line_tree_inhit2" model="ir.ui.view" > 
+        <field name="name">timesheet.line.tree.inhit2</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='type_ot']" position="after">
+                <field name="type_day_ot" attrs="{'invisible': [('type_ot', '=', 'no')]}" force_save="1"/>
+            </xpath>
+            <xpath expr="//field[@name='unit_amount']" position="after">
+                <field name="read_only_reason_refuse" invisible="1"/>
+                <field name="invisible_button_approved" invisible="1"/>
+                <field name="hr_leave_allocation_id" invisible="1"/>
+                <field name="pay_type" force_save="1" attrs="{'readonly': ['|', '|',('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('read_only_reason_refuse', '=', True), ('type_ot','=','no')]}"/>
+                <field name="status_timesheet_overtime" string="Status" force_save = "1" readonly="1"
+                            decoration-info="status_timesheet_overtime == 'confirm'" 
+                            decoration-warning="status_timesheet_overtime == 'draft'" 
+                            decoration-success="status_timesheet_overtime == 'approved'" 
+                            decoration-danger="status_timesheet_overtime=='refuse'"
+                            decoration-bf = "status_timesheet_overtime in ['draft', 'confirm', 'approved','refuse']"/>
+                <field name="invisible_button_confirm" invisible="1"/>
+                <field name="payment_month" attrs="{'invisible': [('invisible_button_confirm', '=', 'True')], 'readonly': [('status_timesheet_overtime', 'in', ['approved'])]}" required="1"/>
+                <field name="payment_flag" invisible="1"/>
+                <field name="get_year_tb" attrs="{'invisible': [('invisible_button_confirm', '=', 'True')], 'readonly': [('status_timesheet_overtime', 'in', ['approved'])]}" required="1"/>
+                <field name="reason_reject" placeholder="Type Reason Refuse Taskscore..." attrs="{'readonly': ['|','|', ('status_timesheet_overtime', '=', 'confirm'),('status_timesheet_overtime', '=', 'approved'), ('read_only_reason_refuse', '=', True)]}"/>
+                <button name="confirm_timesheet_overtime" string="Confirm" icon="fa-thumbs-up" type="object" attrs="{'invisible': ['|','|','|', ('status_timesheet_overtime', '=', 'confirm'), ('status_timesheet_overtime', '=', 'approved'),('read_only_reason_refuse', '=', True), ('invisible_button_confirm', '=', True)]}"/>
+                <button name="approved_timesheet_overtime" string="Approved" icon="fa-thumbs-up" type="object" attrs="{'invisible': [('invisible_button_approved', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="before">
+                <!-- invisible 3 field -->
+                <field name="request_overtime_ids" optional="hide"/>
+                <field name="check_request_ot" optional="hide"/>
+                <field name="check_approval_ot" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='unit_amount']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='employee_id']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='project_id']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='task_id']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='type_ot']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='type_day_ot']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True)]}</attribute>
+            </xpath>
+            <!-- <xpath expr="//field[@name='pay_type']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|','|', ('status_timesheet_overtime', 'in', ['confirm', 'approved']), ('check_request_ot' ,'=', True), ('type_ot','=','no')]}</attribute>
+            </xpath> -->
+        </field>
+    </record>
+
+    <record model="ir.actions.server" id="action_confirm_all_timesheet_overtime">
+        <field name="name">Confirm All</field>
+        <field name="model_id" ref="model_account_analytic_line"/>
+        <field name="binding_model_id" ref="model_account_analytic_line"/>
+        <field name="state">code</field>
+        <field name="code">
+           action = records.action_confirm_all_timesheet_overtime()
+        </field>
+    </record>
+
+    <record model="ir.actions.server" id="action_approved_all_timesheet_overtime">
+        <field name="name">Approved All</field>
+        <field name="model_id" ref="model_account_analytic_line"/>
+        <field name="binding_model_id" ref="model_account_analytic_line"/>
+        <field name="groups_id" eval="[(4, ref('hr_timesheet_request_overtime.request_overtime_access_director'))]"/>
+        <field name="state">code</field>
+        <field name="code">
+           action = records.action_approved_all_timesheet_overtime()
+        </field>
+    </record>
+
+    <record id="view_request_overtime_search" model="ir.ui.view">
+        <field name="name">request.overtime.filter</field>
+        <field name="model">hr.request.overtime</field>
+        <field name="arch" type="xml">
+            <search string="Search Request Overtime">
+                <filter string="Request Refuse" name="filter_refuse_request" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Approved" name="filter_approvals_request" domain="[('stage_id.name', '=', 'Approved')]"/>
+                <field name="active"/>
+                <field name="project_id"/>
+                <field name="user_id"/>
+                <field name="member_ids"/>
+                <field name="stage_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_by_project" context="{'group_by': 'project_id'}"/>
+                    <filter string="Stage" name="group_by_stage" context="{'group_by': 'stage_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

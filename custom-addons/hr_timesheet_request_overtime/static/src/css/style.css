@@ -1,0 +1,14 @@
+
+.duration_overtime_unit::after {
+    content: "Working day";
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.over_duration > tbody > tr:nth-child(2) > td > label{
+    width: 150px !important;
+}
+
+span.o_field_char.o_field_widget.o_quick_editable.o_required_modifier.title_subject {
+    width: 1100px !important;
+}

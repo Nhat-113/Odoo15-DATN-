@@ -410,10 +410,13 @@ class Project(models.Model):
             if len(list_dates) > 0:
                 date_firstly = min(list_dates)
                 date_final = max(list_dates)
-
-                if project.date_start > date_firstly or project.date < date_final:
+                if project.date and project.date_start:
+                    if project.date_start > date_firstly or project.date < date_final:
+                        raise UserError(_('Invalid time. Cannot set duration of project outside the time set in Company Expenses (%(start)s --> %(end)s).',
+                                                start=date_firstly, end=date_final))
+                else:
                     raise UserError(_('Invalid time. Cannot set duration of project outside the time set in Company Expenses (%(start)s --> %(end)s).',
-                                            start=date_firstly, end=date_final))
+                                                start=date_firstly, end=date_final))
 
 
 class ProjectUpdate(models.Model):

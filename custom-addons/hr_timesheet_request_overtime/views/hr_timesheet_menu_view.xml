@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="hr_request_overtime_action" model="ir.actions.act_window">
+            <field name="name">Request Over Time</field>
+            <field name="res_model">hr.request.overtime</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_timesheets_approvals"
+            name="Approvals"
+            parent="hr_timesheet.timesheet_menu_root"
+            groups="request_overtime_access_user"
+            sequence="99"/>
+
+        <menuitem
+            id="hr_timesheet_request_overtime_menu"
+            name="Request Overtime"
+            parent="menu_timesheets_approvals"
+            action="hr_request_overtime_action"
+            sequence="2"/>
+            
+    </data>
+</odoo>
