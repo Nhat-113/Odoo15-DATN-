@@ -36,18 +36,18 @@ class DashboardBlock(models.Model):
     #get data project list
     @api.model
     def get_position_employee(self):
+        cr = self._cr
+
         user_id_login = self.env.user.id
         selected_companies = self.get_current_company_value() 
         get_role_user_login = self.get_role_user_login() 
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
+        sql_domain_for_department = ' AND (hr_employee.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR hr_employee.department_id IS NULL )' 
 
         if len(id_all_mirai_department) == 0: 
             sql_domain_for_department = ''
         else: 
             id_all_mirai_department.append(0)
-            
-        cr = self._cr
-        sql_domain_for_department = ' AND (hr_employee.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR hr_employee.department_id IS NULL )' 
         sql_domain_for_active = ' AND (hr_employee.active = true )  ' 
 
         if get_role_user_login  == 'Ceo':
@@ -64,12 +64,12 @@ class DashboardBlock(models.Model):
 
         elif get_role_user_login  == 'Sub-Ceo':
             sql = """SELECT  hr_job.name, count(*)  FROM hr_employee
-                    INNER JOIN hr_job on hr_job.id = hr_employee.job_id 
-                    LEFT OUTER JOIN hr_department ON hr_employee.department_id = hr_department.id  
-                    INNER JOIN RES_COMPANY ON HR_EMPLOYEE.COMPANY_ID = RES_COMPANY.ID
-                    INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL
-                    WHERE  hr_employee.company_id IN  """ + str(tuple(selected_companies)) + """
-                    """
+                        INNER JOIN hr_job on hr_job.id = hr_employee.job_id 
+                        LEFT OUTER JOIN hr_department ON hr_employee.department_id = hr_department.id  
+                        INNER JOIN RES_COMPANY ON HR_EMPLOYEE.COMPANY_ID = RES_COMPANY.ID
+                        INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL
+                        WHERE  hr_employee.company_id IN  """ + str(tuple(selected_companies)) + """
+                        """
             sql_domain_for_role = 'AND (res_users.id =  ' + str(user_id_login)  + ')'
             sql_group_by =  ' GROUP BY hr_job.name, res_users.id'
 
@@ -93,14 +93,12 @@ class DashboardBlock(models.Model):
         get_role_user_login = self.get_role_user_login() 
 
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
+        sql_domain_for_department = ' and (project_project.department_id not in ' + str(tuple(id_all_mirai_department)) + ' or project_project.department_id is null )'
 
         if len(id_all_mirai_department) == 0: 
             sql_domain_for_department = ''
         else: 
             id_all_mirai_department.append(0)
-
-        sql_domain_for_department = ' and (project_project.department_id not in ' + str(tuple(id_all_mirai_department)) + ' or project_project.department_id is null )' 
-
         cr = self._cr
         if get_role_user_login  == 'Ceo':
             sql = """SELECT last_update_status, count(*)  FROM project_project WHERE  company_id IN  """ + str(tuple(selected_companies)) + """ """
@@ -198,12 +196,12 @@ class DashboardBlock(models.Model):
         selected_companies = self.get_current_company_value()
 
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
+        sql_domain_for_department = ' and (hr_contract.department_id not in ' + str(tuple(id_all_mirai_department)) + ' or hr_contract.department_id is null )' 
+
         if len(id_all_mirai_department) == 0: 
             sql_domain_for_department = ''
         else: 
             id_all_mirai_department.append(0)
-
-        sql_domain_for_department = ' and (hr_contract.department_id not in ' + str(tuple(id_all_mirai_department)) + ' or hr_contract.department_id is null )' 
         sql_order_by =  ' order by hr_contract.contract_document_type '
 
         cr = self._cr

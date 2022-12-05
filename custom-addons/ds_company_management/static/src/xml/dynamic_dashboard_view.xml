@@ -53,7 +53,7 @@
                             <div style="display: none;" class="chart_project tabcontent" >
                                 <div class="chart_project_detail">
                                     <div class="chart_avg_project">
-                                        <p class="project_status">AVG Effort In Year(%)</p>
+                                        <p class="project_status">AVG Effort In Year (%)</p>
                                         <div class="ele_ment_chart_project_avg">
                                             <canvas id="chart_avg_project" class="canvas job_postition"></canvas>
                                         </div>
