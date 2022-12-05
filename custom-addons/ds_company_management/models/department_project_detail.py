@@ -21,6 +21,7 @@ class DepartmentProjectDetail(models.Model):
                     pmh.month_end,
                     pmh.working_day,
                     pmh.total_project_expense AS total_project_cost,
+                    pmh.total_department_expense,
                     pmh.members AS total_members,
                     pmh.total_salary,
                     pmh.revenue AS total_revenue,
@@ -59,6 +60,7 @@ class DepartmentProjectDetailData(models.Model):
     total_members = fields.Float(string='Effort (MM)', digits=(12,3))
     total_salary = fields.Float(string="Salary Cost")
     total_project_cost = fields.Float(string="Prj Expenses")
+    total_department_expense = fields.Float(string="Department Expenses")
     total_revenue = fields.Float(string="Revenue")
     total_avg_operation_project = fields.Float(string="Total Avg Operation Project")
     total_commission = fields.Float(string="Commission")

@@ -177,6 +177,8 @@ class ProjectManagementData(models.Model):
     revenue = fields.Float(string="Revenue")
     total_commission = fields.Float(string="Total Commission")
     project_cost = fields.Float(string="Prj Expenses")
+    total_avg_operation_project = fields.Float(string="Operation Cost")
+    total_department_expense = fields.Float(string="Department Expenses", help="Total Department Expenses By Month")
     
     last_update_color = fields.Integer(related='project_id.last_update_color', store=False)
     count_members = fields.Float(string='Effort (MM)', digits=(12,3))

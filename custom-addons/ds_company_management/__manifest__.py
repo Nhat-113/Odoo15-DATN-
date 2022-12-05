@@ -31,6 +31,7 @@
         'views/project_management_ceo_view.xml',
         'views/department_project_detail_view.xml',
         'views/project_management_member_detail_view.xml',
+        'views/available_booking_employee_view.xml',
         'views/company_management_menu.xml',
         'views/project_expense_management_views.xml'
     ],

@@ -16,6 +16,10 @@ span[name="message_warning"] {
     font-weight: 600;
 }
 
+.project_cost_management .o_form_label {
+    white-space: nowrap;
+}
+
 .human_resource_template {
     width: 100%;
     table-layout: fixed;

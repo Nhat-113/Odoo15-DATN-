@@ -164,7 +164,8 @@ class ProjectManagementHistory(models.Model):
                     FROM get_contract_employee_company
                     WHERE (contract_type NOT IN ('Internship', 'Intern', 'intern', 'internship') 
                         OR contract_type IS NULL)
-                        AND department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                        AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                            OR department_id IS NULL)
                     GROUP BY company_id, employee_id
                 ),
 
@@ -422,9 +423,8 @@ class ProjectManagementHistory(models.Model):
                         gmp.result_commission,
                         gmp.revenue_vnd,
                         (COALESCE(NULLIF(cts.salary, NULL), 0)) AS total_salary,
-                        (COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)
-                            + COALESCE(NULLIF(cdp.total_project_expense, NULL), 0)
-                        ) AS total_project_expense,
+                        (COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)) AS total_project_expense,
+                        (COALESCE(NULLIF(cdp.total_project_expense, NULL), 0)) AS total_department_expense,
                         (COALESCE(NULLIF(em.total_expenses, NULL), 0)) AS operation_cost,
                         (COALESCE(NULLIF(pcm.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project,
                         (COALESCE(NULLIF(pni.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project_not_intern,
@@ -498,7 +498,10 @@ class ProjectManagementHistory(models.Model):
                             (CASE 
                                 WHEN pcv.members_project_not_intern = 0
                                     THEN pcv.average_cost_company
-                                ELSE (pcv.average_cost_company + ((pcv.total_project_expense::decimal + pcv.result_commission ) / pcv.members_project_not_intern))
+                                ELSE (pcv.average_cost_company + (
+                                        (pcv.total_project_expense::decimal 
+                                        + pcv.total_department_expense::decimal 
+                                        + pcv.result_commission ) / pcv.members_project_not_intern))
                             END)::NUMERIC(20, 4) AS average_cost_project
 
                     FROM project_compute_value_by_month AS pcv
@@ -526,6 +529,7 @@ class ProjectManagementHistory(models.Model):
                         pac.total_cost,
                         pac.total_salary,
                         pac.total_project_expense,
+                        pac.total_department_expense,
                         pac.operation_cost,
                         pac.members_project AS members,
                         pac.members_project_not_intern,
@@ -589,11 +593,13 @@ class ProjectManagementHistoryData(models.Model):
     month_end = fields.Date(string="End")
     working_day = fields.Float(string="Working day")
     total_project_expense = fields.Float(string="Prj Expenses", help="Total Project Expenses By Month")
+    total_department_expense = fields.Float(string="Department Expenses", help="Total Department Expenses By Month")
     operation_cost = fields.Float(string="Operation Cost", help="Total Operation Cost")
     average_cost_company = fields.Float(string="Company Avg Cost")
     average_cost_project = fields.Float(string="Prj Avg Cost")
     members = fields.Float(string="Effort (MM)", digits=(12,3))
-    all_members = fields.Float(string="Total members", digits=(12,3))
+    members_project_not_intern = fields.Float(string="Effort (MM - Remove Intern)", digits=(12,3))
+    all_members = fields.Float(string="Total members", digits=(12,3), help="Total members multi company not intern")
     total_avg_operation_project = fields.Float(string="Total Avg Operation Project")
     total_commission = fields.Float(string="Commission")
     

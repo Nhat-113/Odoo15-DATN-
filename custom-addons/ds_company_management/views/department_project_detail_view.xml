@@ -37,6 +37,7 @@
                 <field name="total_members" sum="Total Members"/>
                 <field name="total_salary" sum="Total Salary Cost" widget="monetary"/>
                 <field name="total_project_cost" sum="Total Prj Expenses" widget="monetary"/>
+                <field name="total_department_expense" sum="Total Department Expenses" widget="monetary"/>
                 <field name="total_revenue" sum="Total Revenue" widget="monetary"/>
                 <field name="total_commission" sum="Total commission" widget="monetary"/>
                 <field name="total_profit" sum="Total Profit" widget="monetary"/>

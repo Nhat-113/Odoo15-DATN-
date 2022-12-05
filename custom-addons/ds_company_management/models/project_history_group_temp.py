@@ -20,19 +20,16 @@ class ProjectHistoryGroup(models.Model):
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
                 SELECT
-                    project_management_id AS id,
-                    project_management_id,
-                    company_id,
+                    project_id AS id,
                     project_id,
-                    (SUM(members)) AS total_members,
-                    (SUM(total_salary)) AS total_salary,
-                    (SUM(profit)) AS total_profit,
-                    currency_id
+                    SUM(members) AS total_members,
+                    SUM(total_salary) AS total_salary,
+                    SUM(total_project_expense) AS total_project_expense,
+                    SUM(total_department_expense) AS total_department_expense,
+                    SUM(profit) AS total_profit,
+                    SUM(total_avg_operation_project) AS total_avg_operation_project
 
                 FROM project_management_history
-                GROUP BY project_management_id,
-                        company_id,
-                        project_id,
-                        currency_id
+                GROUP BY project_id
             ) """ % (self._table)
         )
