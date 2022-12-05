@@ -75,8 +75,9 @@ class SupportServices(models.Model):
     company_ids = fields.Many2many('res.company', string='Companies')
     expense_type = fields.Many2one('expense.support.service', tracking=True, string="Expense Type")
     category_expense = fields.Many2one('expense.general.category', tracking=True, string="Expense Category")
-    domain_department_id = fields.Char(string="Department domain", readonly=True, store=False, compute='_compute_domain_department')
-    domain_project_id = fields.Char(string="Project domain", readonly=True, store=False, compute='_compute_domain_project')
+    domain_department_id = fields.Char(string="Department domain", readonly=True, store=False, compute='_compute_domain_project_department')
+    domain_project_id = fields.Char(string="Project domain", readonly=True, store=False, compute='_compute_domain_project_department')
+    check_readonly_field_project = fields.Boolean(default=False, compute='compute_domain_readonly_project')
     
 
     @api.depends('category')
@@ -88,7 +89,14 @@ class SupportServices(models.Model):
             else:
                 request.check_role_it = False
 
-    
+    @api.depends('category', 'payment', 'status', 'cost_type')
+    def compute_domain_readonly_project(self):
+        for request in self:
+            if request.status.type_status != 'draft' and request.category.type_category != 'team_building' and request.cost_type.type_cost == False or\
+                request.category.type_category in ['other', 'it_helpdesk'] and request.status.type_status == 'done':
+                request.check_readonly_field_project = True
+            else:
+                request.check_readonly_field_project = False
 
     @api.onchange('member_team_building')
     def add_booking_team_building(self):
@@ -117,7 +125,7 @@ class SupportServices(models.Model):
             else:
                 request.check_invisible_field_approver = False
 
-    @api.depends('category', 'payment', 'status', 'cost_type')
+    @api.depends('category', 'payment', 'status', 'cost_type', 'amount', 'name', 'send_to')
     def compute_check_invisible_project_id(self):
         for request in self:
             if request.category.type_category == 'team_building' or \
@@ -167,14 +175,10 @@ class SupportServices(models.Model):
             record.domain_company_id = json.dumps([('id', 'in', record.requester_id.company_ids.ids)])
 
     @api.depends('company_id')
-    def _compute_domain_department(self):
-        for record in self:
-            record.domain_department_id = json.dumps([('company_id', '=', record.company_id.id)])
-
-    @api.depends('company_id')
-    def _compute_domain_project(self):
+    def _compute_domain_project_department(self):
         for record in self:
             record.domain_project_id = json.dumps([('company_id', '=', record.company_id.id)])
+            record.domain_department_id = json.dumps([('company_id', '=', record.company_id.id)])
 
     @api.onchange('category', 'payment')
     def _compute_domain_status(self):
@@ -542,6 +546,11 @@ class SupportServices(models.Model):
                         'expense_vnd': request.amount
                     })
 
+    @api.constrains('name', 'project_id', 'member_team_building')
+    def check_booking_team_building(self):
+        for request in self:
+            if len(request.member_team_building) == 0:
+               raise UserError('You have not booked any members for request team building')
 
 class DepartmentItHr(models.Model):
     _name = "department.it.hr"

@@ -67,6 +67,7 @@
                     <button string="Repaid" id='action_repaid_service' name="action_repaid_service" type="object" class="btn-primary" attrs="{'invisible': ['|', ('flag_category', '!=', 'salary_advance'), ('flag_status', '!=', 'done')]}" groups="ds_support_services.support_service_hr"/>
                     <button string="Refuse" name="action_refuse_reason" type="object" attrs="{'invisible': [('flag_status', '!=', 'request')]}" data-hotkey="x" groups="ds_support_services.support_service_sub_ceo"/>
                     <button string="Restore" name="toggle_active" type="object" attrs="{'invisible': [('flag_status', '!=', 'refuse')]}" data-hotkey="z" groups="ds_support_services.support_service_sub_ceo"/>
+                    <button string="Set to Draft" name="toggle_active" type="object" attrs="{'invisible': [('flag_status', '=', 'draft')]}" groups="ds_support_services.support_service_admin"/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="REFUSED" bg_color="bg-danger" attrs="{'invisible':[('flag_status', '!=', 'refuse')]}"/>
@@ -109,6 +110,7 @@
                         <group string='Detail'>
                             <group name="group_left">
                                 <field name="flag_cost" invisible="1"/>
+                                <field name="check_readonly_field_project" invisible="1"/>
                                 <field name="flag_status" invisible="1"/>
                                 <field name="check_invisible_project_id" invisible="1"/>
                                 <field name="domain_department_id" invisible="1"/>
@@ -123,7 +125,7 @@
                                 <field name="currency_vnd" invisible="1"/>
                                 <field name="amount" widget="monetary" attrs="{'invisible': [('flag_category', 'not in', ['team_building', 'salary_advance'])], 'required': [('flag_category', 'in', ['team_building', 'salary_advance'])], 'readonly': ['|', ('flag_status', '!=', 'draft'), ('flag_category', '=', 'team_building')]}" force_save="1"/>
                                 <field name="department_id" domain="domain_department_id" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_cost', '!=', 'cost_department')], 'required': [('flag_cost', '=', 'cost_department')], 'readonly': [('flag_status', '=', 'done')]}" groups="ds_support_services.support_service_sub_ceo"/>
-                                <field name="project_id" domain="domain_project_id" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': ['|', ('check_invisible_project_id', '=', True), ('flag_category', 'in', ['salary_advance', 'open_projects'])], 'required': [('check_invisible_project_id', '=', False)], 'readonly': [('flag_status', '!=', 'draft')]}"/>
+                                <field name="project_id" domain="domain_project_id" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': ['|', ('check_invisible_project_id', '=', True), ('flag_category', 'in', ['salary_advance', 'open_projects'])], 'required': [('check_invisible_project_id', '=', False)], 'readonly': [('check_readonly_field_project', '=', True)]}"/>
                                 <field name="company_ids" widget="many2many_tags" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_cost', '!=', 'cost_general')], 'required': [('flag_cost', '=', 'cost_general')], 'readonly': [('flag_status', '=', 'done')]}" groups="ds_support_services.support_service_sub_ceo"/>
                                 <field name="expense_type" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" attrs="{'invisible': [('flag_cost', '!=', 'cost_general')], 'required': [('flag_cost', '=', 'cost_general')], 'readonly': [('flag_status', '=', 'done')]}" groups="ds_support_services.support_service_hr"/>
                             </group>
@@ -160,7 +162,7 @@
                             </page>
                             <page string="Member" attrs="{'invisible': ['|', ('flag_category', '!=', 'team_building'), ('project_id', '=', False)]}">
                                 <field name="member_team_building" colspan="4" attrs="{'readonly': [('flag_status','!=', 'draft')]}">
-                                    <tree string="Member" delete="1" editable="top" create="1">
+                                    <tree string="Member" delete="1" editable="bottom" create="1">
                                         <field name="employee_id_domain" invisible="1"/>
                                         <field name="employee_id" domain="employee_id_domain"/>
                                         <field name="amount" sum="Total Amount" widget="monetary"/>
