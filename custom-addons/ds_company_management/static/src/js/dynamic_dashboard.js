@@ -1025,6 +1025,13 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_payroll_revenue_follow_month",
                 })
                 .then(function(data) {
+                    for (let i = 0; i < data.length; i++) {
+                        if (data[i][1] == null) 
+                            {
+                                data[i][1] = 0;
+                            }
+                    }
+
                     if (data.length > 0)
                     {
                         var data_employee = data;
