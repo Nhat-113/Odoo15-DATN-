@@ -34,10 +34,14 @@
     margin: 2px;
 }
 .header_dashboard {
+    position: fixed;
+    top: 44px;
+    width: 100%;
     padding: 10px 10px 0px 10px;
     border-bottom: 1px solid;
     display: flex;
     justify-content: space-between;
+    background: beige;
 }
 .header_dashboard h2 {
     margin: 0;
@@ -45,7 +49,7 @@
 .content_chart {
     margin: 0 auto;
     height: auto;
-    margin-top: 4px;
+    margin-top: 30px;
 }
 .bom_dashboard_template {
     height: 100%;

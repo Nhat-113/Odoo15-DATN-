@@ -25,26 +25,58 @@ class DashboardBlock(models.Model):
             cookies_cids.append(0)
         return cookies_cids
 
-
+    #get check role user 
+    def get_role_user_login(self):
+        if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
+            return 'Ceo'
+        elif self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and \
+				self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
+            return 'Sub-Ceo'
     
     #get data project list
     @api.model
     def get_position_employee(self):
-        selected_companies = self.get_current_company_value(); 
+        user_id_login = self.env.user.id
+        selected_companies = self.get_current_company_value() 
+        get_role_user_login = self.get_role_user_login() 
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
 
+        if len(id_all_mirai_department) == 0: 
+            sql_domain_for_department = ''
+        else: 
+            id_all_mirai_department.append(0)
+            
         cr = self._cr
-        sql = """SELECT  hr_job.name, count(*)  FROM hr_employee
+        sql_domain_for_department = ' AND (hr_employee.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR hr_employee.department_id IS NULL )' 
+        sql_domain_for_active = ' AND (hr_employee.active = true )  ' 
+
+        if get_role_user_login  == 'Ceo':
+            sql = """SELECT  hr_job.name, count(*)  FROM hr_employee
+                        INNER JOIN hr_job on hr_job.id = hr_employee.job_id 
+                        LEFT OUTER JOIN hr_department ON hr_employee.department_id = hr_department.id  
+                        WHERE hr_employee.company_id IN  """ + str(tuple(selected_companies)) + """
+                        """
+                        
+            sql_group_by =  ' GROUP BY  hr_job.name'
+            sql += sql_domain_for_department
+            sql += sql_domain_for_active
+            sql += sql_group_by
+
+        elif get_role_user_login  == 'Sub-Ceo':
+            sql = """SELECT  hr_job.name, count(*)  FROM hr_employee
                     INNER JOIN hr_job on hr_job.id = hr_employee.job_id 
                     LEFT OUTER JOIN hr_department ON hr_employee.department_id = hr_department.id  
+                    INNER JOIN RES_COMPANY ON HR_EMPLOYEE.COMPANY_ID = RES_COMPANY.ID
+                    INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL
                     WHERE  hr_employee.company_id IN  """ + str(tuple(selected_companies)) + """
-                       """
+                    """
+            sql_domain_for_role = 'AND (res_users.id =  ' + str(user_id_login)  + ')'
+            sql_group_by =  ' GROUP BY hr_job.name, res_users.id'
 
-        sql_domain_for_department = ' AND (hr_employee.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR hr_employee.department_id IS NULL )' 
-        sql_group_by =  ' GROUP BY  hr_job.name'
-
-        sql += sql_domain_for_department
-        sql += sql_group_by
+            sql += sql_domain_for_department
+            sql += sql_domain_for_active
+            sql += sql_domain_for_role
+            sql += sql_group_by
 
         cr.execute(sql)
 
@@ -56,17 +88,39 @@ class DashboardBlock(models.Model):
         return data
     @api.model
     def get_project_status(self):
-        selected_companies = self.get_current_company_value(); 
+        user_id_login = self.env.user.id
+        selected_companies = self.get_current_company_value()
+        get_role_user_login = self.get_role_user_login() 
+
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
 
-        cr = self._cr
-        sql = """SELECT last_update_status, count(*)  FROM project_project WHERE  company_id IN  """ + str(tuple(selected_companies)) + """ """
+        if len(id_all_mirai_department) == 0: 
+            sql_domain_for_department = ''
+        else: 
+            id_all_mirai_department.append(0)
+
         sql_domain_for_department = ' and (project_project.department_id not in ' + str(tuple(id_all_mirai_department)) + ' or project_project.department_id is null )' 
 
-        sql_group_by = ' group by last_update_status'
+        cr = self._cr
+        if get_role_user_login  == 'Ceo':
+            sql = """SELECT last_update_status, count(*)  FROM project_project WHERE  company_id IN  """ + str(tuple(selected_companies)) + """ """
+            sql_group_by = ' group by last_update_status'
 
-        sql += sql_domain_for_department
-        sql += sql_group_by
+            sql += sql_domain_for_department
+            sql += sql_group_by
+
+        elif get_role_user_login  == 'Sub-Ceo':
+            sql = """SELECT project_project.last_update_status, count(*), res_users.id  FROM project_project 
+                        INNER JOIN RES_COMPANY ON project_project.COMPANY_ID = RES_COMPANY.ID
+                        INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL
+                        WHERE  project_project.company_id IN  """ + str(tuple(selected_companies)) + """ """
+            sql_group_by = ' group by last_update_status, res_users.id'
+            sql_domain_for_role = 'AND (res_users.id =  ' + str(user_id_login)  + ')'
+            
+            sql += sql_domain_for_department
+            sql += sql_domain_for_role
+
+            sql += sql_group_by
 
         cr.execute(sql)
         dat = cr.fetchall()
@@ -78,39 +132,44 @@ class DashboardBlock(models.Model):
     @api.model
     def get_effort_human_resource(self):
         user_id_login = self.env.user.id
-        selected_companies = self.get_current_company_value();
+        get_role_user_login = self.get_role_user_login() 
 
+        selected_companies = self.get_current_company_value()
+		
+        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()		
+        # div_manager_department_id =  self.env.user.employee_ids.department_id.id
         cr = self._cr
-        
-        sql_domain_for_company = 'WHERE ( company_id IN ' + str(tuple(selected_companies)) + ' OR company_project_id in ' + str(tuple(selected_companies)) + ')'
-        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
-
-        sql_domain_for_department = ' AND (human_resource_management.department_id NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )' 
-        # sql_domain_for_project_department = ' and (human_resource_management.department_id not in ' + str(tuple(id_all_mirai_department)) + ' or human_resource_management.department_id is null )' 
+	
+        # sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ' or company_project_id in ' + str(tuple(selected_companies)) + ')'
+        sql_domain_for_company = ''
 
         sql_domain_for_role = ''
-        sql_order_by = '  ORDER BY employee_id'
-         
+        if len(id_all_mirai_department) == 0: 
+            sql_domain_for_department_emp = ''
+            sql_domain_for_department_proj = ''
+        else: 
+            id_all_mirai_department.append(0)
+            sql_domain_for_department_emp = ' AND (human_resource_management.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.department_id IS NULL )'
+            sql_domain_for_department_proj = ' AND (human_resource_management.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management.PROJECT_DEPARTMENT_ID IS NULL )' 
 
-        if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
+        if get_role_user_login  == 'Ceo':
+            sql_domain_for_role = ''
+            sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ')'
+
+
+        elif get_role_user_login  == 'Sub-Ceo':
+            sql_domain_for_company =   'where ( company_manager_user_id = ' + str(user_id_login) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
             sql_domain_for_role = ''
 
-        elif self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and \
-                self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
-            sql_domain_for_role = ' OR company_manager_user_id = ' + str(user_id_login)
-
-        elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
-                self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
-            sql_domain_for_role = ' AND (department_manager_user_id = ' + str(user_id_login) + ' OR department_manager_project_id = ' + str(user_id_login) + ')'
 
         sql = ("""select employee_id, project_type_name, month1, month2, month3, month4, month5, month6, month7, month8, month9, month10, month11, month12,
                         average, department_manager_user_id, company_manager_user_id, start_date_contract,
                         end_date_contract from human_resource_management 
                 """)
         sql += sql_domain_for_company
-        sql += sql_domain_for_department
         sql += sql_domain_for_role
-        sql += sql_order_by
+        sql += sql_domain_for_department_emp
+        sql += sql_domain_for_department_proj
 
         cr.execute(sql)
         data = cr.fetchall()
@@ -120,10 +179,12 @@ class DashboardBlock(models.Model):
     def get_revenue_company(self):
         selected_companies = self.get_current_company_value(); 
         cr = self._cr
-        cr.execute("""select to_char(month_start, 'Month YYYY') as l_month ,sum(total_revenue)/100000000 as revenue,
+        sql  = ("""select to_char(month_start, 'Month YYYY') as l_month ,sum(total_revenue)/100000000 as revenue,
                         sum(total_members) as members from project_management_ceo_data
                          WHERE   extract(year from month_start)  = extract(year from CURRENT_DATE)   and  company_id in  """ + str(tuple(selected_companies)) + """
                         group by month_start""")
+
+        cr.execute(sql)
         data = cr.fetchall()
         
         return data
@@ -132,21 +193,45 @@ class DashboardBlock(models.Model):
     # get data for contract type
     @api.model
     def get_contract_type(self):
+        user_id_login = self.env.user.id
+        get_role_user_login = self.get_role_user_login() 
+        selected_companies = self.get_current_company_value()
 
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
-        selected_companies = self.get_current_company_value(); 
-        
-        cr = self._cr
-        sql = """SELECT hr_contract.contract_document_type ,count(*) FROM hr_contract
-                    LEFT OUTER JOIN hr_department ON hr_contract.department_id = hr_department.id 
-                    WHERE hr_contract.state = 'open' AND  hr_contract.company_id IN  """ + str(tuple(selected_companies)) + """
-                    """
-        sql_domain_for_department = ' and (hr_contract.department_id not in ' + str(tuple(id_all_mirai_department)) + ' or hr_contract.department_id is null )' 
+        if len(id_all_mirai_department) == 0: 
+            sql_domain_for_department = ''
+        else: 
+            id_all_mirai_department.append(0)
 
-        sql_order_by =  ' group by hr_contract.contract_document_type '
-        
-        sql += sql_domain_for_department
-        sql += sql_order_by
+        sql_domain_for_department = ' and (hr_contract.department_id not in ' + str(tuple(id_all_mirai_department)) + ' or hr_contract.department_id is null )' 
+        sql_order_by =  ' order by hr_contract.contract_document_type '
+
+        cr = self._cr
+        if get_role_user_login  == 'Ceo':
+
+            sql = """SELECT hr_contract.contract_document_type ,count(*) FROM hr_contract
+                        LEFT OUTER JOIN hr_department ON hr_contract.department_id = hr_department.id 
+                        WHERE hr_contract.state = 'open' AND  hr_contract.company_id IN  """ + str(tuple(selected_companies)) + """
+                        """
+            sql_group_by = ' group by hr_contract.contract_document_type '
+
+            sql += sql_domain_for_department
+            sql += sql_group_by
+            sql += sql_order_by
+
+        elif get_role_user_login  == 'Sub-Ceo':
+            sql = """SELECT hr_contract.contract_document_type ,count(*) FROM hr_contract
+                        LEFT OUTER JOIN hr_department ON hr_contract.department_id = hr_department.id 
+                        INNER JOIN RES_COMPANY ON hr_contract.COMPANY_ID = RES_COMPANY.ID
+                        INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL
+                        WHERE hr_contract.state = 'open' AND  hr_contract.company_id IN  """ + str(tuple(selected_companies)) + """
+                    """
+            sql_domain_for_role = ' AND (res_users.id =  ' + str(user_id_login)  + ')'
+            sql_group_by =  ' group by hr_contract.contract_document_type, res_users.id '
+            sql += sql_domain_for_department
+            sql += sql_domain_for_role
+            sql += sql_group_by
+            sql += sql_order_by
 
         cr = self._cr
         cr.execute(sql)
@@ -156,131 +241,69 @@ class DashboardBlock(models.Model):
             data.append({'label': dat[i][0], 'value': dat[i][1]})
         return data
     
-    #get data payroll follow months 
     @api.model
     def get_payroll_follow_month(self):
-        # SELECT hr_payslip.date_from, hr_payslip.date_to,
-        #                 hr_payslip.name, hr_payslip_line.slip_id, hr_payslip.id, (hr_payslip_line.amount)/1000000,
-		# 				hr_payslip.employee_id,hr_employee.department_id,
-		# 				hr_department.parent_id
-        #                 FROM hr_payslip_line
-        #                 INNER JOIN hr_payslip					
-        #                 ON hr_payslip.id=hr_payslip_line.slip_id
-        #                 INNER JOIN hr_employee
-        #                 ON hr_employee.id = hr_payslip.employee_id
-		# 				LEFT OUTER JOIN hr_department ON hr_employee.department_id = hr_department.id 
-        #                 Where ( hr_payslip_line.code = 'NET' or  hr_payslip_line.code = 'NET1' or  hr_payslip_line.code = 'HOUR' )
-        #                 and  EXTRACT(YEAR FROM hr_payslip.date_from)  = EXTRACT(YEAR FROM NOW())
-        #                 and hr_payslip.state = 'done' 
-		# 				and  (hr_employee.department_id != 27 or hr_employee.department_id is null)  
-		# 				and (hr_department.parent_id != 27 or hr_department.parent_id is null)
-        #                 order by  hr_payslip.date_from 
-        
-        company_id = self.get_current_company_value()
-        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
+        user_id_login = self.env.user.id
+        selected_companies = self.get_current_company_value() 
+        get_role_user_login = self.get_role_user_login() 
 
-        sql_domain_for_department = ' AND ( hr_employee.department_id NOT IN ' + str(tuple(id_all_mirai_department)) +  ' OR hr_employee.department_id is null )' 
-        sql_order_by =  ' ORDER BY  hr_payslip.date_from '
-        
         cr = self._cr
-        sql = """SELECT hr_payslip.date_from, hr_payslip.date_to,
-                        hr_payslip.name, hr_payslip_line.slip_id, hr_payslip.id, (hr_payslip_line.amount)/1000000
-                        FROM hr_payslip_line
-                        INNER JOIN hr_payslip					
-                        ON hr_payslip.id=hr_payslip_line.slip_id
-                        INNER JOIN hr_employee
-                        ON hr_employee.id = hr_payslip.employee_id
-						LEFT OUTER JOIN hr_department ON hr_employee.department_id = hr_department.id 
-                        Where  EXTRACT(YEAR FROM hr_payslip.date_from)  = EXTRACT(YEAR FROM NOW())
-                        AND ( hr_payslip_line.code = 'NET' OR  hr_payslip_line.code = 'NET1' OR  hr_payslip_line.code = 'HOUR' )
-                        AND ( hr_payslip_line.code = 'NET' OR  hr_payslip_line.code = 'NET1' OR  hr_payslip_line.code = 'HOUR' )
-                        AND hr_payslip.state = 'done' 
-                        AND hr_payslip.company_id IN  """ + str(tuple(company_id)) + """ """
-                       
-        sql += sql_domain_for_department  
-        sql += sql_order_by
-        
+        if get_role_user_login  == 'Ceo':
+            sql = """SELECT to_char(month_start, 'Month YYYY') AS l_month, sum(total_revenue)/100000000 AS revenue,
+                        sum(project_management_ceo_data.total_salary)/100000000  from project_management_ceo_data
+                        WHERE   extract(year from month_start)  = extract(year from CURRENT_DATE)   AND  company_id IN  """ + str(tuple(selected_companies)) + """
+                        group by month_start """
+         
+            sql_domain_for_role = ''
+
+        elif get_role_user_login  == 'Sub-Ceo':
+
+            sql_domain_for_role = ' AND (res_users.id =  ' + str(user_id_login)  + ')'
+            sql_order_by   = ' GROUP BY project_management_ceo_data.month_start'  
+            sql  = """ SELECT to_char(month_start, 'Month YYYY') AS l_month, sum(total_revenue)/100000000 AS revenue,
+                                sum(project_management_ceo_data.total_salary)/100000000 AS salary  from project_management_ceo_data
+                                INNER JOIN RES_COMPANY ON project_management_ceo_data.COMPANY_ID = RES_COMPANY.ID
+                                INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL
+                                WHERE   extract(year from month_start)  = extract(year from CURRENT_DATE)   AND  project_management_ceo_data.company_id IN  """ + str(tuple(selected_companies)) + """
+                                """
+            sql += sql_domain_for_role
+            sql += sql_order_by
+
         cr.execute(sql)
-        dat = cr.fetchall()
-        data_payroll = []
-        # sum = 0 
-        for i in range(0, len(dat)):
-            data_payroll.append({'label': dat[i][0], 'value': dat[i][5] })
-
-        data = []
-        years = []
-        months = []
-        for item in data_payroll:
-            if item['label'].year not in years:
-                years.append(item['label'].year)
-            if item['label'].month not in months:
-                months.append(item['label'].month)
-
-        for year in years:
-            for month in months:
-                sum = 0
-                for item in data_payroll:
-                    if (item['label'].month==month)and(item['label'].year==year):
-                        sum += item['value']
-                if sum:
-                    data.append({'label':[month, year], 'value': sum})
-            
-        return data
-    
-    # @api.model
-    # def join_resign_trends(self):
-    #     cr = self._cr
-    #     month_list = []
-    #     join_trend = []
-    #     resign_trend = []
-    #     for i in range(11, -1, -1):
-    #         last_month = datetime.now() - relativedelta(months=i)
-    #         text = format(last_month, '%B %Y')
-    #         month_list.append(text)
-    #     for month in month_list:
-    #         vals = {
-    #             'l_month': month,
-    #             'count': 0
-    #         }
-            
-    #         join_trend.append(vals)
-    #     for month in month_list:
-    #         vals = {
-    #             'l_month': month,
-    #             'count': 0
-    #         }
-    #         resign_trend.append(vals)
-            
-    #     cr.execute('''select to_char(month_start, 'Month YYYY') as l_month ,sum(total_revenue)/10000000 as revenue from project_management_ceo
-	#         	WHERE   to_char(month_start, 'YYYY') = '2022'
-    #                 group by month_start''')
-    #     join_data = cr.fetchall()
+        data = cr.fetchall()
         
-    #     cr.execute('''		
-    #         select to_char(month_start, 'Month YYYY') as l_month , sum(total_members) as members from project_management_ceo
-    #             WHERE   to_char(month_start, 'YYYY') = '2022'
-    #             group by month_start''')
-    #     resign_data = cr.fetchall()
+        return data
 
-    #     for line in join_data:
-    #         match = list(filter(lambda d: d['l_month'].replace(' ', '') == line[0].replace(' ', ''), join_trend))
-    #         if match:
-    #             match[0]['count'] = line[1]
-    #     for line in resign_data:
-    #         match = list(filter(lambda d: d['l_month'].replace(' ', '') == line[0].replace(' ', ''), resign_trend))
-    #         if match:
-    #             match[0]['count'] = line[1]
-    #     for join in join_trend:
-    #         join['l_month'] = join['l_month'].split(' ')[:1][0].strip()[:3]
-    #     for resign in resign_trend:
-    #         resign['l_month'] = resign['l_month'].split(' ')[:1][0].strip()[:3]
-    #     graph_result = [{
-    #         'name': 'Join',
-    #         'values': join_trend
-    #     }, {
-    #         'name': 'Resign',
-    #         'values': resign_trend
-    #     }]
+    @api.model
+    def get_payroll_revenue_follow_month(self):
+        user_id_login = self.env.user.id
+        selected_companies = self.get_current_company_value()
+        get_role_user_login = self.get_role_user_login() 
 
-    #     return graph_result
-    
+        cr = self._cr
+        if get_role_user_login  == 'Ceo':
+            sql = """SELECT to_char(month_start, 'Month YYYY') AS l_month, (sum(project_management_ceo_data.total_revenue) / sum(project_management_ceo_data.total_salary)) AS revenue
+                        FROM project_management_ceo_data
+                        WHERE   extract(year FROM month_start)  = extract(year FROM CURRENT_DATE)   AND  company_id IN  """ + str(tuple(selected_companies)) + """
+                        group by month_start """
+         
+            sql_domain_for_role = ''
+
+        elif get_role_user_login  == 'Sub-Ceo':
+
+            sql_domain_for_role = ' AND (res_users.id =  ' + str(user_id_login)  + ')'
+            sql_order_by   = ' GROUP BY project_management_ceo_data.month_start'  
+            sql  = """ SELECT to_char(month_start, 'Month YYYY') AS l_month, sum(total_revenue)/100000000 AS revenue,
+                                sum(project_management_ceo_data.total_salary)/100000000 AS salary  FROM project_management_ceo_data
+                                INNER JOIN RES_COMPANY ON project_management_ceo_data.COMPANY_ID = RES_COMPANY.ID
+                                INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL
+                                WHERE   extract(year FROM month_start)  = extract(year FROM CURRENT_DATE)   AND  project_management_ceo_data.company_id IN  """ + str(tuple(selected_companies)) + """
+                                """
+            sql += sql_domain_for_role
+            sql += sql_order_by
+
+        cr.execute(sql)
+        data = cr.fetchall()
+        
+        return data
+
