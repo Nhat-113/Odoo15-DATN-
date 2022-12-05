@@ -105,7 +105,7 @@ class UpgradeAction(models.Model):
                 DELETE FROM project_management_data;
                 INSERT INTO 
                     project_management_data(
-                        --id, 
+                        id, 
                         project_id, 
                         department_id, 
                         company_id, 
@@ -134,7 +134,7 @@ class UpgradeAction(models.Model):
                         write_date
                     )  
                 SELECT 
-                    --pm.id,
+                    pm.id,
                     pm.project_id,
                     pm.department_id,
                     pm.company_id,
@@ -177,7 +177,7 @@ class UpgradeAction(models.Model):
                 DELETE FROM project_management_history_data;
                 INSERT INTO
                     project_management_history_data(
-                        --id,
+                        id,
                         project_management_id,
                         currency_id,
                         months,
@@ -205,7 +205,7 @@ class UpgradeAction(models.Model):
                         write_date
                     )
                 SELECT
-                    --id,
+                    id,
                     project_management_id,
                     currency_id,
                     months,
@@ -241,7 +241,7 @@ class UpgradeAction(models.Model):
                 DELETE FROM project_management_member_data;
                 INSERT INTO
                     project_management_member_data(
-                        --id,
+                        id,
                         project_management_id,
                         company_id,
                         employee_id,
@@ -259,7 +259,7 @@ class UpgradeAction(models.Model):
                         write_date
                     )
                 SELECT
-                    --id,
+                    id,
                     project_management_id,
                     company_id,
                     employee_id,
@@ -285,7 +285,7 @@ class UpgradeAction(models.Model):
                 DELETE FROM project_management_member_detail_data;
                 INSERT INTO
                     project_management_member_detail_data(
-                        --id,
+                        id,
                         project_members,
                         employee_id,
                         currency_id,
@@ -307,7 +307,7 @@ class UpgradeAction(models.Model):
                         write_date
                     )
                 SELECT
-                    --id,
+                    id,
                     project_members,
                     employee_id,
                     currency_id,
@@ -337,7 +337,7 @@ class UpgradeAction(models.Model):
                 DELETE FROM department_project_detail_data;
                 INSERT INTO
                     department_project_detail_data(
-                        --id,
+                        id,
                         project_management_id,
                         company_id,
                         project_id,
@@ -364,7 +364,7 @@ class UpgradeAction(models.Model):
                         write_date
                     )
                 SELECT
-                    --id,
+                    id,
                     project_management_id,
                     company_id,
                     project_id,
@@ -399,7 +399,7 @@ class UpgradeAction(models.Model):
                 DELETE FROM project_management_subceo_data;
                 INSERT INTO 
                     project_management_subceo_data(
-                        --id,
+                        id,
                         company_id,
                         department_id,
                         currency_id,
@@ -422,7 +422,7 @@ class UpgradeAction(models.Model):
                         write_date
                     )
                 SELECT
-                    --id,
+                    id,
                     company_id,
                     department_id,
                     currency_id,

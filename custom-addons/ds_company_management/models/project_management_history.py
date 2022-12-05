@@ -600,7 +600,7 @@ class ProjectManagementHistoryData(models.Model):
     members = fields.Float(string="Effort (MM)", digits=(12,3))
     members_project_not_intern = fields.Float(string="Effort (MM - Remove Intern)", digits=(12,3))
     all_members = fields.Float(string="Total members", digits=(12,3), help="Total members multi company not intern")
-    total_avg_operation_project = fields.Float(string="Total Avg Operation Project")
+    total_avg_operation_project = fields.Float(string="Total OP Avg Prj")
     total_commission = fields.Float(string="Commission")
     
     total_salary = fields.Float(string="Salary Cost", help="Total salary Employees By Month = SUM(salary_employee * effort_rate)")

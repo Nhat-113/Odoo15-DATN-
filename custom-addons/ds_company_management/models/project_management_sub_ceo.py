@@ -190,7 +190,7 @@ class ProjectManagementSubCeoData(models.Model):
     total_salary = fields.Float(string="Salary Cost")
     total_project_cost = fields.Float(string="Prj Expenses")
     total_department_cost = fields.Float(string="Department Expenses")
-    total_avg_operation_department = fields.Float(string="Operation Cost")
+    total_avg_operation_department = fields.Float(string="Total OP Avg Prj")
     total_revenue = fields.Float(string="Revenue")
     total_commission = fields.Float(string="Commission")
     total_profit = fields.Float(string="Profit")

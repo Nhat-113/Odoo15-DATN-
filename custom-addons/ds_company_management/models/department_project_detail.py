@@ -62,7 +62,7 @@ class DepartmentProjectDetailData(models.Model):
     total_project_cost = fields.Float(string="Prj Expenses")
     total_department_expense = fields.Float(string="Department Expenses")
     total_revenue = fields.Float(string="Revenue")
-    total_avg_operation_project = fields.Float(string="Total Avg Operation Project")
+    total_avg_operation_project = fields.Float(string="Total OP Avg Prj")
     total_commission = fields.Float(string="Commission")
     total_profit = fields.Float(string="Profit")
     profit_margin = fields.Float(string="Profit Margin (%)", digits=(12,2), help="Profit Margin = profit / revenue * 100")
