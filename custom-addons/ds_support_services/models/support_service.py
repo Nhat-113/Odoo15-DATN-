@@ -248,7 +248,6 @@ class SupportServices(models.Model):
                 record.approval = False
                 record.send_to = open_prj if len(open_prj) > 0 else False
             else:
-                record.send_to = False
                 if record.payment.type_payment == 'have_cost':
                     record.approval = sub_ceo
     
@@ -479,6 +478,7 @@ class SupportServices(models.Model):
                             'project_expense_management_id': department_expense_management_id.id,
                             'name': request.name,
                             'expense_date': request.date_request,
+                            'total_expenses': 0,
                             'expense_vnd': request.amount_it_other
                         })
                 else:
@@ -511,6 +511,7 @@ class SupportServices(models.Model):
                             'project_expense_management_id': project_expense_management_id.id,
                             'name': request.name,
                             'expense_date': request.date_request,
+                            'total_expenses': 0,
                             'expense_vnd': request.amount_it_other
                         })
             elif request.category.type_category == 'team_building':
@@ -543,13 +544,14 @@ class SupportServices(models.Model):
                         'project_expense_management_id': project_expense_management_id.id,
                         'name': request.name,
                         'expense_date': request.date_request,
+                        'total_expenses': 0,
                         'expense_vnd': request.amount
                     })
 
     @api.constrains('name', 'project_id', 'member_team_building')
     def check_booking_team_building(self):
         for request in self:
-            if len(request.member_team_building) == 0:
+            if len(request.member_team_building) == 0 and request.category.type_category == 'team_building':
                raise UserError('You have not booked any members for request team building')
 
 class DepartmentItHr(models.Model):
