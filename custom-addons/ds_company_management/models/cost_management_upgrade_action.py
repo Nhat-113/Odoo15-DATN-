@@ -62,29 +62,30 @@ class UpgradeAction(models.Model):
                     
         for pm in project_departments:
             for expense in department_expenses:
-                if expense.expense_date >= pm.project_id.date_start and expense.expense_date <= pm.project_id.date:
-                    cnt = self.compute_count_project_department_expense(project_departments, expense.department_id.id, expense.expense_date)
-                    # cnt = sum(1 for prj in project_departments if expense.expense_date >= prj.project_id.date_start and expense.expense_date <= prj.project_id.date)
-                    vals = {
-                        'name': expense.name,
-                        'expense_date': expense.expense_date,
-                        'total_expenses': expense.total_expenses / cnt,
-                        'exchange_rate': expense.exchange_rate,                    
-                        'expense_vnd': expense.exchange_rate * expense.total_expenses / cnt
-                    }
-                    
-                    vals_update = {
-                        'project_management_id': pm.id,
-                        'currency_id': expense.currency_id.id,
-                        'currency_vnd': expense.currency_vnd.id,
-                        'project_id': pm.project_id.id,
-                        'department_id': pm.department_id.id
-                    }
-                    
-                    #because project_expense_value, fields in vals_update using related with project_expense_management,
-                    # so can't create them -> using write method to update them
-                    result = self.env['project.expense.value'].sudo().create(vals)
-                    result.sudo().write(vals_update)
+                if expense.department_id.id == pm.department_id.id:
+                    if expense.expense_date >= pm.project_id.date_start and expense.expense_date <= pm.project_id.date:
+                        cnt = self.compute_count_project_department_expense(project_departments, expense.department_id.id, expense.expense_date)
+                        # cnt = sum(1 for prj in project_departments if expense.expense_date >= prj.project_id.date_start and expense.expense_date <= prj.project_id.date)
+                        vals = {
+                            'name': expense.name,
+                            'expense_date': expense.expense_date,
+                            'total_expenses': expense.total_expenses / cnt,
+                            'exchange_rate': expense.exchange_rate,                    
+                            'expense_vnd': expense.exchange_rate * expense.total_expenses / cnt
+                        }
+                        
+                        vals_update = {
+                            'project_management_id': pm.id,
+                            'currency_id': expense.currency_id.id,
+                            'currency_vnd': expense.currency_vnd.id,
+                            'project_id': pm.project_id.id,
+                            'department_id': pm.department_id.id
+                        }
+                        
+                        #because project_expense_value, fields in vals_update using related with project_expense_management,
+                        # so can't create them -> using write method to update them
+                        result = self.env['project.expense.value'].sudo().create(vals)
+                        result.sudo().write(vals_update)
         
         return
         # return {'type': 'ir.actions.client', 'tag': 'reload'}
