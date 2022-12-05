@@ -163,6 +163,7 @@
                             <page string="Member" attrs="{'invisible': ['|', ('flag_category', '!=', 'team_building'), ('project_id', '=', False)]}">
                                 <field name="member_team_building" colspan="4" attrs="{'readonly': [('flag_status','!=', 'draft')]}">
                                     <tree string="Member" delete="1" editable="bottom" create="1">
+                                        <field name="currency_vnd" invisible="1"/>
                                         <field name="employee_id_domain" invisible="1"/>
                                         <field name="employee_id" domain="employee_id_domain"/>
                                         <field name="amount" sum="Total Amount" widget="monetary"/>

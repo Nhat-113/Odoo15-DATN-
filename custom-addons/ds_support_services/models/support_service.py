@@ -396,12 +396,12 @@ class SupportServices(models.Model):
             if request.date_request < date.today() and request.env.user.has_group('ds_support_services.support_service_hr') == False:
                 raise UserError('Request date cannot be earlier than today.')
         
-    @api.constrains('amount')
+    @api.constrains('amount', 'requester_id')
     def check_amount_advance_salary(self):
         for request in self:
-            if request.requester_id.employee_id.id and request.category.type_category == 'salary_advance': 
+            if request.category.type_category == 'salary_advance' and request.requester_id.employee_id.id or request.requester_id.employee_ids.id: 
                 contract = self.env['hr.contract'].sudo().search([
-                    ('employee_id', '=', request.requester_id.employee_id.id),
+                    ('employee_id', '=', request.requester_id.employee_id.id or request.requester_id.employee_ids.id),
                     ('date_start', '<=', request.date_request),
                     ('active', '=', True),
                     ('state', 'in', ['draft','open']),
