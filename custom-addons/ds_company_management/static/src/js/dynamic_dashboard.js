@@ -41,7 +41,6 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
         events: {
             "click #chart_employee": "swap_menu",
             "click #chart_project": "swap_menu",
-            "click #chart_revenue": "swap_menu",
         },
 
         swap_menu: function(events) {
@@ -157,6 +156,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                             },
                         },
                     });
+                    for (let i = 0; i < data.length; i++) {
+                        data[i].label = data[i].label.replace("_", " ").replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+                    }
                     const dataTemp = project_status.data;
                     for (let i = 0; i < data.length; i++) {
                         dataTemp.labels.push(data[i].label);
@@ -203,6 +205,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                         beginAtZero: true,
                                     },
                                 },
+                            },
+                            plugins: {
+                                legend: false // Hide legend
                             },
                         },
                     });
@@ -256,6 +261,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                         beginAtZero: true,
                                     },
                                 },
+                            },
+                            plugins: {
+                                legend: false // Hide legend
                             },
                         },
                     });
@@ -404,6 +412,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                     },
                                 },
                             },
+                            plugins: {
+                                legend: false // Hide legend
+                            },
                         },
                     });
                     const dataTemp = chartProjectBase.data;
@@ -549,6 +560,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                         beginAtZero: true,
                                     },
                                 },
+                            },
+                            plugins: {
+                                legend: false // Hide legend
                             },
                         },
                     });
@@ -848,7 +862,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     if (!speedCanvas)
                         return
                     var dataFirst = {
-                        label: "Revenue(Hundred Million)",
+                        label: "Revenue",
                         data: [],
                         lineTension: 0,
                         fill: false,
@@ -856,16 +870,23 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     };
 
                     var dataSecond = {
-                        label: "Effort (MM)",
+                        label: "Profit",
                         data: [],
                         lineTension: 0,
                         fill: false,
                         borderColor: '#00ACC1'
                     };
+                    var dataThird = {
+                        label: "Total Cost",
+                        data: [],
+                        lineTension: 0,
+                        fill: false,
+                        borderColor: '#4CAF50'
+                    };
 
                     var speedData = {
                         labels: [],
-                        datasets: [dataFirst, dataSecond]
+                        datasets: [dataFirst, dataSecond, dataThird]
                     };
 
                     var chartOptions = {
@@ -891,12 +912,13 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         dataTemp.labels.push(data[i][0]);
                         dataTemp.datasets[0].data.push(data[i][1]);
                         dataTemp.datasets[1].data.push(data[i][2]);
+                        dataTemp.datasets[2].data.push(data[i][3]);
                     }
 
                     lineChart.data.labels = dataTemp.labels;
                     lineChart.data.datasets[0].data = dataTemp.datasets[0].data;
-
                     lineChart.data.datasets[1].data = dataTemp.datasets[1].data;
+                    lineChart.data.datasets[2].data = dataTemp.datasets[2].data;
                     lineChart.update();
                 });
         },
@@ -937,8 +959,14 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                     },
                                 },
                             },
+                            plugins: {
+                                legend: false // Hide legend
+                            },
                         },
-                    });
+                    });                    
+                    for (let i = 0; i < data.length; i++) {
+                        data[i].label = data[i].label.replace("_", " ").replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+                    }
                     const dataTemp = contract.data;
                     for (let i = 0; i < data.length; i++) {
                         dataTemp.labels.push(data[i].label);
@@ -965,7 +993,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     if (!speedCanvas)
                         return
                     var dataFirst = {
-                        label: "Revenue (Hundred Million)",
+                        label: "Revenue",
                         data: [],
                         lineTension: 0,
                         fill: false,
@@ -973,7 +1001,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     };
 
                     var dataSecond = {
-                        label: "Salary (Hundred Million)",
+                        label: "Salary",
                         data: [],
                         lineTension: 0,
                         fill: false,
@@ -1048,7 +1076,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         data: {
                             labels: [],
                             datasets: [{
-                                label: "Project Internal",
+                                label: "Salary Cost / Revenue",
                                 data: [],
                                 backgroundColor: ['#6869AC'],
                                 borderColor: ['#6869AC'],
@@ -1062,6 +1090,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                         beginAtZero: true,
                                     },
                                 },
+                            },
+                            plugins: {
+                                legend: false // Hide legend
                             },
                         },
                     });

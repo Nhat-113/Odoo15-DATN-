@@ -16,9 +16,8 @@
                     <h2>Dashboard BOM</h2>
                     <div class="left_chart">
                         <div class="button_chart">
-                            <button id="chart_employee" class="btn-chart_employee tablinks_dashboard active" >HR Info</button>
+                            <button id="chart_employee" class="btn-chart_employee tablinks_dashboard active" >Overall Info</button>
                             <button id="chart_project" class="btn-chart_project tablinks_dashboard">Project Info</button>
-                            <button id="chart_revenue" class="btn-chart_revenue tablinks_dashboard">Revenue Info</button>
                         </div>
                     </div>
                 </div>
@@ -38,12 +37,20 @@
                             
                                 <div class="chart_payroll_and_regis">
                                     <div class="chart_payroll">
-                                        <p class="title_chart_payroll">Monthly Salary Statistics (Mil)</p>
+                                        <p class="title_chart_payroll">Monthly Salary Statistics (100 Mils VNĐ)</p>
                                         <canvas id="payroll" width="200" height="80" class="canvas job_postition"></canvas>
                                     </div>
                                     <div class="chart_payroll">
-                                        <p class="title_chart_payroll">Salary Cost / Revenue</p>
+                                        <p class="title_chart_payroll">Salary / Revenue</p>
                                         <canvas id="salary-cost-revenue" width="200" height="80" class="canvas job_postition"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="chart_payroll_and_regis">
+                             
+                                    <div class="element_revenue_chart">
+                                        <p class="title_chart_company_revenue">Company Revenue (100 Mils VNĐ)</p>
+                                        <canvas id="chart_company_revenue" class="canvas job_postition"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -86,14 +93,14 @@
                             </div>
                         </div>
 
-                        <div class="company_revebue_dashboard">
+                        <!-- <div class="company_revebue_dashboard">
                             <div style="display: none" class="chart_company_revenue tabcontent">
                                 <div class="element_revenue_chart">
                                     <p class="title_chart_company_revenue">Company Revenue</p>
                                     <canvas id="chart_company_revenue" class="canvas job_postition"></canvas>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         
                     </div>        
             </div>
