@@ -75,6 +75,7 @@ class HrRequestOverTime(models.Model):
     active = fields.Boolean(string='Invisible Refuse Button', default=True, store=True)
     refuse_reason_id = fields.One2many('hr.request.overtime.refuse.reason', 'request_overtime_ids', tracking=True)
     refuse_reason = fields.Char('Refuse Reason', tracking=True)
+    
 
     
     submit_flag = fields.Boolean(default=True)
@@ -84,7 +85,7 @@ class HrRequestOverTime(models.Model):
     read_only_project = fields.Boolean(default=False)
 
     stage_name = fields.Text(string="Name", compute = '_get_stage_name', default ="Draft", store=True)
-    last_stage = fields.Integer(string="Last stage", default=0)
+    last_stage = fields.Char(string="Last Stage", default=False)
 
     @api.onchange('stage_id')
     def _compute_domain_stage(self):
@@ -138,7 +139,12 @@ class HrRequestOverTime(models.Model):
        
     def reset_request_overtime(self):
         """ Reinsert the request into the recruitment pipe in the first stage"""
-        default_stage = self.env['hr.request.overtime.stage'].search([], order='sequence asc', limit=1).id
+        if self.last_stage in ['Draft', 'Request', 'Confirm']:
+            default_stage = self.env['hr.request.overtime.stage'].search([('name','=','Draft')]).id
+            self.last_stage = False
+        elif self.last_stage in ['Submit', 'Approved']:
+            default_stage = self.env['hr.request.overtime.stage'].search([('name','=','Confirm')]).id
+            self.last_stage = False
         for request in self:
             request.write(
                 {'stage_id': default_stage})

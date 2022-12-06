@@ -20,12 +20,13 @@ class OvertimeGetRefuseReason(models.TransientModel):
         self.request_overtime_ids.confirm_flag = True
         self.request_overtime_ids.request_flag = True
         self.request_overtime_ids.approve_flag = True
+        self.request_overtime_ids.last_stage = self.request_overtime_ids.stage_id.name
         self.request_overtime_ids.stage_id = self.env["hr.request.overtime.stage"].search([('name', '=', 'Refuse')]).id
     
         for record in self.env['account.analytic.line'].search([('request_overtime_ids','=',self.request_overtime_ids.id)]):
             record.write({  'status_timesheet_overtime': 'draft',
                             'payment_month': str(record.date.month),
-                            'payment_flag': False   },
+                            'payment_flag': False},
                             )
             record.check_approval_ot = False
             record.check_request_ot = False

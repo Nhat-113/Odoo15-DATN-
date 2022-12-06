@@ -15,6 +15,7 @@
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="description"/>
                 <field name="stage_name" invisible="1"/>
+                <field name="last_stage" invisible="1"/>
                 <field name="stage_id" widget="badge"   decoration-warning = " stage_name == 'Request' "
                                                         decoration-primary = " stage_name == 'Confirm' "
                                                         decoration-info = " stage_name == 'Submit' "
