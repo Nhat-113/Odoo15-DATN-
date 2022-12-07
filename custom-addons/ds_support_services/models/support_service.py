@@ -397,7 +397,7 @@ class SupportServices(models.Model):
             if request.date_request < date.today() and request.env.user.has_group('ds_support_services.support_service_hr') == False:
                 raise UserError('Request date cannot be earlier than today.')
         
-    @api.constrains('amount', 'requester_id')
+    @api.constrains('amount', 'requester_id', 'category')
     def check_amount_advance_salary(self):
         for request in self:
             if request.category.type_category == 'salary_advance' and request.requester_id.employee_id.id or request.requester_id.employee_ids.id: 
@@ -409,9 +409,10 @@ class SupportServices(models.Model):
                     '|', ('date_end', '>=', request.date_request),
                     ('date_end', '=', False)
                     ])
-                if len(contract)>0 and request.amount > (contract[0].wage + contract[0].taxable_allowance + contract[0].non_taxable_allowance)*2:
+                if len(contract)>0 and request.amount > (contract[0].wage + contract[0].taxable_allowance + contract[0].non_taxable_allowance)*2\
+                    and request.category.type_category == 'salary_advance':
                    raise UserError('Do not input amount more than 2 months salary')
-                elif len(contract)==0:
+                elif len(contract)==0 and request.category.type_category == 'salary_advance':
                    raise UserError('No advance without a contract')
     
     def generate_company_expense(self):
