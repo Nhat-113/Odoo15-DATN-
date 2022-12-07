@@ -185,16 +185,16 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     for (let i = 0; i < dataTemp.labels.length; i ++) {
 
                         if (dataTemp.labels[i] == 'Off Track' ) {
-                            arrayColor[i] = '#6869AC'
+                            arrayColor[i] = '#dc3545'
                         }
                         if (dataTemp.labels[i] == 'At Risk' ) {
-                             arrayColor[i] = '#4CAF50'
+                             arrayColor[i] = '#F4A460'
                         }
                         if (dataTemp.labels[i] == 'On Track' ) {
-                             arrayColor[i] = '#00ACC1'
+                             arrayColor[i] = '#28a745'
                         }
                         if (dataTemp.labels[i] == 'Missing Resource' ) {
-                             arrayColor[i] = '#FFB300'
+                             arrayColor[i] = '#9365B8'
                         }
                     }
 

@@ -103,9 +103,11 @@ class DashboardBlock(models.Model):
         if get_role_user_login  == 'Ceo':
             sql = """SELECT last_update_status, count(*)  FROM project_project WHERE  company_id IN  """ + str(tuple(selected_companies)) + """ """
             sql_group_by = ' group by last_update_status'
+            sql_order_by = ' order by last_update_status '
 
             sql += sql_domain_for_department
             sql += sql_group_by
+            sql += sql_order_by 
 
         elif get_role_user_login  == 'Sub-Ceo':
             sql = """SELECT project_project.last_update_status, count(*), res_users.id  FROM project_project 
@@ -113,12 +115,13 @@ class DashboardBlock(models.Model):
                         INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL
                         WHERE  project_project.company_id IN  """ + str(tuple(selected_companies)) + """ """
             sql_group_by = ' group by last_update_status, res_users.id'
+            sql_order_by = ' order by last_update_status '
             sql_domain_for_role = 'AND (res_users.id =  ' + str(user_id_login)  + ')'
             
             sql += sql_domain_for_department
             sql += sql_domain_for_role
-
             sql += sql_group_by
+            sql += sql_order_by 
 
         cr.execute(sql)
         dat = cr.fetchall()
