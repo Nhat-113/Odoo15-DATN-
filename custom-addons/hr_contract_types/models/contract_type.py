@@ -20,7 +20,7 @@ class ContractInherit(models.Model):
                               required=True, help="Employee category",
                               default=lambda self: self.env['hr.contract.type'].search([], limit=1))
     contract_document_type = fields.Selection([
-        ('offical_labor', 'Offical Labor Contract'),
+        ('offical_labor', 'Official Labor Contract'),
         ('probationary', 'Probationary Contract'),
         ('internship', 'Internship Contract'),
         ('collaborator', 'Collaborator Contract')

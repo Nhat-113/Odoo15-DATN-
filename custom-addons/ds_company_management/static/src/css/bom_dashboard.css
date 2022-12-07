@@ -8,6 +8,9 @@
     flex-wrap: nowrap;
     flex-direction: column;
 }
+.view_effort_chart {
+    width: 99.5% !important;
+}
 .view_effort_chart, .view_effort_chart_2 {
     display: flex;
     width: 99%;
@@ -34,10 +37,14 @@
     margin: 2px;
 }
 .header_dashboard {
+    position: fixed;
+    top: 44px;
+    width: 100%;
     padding: 10px 10px 0px 10px;
     border-bottom: 1px solid;
     display: flex;
     justify-content: space-between;
+    background: beige;
 }
 .header_dashboard h2 {
     margin: 0;
@@ -45,7 +52,7 @@
 .content_chart {
     margin: 0 auto;
     height: auto;
-    margin-top: 4px;
+    margin-top: 30px;
 }
 .bom_dashboard_template {
     height: 100%;
@@ -63,14 +70,14 @@
 .button_chart > button {
     margin-left: 10px;
     border: none;
-    background: #FFFFFF;
+    background: #F0F0FF;
     border-radius: 4px;
-    color: black;
+    color: #a39598;
     font-size: 14px;
     font-weight: 700;
 }
 .button_chart > .active {
-    background: #F0F0FF;
+    background: #FFFFFF;
     color: #6869AC;
 }
 .data_employee_chart {
@@ -78,7 +85,7 @@
     flex-wrap: wrap;
     flex-direction: row;
 }
-.chart_postition_employee, .chart_contract_type, .chart_payroll{
+.chart_postition_employee, .chart_contract_type, .chart_payroll, .element_revenue_chart{
     width: 49.5%;
     background: #FFFFFF;
     border-radius: 16px;
@@ -92,7 +99,7 @@
 /* .chart_payroll {
     margin: 0 auto;
 } */
-.title_chart_contract_type, .title_chart_payroll, .title_chart_jobposition {
+.title_chart_contract_type, .title_chart_payroll, .title_chart_jobposition, .title_chart_company_revenue {
     font-size: 14px;
     text-align: center;
     font-weight: 700;
@@ -100,22 +107,21 @@
     margin: 8px 0 0 27px;
     float: left;
 }
-.title_chart_company_revenue {
+/* .title_chart_company_revenue {
     float: left;
     text-align: center;
     font-size: 17px;
     color: #6869AC;
     font-weight: 700;
-    position: absolute;
-    left: 30px;
-}
+    margin-left: 30px;
+} */
 .canvas {
     padding: 15px;
 }
 .title_chart_ODC ,.title_chart_base, .title_chart_Internal, .project_status {
     float: left;
     text-align: center;
-    font-size: 11px;
+    font-size: 14px;
     color: #6869AC;
     font-weight: 700;
     margin: 12px 12px -2px 12px;
@@ -141,21 +147,15 @@
     top: 50%;
     left: 48%
 }
-.loading-img-dashboard {
-    -webkit-animation: round_image 1s linear infinite;
-    position: absolute;
-    top: 44%;
-    left: 48.5%;
-}
 
 @media only screen and (max-width: 1400px) {
-    .chart_postition_employee, .chart_contract_type, .chart_payroll {
+    .chart_postition_employee, .chart_contract_type, .chart_payroll, .element_revenue_chart {
         width: 47%;
     }
     .data_employee_chart {
         margin-left: 1%;
     }
-    .title_chart_contract_type, .title_chart_payroll, .title_chart_jobposition {
+    .title_chart_contract_type, .title_chart_payroll, .title_chart_jobposition,.title_chart_company_revenue {
         font-size: 12px;
         text-align: center;
         color: #6869AC;
@@ -165,4 +165,8 @@
         font-size: 12px;
         color: #6869AC;
     }
+    .view_effort_chart {
+        width: 99% !important;
+    }
+    
 }

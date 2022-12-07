@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <template id="probationary_contract_qweb_report" name="probationary_contract_qweb_report">
+    <template id="probationary_contract_gross_qweb_report" name="probationary_contract_gross_qweb_report">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="e">
                 <t t-call="web.external_layout">
@@ -251,7 +251,7 @@
                                         <br/>
                                         <p class="font-weight-bold">1. Quyền lợi: </p>
                                         <div class="ml-2">
-                                            <p class="font-weight-bold">-    Thu nhập thực nhận:
+                                            <p class="font-weight-bold">-    Tổng thu nhập (Gross):
                                                 <span>
                                                     <t t-if="e.wage">
                                                         <span t-esc="'{:,}'.format(int(e.wage + e.other_allowance))"/>
@@ -280,7 +280,7 @@
                                     </div>
                                     <br/>
                                     <br/>
-                                    <p class="font-weight-bold">Điều 4. Nghĩa vụ và quyền hạn của người sử dụng lao động</p>
+                                    <p class="font-weight-bold">Điều 4. Quyền hạn và nghĩa vụ của người sử dụng lao động</p>
                                     <div class="ml-4">
                                         <p class="font-weight-bold">1. Nghĩa vụ: </p>
                                         <div class="ml-2">

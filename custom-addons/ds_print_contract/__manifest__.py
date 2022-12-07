@@ -28,6 +28,8 @@
              "views/contract_gross_report.xml",
              "data/annex_contract_gross_mail_template.xml",
              "data/offical_labor_contract_gross_mail_template.xml",
+             "views/probationary_contract_gross_report.xml",
+             "data/probationary_contract_gross_mail_template.xml",
              ],
     "installable": True,
     'auto_install': False,

@@ -34,6 +34,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
     var QWeb = core.qweb;
     var backgroundColorRandom = ['#6869AC', '#4CAF50', '#00ACC1', '#FFB300', '#E53935', '#6060EC', '#119989', '#E53935', '#00B981']
 
+    var currentTime = new Date()
+    var currentYear = currentTime.getFullYear()
+    
     var DynamicDashboard = AbstractAction.extend({
         template: "dynamic_bom_dashboard",
         jsLibs: ["/ds_company_management/static/src/js/lib/chart.js"],
@@ -41,7 +44,6 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
         events: {
             "click #chart_employee": "swap_menu",
             "click #chart_project": "swap_menu",
-            "click #chart_revenue": "swap_menu",
         },
 
         swap_menu: function(events) {
@@ -86,7 +88,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 self.chartProjectAvg();
                 self.chartProjectBill();
                 self.chartProjectNotBill();
-                self.chartProjectNull();
+                self.chartPayrollRevenueFollowMonth();
             }, 2500);
             setTimeout(() => {
                 self.chartCompanyAvg();
@@ -120,12 +122,21 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_project_status",
                 })
                 .then(function(data) {
+                    const sum_status_project = data.reduce((accumulator, object) => {
+                        return accumulator + object.value;
+                      }, 0);
+
+                    for (let i  = 0 ; i < data.length ; i ++ ) {
+                        data[i].value =   (data[i].value / sum_status_project) * 100
+                    }
+                    
                     var ele = document.getElementById("project_status");
-                    if (!ele) 
+                    if (!ele)
                         return
                     if (Chart.getChart("project_status")){
                         Chart.getChart("project_status").destroy();
                     }
+                    let arrayColor = []
                     const ctx = ele.getContext("2d");
                     const project_status = new Chart(ctx, {
                         type: "pie",
@@ -134,25 +145,57 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                             datasets: [{
                                 label: "Project Status Chart",
                                 data: [],
-                                backgroundColor: backgroundColorRandom,
-                                borderColor: backgroundColorRandom,
-                                borderWidth: 1,
+                                backgroundColor: arrayColor,
+                                borderColor: arrayColor,
+                                borderWidth: 0,     
+                                showLine: false   
                             }, ],
                         },
                         options: {
                             scales: {
-                                yAxes: {
-                                    ticks: {
-                                        beginAtZero: true,
-                                    },
-                                },
+                                // yAxes: {
+                                //     ticks: {
+                                //         beginAtZero: true,
+                                //     },
+                                //     gridLines: {
+                                //         drawOnChartArea: false
+                                //     }
+                        
+                                // },
+                                // xAxes: {
+                                //     gridLines: {
+                                //         drawOnChartArea: false
+                                //     }
+                        
+                                // },
                             },
                         },
                     });
+                    for (let i = 0; i < data.length; i++) {
+                        data[i].label = data[i].label.replace("_", " ").replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+                    }
                     const dataTemp = project_status.data;
+                    
+                   
                     for (let i = 0; i < data.length; i++) {
                         dataTemp.labels.push(data[i].label);
                         dataTemp.datasets[0].data.push(data[i].value);
+                    }
+
+                    for (let i = 0; i < dataTemp.labels.length; i ++) {
+
+                        if (dataTemp.labels[i] == 'Off Track' ) {
+                            arrayColor[i] = '#dc3545'
+                        }
+                        if (dataTemp.labels[i] == 'At Risk' ) {
+                             arrayColor[i] = '#F4A460'
+                        }
+                        if (dataTemp.labels[i] == 'On Track' ) {
+                             arrayColor[i] = '#28a745'
+                        }
+                        if (dataTemp.labels[i] == 'Missing Resource' ) {
+                             arrayColor[i] = '#9365B8'
+                        }
                     }
 
                     project_status.data.labels = dataTemp.labels;
@@ -169,7 +212,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 .then(function(data) {
                     var data_employee = data;
                     var ele = document.getElementById("job-position");
-                    if (!ele) 
+                    if (!ele)
                         return
                     if (Chart.getChart("job-position")){
                         Chart.getChart("job-position").destroy();
@@ -195,6 +238,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                         beginAtZero: true,
                                     },
                                 },
+                            },
+                            plugins: {
+                                legend: false // Hide legend
                             },
                         },
                     });
@@ -222,7 +268,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         var data_employee = self.valueProjectBill(data);
                     }
                     var ele = document.getElementById("chart_ODC");
-                    if (!ele) 
+                    if (!ele)
                         return
                     if (Chart.getChart("chart_ODC")){
                         Chart.getChart("chart_ODC").destroy();
@@ -238,7 +284,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                 data: [],
                                 backgroundColor: ["#6869AC"],
                                 borderColor: ["#6869AC"],
-                                borderWidth: 1,
+                                borderWidth: 2,
                             }, ],
                         },
                         options: {
@@ -249,11 +295,18 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                     },
                                 },
                             },
+                            plugins: {
+                                legend: false // Hide legend
+                            },
                         },
                     });
                     const dataTemp = chartODC.data;
                     if(!data_employee)
                         return
+
+                    for (let i = 0; i < chartODC.data.labels.length; i++) {
+                        chartODC.data.labels[i]  = chartODC.data.labels[i] + ' ' + currentYear;
+                    }
                     for (let i = 0; i <= Object.keys(data_employee).length; i++) {
                         dataTemp.datasets[0].data.push(data_employee[i]);
                     }
@@ -334,10 +387,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     if ((arr[j][1] == "Project Base" || arr[j][1] == "ODC") && arr[j][i] >= 0) {
                         effort_project_bill[i] = (effort_project_bill[i] || 0) + parseFloat(arr[j][i]);
                     }
-                    
+
                     if(arr[j][i] >= 0) {
                         set_arr.add(arr[j][0])
-                    }                   
+                    }
                 }
                 effort_company.push(set_arr.size * 100)
             }
@@ -348,10 +401,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
 
            for(let i = 0; i < effort_project_bill.length ; i ++) {
                 avg_effort_project_bill[i] = (effort_project_bill[i] / effort_company[i]) * 100
-           }
+            }
 
             var rv = {};
-            for (var i = 0; i <= avg_effort_project_bill.length; ++i) 
+            for (var i = 0; i <= avg_effort_project_bill.length; ++i)
                 rv[i] = avg_effort_project_bill[i];
             return rv;
         },
@@ -372,7 +425,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     if (Chart.getChart("chart_project_base")){
                         Chart.getChart("chart_project_base").destroy();
                     }
-                    if (!ele) 
+                    if (!ele)
                         return
                     const ctx = ele.getContext("2d");
 
@@ -385,7 +438,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                 data: [],
                                 backgroundColor: ['#6869AC'],
                                 borderColor: ['#6869AC'],
-                                borderWidth: 1,
+                                borderWidth: 2,
                             }, ],
                         },
                         options: {
@@ -396,11 +449,17 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                     },
                                 },
                             },
+                            plugins: {
+                                legend: false // Hide legend
+                            },
                         },
                     });
                     const dataTemp = chartProjectBase.data;
                     if(!data_employee)
                         return
+                    for (let i = 0; i < chartProjectBase.data.labels.length; i++) {
+                        chartProjectBase.data.labels[i]  = chartProjectBase.data.labels[i] + ' ' + currentYear;
+                    }
                     for (let i = 0; i <= Object.keys(data_employee).length; i++) {
                         dataTemp.datasets[0].data.push(data_employee[i]);
                     }
@@ -481,10 +540,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     if ((arr[j][1] == "Internal") && arr[j][i] >= 0) {
                         effort_project_not_bill[i] = (effort_project_not_bill[i] || 0) + parseFloat(arr[j][i]);
                     }
-                    
+
                     if(arr[j][i] >= 0) {
                         set_arr.add(arr[j][0]);
-                    }                   
+                    }
                 }
                 effort_company.push(set_arr.size * 100)
             }
@@ -493,160 +552,11 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
             effort_company.splice(0, 2);
            for(let i = 0; i < effort_project_not_bill.length ; i ++) {
                 avg_effort_project_bill[i] = (effort_project_not_bill[i] / effort_company[i]) * 100
-           }
+            }
 
             var rv = {};
-            for (var i = 0; i <= avg_effort_project_bill.length; ++i) 
+            for (var i = 0; i <= avg_effort_project_bill.length; ++i)
                 rv[i] = avg_effort_project_bill[i];
-            return rv;
-        },
-
-        chartProjectNull: function() {
-            let self = this;
-            rpc
-                .query({
-                    model: "dashboard.block",
-                    method: "get_effort_human_resource",
-                })
-                .then(function(data) {
-                    if (data.length > 0)
-                    {
-                        var data_employee = self.valueProjectNull(data);
-                    }
-                    var ele = document.getElementById("chart_project_internal");
-                    if (!ele) 
-                        return
-                    if (Chart.getChart("chart_project_internal")){
-                        Chart.getChart("chart_project_internal").destroy();
-                    }
-                    const ctx = ele.getContext("2d");
-
-                    const chartProjectInternal = new Chart(ctx, {
-                        type: "line",
-                        data: {
-                            labels: ["Jan","Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
-
-                            datasets: [{
-                                label: "Project Null",
-                                data: [],
-                                backgroundColor: ["#6869AC"],
-                                borderColor: ["#6869AC"],
-                                borderWidth: 1,
-                            }, ],
-                        },
-                        options: {
-                            scales: {
-                                yAxes: {
-                                    ticks: {
-                                        beginAtZero: true,
-                                    },
-                                },
-                            },
-                        },
-                    });
-                    const dataTemp = chartProjectInternal.data;
-                    if(!data_employee)
-                        return
-                    for (let i = 0; i <= Object.keys(data_employee).length; i++) {
-                        dataTemp.datasets[0].data.push(data_employee[i]);
-                    }
-                    chartProjectInternal.data.datasets[0].data =
-                        dataTemp.datasets[0].data;
-                    chartProjectInternal.update();
-                });
-        },
-
-        valueProjectNull: function(arr) {
-            const dimensions = [arr.length, arr[0].length];
-            let arrCheckMonth = new Array();
-
-            arr.forEach((childArr) => {
-                if (childArr[dimensions[1] - 2] != null) {
-                    let arrStartDate = childArr[dimensions[1] - 2].split(",");
-                    let arrEndDate = childArr[dimensions[1] - 1].split(",");
-                    let contractAvailableSet = new Set();
-                    for (let index = 0; index < arrStartDate.length; index++) {
-                        if (
-                            parseInt(arrStartDate[index].split("-")[1]) <
-                            new Date().getFullYear() &&
-                            parseInt(arrEndDate[index].split("-")[1]) == 0
-                        ) {
-                            for (let i = 1; i <= 12; i++) {
-                                contractAvailableSet.add(i);
-                            }
-                        } else if (
-                            parseInt(arrStartDate[index].split("-")[1]) ==
-                            new Date().getFullYear()
-                        ) {
-                            if (
-                                parseInt(arrStartDate[index].split("-")[0]) <=
-                                parseInt(arrEndDate[index].split("-")[0]) &&
-                                parseInt(arrEndDate[index].split("-")[0]) != 0
-                            ) {
-                                for (
-                                    let i = parseInt(arrStartDate[index].split("-")[0]); i <= parseInt(arrEndDate[index].split("-")[0]); i++
-                                ) {
-                                    contractAvailableSet.add(i);
-                                }
-                            } else if (parseInt(arrEndDate[index].split("-")[0]) == 0) {
-                                for (
-                                    let i = parseInt(arrStartDate[index].split("-")[0]); i <= 12; i++
-                                ) {
-                                    contractAvailableSet.add(i);
-                                }
-                            }
-                        }
-                    }
-                    arrCheckMonth.push(contractAvailableSet);
-                } else {
-                    arrCheckMonth.push(new Set());
-                }
-            });
-            for (let index = 0; index < arr.length; index++) {
-                let sum = 0,
-                    cnt = 0;
-
-                for (let i = 2; i <= 13; i++) {
-                    if (!arrCheckMonth[index].has(i - 1)) {
-                        arr[index][i] = -1;
-                    } else {
-                        sum += arr[index][i];
-                        cnt++;
-                    }
-                }
-                arr[index][14] =
-                    cnt > 0 ? Number.parseFloat(sum / cnt).toFixed(2) : "NaN";
-            }
-
-            let count_row_array = arr.length;
-            var total_effort_project_null = [];
-            var avg_effort_project_null = [];
-            var effort_company = [];
-            for (let i = 0; i < 14; i++) {
-                var set_arr = new Set()
-                for (let j = 0; j < count_row_array; j++) {
-                    if ((arr[j][1] == null ) && arr[j][i] >= 0) {
-                        total_effort_project_null[i] = (total_effort_project_null[i] || 0) + parseFloat(arr[j][i]);
-                    }
-                    
-                    if(arr[j][i] >= 0) {
-                        set_arr.add(arr[j][0])
-                    }                   
-                }
-                effort_company.push(set_arr.size * 100)
-            }
-
-            total_effort_project_null = Array.from(total_effort_project_null, (item) => item || 0);
-            total_effort_project_null.splice(0, 2);
-            effort_company.splice(0, 2);
-
-           for(let i = 0; i < total_effort_project_null.length ; i ++) {
-            avg_effort_project_null[i] = (total_effort_project_null[i] / effort_company[i]) * 100
-           }
-
-            var rv = {};
-            for (var i = 0; i <= avg_effort_project_null.length; ++i) 
-                rv[i] = avg_effort_project_null[i];
             return rv;
         },
 
@@ -663,7 +573,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         var data_employee = self.valueProjectFree(data);
                     }
                     var ele = document.getElementById("chart_project_free");
-                    if (!ele) 
+                    if (!ele)
                         return
 
                     if (Chart.getChart("chart_project_free")){
@@ -680,7 +590,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                 data: [],
                                 backgroundColor: ["#6869AC"],
                                 borderColor: ["#6869AC"],
-                                borderWidth: 1,
+                                borderWidth: 2,
                             }, ],
                         },
                         options: {
@@ -691,11 +601,17 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                     },
                                 },
                             },
+                            plugins: {
+                                legend: false // Hide legend
+                            },
                         },
                     });
                     const dataTemp = chartProjectInternal.data;
                     if(!data_employee)
                         return
+                    for (let i = 0; i < chartProjectInternal.data.labels.length; i++) {
+                        chartProjectInternal.data.labels[i]  = chartProjectInternal.data.labels[i] + ' ' + currentYear;
+                    }
                     for (let i = 0; i <= Object.keys(data_employee).length; i++) {
                         dataTemp.datasets[0].data.push(data_employee[i]);
                     }
@@ -777,10 +693,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     if (arr[j][i] >= 0) {
                         effort_project_total[i] = (effort_project_total[i] || 0) + parseFloat(arr[j][i]);
                     }
-                    
+
                     if(arr[j][i] >= 0) {
                         set_arr.add(arr[j][0])
-                    }                   
+                    }
                 }
                 effort_company.push(set_arr.size * 100)
             }
@@ -793,7 +709,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     avg_effort_project_not_free[i] = ( (effort_company[i] - effort_project_total[i]) / effort_company[i] ) * 100
             }
             var rv = {};
-            for (var i = 0; i <= avg_effort_project_not_free.length; ++i) 
+            for (var i = 0; i <= avg_effort_project_not_free.length; ++i)
                 rv[i] = avg_effort_project_not_free[i];
             return rv;
         },
@@ -808,10 +724,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 .then(function(data) {
                     if (data.length > 0)
                         {
-                            var data_employee = self.valueProjectAVG(data);
-                        }
+                        var data_employee = self.valueProjectAVG(data);
+                    }
                     var ele = document.getElementById("chart_avg_project");
-                    if (!ele) 
+                    if (!ele)
                         return
                     if (Chart.getChart("chart_avg_project")){
                         Chart.getChart("chart_avg_project").destroy();
@@ -821,22 +737,27 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     const chartAvgProject = new Chart(ctx, {
                         type: "pie",
                         data: {
-                            labels: [ "Project Internal", "Billable", "Project Null", "Available"],
+                            labels: [ "Internal", "Billable", "Available"],
                             datasets: [{
                                 label: "Project Avg",
                                 data: [],
                                 backgroundColor:backgroundColorRandom ,
-                                borderColor: backgroundColorRandom, 
+                                borderColor: backgroundColorRandom,
                                 borderWidth: 1,
                             }, ],
                         },
                         options: {
                             scales: {
-                                yAxes: {
-                                    ticks: {
-                                        beginAtZero: true,
-                                    },
-                                },
+                                // yAxes: {
+                                //     gridLines: {
+                                //         drawBorder: false,
+                                //     }
+                                // },
+                                // xAxes: {
+                                //     gridLines: {
+                                //         drawBorder: false,
+                                //     }
+                                // },
                             },
                         },
                     });
@@ -932,10 +853,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     if ( (arr[j][1] == null) && arr[j][i] >= 0) {
                         sum_null[i] = (sum_null[i] || 0) + parseFloat(arr[j][i]);
                     }
-                    
+
                     if(arr[j][i] >= 0) {
                         set_arr.add(arr[j][0])
-                    }                   
+                    }
                 }
                 effort_company.push(set_arr.size * 100)
             }
@@ -951,21 +872,21 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
 
             effort_company = Array.from(effort_company, (item) => item || 0);
 
-            var sum_value_not_bill, sum_value_bill, sum_value_null, total_effort_company, sum_value_free
+            var sum_value_not_bill, sum_value_bill, total_effort_company, sum_value_free
 
             sum_value_not_bill = sum_not_bill.reduce((a, b) => a + b, 0);
             sum_value_bill = sum_bill.reduce((a, b) => a + b, 0);
-            sum_value_null = sum_null.reduce((a, b) => a + b, 0);
+            // sum_value_null = sum_null.reduce((a, b) => a + b, 0);
             total_effort_company = effort_company.reduce((a, b) => a + b, 0);
-            sum_value_free =  total_effort_company -(sum_value_not_bill  + sum_value_bill + sum_value_null);
+            sum_value_free = total_effort_company - (sum_value_not_bill + sum_value_bill);
 
-            
+
             var effort_avg_value_not_bill = (sum_value_not_bill / total_effort_company) * 100;
             var effort_avg_value_bill = (sum_value_bill / total_effort_company) * 100;
-            var effort_avg_value_null = (sum_value_null / total_effort_company) * 100;
+            // var effort_avg_value_null = (sum_value_null / total_effort_company) * 100;
             var effort_avg_sum_value_free = (sum_value_free / total_effort_company) * 100;
 
-            let avg = [effort_avg_value_not_bill, effort_avg_value_bill, effort_avg_value_null, effort_avg_sum_value_free];
+            let avg = [effort_avg_value_not_bill, effort_avg_value_bill, effort_avg_sum_value_free];
 
             var avgProjectObj = {};
             for (var i = 0; i <= avg.length; ++i)
@@ -986,63 +907,79 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     if (Chart.getChart("chart_company_revenue")){
                         Chart.getChart("chart_company_revenue").destroy();
                     }
-                    if (!speedCanvas) 
+                    if (!speedCanvas)
                         return
                     var dataFirst = {
-                        label: "Revenue(Hundred Million)",
+                        label: "Revenue",
                         data: [],
                         lineTension: 0,
                         fill: false,
-                        borderColor: '#6869AC'
-                      };
-                    
+                        borderColor: '#6869AC',
+                        backgroundColor: '#6869AC'
+                    };
+
                     var dataSecond = {
-                        label: "Effort (MM)",
+                        label: "Profit",
                         data: [],
                         lineTension: 0,
                         fill: false,
-                        borderColor: '#00ACC1'
-                      };
-                    
+                        borderColor: '#4CAF50',
+                        backgroundColor: '#4CAF50'
+                    };
+                    var dataThird = {
+                        label: "Total Cost",
+                        data: [],
+                        lineTension: 0,
+                        fill: false,
+                        borderColor: '#FFB300',
+                        backgroundColor: '#FFB300'
+
+                    };
+
                     var speedData = {
-                      labels: [],
-                      datasets: [dataFirst, dataSecond]
+                        labels: [],
+                        datasets: [dataFirst, dataSecond, dataThird]
                     };
-                    
+
                     var chartOptions = {
-                      legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                          boxWidth: 80,
-                          fontColor: 'black'
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                boxWidth: 80,
+                                fontColor: 'black'
+                            }
                         }
-                      }
                     };
-                    
+
                     var lineChart = new Chart(speedCanvas, {
-                      type: 'line',
-                      data: speedData,
-                      options: chartOptions
+                        type: 'line',
+                        data: speedData,
+                        options: chartOptions
                     });
 
                     const dataTemp = lineChart.data;
 
                     for (let i = 0; i < data.length; i++) {
+                        // change text label of chart
+                        data[i][0] = data[i][0].slice(0, 3) + ' ' + currentYear  ;
+
+                        //  push data of chart
                         dataTemp.labels.push(data[i][0]);
                         dataTemp.datasets[0].data.push(data[i][1]);
                         dataTemp.datasets[1].data.push(data[i][2]);
+                        dataTemp.datasets[2].data.push(data[i][3]);
                     }
 
                     lineChart.data.labels = dataTemp.labels;
                     lineChart.data.datasets[0].data = dataTemp.datasets[0].data;
-
                     lineChart.data.datasets[1].data = dataTemp.datasets[1].data;
+                    lineChart.data.datasets[2].data = dataTemp.datasets[2].data;
                     lineChart.update();
                 });
         },
 
-   
+
         contractBarChart: function() {
             rpc
                 .query({
@@ -1057,7 +994,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         Chart.getChart("contract").destroy();
                     }
                     const ctx =ele.getContext('2d');
-                   
+
                     const contract = new Chart(ctx, {
                         type: "bar",
                         data: {
@@ -1065,8 +1002,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                             datasets: [{
                                 label: "Contract",
                                 data: [],
-                                backgroundColor: backgroundColorRandom,
-                                borderColor: backgroundColorRandom,
+                                backgroundColor: [],
+                                borderColor: '' ,
                                 borderWidth: 1,
                             }, ],
                         },
@@ -1078,14 +1015,42 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                     },
                                 },
                             },
+                            plugins: {
+                                legend: false // Hide legend
+                            },
                         },
-                    });
+                    });                    
+                    for (let i = 0; i < data.length; i++) {
+                        data[i].label = data[i].label.replace("_", " ").replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+                        if (data[i].label == 'Offical Labor' )
+                        {
+                            data[i].label = 'Official Labor'
+                        }
+                    }
                     const dataTemp = contract.data;
                     for (let i = 0; i < data.length; i++) {
                         dataTemp.labels.push(data[i].label);
                         dataTemp.datasets[0].data.push(data[i].value)
                     }
-                    contract.data.labels = dataTemp.labels;
+                    let dataLabel =  contract.data.labels
+                    
+                    for (let i = 0; i< dataLabel.length; i ++ )
+                        {
+                            if (dataLabel[i] == 'Collaborator' ) {
+                                contract.data.datasets[0].backgroundColor[i] = '#F4A460' 
+                            }
+                            if (dataLabel[i] == 'Internship' ) {
+                                contract.data.datasets[0].backgroundColor[i] = '#9365B8' 
+                            }
+                            if (dataLabel[i] == 'Offical Labor' || dataLabel[i] == 'Official Labor' ) {
+                                contract.data.datasets[0].backgroundColor[i] = '#dc3545' 
+                            }
+                            if (dataLabel[i] == 'Probationary' ) {
+                                contract.data.datasets[0].backgroundColor[i] = '#28a745'
+                            }
+                        }
+
+                    dataLabel = dataTemp.labels;
                     contract.data.datasets[0].data = dataTemp.datasets[0].data;
                     contract.update();
 
@@ -1099,23 +1064,109 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_payroll_follow_month",
                 })
                 .then(function(data) {
-                    var ele = document.getElementById('payroll')
-                    if (!ele)
-                        return
-                    if (Chart.getChart("payroll")){
+                    var speedCanvas = document.getElementById("payroll");
+                    if (Chart.getChart("payroll")) {
                         Chart.getChart("payroll").destroy();
                     }
-                    const ctx = ele.getContext('2d');
-                    const payroll = new Chart(ctx, {
+                    if (!speedCanvas)
+                        return
+                    var dataFirst = {
+                        label: "Revenue",
+                        data: [],
+                        lineTension: 0,
+                        fill: false,
+                        borderColor: '#6869AC',
+                        backgroundColor: '#6869AC',
+                        borderWidth: 2,
+                    };
+
+                    var dataSecond = {
+                        label: "Salary",
+                        data: [],
+                        lineTension: 0,
+                        fill: false,
+                        borderColor: '#00ACC1',
+                        backgroundColor: '#00ACC1',
+                        borderWidth: 2,
+                    };
+
+                    var speedData = {
+                        labels: [],
+                        datasets: [dataFirst, dataSecond]
+                    };
+
+                    var chartOptions = {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                boxWidth: 2,
+                                fontColor: 'black'
+                            }
+                        }
+                    };
+
+                    var lineChart = new Chart(speedCanvas, {
+                        type: 'line',
+                        data: speedData,
+                        options: chartOptions
+                    });
+
+                    const dataTemp = lineChart.data;
+              
+                    for (let i = 0; i < data.length; i++) {
+                        // change text label of chart
+                        data[i][0] = data[i][0].slice(0, 3) + ' ' + currentYear  ;
+
+                        //  push data of chart
+                        dataTemp.labels.push(data[i][0]);
+                        dataTemp.datasets[0].data.push(data[i][1]);
+                        dataTemp.datasets[1].data.push(data[i][2]);
+                    }
+
+                    lineChart.data.labels = dataTemp.labels;
+                    lineChart.data.datasets[0].data = dataTemp.datasets[0].data;
+                    lineChart.data.datasets[1].data = dataTemp.datasets[1].data;
+                    lineChart.update();
+                });
+
+        },
+
+        chartPayrollRevenueFollowMonth: function() {
+            rpc
+                .query({
+                    model: "dashboard.block",
+                    method: "get_payroll_revenue_follow_month",
+                })
+                .then(function(data) {
+                    for (let i = 0; i < data.length; i++) {
+                        if (data[i][1] == null) 
+                            {
+                                data[i][1] = 0;
+                            }
+                    }
+
+                    if (data.length > 0)
+                    {
+                        var data_employee = data;
+                    }
+                    var ele = document.getElementById("salary-cost-revenue");
+                    if (Chart.getChart("salary-cost-revenue")){
+                        Chart.getChart("salary-cost-revenue").destroy();
+                    }
+                    if (!ele)
+                        return
+                    const ctx = ele.getContext("2d");
+                    const chartProjectBase = new Chart(ctx, {
                         type: "line",
                         data: {
                             labels: [],
                             datasets: [{
-                                label: "Monthly Salary Statistics",
+                                label: "Salary / Revenue",
                                 data: [],
                                 backgroundColor: ['#6869AC'],
-                                borderColor:['#6869AC'],
-                                borderWidth: 0.2,
+                                borderColor: ['#6869AC'],
+                                borderWidth: 2,
                             }, ],
                         },
                         options: {
@@ -1126,19 +1177,28 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                     },
                                 },
                             },
+                            plugins: {
+                                legend: false // Hide legend
+                            },
                         },
                     });
-                    const dataTemp = payroll.data;
-                    for (let i = 0; i < data.length; i++) {
-                        dataTemp.labels.push(data[i].label);
-                        dataTemp.datasets[0].data.push(data[i].value)
+                    const dataTemp = chartProjectBase.data;
+                    if(!data_employee)
+                        return
+                    for (let i = 0; i < data_employee.length; i++) {
+                        // change text label of chart
+                        data[i][0] = data[i][0].slice(0, 3) + ' ' + currentYear  ;
+
+                        //  push data of chart
+                        dataTemp.labels.push(data_employee[i][0]);
+                        dataTemp.datasets[0].data.push(data_employee[i][1]);
                     }
-                    payroll.data.labels = dataTemp.labels;
-                    payroll.data.datasets[0].data = dataTemp.datasets[0].data;
-                    payroll.update();
 
+                    chartProjectBase.data.labels = dataTemp.labels;
+                    chartProjectBase.data.datasets[0].data = dataTemp.datasets[0].data;
+
+                    chartProjectBase.update();
                 });
-
         },
     });
 

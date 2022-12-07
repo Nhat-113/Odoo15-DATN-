@@ -13,12 +13,11 @@
                         <p class="loading-dashboard">Loading.....</p>
                 </div> -->
                 <div class="header_dashboard">
-                    <h2>Dashboard BOM</h2>
+                    <h2>BOM Dashboards</h2>
                     <div class="left_chart">
                         <div class="button_chart">
-                            <button id="chart_employee" class="btn-chart_employee tablinks_dashboard active" >HR Dashboard</button>
-                            <button id="chart_project" class="btn-chart_project tablinks_dashboard">Project Dashboard</button>
-                            <button id="chart_revenue" class="btn-chart_revenue tablinks_dashboard">Revenue Dashboard</button>
+                            <button id="chart_employee" class="btn-chart_employee tablinks_dashboard active" >Overall Info</button>
+                            <button id="chart_project" class="btn-chart_project tablinks_dashboard">Project Info</button>
                         </div>
                     </div>
                 </div>
@@ -27,23 +26,31 @@
                             <div class="data_employee_chart tabcontent">
                                 <div class="chart_level_and_contract">
                                     <div class="chart_postition_employee">
-                                        <p class="title_chart_jobposition">Level In Company(Members)</p>
+                                        <p class="title_chart_jobposition">Level In Company (Members)</p>
                                         <canvas id="job-position" width="200" height="80" class="canvas job_postition"></canvas>
                                     </div>
                                     <div class="chart_contract_type">
-                                        <p class="title_chart_contract_type">Contract Type(Contracts)</p>
+                                        <p class="title_chart_contract_type">Contract Type (Contracts)</p>
                                         <canvas id="contract" width="200" height="80" class="canvas job_postition"></canvas>
                                     </div>
                                 </div> 
                             
                                 <div class="chart_payroll_and_regis">
                                     <div class="chart_payroll">
-                                        <p class="title_chart_payroll">Monthly Salary Statistics(Mil)</p>
+                                        <p class="title_chart_payroll">Monthly Salary Statistics (100 Mils VNĐ)</p>
                                         <canvas id="payroll" width="200" height="80" class="canvas job_postition"></canvas>
                                     </div>
                                     <div class="chart_payroll">
-                                        <p class="title_chart_payroll">Member In/Out(Members)</p>
-                                        <canvas id="payroll" width="200" height="80" class="canvas job_postition"></canvas>
+                                        <p class="title_chart_payroll">SRI (Salary Revenue Index)</p>
+                                        <canvas id="salary-cost-revenue" width="200" height="80" class="canvas job_postition"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="chart_payroll_and_regis">
+                             
+                                    <div class="element_revenue_chart">
+                                        <p class="title_chart_company_revenue">Company Revenue (100 Mils VNĐ)</p>
+                                        <canvas id="chart_company_revenue" class="canvas job_postition"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -53,13 +60,13 @@
                             <div style="display: none;" class="chart_project tabcontent" >
                                 <div class="chart_project_detail">
                                     <div class="chart_avg_project">
-                                        <p class="project_status">Project AVG Effort In Year(%)</p>
+                                        <p class="project_status">AVG Effort In Year (%)</p>
                                         <div class="ele_ment_chart_project_avg">
                                             <canvas id="chart_avg_project" class="canvas job_postition"></canvas>
                                         </div>
                                     </div>
                                     <div class="chart_project_status">
-                                        <p class="project_status">Project Status (Projects)</p>
+                                        <p class="project_status">Status (%)</p>
                                         <div class="ele_ment_chart_project_status">
                                             <canvas id="project_status" width="200" height="50" class="canvas job_postition"></canvas>
                                         </div>
@@ -68,36 +75,32 @@
 
                                 <div class="view_effort_chart">
                                     <div class="chart_ODC">
-                                        <p class="title_chart_ODC">Monthly Project Billable Statistics(%)</p>
+                                        <p class="title_chart_ODC">Monthly Billable Statistics (%)</p>
                                         <canvas id="chart_ODC" class="canvas job_postition" width="200" height="100"></canvas>
                                     </div>
                                     <div class="chart_project_base">
-                                        <p class="title_chart_base">Monthly Project Internal Statistics(%)</p>
+                                        <p class="title_chart_base">Monthly Internal Statistics (%)</p>
                                         <canvas id="chart_project_base" class="canvas job_postition" width="200" height="100"></canvas>
                                     </div>
                                 </div>
 
                                 <div class="view_effort_chart_2">
-                                    <div class="chart_project_null">
-                                        <p class="title_chart_Internal">Monthly Project Null Statistics(%)</p>
-                                        <canvas id="chart_project_internal" class="canvas job_postition" width="200" height="100"></canvas>
-                                    </div>
                                     <div class="chart_project_free">
-                                        <p class="title_chart_Internal">Monthly Project Avaiable Statistics(%)</p>
+                                        <p class="title_chart_Internal">Monthly Available Statistics (%)</p>
                                         <canvas id="chart_project_free" class="canvas job_postition" width="200" height="100"></canvas>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="company_revebue_dashboard">
+                        <!-- <div class="company_revebue_dashboard">
                             <div style="display: none" class="chart_company_revenue tabcontent">
                                 <div class="element_revenue_chart">
                                     <p class="title_chart_company_revenue">Company Revenue</p>
                                     <canvas id="chart_company_revenue" class="canvas job_postition"></canvas>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         
                     </div>        
             </div>
