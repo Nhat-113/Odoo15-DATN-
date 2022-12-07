@@ -1022,6 +1022,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     });                    
                     for (let i = 0; i < data.length; i++) {
                         data[i].label = data[i].label.replace("_", " ").replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+                        if (data[i].label == 'Offical Labor' )
+                        {
+                            data[i].label = 'Official Labor'
+                        }
                     }
                     const dataTemp = contract.data;
                     for (let i = 0; i < data.length; i++) {
