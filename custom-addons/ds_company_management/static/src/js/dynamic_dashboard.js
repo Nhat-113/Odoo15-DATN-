@@ -1033,16 +1033,16 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     for (let i = 0; i< dataLabel.length; i ++ )
                         {
                             if (dataLabel[i] == 'Collaborator' ) {
-                                contract.data.datasets[0].backgroundColor[i] = '#6869AC'
+                                contract.data.datasets[0].backgroundColor[i] = '#F4A460' 
                             }
                             if (dataLabel[i] == 'Internship' ) {
-                                contract.data.datasets[0].backgroundColor[i] = '#4CAF50'
+                                contract.data.datasets[0].backgroundColor[i] = '#9365B8' 
                             }
-                            if (dataLabel[i] == 'Offical Labor' ) {
-                                contract.data.datasets[0].backgroundColor[i] = '#00ACC1'
+                            if (dataLabel[i] == 'Offical Labor' || dataLabel[i] == 'Official Labor' ) {
+                                contract.data.datasets[0].backgroundColor[i] = '#dc3545' 
                             }
                             if (dataLabel[i] == 'Probationary' ) {
-                                contract.data.datasets[0].backgroundColor[i] = '#FFB300'
+                                contract.data.datasets[0].backgroundColor[i] = '#28a745'
                             }
                         }
 

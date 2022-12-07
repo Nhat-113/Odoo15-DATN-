@@ -41,7 +41,7 @@
                                         <canvas id="payroll" width="200" height="80" class="canvas job_postition"></canvas>
                                     </div>
                                     <div class="chart_payroll">
-                                        <p class="title_chart_payroll">Salary / Revenue</p>
+                                        <p class="title_chart_payroll">SRI (Salary Revenue Index)</p>
                                         <canvas id="salary-cost-revenue" width="200" height="80" class="canvas job_postition"></canvas>
                                     </div>
                                 </div>
@@ -86,7 +86,7 @@
 
                                 <div class="view_effort_chart_2">
                                     <div class="chart_project_free">
-                                        <p class="title_chart_Internal">Monthly Avaiable Statistics (%)</p>
+                                        <p class="title_chart_Internal">Monthly Available Statistics (%)</p>
                                         <canvas id="chart_project_free" class="canvas job_postition" width="200" height="100"></canvas>
                                     </div>
                                 </div>
