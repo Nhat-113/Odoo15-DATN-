@@ -13,7 +13,7 @@
                         <p class="loading-dashboard">Loading.....</p>
                 </div> -->
                 <div class="header_dashboard">
-                    <h2>Dashboard BOM</h2>
+                    <h2>BOM Dashboards</h2>
                     <div class="left_chart">
                         <div class="button_chart">
                             <button id="chart_employee" class="btn-chart_employee tablinks_dashboard active" >Overall Info</button>
