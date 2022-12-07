@@ -34,6 +34,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
     var QWeb = core.qweb;
     var backgroundColorRandom = ['#6869AC', '#4CAF50', '#00ACC1', '#FFB300', '#E53935', '#6060EC', '#119989', '#E53935', '#00B981']
 
+    var currentTime = new Date()
+    var currentYear = currentTime.getFullYear()
+    
     var DynamicDashboard = AbstractAction.extend({
         template: "dynamic_bom_dashboard",
         jsLibs: ["/ds_company_management/static/src/js/lib/chart.js"],
@@ -133,6 +136,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     if (Chart.getChart("project_status")){
                         Chart.getChart("project_status").destroy();
                     }
+                    let arrayColor = []
                     const ctx = ele.getContext("2d");
                     const project_status = new Chart(ctx, {
                         type: "pie",
@@ -141,18 +145,29 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                             datasets: [{
                                 label: "Project Status Chart",
                                 data: [],
-                                backgroundColor: backgroundColorRandom,
-                                borderColor: backgroundColorRandom,
-                                borderWidth: 1,
+                                backgroundColor: arrayColor,
+                                borderColor: arrayColor,
+                                borderWidth: 0,     
+                                showLine: false   
                             }, ],
                         },
                         options: {
                             scales: {
-                                yAxes: {
-                                    ticks: {
-                                        beginAtZero: true,
-                                    },
-                                },
+                                // yAxes: {
+                                //     ticks: {
+                                //         beginAtZero: true,
+                                //     },
+                                //     gridLines: {
+                                //         drawOnChartArea: false
+                                //     }
+                        
+                                // },
+                                // xAxes: {
+                                //     gridLines: {
+                                //         drawOnChartArea: false
+                                //     }
+                        
+                                // },
                             },
                         },
                     });
@@ -160,9 +175,27 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         data[i].label = data[i].label.replace("_", " ").replace(/(^\w|\s\w)/g, m => m.toUpperCase());
                     }
                     const dataTemp = project_status.data;
+                    
+                   
                     for (let i = 0; i < data.length; i++) {
                         dataTemp.labels.push(data[i].label);
                         dataTemp.datasets[0].data.push(data[i].value);
+                    }
+
+                    for (let i = 0; i < dataTemp.labels.length; i ++) {
+
+                        if (dataTemp.labels[i] == 'Off Track' ) {
+                            arrayColor[i] = '#6869AC'
+                        }
+                        if (dataTemp.labels[i] == 'At Risk' ) {
+                             arrayColor[i] = '#4CAF50'
+                        }
+                        if (dataTemp.labels[i] == 'On Track' ) {
+                             arrayColor[i] = '#00ACC1'
+                        }
+                        if (dataTemp.labels[i] == 'Missing Resource' ) {
+                             arrayColor[i] = '#FFB300'
+                        }
                     }
 
                     project_status.data.labels = dataTemp.labels;
@@ -251,7 +284,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                 data: [],
                                 backgroundColor: ["#6869AC"],
                                 borderColor: ["#6869AC"],
-                                borderWidth: 1,
+                                borderWidth: 2,
                             }, ],
                         },
                         options: {
@@ -270,6 +303,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     const dataTemp = chartODC.data;
                     if(!data_employee)
                         return
+
+                    for (let i = 0; i < chartODC.data.labels.length; i++) {
+                        chartODC.data.labels[i]  = chartODC.data.labels[i] + ' ' + currentYear;
+                    }
                     for (let i = 0; i <= Object.keys(data_employee).length; i++) {
                         dataTemp.datasets[0].data.push(data_employee[i]);
                     }
@@ -401,7 +438,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                 data: [],
                                 backgroundColor: ['#6869AC'],
                                 borderColor: ['#6869AC'],
-                                borderWidth: 1,
+                                borderWidth: 2,
                             }, ],
                         },
                         options: {
@@ -420,6 +457,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     const dataTemp = chartProjectBase.data;
                     if(!data_employee)
                         return
+                    for (let i = 0; i < chartProjectBase.data.labels.length; i++) {
+                        chartProjectBase.data.labels[i]  = chartProjectBase.data.labels[i] + ' ' + currentYear;
+                    }
                     for (let i = 0; i <= Object.keys(data_employee).length; i++) {
                         dataTemp.datasets[0].data.push(data_employee[i]);
                     }
@@ -550,7 +590,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                                 data: [],
                                 backgroundColor: ["#6869AC"],
                                 borderColor: ["#6869AC"],
-                                borderWidth: 1,
+                                borderWidth: 2,
                             }, ],
                         },
                         options: {
@@ -569,6 +609,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     const dataTemp = chartProjectInternal.data;
                     if(!data_employee)
                         return
+                    for (let i = 0; i < chartProjectInternal.data.labels.length; i++) {
+                        chartProjectInternal.data.labels[i]  = chartProjectInternal.data.labels[i] + ' ' + currentYear;
+                    }
                     for (let i = 0; i <= Object.keys(data_employee).length; i++) {
                         dataTemp.datasets[0].data.push(data_employee[i]);
                     }
@@ -694,7 +737,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     const chartAvgProject = new Chart(ctx, {
                         type: "pie",
                         data: {
-                            labels: [ "Project Internal", "Billable", "Available"],
+                            labels: [ "Internal", "Billable", "Available"],
                             datasets: [{
                                 label: "Project Avg",
                                 data: [],
@@ -705,11 +748,16 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         },
                         options: {
                             scales: {
-                                yAxes: {
-                                    ticks: {
-                                        beginAtZero: true,
-                                    },
-                                },
+                                // yAxes: {
+                                //     gridLines: {
+                                //         drawBorder: false,
+                                //     }
+                                // },
+                                // xAxes: {
+                                //     gridLines: {
+                                //         drawBorder: false,
+                                //     }
+                                // },
                             },
                         },
                     });
@@ -866,7 +914,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         data: [],
                         lineTension: 0,
                         fill: false,
-                        borderColor: '#6869AC'
+                        borderColor: '#6869AC',
+                        backgroundColor: '#6869AC'
                     };
 
                     var dataSecond = {
@@ -874,14 +923,17 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         data: [],
                         lineTension: 0,
                         fill: false,
-                        borderColor: '#00ACC1'
+                        borderColor: '#4CAF50',
+                        backgroundColor: '#4CAF50'
                     };
                     var dataThird = {
                         label: "Total Cost",
                         data: [],
                         lineTension: 0,
                         fill: false,
-                        borderColor: '#4CAF50'
+                        borderColor: '#FFB300',
+                        backgroundColor: '#FFB300'
+
                     };
 
                     var speedData = {
@@ -909,6 +961,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     const dataTemp = lineChart.data;
 
                     for (let i = 0; i < data.length; i++) {
+                        // change text label of chart
+                        data[i][0] = data[i][0].slice(0, 3) + ' ' + currentYear  ;
+
+                        //  push data of chart
                         dataTemp.labels.push(data[i][0]);
                         dataTemp.datasets[0].data.push(data[i][1]);
                         dataTemp.datasets[1].data.push(data[i][2]);
@@ -946,8 +1002,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                             datasets: [{
                                 label: "Contract",
                                 data: [],
-                                backgroundColor: backgroundColorRandom,
-                                borderColor: backgroundColorRandom,
+                                backgroundColor: [],
+                                borderColor: '' ,
                                 borderWidth: 1,
                             }, ],
                         },
@@ -972,7 +1028,25 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         dataTemp.labels.push(data[i].label);
                         dataTemp.datasets[0].data.push(data[i].value)
                     }
-                    contract.data.labels = dataTemp.labels;
+                    let dataLabel =  contract.data.labels
+                    
+                    for (let i = 0; i< dataLabel.length; i ++ )
+                        {
+                            if (dataLabel[i] == 'Collaborator' ) {
+                                contract.data.datasets[0].backgroundColor[i] = '#6869AC'
+                            }
+                            if (dataLabel[i] == 'Internship' ) {
+                                contract.data.datasets[0].backgroundColor[i] = '#4CAF50'
+                            }
+                            if (dataLabel[i] == 'Offical Labor' ) {
+                                contract.data.datasets[0].backgroundColor[i] = '#00ACC1'
+                            }
+                            if (dataLabel[i] == 'Probationary' ) {
+                                contract.data.datasets[0].backgroundColor[i] = '#FFB300'
+                            }
+                        }
+
+                    dataLabel = dataTemp.labels;
                     contract.data.datasets[0].data = dataTemp.datasets[0].data;
                     contract.update();
 
@@ -997,7 +1071,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         data: [],
                         lineTension: 0,
                         fill: false,
-                        borderColor: '#6869AC'
+                        borderColor: '#6869AC',
+                        backgroundColor: '#6869AC',
+                        borderWidth: 2,
                     };
 
                     var dataSecond = {
@@ -1005,7 +1081,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         data: [],
                         lineTension: 0,
                         fill: false,
-                        borderColor: '#00ACC1'
+                        borderColor: '#00ACC1',
+                        backgroundColor: '#00ACC1',
+                        borderWidth: 2,
                     };
 
                     var speedData = {
@@ -1018,7 +1096,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                             display: true,
                             position: 'top',
                             labels: {
-                                boxWidth: 80,
+                                boxWidth: 2,
                                 fontColor: 'black'
                             }
                         }
@@ -1031,8 +1109,12 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     });
 
                     const dataTemp = lineChart.data;
-
+              
                     for (let i = 0; i < data.length; i++) {
+                        // change text label of chart
+                        data[i][0] = data[i][0].slice(0, 3) + ' ' + currentYear  ;
+
+                        //  push data of chart
                         dataTemp.labels.push(data[i][0]);
                         dataTemp.datasets[0].data.push(data[i][1]);
                         dataTemp.datasets[1].data.push(data[i][2]);
@@ -1076,11 +1158,11 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         data: {
                             labels: [],
                             datasets: [{
-                                label: "Salary Cost / Revenue",
+                                label: "Salary / Revenue",
                                 data: [],
                                 backgroundColor: ['#6869AC'],
                                 borderColor: ['#6869AC'],
-                                borderWidth: 1,
+                                borderWidth: 2,
                             }, ],
                         },
                         options: {
@@ -1100,6 +1182,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     if(!data_employee)
                         return
                     for (let i = 0; i < data_employee.length; i++) {
+                        // change text label of chart
+                        data[i][0] = data[i][0].slice(0, 3) + ' ' + currentYear  ;
+
+                        //  push data of chart
                         dataTemp.labels.push(data_employee[i][0]);
                         dataTemp.datasets[0].data.push(data_employee[i][1]);
                     }
