@@ -3,9 +3,9 @@
     <data noupdate="1">
         <!--Email template -->
         <record id="offical_labor_contract_mail_template" model="mail.template">
-            <field name="name">Offical Labor Contract - Send by Email</field>
+            <field name="name">Official Labor Contract - Send by Email</field>
             <field name="email_from">"{{object.company_id.name}}"&lt;{{object.company_id.email}}&gt;</field>
-            <field name="subject">{{object.company_id.name}} - Offical Labor Contract (Ref {{object.name or 'n/a' }})</field>
+            <field name="subject">{{object.company_id.name}} - Official Labor Contract (Ref {{object.name or 'n/a' }})</field>
             <field name="email_to">{{(object.employee_id.work_email or '')}}</field>
             <field name="model_id" ref="model_hr_contract"/>
             <field name="auto_delete" eval="False"/>
