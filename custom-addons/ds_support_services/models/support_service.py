@@ -93,7 +93,8 @@ class SupportServices(models.Model):
     def compute_domain_readonly_project(self):
         for request in self:
             if request.status.type_status != 'draft' and request.category.type_category != 'team_building' and request.cost_type.type_cost == False or\
-                request.category.type_category in ['other', 'it_helpdesk'] and request.status.type_status == 'done':
+                request.category.type_category in ['other', 'it_helpdesk'] and request.status.type_status == 'done' or\
+                request.category.type_category == 'team_building' and request.status.type_status != 'draft':
                 request.check_readonly_field_project = True
             else:
                 request.check_readonly_field_project = False

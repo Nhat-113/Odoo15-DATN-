@@ -140,8 +140,8 @@
                                 <div class="o_row team_building" id="get_month_team_building" attrs="{'invisible': [('flag_category', '!=', 'team_building')], 'required': [('flag_category', '=', 'team_building')], 'readonly': [('flag_status', '!=', 'draft')]}" groups="ds_support_services.support_service_pm">
                                     <label for="get_month_tb" string="Month" class="label_month_team_building" attrs="{'invisible': [('flag_category', '!=', 'team_building')], 'required': [('flag_category', '=', 'team_building')], 'readonly': [('flag_status', '!=', 'draft')]}" groups="ds_support_services.support_service_pm"/>
                                     <div id="get_month_team_building_2" attrs="{'invisible': [('flag_category', '!=', 'team_building')], 'required': [('flag_category', '=', 'team_building')], 'readonly': [('flag_status', '!=', 'draft')]}" groups="ds_support_services.support_service_pm">
-                                            <field name="get_month_tb" nolabel="1" placeholder="Please select month ..."/>
-                                            <field name="get_year_tb"  nolabel="1" placeholder="Please select year ..."/>
+                                            <field name="get_month_tb" nolabel="1" placeholder="Please select month ..." attrs="{'readonly': [('check_readonly_field_project', '=', True)]}"/>
+                                            <field name="get_year_tb"  nolabel="1" placeholder="Please select year ..." attrs="{'readonly': [('check_readonly_field_project', '=', True)]}"/>
                                     </div>
                                 </div>
                             </group>
