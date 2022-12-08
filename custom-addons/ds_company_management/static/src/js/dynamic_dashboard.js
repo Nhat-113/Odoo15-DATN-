@@ -81,6 +81,8 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 self.jobPositionPierChart();
                 self.contractBarChart();
                 self.payrollDashboard();
+                self.chartCompanyAvg();
+
             }, 1000);
             setTimeout(() => {
                 self.projectTypePierChart();
@@ -90,9 +92,6 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                 self.chartProjectNotBill();
                 self.chartPayrollRevenueFollowMonth();
             }, 2500);
-            setTimeout(() => {
-                self.chartCompanyAvg();
-            }, 3000);
         },
 
         willStart: function() {
@@ -896,6 +895,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
         },
 
         chartCompanyAvg: function() {
+            console.log(`a`);
             let self = this;
             rpc
                 .query({
@@ -903,7 +903,10 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_revenue_company",
                 })
                 .then(function(data) {
+                    console.log(`data`, data);
                     var speedCanvas = document.getElementById("chart_company_revenue");
+                    console.log(`speedCanvas`, speedCanvas);
+
                     if (Chart.getChart("chart_company_revenue")){
                         Chart.getChart("chart_company_revenue").destroy();
                     }
