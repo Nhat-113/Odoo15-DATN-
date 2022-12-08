@@ -284,9 +284,9 @@ class SupportServices(models.Model):
             self._send_message_auto_subscribe_notify_request_service(self.send_to , mail_template_no_payment, subject_template)
     
     def action_approve_service(self):
-        if self.cost_type.type_cost == False:
+        if self.cost_type.type_cost == False and self.category.type_category in ['other', 'it_helpdesk'] and self.payment.type_payment == 'have_cost':
            raise UserError('Cost Type cannot be blank.')
-           
+
         self.status = self.env['status.support.service'].search([('type_status', '=', 'approval')]).id
 
         mail_template_user = "ds_support_services.approvals_request_service_template_user"
