@@ -895,7 +895,6 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
         },
 
         chartCompanyAvg: function() {
-            console.log(`a`);
             let self = this;
             rpc
                 .query({
@@ -903,9 +902,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     method: "get_revenue_company",
                 })
                 .then(function(data) {
-                    console.log(`data`, data);
                     var speedCanvas = document.getElementById("chart_company_revenue");
-                    console.log(`speedCanvas`, speedCanvas);
 
                     if (Chart.getChart("chart_company_revenue")){
                         Chart.getChart("chart_company_revenue").destroy();

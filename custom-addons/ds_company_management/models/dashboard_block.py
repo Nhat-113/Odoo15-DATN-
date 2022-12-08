@@ -186,7 +186,7 @@ class DashboardBlock(models.Model):
         if get_role_user_login  == 'Ceo':
             sql  = ("""SELECT to_char(month_start, 'Month YYYY') AS l_month ,sum(total_revenue)/100000000 AS revenue,
                         sum(project_management_ceo_data.total_profit)/100000000 AS total_profit, 
-                        sum(total_salary + total_project_cost + total_department_cost + total_avg_operation_company)/100000000  AS cost_data from project_management_ceo_data
+                        sum(total_salary + total_project_cost )/100000000  AS cost_data from project_management_ceo_data
                         WHERE   extract(year from month_start)  = extract(year from CURRENT_DATE)   AND  company_id in  """ + str(tuple(selected_companies)) + """
                         group by month_start""")
 
@@ -197,8 +197,7 @@ class DashboardBlock(models.Model):
 
             sql  = ("""SELECT to_char(project_management_ceo_data.month_start, 'Month YYYY') AS l_month ,sum(project_management_ceo_data.total_revenue)/100000000 AS revenue,
                         sum(project_management_ceo_data.total_profit)/100000000 AS total_profit, 
-                        sum(project_management_ceo_data.total_salary + project_management_ceo_data.total_project_cost + project_management_ceo_data.total_department_cost +
-                        project_management_ceo_data.total_avg_operation_company)/100000000  AS cost_data from project_management_ceo_data
+                        sum(project_management_ceo_data.total_salary + project_management_ceo_data.total_project_cost)/100000000  AS cost_data from project_management_ceo_data
                         INNER JOIN RES_COMPANY ON project_management_ceo_data.COMPANY_ID = RES_COMPANY.ID
                         INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL
                         WHERE   extract(year from month_start)  = extract(year from CURRENT_DATE)   AND  project_management_ceo_data.company_id in  """ + str(tuple(selected_companies)) + """
