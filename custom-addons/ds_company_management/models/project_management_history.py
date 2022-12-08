@@ -12,10 +12,42 @@ class ProjectManagementHistory(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
-                WITH extract_month_project AS (
-                    --- Generate month from date_start & date_end project ---
+                WITH check_project_status AS (
+                    SELECT 
+                        project_id,
+                        date
+                        --status
+                    FROM project_update
+                    WHERE status = 'off_track'
+                ),
+
+                compute_duration_project AS (
                     SELECT 
                         pm.id AS project_management_id,
+                        pm.project_id,
+                        pm.company_id,
+                        pm.department_id,
+                        pm.stage_name,
+                        pm.date_start,
+                        (CASE
+                            WHEN cp.date IS NULL
+                                THEN pm.date_end
+                            ELSE cp.date
+                        END)::date AS date_end,
+                        
+                        -- pm.date_end,
+                        pm.revenue,
+                        pm.revenue_from
+
+                    FROM project_management AS pm
+                    LEFT JOIN check_project_status AS cp
+                        ON cp.project_id = pm.project_id
+                ),
+
+                extract_month_project AS (
+                    --- Generate month from date_start & date_end project ---
+                    SELECT 
+                        pm.project_management_id,
                         pm.project_id,
                         pm.company_id,
                         pm.department_id,
@@ -30,7 +62,7 @@ class ProjectManagementHistory(models.Model):
                         pm.revenue,
                         pm.revenue_from
 
-                    FROM project_management AS pm
+                    FROM compute_duration_project AS pm
                     GROUP BY
                         project_management_id,
                         pm.project_id,
@@ -138,13 +170,14 @@ class ProjectManagementHistory(models.Model):
                                 THEN hc.date_end 
                             ELSE cm.max_months
                         END) AS date_end,
-                        hct.name AS contract_type
+                        --hct.name AS contract_type
+                        hc.contract_document_type
 
                     FROM hr_contract AS hc
                     LEFT JOIN compute_max_duration_company AS cm
                         ON cm.company_id = hc.company_id
-                    LEFT JOIN hr_contract_type AS hct
-                        ON hct.id = hc.contract_type_id
+                    --LEFT JOIN hr_contract_type AS hct
+                       -- ON hct.id = hc.contract_type_id
                     LEFT JOIN hr_employee AS he
                         ON he.id = hc.employee_id
                     WHERE hc.state != 'cancel'
@@ -161,8 +194,7 @@ class ProjectManagementHistory(models.Model):
                         )::date AS months
                     
                     FROM get_contract_employee_company
-                    WHERE (contract_type NOT IN ('Internship', 'Intern', 'intern', 'internship') 
-                        OR contract_type IS NULL)
+                    WHERE contract_document_type != 'internship' 
                         AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                             OR department_id IS NULL)
                     GROUP BY company_id, employee_id
@@ -215,7 +247,7 @@ class ProjectManagementHistory(models.Model):
 
                     FROM project_expense_value_month
                     WHERE project_id IS NOT NULL
-		                AND project_expense_management_id IS NOT NULL
+                        AND project_expense_management_id IS NOT NULL
                     GROUP BY project_id,
                             months
                 ),
