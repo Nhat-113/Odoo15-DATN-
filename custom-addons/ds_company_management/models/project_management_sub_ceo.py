@@ -59,17 +59,17 @@ class ProjectManagementSubCeo(models.Model):
                             -- average_cost_company,
                             currency_id
                 ),
-                compute_average_cost_company_for_any_department AS (
-                    SELECT
-                        company_id,
-                        month_start,
-                        average_cost_company
+                --compute_average_cost_company_for_any_department AS (
+                    --SELECT
+                        --company_id,
+                        --month_start,
+                        --average_cost_company
 
-                    FROM project_history_department
-                    GROUP BY company_id,
-                            month_start,
-                            average_cost_company
-                ),
+                    --FROM project_history_department
+                    --GROUP BY company_id,
+                            --month_start,
+                            --average_cost_company
+                --),
 
                 --- compute max duration for generate month for department by revenue management of company expense
                 compute_max_duration_department AS (
@@ -139,14 +139,14 @@ class ProjectManagementSubCeo(models.Model):
                     COALESCE(NULLIF(phdg.salary_cost, 	NULL), 0) + COALESCE(NULLIF(ga.available_salary, NULL), 0) AS total_salary,
                     (COALESCE(NULLIF(phdg.profit, 		NULL), 0) 
                         - COALESCE(NULLIF(ga.available_salary, NULL), 0) 
-                        - COALESCE(NULLIF(cac.average_cost_company * ga.available_mm, NULL), 0) 
+                        - COALESCE(NULLIF(ac.average_cost_company * ga.available_mm, NULL), 0) 
                     ) AS total_profit,
                     COALESCE(NULLIF(ga.available_salary, NULL), 0) AS available_salary,
-                    COALESCE(NULLIF(cac.average_cost_company, NULL), 0) AS average_cost_company,
+                    COALESCE(NULLIF(ac.average_cost_company, NULL), 0) AS average_cost_company,
                     (CASE
-                        WHEN cac.average_cost_company IS NULL OR ga.available_mm IS NULL
+                        WHEN ac.average_cost_company IS NULL OR ga.available_mm IS NULL
                             THEN COALESCE(NULLIF(phdg.total_avg_operation_project, NULL), 0)
-                        ELSE cac.average_cost_company * ga.available_mm + COALESCE(NULLIF(phdg.total_avg_operation_project, NULL), 0)
+                        ELSE ac.average_cost_company * ga.available_mm + COALESCE(NULLIF(phdg.total_avg_operation_project, NULL), 0)
                     END) AS total_avg_operation_department,
                     
                     rcr.id AS currency_id,
@@ -160,9 +160,9 @@ class ProjectManagementSubCeo(models.Model):
                 LEFT JOIN get_available_employee AS ga
                     ON ga.department_id = dbm.department_id
                     AND ga.months = dbm.months
-                LEFT JOIN compute_average_cost_company_for_any_department AS cac
-                    ON cac.company_id = dbm.company_id
-                    AND cac.month_start = dbm.months
+                LEFT JOIN average_cost_company_temp AS ac
+                    ON ac.company_id = dbm.company_id
+                    AND ac.month_start = dbm.months
                 LEFT JOIN res_company AS rc
                     ON rc.id = dbm.company_id
                 LEFT JOIN res_users AS ru
@@ -189,8 +189,8 @@ class ProjectManagementSubCeoData(models.Model):
     total_members = fields.Float(string='Effort (MM)', digits=(12,3))
     total_salary = fields.Float(string="Salary Cost")
     total_project_cost = fields.Float(string="Prj Expenses")
-    total_department_cost = fields.Float(string="Department Expenses")
-    total_avg_operation_department = fields.Float(string="Total OP Avg Prj")
+    total_department_cost = fields.Float(string="Dpm Expenses")
+    total_avg_operation_department = fields.Float(string="Operation Dpm")
     total_revenue = fields.Float(string="Revenue")
     total_commission = fields.Float(string="Commission")
     total_profit = fields.Float(string="Profit")

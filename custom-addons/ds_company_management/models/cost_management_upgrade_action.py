@@ -521,6 +521,7 @@ class UpgradeAction(models.Model):
                         available_salary,
                         available_mm,
                         available_effort,
+                        available_operation,
                         create_uid,
                         write_uid,
                         create_date,
@@ -528,21 +529,25 @@ class UpgradeAction(models.Model):
                     )
                 SELECT
                     --id,
-                    company_id,
-                    department_id,
-                    employee_id,
-                    currency_id,
-                    months,
-                    months_str,
-                    salary,
-                    available_salary,
-                    available_mm,
-                    available_effort,
+                    ab.company_id,
+                    ab.department_id,
+                    ab.employee_id,
+                    ab.currency_id,
+                    ab.months,
+                    ab.months_str,
+                    ab.salary,
+                    ab.available_salary,
+                    ab.available_mm,
+                    ab.available_effort,
+                    (ab.available_mm * ac.average_cost_company) AS available_operation,
                     """ + user_update + """,
                     """ + user_update + """,
                     CURRENT_DATE,
                     CURRENT_DATE
-                FROM available_booking_employee;
+                FROM available_booking_employee AS ab
+                LEFT JOIN average_cost_company_temp AS ac
+                    ON ac.company_id = ab.company_id
+                    AND ac.month_start = ab.months;
             """
             
             

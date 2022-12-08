@@ -19,13 +19,14 @@
             <tree export_xlsx="0">
                 <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}" readonly="1"/>
                 <field name="months_str"/>
-                <field name="salary" sum="Total Salary" widget="monetary"/>
+                <field name="available_operation" sum="Total Available Operation Cost" width="120px"/>
                 <field name="available_salary" sum="Total Available Salary Cost" widget="monetary"/>
-                <field name="available_mm" sum="Total Available Man Month"/>
-                <field name="available_effort" sum="Total Available Effort"/>
+                <field name="available_mm" sum="Total Available Man Month" width="116px"/>
+                <field name="available_effort" sum="Total Available Effort" width="116px"/>
                 <field name="department_id" optional="hide"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide"/>
                 <field name="months" invisible="1"/>
+                <field name="salary" sum="Total Salary" widget="monetary" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
             </tree>
         </field>
