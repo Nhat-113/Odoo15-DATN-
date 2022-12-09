@@ -21,6 +21,7 @@
 #
 ###################################################################################
 from datetime import datetime
+import json
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
@@ -67,7 +68,19 @@ class HrAnnouncementTable(models.Model):
                                                                                                "announcement want too"
                                                                                                " see")
 
-    email_to = fields.Many2many('res.partner', string="Send To", domain="[('email', '!=', False)]")
+    def  _get_defaut_all_staff(self):
+        return self.env['res.partner'].search([('email','=','allstaff@d-soft.com.vn')])
+
+    email_to = fields.Many2many('res.partner', string="Send To",  default=_get_defaut_all_staff)
+    domain_email = fields.Char('Domain Email', compute='compute_domain_email', store=True)
+
+    @api.depends('company_id')
+    def compute_domain_email(self):
+        for record in self:
+            if not record.company_id.id:
+                record.domain_email = json.dumps([('email', '!=', False)])
+            else:
+                record.domain_email = json.dumps([('email', '!=', False), ('company_id','=', record.company_id.id)])
     
     def reject(self):
         self.state = 'rejected'
