@@ -67,7 +67,7 @@ class HrAnnouncementTable(models.Model):
                                                                                                "announcement want too"
                                                                                                " see")
 
-    email_to = fields.Many2many('hr.employee', string="Send To", default=lambda self: self.default_select_mail_all_staff())
+    email_to = fields.Many2many('res.partner', string="Send To", domain="[('email', '!=', False)]")
     
     def reject(self):
         self.state = 'rejected'
@@ -106,7 +106,7 @@ class HrAnnouncementTable(models.Model):
                 value.message_notify(
                     subject = _(subject),
                     body = assignation_msg,
-                    partner_ids = user.user_id.partner_id.ids,
+                    partner_ids = user.ids,
                     record_name = value.announcement_reason,
                     email_layout_xmlid = 'mail.mail_notification_light',
                     model_description = anno_model_description,
@@ -139,3 +139,9 @@ class HrAnnouncementTable(models.Model):
                 recd.write({
                     'state': 'expired'
                 })
+
+    @api.model
+    def create(self, vals_list):
+        announcement = super(HrAnnouncementTable, self).create(vals_list)
+        announcement.attachment_id.write({'res_model': self._name, 'res_id': announcement.id})
+        return announcement
