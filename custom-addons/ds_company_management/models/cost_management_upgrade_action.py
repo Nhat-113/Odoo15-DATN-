@@ -517,7 +517,6 @@ class UpgradeAction(models.Model):
                         currency_id,
                         months,
                         months_str,
-                        salary,
                         available_salary,
                         available_mm,
                         available_effort,
@@ -535,19 +534,18 @@ class UpgradeAction(models.Model):
                     ab.currency_id,
                     ab.months,
                     ab.months_str,
-                    ab.salary,
                     ab.available_salary,
                     ab.available_mm,
                     ab.available_effort,
-                    (ab.available_mm * ac.average_cost_company) AS available_operation,
+                    ab.available_operation,
                     """ + user_update + """,
                     """ + user_update + """,
                     CURRENT_DATE,
                     CURRENT_DATE
-                FROM available_booking_employee AS ab
-                LEFT JOIN average_cost_company_temp AS ac
-                    ON ac.company_id = ab.company_id
-                    AND ac.month_start = ab.months;
+                FROM available_booking_employee AS ab;
+                --LEFT JOIN average_cost_company_temp AS ac
+                    --ON ac.company_id = ab.company_id
+                    --AND ac.month_start = ab.months;
             """
             
             

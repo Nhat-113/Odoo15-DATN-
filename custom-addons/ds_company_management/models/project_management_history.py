@@ -34,8 +34,6 @@ class ProjectManagementHistory(models.Model):
                                 THEN pm.date_end
                             ELSE cp.date
                         END)::date AS date_end,
-                        
-                        -- pm.date_end,
                         pm.revenue,
                         pm.revenue_from
 
@@ -144,68 +142,27 @@ class ProjectManagementHistory(models.Model):
                             project_id,
                             months
                 ),
-
-                compute_max_duration_company AS (
-                    SELECT
-                        (CASE
-                            WHEN max(sort_date) < CURRENT_DATE::DATE
-                                THEN (date_trunc('month',CURRENT_DATE))::DATE
-                            ELSE max(sort_date)
-                        END) AS max_months,
-                        pp.company_id
-                    FROM project_revenue_value AS prv
-                    LEFT JOIN project_project AS pp
-                        ON pp.id = prv.project_id
-                    GROUP BY pp.company_id
-                ),
-
-                get_contract_employee_company AS (
-                    SELECT
-                        hc.company_id,
-                        he.department_id,
-                        hc.employee_id,
-                        hc.date_start,
-                        (CASE
-                            WHEN hc.date_end IS NOT NULL
-                                THEN hc.date_end 
-                            ELSE cm.max_months
-                        END) AS date_end,
-                        --hct.name AS contract_type
-                        hc.contract_document_type
-
-                    FROM hr_contract AS hc
-                    LEFT JOIN compute_max_duration_company AS cm
-                        ON cm.company_id = hc.company_id
-                    --LEFT JOIN hr_contract_type AS hct
-                       -- ON hct.id = hc.contract_type_id
-                    LEFT JOIN hr_employee AS he
-                        ON he.id = hc.employee_id
-                    WHERE hc.state != 'cancel'
-                ),
-
-                generate_month_contract_remove_intern_company AS (
+                pesudo_contract_count_member AS (
                     SELECT
                         company_id,
                         employee_id,
-                        generate_series(
-                            date_trunc('month', min(date_start)), 
-                            date_trunc('month', max(date_end)), 
-                            '1 month'
-                        )::date AS months
-                    
-                    FROM get_contract_employee_company
+                        months,
+                        --working_day,
+                        --total_working_day,
+                        SUM(working_day::DECIMAL / total_working_day::DECIMAL)::NUMERIC(10, 2) AS mm
+                    FROM pesudo_contract
                     WHERE contract_document_type != 'internship' 
-                        AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
-                            OR department_id IS NULL)
-                    GROUP BY company_id, employee_id
+                    GROUP BY company_id,
+                            employee_id,
+                            months
                 ),
 
                 company_count_member_not_intern AS (
                     SELECT
                         company_id,
                         months,
-                        COUNT(DISTINCT (employee_id)) AS all_members
-                    FROM generate_month_contract_remove_intern_company
+                        SUM(mm) AS all_members
+                    FROM pesudo_contract_count_member
                     GROUP BY company_id, months
                 ),
 
@@ -527,7 +484,7 @@ class ProjectManagementHistory(models.Model):
                             ((pcv.working_day::decimal / pcv.total_working_day)::NUMERIC(6, 4)) AS duration_month,
                             
                             (CASE 
-                                WHEN pcv.members_project_not_intern = 0
+                                WHEN pcv.members_project = 0
                                     THEN pcv.average_cost_company
                                 ELSE (pcv.average_cost_company + (
                                         (pcv.total_project_expense::decimal 

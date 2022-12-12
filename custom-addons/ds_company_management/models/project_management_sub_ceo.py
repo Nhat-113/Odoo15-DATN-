@@ -108,18 +108,40 @@ class ProjectManagementSubCeo(models.Model):
                             ON cm.department_id = hd.id
                         WHERE hd.id NOT IN (SELECT department_id FROM department_mirai_fnb)
                 ),
-                get_available_employee AS (
+                get_available_salary_employee AS (
                     SELECT
                         department_id,
                         months,
                         SUM(available_salary) AS available_salary,
-                        SUM(available_mm) AS available_mm
+                        SUM(available_operation) AS available_operation
                         
                     FROM available_booking_employee
                     WHERE department_id IS NOT NULL
                     GROUP BY department_id,
                             months
                 )
+                --get_available_mm_employee_remove_intern AS (
+                    --SELECT
+                      --  department_id,
+                        --months,
+                        --SUM(available_mm) AS available_mm
+
+                    --FROM available_booking_employee
+                    --WHERE department_id IS NOT NULL
+                    --GROUP BY department_id, months
+                --),
+                --get_available_employee AS (
+                    --SELECT
+                        --gas.department_id,
+                        --gas.months,
+                        --gas.available_salary,
+                        --gas.available_operation,
+                        --gam.available_mm
+                    --FROM get_available_salary_employee AS gas
+                    --LEFT JOIN get_available_mm_employee_remove_intern AS gam
+                        --ON gam.department_id = gas.department_id
+                    --AND gam.months = gas.months
+                --)
                     
                 SELECT
                     ROW_NUMBER() OVER(ORDER BY dbm.months ASC) AS id,
@@ -139,14 +161,14 @@ class ProjectManagementSubCeo(models.Model):
                     COALESCE(NULLIF(phdg.salary_cost, 	NULL), 0) + COALESCE(NULLIF(ga.available_salary, NULL), 0) AS total_salary,
                     (COALESCE(NULLIF(phdg.profit, 		NULL), 0) 
                         - COALESCE(NULLIF(ga.available_salary, NULL), 0) 
-                        - COALESCE(NULLIF(ac.average_cost_company * ga.available_mm, NULL), 0) 
+                        - COALESCE(NULLIF(ga.available_operation, NULL), 0) 
                     ) AS total_profit,
                     COALESCE(NULLIF(ga.available_salary, NULL), 0) AS available_salary,
                     COALESCE(NULLIF(ac.average_cost_company, NULL), 0) AS average_cost_company,
                     (CASE
-                        WHEN ac.average_cost_company IS NULL OR ga.available_mm IS NULL
+                        WHEN ga.available_operation IS NULL
                             THEN COALESCE(NULLIF(phdg.total_avg_operation_project, NULL), 0)
-                        ELSE ac.average_cost_company * ga.available_mm + COALESCE(NULLIF(phdg.total_avg_operation_project, NULL), 0)
+                        ELSE ga.available_operation + COALESCE(NULLIF(phdg.total_avg_operation_project, NULL), 0)
                     END) AS total_avg_operation_department,
                     
                     rcr.id AS currency_id,
@@ -157,7 +179,7 @@ class ProjectManagementSubCeo(models.Model):
                     ON phdg.company_id = dbm.company_id
                     AND phdg.department_id = dbm.department_id
                     AND phdg.month_start = dbm.months
-                LEFT JOIN get_available_employee AS ga
+                LEFT JOIN get_available_salary_employee AS ga
                     ON ga.department_id = dbm.department_id
                     AND ga.months = dbm.months
                 LEFT JOIN average_cost_company_temp AS ac

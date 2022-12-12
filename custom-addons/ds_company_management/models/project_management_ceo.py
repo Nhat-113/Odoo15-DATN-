@@ -34,18 +34,39 @@ class ProjectManagementCeo(models.Model):
                             average_cost_company,
                             currency_id
                 ),
-                get_available_employee AS (
+                get_available_salary_employee AS (
                     SELECT
                         company_id,
                         months,
                         SUM(available_salary) AS available_salary,
-                        SUM(available_mm) AS available_mm
+                        SUM(available_operation) AS available_operation
                         
                     FROM available_booking_employee
                     WHERE department_id IS NULL
                     GROUP BY company_id,
                             months
                 )
+                --get_available_mm_employee_remove_intern AS (
+                   -- SELECT
+                       -- company_id,
+                       -- months,
+                       -- SUM(available_mm) AS available_mm
+
+                    --FROM available_booking_employee
+                   -- WHERE department_id IS NULL
+                    --GROUP BY company_id, months
+                --),
+                --get_available_employee AS (
+                    --SELECT
+                        --gas.company_id,
+                        --gas.months,
+                        --gas.available_salary,
+                        --gam.available_mm
+                    --FROM get_available_salary_employee AS gas
+                    --LEFT JOIN get_available_mm_employee_remove_intern AS gam
+                        --ON gam.company_id = gas.company_id
+                   -- AND gam.months = gas.months
+                --)
 
                 SELECT
                     --ROW_NUMBER() OVER(ORDER BY cm.month_start ASC) AS id,
@@ -62,18 +83,18 @@ class ProjectManagementCeo(models.Model):
                     (cm.total_salary + COALESCE(NULLIF(ga.available_salary, NULL), 0)) AS total_salary,
                     (cm.total_profit 
                         - COALESCE(NULLIF(ga.available_salary, NULL), 0)
-                        - COALESCE(NULLIF(cm.average_cost_company * ga.available_mm, NULL), 0)
+                        - COALESCE(NULLIF(ga.available_operation, NULL), 0)
                     ) AS total_profit,
                     (CASE
-                        WHEN cm.average_cost_company IS NULL OR ga.available_mm IS NULL
+                        WHEN ga.available_operation IS NULL
                             THEN COALESCE(NULLIF(cm.total_avg_operation_department, NULL), 0)
-                        ELSE cm.average_cost_company * ga.available_mm + COALESCE(NULLIF(cm.total_avg_operation_department, NULL), 0)
+                        ELSE ga.available_operation + COALESCE(NULLIF(cm.total_avg_operation_department, NULL), 0)
                     END) AS total_avg_operation_company,
                     rcu.id AS currency_id
                 FROM cost_management_subceo_group AS cm
                 LEFT JOIN res_company AS rc
                     ON rc.id = cm.company_id
-                LEFT JOIN get_available_employee AS ga
+                LEFT JOIN get_available_salary_employee AS ga
                     ON ga.company_id = cm.company_id
                     AND ga.months = cm.month_start
                 LEFT JOIN res_currency AS rcu

@@ -169,7 +169,7 @@ class ProjectManagementData(models.Model):
     currency_id = fields.Many2one('res.currency', string="Currency")
     date_start = fields.Date(string='Start')
     date_end = fields.Date(string='End')
-    status = fields.Char(string='Status')
+    status = fields.Selection(related='project_id.last_update_status', string='Status')
     stage_id = fields.Many2one('project.project.stage', string="Stage")
     stage_name = fields.Char(string='Stage Name')
     
