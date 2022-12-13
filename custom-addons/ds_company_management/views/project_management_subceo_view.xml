@@ -35,7 +35,7 @@
         <field name="name">project.management.subceo.data.tree</field>
         <field name="model">project.management.subceo.data</field>
         <field name="arch" type="xml">
-            <tree string="Project Management Sub CEO" default_order="department_id, month_start desc">
+            <tree string="Project Management Sub CEO" default_order="department_id, month_start desc" class="available_booking_employee_department">
                 <field name="department_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="months"/>
@@ -44,13 +44,16 @@
                 <field name="total_members" sum="Total Members"/>
                 <field name="total_salary" sum="Total Salary Cost" widget="monetary"/>
                 <field name="total_project_cost" sum="Total Prj Expenses" widget="monetary"/>
-                <field name="total_revenue" sum="Total Revenue" widget="monetary"/>
+                <field name="total_department_cost" sum="Total Department Expenses" widget="monetary"/>
                 <field name="total_commission" sum="Total commission" widget="monetary"/>
+                <field name="total_avg_operation_department" sum="Total Avg Operation Cost" widget="monetary"/>
+                <field name="total_revenue" sum="Total Revenue" widget="monetary"/>
                 <field name="total_profit" sum="Total Profit" widget="monetary"/>
                 <field name="profit_margin" avg="Average profit margin" width="116px"/>
                 <field name="currency_id" invisible="1"/>
                 <field name="user_login" invisible="1"/>
-                <button name="get_project_detail" type="object" string="Detail" class="btn btn-primary"/>
+                <button name="get_available_booking_employees" type="object" string="Avl Cst" class="btn btn-primary"/>
+                <button name="get_project_detail" type="object" string="Prj Cst" class="btn btn-primary"/>
             </tree>
         </field>
     </record>

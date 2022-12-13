@@ -35,25 +35,16 @@ class ProjectManagementMemberDetail(models.Model):
                     pmh.average_cost_company,
                     pmh.average_cost_project,
                     pmh.profit,
-                    pmh.members_project_not_intern AS total_members,
+                    --pmh.members_project_not_intern AS total_members,
+                    pmh.members AS total_members,
+                    ppb.salary,
                     (CONCAT((EXTRACT(YEAR FROM ppb.start_date_month))::text, ' ', TO_CHAR(ppb.start_date_month, 'Month'))) AS months,
                     
                     (CASE
-                        WHEN pmt.name IN('intern', 'Intern')
+                        WHEN pmh.members = 0 OR pmh.members IS NULL 
+                            OR pmh.profit = 0 OR pmh.profit IS NULL
                             THEN 0
-                        ELSE ppb.salary
-                    END) AS salary,
-                    
-                    (CASE
-                        WHEN pmt.name IN('intern', 'Intern')
-                            THEN 0
-                        ELSE 
-                            (CASE
-                                WHEN pmh.members_project_not_intern = 0 OR pmh.members_project_not_intern IS NULL 
-                                    OR pmh.profit = 0 OR pmh.profit IS NULL
-                                    THEN 0
-                                ELSE pmh.profit / pmh.members_project_not_intern * ppb.effort_rate_month / 100
-                            END)
+                        ELSE pmh.profit / pmh.members * ppb.effort_rate_month / 100
                     END) AS average_profit,
                     
                     pmh.currency_id
@@ -62,6 +53,8 @@ class ProjectManagementMemberDetail(models.Model):
                 RIGHT JOIN project_management_member AS pmm
                     ON pmm.employee_id = ppb.employee_id
                     AND pmm.project_id = ppb.project_id
+                    AND ppb.start_booking BETWEEN pmm.start_date AND pmm.end_date
+	                AND ppb.end_booking BETWEEN pmm.start_date AND pmm.end_date
                     
                 LEFT JOIN planning_member_type AS pmt
                     ON pmt.id = pmm.member_type

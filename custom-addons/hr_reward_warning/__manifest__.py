@@ -35,6 +35,8 @@
         'security/ir.model.access.csv',
         'security/reward_security.xml',
         'views/hr_announcement_view.xml',
+        'data/mail_templates.xml',
+
     ],
     'assets': {
         'web.assets_backend': [

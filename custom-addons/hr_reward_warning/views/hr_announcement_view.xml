@@ -69,7 +69,10 @@
                                        attrs="{'invisible': ['|',('is_announcement', '!=', False), ('announcement_type', '!=', 'job_position')]}"/>
 
                                 <field name="requested_date" readonly="1"/>
+                                <field name="domain_email" invisible="1"/>
                                 <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                                <field name="email_to" widget="many2many_tags" context="{'force_email':True}" domain="domain_email"/>
+
                             </group>
                         </group>
                         <notebook>

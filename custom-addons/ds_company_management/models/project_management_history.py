@@ -12,10 +12,40 @@ class ProjectManagementHistory(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
-                WITH extract_month_project AS (
-                    --- Generate month from date_start & date_end project ---
+                WITH check_project_status AS (
+                    SELECT 
+                        project_id,
+                        date
+                        --status
+                    FROM project_update
+                    WHERE status = 'off_track'
+                ),
+
+                compute_duration_project AS (
                     SELECT 
                         pm.id AS project_management_id,
+                        pm.project_id,
+                        pm.company_id,
+                        pm.department_id,
+                        pm.stage_name,
+                        pm.date_start,
+                        (CASE
+                            WHEN cp.date IS NULL
+                                THEN pm.date_end
+                            ELSE cp.date
+                        END)::date AS date_end,
+                        pm.revenue,
+                        pm.revenue_from
+
+                    FROM project_management AS pm
+                    LEFT JOIN check_project_status AS cp
+                        ON cp.project_id = pm.project_id
+                ),
+
+                extract_month_project AS (
+                    --- Generate month from date_start & date_end project ---
+                    SELECT 
+                        pm.project_management_id,
                         pm.project_id,
                         pm.company_id,
                         pm.department_id,
@@ -30,7 +60,7 @@ class ProjectManagementHistory(models.Model):
                         pm.revenue,
                         pm.revenue_from
 
-                    FROM project_management AS pm
+                    FROM compute_duration_project AS pm
                     GROUP BY
                         project_management_id,
                         pm.project_id,
@@ -82,98 +112,74 @@ class ProjectManagementHistory(models.Model):
                     ORDER By project_id
                 ),
 
-                project_count_member AS (
+                compute_project_count_member_salary AS (
+                    --SELECT
+                        --company_id,
+                        --project_id,
+                        --months,
+                        --SUM(man_month) AS total_members,
+                        --SUM(salary)::NUMERIC(20, 5) AS salary
+                    --FROM project_planning_booking
+                        --WHERE department_id NOT IN (SELECT department_id FROM department_mirai_fnb) 
+                            --OR department_id IS NULL
+                    --GROUP BY company_id,
+                            --project_id,
+                            --months
                     SELECT
-                        ROW_NUMBER() OVER(ORDER BY months ASC) AS id,
-                        ppb.company_id,
-                        ppb.project_id,
-                        ppb.months,
-                        (SUM(ppb.man_month)) AS total_members
-                    FROM project_planning_booking AS ppb
-                        WHERE ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb) 
-                            OR ppb.department_id IS NULL
-                    GROUP BY company_id,
-                            project_id,
-                            months
+                        project_id,
+                        months,
+                        SUM(mm)::NUMERIC(10, 2) AS total_members,
+                        SUM(salary) AS salary
+                    FROM project_count_member_contract
+                    WHERE department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                        OR department_id IS NULL
+                    GROUP BY project_id, months
                 ),
 
                 project_count_member_not_intern AS (
-                    SELECT
-                        ROW_NUMBER() OVER(ORDER BY months ASC) AS id,
-                        ppb.company_id,
-                        ppb.project_id,
-                        ppb.months,
-                        (SUM(ppb.man_month)) AS total_members
-                    FROM project_planning_booking AS ppb
-                    WHERE (ppb.member_type_name NOT IN ('Intern', 'intern') 
-                            OR ppb.member_type_name IS NULL)
-                            AND (ppb.department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
-                                    OR ppb.department_id IS NULL)
-                    GROUP BY company_id,
+                    -- 	SELECT
+                    -- 		company_id,
+                    -- 		project_id,
+                    -- 		months,
+                    -- 		SUM(man_month) AS total_members
+                    -- 	FROM project_planning_booking
+                    -- 	WHERE (member_type_name NOT IN ('Intern', 'intern') 
+                    -- 			OR member_type_name IS NULL)
+                    -- 			AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                    -- 					OR department_id IS NULL)
+                    -- 	GROUP BY company_id,
+                    -- 			project_id,
+                    -- 			months
+                        SELECT
                             project_id,
-                            months
+                            months,
+                            SUM(mm)::NUMERIC(10, 2) AS total_members
+                        FROM project_count_member_contract
+                        WHERE (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                            OR department_id IS NULL) AND type_contract = 'official'
+                        GROUP BY project_id, months
                 ),
-
-                compute_max_duration_company AS (
-                    SELECT
-                        (CASE
-                            WHEN max(sort_date) < CURRENT_DATE::DATE
-                                THEN (date_trunc('month',CURRENT_DATE))::DATE
-                            ELSE max(sort_date)
-                        END) AS max_months,
-                        pp.company_id
-                    FROM project_revenue_value AS prv
-                    LEFT JOIN project_project AS pp
-                        ON pp.id = prv.project_id
-                    GROUP BY pp.company_id
-                ),
-
-                get_contract_employee_company AS (
-                    SELECT
-                        hc.company_id,
-                        he.department_id,
-                        hc.employee_id,
-                        hc.date_start,
-                        (CASE
-                            WHEN hc.date_end IS NOT NULL
-                                THEN hc.date_end 
-                            ELSE cm.max_months
-                        END) AS date_end,
-                        hct.name AS contract_type
-
-                    FROM hr_contract AS hc
-                    LEFT JOIN compute_max_duration_company AS cm
-                        ON cm.company_id = hc.company_id
-                    LEFT JOIN hr_contract_type AS hct
-                        ON hct.id = hc.contract_type_id
-                    LEFT JOIN hr_employee AS he
-                        ON he.id = hc.employee_id
-                    WHERE hc.state != 'cancel'
-                ),
-
-                generate_month_contract_remove_intern_company AS (
+                pesudo_contract_count_member AS (
                     SELECT
                         company_id,
                         employee_id,
-                        generate_series(
-                            date_trunc('month', min(date_start)), 
-                            date_trunc('month', max(date_end)), 
-                            '1 month'
-                        )::date AS months
-                    
-                    FROM get_contract_employee_company
-                    WHERE (contract_type NOT IN ('Internship', 'Intern', 'intern', 'internship') 
-                        OR contract_type IS NULL)
-                        AND department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
-                    GROUP BY company_id, employee_id
+                        months,
+                        --working_day,
+                        --total_working_day,
+                        SUM(working_day::DECIMAL / total_working_day::DECIMAL)::NUMERIC(10, 2) AS mm
+                    FROM pesudo_contract
+                    WHERE contract_document_type != 'internship' 
+                    GROUP BY company_id,
+                            employee_id,
+                            months
                 ),
 
                 company_count_member_not_intern AS (
                     SELECT
                         company_id,
                         months,
-                        COUNT(DISTINCT (employee_id)) AS all_members
-                    FROM generate_month_contract_remove_intern_company
+                        SUM(mm) AS all_members
+                    FROM pesudo_contract_count_member
                     GROUP BY company_id, months
                 ),
 
@@ -215,7 +221,7 @@ class ProjectManagementHistory(models.Model):
 
                     FROM project_expense_value_month
                     WHERE project_id IS NOT NULL
-		                AND project_expense_management_id IS NOT NULL
+                        AND project_expense_management_id IS NOT NULL
                     GROUP BY project_id,
                             months
                 ),
@@ -301,22 +307,22 @@ class ProjectManagementHistory(models.Model):
 
 
                 --- Compute total salary employee & revenue project by month ---
-                compute_total_salary_employee AS (
-                    SELECT
-                        company_id,
-                        project_id,
-                        months,
-                        sum(salary)::NUMERIC(20, 5) AS salary
-                        
-                    FROM project_planning_booking 
-                    WHERE (member_type_name NOT IN('Intern', 'intern')
-                            OR member_type_name IS NULL)
-                        AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
-                            OR department_id IS NULL)
-                    GROUP BY company_id,
-                            project_id,
-                            months
-                ),
+                -- compute_total_salary_employee AS (
+                -- 	SELECT
+                -- 		company_id,
+                -- 		project_id,
+                -- 		months,
+                -- 		sum(salary)::NUMERIC(20, 5) AS salary
+                -- 		
+                -- 	FROM project_planning_booking 
+                -- 	WHERE (member_type_name NOT IN('Intern', 'intern')
+                -- 			OR member_type_name IS NULL)
+                -- 		AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                -- 			OR department_id IS NULL)
+                -- 	GROUP BY company_id,
+                -- 			project_id,
+                -- 			months
+                -- ),
 
                 expense_management_join_company AS (
                     SELECT
@@ -421,10 +427,9 @@ class ProjectManagementHistory(models.Model):
                         gmp.revenue_from,
                         gmp.result_commission,
                         gmp.revenue_vnd,
-                        (COALESCE(NULLIF(cts.salary, NULL), 0)) AS total_salary,
-                        (COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)
-                            + COALESCE(NULLIF(cdp.total_project_expense, NULL), 0)
-                        ) AS total_project_expense,
+                        (COALESCE(NULLIF(pcm.salary, NULL), 0)) AS total_salary,
+                        (COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)) AS total_project_expense,
+                        (COALESCE(NULLIF(cdp.total_project_expense, NULL), 0)) AS total_department_expense,
                         (COALESCE(NULLIF(em.total_expenses, NULL), 0)) AS operation_cost,
                         (COALESCE(NULLIF(pcm.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project,
                         (COALESCE(NULLIF(pni.total_members, NULL), 0))::NUMERIC(20, 4) AS members_project_not_intern,
@@ -464,13 +469,13 @@ class ProjectManagementHistory(models.Model):
                         ON em.res_company_id = gmp.company_id
                         AND em.get_month::int = EXTRACT(MONTH FROM gmp.month_start)
                         AND em.get_year::int = EXTRACT(YEAR FROM gmp.month_start)
-                        
-                    LEFT JOIN compute_total_salary_employee AS cts
-                        ON cts.project_id = gmp.project_id
-                        AND EXTRACT(MONTH FROM cts.months) = EXTRACT(MONTH FROM gmp.month_start)
-                        AND EXTRACT(YEAR FROM cts.months) = EXTRACT(YEAR FROM gmp.month_start) 
+                -- 		
+                -- 	LEFT JOIN compute_total_salary_employee AS cts
+                -- 		ON cts.project_id = gmp.project_id
+                -- 		AND EXTRACT(MONTH FROM cts.months) = EXTRACT(MONTH FROM gmp.month_start)
+                -- 		AND EXTRACT(YEAR FROM cts.months) = EXTRACT(YEAR FROM gmp.month_start) 
                     
-                    LEFT JOIN project_count_member AS pcm
+                    LEFT JOIN compute_project_count_member_salary AS pcm
                         ON pcm.project_id = gmp.project_id
                         AND EXTRACT(MONTH FROM pcm.months) = EXTRACT(MONTH FROM gmp.month_start)
                         AND EXTRACT(YEAR FROM pcm.months) = EXTRACT(YEAR FROM gmp.month_start)
@@ -496,9 +501,12 @@ class ProjectManagementHistory(models.Model):
                             ((pcv.working_day::decimal / pcv.total_working_day)::NUMERIC(6, 4)) AS duration_month,
                             
                             (CASE 
-                                WHEN pcv.members_project_not_intern = 0
+                                WHEN pcv.members_project = 0
                                     THEN pcv.average_cost_company
-                                ELSE (pcv.average_cost_company + ((pcv.total_project_expense::decimal + pcv.result_commission ) / pcv.members_project_not_intern))
+                                ELSE (pcv.average_cost_company + (
+                                        (pcv.total_project_expense::decimal 
+                                        + pcv.total_department_expense::decimal 
+                                        + pcv.result_commission ) / pcv.members_project))
                             END)::NUMERIC(20, 4) AS average_cost_project
 
                     FROM project_compute_value_by_month AS pcv
@@ -526,6 +534,7 @@ class ProjectManagementHistory(models.Model):
                         pac.total_cost,
                         pac.total_salary,
                         pac.total_project_expense,
+                        pac.total_department_expense,
                         pac.operation_cost,
                         pac.members_project AS members,
                         pac.members_project_not_intern,
@@ -554,16 +563,16 @@ class ProjectManagementHistory(models.Model):
                         *,
                         (cpr.average_cost_company * cpr.members_project_not_intern)::NUMERIC(20, 4) AS total_avg_operation_project,
                         (CONCAT((EXTRACT(YEAR FROM cpr.month_start))::text, ' ', TO_CHAR(cpr.month_start, 'Month'))) AS months,
-                        (cpr.revenue - (cpr.members_project_not_intern 
+                        (cpr.revenue - (cpr.members 
                                         * cpr.average_cost_project 
-                                        + cpr.total_salary)
+                                        + cpr.total_salary - (cpr.members - cpr.members_project_not_intern) * cpr.average_cost_company)
                         ) AS profit,
                         (CASE
                             WHEN cpr.revenue = 0
                                 THEN 0
-                            ELSE (cpr.revenue - (cpr.members_project_not_intern 
+                            ELSE (cpr.revenue - (cpr.members 
                                                 * cpr.average_cost_project 
-                                                + cpr.total_salary)
+                                                + cpr.total_salary- (cpr.members - cpr.members_project_not_intern) * cpr.average_cost_company)
                                     ) / cpr.revenue * 100
                         END) AS profit_margin,
                         date_trunc('month', cpr.month_start)::DATE AS months_domain
@@ -589,12 +598,14 @@ class ProjectManagementHistoryData(models.Model):
     month_end = fields.Date(string="End")
     working_day = fields.Float(string="Working day")
     total_project_expense = fields.Float(string="Prj Expenses", help="Total Project Expenses By Month")
+    total_department_expense = fields.Float(string="Dpm Expenses", help="Total Department Expenses By Month")
     operation_cost = fields.Float(string="Operation Cost", help="Total Operation Cost")
     average_cost_company = fields.Float(string="Company Avg Cost")
     average_cost_project = fields.Float(string="Prj Avg Cost")
     members = fields.Float(string="Effort (MM)", digits=(12,3))
-    all_members = fields.Float(string="Total members", digits=(12,3))
-    total_avg_operation_project = fields.Float(string="Total Avg Operation Project")
+    members_project_not_intern = fields.Float(string="Effort (MM - Remove Intern)", digits=(12,3))
+    all_members = fields.Float(string="Total members", digits=(12,3), help="Total members multi company not intern")
+    total_avg_operation_project = fields.Float(string="Operation Prj")
     total_commission = fields.Float(string="Commission")
     
     total_salary = fields.Float(string="Salary Cost", help="Total salary Employees By Month = SUM(salary_employee * effort_rate)")

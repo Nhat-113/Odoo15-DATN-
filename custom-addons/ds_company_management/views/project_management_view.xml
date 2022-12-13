@@ -32,8 +32,10 @@
                 <field name="count_members" sum="Total Members"/>
                 <field name="total_salary" sum="Total Salary Cost" widget="monetary"/>
                 <field name="project_cost" sum="Total Prj Expenses" widget="monetary"/>
-                <field name="revenue" sum="Total Revenue" widget="monetary"/>
+                <field name="total_department_expense" sum="Total department expense" widget="monetary"/>
                 <field name="total_commission" sum="Total commission" widget="monetary"/>
+                <field name="total_avg_operation_project" sum="Total Avg Operation Cost" widget="monetary"/>
+                <field name="revenue" sum="Total Revenue" widget="monetary"/>
                 <field name="profit" sum="Total Profit" widget="monetary"/>
                 <field name="profit_margin" avg="Average profit margin" width="116px"/>
                 <field name="last_update_color" invisible="1"/>
@@ -51,7 +53,7 @@
         <field name="model">project.management.data</field>
         <field name="priority">999</field>
         <field name="arch" type="xml">
-            <form string="Cost Managements" class="o_form_project_project" edit="0" delete="0" create="0">
+            <form string="Cost Managements" class="o_form_project_project project_cost_management" edit="0" delete="0" create="0">
                 <sheet>
                     <div class="oe_title" style="width: 800px">
                         <label for="project_id" class="oe_edit_only"/>
@@ -77,8 +79,10 @@
                             <field name="count_members"/>
                             <field name="total_salary" widget="monetary"/>
                             <field name="project_cost" widget="monetary"/>
+                            <field name="total_department_expense" widget="monetary"/>
                             <field name="revenue" widget="monetary"/>
                             <!-- <field name="bonus"/> -->
+                            <field name="total_avg_operation_project" widget="monetary"/>
                             <field name="profit" widget="monetary"/>
                             <field name="total_commission" widget="monetary"/>
                             <field name="currency_id" invisible="1"/>
@@ -93,17 +97,19 @@
                                     <field name="month_end" optional="hide"/>
                                     <field name="working_day" sum="Total Working day"/>
                                     <field name="revenue" sum="Total revenue" widget="monetary"/>
-                                    <field name="total_commission" sum="Total commission" widget="monetary"/>
                                     <field name="members" sum="Total members"/>
+                                    <field name="members_project_not_intern" sum="Total members removed intern" optional="hide"/>
+                                    <field name="all_members" sum="Total all members" optional="hide"/>
                                     <field name="total_salary" sum="Total salary" widget="monetary"/>
                                     <field name="total_project_expense" sum="Total project expense" widget="monetary"/>
-                                    <field name="operation_cost" sum="Total operation cost" optional="show" widget="monetary" invisible="1"/>
-                                    <field name="profit" sum="Total profit" widget="monetary"/>
-                                    <field name="profit_margin" avg="Average profit margin" width="116px"/>
-                                    <field name="all_members" sum="Total all members" optional="hide"/>
+                                    <field name="total_department_expense" sum="Total department expense" widget="monetary"/>
+                                    <field name="total_commission" sum="Total commission" widget="monetary"/>
+                                    <field name="operation_cost" sum="Total operation cost" optional="show" widget="monetary"/>
+                                    <field name="total_avg_operation_project" sum="Total Avg Operation Cost" optional="hide" widget="monetary"/>
                                     <field name="average_cost_company" sum="Total average cost company" optional="hide" widget="monetary"/>
                                     <field name="average_cost_project" sum="Total average cost project" optional="hide" widget="monetary"/>
-                                    <field name="total_avg_operation_project" sum="Total average cost project all member" optional="hide" widget="monetary"/>
+                                    <field name="profit" sum="Total profit" widget="monetary"/>
+                                    <field name="profit_margin" avg="Average profit margin" width="116px"/>
                                     <field name="currency_id" invisible="1"/>
                                 </tree>
                                

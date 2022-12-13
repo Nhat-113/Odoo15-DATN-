@@ -220,7 +220,10 @@ class ProjectExpenseValue(models.Model):
             if record.currency_id.name == 'VND':
                 record.expense_vnd = record.total_expenses
             else:
-                record.expense_vnd = record.total_expenses * record.exchange_rate
+                if record.total_expenses > 0:
+                    record.expense_vnd = record.total_expenses * record.exchange_rate
+                else:
+                    record.expense_vnd = record.expense_vnd
 
 
     def validate_project_expense_content(self, action):

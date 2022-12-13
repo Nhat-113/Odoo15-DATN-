@@ -169,14 +169,16 @@ class ProjectManagementData(models.Model):
     currency_id = fields.Many2one('res.currency', string="Currency")
     date_start = fields.Date(string='Start')
     date_end = fields.Date(string='End')
-    status = fields.Char(string='Status')
+    status = fields.Selection(related='project_id.last_update_status', string='Status')
     stage_id = fields.Many2one('project.project.stage', string="Stage")
     stage_name = fields.Char(string='Stage Name')
     
     # bonus = fields.Float(string="Bonus")
     revenue = fields.Float(string="Revenue")
-    total_commission = fields.Float(string="Total Commission")
+    total_commission = fields.Float(string="Commission")
     project_cost = fields.Float(string="Prj Expenses")
+    total_avg_operation_project = fields.Float(string="Operation Prj")
+    total_department_expense = fields.Float(string="Dpm Expenses", help="Total Department Expenses By Month")
     
     last_update_color = fields.Integer(related='project_id.last_update_color', store=False)
     count_members = fields.Float(string='Effort (MM)', digits=(12,3))

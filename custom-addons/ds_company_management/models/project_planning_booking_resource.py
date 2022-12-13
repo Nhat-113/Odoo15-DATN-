@@ -10,24 +10,42 @@ class ProjectPlanningBookingResource(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
-                WITH handle_multi_payslip AS (
+                WITH get_salary_employee AS (
+                    SELECT 
+                        slip_id,
+                    -- 	code,
+                        SUM(total) AS salary
+                    FROM hr_payslip_line
+                    WHERE code IN ('NET', 'NET1', 'BH', 'TTNCN', 'TTNCN1')
+                    GROUP BY slip_id
+                    ORDER BY slip_id
+                ),
+                get_salary_13_months AS (
+                    SELECT 
+                        slip_id,
+                        total
+                    FROM hr_payslip_line
+                    WHERE code IN ('LBN')
+                    ORDER BY slip_id
+                ),
+                get_slip_employee AS (
+                    SELECT
+                        gs.slip_id,
+                        (gs.salary - gm.total) AS salary
+                    FROM get_salary_employee AS gs
+                    LEFT JOIN get_salary_13_months AS gm
+                        ON gm.slip_id = gs.slip_id
+                ),
+
+                handle_multi_payslip AS (
                     SELECT
                         hp.employee_id,
                         hp.date_from,
                         hp.date_to,
-                        SUM(hpl.total) AS total,
-                        SUM(hplbh.total) AS bhxh,
-                        SUM(hpltt.total) AS ttncn
+                        SUM(gs.salary) AS salary
                     FROM hr_payslip AS hp
-                    LEFT JOIN hr_payslip_line AS hpl
-                        ON hpl.slip_id = hp.id
-                        AND hpl.code IN('NET', 'NET1') 
-                    LEFT JOIN hr_payslip_line AS hplbh
-                        ON hp.id = hplbh.slip_id
-                        AND hplbh.code = 'BH'
-                    LEFT JOIN hr_payslip_line AS hpltt
-                        ON hp.id = hpltt.slip_id
-                        AND hpltt.code IN('TTNCN', 'TTNCN1')  
+                    LEFT JOIN get_slip_employee AS gs
+                        ON gs.slip_id = hp.id
                     WHERE hp.state = 'done'
                     GROUP BY hp.employee_id,
                             hp.date_from,
@@ -48,12 +66,12 @@ class ProjectPlanningBookingResource(models.Model):
                     br.end_date_month,
                     br.man_month,
                     br.effort_rate_month,
-                    hmp.total,
-                    hmp.bhxh,
-                    hmp.ttncn,
-                    ((COALESCE(NULLIF(hmp.total + hmp.bhxh + hmp.ttncn, NULL), 0)) * (COALESCE(NULLIF(br.effort_rate_month, NULL), 0)) / 100 ) AS salary,
+                    ((COALESCE(NULLIF(hmp.salary + pc.salary_lbn, NULL), 0)) * (COALESCE(NULLIF(br.effort_rate_month, NULL), 0)) / 100 ) AS salary,
+                    pc.salary_lbn,
                     pl.inactive,
-                    pl.inactive_date
+                    pl.inactive_date,
+                    pl.start_date AS start_booking,
+                    pl.end_date AS end_booking
                     
                 FROM booking_resource_month AS br
                 LEFT JOIN planning_calendar_resource AS pl
@@ -67,7 +85,96 @@ class ProjectPlanningBookingResource(models.Model):
                     ON hmp.employee_id = br.employee_id
                     AND EXTRACT (MONTH FROM br.start_date_month) = EXTRACT (MONTH FROM hmp.date_from)
                     AND EXTRACT (YEAR FROM br.start_date_month) = EXTRACT (YEAR FROM hmp.date_from)
+                LEFT JOIN pesudo_contract_generate AS pc
+                    ON pc.employee_id = br.employee_id
+                    AND EXTRACT(MONTH FROM pc.months) = EXTRACT(MONTH FROM br.start_date_month)
+                    AND EXTRACT(YEAR FROM pc.months) = EXTRACT(YEAR FROM br.start_date_month)
 
                 ORDER BY project_id, employee_id, months
+            )""" % (self._table)
+        )
+        
+        
+class ProjectCountMember(models.Model):
+    _name = 'project.count.member.contract'
+    _auto = False
+    
+    
+    def init(self):
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""
+            CREATE OR REPLACE VIEW %s AS (
+                WITH compute_total_effort_by_month AS (
+                    SELECT 
+                        company_id,
+                        department_id,
+                        project_id,
+                        employee_id,
+                        months,
+                        SUM(man_month) AS man_month,
+                        SUM(effort_rate_month) AS effort_rate_month,
+                 		SUM(salary) AS salary
+                    FROM project_planning_booking
+                    WHERE (member_type_name NOT IN('Shadow Time', 'shadow time') 
+                            OR member_type_name IS NULL)
+                        AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                            OR department_id IS NULL)
+                        AND effort_rate_month > 0
+                    GROUP BY company_id,
+                        department_id,
+                        project_id,
+                        employee_id,
+                        months
+                    ORDER BY department_id, employee_id, months
+                ),
+                get_contract_employee AS (
+                    SELECT 
+                        company_id,
+                        department_id,
+                        employee_id,
+                        months,
+                        SUM(working_day) AS working_day,
+                        total_working_day,
+                        
+                        (CASE
+                            WHEN contract_document_type NOT IN('Intern', 'intern', 'internship')
+                                THEN 'official'
+                            ELSE 'intern'
+                        END) AS type_contract
+                        
+                    FROM pesudo_contract
+                    GROUP BY company_id,
+                            department_id,
+                            employee_id,
+                            months,
+                            total_working_day,
+                            type_contract
+                )
+                SELECT
+                    ct.company_id,
+                    ct.department_id,
+                    ct.project_id,
+                    ct.employee_id,
+                    ct.months,
+                    ct.effort_rate_month,
+                    ct.man_month,
+                    ct.salary,
+                    gc.working_day,
+                    gc.total_working_day,
+                    (CASE
+                        WHEN gc.working_day IS NULL or gc.total_working_day IS NULL
+                            THEN 0
+                        ELSE(CASE
+                                WHEN gc.working_day <> gc.total_working_day
+                                    THEN (gc.working_day / gc.total_working_day) * ct.effort_rate_month / 100
+                                ELSE ct.man_month
+                            END)
+                    END) AS mm,
+                    gc.type_contract
+                    
+                FROM compute_total_effort_by_month AS ct
+                LEFT JOIN get_contract_employee AS gc
+                    ON gc.employee_id = ct.employee_id
+                    AND gc.months = ct.months
             )""" % (self._table)
         )
