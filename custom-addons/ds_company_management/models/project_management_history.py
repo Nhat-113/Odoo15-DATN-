@@ -128,7 +128,7 @@ class ProjectManagementHistory(models.Model):
                     SELECT
                         project_id,
                         months,
-                        SUM(mm) AS total_members,
+                        SUM(mm)::NUMERIC(10, 2) AS total_members,
                         SUM(salary) AS salary
                     FROM project_count_member_contract
                     WHERE department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
@@ -153,7 +153,7 @@ class ProjectManagementHistory(models.Model):
                         SELECT
                             project_id,
                             months,
-                            SUM(mm) AS total_members
+                            SUM(mm)::NUMERIC(10, 2) AS total_members
                         FROM project_count_member_contract
                         WHERE (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                             OR department_id IS NULL) AND type_contract = 'official'

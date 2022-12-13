@@ -10,7 +10,7 @@ class ProjectPlanningBookingResource(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
-                WITH get_slip_employee AS (
+                WITH get_salary_employee AS (
                     SELECT 
                         slip_id,
                     -- 	code,
@@ -19,6 +19,22 @@ class ProjectPlanningBookingResource(models.Model):
                     WHERE code IN ('NET', 'NET1', 'BH', 'TTNCN', 'TTNCN1')
                     GROUP BY slip_id
                     ORDER BY slip_id
+                ),
+                get_salary_13_months AS (
+                    SELECT 
+                        slip_id,
+                        total
+                    FROM hr_payslip_line
+                    WHERE code IN ('LBN')
+                    ORDER BY slip_id
+                ),
+                get_slip_employee AS (
+                    SELECT
+                        gs.slip_id,
+                        (gs.salary - gm.total) AS salary
+                    FROM get_salary_employee AS gs
+                    LEFT JOIN get_salary_13_months AS gm
+                        ON gm.slip_id = gs.slip_id
                 ),
 
                 handle_multi_payslip AS (

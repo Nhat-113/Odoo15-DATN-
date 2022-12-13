@@ -113,7 +113,7 @@ class AvailableBookingEmployees(models.Model):
                             type_contract
                 ),
 
-                get_payslip_employee AS (
+                get_salary_employee AS (
                     SELECT 
                         slip_id,
                     -- 	code,
@@ -122,6 +122,24 @@ class AvailableBookingEmployees(models.Model):
                     WHERE code IN ('NET', 'NET1', 'BH', 'TTNCN', 'TTNCN1')
                     GROUP BY slip_id
                     ORDER BY slip_id
+                ),
+
+                get_salary_13_months AS (
+                    SELECT 
+                        slip_id,
+                        total
+                    FROM hr_payslip_line
+                    WHERE code IN ('LBN')
+                    ORDER BY slip_id
+                ),
+
+                get_payslip_employee AS (
+                    SELECT
+                        gs.slip_id,
+                        (gs.salary - gm.total) AS salary
+                    FROM get_salary_employee AS gs
+                    LEFT JOIN get_salary_13_months AS gm
+                        ON gm.slip_id = gs.slip_id
                 ),
 
                 handle_multi_payslip AS (
