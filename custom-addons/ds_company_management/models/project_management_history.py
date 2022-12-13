@@ -113,34 +113,51 @@ class ProjectManagementHistory(models.Model):
                 ),
 
                 compute_project_count_member_salary AS (
+                    --SELECT
+                        --company_id,
+                        --project_id,
+                        --months,
+                        --SUM(man_month) AS total_members,
+                        --SUM(salary)::NUMERIC(20, 5) AS salary
+                    --FROM project_planning_booking
+                        --WHERE department_id NOT IN (SELECT department_id FROM department_mirai_fnb) 
+                            --OR department_id IS NULL
+                    --GROUP BY company_id,
+                            --project_id,
+                            --months
                     SELECT
-                        company_id,
                         project_id,
                         months,
-                        SUM(man_month) AS total_members,
-                        SUM(salary)::NUMERIC(20, 5) AS salary
-                    FROM project_planning_booking
-                        WHERE department_id NOT IN (SELECT department_id FROM department_mirai_fnb) 
-                            OR department_id IS NULL
-                    GROUP BY company_id,
-                            project_id,
-                            months
+                        SUM(mm) AS total_members,
+                        SUM(salary) AS salary
+                    FROM project_count_member_contract
+                    WHERE department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                        OR department_id IS NULL
+                    GROUP BY project_id, months
                 ),
 
                 project_count_member_not_intern AS (
-                    SELECT
-                        company_id,
-                        project_id,
-                        months,
-                        SUM(man_month) AS total_members
-                    FROM project_planning_booking
-                    WHERE (member_type_name NOT IN ('Intern', 'intern') 
-                            OR member_type_name IS NULL)
-                            AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
-                                    OR department_id IS NULL)
-                    GROUP BY company_id,
+                    -- 	SELECT
+                    -- 		company_id,
+                    -- 		project_id,
+                    -- 		months,
+                    -- 		SUM(man_month) AS total_members
+                    -- 	FROM project_planning_booking
+                    -- 	WHERE (member_type_name NOT IN ('Intern', 'intern') 
+                    -- 			OR member_type_name IS NULL)
+                    -- 			AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                    -- 					OR department_id IS NULL)
+                    -- 	GROUP BY company_id,
+                    -- 			project_id,
+                    -- 			months
+                        SELECT
                             project_id,
-                            months
+                            months,
+                            SUM(mm) AS total_members
+                        FROM project_count_member_contract
+                        WHERE (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                            OR department_id IS NULL) AND type_contract = 'official'
+                        GROUP BY project_id, months
                 ),
                 pesudo_contract_count_member AS (
                     SELECT

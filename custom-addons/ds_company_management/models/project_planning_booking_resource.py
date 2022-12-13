@@ -79,3 +79,88 @@ class ProjectPlanningBookingResource(models.Model):
         )
         
         
+class ProjectCountMember(models.Model):
+    _name = 'project.count.member.contract'
+    _auto = False
+    
+    
+    def init(self):
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""
+            CREATE OR REPLACE VIEW %s AS (
+                WITH compute_total_effort_by_month AS (
+                    SELECT 
+                        company_id,
+                        department_id,
+                        project_id,
+                        employee_id,
+                        months,
+                        SUM(man_month) AS man_month,
+                        SUM(effort_rate_month) AS effort_rate_month,
+                 		SUM(salary) AS salary
+                    FROM project_planning_booking
+                    WHERE (member_type_name NOT IN('Shadow Time', 'shadow time') 
+                            OR member_type_name IS NULL)
+                        AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                            OR department_id IS NULL)
+                        AND effort_rate_month > 0
+                    GROUP BY company_id,
+                        department_id,
+                        project_id,
+                        employee_id,
+                        months
+                    ORDER BY department_id, employee_id, months
+                ),
+                get_contract_employee AS (
+                    SELECT 
+                        company_id,
+                        department_id,
+                        employee_id,
+                        months,
+                        SUM(working_day) AS working_day,
+                        total_working_day,
+                        
+                        (CASE
+                            WHEN contract_document_type NOT IN('Intern', 'intern', 'internship')
+                                THEN 'official'
+                            ELSE 'intern'
+                        END) AS type_contract
+                        
+                    FROM pesudo_contract
+                    GROUP BY company_id,
+                            department_id,
+                            employee_id,
+                            months,
+                            total_working_day,
+                            type_contract
+                )
+                SELECT
+                    ct.company_id,
+                    ct.department_id,
+                    ct.project_id,
+                    ct.employee_id,
+                    ct.months,
+                    ct.effort_rate_month,
+                    ct.man_month,
+                    ct.salary,
+                    gc.working_day,
+                    gc.total_working_day,
+                    (CASE
+                        WHEN gc.working_day IS NULL or gc.total_working_day IS NULL
+                            THEN 0
+                        ELSE(CASE
+                                WHEN gc.working_day <> gc.total_working_day
+                                    THEN (gc.working_day / gc.total_working_day) * ct.effort_rate_month / 100
+                                ELSE ct.man_month
+                            END)
+                    END) AS mm,
+                    gc.type_contract
+                    
+                FROM compute_total_effort_by_month AS ct
+                LEFT JOIN get_contract_employee AS gc
+                    ON gc.company_id = ct.company_id
+                    AND gc.department_id = ct.department_id
+                    AND gc.employee_id = ct.employee_id
+                    AND gc.months = ct.months
+            )""" % (self._table)
+        )
