@@ -174,9 +174,7 @@ class ProjectCountMember(models.Model):
                     
                 FROM compute_total_effort_by_month AS ct
                 LEFT JOIN get_contract_employee AS gc
-                    ON gc.company_id = ct.company_id
-                    AND gc.department_id = ct.department_id
-                    AND gc.employee_id = ct.employee_id
+                    ON gc.employee_id = ct.employee_id
                     AND gc.months = ct.months
             )""" % (self._table)
         )
