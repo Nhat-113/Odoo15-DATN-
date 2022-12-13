@@ -33,8 +33,8 @@
                 <field name="total_salary" sum="Total Salary Cost" widget="monetary"/>
                 <field name="project_cost" sum="Total Prj Expenses" widget="monetary"/>
                 <field name="total_department_expense" sum="Total department expense" widget="monetary"/>
-                <field name="total_avg_operation_project" sum="Total Avg Operation Cost" widget="monetary"/>
                 <field name="total_commission" sum="Total commission" widget="monetary"/>
+                <field name="total_avg_operation_project" sum="Total Avg Operation Cost" widget="monetary"/>
                 <field name="revenue" sum="Total Revenue" widget="monetary"/>
                 <field name="profit" sum="Total Profit" widget="monetary"/>
                 <field name="profit_margin" avg="Average profit margin" width="116px"/>
