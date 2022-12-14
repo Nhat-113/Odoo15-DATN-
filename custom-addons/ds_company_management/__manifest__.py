@@ -25,6 +25,7 @@
         'data/cron_reset_upgrade_exchange_rate_api.xml',
         'data/exchange_rate_api_data.xml',
         'views/exchange_rate_view.xml',
+        'views/compare_salary_cost_support_view.xml',
         # 'views/human_resource_management_view.xml',
         'views/project_management_view.xml',
         'views/project_management_subceo_view.xml',

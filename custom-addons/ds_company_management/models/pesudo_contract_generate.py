@@ -191,7 +191,7 @@ class PesudoContractGenerate(models.Model):
                     FROM hr_payslip_line AS hpl
                     INNER JOIN hr_payslip AS hp
                         ON hp.id = hpl.slip_id
-                    WHERE code = 'LBN' AND hp.state = 'done'
+                    WHERE hpl.code = 'LBN' AND hp.state = 'done'
                     GROUP BY hp.employee_id, EXTRACT(YEAR FROM hp.date_from) 
                     ORDER BY employee_id
                 )

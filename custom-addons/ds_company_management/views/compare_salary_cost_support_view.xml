@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <!-- Sidebar filter  -->
+    <record id="compare_salary_cost_support_filter" model="ir.ui.view">
+        <field name="name">compare.salary.cost.data.search</field>
+        <field name="model">compare.salary.cost.data</field>
+        <field name="arch" type="xml">
+            <search>
+                <searchpanel>
+                    <field name="company_id" icon="fa-building" enable_counters="1"/>
+                </searchpanel>
+
+                <separator orientation="vertical" />
+                <field name="months"/>
+
+                <filter string="Current Year" name="filter_current_year_compare_salary" domain="[
+                    ('months', '&gt;=', (context_today().strftime('%%Y-01-01'))),
+                    ('months', '&lt;=', (context_today().strftime('%%Y-12-31')))]"/>
+
+                <group expand="1" string="Group By">
+                    <filter string="Company" name="group_by_company_compare_salary" context="{'group_by': 'company_id'}"/>
+                    <separator orientation="vertical" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="compare_salary_cost_support_tree" model="ir.ui.view">
+        <field name="name">compare.salary.cost.data.tree</field>
+        <field name="model">compare.salary.cost.data</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="employee_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="salary" widget="monetary" sum="Total Salary"/>
+                <field name="bhxh" widget="monetary" sum="Total BHXH"/>
+                <field name="ttncn" widget="monetary" sum="Total TTNCN"/>
+                <field name="salary_lbn" widget="monetary" sum="Total 13th Month Salary"/>
+                <field name="total_salary" widget="monetary" sum="Total Salary Cost"/>
+                <field name="company_id"/>
+                <field name="months" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="compare_salary_cost_support_action" model="ir.actions.act_window">
+        <field name="name">Statistics Salary Cost</field>
+        <field name="res_model">compare.salary.cost.data</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="compare_salary_cost_support_filter"/>
+        <field name="context">{'search_default_filter_current_year_compare_salary': 1, 'search_default_group_by_company_compare_salary': 1}</field>
+    </record>
+</odoo>
