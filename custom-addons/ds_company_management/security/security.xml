@@ -96,4 +96,11 @@
         <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_ceo'))]"/>
     </record>
 
+    <record id="compare_salary_cost_rule" model="ir.rule">
+        <field name="name">CEO: Compare Salary Cost Multi Company Rule</field>
+        <field name="model_id" ref="model_compare_salary_cost_data"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_ceo'))]"/>
+    </record>
+
 </odoo>
