@@ -66,7 +66,7 @@ class ProjectPlanningBookingResource(models.Model):
                     br.end_date_month,
                     br.man_month,
                     br.effort_rate_month,
-                    ((COALESCE(NULLIF(hmp.salary + pc.salary_lbn, NULL), 0)) * (COALESCE(NULLIF(br.effort_rate_month, NULL), 0)) / 100 ) AS salary,
+                    ((COALESCE(NULLIF(hmp.salary, NULL), 0) + (COALESCE(NULLIF(pc.salary_lbn, NULL), 0))) * (COALESCE(NULLIF(br.effort_rate_month, NULL), 0)) / 100 ) AS salary,
                     pc.salary_lbn,
                     pl.inactive,
                     pl.inactive_date,
@@ -112,8 +112,8 @@ class ProjectCountMember(models.Model):
                         employee_id,
                         months,
                         SUM(man_month) AS man_month,
-                        SUM(effort_rate_month) AS effort_rate_month,
-                 		SUM(salary) AS salary
+                        SUM(effort_rate_month) AS effort_rate_month
+                 		--SUM(salary) AS salary
                     FROM project_planning_booking
                     WHERE (member_type_name NOT IN('Shadow Time', 'shadow time') 
                             OR member_type_name IS NULL)
@@ -158,7 +158,7 @@ class ProjectCountMember(models.Model):
                     ct.months,
                     ct.effort_rate_month,
                     ct.man_month,
-                    ct.salary,
+                    --ct.salary,
                     gc.working_day,
                     gc.total_working_day,
                     (CASE

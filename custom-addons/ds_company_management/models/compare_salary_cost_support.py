@@ -26,7 +26,8 @@ class CompareSalaryCostSupport(models.Model):
                         bh.total AS bhxh,
                         tt.total AS ttncn,
                 -- 		lbn.total AS salary_lbn,
-                        pc.salary_lbn,
+                        --pc.salary_lbn,
+                        COALESCE(NULLIF(pc.salary_lbn, NULL), 0) AS salary_lbn,
                         rc.id AS currency_id
                     FROM hr_payslip AS hp
                     LEFT JOIN get_payslip_line_value AS net

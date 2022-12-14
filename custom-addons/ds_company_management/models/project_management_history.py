@@ -112,7 +112,7 @@ class ProjectManagementHistory(models.Model):
                     ORDER By project_id
                 ),
 
-                compute_project_count_member_salary AS (
+                compute_project_count_member AS (
                     --SELECT
                         --company_id,
                         --project_id,
@@ -128,12 +128,22 @@ class ProjectManagementHistory(models.Model):
                     SELECT
                         project_id,
                         months,
-                        SUM(mm)::NUMERIC(10, 2) AS total_members,
-                        SUM(salary) AS salary
+                        SUM(mm)::NUMERIC(10, 2) AS total_members
+                        --SUM(salary) AS salary
                     FROM project_count_member_contract
                     WHERE department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                         OR department_id IS NULL
                     GROUP BY project_id, months
+                ),
+                
+                compute_project_total_salary AS (
+                    SELECT
+                        project_id,
+                        months,
+                        SUM(salary) AS salary
+                    FROM project_planning_booking
+                    GROUP BY project_id,
+                        months
                 ),
 
                 project_count_member_not_intern AS (
@@ -427,7 +437,7 @@ class ProjectManagementHistory(models.Model):
                         gmp.revenue_from,
                         gmp.result_commission,
                         gmp.revenue_vnd,
-                        (COALESCE(NULLIF(pcm.salary, NULL), 0)) AS total_salary,
+                        (COALESCE(NULLIF(cpt.salary, NULL), 0)) AS total_salary,
                         (COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)) AS total_project_expense,
                         (COALESCE(NULLIF(cdp.total_project_expense, NULL), 0)) AS total_department_expense,
                         (COALESCE(NULLIF(em.total_expenses, NULL), 0)) AS operation_cost,
@@ -475,10 +485,15 @@ class ProjectManagementHistory(models.Model):
                 -- 		AND EXTRACT(MONTH FROM cts.months) = EXTRACT(MONTH FROM gmp.month_start)
                 -- 		AND EXTRACT(YEAR FROM cts.months) = EXTRACT(YEAR FROM gmp.month_start) 
                     
-                    LEFT JOIN compute_project_count_member_salary AS pcm
+                    LEFT JOIN compute_project_count_member AS pcm
                         ON pcm.project_id = gmp.project_id
                         AND EXTRACT(MONTH FROM pcm.months) = EXTRACT(MONTH FROM gmp.month_start)
                         AND EXTRACT(YEAR FROM pcm.months) = EXTRACT(YEAR FROM gmp.month_start)
+                        
+                    LEFT JOIN compute_project_total_salary AS cpt
+                        ON cpt.project_id = gmp.project_id
+                        AND EXTRACT(MONTH FROM cpt.months) = EXTRACT(MONTH FROM gmp.month_start)
+                        AND EXTRACT(YEAR FROM cpt.months) = EXTRACT(YEAR FROM gmp.month_start)
                         
                     LEFT JOIN project_count_member_not_intern AS pni
                         ON pni.project_id = gmp.project_id
