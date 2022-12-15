@@ -23,7 +23,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/cron_reset_upgrade_exchange_rate_api.xml',
-        'data/cron_update_resource_managerment_history.xml',
+        'data/cron_update_resource_management_history.xml',
         'data/exchange_rate_api_data.xml',
         'views/exchange_rate_view.xml',
         'views/compare_salary_cost_support_view.xml',
