@@ -191,7 +191,7 @@ class PesudoContractGenerate(models.Model):
                     FROM hr_payslip_line AS hpl
                     INNER JOIN hr_payslip AS hp
                         ON hp.id = hpl.slip_id
-                    WHERE code = 'LBN' AND hp.state = 'done'
+                    WHERE hpl.code = 'LBN' AND hp.state = 'done'
                     GROUP BY hp.employee_id, EXTRACT(YEAR FROM hp.date_from) 
                     ORDER BY employee_id
                 )
@@ -203,7 +203,12 @@ class PesudoContractGenerate(models.Model):
                     cw.years,
                     --ct.total_mm,
                     --gs.total,
-                    (COALESCE(NULLIF(gs.total * mm / total_mm, NULL), 0)) AS salary_lbn
+                    --(COALESCE(NULLIF(gs.total * mm / total_mm, NULL), 0) / ) AS salary_lbn
+                    (CASE
+                        WHEN gs.total IS NULL OR cw.mm IS NULL OR ct.total_mm IS NULL OR ct.total_mm = 0
+                            THEN 0
+                        ELSE gs.total * cw.mm / ct.total_mm
+                    END) salary_lbn
 
                 FROM compute_working_day_month_contract AS cw
                 LEFT JOIN compute_total_month_contract AS ct

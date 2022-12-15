@@ -1,4 +1,4 @@
-odoo.define('cost_manamgenet.upgrade_data', function(require) {
+odoo.define('cost_management.upgrade_data', function(require) {
     "use strict";
     var ListController = require('web.ListController');
     var core = require('web.core');
@@ -17,6 +17,18 @@ odoo.define('cost_manamgenet.upgrade_data', function(require) {
                         return location.reload();
                     }, 500);
                     
+                })
+            });
+
+            self.$buttons.on("click", ".upgrade_salary_cost_support", function() {
+                self._rpc({
+                    model: 'compare.salary.cost.data',
+                    method: 'upgrade_salary_cost_support'
+                }).then(() => {
+                    self.messageNotify();
+                    setTimeout(function (){
+                        return location.reload();
+                    }, 500);
                 })
             })
         },

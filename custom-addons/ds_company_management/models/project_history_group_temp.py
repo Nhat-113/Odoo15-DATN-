@@ -206,9 +206,10 @@ class AvailableBookingEmployees(models.Model):
 
                     FROM get_contract_employee AS gc
                     LEFT JOIN compute_total_effort_by_month AS ct
-                        ON ct.company_id = gc.company_id
-                        AND ct.department_id = gc.department_id
-                        AND ct.employee_id = gc.employee_id
+                        ON --ct.company_id = gc.company_id
+                        --AND ct.department_id = gc.department_id
+                        --AND 
+                            ct.employee_id = gc.employee_id
                         AND ct.months = gc.months
                     LEFT JOIN average_cost_company_temp AS ac
                         ON ac.company_id = gc.company_id

@@ -1,5 +1,6 @@
 from . import cost_management_upgrade_action
 from . import pesudo_contract_generate
+from . import compare_salary_cost_support
 from . import project_planning_booking_resource
 from . import exchange_rate_management
 from . import human_resource_management

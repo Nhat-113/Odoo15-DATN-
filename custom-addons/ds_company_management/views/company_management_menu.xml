@@ -56,6 +56,13 @@
         sequence="1"
         parent="ds_company_management.configuration"
         action="exchange_rate_action"/>
+    
+    <menuitem
+        id="compare_salary_cost_menu"
+        name="Statistics Salary Cost"
+        sequence="2"
+        parent="ds_company_management.configuration"
+        action="compare_salary_cost_support_action"/>
 
     <record id="action_human_resource_template" model="ir.actions.client">
         <field name="name">Human Resource Management</field>
