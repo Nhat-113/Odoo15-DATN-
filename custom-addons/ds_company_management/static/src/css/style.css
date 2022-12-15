@@ -337,7 +337,7 @@ button.view-member-free:hover {
 .title-avai-head-count .title-avai-head-count-rate {
     font-weight: bold !important;
 }
-#countriesDropdown {
+#filter-project-type {
     position: absolute;
     top: 100px;
     right: 35.5%;
