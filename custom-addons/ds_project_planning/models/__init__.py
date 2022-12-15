@@ -9,3 +9,4 @@ from . import project_task
 from . import ir_act_window
 from . import ir_ui_view
 from . import booking_resource_upgrade
+from . import project_update_status

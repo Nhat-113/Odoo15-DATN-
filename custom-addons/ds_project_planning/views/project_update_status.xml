@@ -1,0 +1,19 @@
+<odoo>
+    <data>
+
+        <record id="project_update_view_form_inherit" model="ir.ui.view">
+            <field name="name">project.update.view.form.inherit</field>
+            <field name="model">project.update</field>
+            <field name="inherit_id" ref="project.project_update_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="before">
+                    <header>
+                        <field name="check_action_update_booking" invisible="1"/>
+                        <button string="Update Booking Resource" confirm="The members are booked will be cleared effort (effort rate = 0) from the date the project set is Off Track. Are you sure to update booking?" class="btn-primary" attrs="{'invisible':[('check_action_update_booking', '=', True)]}" name="set_effort_project_done" type="object"/>
+                    </header>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
