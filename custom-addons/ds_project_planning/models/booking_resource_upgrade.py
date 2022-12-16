@@ -30,6 +30,14 @@ class BookingResourceWeek(models.Model):
                             total_effort_week += (rec.effort_rate_day)
 
                     week.effort_rate_week = total_effort_week/5
+            elif record.booking_id.check_edit_effort == False and id_month_db == False:
+                for week in self:
+                    total_effort_week = 0
+                    for rec in record.booking_id.booking_upgrade_day:
+                        if week.start_date_week <= rec.start_date_day and week.end_date_week >= rec.start_date_day:
+                            total_effort_week += (rec.effort_rate_day)
+
+                    week.effort_rate_week = total_effort_week/5
     
     @api.onchange('effort_rate_week')
     def check_edit_effort(self):
@@ -203,13 +211,10 @@ class BookingResourceMonth(models.Model):
     @api.depends('booking_id.booking_upgrade_week')
     def compute_effort_month(self):
         for month in self:
-            if month.booking_id.check_edit_effort == 'effort_week':
+            if month.booking_id.check_edit_effort in ['effort_week', False]:
                 total_effort_day = 0
                 for day in month.booking_id.booking_upgrade_day:
-                    if self.env.user.has_group('project.group_project_manager') == False:
-                        if day.start_date_day >= month.start_date_month and day.end_date_day <= month.end_date_month:
-                            total_effort_day += day.effort_rate_day
-                    else:
+                    if day.start_date_day >= month.start_date_month and day.end_date_day <= month.end_date_month:
                         total_effort_day += day.effort_rate_day
 
                 start_date_of_month = date(month.start_date_month.year, month.start_date_month.month, 1)
