@@ -9,7 +9,7 @@
                 <xpath expr="//sheet" position="before">
                     <header>
                         <field name="check_action_update_booking" invisible="1"/>
-                        <button string="Update Booking Resource" confirm="The members are booked will be cleared effort (effort rate = 0) from the date the project set is Off Track. Are you sure to update booking?" class="btn-primary" attrs="{'invisible':[('check_action_update_booking', '=', True)]}" name="set_effort_project_done" type="object"/>
+                        <button string="Update Booking Resource" confirm="The members are booked will be cleared effort (effort rate = 0) from the date the project set is Off Track. Are you sure to update booking?" class="btn-primary" attrs="{'invisible':['|', ('check_action_update_booking', '=', True), ('status', '!=', 'off_track')]}" name="set_effort_project_done" type="object"/>
                     </header>
                 </xpath>
             </field>
