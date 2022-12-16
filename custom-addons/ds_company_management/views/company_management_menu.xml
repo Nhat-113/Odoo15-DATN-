@@ -64,6 +64,21 @@
         parent="ds_company_management.configuration"
         action="compare_salary_cost_support_action"/>
 
+    <menuitem
+        id="project_booking_support_menu"
+        name="Statistics Planning Booking"
+        sequence="3"
+        parent="ds_company_management.configuration"
+        action="project_booking_support_action"/>
+
+    <menuitem
+        id="available_booking_support_menu"
+        name="Statistics Available Booking"
+        sequence="4"
+        parent="ds_company_management.configuration"
+        action="available_booking_action"
+        groups="ds_company_management.group_company_management_ceo"/>
+
     <record id="action_human_resource_template" model="ir.actions.client">
         <field name="name">Human Resource Management</field>
         <field name="tag">human_resource_template</field>

@@ -266,7 +266,7 @@ class AvailableBookingEmployees(models.Model):
         
 class AvailableBookingEmployeeData(models.Model):
     _name = 'available.booking.employee.data'
-    _order = 'employee_id'
+    _order = 'company_id, department_id, employee_id, months DESC'
     
     
     company_id = fields.Many2one('res.company', string='Company')
