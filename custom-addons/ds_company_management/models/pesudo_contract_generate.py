@@ -175,12 +175,11 @@ class PesudoContractGenerate(models.Model):
                 ),
                 compute_total_month_contract AS (
                     SELECT
-                        company_id,
                         employee_id,
                         years,
                         SUM(mm) AS total_mm
                     FROM compute_working_day_month_contract
-                    GROUP BY company_id, employee_id, years
+                    GROUP BY employee_id, years
                 ),
 
                 get_salary_lbn AS (

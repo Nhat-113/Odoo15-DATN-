@@ -36,7 +36,7 @@
                 <field name="salary" widget="monetary" sum="Total Salary"/>
                 <field name="bhxh" widget="monetary" sum="Total BHXH"/>
                 <field name="ttncn" widget="monetary" sum="Total TTNCN"/>
-                <!-- <field name="salary_lbn" widget="monetary" sum="Total 13th Month Salary"/> -->
+                <field name="salary_lbn" widget="monetary" sum="Total 13th Month Salary"/>
                 <field name="total_salary" widget="monetary" sum="Total Salary Cost"/>
                 <field name="company_id"/>
                 <field name="months" invisible="1"/>
