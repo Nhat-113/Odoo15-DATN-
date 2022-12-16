@@ -53,6 +53,7 @@ class HrRequestOverTime(models.Model):
                               readonly=True, help="The duration of working overtime in the project", default=0)
 
     company_id = fields.Many2one('res.company', string="Company", required=True, default=lambda self: self.env.company)
+    domain_company = fields.Char(string="Domain Company Alow")
     description = fields.Text(string="Description", tracking=True)
     stage_id = fields.Many2one('hr.request.overtime.stage', 'Status', ondelete='restrict',
                             default=_get_default_stage_id, 
@@ -66,6 +67,7 @@ class HrRequestOverTime(models.Model):
 
     request_creator_id = fields.Many2many('res.users', 'hr_request_overtime_res_users_inform_rel', string='Inform to', default=False, tracking=True, store=True)
     requester_id = fields.Many2one('res.users', string='Approver', required=True, default=lambda self: self._get_default_approve(), readonly=False, tracking=True, store=True)
+    domain_requester = fields.Char('Domain Approver', compute="_compute_domain_approver")
     member_ids = fields.Many2many('hr.employee', string='Members',
                                   help="All members has been assigned to the project", tracking=True)
     
@@ -94,6 +96,8 @@ class HrRequestOverTime(models.Model):
                 record.domain_stage = json.dumps([('name', 'in', ['Draft','Request','Confirm','Submit', 'Approved', 'Refuse'])])
             else:
                 record.domain_stage = json.dumps([('name', 'in', ['Draft','Request','Confirm','Submit', 'Approved'])])
+
+            record.domain_company = json.dumps([('id','in', self.env.context['allowed_company_ids'])])
 
     def _compute_invisible_button_refuse(self):
         for record in self:
@@ -125,6 +129,14 @@ class HrRequestOverTime(models.Model):
                 project_ids = []
             
             record.get_domain_projects = json.dumps([('company_id', '=', record.company_id.id), ('id', 'in', project_ids)])
+
+
+    @api.depends('company_id')
+    def _compute_domain_approver(self):
+        for record in self:
+            user_ids = self.env['res.users'].search([('company_ids', 'in', record.company_id.ids)]).ids
+            record.domain_requester = json.dumps([('id','in', user_ids)])
+
 
     def action_refuse_reason(self):
         return {

@@ -76,7 +76,8 @@
                                     <field name="end_date_project" widget="daterange" options='{"related_start_date": "start_date"}' attrs="{'invisible': [('project_id','=',False)]}"/>
                                 </div>
                                 <field name="user_id" string="Project Manager" widget="many2one_avatar_user" domain="[('share', '=', False)]" width="2" attrs="{'invisible': [('project_id','=',False)]}"/>
-                                <field name="company_id" groups="base.group_multi_company" attrs="{'readonly': [('read_only_project','=', True)]}"/>
+                                <field name="domain_company" invisible="1"/>
+                                <field name="company_id" groups="base.group_multi_company" attrs="{'readonly': [('read_only_project','=', True)]}" domain = "domain_company"/>
                                 <field name="request_creator_id" invisible="1" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" widget="many2many_tags" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
                             </group>
                             <group name="group_right" class="over_duration">
@@ -88,7 +89,8 @@
                                     <field name="end_date" widget="daterange" options='{"related_start_date": "start_date"}' attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}"/>
                                 </div>
                                 <field name="duration_overtime" readonly="1"/>
-                                <field name="requester_id" readonly="0" widget="many2one_avatar_user" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}"/>
+                                <field name="domain_requester" invisible="1"/>
+                                <field name="requester_id" readonly="0" widget="many2one_avatar_user" attrs="{'readonly': ['|', ('stage_name','!=', 'Draft'), ('active', '=', False)]}" options="{'no_create_edit': True, 'no_open': True, 'no_create': True}" domain="domain_requester"/>
                             </group>
                         </group>
                         <separator string="Description"/>
