@@ -10,6 +10,9 @@
 
       <button t-if="widget.modelName == 'compare.salary.cost.data'" 
         class="btn btn-primary upgrade_salary_cost_support" type="button">Upgrade</button>
+
+      <button t-if="widget.modelName == 'project.planning.booking.data'" 
+        class="btn btn-primary upgrade_project_booking_support" type="button">Upgrade</button>
     </t>
   </t>
 </template>

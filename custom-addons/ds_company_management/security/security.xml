@@ -103,4 +103,18 @@
         <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_ceo'))]"/>
     </record>
 
+    <record id="project_salary_booking_support_rule" model="ir.rule">
+        <field name="name">CEO: Project Booking Support Multi Company Rule</field>
+        <field name="model_id" ref="model_project_planning_booking_data"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_ceo'))]"/>
+    </record>
+
+    <record id="available_booking_support_rule" model="ir.rule">
+        <field name="name">CEO: Available Booking Support Multi Company Rule</field>
+        <field name="model_id" ref="model_available_booking_employee_data"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_ceo'))]"/>
+    </record>
+
 </odoo>

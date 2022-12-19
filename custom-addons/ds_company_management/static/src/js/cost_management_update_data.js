@@ -30,6 +30,18 @@ odoo.define('cost_management.upgrade_data', function(require) {
                         return location.reload();
                     }, 500);
                 })
+            }),
+
+            self.$buttons.on("click", ".upgrade_project_booking_support", function() {
+                self._rpc({
+                    model: 'project.planning.booking.data',
+                    method: 'upgrade_project_booking_support'
+                }).then(() => {
+                    self.messageNotify();
+                    setTimeout(function (){
+                        return location.reload();
+                    }, 500);
+                })
             })
         },
         messageNotify: function() {

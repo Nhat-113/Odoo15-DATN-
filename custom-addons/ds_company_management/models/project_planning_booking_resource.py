@@ -1,4 +1,4 @@
-from odoo import fields, models, tools
+from odoo import fields, models, tools, api
 
 
 class ProjectPlanningBookingResource(models.Model):
@@ -71,7 +71,8 @@ class ProjectPlanningBookingResource(models.Model):
                     pl.inactive,
                     pl.inactive_date,
                     pl.start_date AS start_booking,
-                    pl.end_date AS end_booking
+                    pl.end_date AS end_booking,
+                    rc.id AS currency_id
                     
                 FROM booking_resource_month AS br
                 LEFT JOIN planning_calendar_resource AS pl
@@ -89,11 +90,83 @@ class ProjectPlanningBookingResource(models.Model):
                     ON pc.employee_id = br.employee_id
                     AND EXTRACT(MONTH FROM pc.months) = EXTRACT(MONTH FROM br.start_date_month)
                     AND EXTRACT(YEAR FROM pc.months) = EXTRACT(YEAR FROM br.start_date_month)
+                LEFT JOIN res_currency AS rc
+                    ON rc.name = 'VND'
 
                 ORDER BY project_id, employee_id, months
             )""" % (self._table)
         )
         
+
+class ProjectPlanningBookingResourceData(models.Model):
+    _name = 'project.planning.booking.data'
+    _order = 'company_id, project_id, employee_id, months DESC'
+    
+    
+    company_id = fields.Many2one('res.company', string='Company')
+    project_id = fields.Many2one('project.project', string='Project')
+    employee_id = fields.Many2one('hr.employee', string='Employee')
+    currency_id = fields.Many2one('res.currency', string='Currency')
+    
+    months = fields.Date(string="Month Filter")
+    starts = fields.Date(string='Start')
+    ends = fields.Date(string='End')
+    
+    effort_rate = fields.Float(string='Effort Rate (%)')
+    man_month = fields.Float(string='Man Month')
+    salary = fields.Monetary(string='Salary')
+    salary_lbn = fields.Monetary(string='13th Month Salary')
+    
+    
+    
+    @api.model
+    def upgrade_project_booking_support(self):
+        user_update = str(self.env.user.id)
+        query = self.query_update_project_planning_booking(user_update)
+        self.env.cr.execute(query)
+        return
+        
+    def query_update_project_planning_booking(self, user_update):
+        return """
+                DELETE FROM project_planning_booking_data;
+                INSERT INTO 
+                    project_planning_booking_data(
+                        company_id,
+                        project_id,
+                        currency_id,
+                        employee_id,
+                        months,
+                        starts,
+                        ends,
+                        effort_rate,
+                        man_month,
+                        salary,
+                        salary_lbn,
+                        create_uid, 
+                        write_uid, 
+                        create_date, 
+                        write_date
+                    )  
+                SELECT 
+                    company_id,
+                    project_id,
+                    currency_id,
+                    employee_id,
+                    months,
+                    start_date_month,
+	                end_date_month,
+                    effort_rate_month,
+                    man_month,
+                    salary,
+                    salary_lbn,
+                    """ + user_update + """,
+                    """ + user_update + """,
+                    CURRENT_DATE,
+                    CURRENT_DATE
+                FROM project_planning_booking;
+            """
+    
+
         
 class ProjectCountMember(models.Model):
     _name = 'project.count.member.contract'
