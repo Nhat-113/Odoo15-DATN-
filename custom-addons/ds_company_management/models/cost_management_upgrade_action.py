@@ -511,6 +511,7 @@ class UpgradeAction(models.Model):
                 INSERT INTO
                     available_booking_employee_data(
                         --id,
+                        company_emp,
                         company_id,
                         department_id,
                         employee_id,
@@ -528,6 +529,7 @@ class UpgradeAction(models.Model):
                     )
                 SELECT
                     --id,
+                    ab.company_emp,
                     ab.company_id,
                     ab.department_id,
                     ab.employee_id,

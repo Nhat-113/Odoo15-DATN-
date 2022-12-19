@@ -54,6 +54,7 @@ class ProjectPlanningBookingResource(models.Model):
 
                 SELECT 
                     ROW_NUMBER() OVER(ORDER BY start_date_month ASC) AS id,
+                    he.company_id AS company_emp,
                     pp.company_id,
                     pl.project_id,
                     pp.department_id,
@@ -92,6 +93,8 @@ class ProjectPlanningBookingResource(models.Model):
                     AND EXTRACT(YEAR FROM pc.months) = EXTRACT(YEAR FROM br.start_date_month)
                 LEFT JOIN res_currency AS rc
                     ON rc.name = 'VND'
+                LEFT JOIN hr_employee AS he
+		            ON he.id = br.employee_id
 
                 ORDER BY project_id, employee_id, months
             )""" % (self._table)
@@ -103,6 +106,7 @@ class ProjectPlanningBookingResourceData(models.Model):
     _order = 'company_id, project_id, employee_id, months DESC'
     
     
+    company_emp = fields.Many2one('res.company', string='Company Employee')
     company_id = fields.Many2one('res.company', string='Company')
     project_id = fields.Many2one('project.project', string='Project')
     employee_id = fields.Many2one('hr.employee', string='Employee')
@@ -131,6 +135,7 @@ class ProjectPlanningBookingResourceData(models.Model):
                 DELETE FROM project_planning_booking_data;
                 INSERT INTO 
                     project_planning_booking_data(
+                        company_emp,
                         company_id,
                         project_id,
                         currency_id,
@@ -148,6 +153,7 @@ class ProjectPlanningBookingResourceData(models.Model):
                         write_date
                     )  
                 SELECT 
+                    company_emp,
                     company_id,
                     project_id,
                     currency_id,

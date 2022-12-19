@@ -8,6 +8,7 @@
                 <field name="employee_id" icon="fa-users" enable_counters="1"/>
                 <field name="department_id" icon="fa-users" enable_counters="1"/>
                 <field name="company_id" groups="base.group_multi_company" icon="fa-building" enable_counters="1"/>
+                <field name="company_emp" groups="base.group_multi_company" icon="fa-building" enable_counters="1"/>
             </search>
         </field>
     </record>
@@ -26,6 +27,7 @@
                 <field name="available_effort" sum="Total Available Effort" width="116px"/>
                 <field name="department_id" optional="hide"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="company_emp" groups="base.group_multi_company" optional="hide"/>
                 <field name="salary" sum="Total Salary" widget="monetary" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
             </tree>
