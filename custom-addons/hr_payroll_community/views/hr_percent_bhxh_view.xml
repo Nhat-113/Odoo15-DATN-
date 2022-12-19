@@ -4,8 +4,9 @@
         <field name="name">BHXH (%) List</field>
         <field name="model">hr.percent.bhxh</field>
         <field name="arch" type="xml">
-            <tree create="0" delete="0" multi_edit="1" sample="1" editable='top'>
-                <field name="name" readonly="1" width="50px"/>
+            <tree create="1" delete="0" multi_edit="1" sample="1" editable='top'>
+                <field name="name" readonly="0" width="50px"/>
+                <field name="type_percent" readonly="0"/>
                 <field name="percent" readonly='0'/>
             </tree>
         </field>

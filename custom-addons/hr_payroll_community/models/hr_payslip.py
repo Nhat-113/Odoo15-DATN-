@@ -431,21 +431,33 @@ class HrPayslip(models.Model):
             
             percent_net = self.env['hr.percent.bhxh'].search([('type_percent', '=', 'bhxh_net')]).percent
             percent_gross = self.env['hr.percent.bhxh'].search([('type_percent', '=', 'bhxh_gross')]).percent
+            percent_gross_sdld = self.env['hr.percent.bhxh'].search([('type_percent', '=', 'bhxh_gross_sdld')]).percent
 
             if contract.struct_id.code == 'BASE1':
-                bhxh_percent = percent_net     
+                bhxh_percent = percent_net
+                bhxh_percent_sdld = 0
             elif contract.struct_id.code == 'BASE2':
                 bhxh_percent = percent_gross
+                bhxh_percent_sdld = percent_gross_sdld
             else:
                 bhxh_percent = 0
+                bhxh_percent_sdld = 0
 
             bhxh = {
                     'name': 'BHXH (%)',
                     'code': 'PBH',
                     'contract_id': contract.id,
                     'amount': bhxh_percent
+                }
+            bhxh_sdld = {
+                    'name': 'BHXH (%) (của SDLĐ)',
+                    'code': 'BHC',
+                    'contract_id': contract.id,
+                    'amount': bhxh_percent_sdld
                 }  
             res.append(bhxh)
+            if bhxh_percent_sdld > 0:
+                res.append(bhxh_sdld)
         return res
 
 
