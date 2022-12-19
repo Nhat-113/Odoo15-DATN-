@@ -70,8 +70,8 @@ class AvailableBookingEmployees(models.Model):
                 ---- Compute available_booking_employee --
                 WITH compute_total_effort_by_month AS (
                     SELECT 
-                        company_id,
-                        department_id,
+                        --company_id,
+                        --department_id,
                         employee_id,
                         months,
                         SUM(man_month) AS man_month,
@@ -83,11 +83,11 @@ class AvailableBookingEmployees(models.Model):
                         AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
                             OR department_id IS NULL)
                         AND effort_rate_month > 0
-                    GROUP BY company_id,
-                        department_id,
+                    GROUP BY --company_id,
+                        --department_id,
                         employee_id,
                         months
-                    ORDER BY department_id, employee_id, months
+                    ORDER BY employee_id, months
                 ),
                 get_contract_employee AS (
                     SELECT 
