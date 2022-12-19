@@ -159,6 +159,7 @@ class AvailableBookingEmployees(models.Model):
 
                 compute_available_effort_employee AS (
                     SELECT
+                        he.company_id AS company_emp,
                         gc.company_id,
                         gc.department_id,
                         gc.employee_id,
@@ -224,10 +225,13 @@ class AvailableBookingEmployees(models.Model):
                     AND EXTRACT(YEAR FROM pc.months) = EXTRACT(YEAR FROM gc.months)
                     LEFT JOIN res_currency AS rc
                         ON rc.name = 'VND'
+                    LEFT JOIN hr_employee AS he
+		                ON he.id = gc.employee_id
 
                     ORDER BY department_id, employee_id, months
                 )
                 SELECT
+                    company_emp,
                     company_id,
                     department_id,
                     employee_id,
@@ -249,7 +253,8 @@ class AvailableBookingEmployees(models.Model):
 
                 FROM compute_available_effort_employee
                 WHERE available_effort > 0
-                GROUP BY company_id,
+                GROUP BY company_emp, 
+                        company_id,
                         department_id,
                         employee_id,
                         months,
@@ -269,6 +274,7 @@ class AvailableBookingEmployeeData(models.Model):
     _order = 'company_id, department_id, employee_id, months DESC'
     
     
+    company_emp = fields.Many2one('res.company', string='Company Employee')
     company_id = fields.Many2one('res.company', string='Company')
     department_id = fields.Many2one('hr.department', string='Department')
     employee_id = fields.Many2one('hr.employee', string='Employee')

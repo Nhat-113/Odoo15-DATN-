@@ -20,6 +20,8 @@
                 <group expand="1" string="Group By">
                     <filter string="Company" name="group_by_company_project_booking_support" context="{'group_by': 'company_id'}"/>
                     <separator orientation="vertical" />
+                    <filter string="Company Employee" name="group_by_company_employee_booking_support" context="{'group_by': 'company_emp'}"/>
+                    <separator orientation="vertical" />
                 </group>
             </search>
         </field>
@@ -42,6 +44,7 @@
                 <field name="salary_lbn" widget="monetary" sum="Total 13th Month Salary"/>
                 <!-- <field name="total_salary" widget="monetary" sum="Total Salary Cost"/> -->
                 <field name="company_id" optional='hide'/>
+                <field name="company_emp" optional='hide'/>
                 <field name="months" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
             </tree>
