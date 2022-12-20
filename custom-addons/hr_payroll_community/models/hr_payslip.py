@@ -444,13 +444,13 @@ class HrPayslip(models.Model):
                 bhxh_percent_sdld = 0
 
             bhxh = {
-                    'name': 'BHXH (%)',
+                    'name': 'BHXH (%) (Trích vào lương NLĐ)',
                     'code': 'PBH',
                     'contract_id': contract.id,
                     'amount': bhxh_percent
                 }
             bhxh_sdld = {
-                    'name': 'BHXH (%) (của SDLĐ)',
+                    'name': 'BHXH (%) (Trích vào chi phí DN)',
                     'code': 'BHC',
                     'contract_id': contract.id,
                     'amount': bhxh_percent_sdld
