@@ -515,7 +515,7 @@
         </record>
 
         <record id="hr_rule_bhmirai" model="hr.salary.rule">
-            <field name="name">BHYT, BHXH, BHTN (VND) (Của NLĐ)</field>
+            <field name="name">BHYT, BHXH, BHTN (VND) (NLĐ đóng)</field>
             <field name="sequence" eval="19"/>
             <field name="code">BH</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -526,7 +526,7 @@
         </record>
 
         <record id="hr_rule_bhmirai1" model="hr.salary.rule">
-            <field name="name">BHYT, BHXH, BHTN (VND) (Của NLĐ)</field>
+            <field name="name">BHYT, BHXH, BHTN (VND) (NLĐ đóng)</field>
             <field name="sequence" eval="19"/>
             <field name="code">BH</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -537,7 +537,7 @@
         </record>
 
         <record id="hr_rule_bhmirai_sdld" model="hr.salary.rule">
-            <field name="name">BHYT, BHXH, BHTN (VND) (Của SDLĐ)</field>
+            <field name="name">BHYT, BHXH, BHTN (VND) (SDLĐ đóng)</field>
             <field name="sequence" eval="23"/>
             <field name="code">BHC</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -548,7 +548,7 @@
         </record>
 
         <record id="hr_rule_bhmirai1_sdld" model="hr.salary.rule">
-            <field name="name">BHYT, BHXH, BHTN (VND) (Của SDLĐ)</field>
+            <field name="name">BHYT, BHXH, BHTN (VND) (SDLĐ đóng)</field>
             <field name="sequence" eval="23"/>
             <field name="code">BHC</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
