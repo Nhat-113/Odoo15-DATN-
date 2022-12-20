@@ -20,4 +20,4 @@ access_hr_contract_advantage_template,hr.contract.advantage.template.user,model_
 access_hr_payslip_employees,access_hr_payslip_employees,model_hr_payslip_employees,base.group_user,1,1,1,1
 access_group_user,Access User,model_hr_payslip_employees,hr_payroll_community.group_hr_payroll_community_user,1,1,1,1
 access_group_user,Access User,model_payslip_lines_contribution_register,hr_payroll_community.group_hr_payroll_community_user,1,1,1,1
-access_group_bhxh_hr,Access HR,model_hr_percent_bhxh,hr_payroll_community.group_hr_payroll_community_manager,1,1,0,0
+access_group_bhxh_hr,Access HR,model_hr_percent_bhxh,hr_payroll_community.group_hr_payroll_community_manager,1,1,1,0
