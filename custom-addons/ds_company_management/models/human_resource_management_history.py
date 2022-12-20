@@ -142,12 +142,12 @@ class HumanResourceManagementHistory(models.Model):
 	
         # sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ' or company_project_id in ' + str(tuple(selected_companies)) + ')'
         sql_domain_for_company = ''
-
         sql_domain_for_role = ''
-        if len(id_all_mirai_department) == 0: 
-            sql_domain_for_department_emp = ''
-            sql_domain_for_department_proj = ''
-        else: 
+        
+        sql_domain_for_department_emp = ''
+        sql_domain_for_department_proj = ''
+
+        if len(id_all_mirai_department) > 0: 
             id_all_mirai_department.append(0)
             sql_domain_for_department_emp = ' AND (human_resource_management_history.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.department_id IS NULL )'
             sql_domain_for_department_proj = ' AND (human_resource_management_history.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.PROJECT_DEPARTMENT_ID IS NULL )' 
@@ -272,4 +272,75 @@ class HumanResourceManagementHistory(models.Model):
 
         return {
             'get_human_resource_free_history': get_human_resource_free_history,
+        }
+
+    #get data history support 
+    @api.model
+    def get_list_human_resource_history_support(self):
+        user_id_login = self.env.user.id
+        selected_companies =  self.env['human.resource.management'].get_current_company_value()
+        get_role_user_login = self.get_role_user_login() 
+        id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()		
+        # div_manager_department_id =  self.env.user.employee_ids.department_id.id
+        cr = self._cr
+	
+        # sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ' or company_project_id in ' + str(tuple(selected_companies)) + ')'
+        sql_domain_for_company = ''
+        sql_domain_for_role = ''
+
+        if len(id_all_mirai_department) > 0: 
+            id_all_mirai_department.append(0)
+            sql_domain_for_department_emp = ' AND (human_resource_management_history.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.department_id IS NULL )'
+            sql_domain_for_department_proj = ' AND (human_resource_management_history.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.PROJECT_DEPARTMENT_ID IS NULL )' 
+        if  get_role_user_login  == 'Ceo':
+            sql_domain_for_company = 'where company_id != company_project_id and  ( company_id in ' + str(tuple(selected_companies)) + ')'
+
+        elif get_role_user_login  == 'Sub-Ceo':
+            sql_domain_for_company =   'where ( company_manager_user_id != ' + str(user_id_login) + ' and user_id_sub_ceo_project = ' + str(user_id_login) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
+
+        elif get_role_user_login  == 'Div-Manager':
+            sql_domain_for_role = ' where ( (department_manager_user_id != ' + str(user_id_login) + 'or  department_manager_user_id is null  )' + ' and department_manager_project_id = ' + str(user_id_login) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
+
+        sql = ("""select  	employee_name,
+                            company_name,
+                            department_name,
+                            project_name,
+                            project_type_name,
+                            year_of_project,
+                            month1,
+                            month2,
+                            month3,
+                            month4,
+                            month5,
+                            month6,
+                            month7,
+                            month8,
+                            month9,
+                            month10,
+                            month11,
+                            month12,
+                            average,
+                            company_manager_user_id,
+                            department_manager_user_id,
+                            company_project_id,
+                            company_id,
+                            department_id,
+                            employee_id,
+                            project_department_id,
+                            department_manager_project_id,
+                            user_id_sub_ceo_project,
+                            year_history,
+                            start_date_contract,
+                            end_date_contract 
+                            from human_resource_management_history """)
+        sql += sql_domain_for_company
+        sql += sql_domain_for_role
+        sql += sql_domain_for_department_emp
+        sql += sql_domain_for_department_proj
+
+        cr.execute(sql)
+        list_human_resource_history_support = cr.fetchall()
+
+        return {
+            'list_human_resource_history_support': list_human_resource_history_support,
         }

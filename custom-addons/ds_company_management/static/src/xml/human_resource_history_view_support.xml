@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="initial-scale=1"/>
+    <t t-name="Human_resource_history_support">
+        <div class="main_content_hmrc">
+            <div class="human_resource_in_top">
+                <div class="header_human_resource">
+                    <h2 class="title_human_resource">Human Resource Management Support History</h2>
+                    <div class="search_textbox">
+                        <input type="text" id="search_input" placeholder="Search ..." />
+                        <i title="Search..." role="img" aria-label="Search..." class="o_searchview_icon icon_search_human fa fa-search"></i>
+
+                        <div class="selection-box">
+                            <!-- <button class="view-member-free" >Available Resource</button> -->
+                            <select id="filter-project-type">
+                                <option>All</option>
+                                <option>Project Billable</option>
+                                <option>Project Internal</option>
+                            </select>
+                            <select id="filter-year">
+                                <!-- <option>2022</option> -->
+                                <!-- <option t-foreach="12" t-as="i" t-att-value="i" class="filter-year-data" >
+                                    <t t-esc="i"/>
+                                </option> -->
+                                <option value="2022">2022</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                                <option value="2029">2029</option>
+                            </select>
+                        </div>
+                        
+                        <h3 id="count_member_of_company"></h3>
+                    </div>
+                </div>
+                <div class="human_resouce_value">
+                    <button class="export_excel btn btn-secondary fa fa-download o_list_export_xlsx" ></button>
+                </div>
+            </div>
+
+            <div class="human_resource_template">
+                <table> 
+                    <tbody id="over-view-table" >
+                        <tr class="over-header">
+                        <th></th>
+                        <th>January</th>
+                        <th>February</th>
+                        <th>March</th>
+                        <th>April</th>
+                        <th>May</th>
+                        <th>June</th>
+                        <th>July</th>
+                        <th>August</th>
+                        <th>September</th>
+                        <th>October</th>
+                        <th>November</th>
+                        <th>December</th>
+                        </tr>
+                        <tr class="value-over">
+                            <td>Member Count</td>
+                            <td t-foreach="12" t-as="i" class="value-member-count">
+                                <t t-esc="i"/>
+                            </td>
+                        </tr>
+                        <tr class="value-over">
+                            <td>Average Usage Rate (%)</td>
+                            <td t-foreach="12" t-as="i" class="value-member-aver-usage">
+                                <t t-esc="i"/>
+                            </td>
+                        </tr>
+                        <tr class="value-over">
+                            <td>Billable Headcounts </td>
+                            <td t-foreach="12" t-as="i" class="bill-able-headcounts">
+                                <t t-esc="i"/>
+                            </td>
+                        </tr>
+                        <tr class="value-over">
+                            <td>Billable Headcounts Rate (%)</td>
+                            <td t-foreach="12" t-as="i" class="bill-able-avg">
+                                <t t-esc="i"/>
+                            </td>
+                        </tr>
+                        <tr class="value-over">
+                            <td>Internal Headcounts</td>
+                            <td t-foreach="12" t-as="i" class="internal-headcounts">
+                                <t t-esc="i"/>
+                            </td>
+                        </tr>
+                        <tr class="value-over">
+                            <td>Internal Headcounts Rate (%)</td>
+                            <td t-foreach="12" t-as="i" class="internal-headcounts-avg">
+                                <t t-esc="i"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table id="human_resource_table">
+                    <tbody class="human_resource_content" id="human_reource_tbody">
+                        <tr class="header_tabel">
+                            <th></th>
+                            <th class="human_employee_id header_human_table">
+                                Employee ID
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table_name">
+                                Employee Name
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                Company
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                Department
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                Project
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                Project Type
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                January
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                February
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                March
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                April
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                May
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                June
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                July
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                August
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                September
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                October
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                November
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                December
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                AVG (%)
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+                            <th class="header_human_table">
+                                Year Of History
+                                <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                            </th>
+
+                        </tr>
+                        <t t-foreach="widget.list_human_resource_history_support" t-as="list_human_resource_history_support">
+                            <tr class="detail">
+                                <td class="td_value_none"></td>
+                                <td class="td_value human_employee_id" type="string">
+                                    <t t-esc="list_human_resource_history_support[24]"/>
+                                </td>
+                                <td class="td_value name_employee" type="string">
+                                    <t t-esc="list_human_resource_history_support[0]"/>
+                                </td>
+                                <td t-foreach="list_human_resource_history_support.slice(1,-27)" t-as="i" type="string"  class="td_value">
+                                    <t t-esc="i" />
+                                </td>
+                                <td class="td_value project_type" type="string">
+                                    <t t-esc="list_human_resource_history_support[4]"/>
+                                </td>      
+                                <td t-foreach="list_human_resource_history_support.slice(6,-13)" t-as="i" type="string"  class="td_value">
+                                    <t t-esc="i" />
+                                </td>
+                                <td class="AVG_colum" type="string">
+                                    <t t-esc="list_human_resource_history_support[19]"/>
+                                </td>
+                                <td class="Year_of_history" type="string">
+                                    <t t-esc="list_human_resource_history_support[28]"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr id="avg-row" class="Avg_effort_member" style="display:none">
+                            <th scope="row" class="td_value_none">Average Res Rate (%)</th>
+                            <td class="td_value_none"></td>
+                            <td class="td_value human_employee_id" type="string" ></td>
+                           
+                            <td t-foreach="18" t-as="i" class="available-headcounts-avg">
+                                <t t-esc="i"/>
+                            </td>
+                        </tr>
+                        <tr id="total-row" class="total_member_avai" style="display:none">
+                            <th scope="row">Total Members</th>
+                            <td class="td_value human_employee_id" type="string"></td>
+                            <td t-foreach="18" t-as="i" class="available-headcounts-avg">
+                                <t t-esc="i"/>
+                            </td>
+                        </tr>
+
+                        <tr id="total-effort-all-res-rate" class="total_member_avai-2" style="display:none">
+                            <th scope="row">All Res Rate (%)</th>
+                            <td class="td_value human_employee_id" type="string"></td>
+                            <td t-foreach="18" t-as="i" class="available-headcounts-avg">
+                                <t t-esc="i"/>
+                            </td>
+                        </tr>
+
+                        <tr id="total-row-member-of-company" class="total_member_avai_company" style="display:none">
+                            <th scope="row">Total Members Company</th>
+                            <td class="td_value human_employee_id" type="string"></td>
+                            <td t-foreach="18" t-as="i" class="available-headcounts-avg">
+                                <t t-esc="i"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </t>
+</templates>
