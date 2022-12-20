@@ -1,13 +1,7 @@
 odoo.define('human_resource_template_history.Dashboard', function (require) {
     "use strict";
 
-    const ActionMenus = require("web.ActionMenus");
-    const ComparisonMenu = require("web.ComparisonMenu");
-    const ActionModel = require("web.ActionModel");
-    const FavoriteMenu = require("web.FavoriteMenu");
     const FilterMenu = require("web.FilterMenu");
-    const GroupByMenu = require("web.GroupByMenu");
-    const Pager = require("web.Pager");
     const SearchBar = require("web.SearchBar");
     const { useModel } = require("web.Model");
     const { Component, hooks } = owl;
@@ -36,7 +30,6 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
     var session = require('web.session');
     var web_client = require('web.web_client');
     var _t = core._t;
-    var QWeb = core.qweb;
     const number_rows_not_count = 4;
 
     var HumanResourceHistoryTemplate = AbstractAction.extend({
@@ -66,17 +59,14 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
                     var input = document.getElementById("search_input");
                     if(!input)  
                          return
-                    // Event search in when input onchange
-                    // after event search run, event compute_avg call again to calculator avg effort 
-                    input.addEventListener('keyup', () => self.callBackFunction())
+                    // Event search in when input onchange, after event search run, event compute_avg call again to calculator avg effort 
+                    input.addEventListener('keyup', () => self.callBackDataFunction())
 
                     var input_available_list = document.getElementById("search_input_avai");
                     if(!input_available_list)  
                          return
                     // Event search in when input onchange
-                    input_available_list.addEventListener('keyup', self.searchFunctionAvaiList);
-                    input_available_list.addEventListener('keyup', () => self.value_table_over_view());
-
+                    input_available_list.addEventListener('keyup', () => self.callBackDataHistoryFunction());
 
                     // Event filter  in when selection onchange
                     var selection = document.getElementById("filter-project-type");
@@ -84,10 +74,9 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
 
                     if(!selection)  
                         return
-                    selection.addEventListener('change', () => self.callBackFunction())
-                    selectionHistory.addEventListener('change', () => self.callBackFunction())
-
-                    // compute avg effort member in table when render DOM element   
+                    selection.addEventListener('change', () => self.callBackDataFunction())
+                    selectionHistory.addEventListener('change', () => self.callBackDataFunction())
+                    selectionHistory.addEventListener('change', () => self.callBackDataHistoryFunction());
 
                     //sort table
                     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
@@ -172,6 +161,7 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
                     self.compute_avg_all_res_rate();
                     self.compute_avg_all_avai_rate();
                     self.value_table_over_view();
+                    self.replace_value_human_resource_free()
                 }, 500);
             });
         },
@@ -194,7 +184,6 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
                 .then(function (res) {
                     if (res["list_human_resource_history"].length > 0) {
                         self.list_human_resource_history = self.processMonthAvailable(res["list_human_resource_history"])
-                        console.log(`self.list_human_resource_history`, self.list_human_resource_history);
                     } else {
                         self.list_human_resource_history = res["list_human_resource_history"]
                     }
@@ -214,12 +203,19 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
             return $.when(def1, def2);
         },
 
-        callBackFunction: function () {
+        callBackDataFunction: function () {
             let self = this;
-             self.searchFunction();
-            // after event search run,event compute_avg call again to calculator avg effort 
+            self.searchFunction();
+            // after event search run, event compute_avg call again to calculator avg effort 
             self.compute_avg();
             self.compute_avg_all_res_rate();
+            self.value_table_over_view();
+        },
+
+        callBackDataHistoryFunction: function () {
+            let self = this;
+            // after event search run, event compute_avg call again to calculator avg effort 
+            self.searchFunctionAvailableList();
             self.value_table_over_view();
         },
 
@@ -270,7 +266,7 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
                     cnt = 0,
                     cntGreaterThanZero = 0;
                 /*
-                    January column's index in array is 7
+                    January column's index in array is 6
                     December column's index in arrayy is 18
                  */
                 for (let i = 6; i <= 18; i++) {
@@ -296,10 +292,7 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
 
             arrFree.forEach(childArr => {
                 if (childArr[dimensions[1] - 2] != null) {
-                    /*
-                        Start Date column's index is 2rd last of array
-                        End Date column's index is thearrCheckMonth last index of array
-                     */
+                    
                     let arrStartDate = childArr[dimensions[1] - 2].split(',');
                     let arrEndDate = childArr[dimensions[1] - 1].split(',');
 
@@ -365,7 +358,7 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
 
             let selectionYearHistory = document.getElementById("filter-year");
             let filterSelectionYearHistory = selectionYearHistory.value.toUpperCase();
-            var input, filter, table, tr, td, i, txtValue, year_of_history_value, year_of_history;
+            var input, filter, table, tr, td, i, txtValue, year_of_history_value, year_of_history, project_type, project_type_value;
             input = document.getElementById("search_input");
             filter = input.value.toUpperCase();
 
@@ -375,10 +368,11 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
             
             for (i = 1; i < tr.length - value_row_not_search; i++) {
                 td = tr[i];
-                year_of_history = tr[i].querySelector('.Year_of_history')
-                console.log(`tr[i]`, tr[i]);
-                year_of_history_value = year_of_history.textContent || year_of_history.innerText
-
+                year_of_history = tr[i].querySelector('.Year_of_history');
+                project_type = tr[i].querySelector('.project_type');
+                year_of_history_value = year_of_history.textContent || year_of_history.innerText;
+                project_type_value = project_type.textContent || project_type.innerText;
+                
                 // project ALL in human
                 if (filterSelection == 'ALL') {
                     if (td) {
@@ -390,27 +384,17 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
                         }
                     }
                 }
-                // project INTERNAL
-                // if (filterSelection == 'PROJECT INTERNAL') {
-                //     txtValue = td.textContent || td.innerText;
-                //     if (txtValue.toUpperCase().indexOf(filter) > -1   && (year_of_history_value.toUpperCase().indexOf(filterSelectionYearHistory) > -1 ) ) {
-                //         tr[i].style.display = '';
-                //     }                           
-                //     if (( txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1 || txtValue.toUpperCase().indexOf(filter) <= -1) 
-                //             && (year_of_history_value.toUpperCase().indexOf(filterSelectionYearHistory) <= -1 )
-                //     )
-                //         {
-                //             tr[i].style.display = 'none';
-                //         } 
-                // }
                 if (filterSelection == 'PROJECT INTERNAL') {
                     txtValue = td.textContent || td.innerText;
-                    if ( (txtValue.toUpperCase().indexOf('INTERNAL') > -1 || txtValue.toUpperCase().indexOf(null) > -1) 
-                            && txtValue.toUpperCase().indexOf(filter) > -1
-                            && (year_of_history_value.toUpperCase().indexOf(filterSelectionYearHistory) > -1 )
-                            ){
+                if  (   (txtValue.toUpperCase().indexOf('INTERNAL') > -1) && txtValue.toUpperCase().indexOf(filter) > -1
+                        && (year_of_history_value.toUpperCase().indexOf(filterSelectionYearHistory) > -1 )
+                        && (project_type_value.toUpperCase().indexOf('') > -1 )
+                    )
+                    {
                         tr[i].style.display = '';
-                    } else {
+                    }
+                else 
+                    {
                         tr[i].style.display = 'none';
                     }
                 }
@@ -418,22 +402,26 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
                 // project BILLABLE
                 if (filterSelection == 'PROJECT BILLABLE') {
                     txtValue = td.textContent || td.innerText;
-                    if ( (txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1) 
+                    if  (   (txtValue.toUpperCase().indexOf('ODC') > -1 || txtValue.toUpperCase().indexOf('PROJECT BASE') > -1) 
                             && txtValue.toUpperCase().indexOf(filter) > -1
                             && (year_of_history_value.toUpperCase().indexOf(filterSelectionYearHistory) > -1 )
-                            ){
+                        )
+                    {
                         tr[i].style.display = '';
-                    } else {
+                    } 
+                    else {
                         tr[i].style.display = 'none';
-                    }
+                        }
                 }
             }
 
         },
-        searchFunctionAvaiList: function(e) {
+        searchFunctionAvailableList: function(e) {
             const value_row_not_search = 3;
-            var input, filter, table, tr, td, i, txtValue;
+            var input, filter, table, tr, td, i, txtValue, year_of_history, year_of_history_value;
             input = document.getElementById("search_input_avai");
+            let selectionYearHistory = document.getElementById("filter-year");
+            let filterSelectionYearHistory = selectionYearHistory.value.toUpperCase();
             filter = input.value.toUpperCase();
 
             table = document.getElementById("human_resource_free_table");
@@ -442,9 +430,12 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
 
             for (i = 1; i < tr.length - value_row_not_search; i++) {
                 td = tr[i];
+                year_of_history = tr[i].querySelector('.td_value_year_history');
+                year_of_history_value = year_of_history.textContent || year_of_history.innerText;
+    
                 if (td) {
                     txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    if (txtValue.toUpperCase().indexOf(filter) > -1 && year_of_history_value.toUpperCase().indexOf(filterSelectionYearHistory) > -1 ) {
                         tr[i].style.display = '';
                     } else {
                         tr[i].style.display = 'none';
@@ -692,17 +683,10 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
                         count_billable_member += 1;
                         listId.push(id_employee);
                     }
-
-                    // if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) && thisNumber > 0 &&  (project_type != 'ODC' || project_type != 'Project Base')) {
-                    //     count_internal_member += 1;
-                    //     listId.push(id_employee);
-                    // }
-
                 }
             } finally {
                 return {
                     count_billable_member: count_billable_member, 
-                    // count_internal_member: count_internal_member
                 };
             }
         },
@@ -724,12 +708,6 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
                     let parent_style = row.cells[colNumber].parentElement.style.display;
                     var thisNumber = parseFloat(table.rows[i].cells[colNumber].childNodes.item(0).data);
           
-                    // if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) && thisNumber > 0 && (project_type == 'ODC' || project_type == 'Project Base')) {
-                    //     count_billable_member += 1;
-                    //     console.log(`a`);
-                    //     listId.push(id_employee);
-                    // }
-
                     if (parent_style != 'none' && !isNaN(thisNumber) && !listId.includes(id_employee) && thisNumber > 0 &&  (project_type == 'Internal')) {
                         count_internal_member += 1;
                         listId.push(id_employee);
@@ -755,11 +733,9 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
             });
 
             var table2excel = new Table2Excel();
-
             var myTableHuman = document.getElementsByTagName("table")[1];
 
             var myCloneTable = myTableHuman.cloneNode(true);
-
             var element_none = myCloneTable.querySelectorAll('tr');
 
             for (let i = 0; i < element_none.length; i++) {
@@ -768,62 +744,8 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
                 }
             }
             document.body.appendChild(myCloneTable);
-
             table2excel.export(myCloneTable);
-
             myCloneTable.remove();
-            // Table2Excel.extend((cell, cellText) => {
-            //     return $(cell).attr('type') == 'string' ? {
-            //         t: 's',
-            //         v: cellText
-            //     } : null;
-            // });
-
-            // var table2excel = new Table2Excel();
-            // // let table_to_exp = document.getElementById("human_resource_table").not("tr .total_member_avai_company");
-            // let table_to_exp_2 = $("table #human_resource_table td").not("tr .total_member_avai_company")
-
-            // // console.log(`table_to_exp`, table_to_exp);
-
-            // // let tr_exp = table_to_exp.querySelectorAll("tr");
-
-            // table2excel.export(table_to_exp_2);
-            
-            // var result = [];
-            // var table =  document.getElementById("human_resource_table")
-            // var rows = table.rows;
-            // var cells, arrTemp;
-          
-            // for (var i=0, iLen=rows.length; i<iLen; i++) {
-            //     cells = rows[i].cells;
-            //     arrTemp = [];
-            //     if(rows[i].style.display != 'none') {
-            //         for (var j = 0, jLen = cells.length; j < jLen; j++) {
-            //             arrTemp.push(cells[j].textContent.replace(/\n/g,'').replace(/\r/g,' ').trim());
-            //         }
-            //     }
-            //   result.push(arrTemp);
-            // }
-
-            // let dataExport = [];
-
-            // for(let i=0; i <  result.length ; i ++) {
-            //     if (result[i].length > 0) {
-            //         dataExport.push(result[i]);
-            //     } 
-            // }
-            // var csvContent = ""
-            // dataExport.forEach(function(RowItem, RowIndex) {
-            //     RowItem.forEach(function(ColItem, ColIndex) {
-            //     csvContent += ColItem + ',';
-            //     });
-            //     csvContent += "\r\n";
-            // });
-            // var ele = document.createElement("A");
-            // ele.setAttribute("href",  "data:application/xls;charset=utf-8,%EF%BB%BF"+ encodeURI(csvContent) );
-            // ele.setAttribute("download","human_resource.xls");
-            // document.body.appendChild(ele);
-            // ele.click();
         },
 
         view_effort_member_free: function () {
@@ -837,51 +759,14 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
             }
         },
 
-        // replace_value_human_resource: function () {
-        //     var table, cell_elements;
-        //     table = document.getElementById('human_resource_table');
-        //     if (!table) return;
-        //     cell_elements = table.getElementsByTagName('td');
-        //     for (var i = 0, len = cell_elements.length; i < len; i++) {
-
-        //         if (cell_elements[i].innerHTML < 0) {
-        //             cell_elements[i].innerText = "NaN";
-        //         }
-        //         if (cell_elements[i].innerText == "" && cell_elements[i].className == "AVG_colum") {
-        //             cell_elements[i].innerText = "0";
-        //         }
-        //     }
-
-        // },
-
         replace_value_human_resource_free: function () {
             var table_free, cell_elements_free;
             table_free = document.getElementById('human_resource_free_table');
             cell_elements_free = table_free.querySelectorAll('td.td_value');
             for (var i = 0, len = cell_elements_free.length; i < len; i++) {
-                if (cell_elements_free[i].innerHTML < 0) {
-                    cell_elements_free[i].innerText = "NaN";
-                }
-            }
-            for (var i = 0, len = cell_elements_free.length; i < len; i++) {
                 cell_elements_free[i].innerText = (100 - parseFloat(cell_elements_free[i].innerText)).toFixed(2);
             }
         },
-        // hide_value_old_month: function() {
-        //     var dateObj = new Date();
-
-        //     var table = document.getElementById('human_resource_free_table');
-        //     var month = dateObj.getUTCMonth() + 1;
-        //     const number_month_in_year = 12;
-        //     const current_month = (number_month_in_year - month) + 1;
-        //     for (let i = 0; i < table.rows.length; i++) {
-        //         var start_month_in_table = 4
-        //         for (start_month_in_table; start_month_in_table < table.rows[i].cells.length - current_month; start_month_in_table++) {
-        //             table.rows[i].cells[start_month_in_table].style.display = "none";
-        //         }
-        //     }
-        // },
-
 
         // //compute avavai label rate
         computeTableColumnTotalFree: function (colNumber) {
@@ -919,8 +804,8 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
             // var arrEffortHuman = self.compute_avg();
             var avgEffortInFreeTable = []
 
-            //start calculator effort from  Fifth column => j = 5
-            for (var j = 5 ; j < howManyCols; j++) {
+            //start calculator effort from  Fifth column => j = 5 and -1 because -1 is last column is history year
+            for (var j = 5 ; j < howManyCols -1 ; j++) {
                 final = self.computeTableColumnTotalFree(j);
                 arrFreeEffort.push(final);
                 member_free = self.compute_member_free_company(j);

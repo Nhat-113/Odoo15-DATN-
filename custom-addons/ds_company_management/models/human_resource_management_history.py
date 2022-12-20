@@ -118,10 +118,22 @@ class HumanResourceManagementHistory(models.Model):
              """
         self.env.cr.execute(sql)
     
+    #check role user login
+    def get_role_user_login(self):
+        if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
+            return 'Ceo'
+        elif self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and \
+				self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
+            return 'Sub-Ceo'
+        elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
+                self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
+            return 'Div-Manager'
+
     # function get data human resource
     @api.model
     def get_list_human_resource_history(self):
         user_id_login = self.env.user.id
+        get_role_user_login = self.get_role_user_login() 
         selected_companies =  self.env['human.resource.management'].get_current_company_value()
 		
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()		
@@ -140,18 +152,15 @@ class HumanResourceManagementHistory(models.Model):
             sql_domain_for_department_emp = ' AND (human_resource_management_history.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.department_id IS NULL )'
             sql_domain_for_department_proj = ' AND (human_resource_management_history.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.PROJECT_DEPARTMENT_ID IS NULL )' 
 
-        if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
+        if  get_role_user_login  == 'Ceo':
             sql_domain_for_role = ''
             sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ')'
 
-
-        elif self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and \
-				self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
+        elif get_role_user_login  == 'Sub-Ceo':
             sql_domain_for_company =   'where ( company_manager_user_id = ' + str(user_id_login) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
             sql_domain_for_role = ''
 
-        elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
-                self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
+        elif get_role_user_login  == 'Div-Manager':
             sql_domain_for_company = ''
             sql_domain_for_role = ' where (department_manager_user_id = ' + str(user_id_login) +  ')'
 
@@ -203,6 +212,7 @@ class HumanResourceManagementHistory(models.Model):
     @api.model
     def get_human_resource_free_history(self):
         user_id_login = self.env.user.id
+        get_role_user_login = self.get_role_user_login() 
         selected_companies =  self.env['human.resource.management'].get_current_company_value()
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
         cr = self._cr
@@ -217,21 +227,19 @@ class HumanResourceManagementHistory(models.Model):
             sql_domain_for_department_emp = ' AND (human_resource_management_history.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.department_id IS NULL )'
             sql_domain_for_department_proj = ' AND (human_resource_management_history.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.PROJECT_DEPARTMENT_ID IS NULL )' 
 
-        sql_domain_for_group_by = 'GROUP BY employee_id, employee_name ,company_name, department_name, company_id, start_date_contract, end_date_contract order by employee_name asc'
+        sql_domain_for_group_by = 'GROUP BY employee_id, employee_name ,company_name, department_name, company_id, year_history, start_date_contract, end_date_contract order by employee_name asc'
 
-        if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
+        if get_role_user_login  == 'Ceo':
             sql_domain_for_role = ''
 
-        if self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
+        if get_role_user_login  == 'Sub-Ceo':
             # sql_domain_for_company = sql_domain_for_company[:-1]
-            sql_domain_for_company  = ''
-            sql_domain_for_role = 'where ( company_manager_user_id = ' + str(user_id_login) + ')'
+            sql_domain_for_company  = 'where ( company_id in ' + str(tuple(selected_companies)) + ')'
+            sql_domain_for_role = ' and ( company_manager_user_id = ' + str(user_id_login) + ')'
 
-        elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
-                self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
-            sql_domain_for_company = ''
-            sql_domain_for_role = ' where (department_manager_user_id = ' + str(user_id_login) +  ')'
-
+        elif get_role_user_login  == 'Div-Manager':
+            sql_domain_for_company  = 'where ( company_id in ' + str(tuple(selected_companies)) + ')'
+            sql_domain_for_role = ' and (department_manager_user_id = ' + str(user_id_login) +  ')'
 
         sql = ("""SELECT  employee_id, employee_name, company_name, department_name,
 				SUM (month1 ) as month1,
@@ -247,6 +255,7 @@ class HumanResourceManagementHistory(models.Model):
 				SUM (month11) as month11,
 				SUM (month12) as month12,
 				company_id,
+				year_history,
 				start_date_contract,
 				end_date_contract
 				FROM human_resource_management_history 

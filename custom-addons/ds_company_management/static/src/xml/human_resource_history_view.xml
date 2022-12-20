@@ -194,12 +194,12 @@
                                 <td class="td_value name_employee" type="string">
                                     <t t-esc="list_human_resource_history[0]"/>
                                 </td>
-                                <td class="td_value project_type" type="string">
-                                    <t t-esc="list_human_resource_history[4]"/>
-                                </td>            
                                 <td t-foreach="list_human_resource_history.slice(1,-27)" t-as="i" type="string"  class="td_value">
                                     <t t-esc="i" />
                                 </td>
+                                <td class="td_value project_type" type="string">
+                                    <t t-esc="list_human_resource_history[4]"/>
+                                </td>      
                                 <td t-foreach="list_human_resource_history.slice(6,-13)" t-as="i" type="string"  class="td_value">
                                     <t t-esc="i" />
                                 </td>
@@ -215,91 +215,33 @@
                             <th scope="row" class="td_value_none">Average Res Rate (%)</th>
                             <td class="td_value_none"></td>
                             <td class="td_value human_employee_id" type="string" ></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
+                           
+                            <td t-foreach="18" t-as="i" class="available-headcounts-avg">
+                                <t t-esc="i"/>
+                            </td>
                         </tr>
                         <tr id="total-row" class="total_member_avai" style="display:none">
                             <th scope="row">Total Members</th>
                             <td class="td_value human_employee_id" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
+                            <td t-foreach="18" t-as="i" class="available-headcounts-avg">
+                                <t t-esc="i"/>
+                            </td>
                         </tr>
 
                         <tr id="total-effort-all-res-rate" class="total_member_avai-2" style="display:none">
                             <th scope="row">All Res Rate (%)</th>
                             <td class="td_value human_employee_id" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
+                            <td t-foreach="18" t-as="i" class="available-headcounts-avg">
+                                <t t-esc="i"/>
+                            </td>
                         </tr>
 
                         <tr id="total-row-member-of-company" class="total_member_avai_company" style="display:none">
                             <th scope="row">Total Members Company</th>
                             <td class="td_value human_employee_id" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
-                            <td class="td_value" type="string"></td>
+                            <td t-foreach="18" t-as="i" class="available-headcounts-avg">
+                                <t t-esc="i"/>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -383,6 +325,10 @@
                                         December
                                         <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
                                     </th>
+                                    <th class="header_member_free" style ="display:none">
+                                        Year Of History
+                                        <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                                    </th>
                                 </tr>
                                 <t t-foreach="widget.get_human_resource_free_history" t-as="get_human_resource_free_history">
                                     <tr class="detail">
@@ -399,8 +345,11 @@
                                         <td class="td_value_department" type="string">
                                             <t t-esc="get_human_resource_free_history[3]"/>
                                         </td>
-                                        <td t-foreach="get_human_resource_free_history.slice(4,-3)" t-as="i" type="string"  class="td_value">
+                                        <td t-foreach="get_human_resource_free_history.slice(4,-4)" t-as="i" type="string"  class="td_value">
                                             <t t-esc="i" />
+                                        </td>
+                                        <td class="td_value_year_history" type="string" style ="display:none">
+                                            <t t-esc="get_human_resource_free_history[17]"/>
                                         </td>
                                     </tr>
                                 </t>
