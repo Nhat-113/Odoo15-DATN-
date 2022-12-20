@@ -1,0 +1,13 @@
+<odoo>
+    <data noupdate="1">
+        <record model="ir.config_parameter" id="time_off_every_year">
+            <field name="key">time_off_every_year</field>
+            <field name="value" type="int">2024</field>
+        </record>
+
+        <record model="ir.config_parameter" id="time_off_reserve">
+            <field name="key">time_off_reserve</field>
+            <field name="value" type="int">2023</field>
+        </record>
+    </data>
+</odoo>
