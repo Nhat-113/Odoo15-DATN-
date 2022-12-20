@@ -44,15 +44,13 @@ class AverageCostCompany(models.Model):
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (  
                 SELECT
-                    pm.company_id,
-                    (date_trunc('month', pmh.month_start))::date AS month_start,
-                    pmh.average_cost_company
-                FROM project_management AS pm
-                RIGHT JOIN project_management_history AS pmh
-                    ON pm.id = pmh.project_management_id
-                GROUP BY pm.company_id,
-                    month_start,
-                    pmh.average_cost_company
+                    company_id,
+                    (date_trunc('month', month_start))::date AS month_start,
+                    average_cost_company
+                FROM project_management_history
+                GROUP BY company_id,
+                    date_trunc('month', month_start)::date,
+                    average_cost_company
             ) """ % (self._table)
         )
         
