@@ -856,7 +856,7 @@
         </record>
 
         <record id="hr_rule_tncnbn2_mirai" model="hr.salary.rule">
-            <field name="name">Thuế TNCN (VND) = (23) * 5%</field>
+            <field name="name">Thuế TNCN (VND) = (24) * 5%</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -869,7 +869,7 @@
         </record>
 
         <record id="hr_rule_tncnbn3_mirai" model="hr.salary.rule">
-            <field name="name">Thuế TNCN (VND) = (23) * 10% - 250000</field>
+            <field name="name">Thuế TNCN (VND) = (24) * 10% - 250000</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -882,7 +882,7 @@
         </record>
 
         <record id="hr_rule_tncnbn4_mirai" model="hr.salary.rule">
-            <field name="name">Thuế TNCN (VND) = (23) * 15% - 750000</field>
+            <field name="name">Thuế TNCN (VND) = (24) * 15% - 750000</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -895,7 +895,7 @@
         </record>
 
         <record id="hr_rule_tncnbn5_mirai" model="hr.salary.rule">
-            <field name="name">Thuế TNCN (VND) = (23) * 20% - 1650000</field>
+            <field name="name">Thuế TNCN (VND) = (24) * 20% - 1650000</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -908,7 +908,7 @@
         </record>
 
         <record id="hr_rule_tncnbn6_mirai" model="hr.salary.rule">
-            <field name="name">Thuế TNCN (VND) = (23) * 25% - 3250000</field>
+            <field name="name">Thuế TNCN (VND) = (24) * 25% - 3250000</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -921,7 +921,7 @@
         </record>
 
         <record id="hr_rule_tncnbn7_mirai" model="hr.salary.rule">
-            <field name="name">Thuế TNCN (VND) = (23) * 30% - 5850000</field>
+            <field name="name">Thuế TNCN (VND) = (24) * 30% - 5850000</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -934,7 +934,7 @@
         </record>
 
         <record id="hr_rule_tncnbn8_mirai" model="hr.salary.rule">
-            <field name="name">Thuế TNCN (VND) = (23) * 35% - 9850000</field>
+            <field name="name">Thuế TNCN (VND) = (24) * 35% - 9850000</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCN1</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
