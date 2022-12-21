@@ -14,7 +14,7 @@ class CompareSalaryCostSupport(models.Model):
                         total,
                         code
                     FROM hr_payslip_line
-                    WHERE code IN ('NET', 'NET1', 'BH', 'TTNCN', 'TTNCN1', 'LBN')
+                    WHERE code IN ('NET', 'NET1', 'BH', 'BHC', 'TTNCN', 'TTNCN1', 'LBN')
                 ),
                 compute_salary_value AS (
                     SELECT 
@@ -23,7 +23,7 @@ class CompareSalaryCostSupport(models.Model):
                         hp.date_from,
                         hp.date_to,
                         (net.total - lbn.total) AS salary,
-                        bh.total AS bhxh,
+                        (bh.total + COALESCE(NULLIF(bhc.total, NULL), 0)) AS bhxh,
                         tt.total AS ttncn,
                 -- 		lbn.total AS salary_lbn,
                         --pc.salary_lbn,
@@ -36,6 +36,9 @@ class CompareSalaryCostSupport(models.Model):
                     LEFT JOIN get_payslip_line_value AS bh
                         ON bh.slip_id = hp.id
                         AND bh.code = 'BH'
+                    LEFT JOIN get_payslip_line_value AS bhc
+                        ON bhc.slip_id = hp.id
+                        AND bhc.code = 'BHC'
                     LEFT JOIN get_payslip_line_value AS tt
                         ON tt.slip_id = hp.id
                         AND tt.code IN ('TTNCN', 'TTNCN1')

@@ -16,7 +16,7 @@ class ProjectPlanningBookingResource(models.Model):
                     -- 	code,
                         SUM(total) AS salary
                     FROM hr_payslip_line
-                    WHERE code IN ('NET', 'NET1', 'BH', 'TTNCN', 'TTNCN1')
+                    WHERE code IN ('NET', 'NET1', 'BH', 'BHC', 'TTNCN', 'TTNCN1')
                     GROUP BY slip_id
                     ORDER BY slip_id
                 ),
