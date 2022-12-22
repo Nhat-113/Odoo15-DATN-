@@ -27,7 +27,7 @@ class CompareSalaryCostSupport(models.Model):
                         tt.total AS ttncn,
                 -- 		lbn.total AS salary_lbn,
                         --pc.salary_lbn,
-                        COALESCE(NULLIF(pc.salary_lbn, NULL), 0) AS salary_lbn,
+                        --COALESCE(NULLIF(pc.salary_lbn, NULL), 0) AS salary_lbn,
                         rc.id AS currency_id
                     FROM hr_payslip AS hp
                     LEFT JOIN get_payslip_line_value AS net
@@ -45,10 +45,10 @@ class CompareSalaryCostSupport(models.Model):
                     LEFT JOIN get_payslip_line_value AS lbn
                         ON lbn.slip_id = hp.id
                         AND lbn.code = 'LBN'
-                    LEFT JOIN pesudo_contract_generate AS pc
-                        ON pc.employee_id = hp.employee_id
-                        AND EXTRACT(MONTH FROM pc.months) = EXTRACT(MONTH FROM hp.date_from)
-                        AND EXTRACT(YEAR FROM pc.months) = EXTRACT(YEAR FROM hp.date_from)
+                    --LEFT JOIN pesudo_contract_generate AS pc
+                       -- ON pc.employee_id = hp.employee_id
+                        --AND EXTRACT(MONTH FROM pc.months) = EXTRACT(MONTH FROM hp.date_from)
+                        --AND EXTRACT(YEAR FROM pc.months) = EXTRACT(YEAR FROM hp.date_from)
                     LEFT JOIN res_currency AS rc
 		                ON rc.name = 'VND'
                     WHERE hp.state = 'done'
@@ -64,14 +64,14 @@ class CompareSalaryCostSupport(models.Model):
                     SUM(salary) AS salary,
                     SUM(bhxh) AS bhxh,
                     SUM(ttncn) AS ttncn,
-                    salary_lbn,
+                    --salary_lbn,
                     currency_id
                 FROM compute_salary_value
                 GROUP BY company_id,
                         employee_id,
                         date_from,
                         date_to,
-                        salary_lbn,
+                        --salary_lbn,
                         currency_id                
             ) """ % (self._table)
         )
@@ -90,7 +90,7 @@ class CompareSalaryCostData(models.Model):
     salary = fields.Monetary(string="Salary")
     bhxh = fields.Monetary(string="BHXH")
     ttncn = fields.Monetary(string='TTNCN')
-    salary_lbn = fields.Monetary(string='13th Month Salary')
+    # salary_lbn = fields.Monetary(string='13th Month Salary')
     total_salary = fields.Monetary(string='Total Salary Cost')
     currency_id = fields.Many2one('res.currency', string="Currency")
     
@@ -117,7 +117,7 @@ class CompareSalaryCostData(models.Model):
                         salary,
                         bhxh,
                         ttncn,
-                        salary_lbn,
+                        --salary_lbn,
                         total_salary,
                         create_uid, 
                         write_uid, 
@@ -134,8 +134,8 @@ class CompareSalaryCostData(models.Model):
                     salary,
                     bhxh,
                     ttncn,
-                    salary_lbn,
-                    (salary + bhxh + ttncn + salary_lbn) AS total_salary,
+                    --salary_lbn,
+                    (salary + bhxh + ttncn) AS total_salary,
                     """ + user_update + """,
                     """ + user_update + """,
                     CURRENT_DATE,
