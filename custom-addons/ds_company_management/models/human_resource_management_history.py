@@ -43,78 +43,81 @@ class HumanResourceManagementHistory(models.Model):
 
     def action_generate_new_history(self):
         current_year = datetime.date.today().year
-        sql = """
-            DELETE FROM human_resource_management_history WHERE year_history=""" + str(current_year) + """;
-            INSERT INTO
-                human_resource_management_history
-                (
-                    employee_name,
-                    company_name,
-                    department_name,
-                    project_name,
-                    project_type_name,
-                    year_of_project,
-                    month1,
-                    month2,
-                    month3,
-                    month4,
-                    month5,
-                    month6,
-                    month7,
-                    month8,
-                    month9,
-                    month10,
-                    month11,
-                    month12,
-                    average,
-                    company_manager_user_id,
-                    department_manager_user_id,
-                    company_project_id,
-                    company_id,
-                    department_id,
-                    employee_id,
-                    project_department_id,
-                    department_manager_project_id,
-                    user_id_sub_ceo_project,
-                    year_history,
-                    start_date_contract,
-                    end_date_contract 
-                    )
-                SELECT
-                    employee_name,
-                    company_name,
-                    department_name,
-                    project_name,
-                    project_type_name,
-                    year_of_project,
-                    month1,
-                    month2,
-                    month3,
-                    month4,
-                    month5,
-                    month6,
-                    month7,
-                    month8,
-                    month9,
-                    month10,
-                    month11,
-                    month12,
-                    average,
-                    company_manager_user_id,
-                    department_manager_user_id,
-                    company_project_id,
-                    company_id,
-                    department_id,
-                    employee_id,
-                    project_department_id,
-                    department_manager_project_id,
-                    user_id_sub_ceo_project,
-                    """ + str(current_year) + """,
-                    start_date_contract,
-                    end_date_contract
+        # sql = """
+        #     DELETE FROM human_resource_management_history WHERE year_history=""" + str(current_year) + """;
+        #     INSERT INTO
+        #         human_resource_management_history
+        #         (
+        #             employee_name,
+        #             company_name,
+        #             department_name,
+        #             project_name,
+        #             project_type_name,
+        #             year_of_project,
+        #             month1,
+        #             month2,
+        #             month3,
+        #             month4,
+        #             month5,
+        #             month6,
+        #             month7,
+        #             month8,
+        #             month9,
+        #             month10,
+        #             month11,
+        #             month12,
+        #             average,
+        #             company_manager_user_id,
+        #             department_manager_user_id,
+        #             company_project_id,
+        #             company_id,
+        #             department_id,
+        #             employee_id,
+        #             project_department_id,
+        #             department_manager_project_id,
+        #             user_id_sub_ceo_project,
+        #             year_history,
+        #             start_date_contract,
+        #             end_date_contract 
+        #             )
+        #         SELECT
+        #             employee_name,
+        #             company_name,
+        #             department_name,
+        #             project_name,
+        #             project_type_name,
+        #             year_of_project,
+        #             month1,
+        #             month2,
+        #             month3,
+        #             month4,
+        #             month5,
+        #             month6,
+        #             month7,
+        #             month8,
+        #             month9,
+        #             month10,
+        #             month11,
+        #             month12,
+        #             average,
+        #             company_manager_user_id,
+        #             department_manager_user_id,
+        #             company_project_id,
+        #             company_id,
+        #             department_id,
+        #             employee_id,
+        #             project_department_id,
+        #             department_manager_project_id,
+        #             user_id_sub_ceo_project,
+        #             """ + str(current_year) + """,
+        #             start_date_contract,
+        #             end_date_contract
 
-                FROM human_resource_management;
+        #         FROM human_resource_management;
                 
+        #      """
+        sql = """
+                DELETE FROM human_resource_management_history 
              """
         self.env.cr.execute(sql)
     
