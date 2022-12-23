@@ -11,4 +11,16 @@
             <field name="code">model.re_compute_percent_bhxh()</field>
         </record>
     </data>
+
+    <data>
+        <record id="ir_cron_remove_bhxh" model="ir.cron">
+            <field name="name">Payroll: Remove BHXH Prob Contract</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">False</field>
+            <field name="model_id" ref="model_hr_percent_bhxh"/>
+            <field name="state">code</field>
+            <field name="code">model.remove_bhxh_prob_contract()</field>
+        </record>
+    </data>
 </odoo>
