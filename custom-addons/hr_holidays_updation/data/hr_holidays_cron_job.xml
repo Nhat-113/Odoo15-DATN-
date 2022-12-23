@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="ir_cron_hr_holiday" model="ir.cron">
+            <field name="name">Time Off: Reserved leave</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">True</field>
+            <field name="model_id" ref="model_hr_leave_type"/>
+            <field name="state">code</field>
+            <field name="code">model.gen_cron_job_reserved_leave()</field>
+            <field name="interval_number">12</field>
+            <field name="interval_type">months</field>
+            <field name="nextcall" eval="(datetime(year = DateTime.now().year, month = 12, day = 31, hour = 0, minute = 0, second = 0)).strftime('%Y-%m-%d 11:00:00')"/>
+        </record>
+    </data>
+
+    <data>
+        <record id="ir_cron_hr_time_off" model="ir.cron">
+            <field name="name">Time Off: Every Year</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">True</field>
+            <field name="model_id" ref="model_hr_leave_type"/>
+            <field name="state">code</field>
+            <field name="code">model.gen_cron_job_time_off()</field>
+            <field name="interval_number">12</field>
+            <field name="interval_type">months</field>
+            <field name="nextcall" eval="(datetime(year = 2023, month = 12, day = 15, hour = 0, minute = 0, second = 0)).strftime('%Y-%m-%d 11:00:00')"/>
+        </record>
+    </data>
+</odoo>

@@ -11,6 +11,8 @@
     'depends': ['hr', 'base', 'hr_holidays', 'resource'],
     'data': [
         'data/hr_holidays_update_data.xml',
+        'data/hr_holidays_cron_job.xml',
+        'data/hr_holidays_parameter_system.xml',
     ],
     'assets': {
         'web.assets_backend': [

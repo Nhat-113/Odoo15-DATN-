@@ -101,19 +101,22 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
             });
         },
 
-        fetch_data: function() {},
-
-        // denyClick: function() {
-        //     const box = document.getElementById('deny-click');
-        //         if (!box)
-        //             return
-        //     var  loading_img= document.getElementById('loading-img-dashboard');
-        //         if (!loading_img)
-        //                 return
-        //     loading_img.style.display = "none";
-        //     box.removeAttribute('style');
-        // },
-
+        fetch_data: function () {
+            let self = this;
+            rpc
+            .query({
+                model: "dashboard.block",
+                method: "get_payroll_static_follow_month",
+            })
+                .then(function (res) {
+                    if ( res["data_payroll_static"].length == 0) {
+                        self.data_payroll_static = Array.from(Array(12), () => 0)
+                    }else 
+                        self.data_payroll_static = res["data_payroll_static"];
+                });
+            return self.data_payroll_static;
+        },
+       
         projectTypePierChart: function() {
             rpc
                 .query({
@@ -1058,6 +1061,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
 
         },
         payrollDashboard: function() {
+            let data_payroll =  this.fetch_data();
+            data_payroll =  data_payroll.sort((a, b) => a[0] - b[0]);
+
             rpc
                 .query({
                     model: "dashboard.block",
@@ -1121,7 +1127,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                         //  push data of chart
                         dataTemp.labels.push(data[i][0]);
                         dataTemp.datasets[0].data.push(data[i][1]);
-                        dataTemp.datasets[1].data.push(data[i][2]);
+                        dataTemp.datasets[1].data.push(data_payroll[i][1]);
                     }
 
                     lineChart.data.labels = dataTemp.labels;
@@ -1133,19 +1139,22 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
         },
 
         chartPayrollRevenueFollowMonth: function() {
+            let data_payroll =  this.fetch_data();
+            data_payroll =  data_payroll.sort((a, b) => a[0] - b[0]);
             rpc
                 .query({
                     model: "dashboard.block",
                     method: "get_payroll_revenue_follow_month",
                 })
                 .then(function(data) {
-                    for (let i = 0; i < data.length; i++) {
-                        if (data[i][1] == null) 
-                            {
-                                data[i][1] = 0;
-                            }
-                    }
 
+                    for (let i = 0; i < data.length; i++) {
+                        data[i][1] = data_payroll[i][1]/data[i][1]
+
+                        if (data[i][1] == null || data[i][1] == 0) {
+                            data[i][1] = 0;
+                        }
+                    }
                     if (data.length > 0)
                     {
                         var data_employee = data;

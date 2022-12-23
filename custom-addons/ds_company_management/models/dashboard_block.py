@@ -184,9 +184,9 @@ class DashboardBlock(models.Model):
 
         cr = self._cr
         if get_role_user_login  == 'Ceo':
-            sql  = ("""SELECT to_char(month_start, 'Month YYYY') AS l_month ,sum(total_revenue)/100000000 AS revenue,
-                        sum(project_management_ceo_data.total_profit)/100000000 AS total_profit, 
-                        sum(total_salary + total_project_cost )/100000000  AS cost_data from project_management_ceo_data
+            sql  = ("""SELECT to_char(month_start, 'Month YYYY') AS l_month ,SUM(total_revenue)/100000000 AS revenue,
+                        SUM(project_management_ceo_data.total_profit)/100000000 AS total_profit, 
+                        SUM(total_salary + total_project_cost + total_department_cost + total_avg_operation_company)/100000000  AS cost_data from project_management_ceo_data
                         WHERE   extract(year from month_start)  = extract(year from CURRENT_DATE)   AND  company_id in  """ + str(tuple(selected_companies)) + """
                         group by month_start""")
 
@@ -195,9 +195,11 @@ class DashboardBlock(models.Model):
             sql_domain_for_role = ' AND (res_users.id =  ' + str(user_id_login)  + ')'
             sql_order_by   = ' GROUP BY project_management_ceo_data.month_start'  
 
-            sql  = ("""SELECT to_char(project_management_ceo_data.month_start, 'Month YYYY') AS l_month ,sum(project_management_ceo_data.total_revenue)/100000000 AS revenue,
-                        sum(project_management_ceo_data.total_profit)/100000000 AS total_profit, 
-                        sum(project_management_ceo_data.total_salary + project_management_ceo_data.total_project_cost)/100000000  AS cost_data from project_management_ceo_data
+            sql  = ("""SELECT to_char(project_management_ceo_data.month_start, 'Month YYYY') AS l_month, SUM(project_management_ceo_data.total_revenue)/100000000 AS revenue,
+                        SUM(project_management_ceo_data.total_profit)/100000000 AS total_profit, 
+                        SUM(project_management_ceo_data.total_salary + project_management_ceo_data.total_project_cost 
+                        + project_management_ceo_data.total_department_cost + project_management_ceo_data.total_avg_operation_company)/100000000  AS cost_data 
+                        FROM project_management_ceo_data
                         INNER JOIN RES_COMPANY ON project_management_ceo_data.COMPANY_ID = RES_COMPANY.ID
                         INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL
                         WHERE   extract(year from month_start)  = extract(year from CURRENT_DATE)   AND  project_management_ceo_data.company_id in  """ + str(tuple(selected_companies)) + """
@@ -294,7 +296,50 @@ class DashboardBlock(models.Model):
         data = cr.fetchall()
         
         return data
+    
+    @api.model
+    def get_payroll_static_follow_month(self):
+        user_id_login = self.env.user.id
+        selected_companies = self.get_current_company_value() 
+        get_role_user_login = self.get_role_user_login() 
 
+        cr = self._cr
+        if get_role_user_login  == 'Ceo':
+            sql = """SELECT EXTRACT(MONTH FROM date_from)   AS l_month,
+                        sum(compare_salary_cost_data.total_salary)/100000000  from compare_salary_cost_data
+                        WHERE   extract(year from date_from)  = extract(year from CURRENT_DATE)   AND  company_id IN  """ + str(tuple(selected_companies)) + """
+                        group by date_from """
+         
+            sql_domain_for_role = ''
+
+        elif get_role_user_login  == 'Sub-Ceo':
+
+            sql_domain_for_role = ' AND (res_users.id =  ' + str(user_id_login)  + ')'
+            sql_order_by   = ' GROUP BY compare_salary_cost_data.date_from'  
+            sql  = """ SELECT EXTRACT(MONTH FROM date_from) AS l_month,
+                                sum(compare_salary_cost_data.total_salary)/100000000 AS salary  from compare_salary_cost_data
+                                INNER JOIN RES_COMPANY ON compare_salary_cost_data.COMPANY_ID = RES_COMPANY.ID
+                                INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL
+                                WHERE   extract(year from date_from)  = extract(year from CURRENT_DATE)   AND  compare_salary_cost_data.company_id IN  """ + str(tuple(selected_companies)) + """
+                                """
+            sql += sql_domain_for_role
+            sql += sql_order_by
+
+   
+        cr.execute(sql)
+        data_payroll_static = cr.fetchall()
+        list_month_data = []
+        for item , _ in data_payroll_static:
+            list_month_data.append(item)
+
+        
+        for index in range(1,13):
+            if index not in list_month_data:
+                data_payroll_static.append((index,0))
+
+        return {
+            'data_payroll_static': data_payroll_static,
+        }
     @api.model
     def get_payroll_revenue_follow_month(self):
         user_id_login = self.env.user.id
@@ -303,7 +348,7 @@ class DashboardBlock(models.Model):
 
         cr = self._cr
         if get_role_user_login  == 'Ceo':
-            sql = """SELECT to_char(month_start, 'Month YYYY') AS l_month, (sum(project_management_ceo_data.total_salary) / NULLIF(sum(project_management_ceo_data.total_revenue), 0) ) AS revenue
+            sql = """SELECT to_char(month_start, 'Month YYYY') AS l_month, sum(project_management_ceo_data.total_revenue)/100000000 AS revenue
                         FROM project_management_ceo_data
                         WHERE   extract(year FROM month_start)  = extract(year FROM CURRENT_DATE)   AND  company_id IN  """ + str(tuple(selected_companies)) + """
                         group by month_start """
@@ -314,7 +359,7 @@ class DashboardBlock(models.Model):
 
             sql_domain_for_role = ' AND (res_users.id =  ' + str(user_id_login)  + ')'
             sql_order_by   = ' GROUP BY project_management_ceo_data.month_start'  
-            sql  = """ SELECT to_char(month_start, 'Month YYYY') AS l_month, (sum(project_management_ceo_data.total_salary) / NULLIF(sum(project_management_ceo_data.total_revenue), 0) ) AS revenue
+            sql  = """ SELECT to_char(month_start, 'Month YYYY') AS l_month, sum(project_management_ceo_data.total_revenue)/100000000 AS revenue
                                  FROM project_management_ceo_data
                                 INNER JOIN RES_COMPANY ON project_management_ceo_data.COMPANY_ID = RES_COMPANY.ID
                                 INNER JOIN res_users ON res_users.login =  RES_COMPANY.USER_EMAIL

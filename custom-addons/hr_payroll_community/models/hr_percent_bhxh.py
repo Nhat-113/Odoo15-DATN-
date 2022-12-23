@@ -37,3 +37,34 @@ class HrPercentBHXH(models.Model):
                     'payslip_id': payslip.id
                 })
             payslip.compute_sheet()
+
+    def remove_bhxh_prob_contract(self):
+        contract_ids = self.env['hr.contract'].search([('contract_document_type', '=', 'probationary')]).ids
+        payslips = self.env['hr.payslip'].search([('contract_id', 'in', contract_ids)])
+        for payslip in payslips:
+            input_bhxh_sdld = self.env['hr.payslip.input'].search([('payslip_id', '=', payslip.id), ('code', '=', 'BHC')])
+            if len(input_bhxh_sdld) == 0:
+                self.env['hr.payslip.input'].create({
+                    'name': 'BHXH (%) (của SDLĐ)',
+                    'code': 'BHC',
+                    'amount': 0,
+                    'contract_id': payslip.contract_id.id,
+                    'payslip_id': payslip.id
+                })
+            else:
+                input_bhxh_sdld.write({'amount': 0})
+
+            input_bhxh = self.env['hr.payslip.input'].search([('payslip_id', '=', payslip.id), ('code', '=', 'PBH')])
+            if len(input_bhxh) == 0:
+                self.env['hr.payslip.input'].create({
+                    'name': 'BHXH (%) (của NLĐ)',
+                    'code': 'PBH',
+                    'amount': 0,
+                    'contract_id': payslip.contract_id.id,
+                    'payslip_id': payslip.id
+                })
+            else:
+                input_bhxh.write({'amount': 0})
+
+            payslip.compute_sheet()
+            payslip.write({'state': 'done'})
