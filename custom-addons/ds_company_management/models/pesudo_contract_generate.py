@@ -25,7 +25,7 @@ class PesudoContract(models.Model):
                 get_contract_employee_company AS (
                     SELECT
                         hc.company_id,
-                        he.department_id,
+                        hc.department_id,
                         hc.employee_id,
                         hc.date_start,
                         (CASE
@@ -60,8 +60,8 @@ class PesudoContract(models.Model):
                     LEFT JOIN compute_max_duration_company AS cm
                         ON cm.company_id = hc.company_id
                     
-                    LEFT JOIN hr_employee AS he
-                        ON he.id = hc.employee_id
+                    --LEFT JOIN hr_employee AS he
+                        --ON he.id = hc.employee_id
                     WHERE hc.state != 'cancel'
                 ),
 
@@ -144,6 +144,11 @@ class PesudoContract(models.Model):
                         WHERE dw NOT IN (6,0)
                     ) AS total_working_day,
                     contract_document_type,
+                    (CASE
+                        WHEN contract_document_type NOT IN('Intern', 'intern', 'internship')
+                            THEN 'official'
+                        ELSE 'intern'
+                    END) AS type_contract,
                     contract_id
                 FROM get_start_end_month_contract
                 
@@ -164,14 +169,13 @@ class PesudoContractGenerate(models.Model):
             CREATE OR REPLACE VIEW %s AS (  
                 WITH compute_working_day_month_contract AS (
                     SELECT
-                        company_id,
                         employee_id,
                         months,
                         SUM(working_day::DECIMAL / total_working_day::DECIMAL)::NUMERIC(10, 2) AS mm,
                         EXTRACT(YEAR FROM months) AS years
                     FROM pesudo_contract
                     WHERE contract_document_type = 'offical_labor'
-                    GROUP BY company_id, employee_id, months
+                    GROUP BY employee_id, months
                 ),
                 compute_total_month_contract AS (
                     SELECT

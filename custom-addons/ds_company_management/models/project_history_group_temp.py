@@ -95,12 +95,7 @@ class AvailableBookingEmployees(models.Model):
                         months,
                         SUM(working_day) AS working_day,
                         total_working_day,
-                        
-                        (CASE
-                            WHEN contract_document_type NOT IN('Intern', 'intern', 'internship')
-                                THEN 'official'
-                            ELSE 'intern'
-                        END) AS type_contract
+                        type_contract
                         
                     FROM pesudo_contract
                     GROUP BY company_id,
@@ -173,31 +168,28 @@ class AvailableBookingEmployees(models.Model):
                                     END)
                             ELSE (CASE
                                     WHEN gc.working_day <> gc.total_working_day
-                                        THEN 1 - gc.working_day / gc.total_working_day * ct.effort_rate_month / 100
+                                        THEN gc.working_day / gc.total_working_day * (100 - ct.effort_rate_month) / 100
                                     ELSE 1 - ct.man_month
                                 END)
-                        END) AS available_mm,
+                        END)::NUMERIC(10, 2) AS available_mm,
                         
+                        -- Handle member have multi contract of multi company in a month
                         (CASE
                             WHEN ct.effort_rate_month IS NULL
-                                THEN 100
-                            ELSE 100 - ct.effort_rate_month
-                        END) AS available_effort,
-                        
-                        (CASE
-                            WHEN hm.salary IS NULL
-                                THEN 0
+                                THEN (CASE
+                                        WHEN gc.working_day <> gc.total_working_day
+                                            THEN gc.working_day / gc.total_working_day * 100
+                                        ELSE 100
+                                    END)
                             ELSE (CASE
-                                    WHEN ct.effort_rate_month IS NULL
-                                        THEN hm.salary + COALESCE(NULLIF(pc.salary_lbn, NULL), 0)
-                                    ELSE (hm.salary + COALESCE(NULLIF(pc.salary_lbn, NULL), 0)) * (100 - ct.effort_rate_month) / 100
+                                    WHEN gc.working_day <> gc.total_working_day
+                                        THEN ((100 - ct.effort_rate_month) * gc.working_day / 100) / gc.total_working_day * 100
+                                    ELSE 100 - ct.effort_rate_month
                                 END)
-                        END) AS available_salary,
-                -- 		hm.salary,
-                -- 		pc.salary_lbn,
-                                
-                        ct.man_month,
-                        ct.effort_rate_month,
+                        END)::NUMERIC(20, 2) AS available_effort,
+                        
+                        --ct.man_month,
+                        --ct.effort_rate_month,
                 -- 		(COALESCE(NULLIF(ct.salary, NULL), 0)) AS salary,
                         (COALESCE(NULLIF(ac.average_cost_company, NULL), 0)) AS average_cost_company,
                         gc.type_contract,
@@ -213,20 +205,41 @@ class AvailableBookingEmployees(models.Model):
                     LEFT JOIN average_cost_company_temp AS ac
                         ON ac.company_id = gc.company_id
                         AND ac.month_start = gc.months
-                    LEFT JOIN handle_multi_payslip AS hm
-                        ON hm.employee_id = gc.employee_id
-                        AND EXTRACT (MONTH FROM gc.months) = EXTRACT (MONTH FROM hm.date_from)
-                        AND EXTRACT (YEAR FROM gc.months) = EXTRACT (YEAR FROM hm.date_from)
-                    LEFT JOIN pesudo_contract_generate AS pc
-                    ON pc.employee_id = gc.employee_id
-                    AND EXTRACT(MONTH FROM pc.months) = EXTRACT(MONTH FROM gc.months)
-                    AND EXTRACT(YEAR FROM pc.months) = EXTRACT(YEAR FROM gc.months)
                     LEFT JOIN res_currency AS rc
                         ON rc.name = 'VND'
                     LEFT JOIN hr_employee AS he
 		                ON he.id = gc.employee_id
 
                     ORDER BY department_id, employee_id, months
+                ),
+                compute_available_salary_employee AS (
+                    SELECT
+                        ca.company_emp,
+                        ca.company_id,
+                        ca.department_id,
+                        ca.employee_id,
+                        ca.months,
+                        ca.available_mm,
+                        ca.available_effort,
+                        ca.average_cost_company,
+                        
+                        (CASE
+                            WHEN hm.salary IS NULL
+                                THEN 0
+                            ELSE (hm.salary + COALESCE(NULLIF(pc.salary_lbn, NULL), 0)) * ca.available_effort / 100
+                        END)::NUMERIC(20, 4) AS available_salary,
+                        ca.type_contract,
+                        ca.currency_id
+
+                    FROM compute_available_effort_employee AS ca
+                    LEFT JOIN handle_multi_payslip AS hm
+                        ON hm.employee_id = ca.employee_id
+                        AND EXTRACT (MONTH FROM ca.months) = EXTRACT (MONTH FROM hm.date_from)
+                        AND EXTRACT (YEAR FROM ca.months) = EXTRACT (YEAR FROM hm.date_from)
+                    LEFT JOIN pesudo_contract_generate AS pc
+                        ON pc.employee_id = ca.employee_id
+                        AND EXTRACT(MONTH FROM pc.months) = EXTRACT(MONTH FROM ca.months)
+                        AND EXTRACT(YEAR FROM pc.months) = EXTRACT(YEAR FROM ca.months)
                 )
                 SELECT
                     company_emp,
@@ -236,9 +249,9 @@ class AvailableBookingEmployees(models.Model):
                     months,
                     (CONCAT((EXTRACT(YEAR FROM months))::text, ' ', TO_CHAR(months, 'Month'))) AS months_str,
                     SUM(available_mm) AS available_mm,
-                    available_effort,
+                    SUM(available_effort) AS available_effort,
                 -- 	salary,
-                    available_salary,
+                    SUM(available_salary) AS available_salary,
                 -- 	average_cost_company,
                     SUM(CASE
                             WHEN type_contract = 'intern'
@@ -249,7 +262,7 @@ class AvailableBookingEmployees(models.Model):
                 -- 	type_contract
                     
 
-                FROM compute_available_effort_employee
+                FROM compute_available_salary_employee
                 WHERE available_effort > 0
                 GROUP BY company_emp, 
                         company_id,
@@ -262,7 +275,7 @@ class AvailableBookingEmployees(models.Model):
                         currency_id
                         
 
-                ORDER BY department_id, employee_id, months
+                ORDER BY  employee_id, months
             )""" % (self._table)
         )
         
