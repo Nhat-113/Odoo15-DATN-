@@ -189,6 +189,7 @@ class ProjectManagementData(models.Model):
     member_ids = fields.One2many('project.management.member.data', 'project_management_id', string="Members")
     project_expense_values = fields.One2many('project.expense.value', 'project_management_id', string="Project Cost Management")
     project_management_history = fields.One2many('project.management.history.data', 'project_management_id', string="Project Management History")
+    project_management_request_overtimes = fields.One2many('project.management.request.overtime.data', 'project_management_id', string="Overtime Detail")
     project_management_history_temp = fields.One2many('project.history.group.temp', 'project_management_id', string="Project Management History Temp")
     
     

@@ -40,6 +40,7 @@ class UpgradeAction(models.Model):
         all_query = self.query_delete_project_expense_value_generate() +\
                     self.query_available_booking_employee(user_update) +\
                     self.query_project_management(user_update) +\
+                    self.query_project_management_request_overtime(user_update) +\
                     self.query_project_management_history(user_update) +\
                     self.query_project_management_member(user_update) +\
                     self.query_project_management_member_detail(user_update) +\
@@ -232,6 +233,43 @@ class UpgradeAction(models.Model):
                     CURRENT_DATE,
                     CURRENT_DATE
                 FROM project_management_history;
+       
+            """
+         
+    def query_project_management_request_overtime(self, user_update):
+        return """
+                DELETE FROM project_management_request_overtime_data;
+                INSERT INTO
+                    project_management_request_overtime_data(
+                        project_management_id,
+                        project_id,
+                        employee_id,
+                        currency_id,
+                        date_ot,
+                        salary,
+                        unit_amount,
+                        pay_type,
+                        type_day_ot,
+                        create_uid,
+                        write_uid,
+                        create_date,
+                        write_date
+                    )
+                SELECT
+                    project_management_id,
+                    project_id,
+                    employee_id,
+                    currency_id,
+                    date_ot,
+                    salary,
+                    unit_amount,
+                    pay_type,
+                    type_day_ot,
+                    """ + user_update + """,
+                    """ + user_update + """,
+                    CURRENT_DATE,
+                    CURRENT_DATE
+                FROM project_management_request_overtime;
        
             """
          
