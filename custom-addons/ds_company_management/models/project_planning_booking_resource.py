@@ -208,22 +208,17 @@ class ProjectCountMember(models.Model):
                 ),
                 get_contract_employee AS (
                     SELECT 
-                        company_id,
-                        department_id,
+                        --company_id,
+                        --department_id,
                         employee_id,
                         months,
                         SUM(working_day) AS working_day,
                         total_working_day,
-                        
-                        (CASE
-                            WHEN contract_document_type NOT IN('Intern', 'intern', 'internship')
-                                THEN 'official'
-                            ELSE 'intern'
-                        END) AS type_contract
+                        type_contract
                         
                     FROM pesudo_contract
-                    GROUP BY company_id,
-                            department_id,
+                    GROUP BY --company_id,
+                            --department_id,
                             employee_id,
                             months,
                             total_working_day,
