@@ -26,6 +26,8 @@
         'data/exchange_rate_api_data.xml',
         'views/exchange_rate_view.xml',
         'views/compare_salary_cost_support_view.xml',
+        'views/compare_payslip_contract_support_view.xml',
+        'views/booking_resource_month_support_view.xml',
         'views/project_planning_booking_support.xml',
         # 'views/human_resource_management_view.xml',
         'views/project_management_view.xml',

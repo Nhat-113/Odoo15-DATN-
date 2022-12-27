@@ -315,6 +315,17 @@ class ProjectManagementHistory(models.Model):
                     GROUP BY project_id, months
                 ),
 
+                compute_salary_request_overtime AS (
+                    SELECT 
+                        project_id,
+                        payment_month,
+                        get_year_tb,
+                        SUM(salary) AS salary_ot
+                    FROM project_management_request_overtime
+                    GROUP BY project_id,
+                            payment_month,
+                            get_year_tb
+                ),
 
                 --- Compute total salary employee & revenue project by month ---
                 -- compute_total_salary_employee AS (
@@ -437,7 +448,7 @@ class ProjectManagementHistory(models.Model):
                         gmp.revenue_from,
                         gmp.result_commission,
                         gmp.revenue_vnd,
-                        (COALESCE(NULLIF(cpt.salary, NULL), 0)) AS total_salary,
+                        (COALESCE(NULLIF(cpt.salary, NULL), 0) + COALESCE(NULLIF(csr.salary_ot, NULL), 0)) AS total_salary,
                         (COALESCE(NULLIF(pevt.total_project_expense, NULL), 0)) AS total_project_expense,
                         (COALESCE(NULLIF(cdp.total_project_expense, NULL), 0)) AS total_department_expense,
                         (COALESCE(NULLIF(em.total_expenses, NULL), 0)) AS operation_cost,
@@ -494,6 +505,11 @@ class ProjectManagementHistory(models.Model):
                         ON cpt.project_id = gmp.project_id
                         AND EXTRACT(MONTH FROM cpt.months) = EXTRACT(MONTH FROM gmp.month_start)
                         AND EXTRACT(YEAR FROM cpt.months) = EXTRACT(YEAR FROM gmp.month_start)
+                    
+                    LEFT JOIN compute_salary_request_overtime AS csr
+                        ON csr.project_id = gmp.project_id
+                        AND csr.payment_month::INT = EXTRACT(MONTH FROM gmp.month_start)
+                        AND csr.get_year_tb::INT = EXTRACT(YEAR FROM gmp.month_start)
                         
                     LEFT JOIN project_count_member_not_intern AS pni
                         ON pni.project_id = gmp.project_id

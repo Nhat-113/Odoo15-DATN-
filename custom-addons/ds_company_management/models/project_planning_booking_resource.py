@@ -252,3 +252,68 @@ class ProjectCountMember(models.Model):
                     AND gc.months = ct.months
             )""" % (self._table)
         )
+        
+        
+class BookingResourceMonthSupport(models.Model):
+    _name = 'booking.resource.month.data'
+    _order = 'company_id, project_id, employee_id, start_date_month DESC'
+    
+    booking_id = fields.Many2one('planning.calendar.resource', string='Booking')
+    project_id = fields.Many2one('project.project', string='Project')
+    company_id = fields.Many2one('res.company', string='Company')
+    name = fields.Char(string='Name')
+    start_date_month = fields.Date(string='Start Date')
+    end_date_month = fields.Date(string='End Date')
+    effort_rate_month = fields.Float(string='Effort(%)')
+    man_month = fields.Float(string='Man Month')
+    employee_id = fields.Many2one('hr.employee', string='Employee')
+    
+    
+    @api.model
+    def upgrade_booking_resource_month_support(self):
+        user_update = str(self.env.user.id)
+        query = self.query_booking_resource_month_support(user_update)
+        self.env.cr.execute(query)
+        return
+        
+    def query_booking_resource_month_support(self, user_update):
+        return """
+                DELETE FROM booking_resource_month_data;
+                INSERT INTO 
+                    booking_resource_month_data(
+                        id,
+                        name,
+                        start_date_month,
+                        end_date_month,
+                        effort_rate_month,
+                        man_month,
+                        booking_id,
+                        employee_id,
+                        project_id,
+                        company_id,
+                        create_uid, 
+                        write_uid, 
+                        create_date, 
+                        write_date
+                    )  
+                SELECT 
+                    br.id,
+                    br.name,
+                    br.start_date_month,
+                    br.end_date_month,
+                    br.effort_rate_month,
+                    br.man_month,
+                    br.booking_id,
+                    br.employee_id,
+                    pl.project_id,
+                    pp.company_id,
+                    """ + user_update + """,
+                    """ + user_update + """,
+                    CURRENT_DATE,
+                    CURRENT_DATE
+                FROM booking_resource_month br
+                LEFT JOIN planning_calendar_resource pl
+                    ON pl.id = br.booking_id
+                LEFT JOIN project_project pp
+                    ON pp.id = pl.project_id;
+            """

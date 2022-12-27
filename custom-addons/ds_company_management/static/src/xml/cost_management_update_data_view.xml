@@ -13,6 +13,12 @@
 
       <button t-if="widget.modelName == 'project.planning.booking.data'" 
         class="btn btn-primary upgrade_project_booking_support" type="button">Upgrade</button>
+
+      <button t-if="widget.modelName == 'compare.payslip.contract.data'" 
+        class="btn btn-primary upgrade_compare_payslip_contract_support" type="button">Upgrade</button>
+
+      <button t-if="widget.modelName == 'booking.resource.month.data'" 
+        class="btn btn-primary upgrade_booking_resource_month_support" type="button">Upgrade</button>
     </t>
   </t>
 </template>

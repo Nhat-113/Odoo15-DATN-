@@ -79,6 +79,22 @@
         action="available_booking_action"
         groups="ds_company_management.group_company_management_ceo"/>
 
+    <menuitem
+        id="compare_payslip_contract_support_menu"
+        name="Statistics Payslip - Contract"
+        sequence="5"
+        parent="ds_company_management.configuration"
+        action="compare_payslip_contract_action"
+        groups="ds_company_management.group_company_management_ceo"/>
+
+    <menuitem
+        id="booking_resource_month_support_menu"
+        name="Statistics Booking Resource Month"
+        sequence="6"
+        parent="ds_company_management.configuration"
+        action="booking_resource_month_support_action"
+        groups="ds_company_management.group_company_management_ceo"/>
+
     <record id="action_human_resource_template" model="ir.actions.client">
         <field name="name">Human Resource Management</field>
         <field name="tag">human_resource_template</field>
