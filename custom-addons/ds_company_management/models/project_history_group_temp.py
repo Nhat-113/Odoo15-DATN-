@@ -1,4 +1,4 @@
-from odoo import fields, models, tools
+from odoo import fields, models, tools, api
 
 
 class ProjectHistoryGroup(models.Model):
@@ -297,3 +297,98 @@ class AvailableBookingEmployeeData(models.Model):
     available_effort = fields.Float(string='Effort Rate (%)')
     available_operation = fields.Float(string='Operation Cost')
     currency_id = fields.Many2one('res.currency', string="Currency")
+    
+    
+    
+class ComparePayslipContract(models.Model):
+    _name = 'compare.payslip.contract'
+    _auto = False
+    
+    
+    def init(self):
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""
+            CREATE OR REPLACE VIEW %s AS (  
+                SELECT
+                    hc.id AS contract_id,
+                    hp.company_id AS company_payslip,
+                    hc.company_id AS company_contract,
+                    hp.employee_id AS employee_payslip,
+                    hc.employee_id AS employee_contract,
+                    hp.date_from,
+                    hp.date_to,
+                    hp.state,
+                    hc.date_start,
+                    hc.date_end
+                FROM hr_payslip AS hp
+                FULL JOIN hr_contract AS hc
+                ON hc.id = hp.contract_id
+            ) """ % (self._table)
+        )
+
+
+class ComparePayslipContractData(models.Model):
+    _name = 'compare.payslip.contract.data'
+    _order = 'company_payslip, employee_payslip, date_from DESC'
+    
+    contract_id = fields.Many2one('hr.contract', string='Contract')
+    company_payslip = fields.Many2one('res.company', string='Company Payslip')
+    company_contract = fields.Many2one('res.company', string='Company Contract')
+    employee_payslip = fields.Many2one('hr.employee', string='Employee Payslip')
+    employee_contract = fields.Many2one('hr.employee', string='Employee Contract')
+    date_from = fields.Date(string='Date From')
+    date_to = fields.Date(string='Date To')
+    date_start = fields.Date(string='Start Contract')
+    date_end = fields.Date(string='End Contract')
+    state = fields.Selection([
+                                ('draft', 'Draft'),
+                                ('verify', 'Waiting'),
+                                ('done', 'Done'),
+                                ('cancel', 'Rejected'),
+                            ], string='Status', index=True)
+    
+    
+    @api.model
+    def upgrade_compare_payslip_contract_support(self):
+        user_update = str(self.env.user.id)
+        query = self.query_compare_payslip_contract_support(user_update)
+        self.env.cr.execute(query)
+        return
+        
+    def query_compare_payslip_contract_support(self, user_update):
+        return """
+                DELETE FROM compare_payslip_contract_data;
+                INSERT INTO 
+                    compare_payslip_contract_data(
+                        contract_id,
+                        company_payslip,
+                        company_contract,
+                        employee_payslip,
+                        employee_contract,
+                        date_from,
+                        date_to,
+                        date_start,
+                        date_end,
+                        state,
+                        create_uid, 
+                        write_uid, 
+                        create_date, 
+                        write_date
+                    )  
+                SELECT 
+                    contract_id,
+                    company_payslip,
+                    company_contract,
+                    employee_payslip,
+                    employee_contract,
+                    date_from,
+                    date_to,
+                    date_start,
+                    date_end,
+                    state,
+                    """ + user_update + """,
+                    """ + user_update + """,
+                    CURRENT_DATE,
+                    CURRENT_DATE
+                FROM compare_payslip_contract;
+            """

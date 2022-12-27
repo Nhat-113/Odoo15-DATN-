@@ -117,4 +117,18 @@
         <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_ceo'))]"/>
     </record>
 
+    <record id="compare_payslip_contract_support_rule" model="ir.rule">
+        <field name="name">CEO: Compare Payslip Contract Support Multi Company Rule</field>
+        <field name="model_id" ref="model_compare_payslip_contract_data"/>
+        <field name="domain_force">['|',('company_contract','=',False),('company_contract', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_ceo'))]"/>
+    </record>
+
+    <record id="booking_resource_month_support_rule" model="ir.rule">
+        <field name="name">CEO: Booking Resource Month Support Multi Company Rule</field>
+        <field name="model_id" ref="model_booking_resource_month_data"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4,ref('ds_company_management.group_company_management_ceo'))]"/>
+    </record>
+
 </odoo>

@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="compare_payslip_contract_search_view" model="ir.ui.view">
+        <field name="name">compare.payslip.contract.data.search</field>
+        <field name="model">compare.payslip.contract.data</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_payslip" icon="fa-users" enable_counters="1"/>
+                <field name="employee_contract" icon="fa-building" enable_counters="1"/>
+                <field name="contract_id" icon="fa-building" enable_counters="1"/>
+
+                <separator orientation="vertical" />
+                <field name="date_from"/>
+                <filter string="Current Year" name="filter_current_year_compare_payslip_contract_support" domain="[
+                    ('date_from', '&gt;=', (context_today().strftime('%%Y-01-01'))),
+                    ('date_from', '&lt;=', (context_today().strftime('%%Y-12-31')))]"/>
+
+                <group expand="1" string="Group By">
+                    <filter string="Contract" name="group_by_contract_id_compare_payslip_contract_support" context="{'group_by': 'contract_id'}"/>
+                    <separator orientation="vertical" />
+
+                    <filter string="Employee Payslip" name="group_by_employee_payslip_compare_payslip_contract_support" context="{'group_by': 'employee_payslip'}"/>
+                    <separator orientation="vertical" />
+
+                    <filter string="Employee Contract" name="group_by_employee_contract_compare_payslip_contract_support" context="{'group_by': 'employee_contract'}"/>
+                    <separator orientation="vertical" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_tree_compare_payslip_contract" model="ir.ui.view">
+        <field name="name">compare.payslip.contract.data.tree</field>
+        <field name="model">compare.payslip.contract.data</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="contract_id"/>
+                <field name="employee_payslip" widget="many2one_avatar"/>
+                <field name="employee_contract" widget="many2one_avatar"/>
+                <field name="company_payslip" groups="base.group_multi_company"/>
+                <field name="company_contract" groups="base.group_multi_company"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="state"/>
+                <field name="date_start" optional="hide"/>
+                <field name="date_end" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+     <record id="compare_payslip_contract_action" model="ir.actions.act_window">
+        <field name="name">Statistics Payslip - Contract</field>
+        <field name="res_model">compare.payslip.contract.data</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="compare_payslip_contract_search_view"/>
+        <field name="context">{'search_default_filter_current_year_compare_payslip_contract_support': 1, 'search_default_group_by_contract_id_compare_payslip_contract_support': 1}</field>
+    </record>
+</odoo>

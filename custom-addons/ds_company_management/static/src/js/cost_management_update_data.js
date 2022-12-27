@@ -42,6 +42,30 @@ odoo.define('cost_management.upgrade_data', function(require) {
                         return location.reload();
                     }, 500);
                 })
+            }),
+
+            self.$buttons.on("click", ".upgrade_compare_payslip_contract_support", function() {
+                self._rpc({
+                    model: 'compare.payslip.contract.data',
+                    method: 'upgrade_compare_payslip_contract_support'
+                }).then(() => {
+                    self.messageNotify();
+                    setTimeout(function (){
+                        return location.reload();
+                    }, 500);
+                })
+            }),
+
+            self.$buttons.on("click", ".upgrade_booking_resource_month_support", function() {
+                self._rpc({
+                    model: 'booking.resource.month.data',
+                    method: 'upgrade_booking_resource_month_support'
+                }).then(() => {
+                    self.messageNotify();
+                    setTimeout(function (){
+                        return location.reload();
+                    }, 500);
+                })
             })
         },
         messageNotify: function() {

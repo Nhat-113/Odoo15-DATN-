@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <!-- Sidebar filter  -->
+    <record id="booking_resource_month_support_search_view" model="ir.ui.view">
+        <field name="name">booking.resource.month.data.search</field>
+        <field name="model">booking.resource.month.data</field>
+        <field name="arch" type="xml">
+            <search>
+                <separator orientation="vertical" />
+                <field name="start_date_month"/>
+
+                <filter string="Current Year" name="filter_current_year_booking_resource_month_support" domain="[
+                    ('start_date_month', '&gt;=', (context_today().strftime('%%Y-01-01'))),
+                    ('start_date_month', '&lt;=', (context_today().strftime('%%Y-12-31')))]"/>
+
+                <group expand="1" string="Group By">
+                    <filter string="Project" name="group_by_project_booking_resource_month_support" context="{'group_by': 'project_id'}"/>
+                    <separator orientation="vertical" />
+
+                    <filter string="Booking" name="group_by_booking_booking_resource_month_support" context="{'group_by': 'booking_id'}"/>
+                    <separator orientation="vertical" />
+
+                    <filter string="Employee" name="group_by_employee_booking_support" context="{'group_by': 'employee_id'}"/>
+                    <separator orientation="vertical" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="booking_resource_month_support_tree" model="ir.ui.view">
+        <field name="name">booking.resource.month.data.tree</field>
+        <field name="model">booking.resource.month.data</field>
+        <field name="arch" type="xml">
+            <tree create="0" delete="0" edit="0">
+                <field name="project_id"/>
+                <field name="booking_id"/>
+                <field name="employee_id"/>
+                <field name="name"/>
+                <field name="start_date_month"/>
+                <field name="end_date_month"/>
+                <field name="effort_rate_month"/>
+                <field name="man_month"/>
+                <field name="company_id" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="booking_resource_month_support_action" model="ir.actions.act_window">
+        <field name="name">Statistics Booking Month</field>
+        <field name="res_model">booking.resource.month.data</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="booking_resource_month_support_search_view"/>
+        <field name="context">{'search_default_filter_current_year_booking_resource_month_support': 1, 'search_default_group_by_project_booking_resource_month_support': 1, 'search_default_group_by_booking_booking_resource_month_support': 1}</field>
+    </record>
+</odoo>
