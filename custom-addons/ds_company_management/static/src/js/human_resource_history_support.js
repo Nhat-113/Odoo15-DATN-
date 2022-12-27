@@ -653,7 +653,7 @@ odoo.define('human_resource_template_history_support.Dashboard', function (requi
             }
           
             // value member company in human
-            let element_member_company = document.querySelectorAll('#total-row-member-of-company .td_value');
+            let element_member_company = document.querySelectorAll('#total-row-member-of-company .available-headcounts-avg');
             let total_element_member_company = [];
 
             for (let i = 0; i < element_member_company.length; i++) {
@@ -661,6 +661,7 @@ odoo.define('human_resource_template_history_support.Dashboard', function (requi
                     total_element_member_company.push(element_member_company[i].innerText);
                 }
             }
+            total_element_member_company = total_element_member_company.slice(5);
 
             for(let i = 0 ; i < textInternalHeadCountRate.length; i++ ){
                 textInternalHeadCountRate[i].innerText = ((compute_effort_internal[i] / (total_element_member_company[i] * 100  )) * 100 ).toFixed(2) ;

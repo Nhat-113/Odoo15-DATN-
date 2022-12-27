@@ -858,7 +858,6 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
             let textBillableHeadCountRate = document.getElementsByClassName('bill-able-avg');
             var compute_effort_billable = this.compute_avg()[4];
 
-
             let textInternalHeadCount = document.getElementsByClassName('internal-headcounts');
             var count_member_internal = this.compute_avg()[3];
             let textInternalHeadCountRate = document.getElementsByClassName('internal-headcounts-avg');
@@ -932,7 +931,7 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
 
 
             // value member company in human
-            let element_member_company = document.querySelectorAll('#total-row-member-of-company .td_value');
+            let element_member_company = document.querySelectorAll('#total-row-member-of-company .available-headcounts-avg');
             let total_element_member_company = [];
 
             for (let i = 0; i < element_member_company.length; i++) {
@@ -940,6 +939,8 @@ odoo.define('human_resource_template_history.Dashboard', function (require) {
                     total_element_member_company.push(element_member_company[i].innerText);
                 }
             }
+
+            total_element_member_company = total_element_member_company.slice(5);
 
             for(let i = 0 ; i < textAvailableHeadCount.length; i++ ){
                 textAvailableHeadCount[i].innerText = count_member_available[i];
