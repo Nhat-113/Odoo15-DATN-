@@ -327,6 +327,7 @@ class DashboardBlock(models.Model):
 
    
         cr.execute(sql)
+        
         data_payroll_static = cr.fetchall()
         list_month_data = []
         for item , _ in data_payroll_static:
@@ -339,6 +340,8 @@ class DashboardBlock(models.Model):
 
         return {
             'data_payroll_static': data_payroll_static,
+            'sql': sql,
+
         }
     @api.model
     def get_payroll_revenue_follow_month(self):

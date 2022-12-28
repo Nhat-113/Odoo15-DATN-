@@ -112,6 +112,7 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
                     if ( res["data_payroll_static"].length == 0) {
                         self.data_payroll_static = Array.from(Array(12), () => 0)
                     }else 
+                        console.log('a', res["sql"]);
                         self.data_payroll_static = res["data_payroll_static"];
                 });
             return self.data_payroll_static;
@@ -1062,7 +1063,9 @@ odoo.define("odoo_dynamic_dashboard.Dashboard", function(require) {
         },
         payrollDashboard: function() {
             let data_payroll =  this.fetch_data();
+            console.log('data_payroll beff', data_payroll);
             data_payroll =  data_payroll.sort((a, b) => a[0] - b[0]);
+            console.log('data_payroll aff', data_payroll);
 
             rpc
                 .query({
