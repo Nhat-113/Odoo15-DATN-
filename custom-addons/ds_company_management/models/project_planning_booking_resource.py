@@ -10,48 +10,6 @@ class ProjectPlanningBookingResource(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
-                WITH get_salary_employee AS (
-                    SELECT 
-                        slip_id,
-                    -- 	code,
-                        SUM(total) AS salary
-                    FROM hr_payslip_line
-                    WHERE code IN ('NET', 'NET1', 'BH', 'BHC', 'TTNCN', 'TTNCN1')
-                    GROUP BY slip_id
-                    ORDER BY slip_id
-                ),
-                get_salary_13_months AS (
-                    SELECT 
-                        slip_id,
-                        total
-                    FROM hr_payslip_line
-                    WHERE code IN ('LBN')
-                    ORDER BY slip_id
-                ),
-                get_slip_employee AS (
-                    SELECT
-                        gs.slip_id,
-                        (gs.salary - gm.total) AS salary
-                    FROM get_salary_employee AS gs
-                    LEFT JOIN get_salary_13_months AS gm
-                        ON gm.slip_id = gs.slip_id
-                ),
-
-                handle_multi_payslip AS (
-                    SELECT
-                        hp.employee_id,
-                        hp.date_from,
-                        hp.date_to,
-                        SUM(gs.salary) AS salary
-                    FROM hr_payslip AS hp
-                    LEFT JOIN get_slip_employee AS gs
-                        ON gs.slip_id = hp.id
-                    WHERE hp.state = 'done'
-                    GROUP BY hp.employee_id,
-                            hp.date_from,
-                            hp.date_to
-                )
-
                 SELECT 
                     ROW_NUMBER() OVER(ORDER BY start_date_month ASC) AS id,
                     he.company_id AS company_emp,
@@ -83,7 +41,7 @@ class ProjectPlanningBookingResource(models.Model):
                 LEFT JOIN project_project AS pp
                     ON pl.project_id = pp.id
                     
-                LEFT JOIN handle_multi_payslip AS hmp
+                LEFT JOIN payslip_get_salary_employee AS hmp
                     ON hmp.employee_id = br.employee_id
                     AND EXTRACT (MONTH FROM br.start_date_month) = EXTRACT (MONTH FROM hmp.date_from)
                     AND EXTRACT (YEAR FROM br.start_date_month) = EXTRACT (YEAR FROM hmp.date_from)

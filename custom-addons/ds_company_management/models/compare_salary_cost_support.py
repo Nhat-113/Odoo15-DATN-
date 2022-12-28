@@ -14,7 +14,7 @@ class CompareSalaryCostSupport(models.Model):
                         total,
                         code
                     FROM hr_payslip_line
-                    WHERE code IN ('NET', 'NET1', 'BH', 'BHC', 'TTNCN', 'TTNCN1', 'LBN')
+                    WHERE code IN ('NET', 'NET1', 'BH', 'BHC', 'TTNCN', 'TTNCN1', 'LBN', 'LTU', 'OT')
                 ),
                 compute_salary_value AS (
                     SELECT 
@@ -22,12 +22,14 @@ class CompareSalaryCostSupport(models.Model):
                         hp.employee_id,
                         hp.date_from,
                         hp.date_to,
-                        (net.total - lbn.total) AS salary,
+                        (net.total - lbn.total - COALESCE(NULLIF(lot.total, NULL), 0)) AS salary,
                         (bh.total + COALESCE(NULLIF(bhc.total, NULL), 0)) AS bhxh,
                         tt.total AS ttncn,
                 -- 		lbn.total AS salary_lbn,
                         --pc.salary_lbn,
                         COALESCE(NULLIF(pc.salary_lbn, NULL), 0) AS salary_lbn,
+                        COALESCE(NULLIF(lot.total, NULL), 0) AS salary_ot,
+                        COALESCE(NULLIF(ltu.total, NULL), 0) AS salary_ltu,
                         rc.id AS currency_id
                     FROM hr_payslip AS hp
                     LEFT JOIN get_payslip_line_value AS net
@@ -45,6 +47,12 @@ class CompareSalaryCostSupport(models.Model):
                     LEFT JOIN get_payslip_line_value AS lbn
                         ON lbn.slip_id = hp.id
                         AND lbn.code = 'LBN'
+                    LEFT JOIN get_payslip_line_value AS lot
+                        ON lot.slip_id = hp.id
+                        AND lot.code = 'OT'
+                    LEFT JOIN get_payslip_line_value AS ltu
+                        ON ltu.slip_id = hp.id
+                        AND ltu.code = 'LTU'
                     LEFT JOIN pesudo_contract_generate AS pc
                         ON pc.employee_id = hp.employee_id
                         AND EXTRACT(MONTH FROM pc.months) = EXTRACT(MONTH FROM hp.date_from)
@@ -64,6 +72,8 @@ class CompareSalaryCostSupport(models.Model):
                     SUM(salary) AS salary,
                     SUM(bhxh) AS bhxh,
                     SUM(ttncn) AS ttncn,
+                    SUM(salary_ot) AS salary_ot,
+	                SUM(salary_ltu) AS salary_ltu,
                     salary_lbn,
                     currency_id
                 FROM compute_salary_value
@@ -91,6 +101,8 @@ class CompareSalaryCostData(models.Model):
     bhxh = fields.Monetary(string="BHXH")
     ttncn = fields.Monetary(string='TTNCN')
     salary_lbn = fields.Monetary(string='13th Month Salary')
+    salary_ot = fields.Monetary(string='Salary OT')
+    salary_ltu = fields.Monetary(string='Salary LTU')
     total_salary = fields.Monetary(string='Total Salary Cost')
     currency_id = fields.Many2one('res.currency', string="Currency")
     
@@ -118,6 +130,8 @@ class CompareSalaryCostData(models.Model):
                         bhxh,
                         ttncn,
                         salary_lbn,
+                        salary_ot,
+                        salary_ltu,
                         total_salary,
                         create_uid, 
                         write_uid, 
@@ -135,7 +149,9 @@ class CompareSalaryCostData(models.Model):
                     bhxh,
                     ttncn,
                     salary_lbn,
-                    (salary + bhxh + ttncn + salary_lbn) AS total_salary,
+                    salary_ot,
+                    salary_ltu,
+                    (salary + bhxh + ttncn + salary_lbn + salary_ot + salary_ltu) AS total_salary,
                     """ + user_update + """,
                     """ + user_update + """,
                     CURRENT_DATE,

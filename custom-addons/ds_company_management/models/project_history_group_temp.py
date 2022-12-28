@@ -106,50 +106,6 @@ class AvailableBookingEmployees(models.Model):
                             type_contract
                 ),
 
-                get_salary_employee AS (
-                    SELECT 
-                        slip_id,
-                    -- 	code,
-                        SUM(total) AS salary
-                    FROM hr_payslip_line
-                    WHERE code IN ('NET', 'NET1', 'BH', 'BHC', 'TTNCN', 'TTNCN1')
-                    GROUP BY slip_id
-                    ORDER BY slip_id
-                ),
-
-                get_salary_13_months AS (
-                    SELECT 
-                        slip_id,
-                        total
-                    FROM hr_payslip_line
-                    WHERE code IN ('LBN')
-                    ORDER BY slip_id
-                ),
-
-                get_payslip_employee AS (
-                    SELECT
-                        gs.slip_id,
-                        (gs.salary - gm.total) AS salary
-                    FROM get_salary_employee AS gs
-                    LEFT JOIN get_salary_13_months AS gm
-                        ON gm.slip_id = gs.slip_id
-                ),
-
-                handle_multi_payslip AS (
-                    SELECT
-                        hp.employee_id,
-                        hp.date_from,
-                        hp.date_to,
-                        SUM(gs.salary) AS salary
-                    FROM hr_payslip AS hp
-                    LEFT JOIN get_payslip_employee AS gs
-                        ON gs.slip_id = hp.id
-                    WHERE hp.state = 'done'
-                    GROUP BY hp.employee_id,
-                            hp.date_from,
-                            hp.date_to
-                ),
-
                 compute_available_effort_employee AS (
                     SELECT
                         he.company_id AS company_emp,
@@ -232,7 +188,7 @@ class AvailableBookingEmployees(models.Model):
                         ca.currency_id
 
                     FROM compute_available_effort_employee AS ca
-                    LEFT JOIN handle_multi_payslip AS hm
+                    LEFT JOIN payslip_get_salary_employee AS hm
                         ON hm.employee_id = ca.employee_id
                         AND EXTRACT (MONTH FROM ca.months) = EXTRACT (MONTH FROM hm.date_from)
                         AND EXTRACT (YEAR FROM ca.months) = EXTRACT (YEAR FROM hm.date_from)
