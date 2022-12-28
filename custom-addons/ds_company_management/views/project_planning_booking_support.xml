@@ -32,7 +32,7 @@
         <field name="model">project.planning.booking.data</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="employee_id"/>
+                <field name="employee_id" widget="many2one_avatar"/>
                 <field name="project_id"/>
                 <field name="starts"/>
                 <field name="ends"/>

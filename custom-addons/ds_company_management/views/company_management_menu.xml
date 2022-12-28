@@ -95,6 +95,14 @@
         action="booking_resource_month_support_action"
         groups="ds_company_management.group_company_management_ceo"/>
 
+    <menuitem
+        id="compare_salary_booking_available_support_menu"
+        name="Statistics Booking - Available - Salary"
+        sequence="7"
+        parent="ds_company_management.configuration"
+        action="compare_salary_booking_available_support_action"
+        groups="ds_company_management.group_company_management_ceo"/>
+
     <record id="action_human_resource_template" model="ir.actions.client">
         <field name="name">Human Resource Management</field>
         <field name="tag">human_resource_template</field>

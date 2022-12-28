@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <!-- Sidebar filter  -->
+    <record id="compare_salary_booking_available_support_filter" model="ir.ui.view">
+        <field name="name">compare.salary.booking.available.data.search</field>
+        <field name="model">compare.salary.booking.available.data</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id" icon="fa-building" enable_counters="1"/>
+
+                <separator orientation="vertical" />
+                <field name="months"/>
+
+                <separator orientation="vertical" />
+                <field name="total_mm"/>
+
+                <separator orientation="vertical" />
+                <field name="total_effort"/>
+
+                <filter string="Current Year" name="filter_current_year_compare_salary_booking_available" domain="[
+                    ('months', '&gt;=', (context_today().strftime('%%Y-01-01'))),
+                    ('months', '&lt;=', (context_today().strftime('%%Y-12-31')))]"/>
+
+                <filter string="Man Month > 1" name="filter_man_month_compare_salary_booking_available" domain="[
+                    ('total_mm', '&gt;', 1)]"/>
+                
+                <filter string="Effort Rate > 100" name="filter_effort_rate_compare_salary_booking_available" domain="[
+                    ('total_effort', '&gt;', 100)]"/>
+
+                <group expand="1" string="Group By">
+                    <filter string="Employee" name="group_by_employee_compare_salary_booking_available" context="{'group_by': 'employee_id'}"/>
+                    <separator orientation="vertical" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="compare_salary_booking_available_support_tree" model="ir.ui.view">
+        <field name="name">compare.salary.booking.available.data.tree</field>
+        <field name="model">compare.salary.booking.available.data</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="employee_id" widget="many2one_avatar"/>
+                <field name="months"/>
+                <field name="man_month" sum="Total Man Month"/>
+                <field name="available_mm" sum="Total Available Man Month"/>
+                <field name="total_mm" sum="Total Man Month"/>
+                <field name="effort_rate_month" sum="Total Effort Rate"/>
+                <field name="available_effort" sum="Total Available Effort Rate"/>
+                <field name="total_effort" sum="Total Effort Rate"/>
+                <field name="salary_booking" widget="monetary" sum="Total Salary Booking"/>
+                <field name="available_salary" widget="monetary" sum="Total Salary Available"/>
+                <field name="total_salary" widget="monetary" sum="Total Salary"/>
+                <field name="salary_cost" widget="monetary" sum="Total Salary Cost"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="compare_salary_booking_available_support_action" model="ir.actions.act_window">
+        <field name="name">Statistics Booking - Available - Salary</field>
+        <field name="res_model">compare.salary.booking.available.data</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="compare_salary_booking_available_support_filter"/>
+        <field name="context">{'search_default_filter_current_year_compare_salary_booking_available': 1, 'search_default_group_by_employee_compare_salary_booking_available': 1}</field>
+    </record>
+</odoo>

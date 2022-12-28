@@ -127,7 +127,10 @@ class ProjectPlanningBookingResourceData(models.Model):
                     """ + user_update + """,
                     CURRENT_DATE,
                     CURRENT_DATE
-                FROM project_planning_booking;
+                FROM project_planning_booking
+                WHERE (member_type_name NOT IN('Shadow Time', 'shadow time') 
+                            OR member_type_name IS NULL)
+                        AND company_id IN (1, 3);
             """
     
 

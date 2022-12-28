@@ -98,6 +98,7 @@ class AvailableBookingEmployees(models.Model):
                         type_contract
                         
                     FROM pesudo_contract
+                    WHERE company_id IN (1, 3) -- Company Dsoft & Mtech
                     GROUP BY company_id,
                             department_id,
                             employee_id,
@@ -347,4 +348,167 @@ class ComparePayslipContractData(models.Model):
                     CURRENT_DATE,
                     CURRENT_DATE
                 FROM compare_payslip_contract;
+            """
+            
+            
+           
+class CompareSalaryBookingAvailable(models.Model):
+    _name = 'compare.salary.booking.available'
+    _auto = False
+    
+    
+    def init(self):
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""
+            CREATE OR REPLACE VIEW %s AS (
+                WITH project_planning_booking_group AS (
+                    SELECT
+                        employee_id,
+                        months,
+                        SUM(man_month) AS man_month,
+                        SUM(effort_rate_month) AS effort_rate_month,
+                        SUM(salary) AS salary
+                        
+                    FROM project_planning_booking
+                    WHERE (member_type_name  NOT IN('Shadow Time', 'shadow time')  OR member_type_name IS NULL)
+                    AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                                                OR department_id IS NULL)
+                    GROUP BY employee_id,
+                            months
+                ),
+                available_booking_employee_group AS (
+                    SELECT
+                        employee_id,
+                        months,
+                        SUM(available_mm) AS available_mm,
+                        SUM(available_effort) AS available_effort,
+                        SUM(available_salary) AS available_salary
+                    FROM available_booking_employee
+                    GROUP BY employee_id,
+                            months
+                ),
+                compare_salary_cost_group AS (
+                    SELECT
+                        employee_id,
+                        months,
+                        SUM(salary) AS salary,
+                        SUM(bhxh) AS bhxh,
+                        SUM(ttncn) AS ttncn,
+                        --SUM(salary_ot) AS salary_ot,
+                        SUM(salary_ltu) AS salary_ltu,
+                        SUM(salary_lbn) AS salary_lbn
+                    FROM compare_salary_cost
+                    GROUP BY employee_id,
+                            months
+                ),
+                pesudo_contract_group AS (
+                    SELECT
+                        employee_id,
+                        months
+                    FROM pesudo_contract
+                    GROUP BY employee_id,
+                            months
+                )
+
+                SELECT
+                    pc.employee_id,
+                    pc.months,
+                    pp.man_month,
+                    pp.effort_rate_month,
+                    pp.salary AS salary_booking,
+                    ab.available_mm,
+                    ab.available_effort,
+                    ab.available_salary,
+                    (COALESCE(NULLIF(pp.man_month, NULL), 0) + COALESCE(NULLIF(ab.available_mm, NULL), 0)) AS total_mm,
+                    (COALESCE(NULLIF(pp.effort_rate_month, NULL), 0) + COALESCE(NULLIF(ab.available_effort, NULL), 0)) AS total_effort,
+                    (COALESCE(NULLIF(pp.salary, NULL), 0) + COALESCE(NULLIF(ab.available_salary, NULL), 0)) AS total_salary,
+                    
+                    (cs.salary + cs.bhxh + cs.ttncn + cs.salary_ltu + cs.salary_lbn) AS salary_cost,
+                    rc.id AS currency_id
+                    
+                FROM pesudo_contract_group AS pc
+                LEFT JOIN project_planning_booking_group AS pp
+                    ON pp.employee_id = pc.employee_id
+                    AND pp.months = pc.months
+                LEFT JOIN available_booking_employee_group AS ab
+                    ON ab.employee_id = pc.employee_id
+                    AND ab.months = pc.months
+                LEFT JOIN compare_salary_cost_group AS cs
+                    ON cs.employee_id = pc.employee_id
+                    AND cs.months = pc.months	
+                LEFT JOIN res_currency AS rc
+                    ON rc.name = 'VND'
+                ORDER BY employee_id, months
+            )""" % (self._table)
+        )
+
+
+class CompareSalaryBookingAvailableData(models.Model):
+    _name = 'compare.salary.booking.available.data'
+    _order = 'employee_id, months DESC'
+    
+    employee_id = fields.Many2one('hr.employee', string='Employee')
+    currency_id = fields.Many2one('res.currency', string="Currency")
+    months = fields.Date(string="Month")
+    man_month = fields.Float(string="Man Month")
+    effort_rate_month = fields.Float(string="Effort Rate (%)")
+    salary_booking = fields.Monetary(string="Salary Booking")
+    available_mm = fields.Float(string="Available MM")
+    available_effort = fields.Float(string="Available Effort (%)")
+    available_salary = fields.Monetary(string="Available Salary")
+    total_mm = fields.Float(string="Total MM")
+    total_effort = fields.Float(string="Total Effort (%)")
+    total_salary = fields.Monetary(string="Total Salary")
+    salary_cost = fields.Monetary(string="Salary Cost")
+    
+    
+    @api.model
+    def upgrade_compare_salary_booking_available_support(self):
+        user_update = str(self.env.user.id)
+        query = self.query_compare_salary_booking_available_support(user_update)
+        self.env.cr.execute(query)
+        return
+        
+    def query_compare_salary_booking_available_support(self, user_update):
+        return """
+                DELETE FROM compare_salary_booking_available_data;
+                INSERT INTO 
+                    compare_salary_booking_available_data(
+                        employee_id,
+                        currency_id,
+                        months,
+                        man_month,
+                        effort_rate_month,
+                        salary_booking,
+                        available_mm,
+                        available_effort,
+                        available_salary,
+                        total_mm,
+                        total_effort,
+                        total_salary,
+                        salary_cost,
+                        create_uid, 
+                        write_uid, 
+                        create_date, 
+                        write_date
+                    )  
+                SELECT 
+                    employee_id,
+                    currency_id,
+                    months,
+                    man_month,
+                    effort_rate_month,
+                    salary_booking,
+                    available_mm,
+                    available_effort,
+                    available_salary,
+                    total_mm,
+                    total_effort,
+                    total_salary,
+                    salary_cost,
+                    """ + user_update + """,
+                    """ + user_update + """,
+                    CURRENT_DATE,
+                    CURRENT_DATE
+                FROM compare_salary_booking_available;
             """
