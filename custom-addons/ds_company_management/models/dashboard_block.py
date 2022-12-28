@@ -308,14 +308,14 @@ class DashboardBlock(models.Model):
             sql = """SELECT EXTRACT(MONTH FROM date_from)   AS l_month,
                         sum(compare_salary_cost_data.total_salary)/100000000  from compare_salary_cost_data
                         WHERE   extract(year from date_from)  = extract(year from CURRENT_DATE)   AND  company_id IN  """ + str(tuple(selected_companies)) + """
-                        group by date_from """
+                        group by EXTRACT(MONTH FROM date_from) """
          
             sql_domain_for_role = ''
 
         elif get_role_user_login  == 'Sub-Ceo':
 
             sql_domain_for_role = ' AND (res_users.id =  ' + str(user_id_login)  + ')'
-            sql_order_by   = ' GROUP BY compare_salary_cost_data.date_from'  
+            sql_order_by   = ' GROUP BY EXTRACT( MONTH FROM compare_salary_cost_data.date_from)'  
             sql  = """ SELECT EXTRACT(MONTH FROM date_from) AS l_month,
                                 sum(compare_salary_cost_data.total_salary)/100000000 AS salary  from compare_salary_cost_data
                                 INNER JOIN RES_COMPANY ON compare_salary_cost_data.COMPANY_ID = RES_COMPANY.ID
