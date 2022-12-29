@@ -16,3 +16,4 @@ from . import department_project_detail
 from . import dashboard_block
 from . import project_management_member
 from . import project_management_member_detail
+from . import human_resource_management_history

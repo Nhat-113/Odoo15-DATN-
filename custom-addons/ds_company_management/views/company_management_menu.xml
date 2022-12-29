@@ -105,6 +105,15 @@
         <field name="tag">human_resource_template_support</field>
     </record>
 
+    <record id="action_human_resource_template_history" model="ir.actions.client">
+        <field name="name">Human Resource Management History</field>
+        <field name="tag">human_resource_template_history</field>
+    </record>
+    <record id="action_human_resource_template_history_support" model="ir.actions.client">
+        <field name="name">Human Resource Management History Support</field>
+        <field name="tag">human_resource_template_history_support</field>
+    </record>
+
     <menuitem
         id="hrm_over_view"
         name="HRM"
@@ -120,6 +129,16 @@
         parent="ds_company_management.hrm_over_view"
         sequence="2"
         action="action_human_resource_template_support"/>
+
+    <menuitem name="History IT" id="menu_human_resource_template_history" 
+        parent="ds_company_management.hrm_over_view"
+        sequence="3"
+        action="action_human_resource_template_history"/>
+
+    <menuitem name="History Support" id="menu_human_resource_template_history_support" 
+        parent="ds_company_management.hrm_over_view"
+        sequence="4"
+        action="action_human_resource_template_history_support"/>
     
     <record id="action_dynamic_dashboard" model="ir.actions.client">
         <field name="name">Dashboard BOM</field>
