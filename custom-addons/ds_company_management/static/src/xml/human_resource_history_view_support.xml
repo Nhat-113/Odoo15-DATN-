@@ -43,7 +43,7 @@
             </div>
 
             <div class="human_resource_template">
-                <table> 
+                <table  style="display:none"> 
                     <tbody id="over-view-table" >
                         <tr class="over-header">
                         <th></th>
@@ -100,7 +100,7 @@
                 </table>
 
                 <table id="human_resource_table">
-                    <tbody class="human_resource_content" id="human_reource_tbody">
+                    <tbody class="human_resource_content" id="human_reource_tbody" style="height: calc(90vh - 71px);">
                         <tr class="header_tabel">
                             <th></th>
                             <th class="human_employee_id header_human_table">
