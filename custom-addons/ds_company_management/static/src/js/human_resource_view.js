@@ -1,42 +1,12 @@
 odoo.define('human_resource_template.Dashboard', function (require) {
     "use strict";
 
-    const ActionMenus = require("web.ActionMenus");
-    const ComparisonMenu = require("web.ComparisonMenu");
-    const ActionModel = require("web.ActionModel");
-    const FavoriteMenu = require("web.FavoriteMenu");
-    const FilterMenu = require("web.FilterMenu");
-    const GroupByMenu = require("web.GroupByMenu");
-    const Pager = require("web.Pager");
-    const SearchBar = require("web.SearchBar");
-    const { useModel } = require("web.Model");
-    const { Component, hooks } = owl;
-
-    var concurrency = require("web.concurrency");
-    var config = require("web.config");
-    var field_utils = require("web.field_utils");
-    var time = require("web.time");
-    var utils = require("web.utils");
     var AbstractAction = require("web.AbstractAction");
     var ajax = require("web.ajax");
-    var Dialog = require("web.Dialog");
-    var field_utils = require("web.field_utils");
     var core = require("web.core");
     var rpc = require("web.rpc");
-    var web_client = require("web.web_client");
-    var abstractView = require("web.AbstractView");
-    var _t = core._t;
-    var QWeb = core.qweb;
-
-    const { useRef, useSubEnv } = hooks;
-    var AbstractAction = require('web.AbstractAction');
     var ajax = require('web.ajax');
-    var core = require('web.core');
-    var rpc = require('web.rpc');
-    var session = require('web.session');
-    var web_client = require('web.web_client');
-    var _t = core._t;
-    var QWeb = core.qweb;
+
     const number_rows_not_count = 4;
 
     var HumanResourceTemplate = AbstractAction.extend({
@@ -67,28 +37,34 @@ odoo.define('human_resource_template.Dashboard', function (require) {
                     if(!input)  
                          return
                     // Event search in when input onchange
-                    input.addEventListener('keyup', self.searchFunction)
                     // after event search run, event compute_avg call again to calculator avg effort 
-                    input.addEventListener('keyup', () => self.compute_avg())
-                    input.addEventListener('keyup', () => self.compute_avg_all_res_rate())
-                    input.addEventListener('keyup', () => self.value_table_over_view())
+                    input.addEventListener('keyup', () => {
+                        self.searchFunction();
+                        self.compute_avg();
+                        self.compute_avg_all_res_rate();
+                        self.value_table_over_view();
+                    })
 
                     var input_available_list = document.getElementById("search_input_avai");
                     if(!input_available_list)  
                          return
                     // Event search in when input onchange
-                    input_available_list.addEventListener('keyup', self.searchFunctionAvaiList);
-                    input_available_list.addEventListener('keyup', () => self.value_table_over_view());
+                    input_available_list.addEventListener('keyup', () => {
+                        self.searchFunctionAvaiList();
+                        self.value_table_over_view();
+                    });
 
 
                     // Event filter  in when selection onchange
                     var selection = document.getElementById("countriesDropdown");
                     if(!selection)  
                         return
-                    selection.addEventListener('change', self.searchFunction)
-                    selection.addEventListener('change', () => self.compute_avg())
-                    selection.addEventListener('change', () => self.compute_avg_all_res_rate())
-                    selection.addEventListener('change', () => self.value_table_over_view())
+                    selection.addEventListener('change', () => {
+                        self.searchFunction();
+                        self.compute_avg();
+                        self.compute_avg_all_res_rate();
+                        self.value_table_over_view();
+                    })
 
   
                     // compute avg effort member in table when render DOM element   
