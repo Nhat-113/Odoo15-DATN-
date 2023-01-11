@@ -756,7 +756,7 @@
         </record>
 
         <record id="hr_rule_tncnbn2" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 5%</field>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 5% - (24)</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -769,7 +769,7 @@
         </record>
 
         <record id="hr_rule_tncnbn3" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 10% - 250000</field>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 10% - 250000 - (24)</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -782,7 +782,7 @@
         </record>
 
         <record id="hr_rule_tncnbn4" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 15% - 750000</field>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 15% - 750000 - (24)</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -795,7 +795,7 @@
         </record>
 
         <record id="hr_rule_tncnbn5" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 20% - 1650000</field>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 20% - 1650000 - (24)</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -808,7 +808,7 @@
         </record>
 
         <record id="hr_rule_tncnbn6" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 25% - 3250000</field>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 25% - 3250000 - (24)</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -821,7 +821,7 @@
         </record>
 
         <record id="hr_rule_tncnbn7" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 30% - 5850000</field>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 30% - 5850000 - (24)</field>
             <field name="sequence" eval="25"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
@@ -834,7 +834,7 @@
         </record>
 
         <record id="hr_rule_tncnbn8" model="hr.salary.rule">
-            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 35% - 9850000</field>
+            <field name="name">Thuế TNCN theo Lương tháng 13/Bonus (VND) = ((16) + (17) + (18) - (2) - (13) - (20)) * 35% - 9850000 - (24)</field>
             <field name="sequence" eval="24"/>
             <field name="code">TTNCNBN</field>
             <field name="category_id" ref="hr_payroll_community.OTH"/>
