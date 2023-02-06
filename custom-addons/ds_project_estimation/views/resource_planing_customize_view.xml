@@ -4,15 +4,22 @@
         <field name="name">estimation.resource.effort.treeview</field>
         <field name="model">estimation.resource.effort</field>
         <field name="arch" type="xml">
-            <tree create="0" edit="0" delete="0">
+            <tree create="0" edit="0" delete="0" editable="bottom">
                 <field name="sequence" readonly="1" force_save="1" />
                 <field name="name" readonly="1" force_save="1" />
-                <field name="dev_effort" readonly="1" force_save="1" />
-                <field name="design_effort" readonly="1" force_save="1" />
-                <field name="tester_effort" readonly="1" force_save="1" />
-                <field name="comtor_effort" readonly="1" force_save="1" />
-                <field name="brse_effort" readonly="1" force_save="1" />
-                <field name="pm_effort" readonly="1" force_save="1" />
+                <field name="total_effort" readonly="1" force_save="1" decoration-bf="1" width="125px"/>
+                <field name="key_primary" invisible="1" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="estimation_resource_plan_result_effort_customize_tree" model="ir.ui.view">
+        <field name="name">estimation.resource.plan.result.effort.treeview</field>
+        <field name="model">estimation.resource.plan.result.effort</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" delete="0" editable="bottom" limit="2">
+                <!-- <field name="sequence" readonly="1" force_save="1" /> -->
+                <field name="name" colspan="2" readonly="1" force_save="1" />
                 <field name="total_effort" readonly="1" force_save="1" decoration-bf="1" width="125px"/>
                 <field name="key_primary" invisible="1" />
             </tree>

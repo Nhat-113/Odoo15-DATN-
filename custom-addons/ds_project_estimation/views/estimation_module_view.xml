@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estimation_module_view_tree" model="ir.ui.view">
+        <field name="name">estimation.module.treeview</field>
+        <field name="model">estimation.module</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" force_save="1" />
+                <field name="component" />
+                <field name="total_manday" readonly="1" width="120px" sum="Total Man-Day"/>
+                <field name="key_primary" invisible="1" />
+                <!-- <field name="check_save_estimation" invisible="1"/> -->
+            </tree>
+        </field>
+    </record>
+
+    <record id="estimation_module_view_form" model="ir.ui.view">
+        <field name="name">estimation.module.form</field>
+        <field name="model">estimation.module</field>
+        <field name="arch" type="xml">
+            <form duplicate="0">
+                <sheet>
+                    <group name="group_top">
+                        <group name="group_left">
+                            <field name="component" placeholder="Please enter the module name ..."/>
+                            <field name="estimation_id" invisible="1"/>
+                            <!-- <field name="get_module_activate" invisible="1"/> -->
+                        </group>
+                        <group name="group_right">
+                            <field name="project_activity_type" attrs="{'readonly': [('module_config_activity', '!=', [])]}"/>
+                        </group>
+
+                        <!-- <field name="check_save_estimation" invisible="1"/> -->
+                        <field name="sequence" invisible="1"/>
+                        <!-- <field name="get_estimation_id" invisible="1"/> -->
+                        <!-- <field name="check_compute" invisible="1"/> -->
+                    </group>
+                    <group attrs="{'invisible': [('module_config_activity', '!=', [])]}" class="box_compute_load_activities" id="activity_disable_click">
+                        <label class="o_form_label label_button_compute_load_activities" for="compute_load_activities">Activity</label>
+                        <button name='compute_load_activities' id="compute_load_activities"
+                                type="object"
+                                attrs="{'invisible': [('module_config_activity', '!=', [])]}"
+                                string="Load Activities" class="btn btn-primary"/>
+                    </group>
+
+                    <separator string="Assumption" />
+                    <field name="module_assumptions">
+                        <tree editable="bottom">
+                            <field name="assumption" />
+                        </tree>
+                    </field>
+                    <separator string="Summary" />
+                    <field name="module_summarys">
+                        <tree create="0" editable="0" delete="0">
+                            <field name="summary_type" readonly="1" force_save="1"/>
+                            <field name="description" readonly="1" force_save="1"/>
+                            <field name="value" readonly="1" force_save="1"/>
+                            <field name="type" invisible="1" force_save="1"/>
+                        </tree>
+                    </field>
+                    <separator string="Effort distribution" />
+                    <field name="module_effort_activity">
+                        <tree create="0" editable="0" delete="0">
+                            <field name="sequence" readonly="1"/>
+                            <field name="activity" readonly="1"/>
+                            <field name="effort" readonly="1"/>
+                            <field name="percent" readonly="1"/>
+                        </tree>
+                    </field>
+                    <separator string='Work Breakdown Structure and Estimate' />
+                    <!-- <field name="module_config_activity" context="{'tree_view_ref' : 'ds_project_estimation.config_activity_tree_view_project_base'}"/> -->
+                    <field name="module_config_activity">
+                        <tree create="0">
+                            <field name="sequence"/>
+                            <field name="activity" />
+                            <field name="effort" />
+                            <field name="check_default" invisible="1"/>
+                        </tree>
+                        <form>
+                            <group name="group_top">
+                                <group name="group_left">
+                                    <field name="activity" />
+                                    <field name="effort" />
+                                </group>
+                                <group name="group_right">
+                                    <field name="activity_type"/>
+                                    <field name="activity_current" attrs="{'invisible': [('activity_type', '!=', 'type_1')], 'required' : [('activity_type', '=', 'type_1')]}" options="{'no_open': True,'no_quick_create':True,'no_create_edit':True}" placeholder="Please select activity ..." />
+                                </group>
+                                <span class="suggest_icon"></span>
+                                <div class="type_tooltip_hover">
+                                    <ul>
+                                        <li><b>Type 1:</b> Percent of a different activity</li>
+                                        <li><b>Type 2:</b> Estimated execution time is entered by the user.</li>
+                                        <li><b>Type 3:</b> Depending on the number of participants and the number of completed days</li>
+                                    </ul>
+                                </div>
+                                <field name="sequence" invisible="1"/>
+                                <field name="module_id" invisible="1"/>
+                                <!-- <field name="domain_module_id" invisible="1"/> -->
+                                <field name="check_default" invisible="1"/>
+                                <field name="check_compute" invisible="1"/>
+                                <field name="sequence_breakdown" invisible="1"/>
+                            </group>
+                            <notebook>
+                                <page string="Breakdown Estimation">
+                                    <field name="add_lines_breakdown_activity">
+                                        <tree editable="bottom">
+                                            <field name="sequence"/>
+                                            <field name="activity" required="1"/>
+                                            <field name="job_pos" required="1"/>
+                                            <field name="persons" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
+                                            <field name="days" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_3')]}" />
+                                            <field name="percent_effort" attrs="{'column_invisible': [('parent.activity_type', '!=', 'type_1')]}" width="140px"/>
+                                            <field name="mandays_input" attrs="{'readonly': [('type', '!=', 'type_2')]}" width="155px"/>
+                                            <field name="type" invisible="1"/>
+                                            <field name="mandays" invisible="1"/>
+                                            <field name="check_compute" invisible="1"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                            </notebook>
+                        </form>
+                    </field>
+
+                    <button name='compute_load_activities' id="compute_load_activities"
+                                    attrs="{'invisible': [('module_config_activity', '=', [])]}"
+                                    type="object" 
+                                    string="Add a line" class="btn btn_add_a_line"/>
+                    <group name="note_group" col="6" class="mt-2 mt-md-0">
+                        <group class="oe_subtotal_footer" colspan="2" name="sale_total">
+                            <field name="total_manday" readonly="1" />
+                            <field name="sequence_activities" readonly="1" invisible="1"/>
+                        </group>
+                        <div class="oe_clear"/>
+                    </group>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="estimation_module_action" model="ir.actions.act_window">
+        <field name="name">Modules</field>
+        <field name="res_model">estimation.module</field>
+        <field name="domain">[('estimation_id', '=', active_id)]</field>
+        <field name="context">{'default_estimation_id': active_id}</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>
+
+

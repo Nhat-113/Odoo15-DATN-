@@ -1,4 +1,5 @@
-.o_list_number_th, .o_list_number {
+.o_list_number_th,
+.o_list_number {
     text-align: left !important;
 }
 
@@ -35,20 +36,22 @@ div[name="add_lines_resource_effort"] table tfoot {
     background-color: #FFFFFF !important;
 } */
 
-div[name="add_lines_summary_totalcost"] table tfoot .name::before, 
+div[name="add_lines_summary_totalcost"] table tfoot .name::before,
 div[name="add_lines_summary_totalcost"] table tfoot td:nth-child(2)::before {
     content: "Total";
     font-weight: bold;
 }
 
 div[name="add_lines_summary_costrate"] table tbody tr {
-    display: none;
+    /* display: none; */
 }
 
 .o_field_widget.o_quick_editable {
     word-break: break-all;
 }
-.o_form_sheet_bg .o_form_label.o_required_modifier:after, .label_button_compute_load_activities::after {
+
+.o_form_sheet_bg .o_form_label.o_required_modifier:after,
+.label_button_compute_load_activities::after {
     content: " *";
     color: red;
 }
@@ -58,7 +61,7 @@ div[name="add_lines_summary_costrate"] table tbody tr {
 }
 
 .o_field_x2many_list[name="module_summarys"] .o_data_row:nth-child(1) td:nth-child(1),
-.o_field_x2many_list[name="module_summarys"] .o_data_row:nth-child(3) td:nth-child(1){
+.o_field_x2many_list[name="module_summarys"] .o_data_row:nth-child(3) td:nth-child(1) {
     position: absolute;
     display: block;
     height: 56px;
@@ -69,11 +72,13 @@ div[name="add_lines_summary_costrate"] table tbody tr {
     border-top: none;
     border-bottom: none;
 }
+
 .o_field_x2many_list[name="module_summarys"] .o_data_row:nth-child(3) td:nth-child(1) {
     border-top: 1px solid #efeeee
 }
 
-div[name="check_activate"] {
+
+/* div[name="check_activate"] {
     position: absolute;
     width: 100%;
     left: 0;
@@ -82,7 +87,8 @@ div[name="check_activate"] {
 }
 div[name="check_activate"] .custom-control-label, div[name="check_activate"] i {
     display: none;
-}
+} */
+
 th[data-name="check_activate"] {
     width: 0 !important;
 }
@@ -141,13 +147,14 @@ th[data-name="check_activate"] {
     z-index: 100;
     top: 18%;
 }
+
 .type_tooltip_hover ul {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-.suggest_icon:hover + .type_tooltip_hover {
+.suggest_icon:hover+.type_tooltip_hover {
     display: block !important;
 }
 
@@ -170,4 +177,26 @@ th[data-name="check_activate"] {
     content: "(MM)";
     font-weight: bold;
     margin-left: 10px;
+}
+
+/* .total_cost_active td {
+    user-select: none;
+    pointer-events: none;
+} */
+
+/* .total_cost_active {
+    width: 100%;
+    position: relative;
+    z-index: 1000;
+    pointer-events: all;
+    user-select: all;
+} */
+
+.total_cost_active {
+    color: #495057;
+    background-color: rgba(0, 0, 0, 0.04);
+
+}
+.invisible_cost_rate {
+    display: none;
 }

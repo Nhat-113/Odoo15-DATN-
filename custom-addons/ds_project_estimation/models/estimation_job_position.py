@@ -13,7 +13,6 @@ class JobPosition(models.Model):
     sequence = fields.Integer(string="No", index=True)
     job_position = fields.Char("Job Position", required=True)
     description = fields.Char("Description", required=True)
-    check_default = fields.Boolean("Is Default", default=False)
 
     _sql_constraints = [
             ('job_position_uniq', 'unique (job_position)', "Job position name already exists!"),
@@ -27,10 +26,15 @@ class JobPosition(models.Model):
             if ls_data:
                 sequence_max = max(record.sequence for record in ls_data)
                 vals['sequence'] = sequence_max + 1
-        if 'check_default' in vals:
-            if vals['check_default'] == False:
-                self.action_create_dynamic_fields(vals['job_position'])
-        return super(JobPosition, self).create(vals)
+        # if 'check_default' in vals:
+        #     if vals['check_default'] == False:
+            self.action_create_dynamic_fields(vals['job_position'])
+            result = super(JobPosition, self).create(vals)
+            self.env['cost.rate'].create({
+                'job_type': result.id,
+                'description': vals['job_position']
+            })
+        return result
            
            
     def action_create_dynamic_fields(self, field_label):
@@ -38,6 +42,7 @@ class JobPosition(models.Model):
         self.validate_character_job_position_input(field_name)
         self.create_dynamic_content('estimation.summary.totalcost', 'ds_project_estimation.estimation_totalcost_customize', field_name, field_label)
         self.create_dynamic_content('estimation.resource.effort', 'ds_project_estimation.estimation_resource_planning_customize_tree', field_name, field_label)
+        self.create_dynamic_content('estimation.resource.plan.result.effort', 'ds_project_estimation.estimation_resource_plan_result_effort_customize_tree', field_name, field_label)
 
             
     def create_dynamic_content(self, model, views, field_name, field_label):
@@ -66,7 +71,7 @@ class JobPosition(models.Model):
                     '<field name="%s" sum="Total effort %s"/>'
                     '</field>'
                     '</data>') % (field_name, field_label)
-        if model == 'estimation.resource.effort': 
+        if model in ['estimation.resource.effort', 'estimation.resource.plan.result.effort']: 
             xml_arch = xml_arch.replace(_('sum="Total effort %s"') % (field_label), '')
         
         vals_xml = {
@@ -82,12 +87,13 @@ class JobPosition(models.Model):
             
             
     def write(self, vals):
-        if 'job_position' in vals and self.check_default == False:
+        if 'job_position' in vals:
             field_name_before = 'x_' + self.job_position.casefold().replace(' ', '_') + '_effort'
             field_name_after = 'x_' + vals['job_position'].casefold().replace(' ', '_') + '_effort'
             self.validate_character_job_position_input(field_name_after)
             get_fields = self.env['ir.model.fields'].sudo().search([('name', '=', field_name_before), 
-                                                                    ('model', 'in', ['estimation.summary.totalcost', 'estimation.resource.effort'])])
+                                                                    ('model', 'in', ['estimation.summary.totalcost', 'estimation.resource.effort', 
+                                                                                     'estimation.resource.plan.result.effort'])])
             
             for field in get_fields:
                 view_name = 'dynamic_fields_customize_' + field.name + '_' + field.model.casefold().replace('.', '_')
@@ -96,7 +102,7 @@ class JobPosition(models.Model):
                 xml_arch_after = _('<field name="%s" sum="Total effort %s"/>') %(field_name_after, vals['job_position'])
                 element_pseudo = '<header></header>'
                 
-                if field.model == 'estimation.resource.effort': 
+                if field.model in ['estimation.resource.effort', 'estimation.resource.plan.result.effort']: 
                     xml_arch_before = xml_arch_before.replace(_(' sum="Total effort %s"') % (self.job_position), '')
                     xml_arch_after = xml_arch_after.replace(_(' sum="Total effort %s"') % (vals['job_position']), '')
                     
@@ -131,19 +137,24 @@ class JobPosition(models.Model):
     
     def unlink(self):
         for record in self:
-            if record.check_default == False:
-                field_name = 'x_' + record.job_position.casefold().replace(' ', '_') + '_effort'
+            is_active_gantt = self.env['gantt.resource.planning'].search([('job_position_id', 'in', record.ids)], limit=1)
+            is_active_cost_rate = self.env['cost.rate'].search([('job_type', 'in', record.ids)], limit=1)
+            if is_active_gantt or is_active_cost_rate:
+                raise ValidationError(_('The %s job position is active, hence it cannot be deleted!', record.job_position))
+            # if record.check_default == False:
+            field_name = 'x_' + record.job_position.casefold().replace(' ', '_') + '_effort'
+            
+            get_fields = self.env['ir.model.fields'].sudo().search([('name', '=', field_name), 
+                                                                ('model', 'in', ['estimation.summary.totalcost', 'estimation.resource.effort',
+                                                                                 'estimation.resource.plan.result.effort'])])
+            for field in get_fields:
+                view_name = 'dynamic_fields_customize_' + field.name + '_' + field.model.casefold().replace('.', '_')
+                xml_view_custome = self.env['ir.ui.view'].sudo().search([('name', '=', view_name), ('model', '=', field.model)])
+                if xml_view_custome:
+                    xml_view_custome.sudo().unlink()
                 
-                get_fields = self.env['ir.model.fields'].sudo().search([('name', '=', field_name), 
-                                                                    ('model', 'in', ['estimation.summary.totalcost', 'estimation.resource.effort'])])
-                for field in get_fields:
-                    view_name = 'dynamic_fields_customize_' + field.name + '_' + field.model.casefold().replace('.', '_')
-                    xml_view_custome = self.env['ir.ui.view'].sudo().search([('name', '=', view_name), ('model', '=', field.model)])
-                    if xml_view_custome:
-                        xml_view_custome.sudo().unlink()
-                    
-                    field.sudo().unlink()
-            else:
-                raise ValidationError(_("You can't delete job position %s because it is required data !") % (record.job_position))
+                field.sudo().unlink()
+            # else:
+            #     raise ValidationError(_("You can't delete job position %s because it is required data !") % (record.job_position))
         return super(JobPosition, self).unlink()
                     
