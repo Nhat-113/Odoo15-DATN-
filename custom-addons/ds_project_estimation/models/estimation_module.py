@@ -33,6 +33,7 @@ class EstimationModule(models.Model):
                             string="Template Project Type")
 
     key_primary = fields.Char(string="Key unique module")
+    is_lock = fields.Boolean(string="Is Lock", default=False)
             
     
     @api.model
@@ -220,11 +221,21 @@ class EstimationModule(models.Model):
                 
     @api.constrains('module_config_activity')
     def check_modify_activity(self):
+        if self.is_lock == True:
+            raise ValidationError(_("This module has been generated successfully, so you cannot modify the content of this module!"))
         self.message_post(body=_("Effort distribution: The content has been modified"))
         
     @api.constrains('module_assumptions')
     def post_message_history_assumption(self):
+        if self.is_lock == True:
+            raise ValidationError(_("This module has been generated successfully, so you cannot modify the content of this module!"))
         self.message_post(body=_("Assumption: The content has been modified"))
+        
+        
+    @api.constrains('component', 'project_activity_type')
+    def validate_lock_module(self):
+        if self.is_lock == True:
+            raise ValidationError(_("This module has been generated successfully, so you cannot modify the content of this module!"))
     
                 
     @api.model

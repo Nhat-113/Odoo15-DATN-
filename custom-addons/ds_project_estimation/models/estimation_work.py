@@ -293,6 +293,10 @@ class Estimation(models.Model):
                 {'message': _("In the next few minutes, project will be generate.")})
                 
             estimation.check_generate_project = True
+            
+            self.action_lock_module(estimation.add_lines_module)
+            self.action_lock_module(estimation.add_lines_summary_costrate)
+            
             return {
                 'name': 'Message',
                 'type': 'ir.actions.act_window',
@@ -302,6 +306,9 @@ class Estimation(models.Model):
                 'target': 'new'
             }
 
+    def action_lock_module(self, data):
+        for record in data:
+            record.is_lock = True
     
     def unlink(self):
         for record in self:

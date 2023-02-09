@@ -1,4 +1,5 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 class EstimationSummaryCostRate(models.Model):
     _name = "estimation.summary.costrate"
@@ -17,8 +18,17 @@ class EstimationSummaryCostRate(models.Model):
     yen_day = fields.Float(string="Unit (Currency/Day)", store=True, compute='_compute_yen_day')
     yen_month = fields.Float(string="Unit (Currency/Month)", store=True)
     
+    is_lock = fields.Boolean(string="Is Lock", default=False)
+    
     
     @api.depends('yen_month')
     def _compute_yen_day(self):
         for record in self:
             record.yen_day = record.yen_month / 20
+            
+            
+    @api.constrains('yen_month')
+    def validate_lock_cost_rate(self):
+        for record in self:
+            if record.is_lock == True:
+                raise ValidationError(_("This module has been generated successfully, so you cannot modify the content of this module!"))
