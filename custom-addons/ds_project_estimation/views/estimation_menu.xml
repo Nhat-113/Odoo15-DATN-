@@ -104,6 +104,7 @@
             name="Currency"
             parent="menu_config"
             sequence="5"
-            action="estimation_currency_action" />
+            action="estimation_currency_action" 
+            groups="ds_project_estimation.estimation_access_administrator"/>
 
 </odoo>

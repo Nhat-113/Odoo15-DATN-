@@ -205,20 +205,21 @@ class EstimationXlsx(models.AbstractModel):
         row_cost_rate, col_cost_rate = row_data_summarize + 5, 1
 
         # get cost rate from last module
-        costrates = estimation.env['estimation.summary.costrate'].search([('estimation_id', '=', estimation.id), 
-                                                                          ('key_primary', '=', estimation.add_lines_module[-1].key_primary)],
-                                                                         order="sequence")
-        for costrate in costrates:
-            row_cost_rate += 1
-            col_value_cost_rate = [
-                costrate.sequence,
-                costrate.job_position.job_position,
-                costrate.yen_month,
-                costrate.yen_day
-            ]
-            for i, value in enumerate(col_value_cost_rate):
-                sheet_summarize.write(
-                    row_cost_rate, col_cost_rate + i, value, format['border'])
+        if len(estimation.add_lines_module) != 0:
+            costrates = estimation.env['estimation.summary.costrate'].search([('estimation_id', '=', estimation.id), 
+                                                                            ('key_primary', '=', estimation.add_lines_module[-1].key_primary)],
+                                                                            order="sequence")
+            for costrate in costrates:
+                row_cost_rate += 1
+                col_value_cost_rate = [
+                    costrate.sequence,
+                    costrate.job_position.job_position,
+                    costrate.yen_month,
+                    costrate.yen_day
+                ]
+                for i, value in enumerate(col_value_cost_rate):
+                    sheet_summarize.write(
+                        row_cost_rate, col_cost_rate + i, value, format['border'])
 
         sheet_summarize.hide_gridlines(2)    
 
@@ -328,7 +329,9 @@ class EstimationXlsx(models.AbstractModel):
         sheet_resource.write(cnt_job_pos, col_data_chartt + 1, count, format_total)
             
         # Paint gantt
-        month = math.ceil(max(item.value_man_month for item in estimation.gantt_view_line))
+        month = 0
+        if len(estimation.gantt_view_line) != 0:
+            month += math.ceil(max(item.value_man_month for item in estimation.gantt_view_line))
         col = 0
         num_days = 10
         

@@ -26,7 +26,13 @@ odoo.define("estimation.EstimationCustomizeResourcePlanFormView", function(requi
                         for (var index = 1; index < resourcePlanHeader.length; index++) {
                             let fieldName = resourcePlanHeader[index].dataset.name;
                             var nodeChildTd = document.createElement('td');
-                            let valsContent = document.createTextNode(data[item][fieldName]);
+                            
+                            let vals = data[item][fieldName];
+                            if (fieldName != 'sequence' && fieldName != 'name') {
+                                vals = vals.toFixed(2);
+                            }
+                            let valsContent = document.createTextNode(vals);
+                            
                             if (index == 1) {
                                 nodeChildTd.setAttribute('colspan', '2'); // Merged 2 column of first column
                                 nodeChildTd.style.textAlign = 'center';

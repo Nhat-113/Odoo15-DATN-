@@ -305,10 +305,10 @@ class Estimation(models.Model):
     
     def unlink(self):
         for record in self:
+            record.add_lines_module.unlink()
             record.add_lines_summary_totalcost.unlink()
             record.add_lines_summary_costrate.unlink()
             record.add_lines_resource_effort.unlink()
-            record.add_lines_module.unlink()
             record.add_lines_overview.unlink()
             record.resource_plan_result_effort.unlink()
             record.gantt_view_line.unlink()

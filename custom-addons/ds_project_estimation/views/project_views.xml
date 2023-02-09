@@ -7,7 +7,9 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='company_id']" position="after">
                 <field name="estimation_id" groups="ds_project_estimation.estimation_access_sale"/>
-                <field name="total_mm" groups="ds_project_estimation.estimation_access_sale" class="total_man_month"/>
+                <field name="total_mm" groups="ds_project_estimation.estimation_access_sale"
+                        attrs="{'readonly': [('estimation_id', '!=', False)]}"
+                        class="total_man_month"/>
             </xpath>
 
             <xpath expr="//field[@name='user_id']" position="before">

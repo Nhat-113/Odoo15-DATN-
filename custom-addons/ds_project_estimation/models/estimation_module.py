@@ -189,32 +189,33 @@ class EstimationModule(models.Model):
             })
     
     def _overview_autolog_description(self, module_name, message, action):
-        overview = self.env['estimation.overview']
-        next_revision = self.estimation_id.add_lines_overview[0].revision + 0.1
-        if action in ['new', 'delete']:
-            des = 'Module ' + module_name + message
-            overview.create({
-                'connect_overview': self.estimation_id.id,
-                'revision': next_revision,
-                'description': des
-            })
-        else:
-            # with write action, module_name = vals
-            if 'component' in module_name:
-                message += '\n\t- Component module: ' + self.component + ' --> ' + module_name['component']
-            if 'project_activity_type' in module_name:
-                project_type_before = 'ODC' if self.project_activity_type == 'odc' else 'Project Base'
-                project_type_after = 'ODC' if module_name['project_activity_type'] == 'odc' else 'Project Base'
-                message += '\n\t- Template Project Type: ' + project_type_before + ' --> ' + project_type_after
-            
-            if 'component' not in module_name and 'project_activity_type' not in module_name:
-                return
-            else:
+        if self:
+            overview = self.env['estimation.overview']
+            next_revision = self.estimation_id.add_lines_overview[0].revision + 0.1
+            if action in ['new', 'delete']:
+                des = 'Module ' + module_name + message
                 overview.create({
                     'connect_overview': self.estimation_id.id,
                     'revision': next_revision,
-                    'description': message
+                    'description': des
                 })
+            else:
+                # with write action, module_name = vals
+                if 'component' in module_name:
+                    message += '\n\t- Component module: ' + self.component + ' --> ' + module_name['component']
+                if 'project_activity_type' in module_name:
+                    project_type_before = 'ODC' if self.project_activity_type == 'odc' else 'Project Base'
+                    project_type_after = 'ODC' if module_name['project_activity_type'] == 'odc' else 'Project Base'
+                    message += '\n\t- Template Project Type: ' + project_type_before + ' --> ' + project_type_after
+                
+                if 'component' not in module_name and 'project_activity_type' not in module_name:
+                    return
+                else:
+                    overview.create({
+                        'connect_overview': self.estimation_id.id,
+                        'revision': next_revision,
+                        'description': message
+                    })
                 
                 
     @api.constrains('module_config_activity')
