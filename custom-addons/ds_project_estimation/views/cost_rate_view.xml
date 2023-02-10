@@ -6,7 +6,7 @@
         <field name="model">cost.rate</field>
         <field name="arch" type="xml">
             <tree editable="bottom">
-                <field name="job_type"/>
+                <field name="job_type" options="{'no_open': True, 'no_create': True}"/>
                 <field name="description" />
                 <field name="create_date" string="Creation Date"/>
             </tree>
