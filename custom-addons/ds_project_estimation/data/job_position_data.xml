@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
         <record id="job_position_data_developer" model="config.job.position">
             <field name="sequence" eval="1" />
             <field name="job_position">Developer</field>
