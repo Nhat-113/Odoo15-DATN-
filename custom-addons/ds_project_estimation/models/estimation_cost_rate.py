@@ -1,5 +1,5 @@
-from email.policy import default
-from odoo import models, fields, api, tools
+from odoo import models, fields, api, tools, _
+from odoo.exceptions import UserError, ValidationError
 import math
 
 
@@ -10,19 +10,19 @@ class CostRate(models.Model):
     _name = "cost.rate"
     _description = "CostRate"
     _order = "id"
-    _rec_name = "role"
+    _rec_name = "description"
 
-    role = fields.Char("Role", required=True)
+
     description = fields.Char("Description", required=True)
-    job_type = fields.Many2one('config.job.position', string='Type')
-    currency_usd_id = fields.Many2one('estimation.currency', default=1)  # 2 is USD , string="Currency"
-    currency_yen_id = fields.Many2one('estimation.currency', default=24)  # 2 is YEN , string="Currency"
-    currency_vnd_id = fields.Many2one('estimation.currency', default=22)  # 2 is VND , string="Currency"
-    currency_sgd_id = fields.Many2one('estimation.currency', default=36)
-    cost_usd = fields.Float("Cost (USD)", )
-    cost_yen = fields.Float("Cost (JPY)", store=True,)
-    cost_vnd = fields.Float("Cost (VND)", store=True,)
-    cost_sgd = fields.Float("Cost (SGD)", store=True)
+    job_type = fields.Many2one('config.job.position', string='Type',required=True)
+    
+    
+    @api.constrains('job_type')
+    def validate_unique_job_position(self):
+        costrate_datas = self.search([('id', '!=', self.id)])
+        if self.job_type.id in costrate_datas.job_type.ids:
+           raise UserError(_('The %s Cost Rate is already exist!', self.job_type.job_position))
+    
 
 class EstimationExchangeRate(models.Model):
     _name = "estimation.currency"
@@ -33,6 +33,7 @@ class EstimationExchangeRate(models.Model):
     symbol = fields.Char(help="Currency sign, to be used when printing amounts.", required=True)
     rounding = fields.Float(string='Rounding Factor', digits=(12, 6), default=0.01, )
     decimal_places = fields.Integer(compute='_compute_decimal_places', store=True, )
+    is_active = fields.Boolean(string="Active", default=False)
 
     def round(self, amount):
         """Return ``amount`` rounded  according to ``self``'s rounding rules.
@@ -50,3 +51,50 @@ class EstimationExchangeRate(models.Model):
                 currency.decimal_places = int(math.ceil(math.log10(1 / currency.rounding)))
             else:
                 currency.decimal_places = 0
+                
+
+    @api.onchange('is_active')
+    def _action_dynamic_column_costrate_currency(self):
+        field_name = 'x_cost_' + self.name.casefold()
+        field_des = 'Cost (' + self.name + ')'
+        model = 'cost.rate'
+        model_dynamic = self.env['ir.model'].search([('model', '=', model)])
+        xml_inherit_id = self.env.ref('ds_project_estimation.view_tree_costrate')
+        view_name = 'dynamic_view_costrate_customize_' + field_name
+        
+        if self.is_active == True:
+            # Create new field (Column) when active new currency
+            vals = {
+                'name': field_name,
+                'field_description': field_des,
+                'model_id': model_dynamic.id,
+                'ttype': 'float',
+                'readonly': False,
+                'store': True
+            }
+            self.env['ir.model.fields'].sudo().create(vals)
+            
+            # Create new view to show new field to cost rate treeview
+            xml_arch = _('<?xml version="1.0" ?>'
+                    '<data>'
+                    '<field name="create_date" position="before">'
+                    '<field name="%s"/>'
+                    '</field>'
+                    '</data>') % (field_name)
+            vals_xml = {
+                'name': view_name,
+                'type': 'tree',
+                'model': model,
+                'mode': 'extension',
+                'inherit_id': xml_inherit_id.id,
+                'arch_base': xml_arch,
+                'active': True
+            }
+            self.env['ir.ui.view'].sudo().create(vals_xml)
+        else:
+            estimations = self.env['estimation.work'].search([('currency_id', 'in', self.ids)], limit=1)
+            if estimations:
+                raise ValidationError('This currency is active, hence it cannot be turned off!')
+            self.env['ir.ui.view'].search([('name', '=', view_name), ('model', '=', model)]).sudo().unlink()
+            self.env['ir.model.fields'].search([('name', '=', field_name), ('model', '=', model)]).sudo().unlink()
+            self.is_active = False

@@ -1,6 +1,5 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-import json
 
 class Activities(models.Model):
     """
@@ -11,7 +10,7 @@ class Activities(models.Model):
     _order = "sequence,id"
     _rec_name = "activity"
 
-    sequence = fields.Integer(string="No") #, readonly=True, store=True, compute='_compute_sequence'
+    sequence = fields.Integer(string="No")
     module_id = fields.Many2one("estimation.module", string="Module")
     sequence_breakdown = fields.Integer(string="Sequence Activities Breakdown", store=True, default=1)
     check_compute = fields.Char(string="Check compute", readonly=True)
@@ -35,16 +34,7 @@ class Activities(models.Model):
     add_lines_breakdown_activity = fields.One2many('module.breakdown.activity', 'activity_id', string="Breakdown Activity")
     check_default = fields.Boolean(string="Check default", default=False)
     key_primary = fields.Char(string="Key Connect activity effort")
-    # domain_module_id = fields.Char(string="domain module id", readonly=True, store=True, compute='_compute_domain_module_id')
-    # domain_select_activities = fields.Char(string="Domain activities", readonly=True, store=True, compute='_compute_domain_activities')
-
-   
-    # @api.depends('activity_type')
-    # def _compute_domain_module_id(self):
-    #     for record in self:
-    #         record.domain_module_id = json.dumps(
-    #             [('id', '=', record.module_id.id or record.module_id.id.origin)]
-    #         )
+    
     
     @api.onchange('activity_type')
     def _get_module_id(self):

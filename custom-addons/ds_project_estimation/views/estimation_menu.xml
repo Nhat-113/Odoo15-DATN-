@@ -13,6 +13,7 @@
     <menuitem id="menu_estimation_work"
             name="Estimations"
             parent="menu_estimation"
+            sequence="1"
             action="action_estimation_work" />
 
     <!-- Action to open the Cost rate list -->
@@ -26,6 +27,7 @@
     <menuitem id="menu_cost_rate"
             name="Cost Rate"
             parent="menu_estimation"
+            sequence="2"
             action="action_cost_rate"
             groups="ds_project_estimation.estimation_access_administrator,ds_project_estimation.estimation_access_director" />
 
@@ -34,6 +36,7 @@
     <menuitem id="menu_config"
             name="Configuration"
             parent="menu_estimation"
+            sequence="3"
             groups="ds_project_estimation.estimation_access_administrator,ds_project_estimation.estimation_access_director" />
 
     <record id="action_setting" model="ir.actions.act_window">
@@ -47,7 +50,7 @@
     <menuitem id="menu_config_setting"
             name="Setting"
             parent="menu_config"
-            sequence="10"
+            sequence="1"
             groups="base.group_system"
             action="action_setting" />
 
@@ -61,6 +64,7 @@
     <menuitem id="menu_config_job_position"
             name="Job Position"
             parent="menu_config"
+            sequence="2"
             action="action_config_job_position" />
 
     <!-- Action to open Activities -->
@@ -73,6 +77,7 @@
     <menuitem id="menu_data_activity"
             name="Activities"
             parent="menu_config"
+            sequence="3"
             action="action_data_activity" />
 
     <!-- Action to open Project type -->
@@ -85,6 +90,21 @@
     <menuitem id="menu_data_project_type"
             name="Project Type"
             parent="menu_config"
+            sequence="4"
             action="action_data_project_type" />
+
+    <!-- Action to open Estimation Currency -->
+    <record id="estimation_currency_action" model="ir.actions.act_window">
+        <field name="name">Currency</field>
+        <field name="res_model">estimation.currency</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <menuitem id="menu_estimation_currency"
+            name="Currency"
+            parent="menu_config"
+            sequence="5"
+            action="estimation_currency_action" 
+            groups="ds_project_estimation.estimation_access_administrator"/>
 
 </odoo>

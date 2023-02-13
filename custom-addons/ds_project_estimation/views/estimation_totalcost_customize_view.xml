@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+
+    <record id="estimation_summary_totalcost_view_form" model="ir.ui.view">
+        <field name="name">estimation.summary.totalcost.form</field>
+        <field name="model">estimation.summary.totalcost</field>
+        <field name="arch" type="xml">
+            <form>
+                <!-- <sheet> -->
+                    <field name="summary_costrates">
+                        <tree create="0" editable="bottom"  delete="0">
+                            <field name="sequence" readonly="1" force_save="1"/>
+                            <field name="name" readonly="1" force_save="1"/>
+                            <field name="job_position" readonly="1" force_save="1"/>
+                            <field name="yen_month" width="160px"/>
+                            <field name="yen_day" width="145px" force_save="1"/>
+                            <field name="key_primary" readonly="1" force_save="1" invisible="1" />
+                        </tree>
+                    </field>
+                <!-- </sheet> -->
+            </form>
+        </field>
+    </record>
+
+    <record id="estimation_totalcost_customize" model="ir.ui.view">
+        <field name="name">estimation.summary.totalcost.tree</field>
+        <field name="model">estimation.summary.totalcost</field>
+        <field name="arch" type="xml">
+            <tree editable="top" create="0" delete="0" edit="0">
+                <field name="sequence" readonly="1" force_save="1"/>
+                <field name="name" readonly="1" force_save="1" width="150px"/>
+                <field name="total_effort" sum="Sum of All Efforts" width="115px" readonly="1" force_save="1"/>
+                <field name="cost" sum="Total of Cost" readonly="1" force_save="1"/>
+                <!-- <field name="get_name_avtivate" invisible="1" force_save="1"/> -->
+                <!-- <field name="is_active" widget="boolean_toggle" nolabel="1" force_save="1"/> -->
+                <field name="key_primary" invisible="1"  force_save="1"/>
+                <button name="get_summary_costrate" type="object" string="Detail" class="btn btn-primary"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- <record id="estimation_costrate_view_tree" model="ir.ui.view">
+        <field name="name">estimation.summary.costrate.tree</field>
+        <field name="model">estimation.summary.costrate</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" create="0" delete="0" limit="1000" export_xlsx="0">
+                <field name="sequence" readonly="1" force_save="1"/>
+                <field name="name" readonly="1" force_save="1"/>
+                <field name="job_position" readonly="1" force_save="1"/>
+                <field name="yen_month" width="160px" widget="custom_field_cost_rate"/>
+                <field name="yen_day" width="145px" force_save="1"/>
+                <field name="key_primary" readonly="1" force_save="1" invisible="1"/>
+            </tree>
+        </field>
+    </record> -->
+
+
+</odoo>

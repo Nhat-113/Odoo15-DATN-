@@ -2,16 +2,22 @@
 {
     'name': "Estimation",
     'summary': "Manage project plan",
-    'author': "Quang Vinh, VietLX",
+    'author': "Dsoft",
     'website': "https://d-soft.com.vn",
     'category': 'Services/Estimation',
     "version": "15.0.1.0.0",
     "license": "AGPL-3",
-    'depends': ['base', 'crm', 'web_domain_field', 'report_xlsx', 'project'],
+    'depends': ['base', 
+                # 'crm', 
+                'web_domain_field', 
+                'report_xlsx', 
+                'project'],
     "application": True,
     'data': [
         "security/estimation_security.xml",
         "security/ir.model.access.csv",
+        "views/estimation_totalcost_customize_view.xml",
+        "views/resource_planing_customize_view.xml",
         "data/currency_data.xml",
         "data/activity_data.xml",
         "data/project_type_data.xml",
@@ -19,15 +25,17 @@
         "data/module_summary_data.xml",
         "data/cost_rate_data.xml",
         "data/estimation_status_data.xml",
+        "views/estimation_currency_view.xml",
         "views/estimation_menu.xml",
         "views/gantt_resource_planning.xml",
+        "views/estimation_module_view.xml",
         "views/work_view.xml",
         "views/estimation_sequence.xml",
         "views/job_position_view.xml",
         "views/cost_rate_view.xml",
         "views/activity_view.xml",
         "views/project_type_view.xml",
-        "views/crm_lead_views.xml",
+        # "views/crm_lead_views.xml",
         "data/gen_project_cron.xml",
         "wizard/message_wizard_views.xml",
         "views/export_estimation_view.xml",
@@ -48,10 +56,10 @@
             '/ds_project_estimation/static/src/js/gantt_view.js',
             '/ds_project_estimation/static/src/js/gantt_action.js',
             '/ds_project_estimation/static/src/css/gantt.css',
-            '/ds_project_estimation/static/src/scss/custom_view_cost_rate.scss'
+            '/ds_project_estimation/static/src/js/estimation_resource_planning.js'
         ],
         'web.assets_qweb': [
-            'ds_project_estimation/static/src/xml/gantt.xml'
+            'ds_project_estimation/static/src/xml/gantt.xml',
         ]
     },
 }

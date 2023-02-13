@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Search view  -->
+    <record id="estimation_currency_search_view" model="ir.ui.view">
+        <field name="name">estimation.currency.search</field>
+        <field name="model">estimation.currency</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="full_name"/>
+                <field name="symbol"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="estimation_currency_view_tree" model="ir.ui.view">
+        <field name="name">estimation.currency.treeview</field>
+        <field name="model">estimation.currency</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name='name' readonly="1"/>
+                <field name="full_name" readonly="1"/>
+                <field name="symbol" readonly="1"/>
+                <field name="rounding" />
+                <field name="decimal_places" />
+                <field name="is_active" widget="boolean_toggle" force_save="1"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
         <record id="job_position_data_developer" model="config.job.position">
             <field name="sequence" eval="1" />
             <field name="job_position">Developer</field>
@@ -28,8 +28,29 @@
         </record>
         <record id="job_position_data_project_manager" model="config.job.position">
             <field name="sequence" eval="6" />
-            <field name="job_position">Project manager</field>
-            <field name="description">Project manager</field>
+            <field name="job_position">PM</field>
+            <field name="description">Project Manager</field>
         </record>
     </data>
+
+    <!-- <data>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'ds_project_estimation'), ('name', '=', 'job_position_data_project_manager')]" />
+            </function>
+            <value eval="{'noupdate': False}"/>
+        </function>
+
+        <record id="job_position_data_project_manager" model="config.job.position">
+            <field name="job_position">PM</field>
+        </record>
+
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'ds_project_estimation'), ('name', '=', 'job_position_data_project_manager')]" />
+            </function>
+            <value eval="{'noupdate': True}"/>
+        </function>
+
+    </data> -->
 </odoo>

@@ -1,17 +1,23 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
-import json, string, uuid
+import uuid
 
 class EstimationModule(models.Model):
     _name = "estimation.module"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description ="Estimation List Modules"
     _rec_name = "component"
     _order = "sequence"
     
+    
+    def _random_key_connect_activity(self):
+        key = str(uuid.uuid4())
+        return key
+    
+    
     sequence = fields.Integer(string="No", index=True)
     component = fields.Char(string="Components", required=True)
-    total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays") 
-    check_compute = fields.Char(string="Check", readonly=True)
+    total_manday = fields.Float(string="Total (man-day)", default=0.0, store=True, compute="_compute_total_mandays", tracking=True) 
     sequence_activities = fields.Integer(string="Sequence Activities", store=True, default=1, compute ='_compute_sequence_activities')
     
     estimation_id = fields.Many2one('estimation.work', string="Estimation")
@@ -26,84 +32,211 @@ class EstimationModule(models.Model):
                             required=True,
                             string="Template Project Type")
 
-    get_estimation_id = fields.Integer(string="Estimation Id")
     key_primary = fields.Char(string="Key unique module")
-    get_module_activate = fields.Char(string="Module activate", compute='_compute_get_modules', store=True)
-    check_save_estimation = fields.Boolean(string="Check save estimation", default=False, store=True)
+    is_lock = fields.Boolean(string="Is Lock", default=False)
+            
     
-    @api.depends('component')
-    def _compute_get_modules(self):
-        for record in self:
-            record.estimation_id.module_activate = record.component
-            if record.component != '':
-                record.get_module_activate = record.component
-            else:
-                record.component = record.get_module_activate
-            
-            #check modified components name
-            modules = self.env['estimation.module'].search([('key_primary', '=', record.key_primary)])
-            for item in modules:
-                if item.component != record.component and record.check_save_estimation == False:
-                    item.write({'component': record.component})
-            
-            
-    def write(self, vals):
-        result = super(EstimationModule, self).write(vals)
-        if 'estimation_id' in vals:
-            module_name = []
-            for item in self:
-                item.check_save_estimation = True
-                module_name.append(item.component)
-
-            #write message description to overview
-            self._overview_autolog_description(module_name, ' has been created successfully!')
-
-            modules = self.env['estimation.module'].search([('estimation_id', '=', vals['estimation_id'])])
-            for module in self.estimation_id.add_lines_summary_totalcost:
-                for module_tab in modules:
-                    if module.key_primary == module_tab.key_primary:
-                        module_tab.sequence = module.sequence
-                        
-        #delete cosrate when modified module name
-        if 'component' in vals:
-            for module in self:
-                cost_rate_db = self.env["estimation.summary.costrate"].search([('key_primary', '=', module.key_primary)])
-                for costrate in cost_rate_db:
-                    if costrate.name != vals['component']:
-                        costrate.unlink()
+    @api.model
+    def create(self, vals):
+        if 'key_primary' not in vals:
+            key_unique = self._random_key_connect_activity()
+            vals['key_primary'] = key_unique
+        
+        modules = self.env['estimation.module'].search([('estimation_id', '=', vals['estimation_id'])], limit=1, order='id DESC')
+        next_sequence = modules.sequence + 1 if modules else 1
+        vals['sequence'] = next_sequence
+        
+        self.validate_unique_module_component(vals['component'], vals['estimation_id'], self.id)
+        result = super(EstimationModule, self).create(vals)
+        
+        self.action_create_data_mutil_models(vals, result.estimation_id.currency_id.name)
+        result._overview_autolog_description(module_name = vals['component'], 
+                                            message = ' has been created successfully!', 
+                                            action = 'new')
+        
         return result
+            
+    def action_create_data_mutil_models(self, vals, currency_name):
+        new_vals = {
+            'estimation_id': vals['estimation_id'],
+            'sequence': vals['sequence'],
+            'name': vals['component'],
+            'key_primary': vals['key_primary']
+        }
+        self.env['estimation.resource.effort'].create(new_vals)
+        total_cost_id = self.env['estimation.summary.totalcost'].create(new_vals)
+        
+        costrates = self.env['cost.rate'].search([])
+        ls_fields = self.get_currency_fields_costrate()
+        for index, record in enumerate(costrates):
+            currency_est = ''
+            for field in ls_fields:
+                if ls_fields[field] == currency_name:
+                    currency_est = field
+                    break
+            
+            data = {
+                'estimation_id': vals['estimation_id'],
+                'total_cost_id': total_cost_id.id,
+                'sequence': index + 1,
+                'name': vals['component'],
+                'job_position': record.job_type.id,
+                'yen_month': record[currency_est],
+                'key_primary': vals['key_primary']
+            }
+            self.env['estimation.summary.costrate'].create(data)
+            
+        #create total MD, MM record for resource planning
+        is_exist_record = self.env['estimation.resource.plan.result.effort'].search([('estimation_id', '=', vals['estimation_id'])])
+        if not is_exist_record:
+            cnt = 1
+            while cnt <= 2:
+                lines = {
+                    'estimation_id': vals['estimation_id'],
+                    'sequence': cnt,
+                    'name': 'Total (MD)' if cnt == 1 else 'Total (MM)',
+                    'total_effort': 0,
+                    'key_primary': 'totalmd' if cnt == 1 else 'totalmm'
+                }
+                self.env['estimation.resource.plan.result.effort'].create(lines)
+                cnt += 1
+        
+    def get_currency_fields_costrate(self):
+        fields = self.env['cost.rate'].fields_get()
+        ls_fields = {}
+        for field in fields:
+            if fields[field]['type'] == 'float':
+                ls_fields[field] = field.replace('x_cost_', '').upper()
+        return ls_fields
+        
+    def create_resource_planning_gantt(self, estimation_id):
+        gantts = self.env['gantt.resource.planning'].search([('estimation_id', '=', estimation_id)])
+        if not gantts:
+            job_positions = self.env['config.job.position'].search([])
+            for record in job_positions:
+                vals = {
+                    'estimation_id': estimation_id,
+                    'job_position_id': record.id,
+                }
+                self.env['gantt.resource.planning'].create(vals)
+        
+    
+    def validate_unique_module_component(self, module_name, estimation_id, current_module):
+        modules = self.search([('estimation_id', '=', estimation_id), ('component', '=', module_name), ('id', '!=', current_module)])
+        if modules:
+           raise ValidationError(_("Module '%(module_name)s' already exists", module_name = module_name) )
+        
+        
+    def write(self, vals):
+        if 'component' in vals:
+            self.validate_unique_module_component(vals['component'], self.estimation_id.id, self.id)
+            self.common_modify_module_values(self.estimation_id.add_lines_summary_totalcost, 'name', vals['component'])
+            self.common_modify_module_values(self.estimation_id.add_lines_summary_costrate, 'name', vals['component'])
+            self.common_modify_module_values(self.estimation_id.add_lines_resource_effort, 'name', vals['component'])
+
+        # Reset sequence module when deleting any module
+        if 'sequence' in vals:
+            self.common_modify_module_values(self.estimation_id.add_lines_resource_effort, 'sequence', vals['sequence'])
+            self.common_modify_module_values(self.estimation_id.add_lines_summary_totalcost, 'sequence', vals['sequence'])
+        
+        self._overview_autolog_description(vals, 'Modified module ' + self.component + ':', 'write')
+        
+        result = super(EstimationModule, self).write(vals)
+        return result
+    
+    
+    def common_modify_module_values(self, datas, field_key, value):
+        for record in datas:
+            if record.key_primary == self.key_primary:
+                record[field_key] = value
+        
 
 
     def unlink(self):
-        module_name = []
+        module_name = ''
+        estimation_id = self.estimation_id.id
+        cnt = 0
         for record in self:
+            # module_name.append(record.component)
+            if cnt > 0 and cnt < len(self):
+                module_name += ', '
+            module_name += record.component
             record.module_assumptions.unlink()
             record.module_summarys.unlink()
             record.module_effort_activity.unlink()
             record.module_config_activity.unlink()
             
-            module_name.append(record.component)
+            record.common_remove_module_multi_model(record.estimation_id.add_lines_summary_totalcost)
+            record.common_remove_module_multi_model(record.estimation_id.add_lines_resource_effort)
+            record.common_remove_module_multi_model(record.estimation_id.add_lines_summary_costrate)
+            cnt += 1
+            
         #write message description to overview
-        self._overview_autolog_description(module_name, ' was deleted successfully!')
-        
-            # record.summary_total_cost.unlink()
-            # record.summary_cost_rate.unlink()
-        return super(EstimationModule, self).unlink()
+        self._overview_autolog_description(module_name, ' was deleted successfully!', action = 'delete')
+        result = super(EstimationModule, self).unlink()
+        self.common_auto_reset_sequence_module(estimation_id)
+        return result
     
-    def _overview_autolog_description(self, module_name, message):
-        if len(self.estimation_id.add_lines_overview) != 0:
-            descriptions = 'Module '
-            max_revision = max(item.revision for item in self.estimation_id.add_lines_overview)
-            for des in self.estimation_id.add_lines_overview:
-                if des.revision == max_revision:
-                    for index in range(len(module_name)):
-                        descriptions += module_name[index]
-                        if index < len(module_name) - 1:
-                            descriptions += ', '
-                    if des.description.find("Module :  Modified Modules") == -1:
-                        des.description += descriptions + message
-                    else:
-                        des.description = des.description.replace("Module :  Modified Modules", '' + descriptions + message)
+    def common_remove_module_multi_model(self, datas):
+        for record in datas:
+            if record.key_primary == self.key_primary:
+                record.unlink()
+                
+    def common_auto_reset_sequence_module(self, estimator_id):
+        modules = self.search([('estimation_id', '=', estimator_id)], order='sequence')
+        for index, record in enumerate(modules):
+            record.write({
+                'sequence': index + 1
+            })
+    
+    def _overview_autolog_description(self, module_name, message, action):
+        if self:
+            overview = self.env['estimation.overview']
+            next_revision = self.estimation_id.add_lines_overview[0].revision + 0.1
+            if action in ['new', 'delete']:
+                des = 'Module ' + module_name + message
+                overview.create({
+                    'connect_overview': self.estimation_id.id,
+                    'revision': next_revision,
+                    'description': des
+                })
+            else:
+                # with write action, module_name = vals
+                if 'component' in module_name:
+                    message += '\n\t- Component module: ' + self.component + ' --> ' + module_name['component']
+                if 'project_activity_type' in module_name:
+                    project_type_before = 'ODC' if self.project_activity_type == 'odc' else 'Project Base'
+                    project_type_after = 'ODC' if module_name['project_activity_type'] == 'odc' else 'Project Base'
+                    message += '\n\t- Template Project Type: ' + project_type_before + ' --> ' + project_type_after
+                
+                if 'component' not in module_name and 'project_activity_type' not in module_name:
+                    return
+                else:
+                    overview.create({
+                        'connect_overview': self.estimation_id.id,
+                        'revision': next_revision,
+                        'description': message
+                    })
+                
+                
+    @api.constrains('module_config_activity')
+    def check_modify_activity(self):
+        if self.is_lock == True:
+            raise ValidationError(_("This module has been generated successfully, so you cannot modify the content of this module!"))
+        self.message_post(body=_("Effort distribution: The content has been modified"))
+        
+    @api.constrains('module_assumptions')
+    def post_message_history_assumption(self):
+        if self.is_lock == True:
+            raise ValidationError(_("This module has been generated successfully, so you cannot modify the content of this module!"))
+        self.message_post(body=_("Assumption: The content has been modified"))
+        
+        
+    @api.constrains('component', 'project_activity_type')
+    def validate_lock_module(self):
+        if self.is_lock == True:
+            raise ValidationError(_("This module has been generated successfully, so you cannot modify the content of this module!"))
+    
                 
     @api.model
     def default_get(self, fields):
@@ -121,14 +254,10 @@ class EstimationModule(models.Model):
             summary_line.append(line)
         
         res.update({
-            'module_summarys': summary_line,
-            'check_compute': 'OK'  #is required for compute sequence
+            'module_summarys': summary_line
         })
         return res
     
-    def _random_key_connect_activity(self):
-        key = str(uuid.uuid4())
-        return key
 
     
     def get_activities_project_type(self, get_data_activities, activities_line, activities_effort_line):
@@ -179,7 +308,7 @@ class EstimationModule(models.Model):
         get_data_activities = self.env['data.activity']
         activities_line = []
         activities_effort_line = []
-        self.key_primary = self._random_key_connect_activity()
+        # self.key_primary = self._random_key_connect_activity()
         self.get_activities_project_type(get_data_activities, activities_line, activities_effort_line)                    
             
         for record in self:
@@ -336,6 +465,45 @@ class BreakdownActivities(models.Model):
     def default_get(self, fields):
         result = super(BreakdownActivities, self).default_get(fields)
         result.update({'check_compute': 'OK'})
+        return result
+    
+    
+    @api.model
+    def create(self, vals):
+        result = super(BreakdownActivities, self).create(vals)
+        estimation_id = result.activity_id.module_id.estimation_id
+        key_primary = result.activity_id.module_id.key_primary
+        gantt = self.env['gantt.resource.planning']
+        cost_rate= self.env['estimation.summary.costrate']
+        check_gantt = gantt.search([('estimation_id', '=', estimation_id.id), ('job_position_id', '=', result.job_pos.id)])
+        check_cost_rate = cost_rate.search([('estimation_id', '=', estimation_id.id), 
+                                            ('key_primary', '=', key_primary),
+                                            ('job_position', '=', result.job_pos.id)])
+        if not check_gantt:
+            gantt.create({
+                'estimation_id': estimation_id.id,
+                'job_position_id': result.job_pos.id,
+                'value_man_month': 0
+            })
+        if not check_cost_rate:
+            total_cost = self.env['estimation.summary.totalcost'].search([('estimation_id', '=', estimation_id.id),
+                                                                          ('key_primary', '=', key_primary)])
+            costrates = self.env['cost.rate'].search([('job_type', '=', result.job_pos.id)])
+            currency_est = ''
+            ls_fields = self.env['estimation.module'].get_currency_fields_costrate()
+            for field in ls_fields:
+                if ls_fields[field] == estimation_id.currency_id.name:
+                    currency_est = field
+                    break
+            cost_rate.create({
+                'estimation_id': estimation_id.id,
+                'total_cost_id': total_cost.id,
+                'sequence': len(total_cost.summary_costrates) + 1,
+                'name': result.activity_id.module_id.component,
+                'job_position': result.job_pos.id,
+                'yen_month': costrates[currency_est],
+                'key_primary': key_primary
+            })
         return result
 
     @api.depends('activity_id.activity_type', 'activity_id.activity_current', 'persons', 'days', 'percent_effort', 'mandays_input')

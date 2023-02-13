@@ -13,18 +13,12 @@ class EstimationResourcePlan(models.Model):
     name= fields.Char(string="Components")
     key_primary = fields.Char(string="Key unique module")
     total_effort = fields.Float(string="Total Effort (MD)", store=True, compute="compute_effort") 
-    design_effort = fields.Float(string="Designer")
-    dev_effort = fields.Float(string="Developer")
-    tester_effort = fields.Float(string="Tester")
-    comtor_effort = fields.Float(string="Comtor")
-    brse_effort = fields.Float(string="Brse")
-    pm_effort = fields.Float(string="PM")
 
 
     def total_efforts_job_position(self, job_position):
         result_total_effort = 0
         for record in self.estimation_id.add_lines_module:
-            if record.component == self.name:
+            if record.key_primary == self.key_primary:
                 for activity in record.module_config_activity:
                     for breakdown in activity.add_lines_breakdown_activity: # compute effort for each job position
                         if breakdown.job_pos.job_position == job_position:
@@ -33,8 +27,7 @@ class EstimationResourcePlan(models.Model):
     
     @api.depends('estimation_id.add_lines_module.total_manday')
     def compute_effort(self):
-        ls_key = {'dev_effort': 'Developer', 'design_effort': 'Designer', 'tester_effort': 'Tester', 
-                  'comtor_effort': 'Comtor', 'pm_effort': 'Project manager', 'brse_effort': 'Brse'}
+        ls_key = self.env['estimation.summary.totalcost'].get_field_effort({})
         for key in ls_key:
             final_effort = final_total_effort = 0
             for record in self:     # compute total effort for each module
@@ -45,11 +38,11 @@ class EstimationResourcePlan(models.Model):
                     
                     #get total manday from module = total_effort field
                     for module in record.estimation_id.add_lines_module:
-                        if module.component == record.name:
+                        if module.key_primary == record.key_primary:
                             record.total_effort = module.total_manday
                             final_total_effort += module.total_manday
             #compute effort for MD & MM record
-            for record in self: 
+            for record in self.estimation_id.resource_plan_result_effort: 
                 if record.name == 'Total (MD)':
                     record[key] = final_effort
                     record.total_effort = final_total_effort
@@ -59,46 +52,59 @@ class EstimationResourcePlan(models.Model):
                         record[key] = round (final_effort / man_month, 2)
                         record.total_effort = round (final_total_effort / man_month, 2)
                     
+class EstimationResourcePlanResultEffort(models.Model):
+    _name = 'estimation.resource.plan.result.effort'
+    _description = 'Model is saving total effort MM & MD for estimation resource plan'
+    
+    estimation_id = fields.Many2one('estimation.work', string="Estimation")
+    sequence = fields.Integer(string="No", store=True)
+    name = fields.Char(string="Component")
+    total_effort = fields.Float(string="Total Effort (MD)")
+    key_primary = fields.Char(string="Key unique")
+    
+    
     @api.model
     def create(self, vals):
         if vals:
-            result = super(EstimationResourcePlan, self).create(vals)
-            record_sum_effort = 'Total (MM)'
-            
-            ls_key = {'design_effort': 'Designer', 'dev_effort': 'Developer', 'tester_effort': 'Tester', 
-                      'comtor_effort': 'Comtor', 'brse_effort': 'Brse', 'pm_effort': 'Project manager'}
-            
-            vals_gantt = {}
-            vals_gantt['estimation_id'] = vals['estimation_id']
-            if vals['name'] == record_sum_effort:
+            result = super(EstimationResourcePlanResultEffort, self).create(vals)
+            if vals['key_primary'] == 'totalmm':
+                ls_key = self.env['estimation.summary.totalcost'].get_field_effort({})
+                self.check_missing_field_values(vals, ls_key)
                 for key in vals:
                     for item in ls_key:
                         if key == item:
-                            vals_gantt['job_position_id'] = EstimationResourcePlan.find_job_position(self, ls_key[item])
-                            vals_gantt['value_man_month'] = vals[key]
                             yy_start =  int(str(result.create_date.year)[-2:])  #take the last 2 numbers of the year
                             mm_start =  result.create_date.month
-                            result_day = EstimationResourcePlan.compute_date_time(vals[key], mm_start, yy_start)
-                            vals_gantt['end_date'] = result_day['end_date']
-                            vals_gantt['start_date'] = result_day['start_date']
-                            vals_gantt['duration'] = (vals_gantt['end_date'] - vals_gantt['start_date']).days + 1
-                            vals_gantt.pop("end_date")
+                            result_day = EstimationResourcePlanResultEffort.compute_date_time(vals[key], mm_start, yy_start)
+                            vals_gantt = {
+                                'estimation_id': vals['estimation_id'],
+                                'job_position_id': EstimationResourcePlanResultEffort.find_job_position(self, ls_key[item]),
+                                'value_man_month': vals[key],
+                                'start_date': result_day['start_date'],
+                                'duration': (result_day['end_date'] - result_day['start_date']).days + 1
+                            }
+                            
                             self.env["gantt.resource.planning"].create(vals_gantt)
-            
-            return result       
+            return result
         
+        
+    def check_missing_field_values(self, vals, ls_keys):
+        for key in ls_keys:
+            if key not in vals:
+                vals.update({key: 0})
+    
+    
     def write(self, vals):
         if vals:
-            result = super(EstimationResourcePlan, self).write(vals)
-            ls_key = {'design_effort': 'Designer', 'dev_effort': 'Developer', 'tester_effort': 'Tester', 
-                      'comtor_effort': 'Comtor', 'brse_effort': 'Brse', 'pm_effort': 'Project manager'}
+            result = super(EstimationResourcePlanResultEffort, self).write(vals)
+            ls_key = self.env['estimation.summary.totalcost'].get_field_effort({})
             vals_gantt= {}
             for rec in self:
-                if rec.name == 'Total (MM)':
+                if rec.key_primary == 'totalmm':
                     for key in vals:
                         for item in ls_key:
                             if key == item:
-                                job_pos_id = EstimationResourcePlan.find_job_position(self, ls_key[item])
+                                job_pos_id = EstimationResourcePlanResultEffort.find_job_position(self, ls_key[item])
                                 gantt_item = self.env['gantt.resource.planning'].search([('estimation_id', '=', rec.estimation_id.id), 
                                                                                        ('job_position_id', '=', job_pos_id)])
                                 for i in vals:
@@ -106,7 +112,7 @@ class EstimationResourcePlan(models.Model):
                                     
                                 yy_start =  int(str(rec.create_date.year)[-2:])   #take the last 2 numbers of the year
                                 mm_start =  rec.create_date.month
-                                result_day = EstimationResourcePlan.compute_date_time(vals_gantt['value_man_month'], mm_start, yy_start)
+                                result_day = EstimationResourcePlanResultEffort.compute_date_time(vals_gantt['value_man_month'], mm_start, yy_start)
                                 vals_gantt['duration'] = (result_day['end_date'] - result_day['start_date']).days + 1
                                 GanttResourcePlanning.write(gantt_item, vals_gantt)
                                 break
@@ -130,7 +136,7 @@ class EstimationResourcePlan(models.Model):
             # scale = 1/31
             surplus = 0 
             dd_end = 1
-            result_end_day = EstimationResourcePlan.convert_to_datetime(dd_end, mm_end, yy_end)
+            result_end_day = EstimationResourcePlanResultEffort.convert_to_datetime(dd_end, mm_end, yy_end)
         
         elif vals_effort_mm < 1:
             mm_end = mm_start 
@@ -139,11 +145,11 @@ class EstimationResourcePlan(models.Model):
             if surplus == 0:
                 dd_end = 1
             else:
-                dd_end = EstimationResourcePlan.compute_days(mm_end, surplus, dd_end)
+                dd_end = EstimationResourcePlanResultEffort.compute_days(mm_end, surplus, dd_end)
             if dd_end == 0:
                 dd_end = 1
             # yy_end = yy_start
-            result_end_day = EstimationResourcePlan.convert_to_datetime(dd_end, mm_end, yy_end)
+            result_end_day = EstimationResourcePlanResultEffort.convert_to_datetime(dd_end, mm_end, yy_end)
         elif vals_effort_mm >= 1:
             if mm_start + vals_effort_mm < 13:
                 mm_end = math.floor(mm_start + vals_effort_mm)
@@ -152,14 +158,14 @@ class EstimationResourcePlan(models.Model):
                     mm_end = 1
                     yy_end = yy_start + 1
 
-                result_dd_end = EstimationResourcePlan.compute_days(mm_end, surplus, dd_end)
+                result_dd_end = EstimationResourcePlanResultEffort.compute_days(mm_end, surplus, dd_end)
                 if result_dd_end == 0:
                     dd_end = 1
                 else:
                     dd_end = result_dd_end
-                result_end_day = EstimationResourcePlan.convert_to_datetime(dd_end, mm_end, yy_end)
+                result_end_day = EstimationResourcePlanResultEffort.convert_to_datetime(dd_end, mm_end, yy_end)
             elif mm_start + vals_effort_mm >= 13:
-                datetime_end = EstimationResourcePlan.compute_year(vals_effort_mm, mm_start, yy_start, dd_end, mm_end, yy_end)
+                datetime_end = EstimationResourcePlanResultEffort.compute_year(vals_effort_mm, mm_start, yy_start, dd_end, mm_end, yy_end)
                 global Index_year
                 Index_year = 0
                 for item in datetime_end:
@@ -169,8 +175,8 @@ class EstimationResourcePlan(models.Model):
                         mm_end = datetime_end[item]
                     else:
                         yy_end = datetime_end[item]
-                result_end_day = EstimationResourcePlan.convert_to_datetime(dd_end, mm_end, yy_end)
-        result_start_day = EstimationResourcePlan.convert_to_datetime(dd_start, mm_start, yy_start)
+                result_end_day = EstimationResourcePlanResultEffort.convert_to_datetime(dd_end, mm_end, yy_end)
+        result_start_day = EstimationResourcePlanResultEffort.convert_to_datetime(dd_start, mm_start, yy_start)
         return {
             'start_date': result_start_day, 
             'end_date': result_end_day
@@ -181,7 +187,7 @@ class EstimationResourcePlan(models.Model):
         check_vals = (mm_start + vals_effort_mm) - 12        #12 is 12 month/year
         if check_vals > 12:
             Index_year += 1
-            return EstimationResourcePlan.compute_year(check_vals, mm_start, yy_start, dd_end, mm_end, yy_end)
+            return EstimationResourcePlanResultEffort.compute_year(check_vals, mm_start, yy_start, dd_end, mm_end, yy_end)
         elif check_vals <= 12:
             mm_end = math.floor(check_vals)
             surplus = check_vals - mm_end
@@ -190,7 +196,7 @@ class EstimationResourcePlan(models.Model):
                 yy_end = yy_start + Index_year + 1
             else:
                 yy_end = yy_start + Index_year
-            dd_end = EstimationResourcePlan.compute_days(mm_end, surplus, dd_end)
+            dd_end = EstimationResourcePlanResultEffort.compute_days(mm_end, surplus, dd_end)
             if dd_end == 0:
                 dd_end = 1
         return {'dd_end': dd_end, 'mm_end': mm_end, 'yy_end': yy_end}
@@ -199,7 +205,7 @@ class EstimationResourcePlan(models.Model):
         if mm_end == 2:   #2 is february
             scale = 1/28   # 1 is max scale surplus
             dd_end = round(surplus / scale)
-        elif EstimationResourcePlan.find_month(mm_end):
+        elif EstimationResourcePlanResultEffort.find_month(mm_end):
             scale = 1/30
             dd_end = round(surplus / scale)
         else:
@@ -218,15 +224,6 @@ class EstimationResourcePlan(models.Model):
     def convert_to_datetime(dd, mm, yy):
         date_string = str(dd) + '/' + str(mm) + '/' + str(yy)
         return datetime.strptime(date_string, '%d/%m/%y').date()
-    
-
-    def unlink(self):
-        for record in self:
-            if record.name == 'Total (MM)':
-                gantt_resource_plan = self.env['gantt.resource.planning'].search([('estimation_id', '=', record.estimation_id.id)])
-                gantt_resource_plan.unlink()
-
-        return super(EstimationResourcePlan, self).unlink()
 
 class GanttResourcePlanning(models.Model):
     _name = "gantt.resource.planning"
