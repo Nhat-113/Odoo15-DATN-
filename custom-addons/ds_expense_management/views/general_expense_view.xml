@@ -10,6 +10,23 @@
         <field name="code">action = records.action_update_group_old_data()</field>
     </record>
 
+
+      <!-- Sidebar filter  -->
+    <record id="expense_management_search_filter" model="ir.ui.view">
+        <field name="name">expense.management.search</field>
+        <field name="model">expense.management</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="description"/>
+                <filter string="Current Year" name="expense_management_filter_current_year" domain="[
+                    ('sort_date', '&gt;=', (context_today().strftime('%%Y-01-01'))),
+                    ('sort_date', '&lt;=', (context_today().strftime('%%Y-12-31')))]"/>
+                
+            </search>
+        </field>
+    </record>
+
+
     <record id="expense_management_view_tree" model="ir.ui.view">
         <field name="name">expense.management.tree</field>
         <field name="model">expense.management</field>

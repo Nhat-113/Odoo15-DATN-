@@ -11,13 +11,32 @@
     <record id="management_expense_action" model="ir.actions.act_window">
         <field name="name">Operation Cost</field>
         <field name="res_model">expense.management</field>
+        <field name="search_view_id" ref="expense_management_search_filter"/>
+        <field name="context">{'search_default_expense_management_filter_current_year': 1}</field>
         <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                        (0, 0, {'view_mode': 'tree', 'view_id': ref('ds_expense_management.expense_management_view_tree')}),
+                        (0, 0, {'view_mode': 'form', 'view_id': ref('ds_expense_management.expense_management_view_form')})
+                        ]"/>
+    </record>
+
+     <record id="management_expense_statitic_action" model="ir.actions.act_window">
+        <field name="name">Statistics</field>
+        <field name="res_model">expense.management</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="expense_management_statistic_search_filter"/>
+        <field name="context">{'search_default_expense_management_statistic_group_by_year': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                        (0, 0, {'view_mode': 'tree', 'view_id': ref('ds_expense_management.expense_management_statistic_view_tree')})
+                        ]"/>
     </record>
 
     <record id="project_expense_management_action" model="ir.actions.act_window">
         <field name="name">Expenses</field>
         <field name="res_model">project.expense.management</field>
         <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="project_expense_management_search_filter"/>
+        <field name="context">{'search_default_project_expense_management_filter_current_year': 1}</field>
     </record>
 
     <record id="project_expense_statistical_action" model="ir.actions.act_window">
@@ -26,13 +45,15 @@
         <field name="view_mode">tree</field>
         <field name="domain">[('project_expense_management_id', '!=', False)]</field>
         <field name="search_view_id" ref="project_expense_search_filter"/>
-        <field name="context">{'search_default_project_expense_filter_current_year': 1}</field>
+        <field name="context">{'search_default_project_expense_filter_current_year': 0, 'search_default_project_expense_group_by_year': 1}</field>
     </record>
 
     <record id="project_revenue_management_action" model="ir.actions.act_window">
         <field name="name">Revenue</field>
         <field name="res_model">project.revenue.management</field>
         <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="project_revenue_management_search_filter"/>
+        <field name="context">{'search_default_project_revenue_management_filter_current_year': 1}</field>
     </record>
 
     <record id="project_revenue_statistical_action" model="ir.actions.act_window">
@@ -40,7 +61,7 @@
         <field name="res_model">project.revenue.value</field>
         <field name="view_mode">tree</field>
         <field name="search_view_id" ref="project_revenue_search_filter"/>
-        <field name="context">{'search_default_project_revenue_filter_current_year': 1}</field>
+        <field name="context">{'search_default_project_revenue_filter_current_year': 0, 'search_default_project_revenue_group_by_year': 1}</field>
 
     </record>
 
@@ -48,8 +69,22 @@
             id="expense_management"
             name="Operation Cost"
             sequence="1"
-            parent="ds_expense_management.expense_management_menu" 
+            parent="ds_expense_management.expense_management_menu" />
+
+
+    <menuitem
+            id="expense_management_cost"
+            name="Cost"
+            sequence="1"
+            parent="ds_expense_management.expense_management" 
             action="management_expense_action"/>
+
+    <menuitem
+            id="expense_management_statistics"
+            name="Statistics"
+            sequence="2"
+            parent="ds_expense_management.expense_management" 
+            action="management_expense_statitic_action"/>
 
 
     <menuitem id="project_expense_parent"

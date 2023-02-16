@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <!-- Sidebar filter  -->
+    <record id="project_expense_management_search_filter" model="ir.ui.view">
+        <field name="name">project.expense.management.search</field>
+        <field name="model">project.expense.management</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="project_id"/>
+                <field name="company_id"/>
+                <field name="department_id"/>
+
+                <filter string="Current Year" name="project_expense_management_filter_current_year" domain="['|',
+                    ('start_date', '&gt;=', (context_today().strftime('%%Y-01-01'))),
+                    ('end_date', '&gt;=', (context_today().strftime('%%Y-01-01')))]"/>
+
+            </search>
+        </field>
+    </record>
+
     <record id="project_expense_management_view_tree" model="ir.ui.view">
         <field name="name">project.expense.management.tree</field>
         <field name="model">project.expense.management</field>
