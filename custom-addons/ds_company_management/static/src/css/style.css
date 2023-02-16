@@ -107,7 +107,7 @@ span[name="message_warning"] {
     margin: 0 auto;
 }
 
-#search_input {
+#search_input, #searchValue {
     display: block;
     outline: none;
     margin: 13px 11px;
@@ -117,6 +117,12 @@ span[name="message_warning"] {
     border-radius: 3px;
 }
 
+.hrm_record_active {
+    display: table-row;
+}
+.hrm_record_inactive {
+    display: none;
+}
 
 /* .human_resource_content tr:hover {
     background-color: #ffff99;

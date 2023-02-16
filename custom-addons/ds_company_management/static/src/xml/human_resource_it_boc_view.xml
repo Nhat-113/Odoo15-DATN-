@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="initial-scale=1"/>
+
+    <t t-name="hrm_it_boc_template">
+        <div class="main_content_hmrc">
+            <div class="human_resource_in_top">
+                <div class="header_human_resource">
+                    <h2 class="title_human_resource">Human Resource Management IT - BoC</h2>
+                    <div class="search_textbox">
+                        <input type="text" id="searchValue" placeholder="Search ..." />
+                        <i title="Search..." role="img" aria-label="Search..." class="o_searchview_icon icon_search_human fa fa-search"></i>
+                        
+                        <h3 id="count_member_of_company">
+                            Current Month Active Members:  
+                            <span class="member_current_month">
+                                <t t-esc="widget.memberCurrentMonth"/>
+                            </span>
+                        </h3>
+                    </div>
+                </div>
+                <div class="human_resouce_value">
+                    <button class="export_excel btn btn-secondary fa fa-download o_list_export_xlsx"></button>
+                </div>
+            </div>
+
+            <div class="human_resource_template">
+                <table class="table">
+                    <tbody id="over-view-table">
+                        <tr class="over-header">
+                            <t t-foreach="widget.listMonths" t-as="month">
+                                <th scope="col">
+                                    <t t-esc="month"/>
+                                </th>
+                            </t>
+                        </tr>
+
+                        <t t-foreach="widget.totalManMonthBillable" t-as="records">
+                            <tr class="value-over">
+                                <t t-foreach="records" t-as="item">
+                                    <td type="string">
+                                        <t t-esc="item"/>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                       
+                    </tbody>
+                </table>
+                <table class="human_resource_itboc">
+                    <tbody class="human_resource_content">
+                        <tr class="header_tabel">
+                                <th class="header_human_table_name">
+                                    Employee
+                                    <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                                </th>
+
+                            <t t-foreach="widget.columns" t-as="col">
+                                <th class="header_human_table">
+                                    <t t-esc="col"/>
+                                    <img src="/ds_company_management/static/src/img/move-verticle.png" class="icon-sort-header"></img>
+                                </th>
+                            </t>
+                        </tr>
+                        <t t-foreach="widget.hrmItBocData" t-as="records">
+                            <tr class="detail">
+                                <t t-foreach="records" t-as="item">
+                                    <td class="td_value" type="string">
+                                        <t t-esc="item"/>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -99,6 +99,11 @@
         <field name="name">Human Resource Management</field>
         <field name="tag">human_resource_template</field>
     </record>
+
+    <record id="action_human_resource_it_boc" model="ir.actions.client">
+        <field name="name">Human Resource Management IT BoC</field>
+        <field name="tag">human_resource_it_boc</field>
+    </record>
     
     <record id="action_human_resource_template_support" model="ir.actions.client">
         <field name="name">Human Resource Management Support</field>
@@ -125,19 +130,24 @@
         sequence="1"
         action="action_human_resource_template"/>
 
-    <menuitem name="Support" id="menu_human_resource_template_support" 
+    <menuitem name="IT - BoC" id="menu_human_resource_it_boc" 
         parent="ds_company_management.hrm_over_view"
         sequence="2"
+        action="action_human_resource_it_boc"/>
+
+    <menuitem name="Support" id="menu_human_resource_template_support" 
+        parent="ds_company_management.hrm_over_view"
+        sequence="3"
         action="action_human_resource_template_support"/>
 
     <menuitem name="History IT" id="menu_human_resource_template_history" 
         parent="ds_company_management.hrm_over_view"
-        sequence="3"
+        sequence="4"
         action="action_human_resource_template_history"/>
 
     <menuitem name="History Support" id="menu_human_resource_template_history_support" 
         parent="ds_company_management.hrm_over_view"
-        sequence="4"
+        sequence="5"
         action="action_human_resource_template_history_support"/>
     
     <record id="action_dynamic_dashboard" model="ir.actions.client">
