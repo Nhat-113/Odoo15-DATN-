@@ -27,6 +27,8 @@
                     <filter string="Department" name="project_expense_group_by_department" context="{'group_by': 'department_id'}"/>
                     <separator orientation="vertical" />
                     <filter string="Project" name="project_expense_group_by_project" context="{'group_by': 'project_id'}"/>
+                    <separator orientation="vertical" />
+                    <filter string="Year" name="project_expense_group_by_year" context="{'group_by': 'expense_date:year'}"/>
                 </group>
             </search>
         </field>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+      <!-- Sidebar filter  -->
+    <record id="expense_management_statistic_search_filter" model="ir.ui.view">
+        <field name="name">expense.management.search</field>
+        <field name="model">expense.management</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="description"/>
+                <group expand="0" string="Group By">
+                    <separator orientation="vertical" />
+                    <filter string="Year" name="expense_management_statistic_group_by_year" context="{'group_by': 'sort_date:year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="expense_management_statistic_view_tree" model="ir.ui.view">
+        <field name="name">expense.management.tree</field>
+        <field name="model">expense.management</field>
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <tree create="false" delete="false" edit="false">
+                <field name="get_month"/>
+                <field name="description"/>
+                <field name="sort_date" invisible="1"/>
+                <field name="total_expenses" sum="Total Expenses" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="company_id" widget="many2many_tags" groups="base.group_multi_company"/>
+                <field name="currency_id" optional="hide"/>
+                <field name="user_subceo" widget="many2many_tags" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>
