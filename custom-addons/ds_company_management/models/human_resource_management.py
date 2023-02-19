@@ -581,12 +581,12 @@ class HumanResourceManagement(models.Model):
                                 + ') AND (PROJECT_DEPARTMENT_ID IS NULL OR PROJECT_DEPARTMENT_ID NOT IN ' + department_removed + ')'
         
         if role_user == 'ceo':
-            company_domain += 'AND (company_id in ' + selected_companies + ')'
+            company_domain += ' AND (company_id in ' + selected_companies + ')'
         elif role_user == 'subceo':
-            company_domain += 'AND (company_id in ' + selected_companies \
+            company_domain += ' AND (company_id in ' + selected_companies \
                                + ' AND company_manager_user_id = ' + user_login + ')'
         else:
-            company_domain += 'AND department_manager_user_id = ' + user_login + ')'
+            company_domain += ' AND (department_manager_user_id = ' + user_login + ')'
 
         query = """
                   SELECT 
@@ -616,18 +616,10 @@ class HumanResourceManagement(models.Model):
     
         cr.execute(query)
         data = cr.fetchall()
-        total = self.get_total_man_month_project_billable(user_login, selected_companies, role_user)
-        # employee_ids = self.get_employee_id_for_contract(department_domain, company_domain)
+        overview = self.get_total_man_month_project_billable(user_login, selected_companies, role_user)
+        total_member_company = self.get_total_member_company(user_login, selected_companies, role_user)
         
-        # if len(data) > 0:
-        #     employee_ids = []
-        #     for record in data:
-        #         employee_ids.append(record[0])
-                
-        #     contracts = self.get_employee_id_for_contract(str(tuple(employee_ids)))
-                
-        
-        return {'data': data, 'total': total}
+        return {'data': data, 'overview': overview, 'total_member_company': total_member_company}
 
 
 
@@ -652,24 +644,27 @@ class HumanResourceManagement(models.Model):
         cr.execute(query)
         return cr.fetchall()
 
-    # def get_employee_id_for_contract(self, employee_ids):
-    #     cr = self._cr
-    #     query = """
-    #             SELECT employee_id,
-    #                 EXTRACT(YEAR FROM date_start) AS year_start,
-    #                 EXTRACT(MONTH FROM date_start) AS month_start,
-    #                 EXTRACT(YEAR FROM date_end) AS year_end,
-    #                 EXTRACT(MONTH FROM date_end) AS month_end
-    #             FROM hr_contract 
-    #             WHERE state != 'cancel' AND
-    #                 (EXTRACT(YEAR FROM date_start) = EXTRACT(YEAR FROM CURRENT_DATE) OR
-    #                 EXTRACT(YEAR FROM date_end) = EXTRACT(YEAR FROM CURRENT_DATE) OR
-    #                 date_end IS NULL) AND
-    #                 employee_id IN """ + employee_ids + \
-    #             """ORDER BY employee_id,
-    #                     date_start""" 
-    #     cr.execute(query)
-    #     return cr.fetchall()
+    def get_total_member_company (self, user_login, selected_companies, role_user):
+        cr = self._cr
+        domain = ''
+        company_user_id = str(self.env.user.company_id.id)
+        if role_user == 'ceo':
+            domain += ' company_id IN ' + selected_companies
+        elif role_user == 'subceo':
+            domain += ' sub_ceo = ' + user_login + ' AND company_id IN ' + selected_companies
+        else:
+            domain += ' company_id = ' + company_user_id + ' AND company_id IN ' + selected_companies
+            
+        query = """
+                SELECT
+                    EXTRACT(MONTH FROM months) AS months,
+                    COUNT(DISTINCT employee_id) AS total_members
+                FROM human_resource_management_member_company
+                WHERE EXTRACT(YEAR FROM months) = EXTRACT(YEAR FROM CURRENT_DATE)
+                    AND """ + domain \
+                + ' GROUP BY months ORDER BY months'
+        cr.execute(query)
+        return cr.fetchall()
     
     
     def check_role_user_login(self):

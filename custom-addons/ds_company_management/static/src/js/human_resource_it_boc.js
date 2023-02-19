@@ -8,6 +8,8 @@ odoo.define('human_resource_it_boc.template', function(require) {
     var ajax = require('web.ajax');
     // var Normalize = require('web.normalize');
 
+    const IndexMonth = 5; // cols start for list Month from HRM data record
+
     var hrmItBoc = AbstractAction.extend({
         template: 'hrm_it_boc_template',
         jsLibs: ["ds_company_management/static/src/js/lib/table2excel.js"],
@@ -21,7 +23,7 @@ odoo.define('human_resource_it_boc.template', function(require) {
                 "July", "August", "September", "October", "November", "December"
             ];
 
-            let columns = ["Company", "Department", "Project", "Project Type"] //"Employee", 
+            let columns = ["Employee", "Company", "Department", "Project", "Project Type"]
             columns = columns.concat(month)
             month.unshift("")
             this._super(parent, action);
@@ -47,22 +49,30 @@ odoo.define('human_resource_it_boc.template', function(require) {
             }).then(function(data) {
                 // convert data effort to Man Month
                 let hrms = data.data;
-                let mmEstimate = data.total;
+                let mmEstimate = data.overview;
+                let memberCompany = data.total_member_company;
 
-                // let contracts = data.contracts;
-                let arrTotalMember = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                let arrTotalMM = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                 let arrEstimate = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                 let arrActualMM = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                let arrTotalMember = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                let arrEffectiveRate = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                 let totalManMonthBillable = [];
                 let dateCurrent = new Date();
                 let currentYear = dateCurrent.getFullYear();
-                let currentMonth = dateCurrent.getMonth();
+                let currentMonth = dateCurrent.getMonth() + 1;
+
+                // handle total member company
+                for(let i = 0; i < memberCompany.length; i++) {
+                    arrTotalMember[memberCompany[i][0] - 1] = memberCompany[i][1];
+                }
+                // handle Human resource data
                 for (let index = 0; index < hrms.length; index++) {
                     let arrDuration = hrms[index].at(-1).split(","); // at(-1): get last item in hrms[index]
                     let arrDurationFinal = [];
                     self.computeDurationContract(arrDuration, arrDurationFinal, currentYear)
 
-                    for (let i = 5; i < hrms[index].length - 1; i++) {
+                    for (let i = IndexMonth; i < hrms[index].length - 1; i++) {
                         let monthIndex = i - 4;
                         let isActive = false;
                         for (let j = 0; j < arrDurationFinal.length; j++) {
@@ -75,16 +85,16 @@ odoo.define('human_resource_it_boc.template', function(require) {
                             hrms[index][i] = 'NaN';
                         } else {
                             if (hrms[index][i] > 0) {
-                                hrms[index][i] = hrms[index][i] / 100;
-                                arrTotalMember[i - 5] += hrms[index][i];
+                                hrms[index][i] = (parseFloat(hrms[index][i]) / 100).toFixed(2);
+                                arrTotalMM[i - IndexMonth] += parseFloat(hrms[index][i]);
                             }
                         }
                     }
-                    // debugger
                     // hrms[index].shift(); //remove first element from data hrms (employee_id)
                     hrms[index].splice(-1); // remove last element from data hrms (durationContract)
                 }
 
+                // handle Contract values (Man month from project billable)
                 for (let index = 0; index < mmEstimate.length; index++) {
                     let positionMonth = mmEstimate[index][0] - 1
                     arrEstimate[positionMonth] += mmEstimate[index][1]
@@ -93,28 +103,23 @@ odoo.define('human_resource_it_boc.template', function(require) {
                 for(let index = 0; index < arrEstimate.length; index++) {
                     if (arrTotalMember[index] != 0) {
                         arrActualMM[index] = (arrEstimate[index] / arrTotalMember[index] * 100).toFixed(2);
+                        if (arrTotalMM[index] != 0) {
+                            arrEffectiveRate[index] = (arrActualMM[index] / ((arrTotalMM[index] *100) / (arrTotalMember[index] * 100) * 100)).toFixed(3);
+                        }
                     }
                 }
 
                 arrEstimate.unshift("Contract Values");
-                arrTotalMember.unshift("Total Member");
+                arrTotalMember.unshift("Total Member Company");
+                arrTotalMM.unshift("Total Member Billable");
                 arrActualMM.unshift("Bill Rate Based - Contract (%)");
+                arrEffectiveRate.unshift("Res Usage Effective Rate (%)");
 
-                totalManMonthBillable.push(arrEstimate, arrTotalMember, arrActualMM);
-                // console.log("data: ", data);
-                // // console.log("contracts: ", contracts);
-                // console.log("totalManMonthBillable: ", totalManMonthBillable);
-                // console.log("arrEstimate: ", arrEstimate);
-                // console.log("arrTotalMember: ", arrTotalMember);
-                // console.log("arrActualMM: ", arrActualMM);
-                // console.log("mmEstimate: ", mmEstimate);
-                // console.log("hrms: ", hrms);
+                totalManMonthBillable.push(arrEstimate, arrTotalMember, arrTotalMM, arrActualMM, arrEffectiveRate);
+
                 self.hrmItBocData = hrms;
                 self.totalManMonthBillable = totalManMonthBillable;
                 self.memberCurrentMonth = arrTotalMember[currentMonth];
-                
-                // self.totalManMonthEstimate = arrEstimate;
-                // self.totalEffort = arrTotalMember;
             })
 
         },
@@ -123,18 +128,30 @@ odoo.define('human_resource_it_boc.template', function(require) {
             let searchValue = this.el.querySelector('#searchValue');
             searchValue.addEventListener('keyup', () => {
                 // let content = searchValue.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                this.searchAction(searchValue.value.toLowerCase());
+                let vals = searchValue.value.toLowerCase();
+                vals = this.recursiveValidateValsInput(vals);
+                this.searchAction(vals);
             })
             this.actionSortTable();
 
             return this._super.apply(this, arguments);
         },
+
+        recursiveValidateValsInput: function (vals) {
+            const specialChars = /[\\]/;
+            if (specialChars.test(vals) == true) { // check string have special characters ?
+                vals = vals.replace("\\", "");
+                return this.recursiveValidateValsInput(vals);
+            } else {
+                return vals;
+            }
+        },
+
         searchAction: function (vals) {
             let hrmDatas = this.el.querySelector('.human_resource_template');
             let recordHrms = hrmDatas.getElementsByClassName('detail');
             let recordOverviews = hrmDatas.getElementsByClassName('value-over');
-            // debugger
-            let currentMonth = new Date().getMonth();
+            let currentMonth = new Date().getMonth() + 1;
             let memberCurrentMonth = this.el.getElementsByClassName('member_current_month')[0];
             
             for (let i = 0; i < recordHrms.length; i++) {
@@ -147,9 +164,9 @@ odoo.define('human_resource_it_boc.template', function(require) {
                 }
             }
 
-            for (let j = 1; j < recordOverviews.length; j++) {
+            for (let j = 2; j < recordOverviews.length; j++) {
                 for (let item = 1; item < recordOverviews[j].cells.length; item++) {    //loop month column overview
-                    if (j == 1) {
+                    if (j == 2) {
                         let result = 0;
                         for (let i = 0; i < recordHrms.length; i ++) {
                             // if (recordHrms[i].className.search('hrm_record_active') != -1) {
@@ -161,11 +178,18 @@ odoo.define('human_resource_it_boc.template', function(require) {
                             }
                         }
                         recordOverviews[j].cells[item].innerText = result;
-                    } else if (j == 2) {
-                        let member = parseFloat(recordOverviews[j - 1].cells[item].innerText);
-                        let contractVals = parseFloat(recordOverviews[0].cells[item].innerText);
+                    } else if (j == 4) {
+                        let actualMM = parseFloat(recordOverviews[j - 1].cells[item].innerText)
+                        let totalEffortRate = parseFloat(recordOverviews[j - 2].cells[item].innerText) * 100;
+                        let memberCompany = parseFloat(recordOverviews[j - 3].cells[item].innerText) * 100;
+                        // let contractVals = parseFloat(recordOverviews[0].cells[item].innerText);
                         
-                        recordOverviews[j].cells[item].innerText = member > 0 ? (contractVals/ member * 100).toFixed(2) : 0;
+                        recordOverviews[j].cells[item].innerText = memberCompany > 0 && totalEffortRate > 0 ? 
+                                                                    (actualMM / ((totalEffortRate/ memberCompany) * 100)).toFixed(2) : 0;
+
+
+                    } else {
+                        break;
                     }
                 }
             }

@@ -153,3 +153,49 @@ class HumanResourceManagementItBoC(models.Model):
 
             )""" % (self._table)
 		)
+  
+  
+  
+class HumanResourceManagementMemberCompany(models.Model):
+	_name = "human.resource.management.member.company"
+	_description = "Human Resource Member Company"
+	_auto = False
+
+	def init(self):
+		tools.drop_view_if_exists(self.env.cr, self._table)
+		self.env.cr.execute("""
+			CREATE OR REPLACE VIEW %s AS (	
+                WITH contract_employees AS (
+                    SELECT 
+                        company_id,
+                        employee_id,
+                        date_start,
+                        (CASE
+                            WHEN date_end IS NULL
+                                THEN TO_DATE(CONCAT('1231', EXTRACT(YEAR FROM CURRENT_DATE)), 'MMDDYY')
+                            ELSE date_end
+                        END) date_end
+                    FROM hr_contract
+                    WHERE state != 'cancel' 
+                        AND department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                    ORDER BY employee_id, date_start
+                )
+                SELECT
+                    ce.company_id,
+                    ce.employee_id,
+                    generate_series(
+                            date_trunc('month', ce.date_start), 
+                            date_trunc('month', ce.date_end), 
+                            '1 month'
+                    )::date AS months,
+                    ru.id AS sub_ceo
+                                
+                FROM contract_employees AS ce
+                LEFT JOIN res_company AS rc
+                        ON rc.id = ce.company_id
+                LEFT JOIN res_users AS ru
+                        ON ru.login = rc.user_email
+                GROUP BY ce.company_id, ce.employee_id, months, ru.id
+                ORDER BY ce.employee_id, months
+            )""" % (self._table)
+		)

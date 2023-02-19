@@ -30,7 +30,7 @@ span[name="message_warning"] {
 .human_resource_template tbody {
     display: block;
     width: 98%;
-    overflow-y: scroll;
+    overflow-y: auto;
     height:calc(64vh - 71px);
     margin-top: -25px;
     margin: 0 auto;
@@ -46,7 +46,7 @@ span[name="message_warning"] {
     padding: 5px 10px;
     width: 200px;
     text-align: left;
-
+    position: relative;
 }
 
 .human_resource_template th {
@@ -54,6 +54,89 @@ span[name="message_warning"] {
     text-align: left;
     padding-left: 5px;
 }
+
+.human_resource_template table tbody tr:first-child th:first-child {
+    width: 350px;
+}
+
+.box_ul_color {
+    list-style: none; 
+    display: flex;
+    white-space: nowrap;
+    justify-content: space-around;
+    margin-right: 12px;
+}
+
+.note-color_box {
+    display: block;
+    float: right;
+    margin-right: 0;
+    position: relative;
+    width: 18%;
+}
+
+.note-color_good {
+    margin: 0 6%;
+}
+
+
+.note-color_good::after, 
+.note-color_not_good::after {
+    position: absolute;
+    content: "";
+    border-color: red red red red;
+    border-width: 8px 20px;
+    border-style: solid;
+    display: block;
+    /* left: 36%; */
+    /* z-index: 1000; */
+    top: 1px;
+}
+
+.note-color_not_good {
+    margin-left: 30%;
+}
+
+.note-color_good::after {
+    left: 0%;
+    border-color: #31871c #31871c #31871c #31871c;
+}
+.note-color_not_good::after {
+    right: 36%;
+}
+
+/* 
+.hidden-content {
+    display: none;
+    position: absolute;
+}
+
+.hidden-content::after {
+    position: absolute;
+    content: "";
+    border-color: transparent transparent #ccc transparent;
+    border-style: solid;
+    border-width: 8px 8px;
+    top: -16px;
+    left: 26%;
+} */
+
+.warning_effective_not_good {
+    color: red;
+}
+
+/* .warning_effective_not_good:hover .hidden-content,
+.warning_effective_good:hover .hidden-content {
+    display: block;
+    width: 184px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+    cursor: default;
+    margin-top: 15px;
+    right: -15%;
+} */
 
 .human_resource_content>tr {
     text-align: center;
