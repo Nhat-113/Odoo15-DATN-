@@ -172,6 +172,10 @@ span[name="message_warning"] {
     width: 98%;
     margin: 0 auto;
     height: 35px;
+    z-index: 10;
+    cursor: pointer;
+    position: sticky;
+    top: 0;
 }
 
 .cd-title-search {
@@ -293,9 +297,6 @@ span[name="message_warning"] {
     display: inline;
 }
 
-.header_tabel {
-    cursor: pointer;
-}
 
 .icon-sort-header {
     width: 11px;
@@ -472,6 +473,7 @@ button.view-member-free:hover {
     background: #eee !important;
     position: sticky;
     top: 0;
+    z-index: 10;
 }
 #over-view-table > tr > td:first-child {
     font-weight: 700;

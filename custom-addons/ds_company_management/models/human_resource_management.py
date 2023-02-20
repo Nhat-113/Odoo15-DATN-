@@ -281,8 +281,8 @@ class HumanResourceManagement(models.Model):
 
                         FROM hr_contract
                         WHERE state != 'cancel' AND
-                                ( EXTRACT(YEAR FROM date_start) = EXTRACT(YEAR FROM CURRENT_DATE) OR
-                                    EXTRACT(YEAR FROM date_end) = EXTRACT(YEAR FROM CURRENT_DATE) OR
+                                ( EXTRACT(YEAR FROM date_start) >= EXTRACT(YEAR FROM CURRENT_DATE) OR
+                                    EXTRACT(YEAR FROM date_end) >= EXTRACT(YEAR FROM CURRENT_DATE) OR
                                     date_end IS NULL)
                         ORDER BY employee_id, date_start
                         ),
