@@ -63,7 +63,7 @@ odoo.define('human_resource_it_boc.template', function(require) {
                 let currentMonth = dateCurrent.getMonth() + 1;
 
                 // handle total member company
-                for(let i = 0; i < memberCompany.length; i++) {
+                for (let i = 0; i < memberCompany.length; i++) {
                     arrTotalMember[memberCompany[i][0] - 1] = memberCompany[i][1];
                 }
                 // handle Human resource data
@@ -86,7 +86,10 @@ odoo.define('human_resource_it_boc.template', function(require) {
                         } else {
                             if (hrms[index][i] > 0) {
                                 hrms[index][i] = (parseFloat(hrms[index][i]) / 100).toFixed(2);
-                                arrTotalMM[i - IndexMonth] += parseFloat(hrms[index][i]);
+
+                                let result = parseFloat(arrTotalMM[i - IndexMonth]);
+                                result += parseFloat(hrms[index][i])
+                                arrTotalMM[i - IndexMonth] = result.toFixed(2);
                             }
                         }
                     }
@@ -100,11 +103,11 @@ odoo.define('human_resource_it_boc.template', function(require) {
                     arrEstimate[positionMonth] += mmEstimate[index][1]
                 }
 
-                for(let index = 0; index < arrEstimate.length; index++) {
+                for (let index = 0; index < arrEstimate.length; index++) {
                     if (arrTotalMember[index] != 0) {
                         arrActualMM[index] = (arrEstimate[index] / arrTotalMember[index] * 100).toFixed(2);
                         if (arrTotalMM[index] != 0) {
-                            arrEffectiveRate[index] = (arrActualMM[index] / ((arrTotalMM[index] *100) / (arrTotalMember[index] * 100) * 100)).toFixed(3);
+                            arrEffectiveRate[index] = (arrActualMM[index] / ((arrTotalMM[index] * 100) / (arrTotalMember[index] * 100) * 100)).toFixed(3);
                         }
                     }
                 }
@@ -168,7 +171,7 @@ odoo.define('human_resource_it_boc.template', function(require) {
                 for (let item = 1; item < recordOverviews[j].cells.length; item++) {    //loop month column overview
                     if (j == 2) {
                         let result = 0;
-                        for (let i = 0; i < recordHrms.length; i ++) {
+                        for (let i = 0; i < recordHrms.length; i++) {
                             // if (recordHrms[i].className.search('hrm_record_active') != -1) {
                             if (recordHrms[i].classList.contains('hrm_record_active')) {
                                 let text = recordHrms[i].cells[item + 4].innerText;
@@ -177,15 +180,15 @@ odoo.define('human_resource_it_boc.template', function(require) {
                                 }
                             }
                         }
-                        recordOverviews[j].cells[item].innerText = result;
+                        recordOverviews[j].cells[item].innerText = result.toFixed(2);
                     } else if (j == 4) {
                         let actualMM = parseFloat(recordOverviews[j - 1].cells[item].innerText)
                         let totalEffortRate = parseFloat(recordOverviews[j - 2].cells[item].innerText) * 100;
                         let memberCompany = parseFloat(recordOverviews[j - 3].cells[item].innerText) * 100;
                         // let contractVals = parseFloat(recordOverviews[0].cells[item].innerText);
-                        
-                        recordOverviews[j].cells[item].innerText = memberCompany > 0 && totalEffortRate > 0 ? 
-                                                                    (actualMM / ((totalEffortRate/ memberCompany) * 100)).toFixed(2) : 0;
+
+                        recordOverviews[j].cells[item].innerText = memberCompany > 0 && totalEffortRate > 0 ?
+                            (actualMM / ((totalEffortRate / memberCompany) * 100)).toFixed(2) : 0;
 
 
                     } else {
@@ -244,8 +247,8 @@ odoo.define('human_resource_it_boc.template', function(require) {
             cols.forEach(col => col.addEventListener('click', (() => {
                 let table = col.closest('tbody');
                 Array.from(table.querySelectorAll('tr.detail'))
-                .sort(compareAction(Array.from(col.parentNode.children).indexOf(col), this.asc = !this.asc))
-                .forEach(tr => table.appendChild(tr));
+                    .sort(compareAction(Array.from(col.parentNode.children).indexOf(col), this.asc = !this.asc))
+                    .forEach(tr => table.appendChild(tr));
             })))
         },
 

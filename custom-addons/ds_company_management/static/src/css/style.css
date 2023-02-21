@@ -172,7 +172,7 @@ span[name="message_warning"] {
     width: 98%;
     margin: 0 auto;
     height: 35px;
-    z-index: 10;
+    z-index: 1;
     cursor: pointer;
     position: sticky;
     top: 0;
@@ -324,6 +324,7 @@ span[name="message_warning"] {
     width: 100%;
     background: rgba(0, 0, 0, 0.75);
     display: none;
+    z-index: 10;
 }
 #human_resource_free_table {
     margin: 20px 0 auto;
@@ -473,7 +474,7 @@ button.view-member-free:hover {
     background: #eee !important;
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 1;
 }
 #over-view-table > tr > td:first-child {
     font-weight: 700;
