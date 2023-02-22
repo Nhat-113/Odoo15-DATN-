@@ -625,13 +625,14 @@ class HumanResourceManagement(models.Model):
 
     def get_total_man_month_project_billable(self, user_login, selected_companies, role_user):
         cr = self._cr
+        div_login = str(self.env.user.employee_id.id)
         domain = ''
         if role_user == 'ceo':
             domain += ' company_id IN ' + selected_companies
         elif role_user == 'subceo':
             domain += ' representative = ' + user_login + ' AND company_id IN ' + selected_companies
         else:
-            domain += ' manager_id = ' + user_login + ' AND company_id IN ' + selected_companies
+            domain += ' manager_id = ' + div_login + ' AND company_id IN ' + selected_companies
             
         query = """
                 SELECT
