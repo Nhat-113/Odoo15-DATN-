@@ -129,8 +129,8 @@ class ProjectPlanningBookingResourceData(models.Model):
                     CURRENT_DATE
                 FROM project_planning_booking
                 WHERE (member_type_name NOT IN('Shadow Time', 'shadow time') 
-                            OR member_type_name IS NULL)
-                        AND company_id IN (1, 3);
+                            OR member_type_name IS NULL);
+                        --AND company_id IN (1, 3);
             """
     
 

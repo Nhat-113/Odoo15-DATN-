@@ -98,13 +98,25 @@ class AvailableBookingEmployees(models.Model):
                         type_contract
                         
                     FROM pesudo_contract
-                    WHERE company_id IN (1, 3) -- Company Dsoft & Mtech
+                    --WHERE company_id IN (1, 3) -- Company Dsoft & Mtech
                     GROUP BY company_id,
                             department_id,
                             employee_id,
                             months,
                             total_working_day,
                             type_contract
+                ),
+                
+                compute_count_month_contract_employee AS (
+                    SELECT
+                        employee_id,
+                        months,
+                        sum(1) AS cnt,
+                        SUM(working_day) AS wdsum
+
+                    FROM get_contract_employee
+                    GROUP BY employee_id, months
+                    ORDER BY employee_id, months
                 ),
 
                 compute_available_effort_employee AS (
@@ -118,31 +130,36 @@ class AvailableBookingEmployees(models.Model):
                         gc.total_working_day,
                         (CASE
                             WHEN ct.effort_rate_month IS NULL
-                                THEN (CASE
-                                        WHEN gc.working_day <> gc.total_working_day
-                                            THEN gc.working_day / gc.total_working_day 
-                                        ELSE 1
-                                    END)
+                                THEN gc.working_day / gc.total_working_day 
                             ELSE (CASE
                                     WHEN gc.working_day <> gc.total_working_day
-                                        THEN gc.working_day / gc.total_working_day * (100 - ct.effort_rate_month) / 100
+                                            THEN gc.working_day / gc.total_working_day * (100 - ct.effort_rate_month) / 100
                                     ELSE 1 - ct.man_month
                                 END)
                         END)::NUMERIC(10, 2) AS available_mm,
                         
                         -- Handle member have multi contract of multi company in a month
+                        --(CASE
+                            --WHEN ct.effort_rate_month IS NULL
+                                --THEN --(CASE
+                                            --WHEN gc.working_day <> gc.total_working_day
+                                                --THEN gc.working_day / gc.total_working_day * 100
+                                            --ELSE 100
+                                        --END)
+                                        --100
+                            --ELSE --(CASE
+                                        --WHEN gc.working_day <> gc.total_working_day
+                                            --THEN ((100 - ct.effort_rate_month) * gc.working_day / 100) / gc.total_working_day * 100
+                                        --ELSE 100 - ct.effort_rate_month
+                                    --END)
+                                    --100 - ct.effort_rate_month
+                        --END)::NUMERIC(20, 2) AS available_effort,
+                        
                         (CASE
                             WHEN ct.effort_rate_month IS NULL
-                                THEN (CASE
-                                        WHEN gc.working_day <> gc.total_working_day
-                                            THEN gc.working_day / gc.total_working_day * 100
-                                        ELSE 100
-                                    END)
-                            ELSE (CASE
-                                    WHEN gc.working_day <> gc.total_working_day
-                                        THEN ((100 - ct.effort_rate_month) * gc.working_day / 100) / gc.total_working_day * 100
-                                    ELSE 100 - ct.effort_rate_month
-                                END)
+                                THEN (100 - cc.wdsum / gc.total_working_day * 100)/ cc.cnt + (gc.working_day / gc.total_working_day * 100)
+                            ELSE ((100 - cc.wdsum / gc.total_working_day * 100) * (100 - ct.effort_rate_month) / 100) / cc.cnt 
+                                    + (gc.working_day / gc.total_working_day * 100) * (100 - ct.effort_rate_month) / 100
                         END)::NUMERIC(20, 2) AS available_effort,
                         
                         --ct.man_month,
@@ -153,6 +170,9 @@ class AvailableBookingEmployees(models.Model):
                         rc.id AS currency_id
 
                     FROM get_contract_employee AS gc
+                    LEFT JOIN compute_count_month_contract_employee AS cc
+                        ON cc.employee_id = gc.employee_id
+                        AND cc.months = gc.months
                     LEFT JOIN compute_total_effort_by_month AS ct
                         ON --ct.company_id = gc.company_id
                         --AND ct.department_id = gc.department_id
@@ -394,7 +414,7 @@ class CompareSalaryBookingAvailable(models.Model):
                         SUM(salary) AS salary,
                         SUM(bhxh) AS bhxh,
                         SUM(ttncn) AS ttncn,
-                        --SUM(salary_ot) AS salary_ot,
+                        SUM(salary_ot) AS salary_ot,
                         SUM(salary_ltu) AS salary_ltu,
                         SUM(salary_lbn) AS salary_lbn
                     FROM compare_salary_cost
@@ -423,7 +443,7 @@ class CompareSalaryBookingAvailable(models.Model):
                     (COALESCE(NULLIF(pp.effort_rate_month, NULL), 0) + COALESCE(NULLIF(ab.available_effort, NULL), 0)) AS total_effort,
                     (COALESCE(NULLIF(pp.salary, NULL), 0) + COALESCE(NULLIF(ab.available_salary, NULL), 0)) AS total_salary,
                     
-                    (cs.salary + cs.bhxh + cs.ttncn + cs.salary_ltu + cs.salary_lbn) AS salary_cost,
+                    (cs.salary + cs.bhxh + cs.ttncn + cs.salary_ltu + cs.salary_lbn + cs.salary_ot) AS salary_cost,
                     rc.id AS currency_id
                     
                 FROM pesudo_contract_group AS pc
