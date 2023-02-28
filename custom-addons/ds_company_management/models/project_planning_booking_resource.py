@@ -57,6 +57,55 @@ class ProjectPlanningBookingResource(models.Model):
                 ORDER BY project_id, employee_id, months
             )""" % (self._table)
         )
+   
+class ProjectPlanningBookingResourceDetect(models.Model):
+    _name = 'project.planning.booking.detect'
+    _auto = False
+    
+    
+    def init(self):
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""
+            CREATE OR REPLACE VIEW %s AS (
+                WITH compute_total_effort_rate_employee_month AS (
+                    SELECT
+                        employee_id,
+                        months,
+                        SUM(effort_rate_month)  AS eff_rate_sum
+
+                    FROM project_planning_booking
+                    WHERE (member_type_name NOT IN('Shadow Time', 'shadow time') 
+                            OR member_type_name IS NULL)
+                    GROUP BY employee_id, months
+
+                )
+
+                SELECT
+                    pp.company_id,
+                    pp.company_emp,
+                    pp.employee_id,
+                    pp.project_id,
+                    pp.currency_id,
+                    pp.member_type_name,
+                    pp.start_date_month,
+                    pp.end_date_month,
+                    pp.months,
+                    pp.effort_rate_month,
+                    pp.man_month,
+                    pp.salary,
+                    pp.salary_lbn,
+                    ct.eff_rate_sum
+                    
+                FROM project_planning_booking AS pp
+                LEFT JOIN compute_total_effort_rate_employee_month AS ct
+                    ON ct.employee_id = pp.employee_id
+                    AND ct.months = pp.months
+                WHERE (pp.member_type_name NOT IN('Shadow Time', 'shadow time') 
+                            OR pp.member_type_name IS NULL)
+                ORDER BY employee_id, months
+            )""" % (self._table)
+        )
+   
         
 
 class ProjectPlanningBookingResourceData(models.Model):
@@ -79,6 +128,7 @@ class ProjectPlanningBookingResourceData(models.Model):
     salary = fields.Monetary(string='Salary')
     salary_lbn = fields.Monetary(string='13th Month Salary')
     
+    total_effort_rate = fields.Float(string="Total Effort Rate (%)")
     
     
     @api.model
@@ -105,6 +155,7 @@ class ProjectPlanningBookingResourceData(models.Model):
                         man_month,
                         salary,
                         salary_lbn,
+                        total_effort_rate,
                         create_uid, 
                         write_uid, 
                         create_date, 
@@ -123,13 +174,14 @@ class ProjectPlanningBookingResourceData(models.Model):
                     man_month,
                     salary,
                     salary_lbn,
+                    eff_rate_sum,
                     """ + user_update + """,
                     """ + user_update + """,
                     CURRENT_DATE,
                     CURRENT_DATE
-                FROM project_planning_booking
-                WHERE (member_type_name NOT IN('Shadow Time', 'shadow time') 
-                            OR member_type_name IS NULL);
+                FROM project_planning_booking_detect;
+                --WHERE (member_type_name NOT IN('Shadow Time', 'shadow time') 
+                            --OR member_type_name IS NULL);
                         --AND company_id IN (1, 3);
             """
     

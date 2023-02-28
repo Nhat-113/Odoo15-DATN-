@@ -17,6 +17,9 @@
                     ('months', '&gt;=', (context_today().strftime('%%Y-01-01'))),
                     ('months', '&lt;=', (context_today().strftime('%%Y-12-31')))]"/>
 
+                <filter string="Detect Effort Rate > 100" name="filter_detect_effort_rate_support" domain="[
+                    ('total_effort_rate', '&gt;', 100)]"/>
+
                 <group expand="1" string="Group By">
                     <filter string="Company" name="group_by_company_project_booking_support" context="{'group_by': 'company_id'}"/>
                     <separator orientation="vertical" />
@@ -37,6 +40,7 @@
                 <field name="starts"/>
                 <field name="ends"/>
                 <field name="effort_rate"/>
+                <field name="total_effort_rate" optional='hide'/>
                 <field name="man_month"/>
                 <field name="salary" widget="monetary" sum="Total Salary"/>
                 <!-- <field name="bhxh" widget="monetary" sum="Total BHXH"/>
