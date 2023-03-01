@@ -36,11 +36,11 @@ class PesudoContract(models.Model):
                                             THEN 
                                                 (CASE
                                                     WHEN EXTRACT(YEAR FROM hc.date_start) > EXTRACT(YEAR FROM CURRENT_DATE)
-                                                        THEN (CONCAT('12/31/', EXTRACT(YEAR FROM hc.date_start)::text))::DATE
+                                                        THEN to_date(CONCAT('12 31 ', EXTRACT(YEAR FROM hc.date_start)::text), 'MM DD YYYY')
                                                     ELSE
                                                         (CASE
                                                             WHEN EXTRACT(MONTH FROM hc.date_start) > EXTRACT(MONTH FROM CURRENT_DATE)
-                                                                THEN (CONCAT('12/31/', EXTRACT(YEAR FROM CURRENT_DATE)::text))::DATE
+                                                                THEN to_date(CONCAT('12 31 ', EXTRACT(YEAR FROM CURRENT_DATE)::text), 'MM DD YYYY')
                                                             ELSE (date_trunc('month', CURRENT_DATE::DATE) + interval '1 month - 1 day')::date
                                                         END)
                                                 END)
