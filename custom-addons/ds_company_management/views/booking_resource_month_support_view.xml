@@ -6,6 +6,9 @@
         <field name="model">booking.resource.month.data</field>
         <field name="arch" type="xml">
             <search>
+                <field name="employee_id"/>
+                <field name="project_id"/>
+
                 <separator orientation="vertical" />
                 <field name="start_date_month"/>
 

@@ -6,6 +6,9 @@
         <field name="model">project.planning.booking.data</field>
         <field name="arch" type="xml">
             <search>
+                <field name="employee_id"/>
+                <field name="project_id"/>
+
                 <searchpanel>
                     <field name="company_id" icon="fa-building" enable_counters="1"/>
                 </searchpanel>
