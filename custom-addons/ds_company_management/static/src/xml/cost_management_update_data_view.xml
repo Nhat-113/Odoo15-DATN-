@@ -19,6 +19,9 @@
 
       <button t-if="widget.modelName == 'booking.resource.month.data'" 
         class="btn btn-primary upgrade_booking_resource_month_support" type="button">Upgrade</button>
+
+      <button t-if="widget.modelName == 'compare.salary.booking.available.data'" 
+        class="btn btn-primary upgrade_compare_salary_booking_available_support" type="button">Upgrade</button>
     </t>
   </t>
 </template>

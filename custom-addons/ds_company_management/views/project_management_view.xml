@@ -6,10 +6,17 @@
         <field name="model">project.management.data</field>
         <field name="arch" type="xml">
             <search>
+                <field name="project_id"/>
+                <field name="user_pm"/>
+
                 <searchpanel>
                     <field name="company_id" groups="base.group_multi_company" icon="fa-building" enable_counters="1"/>
                     <field name="user_pm" icon="fa-users" enable_counters="1"/>
                 </searchpanel>
+
+                <filter string="Current Year" name="project_management_filter_current_year" domain="['|',
+                    ('date_start', '&gt;=', (context_today().strftime('%%Y-01-01'))),
+                    ('date_end', '&gt;=', (context_today().strftime('%%Y-01-01')))]"/>
             </search>
         </field>
     </record>
@@ -157,6 +164,7 @@
         <field name="res_model">project.management.data</field>
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="project_sidebar_filter"/>
+        <field name="context">{'search_default_project_management_filter_current_year': 1}</field>
         <field name="view_ids" eval="[(5, 0, 0),
                           (0, 0, {'view_mode': 'tree', 'view_id': ref('ds_company_management.view_tree_project_management')}),
                           (0, 0, {'view_mode': 'form', 'view_id': ref('ds_company_management.view_form_project_management')}),

@@ -66,6 +66,18 @@ odoo.define('cost_management.upgrade_data', function(require) {
                         return location.reload();
                     }, 500);
                 })
+            }),
+
+            self.$buttons.on("click", ".upgrade_compare_salary_booking_available_support", function() {
+                self._rpc({
+                    model: 'compare.salary.booking.available.data',
+                    method: 'upgrade_compare_salary_booking_available_support'
+                }).then(() => {
+                    self.messageNotify();
+                    setTimeout(function (){
+                        return location.reload();
+                    }, 500);
+                })
             })
         },
         messageNotify: function() {

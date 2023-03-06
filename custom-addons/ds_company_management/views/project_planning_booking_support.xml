@@ -6,6 +6,9 @@
         <field name="model">project.planning.booking.data</field>
         <field name="arch" type="xml">
             <search>
+                <field name="employee_id"/>
+                <field name="project_id"/>
+
                 <searchpanel>
                     <field name="company_id" icon="fa-building" enable_counters="1"/>
                 </searchpanel>
@@ -16,6 +19,9 @@
                 <filter string="Current Year" name="filter_current_year_project_booking_support" domain="[
                     ('months', '&gt;=', (context_today().strftime('%%Y-01-01'))),
                     ('months', '&lt;=', (context_today().strftime('%%Y-12-31')))]"/>
+
+                <filter string="Detect Effort Rate > 100" name="filter_detect_effort_rate_support" domain="[
+                    ('total_effort_rate', '&gt;', 100)]"/>
 
                 <group expand="1" string="Group By">
                     <filter string="Company" name="group_by_company_project_booking_support" context="{'group_by': 'company_id'}"/>
@@ -32,11 +38,12 @@
         <field name="model">project.planning.booking.data</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="employee_id"/>
+                <field name="employee_id" widget="many2one_avatar"/>
                 <field name="project_id"/>
                 <field name="starts"/>
                 <field name="ends"/>
                 <field name="effort_rate"/>
+                <field name="total_effort_rate" optional='hide'/>
                 <field name="man_month"/>
                 <field name="salary" widget="monetary" sum="Total Salary"/>
                 <!-- <field name="bhxh" widget="monetary" sum="Total BHXH"/>

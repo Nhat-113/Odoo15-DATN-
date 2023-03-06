@@ -7,6 +7,8 @@
         <field name="model">department.project.detail.data</field>
         <field name="arch" type="xml">
             <search>
+                <field name="project_id"/>
+                <field name="user_pm"/>
                 <searchpanel>
                     <field name="user_pm" icon="fa-users" enable_counters="1"/>
                 </searchpanel>

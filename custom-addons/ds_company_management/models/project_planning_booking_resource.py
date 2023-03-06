@@ -10,48 +10,6 @@ class ProjectPlanningBookingResource(models.Model):
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""
             CREATE OR REPLACE VIEW %s AS (
-                WITH get_salary_employee AS (
-                    SELECT 
-                        slip_id,
-                    -- 	code,
-                        SUM(total) AS salary
-                    FROM hr_payslip_line
-                    WHERE code IN ('NET', 'NET1', 'BH', 'BHC', 'TTNCN', 'TTNCN1')
-                    GROUP BY slip_id
-                    ORDER BY slip_id
-                ),
-                get_salary_13_months AS (
-                    SELECT 
-                        slip_id,
-                        total
-                    FROM hr_payslip_line
-                    WHERE code IN ('LBN')
-                    ORDER BY slip_id
-                ),
-                get_slip_employee AS (
-                    SELECT
-                        gs.slip_id,
-                        (gs.salary - gm.total) AS salary
-                    FROM get_salary_employee AS gs
-                    LEFT JOIN get_salary_13_months AS gm
-                        ON gm.slip_id = gs.slip_id
-                ),
-
-                handle_multi_payslip AS (
-                    SELECT
-                        hp.employee_id,
-                        hp.date_from,
-                        hp.date_to,
-                        SUM(gs.salary) AS salary
-                    FROM hr_payslip AS hp
-                    LEFT JOIN get_slip_employee AS gs
-                        ON gs.slip_id = hp.id
-                    WHERE hp.state = 'done'
-                    GROUP BY hp.employee_id,
-                            hp.date_from,
-                            hp.date_to
-                )
-
                 SELECT 
                     ROW_NUMBER() OVER(ORDER BY start_date_month ASC) AS id,
                     he.company_id AS company_emp,
@@ -83,7 +41,7 @@ class ProjectPlanningBookingResource(models.Model):
                 LEFT JOIN project_project AS pp
                     ON pl.project_id = pp.id
                     
-                LEFT JOIN handle_multi_payslip AS hmp
+                LEFT JOIN payslip_get_salary_employee AS hmp
                     ON hmp.employee_id = br.employee_id
                     AND EXTRACT (MONTH FROM br.start_date_month) = EXTRACT (MONTH FROM hmp.date_from)
                     AND EXTRACT (YEAR FROM br.start_date_month) = EXTRACT (YEAR FROM hmp.date_from)
@@ -99,6 +57,55 @@ class ProjectPlanningBookingResource(models.Model):
                 ORDER BY project_id, employee_id, months
             )""" % (self._table)
         )
+   
+class ProjectPlanningBookingResourceDetect(models.Model):
+    _name = 'project.planning.booking.detect'
+    _auto = False
+    
+    
+    def init(self):
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""
+            CREATE OR REPLACE VIEW %s AS (
+                WITH compute_total_effort_rate_employee_month AS (
+                    SELECT
+                        employee_id,
+                        months,
+                        SUM(effort_rate_month)  AS eff_rate_sum
+
+                    FROM project_planning_booking
+                    WHERE (member_type_name NOT IN('Shadow Time', 'shadow time') 
+                            OR member_type_name IS NULL)
+                    GROUP BY employee_id, months
+
+                )
+
+                SELECT
+                    pp.company_id,
+                    pp.company_emp,
+                    pp.employee_id,
+                    pp.project_id,
+                    pp.currency_id,
+                    pp.member_type_name,
+                    pp.start_date_month,
+                    pp.end_date_month,
+                    pp.months,
+                    pp.effort_rate_month,
+                    pp.man_month,
+                    pp.salary,
+                    pp.salary_lbn,
+                    ct.eff_rate_sum
+                    
+                FROM project_planning_booking AS pp
+                LEFT JOIN compute_total_effort_rate_employee_month AS ct
+                    ON ct.employee_id = pp.employee_id
+                    AND ct.months = pp.months
+                WHERE (pp.member_type_name NOT IN('Shadow Time', 'shadow time') 
+                            OR pp.member_type_name IS NULL)
+                ORDER BY employee_id, months
+            )""" % (self._table)
+        )
+   
         
 
 class ProjectPlanningBookingResourceData(models.Model):
@@ -121,6 +128,7 @@ class ProjectPlanningBookingResourceData(models.Model):
     salary = fields.Monetary(string='Salary')
     salary_lbn = fields.Monetary(string='13th Month Salary')
     
+    total_effort_rate = fields.Float(string="Total Effort Rate (%)")
     
     
     @api.model
@@ -147,6 +155,7 @@ class ProjectPlanningBookingResourceData(models.Model):
                         man_month,
                         salary,
                         salary_lbn,
+                        total_effort_rate,
                         create_uid, 
                         write_uid, 
                         create_date, 
@@ -165,11 +174,15 @@ class ProjectPlanningBookingResourceData(models.Model):
                     man_month,
                     salary,
                     salary_lbn,
+                    eff_rate_sum,
                     """ + user_update + """,
                     """ + user_update + """,
                     CURRENT_DATE,
                     CURRENT_DATE
-                FROM project_planning_booking;
+                FROM project_planning_booking_detect;
+                --WHERE (member_type_name NOT IN('Shadow Time', 'shadow time') 
+                            --OR member_type_name IS NULL);
+                        --AND company_id IN (1, 3);
             """
     
 

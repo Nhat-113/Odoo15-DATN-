@@ -6,6 +6,8 @@
         <field name="model">compare.salary.cost.data</field>
         <field name="arch" type="xml">
             <search>
+                <field name="employee_id"/>
+                
                 <searchpanel>
                     <field name="company_id" icon="fa-building" enable_counters="1"/>
                 </searchpanel>
@@ -37,6 +39,8 @@
                 <field name="bhxh" widget="monetary" sum="Total BHXH"/>
                 <field name="ttncn" widget="monetary" sum="Total TTNCN"/>
                 <field name="salary_lbn" widget="monetary" sum="Total 13th Month Salary"/>
+                <field name="salary_ltu" widget="monetary" sum="Total Salary LTU"/>
+                <field name="salary_ot" widget="monetary" sum="Total Salary Overtime"/>
                 <field name="total_salary" widget="monetary" sum="Total Salary Cost"/>
                 <field name="company_id"/>
                 <field name="months" invisible="1"/>

@@ -46,10 +46,11 @@ class ProjectManagement(models.Model):
                         ON es.id = est.stage
                     LEFT JOIN project_project_stage AS pps
 		                ON pps.id = pr.stage_id
-                    WHERE EXTRACT(YEAR FROM pr.date_start) = EXTRACT(YEAR FROM CURRENT_DATE) OR
-                        EXTRACT(YEAR FROM pr.date) = EXTRACT(YEAR FROM CURRENT_DATE) OR
-                        (EXTRACT(YEAR FROM CURRENT_DATE) >= EXTRACT(YEAR FROM pr.date_start) AND
-                            EXTRACT(YEAR FROM CURRENT_DATE) <= EXTRACT(YEAR FROM pr.date))
+                    WHERE pr.date_start IS NOT NULL AND pr.date IS NOT NULL
+                    --WHERE EXTRACT(YEAR FROM pr.date_start) = EXTRACT(YEAR FROM CURRENT_DATE) OR
+                        --EXTRACT(YEAR FROM pr.date) = EXTRACT(YEAR FROM CURRENT_DATE) OR
+                        --(EXTRACT(YEAR FROM CURRENT_DATE) >= EXTRACT(YEAR FROM pr.date_start) AND
+                            --EXTRACT(YEAR FROM CURRENT_DATE) <= EXTRACT(YEAR FROM pr.date))
 
                     GROUP BY
                         pr.id,

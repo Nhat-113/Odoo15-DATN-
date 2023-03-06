@@ -30,6 +30,7 @@
         'views/compare_payslip_contract_support_view.xml',
         'views/booking_resource_month_support_view.xml',
         'views/project_planning_booking_support.xml',
+        'views/compare_salary_booking_available_data_view.xml',
         # 'views/human_resource_management_view.xml',
         'views/project_management_view.xml',
         'views/project_management_subceo_view.xml',

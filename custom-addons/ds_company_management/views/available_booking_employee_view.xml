@@ -13,6 +13,36 @@
         </field>
     </record>
 
+    <record id="available_employee_booking_support_search_view" model="ir.ui.view">
+        <field name="name">project.planning.booking.data.search</field>
+        <field name="model">project.planning.booking.data</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id" icon="fa-users" enable_counters="1"/>
+                <field name="company_id" groups="base.group_multi_company" icon="fa-building" enable_counters="1"/>
+                <field name="company_emp" groups="base.group_multi_company" icon="fa-building" enable_counters="1"/>
+
+                <searchpanel>
+                    <field name="company_id" icon="fa-building" enable_counters="1"/>
+                </searchpanel>
+
+                <separator orientation="vertical" />
+                <field name="months"/>
+
+                <filter string="Current Year" name="filter_current_year_available_booking_support" domain="[
+                    ('months', '&gt;=', (context_today().strftime('%%Y-01-01'))),
+                    ('months', '&lt;=', (context_today().strftime('%%Y-12-31')))]"/>
+
+                <group expand="1" string="Group By">
+                    <filter string="Company" name="group_by_company_available_booking_support" context="{'group_by': 'company_id'}"/>
+                    <separator orientation="vertical" />
+                    <filter string="Company Employee" name="group_by_available_company_employee_booking_support" context="{'group_by': 'company_emp'}"/>
+                    <separator orientation="vertical" />
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="view_tree_available_booking_employee" model="ir.ui.view">
         <field name="name">available.booking.employee.data.tree</field>
         <field name="model">available.booking.employee.data</field>
@@ -38,7 +68,7 @@
         <field name="name">Statistics Available Booking</field>
         <field name="res_model">available.booking.employee.data</field>
         <field name="view_mode">tree</field>
-        <field name="search_view_id" ref="project_booking_support_search_view"/>
-        <field name="context">{'search_default_filter_current_year_project_booking_support': 1, 'search_default_group_by_company_employee_booking_support': 1}</field>
+        <field name="search_view_id" ref="available_employee_booking_support_search_view"/>
+        <field name="context">{'search_default_filter_current_year_available_booking_support': 1, 'search_default_group_by_available_company_employee_booking_support': 1}</field>
     </record>
 </odoo>

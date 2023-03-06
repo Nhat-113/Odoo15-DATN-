@@ -98,6 +98,7 @@ class AvailableBookingEmployees(models.Model):
                         type_contract
                         
                     FROM pesudo_contract
+                    --WHERE company_id IN (1, 3) -- Company Dsoft & Mtech
                     GROUP BY company_id,
                             department_id,
                             employee_id,
@@ -105,49 +106,17 @@ class AvailableBookingEmployees(models.Model):
                             total_working_day,
                             type_contract
                 ),
-
-                get_salary_employee AS (
-                    SELECT 
-                        slip_id,
-                    -- 	code,
-                        SUM(total) AS salary
-                    FROM hr_payslip_line
-                    WHERE code IN ('NET', 'NET1', 'BH', 'BHC', 'TTNCN', 'TTNCN1')
-                    GROUP BY slip_id
-                    ORDER BY slip_id
-                ),
-
-                get_salary_13_months AS (
-                    SELECT 
-                        slip_id,
-                        total
-                    FROM hr_payslip_line
-                    WHERE code IN ('LBN')
-                    ORDER BY slip_id
-                ),
-
-                get_payslip_employee AS (
+                
+                compute_count_month_contract_employee AS (
                     SELECT
-                        gs.slip_id,
-                        (gs.salary - gm.total) AS salary
-                    FROM get_salary_employee AS gs
-                    LEFT JOIN get_salary_13_months AS gm
-                        ON gm.slip_id = gs.slip_id
-                ),
+                        employee_id,
+                        months,
+                        sum(1) AS cnt,
+                        SUM(working_day) AS wdsum
 
-                handle_multi_payslip AS (
-                    SELECT
-                        hp.employee_id,
-                        hp.date_from,
-                        hp.date_to,
-                        SUM(gs.salary) AS salary
-                    FROM hr_payslip AS hp
-                    LEFT JOIN get_payslip_employee AS gs
-                        ON gs.slip_id = hp.id
-                    WHERE hp.state = 'done'
-                    GROUP BY hp.employee_id,
-                            hp.date_from,
-                            hp.date_to
+                    FROM get_contract_employee
+                    GROUP BY employee_id, months
+                    ORDER BY employee_id, months
                 ),
 
                 compute_available_effort_employee AS (
@@ -161,31 +130,36 @@ class AvailableBookingEmployees(models.Model):
                         gc.total_working_day,
                         (CASE
                             WHEN ct.effort_rate_month IS NULL
-                                THEN (CASE
-                                        WHEN gc.working_day <> gc.total_working_day
-                                            THEN gc.working_day / gc.total_working_day 
-                                        ELSE 1
-                                    END)
+                                THEN gc.working_day / gc.total_working_day 
                             ELSE (CASE
                                     WHEN gc.working_day <> gc.total_working_day
-                                        THEN gc.working_day / gc.total_working_day * (100 - ct.effort_rate_month) / 100
+                                            THEN gc.working_day / gc.total_working_day * (100 - ct.effort_rate_month) / 100
                                     ELSE 1 - ct.man_month
                                 END)
                         END)::NUMERIC(10, 2) AS available_mm,
                         
                         -- Handle member have multi contract of multi company in a month
+                        --(CASE
+                            --WHEN ct.effort_rate_month IS NULL
+                                --THEN --(CASE
+                                            --WHEN gc.working_day <> gc.total_working_day
+                                                --THEN gc.working_day / gc.total_working_day * 100
+                                            --ELSE 100
+                                        --END)
+                                        --100
+                            --ELSE --(CASE
+                                        --WHEN gc.working_day <> gc.total_working_day
+                                            --THEN ((100 - ct.effort_rate_month) * gc.working_day / 100) / gc.total_working_day * 100
+                                        --ELSE 100 - ct.effort_rate_month
+                                    --END)
+                                    --100 - ct.effort_rate_month
+                        --END)::NUMERIC(20, 2) AS available_effort,
+                        
                         (CASE
                             WHEN ct.effort_rate_month IS NULL
-                                THEN (CASE
-                                        WHEN gc.working_day <> gc.total_working_day
-                                            THEN gc.working_day / gc.total_working_day * 100
-                                        ELSE 100
-                                    END)
-                            ELSE (CASE
-                                    WHEN gc.working_day <> gc.total_working_day
-                                        THEN ((100 - ct.effort_rate_month) * gc.working_day / 100) / gc.total_working_day * 100
-                                    ELSE 100 - ct.effort_rate_month
-                                END)
+                                THEN (100 - cc.wdsum / gc.total_working_day * 100)/ cc.cnt + (gc.working_day / gc.total_working_day * 100)
+                            ELSE ((100 - cc.wdsum / gc.total_working_day * 100) * (100 - ct.effort_rate_month) / 100) / cc.cnt 
+                                    + (gc.working_day / gc.total_working_day * 100) * (100 - ct.effort_rate_month) / 100
                         END)::NUMERIC(20, 2) AS available_effort,
                         
                         --ct.man_month,
@@ -196,6 +170,9 @@ class AvailableBookingEmployees(models.Model):
                         rc.id AS currency_id
 
                     FROM get_contract_employee AS gc
+                    LEFT JOIN compute_count_month_contract_employee AS cc
+                        ON cc.employee_id = gc.employee_id
+                        AND cc.months = gc.months
                     LEFT JOIN compute_total_effort_by_month AS ct
                         ON --ct.company_id = gc.company_id
                         --AND ct.department_id = gc.department_id
@@ -232,7 +209,7 @@ class AvailableBookingEmployees(models.Model):
                         ca.currency_id
 
                     FROM compute_available_effort_employee AS ca
-                    LEFT JOIN handle_multi_payslip AS hm
+                    LEFT JOIN payslip_get_salary_employee AS hm
                         ON hm.employee_id = ca.employee_id
                         AND EXTRACT (MONTH FROM ca.months) = EXTRACT (MONTH FROM hm.date_from)
                         AND EXTRACT (YEAR FROM ca.months) = EXTRACT (YEAR FROM hm.date_from)
@@ -391,4 +368,167 @@ class ComparePayslipContractData(models.Model):
                     CURRENT_DATE,
                     CURRENT_DATE
                 FROM compare_payslip_contract;
+            """
+            
+            
+           
+class CompareSalaryBookingAvailable(models.Model):
+    _name = 'compare.salary.booking.available'
+    _auto = False
+    
+    
+    def init(self):
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        self.env.cr.execute("""
+            CREATE OR REPLACE VIEW %s AS (
+                WITH project_planning_booking_group AS (
+                    SELECT
+                        employee_id,
+                        months,
+                        SUM(man_month) AS man_month,
+                        SUM(effort_rate_month) AS effort_rate_month,
+                        SUM(salary) AS salary
+                        
+                    FROM project_planning_booking
+                    WHERE (member_type_name  NOT IN('Shadow Time', 'shadow time')  OR member_type_name IS NULL)
+                    AND (department_id NOT IN (SELECT department_id FROM department_mirai_fnb)
+                                                OR department_id IS NULL)
+                    GROUP BY employee_id,
+                            months
+                ),
+                available_booking_employee_group AS (
+                    SELECT
+                        employee_id,
+                        months,
+                        SUM(available_mm) AS available_mm,
+                        SUM(available_effort) AS available_effort,
+                        SUM(available_salary) AS available_salary
+                    FROM available_booking_employee
+                    GROUP BY employee_id,
+                            months
+                ),
+                compare_salary_cost_group AS (
+                    SELECT
+                        employee_id,
+                        months,
+                        SUM(salary) AS salary,
+                        SUM(bhxh) AS bhxh,
+                        SUM(ttncn) AS ttncn,
+                        SUM(salary_ot) AS salary_ot,
+                        SUM(salary_ltu) AS salary_ltu,
+                        SUM(salary_lbn) AS salary_lbn
+                    FROM compare_salary_cost
+                    GROUP BY employee_id,
+                            months
+                ),
+                pesudo_contract_group AS (
+                    SELECT
+                        employee_id,
+                        months
+                    FROM pesudo_contract
+                    GROUP BY employee_id,
+                            months
+                )
+
+                SELECT
+                    pc.employee_id,
+                    pc.months,
+                    pp.man_month,
+                    pp.effort_rate_month,
+                    pp.salary AS salary_booking,
+                    ab.available_mm,
+                    ab.available_effort,
+                    ab.available_salary,
+                    (COALESCE(NULLIF(pp.man_month, NULL), 0) + COALESCE(NULLIF(ab.available_mm, NULL), 0)) AS total_mm,
+                    (COALESCE(NULLIF(pp.effort_rate_month, NULL), 0) + COALESCE(NULLIF(ab.available_effort, NULL), 0)) AS total_effort,
+                    (COALESCE(NULLIF(pp.salary, NULL), 0) + COALESCE(NULLIF(ab.available_salary, NULL), 0)) AS total_salary,
+                    
+                    (cs.salary + cs.bhxh + cs.ttncn + cs.salary_ltu + cs.salary_lbn + cs.salary_ot) AS salary_cost,
+                    rc.id AS currency_id
+                    
+                FROM pesudo_contract_group AS pc
+                LEFT JOIN project_planning_booking_group AS pp
+                    ON pp.employee_id = pc.employee_id
+                    AND pp.months = pc.months
+                LEFT JOIN available_booking_employee_group AS ab
+                    ON ab.employee_id = pc.employee_id
+                    AND ab.months = pc.months
+                LEFT JOIN compare_salary_cost_group AS cs
+                    ON cs.employee_id = pc.employee_id
+                    AND cs.months = pc.months	
+                LEFT JOIN res_currency AS rc
+                    ON rc.name = 'VND'
+                ORDER BY employee_id, months
+            )""" % (self._table)
+        )
+
+
+class CompareSalaryBookingAvailableData(models.Model):
+    _name = 'compare.salary.booking.available.data'
+    _order = 'employee_id, months DESC'
+    
+    employee_id = fields.Many2one('hr.employee', string='Employee')
+    currency_id = fields.Many2one('res.currency', string="Currency")
+    months = fields.Date(string="Month")
+    man_month = fields.Float(string="Man Month")
+    effort_rate_month = fields.Float(string="Effort Rate (%)")
+    salary_booking = fields.Monetary(string="Salary Booking")
+    available_mm = fields.Float(string="Available MM")
+    available_effort = fields.Float(string="Available Effort (%)")
+    available_salary = fields.Monetary(string="Available Salary")
+    total_mm = fields.Float(string="Total MM")
+    total_effort = fields.Float(string="Total Effort (%)")
+    total_salary = fields.Monetary(string="Total Salary")
+    salary_cost = fields.Monetary(string="Salary Cost")
+    
+    
+    @api.model
+    def upgrade_compare_salary_booking_available_support(self):
+        user_update = str(self.env.user.id)
+        query = self.query_compare_salary_booking_available_support(user_update)
+        self.env.cr.execute(query)
+        return
+        
+    def query_compare_salary_booking_available_support(self, user_update):
+        return """
+                DELETE FROM compare_salary_booking_available_data;
+                INSERT INTO 
+                    compare_salary_booking_available_data(
+                        employee_id,
+                        currency_id,
+                        months,
+                        man_month,
+                        effort_rate_month,
+                        salary_booking,
+                        available_mm,
+                        available_effort,
+                        available_salary,
+                        total_mm,
+                        total_effort,
+                        total_salary,
+                        salary_cost,
+                        create_uid, 
+                        write_uid, 
+                        create_date, 
+                        write_date
+                    )  
+                SELECT 
+                    employee_id,
+                    currency_id,
+                    months,
+                    man_month,
+                    effort_rate_month,
+                    salary_booking,
+                    available_mm,
+                    available_effort,
+                    available_salary,
+                    total_mm,
+                    total_effort,
+                    total_salary,
+                    salary_cost,
+                    """ + user_update + """,
+                    """ + user_update + """,
+                    CURRENT_DATE,
+                    CURRENT_DATE
+                FROM compare_salary_booking_available;
             """

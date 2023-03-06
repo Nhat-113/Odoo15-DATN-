@@ -7,6 +7,7 @@
         <field name="model">project.management.ceo.data</field>
         <field name="arch" type="xml">
             <search>
+                <field name="company_id"/>
                 <searchpanel>
                     <field name="company_id" icon="fa-building" enable_counters="1"/>
                 </searchpanel>
