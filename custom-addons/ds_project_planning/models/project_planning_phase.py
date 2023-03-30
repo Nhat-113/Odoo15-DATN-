@@ -129,9 +129,9 @@ class PlanningPhase(models.Model):
             # Validate if the current phase is considered to be in another phase
             considered_phases = self.get_phase_between(
                 self.project_id, self.start_date, self.end_date)
-            if considered_phases:
-                raise UserError(
-                    _('Date Start & Date End of the current Phase is considered to be in "%(phase)s" phase!', phase=considered_phases[0].name))
+            # if considered_phases:
+            #     raise UserError(
+            #         _('Date Start & Date End of the current Phase is considered to be in "%(phase)s" phase!', phase=considered_phases[0].name))
     #phase tu dong gom task sau khi chinh sua
     def write(self, vals):
         res = super(PlanningPhase, self).write(vals)
