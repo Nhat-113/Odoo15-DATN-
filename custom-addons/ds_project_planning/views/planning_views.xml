@@ -386,7 +386,7 @@
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_value">
                                     <field name="total_calendar_effort" readonly="1" nolabel="1" help="Total calendar effort of project planning"/>
- MM
+                                    MM
                                 </span>
                                 <span class="o_stat_text">
                                     Booking Effort
@@ -444,14 +444,19 @@
                                     <sheet>
                                         <div class="oe_title" style="width: 500px">
                                             <h1>
-                                                <field name="employee_id" widget="many2one_avatar" class="o_text_overflow" placeholder="Member Name" options="{'no_create': True}" attrs="{'readonly': [('check_upgrade_booking', '=', True)]}"/>
+                                                <field name="employee_id" 
+                                                        widget="many2one_avatar" 
+                                                        class="o_text_overflow" 
+                                                        placeholder="Member Name" 
+                                                        options="{'no_create': True}" 
+                                                        attrs="{'readonly': ['|', ('check_upgrade_booking', '=', True), ('is_generate_success', '=', False), ('is_store', '=', True)]}"/>
                                             </h1>
                                         </div>
                                         <group col="4">
                                             <field name="start_date" attrs="{'readonly': [('readonly_date', '=', True)]}"/>
                                             <field name="end_date" attrs="{'readonly': [('readonly_date', '=', True)]}"/>
-                                            <field name="duration" />
-                                            <field name="calendar_effort" digits="[12,2]"/>
+                                            <field name="duration" force_save="1"/>
+                                            <field name="calendar_effort" digits="[12,2]" force_save="1"/>
                                             <label for="member_type"/>
                                             <div class="o_row" name="member_type">
                                                 <field name="member_type" nolabel="1"/>
@@ -461,7 +466,8 @@
                                             </div>
                                             <label for="effort_rate"/>
                                             <div class="o_row" name="effort_rate">
-                                                <field name="effort_rate" digits="[12,2]" nolabel="1" attrs="{'readonly': ['|', ('inactive', '=', True), ('readonly_date', '=', True)]}"/>
+                                                <field name="effort_rate" digits="[12,2]" nolabel="1"  force_save="1"
+                                                        attrs="{'readonly': ['|', '|', ('inactive', '=', True), ('readonly_date', '=', True), ('is_generate_success', '=', True)]}"/>
                                                 <span> % </span>
                                             </div>
                                             <field name="planning_role_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}" required="1" domain="role_id_domain"/>
@@ -470,6 +476,8 @@
                                             <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
                                             <field name="readonly_date" invisible="1"/>
                                             <field name="role_id_domain" invisible="1"/>
+                                            <field name="is_generate_success" invisible="1"/>
+                                            <field name="is_store" invisible="1"/>
                                         </group>
                                         <field name="note" string="Note" placeholder="Add a note..." colspan="2" class="note_booking"/>
                                         <field name="check_upgrade_booking" invisible="1"/>
@@ -498,12 +506,12 @@
                                                     </tree>
                                                 </field>
                                             </page>
-                                            <page string="Day" invisible="1">
+                                            <page string="Day" invisible="0">
                                                 <field name="booking_upgrade_day" colspan="4" readonly="0">
                                                     <tree string="Week" delete="0" editable="top" create="0">
                                                         <field name="name"/>
                                                         <field name="start_date_day"/>
-                                                        <field name="end_date_day"/>
+                                                        <!-- <field name="end_date_day"/> -->
                                                         <field name="effort_rate_day" readonly="1"/>
                                                     </tree>
                                                 </field>

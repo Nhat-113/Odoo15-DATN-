@@ -103,6 +103,21 @@ class Project(models.Model):
             user.user_id.id for user in self.planning_calendar_resources.employee_id]
         self.member_ids = self.env['res.users'].search(
             [('id', 'in', user_ids)])
+        
+        # Validate unique booking member
+        booking_employees = {}
+        for booking in sorted(self.planning_calendar_resources, key = lambda b: b.employee_id.id):
+            item = (booking.start_date, booking.end_date)
+            if booking.employee_id.id in booking_employees:
+                for el in booking_employees[booking.employee_id.id]:
+                    if booking.start_date >= el[0] and booking.end_date <= el[1]:
+                        raise UserError(_('The booking member %(member)s in perior %(start)s - %(end)s already exist!',\
+                                        member = booking.employee_id.name, start = booking.start_date, end = booking.end_date))
+                booking_employees[booking.employee_id.id].append(item)
+            else:
+                booking_employees[booking.employee_id.id] = [item]
+                
+            
 
     def _count_phase_milestone(self):
         for project in self:
