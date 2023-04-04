@@ -248,7 +248,7 @@ class PlanningCalendarResource(models.Model):
     def check_time_of_project(self):
         # for resource in self:
         self.validate_block_any_action_user()
-        self.validate_duration_booking_member()
+        # self.validate_duration_booking_member()
         if self.project_id.date_start == False or self.project_id.date == False:
             raise UserError('Start date and End date of the project cannot be empty.')
         
@@ -346,11 +346,11 @@ class PlanningCalendarResource(models.Model):
                  
             
     
-    # @api.constrains('calendar_effort', 'effort_rate')
-    # def _check_calendar_effort_rate(self):
-    #     for resource in self:
-    #         if resource.calendar_effort <= 0 or resource.effort_rate <= 0:
-    #            raise UserError(_('Member %(resource)s: Booking Effort and Effort Rate cannot be less than or equal 0.', resource=resource.employee_id.name))
+    @api.constrains('calendar_effort', 'effort_rate')
+    def _check_calendar_effort_rate(self):
+        for resource in self:
+            if resource.calendar_effort <= 0 or resource.effort_rate <= 0:
+               raise UserError(_('Member %(resource)s: Booking Effort and Effort Rate cannot be less than or equal 0.', resource=resource.employee_id.name))
 
 
     # @api.constrains('inactive', 'inactive_date')
@@ -715,11 +715,11 @@ class PlanningCalendarResource(models.Model):
             raise ValidationError(_('The booking member %(member)s is not allowed to edit or delete until the system completes the calculation and effort allocation functions.\
                 \nPlease wait a few minutes', member= self.employee_id.name))
             
-    def validate_duration_booking_member(self):
-        delta = relativedelta(self.end_date, self.start_date)
-        cnt_month = delta.months + (delta.years * 12)
-        if cnt_month > 12:
-            raise ValidationError(_('Due to the extended booking period, which generates excessive data, booking beyond 12 months is not possible.'))
+    # def validate_duration_booking_member(self):
+    #     delta = relativedelta(self.end_date, self.start_date)
+    #     cnt_month = delta.months + (delta.years * 12)
+    #     if cnt_month > 12:
+    #         raise ValidationError(_('Due to the extended booking period, which generates excessive data, booking beyond 12 months is not possible.'))
         
 class PlanningAllocateEffortRate(models.Model):
     """ Type of member in project planning """
