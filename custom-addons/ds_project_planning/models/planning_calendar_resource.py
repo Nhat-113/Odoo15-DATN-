@@ -346,11 +346,11 @@ class PlanningCalendarResource(models.Model):
                  
             
     
-    @api.constrains('calendar_effort', 'effort_rate')
-    def _check_calendar_effort_rate(self):
-        for resource in self:
-            if resource.calendar_effort <= 0 or resource.effort_rate <= 0:
-               raise UserError(_('Member %(resource)s: Booking Effort and Effort Rate cannot be less than or equal 0.', resource=resource.employee_id.name))
+    # @api.constrains('calendar_effort', 'effort_rate')
+    # def _check_calendar_effort_rate(self):
+    #     for resource in self:
+    #         if resource.calendar_effort <= 0 or resource.effort_rate <= 0:
+    #            raise UserError(_('Member %(resource)s: Booking Effort and Effort Rate cannot be less than or equal 0.', resource=resource.employee_id.name))
 
 
     # @api.constrains('inactive', 'inactive_date')
