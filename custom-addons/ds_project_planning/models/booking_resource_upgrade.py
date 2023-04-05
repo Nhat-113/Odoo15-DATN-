@@ -194,7 +194,7 @@ class BookingResourceMonth(models.Model):
             effort_avg_day = sum(booking_days.mapped('effort_rate_day'))
             len_day = len(booking_days)
             if len_day > 0:
-                month.man_month = round((working_day_of_month/working_day_actual) * ((effort_avg_day/len_day)/100), 2)
+                month.man_month = round((working_day_of_month/working_day_actual) * ((effort_avg_day/len_day)/100), 3)
             else:
                 month.man_month = 0
 

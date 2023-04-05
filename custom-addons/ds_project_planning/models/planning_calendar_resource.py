@@ -276,19 +276,29 @@ class PlanningCalendarResource(models.Model):
         self.validate_block_any_action_user()
         
     
-    @api.onchange('booking_upgrade_week')
-    def check_effort_week(self):
+    @api.onchange('booking_upgrade_week', 'booking_upgrade_month')
+    def check_effort_week_month(self):
     # for resource in self:
-        if self.select_type_upgrade == 'week' and self.inactive==False:
-            self.check_edit_effort = 'effort_week'
+        if self.inactive == False:
+            if self.select_type_upgrade == 'week':
+                self.check_edit_effort = 'effort_week'
+            else:
+                self.check_edit_effort = 'effort_month'
+                
+        if self.booking_upgrade_week and self.booking_upgrade_month:
+            self.compute_total_effort_common()
+            self.compute_calendar_effort()
                      
                      
-    @api.onchange('booking_upgrade_month')
-    def check_effort_month(self):
-        # for resource in self:     
-        if self.select_type_upgrade == 'month' and self.inactive==False:
-            self.check_edit_effort = 'effort_month'
+    # @api.onchange('booking_upgrade_month')
+    # def check_effort_month(self):
+    #     # for resource in self:     
+    #     if self.select_type_upgrade == 'month' and self.inactive==False:
+    #         self.check_edit_effort = 'effort_month'
             
+    #     if self.booking_upgrade_week and self.booking_upgrade_month:
+    #         self.compute_total_effort_common()
+    #     self.compute_calendar_effort()
     
     # @api.onchange('check_upgrade_booking')
     # def _get_booking_resource(self):
@@ -383,11 +393,11 @@ class PlanningCalendarResource(models.Model):
             calendar.validate_role_access_action_project(role_user_login, today)
 
 
-    @api.constrains('booking_upgrade_week', 'booking_upgrade_month')
-    def recompute_when_save(self):
-        for resource in self:
-            if resource.booking_upgrade_week and resource.booking_upgrade_month:
-                resource.compute_total_effort_common()  
+    # @api.constrains('booking_upgrade_week', 'booking_upgrade_month')
+    # def recompute_when_save(self):
+    #     for resource in self:
+    #         if resource.booking_upgrade_week and resource.booking_upgrade_month:
+    #             resource.compute_total_effort_common()  
 
         
     def validate_role_access_action_project(self, is_role_pm, today):
@@ -626,36 +636,35 @@ class PlanningCalendarResource(models.Model):
         }
         
 
-    def action_upgrade_booking(self):
-        self.write({
-            'check_upgrade_booking': False
-        })
-        if self.inactive == False:          
-            self.upgrade_booking_common(self.start_date, self.end_date)
-        else:
-            if self.inactive_date:
-                self.upgrade_booking_common(self.start_date, self.inactive_date)
-        self.compute_total_effort_common()
+    # def action_upgrade_booking(self):
+    #     self.write({
+    #         'check_upgrade_booking': False
+    #     })
+    #     if self.inactive == False:          
+    #         self.upgrade_booking_common(self.start_date, self.end_date)
+    #     else:
+    #         if self.inactive_date:
+    #             self.upgrade_booking_common(self.start_date, self.inactive_date)
+    #     self.compute_total_effort_common()
 
 
     def compute_total_effort_common(self):
-        total_effort_week = 0
-        working_day = 0
-        booking_days = self.env['booking.resource.day'].search([('booking_id', '=', self.id),
-                                                                ('start_date_day', '>=', self.start_date),
-                                                                ('start_date_day', '<=', self.end_date)])
-        total_effort = sum(booking_days.mapped('effort_rate_day'))
+        # booking_days = self.env['booking.resource.day'].search([('booking_id', '=', self.id),
+        #                                                         ('start_date_day', '>=', self.start_date),
+        #                                                         ('start_date_day', '<=', self.end_date)])
+        booking_days = self.booking_upgrade_day
         effort_rate_total = 0
         if booking_days:
+            total_effort = sum(booking_days.mapped('effort_rate_day'))
             effort_rate_total = total_effort / len(booking_days)
-
-        self.env['planning.calendar.resource'].search([('id', '=', self.id or self.id.origin)]).write({
-            'effort_rate' : effort_rate_total
-        })
+        self.effort_rate = effort_rate_total
+        # self.env['planning.calendar.resource'].search([('id', '=', self.id or self.id.origin)]).write({
+        #     'effort_rate' : effort_rate_total
+        # })
             
     
-    def calculator_total_effort(self):
-        self.compute_total_effort_common()
+    # def calculator_total_effort(self):
+    #     self.compute_total_effort_common()
         
 
     def calculator_effort_month(self, effort_month_edit, total_effort_week_expired, len_week, len_week_no_expired):
