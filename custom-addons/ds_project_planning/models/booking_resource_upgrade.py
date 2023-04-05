@@ -22,9 +22,8 @@ class BookingResourceWeek(models.Model):
     @api.depends('booking_id.booking_upgrade_month') #, 'booking_id.effort_rate'
     def compute_effort_week(self):
         month_edit = self.booking_id.get_id_month_edit
-        booking_months = self.env['booking.resource.month'].search([('id', '=', int(month_edit))])
-        
         if self.booking_id.check_edit_effort == 'effort_month':
+            booking_months = self.env['booking.resource.month'].search([('id', '=', int(month_edit))])
             for week in self.filtered(lambda w: w.start_date_week >= booking_months.start_date_month and w.end_date_week <= booking_months.end_date_month):
                 booking_days = self.booking_id.booking_upgrade_day.filtered(lambda d: d.start_date_day >= week.start_date_week\
                                                                                     and d.start_date_day <= week.end_date_week)

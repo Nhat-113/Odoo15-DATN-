@@ -133,52 +133,52 @@ class PlanningCalendarResource(models.Model):
 
     # @api.depends('start_date', 'end_date', 'inactive', 'inactive_date', 'effort_rate')
     # def _compute_duration(self):
-        # """ Calculates duration working time"""
-        # id_member_type = self.env['planning.member.type'].search([('name', '=', 'Shadow Time')])
-        # pd_date_range = pd.bdate_range
-        # for resource in self:
-        #     # resource.validate_block_any_action_user()
-        #     if resource.inactive == False and resource.start_date and resource.end_date:
-        #         working_days = len(pd.bdate_range(resource.start_date.strftime('%Y-%m-%d'),
-        #                                         resource.end_date.strftime('%Y-%m-%d')))
-        #         resource.duration = working_days if working_days > 0 else 1
+    #     """ Calculates duration working time"""
+    #     id_member_type = self.env['planning.member.type'].search([('name', '=', 'Shadow Time')])
+    #     pd_date_range = pd.bdate_range
+    #     for resource in self:
+    #         # resource.validate_block_any_action_user()
+    #         if resource.inactive == False and resource.start_date and resource.end_date:
+    #             working_days = len(pd.bdate_range(resource.start_date.strftime('%Y-%m-%d'),
+    #                                             resource.end_date.strftime('%Y-%m-%d')))
+    #             resource.duration = working_days if working_days > 0 else 1
 
-        #     elif resource.inactive == True and resource.start_date and resource.inactive_date:
-        #             working_days = len(pd.bdate_range(resource.start_date.strftime('%Y-%m-%d'),
-        #                                             resource.inactive_date.strftime('%Y-%m-%d')))
-        #             resource.duration = working_days if working_days > 0 else 1
-        #     else:
-        #         resource.duration = 1
+    #         elif resource.inactive == True and resource.start_date and resource.inactive_date:
+    #                 working_days = len(pd.bdate_range(resource.start_date.strftime('%Y-%m-%d'),
+    #                                                 resource.inactive_date.strftime('%Y-%m-%d')))
+    #                 resource.duration = working_days if working_days > 0 else 1
+    #         else:
+    #             resource.duration = 1
                 
-        #     #compute effort rate
-        #     # def _compute_effort_rate_default(self):
-        #     if resource.start_date and resource.end_date and resource.employee_id.id:
-        #         # resource.effort_rate = 100
-        #         resource._common_check_effort_rate(id_member_type)
+    #         #compute effort rate
+    #         # def _compute_effort_rate_default(self):
+    #         if resource.start_date and resource.end_date and resource.employee_id.id:
+    #             # resource.effort_rate = 100
+    #             resource._common_check_effort_rate(id_member_type)
                 
-        #     # compute calendar effort
-        #     # def _compute_calendar_effort(self):
-        #     if resource.check_upgrade_booking == False:
-        #         if resource.start_date and resource.end_date and resource.start_date < resource.end_date:
-        #             day_count = (resource.end_date - resource.start_date).days
-        #             list_start_end = self.compute_get_start_end_month(resource.start_date, resource.end_date, day_count)
-        #             booking_effort = 0
-        #             for i in range(0, len(list_start_end), 2):
-        #                 start_date = list_start_end[i].strftime('%Y-%m-%d')
-        #                 end_date = list_start_end[i+1].strftime('%Y-%m-%d')
-        #                 working_day_actual = len(pd_date_range(start_date, end_date))
+    #         # compute calendar effort
+    #         # def _compute_calendar_effort(self):
+    #         if resource.check_upgrade_booking == False:
+    #             if resource.start_date and resource.end_date and resource.start_date < resource.end_date:
+    #                 day_count = (resource.end_date - resource.start_date).days
+    #                 list_start_end = self.compute_get_start_end_month(resource.start_date, resource.end_date, day_count)
+    #                 booking_effort = 0
+    #                 for i in range(0, len(list_start_end), 2):
+    #                     start_date = list_start_end[i].strftime('%Y-%m-%d')
+    #                     end_date = list_start_end[i+1].strftime('%Y-%m-%d')
+    #                     working_day_actual = len(pd_date_range(start_date, end_date))
 
-        #                 date_start = datetime(year=list_start_end[i].year, month=list_start_end[i].month, day=1).strftime('%Y-%m-%d')
-        #                 date_end = datetime(year=list_start_end[i+1].year, month=list_start_end[i+1].month, day=calendar.monthrange(list_start_end[i+1].year, list_start_end[i+1].month)[1]).strftime('%Y-%m-%d')
+    #                     date_start = datetime(year=list_start_end[i].year, month=list_start_end[i].month, day=1).strftime('%Y-%m-%d')
+    #                     date_end = datetime(year=list_start_end[i+1].year, month=list_start_end[i+1].month, day=calendar.monthrange(list_start_end[i+1].year, list_start_end[i+1].month)[1]).strftime('%Y-%m-%d')
                         
-        #                 working_day_total = len(pd_date_range(date_start, date_end))
-        #                 booking_effort += round((working_day_actual/working_day_total)*(resource.effort_rate/100), 2)
-        #         else:
-        #             booking_effort = 1
-        #         resource.calendar_effort = booking_effort
-        #     else:
-        #         total_man_month = sum(month.man_month for month in resource.booking_upgrade_month)
-        #         resource.calendar_effort = total_man_month
+    #                     working_day_total = len(pd_date_range(date_start, date_end))
+    #                     booking_effort += round((working_day_actual/working_day_total)*(resource.effort_rate/100), 2)
+    #             else:
+    #                 booking_effort = 1
+    #             resource.calendar_effort = booking_effort
+    #         else:
+    #             total_man_month = sum(month.man_month for month in resource.booking_upgrade_month)
+    #             resource.calendar_effort = total_man_month
 
 
     @api.onchange('start_date', 'end_date', 'inactive', 'inactive_date')
