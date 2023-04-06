@@ -278,16 +278,17 @@ class PlanningCalendarResource(models.Model):
     
     @api.onchange('booking_upgrade_week', 'booking_upgrade_month')
     def check_effort_week_month(self):
-    # for resource in self:
         if self.inactive == False:
             if self.select_type_upgrade == 'week':
                 self.check_edit_effort = 'effort_week'
             else:
                 self.check_edit_effort = 'effort_month'
-                
-        if self.booking_upgrade_week and self.booking_upgrade_month:
-            self.compute_total_effort_common()
-            self.compute_calendar_effort()
+           
+
+    @api.onchange('booking_upgrade_day')
+    def onchange_effort_rate(self):
+        self.effort_rate = sum(self.booking_upgrade_day.mapped('effort_rate_day')) / len(self.booking_upgrade_day)
+        self.compute_calendar_effort()
                      
                      
     # @api.onchange('booking_upgrade_month')
