@@ -318,11 +318,14 @@ class PlanningCalendarResource(models.Model):
     
     @api.constrains('employee_id', 'start_date', 'end_date')
     def gen_effort_week_month_when_create_booking(self):
+        cr = self.env.cr
+        user = self.env.user.id
         for resource in self:
             # resource.action_upgrade_booking()
             resource.check_upgrade_booking = False
             resource.is_store = True
-        self.action_set_parameter_cronjob()
+            resource.upgrade_booking_common(user, cr, resource.start_date, resource.end_date if resource.inactive == False else resource.inactive_date)
+        # self.action_set_parameter_cronjob()
     
     
     @api.constrains('inactive', 'inactive_date', 'start_date', 'end_date')
@@ -471,7 +474,7 @@ class PlanningCalendarResource(models.Model):
         return round((100 - total_effort_booked), 2) if total_effort_booked < 100 else 0
             
     
-    def upgrade_booking_common(self, user, cr, params, start_date_common, end_date_common):
+    def upgrade_booking_common(self, user, cr, start_date_common, end_date_common):
         cntday = (end_date_common - start_date_common).days
         day_count_day = cntday + 1
         no_day = 1
@@ -696,7 +699,7 @@ class PlanningCalendarResource(models.Model):
             cr = self.env.cr
             user = self.env.user.id
             for record in booking_ids:
-                record.upgrade_booking_common(user, cr, params, record.start_date, record.end_date if record.inactive == False else record.inactive_date)
+                record.upgrade_booking_common(user, cr, record.start_date, record.end_date if record.inactive == False else record.inactive_date)
                 
                 strid = str(record.id) + ' ' if params.find(str(record.id) + ' ') != -1 else ' ' + str(record.id) if params.find(' ' + str(record.id)) != -1 else str(record.id)
                 # params = re.sub(fr'\s*{record.id}\s*', '',params)
