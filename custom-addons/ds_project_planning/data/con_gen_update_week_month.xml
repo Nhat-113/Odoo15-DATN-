@@ -2,7 +2,7 @@
 <odoo>
     
     <data>
-        <record id="ir_cron_gen_data_booking" model="ir.cron">
+        <!-- <record id="ir_cron_gen_data_booking" model="ir.cron">
             <field name="name">Planning: Generate Data Month Week Day</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
@@ -15,9 +15,9 @@
             <field name="interval_type">minutes</field>
             <field name="priority">1999</field>
             <field name="nextcall" eval="(DateTime.now() + relativedelta(minutes=2)).strftime('%Y-%m-%d %H:%M:%S')" />
-        </record>
+        </record> -->
 
-        <record id="ir_cron_update_data_booking" model="ir.cron">
+        <!-- <record id="ir_cron_update_data_booking" model="ir.cron">
             <field name="name">Planning: Update data booking</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
@@ -27,7 +27,7 @@
             <field name="state">code</field>
             <field name="code">model.action_cronjob_update_value_batch()</field>
             <field name="priority">2000</field>
-        </record>
+        </record> -->
     </data>
 
     <!-- <data>

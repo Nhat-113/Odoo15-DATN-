@@ -449,7 +449,7 @@
                                                         class="o_text_overflow" 
                                                         placeholder="Member Name" 
                                                         options="{'no_create': True}" 
-                                                        attrs="{'readonly': ['|', ('check_upgrade_booking', '=', True), ('is_generate_success', '=', False), ('is_store', '=', True)]}"/>
+                                                        attrs="{'readonly': [('check_upgrade_booking', '=', True)]}"/>
                                             </h1>
                                         </div>
                                         <group col="4">
@@ -467,7 +467,7 @@
                                             <label for="effort_rate"/>
                                             <div class="o_row" name="effort_rate">
                                                 <field name="effort_rate" digits="[12,2]" nolabel="1"  force_save="1"
-                                                        attrs="{'readonly': ['|', '|', ('inactive', '=', True), ('readonly_date', '=', True), ('is_generate_success', '=', True)]}"/>
+                                                        attrs="{'readonly': ['|', '|', ('inactive', '=', True), ('readonly_date', '=', True), ('check_upgrade_booking', '=', True)]}"/>
                                                 <span> % </span>
                                             </div>
                                             <field name="planning_role_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}" required="1" domain="role_id_domain"/>
@@ -476,8 +476,8 @@
                                             <field name="inactive_date" attrs="{'invisible': [('inactive', '=', False)], 'required': [('inactive','=', True)]}" />
                                             <field name="readonly_date" invisible="1"/>
                                             <field name="role_id_domain" invisible="1"/>
-                                            <field name="is_generate_success" invisible="1"/>
-                                            <field name="is_store" invisible="1"/>
+                                            <!-- <field name="is_generate_success" invisible="1"/>
+                                            <field name="is_store" invisible="1"/> -->
                                         </group>
                                         <field name="note" string="Note" placeholder="Add a note..." colspan="2" class="note_booking"/>
                                         <field name="check_upgrade_booking" invisible="1"/>

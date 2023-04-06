@@ -80,8 +80,8 @@ class PlanningCalendarResource(models.Model):
         store=False
     )
     
-    is_generate_success = fields.Boolean(string="Is Generate Success", default=False)
-    is_store = fields.Boolean(string="Is Store", default=False)
+    # is_generate_success = fields.Boolean(string="Is Generate Success", default=False)
+    # is_store = fields.Boolean(string="Is Store", default=False)
     
     
     
@@ -231,15 +231,15 @@ class PlanningCalendarResource(models.Model):
     
     @api.onchange('inactive')
     def _set_inactive_date(self):
-        self.validate_block_any_action_user()
+        # self.validate_block_any_action_user()
         self.check_upgrade_booking = False
         if self.inactive == False:
             self.inactive_date = False   
             
                     
-    @api.onchange('effort_rate')
-    def validate_effort_rate_remaining(self):
-        self.validate_block_any_action_user()
+    # @api.onchange('effort_rate')
+    # def validate_effort_rate_remaining(self):
+    #     self.validate_block_any_action_user()
         # id_member_type = self.env['planning.member.type'].search([('name', '=', 'Shadow Time')])
         # self._common_check_effort_rate(id_member_type)
     
@@ -247,7 +247,7 @@ class PlanningCalendarResource(models.Model):
     @api.onchange('start_date', 'end_date')
     def check_time_of_project(self):
         # for resource in self:
-        self.validate_block_any_action_user()
+        # self.validate_block_any_action_user()
         # self.validate_duration_booking_member()
         if self.project_id.date_start == False or self.project_id.date == False:
             raise UserError('Start date and End date of the project cannot be empty.')
@@ -271,9 +271,9 @@ class PlanningCalendarResource(models.Model):
                     ))
 
     
-    @api.onchange('member_type', 'select_type_gen_week_month')
-    def validate_is_generate_booking(self):
-        self.validate_block_any_action_user()
+    # @api.onchange('member_type', 'select_type_gen_week_month')
+    # def validate_is_generate_booking(self):
+    #     self.validate_block_any_action_user()
         
     
     @api.onchange('booking_upgrade_week', 'booking_upgrade_month')
@@ -287,8 +287,9 @@ class PlanningCalendarResource(models.Model):
 
     @api.onchange('booking_upgrade_day')
     def onchange_effort_rate(self):
-        self.effort_rate = sum(self.booking_upgrade_day.mapped('effort_rate_day')) / len(self.booking_upgrade_day)
-        self.compute_calendar_effort()
+        if self.booking_upgrade_day:
+            self.effort_rate = sum(self.booking_upgrade_day.mapped('effort_rate_day')) / len(self.booking_upgrade_day)
+            self.compute_calendar_effort()
                      
                      
     # @api.onchange('booking_upgrade_month')
@@ -324,7 +325,7 @@ class PlanningCalendarResource(models.Model):
         for resource in self:
             # resource.action_upgrade_booking()
             resource.check_upgrade_booking = False
-            resource.is_store = True
+            # resource.is_store = True
             resource.upgrade_booking_common(user, cr, resource.start_date, resource.end_date if resource.inactive == False else resource.inactive_date)
         # self.action_set_parameter_cronjob()
     
@@ -591,7 +592,7 @@ class PlanningCalendarResource(models.Model):
         self.check_upgrade_booking = True
         self.effort_rate = total_effort / (no_day - 1)
         self.calendar_effort = total_mm
-        self.is_generate_success = True
+        # self.is_generate_success = True
 
     
     def is_month_end(self, date):
@@ -711,22 +712,22 @@ class PlanningCalendarResource(models.Model):
         return 
     
     
-    def action_cronjob_update_value_batch(self):
-        booking_resources = self.search([('project_id', '!=', False)], order="id")
-        for booking in booking_resources:
-            if booking.booking_upgrade_day and booking.booking_upgrade_week and booking.booking_upgrade_month or booking.inactive == True:
-                booking.is_generate_success = True
-                booking.is_store = True
-        return
+    # def action_cronjob_update_value_batch(self):
+    #     booking_resources = self.search([('project_id', '!=', False)], order="id")
+    #     for booking in booking_resources:
+    #         if booking.booking_upgrade_day and booking.booking_upgrade_week and booking.booking_upgrade_month or booking.inactive == True:
+    #             booking.is_generate_success = True
+    #             booking.is_store = True
+    #     return
         
         
         
-    def validate_block_any_action_user(self):
-        """ Action is block any action from user when planning_calendar_resource do not generate success (generate data month - week - day)
-        """
-        if self.is_generate_success == False and self.is_store == True:
-            raise ValidationError(_('The booking member %(member)s is not allowed to edit or delete until the system completes the calculation and effort allocation functions.\
-                \nPlease wait a few minutes', member= self.employee_id.name))
+    # def validate_block_any_action_user(self):
+    #     """ Action is block any action from user when planning_calendar_resource do not generate success (generate data month - week - day)
+    #     """
+    #     if self.is_generate_success == False and self.is_store == True:
+    #         raise ValidationError(_('The booking member %(member)s is not allowed to edit or delete until the system completes the calculation and effort allocation functions.\
+    #             \nPlease wait a few minutes', member= self.employee_id.name))
             
     # def validate_duration_booking_member(self):
     #     delta = relativedelta(self.end_date, self.start_date)
