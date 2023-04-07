@@ -329,28 +329,30 @@ class Project(models.Model):
     @api.model
     def update_status(self):
         projects = self.env['project.project'].search([('active', '=', True)])
-        id_status_done = self.env['project.task.status'].search([('name', '=', 'Done')]).id
-        id_status_cancel = self.env['project.task.status'].search([('name', '=', 'Cancelled')]).id
-        id_status_pending = self.env['project.task.status'].search([('name', '=', 'Pending')]).id
+        task_status_model = self.env['project.task.status']
+        id_status_done = task_status_model.search([('name', '=', 'Done')]).id
+        id_status_cancel = task_status_model.search([('name', '=', 'Cancelled')]).id
+        id_status_pending = task_status_model.search([('name', '=', 'Pending')]).id
         id_type_task = self.env['project.issues.type'].search([('name', '=', 'Task')]).id
         for project in projects:
-            task_expired = []
-            task_all = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',id_type_task), ('status','not in',[id_status_done, id_status_cancel, id_status_pending])])
-            task_out_of_date = self.env['project.task'].search(['&',('project_id', '=', project.id),('issues_type','=',id_type_task),('status','not in',[id_status_done,id_status_cancel,id_status_pending]),('date_end','<',date.today())])
-            if task_all > 0:
-                # nếu số task bị trễ >= 10%(0.1) thì sẽ send mail và chuyển status thành at_risk
-                if len(task_out_of_date)/task_all >= 0.1 and project.last_update_status not in ['off_track', 'on_hold', 'missing_resource']:
-                    for task_expire in task_out_of_date:
-                        task_expired.append(str(task_expire.id))
-                    # Send mail
-                    template = 'project_updation.warning_task_late'
-                    subject_template = '[Warning] Project'
-                    self._send_message_auto_task_deadline(project, task_expired, template, subject_template)
-                    project.write({'last_update_status': 'at_risk'})
-                elif len(task_out_of_date)/task_all < 0.1 and project.last_update_status not in ['off_track', 'on_hold', 'on_track', 'missing_resource']:
+            if project.stage_id.name != 'Done':
+                task_expired = []
+                task_all = self.env['project.task'].search_count(['&',('project_id', '=', project.id),('issues_type','=',id_type_task), ('status','not in',[id_status_done, id_status_cancel, id_status_pending])])
+                task_out_of_date = self.env['project.task'].search(['&',('project_id', '=', project.id),('issues_type','=',id_type_task),('status','not in',[id_status_done,id_status_cancel,id_status_pending]),('date_end','<',date.today())])
+                if task_all > 0:
+                    # nếu số task bị trễ >= 10%(0.1) thì sẽ send mail và chuyển status thành at_risk
+                    if len(task_out_of_date)/task_all >= 0.1 and project.last_update_status not in ['off_track', 'on_hold', 'missing_resource']:
+                        for task_expire in task_out_of_date:
+                            task_expired.append(str(task_expire.id))
+                        # Send mail
+                        template = 'project_updation.warning_task_late'
+                        subject_template = '[Warning] Project'
+                        self._send_message_auto_task_deadline(project, task_expired, template, subject_template)
+                        project.write({'last_update_status': 'at_risk'})
+                    elif len(task_out_of_date)/task_all < 0.1 and project.last_update_status not in ['off_track', 'on_hold', 'on_track', 'missing_resource']:
+                        project.write({'last_update_status': 'on_track'})
+                else:
                     project.write({'last_update_status': 'on_track'})
-            else:
-                project.write({'last_update_status': 'on_track'})
 
         return True
 
