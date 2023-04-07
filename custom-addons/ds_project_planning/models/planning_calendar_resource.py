@@ -195,11 +195,9 @@ class PlanningCalendarResource(models.Model):
         else:
             self.duration = 1
             
-    @api.onchange('duration', 'effort_rate', 'member_type')
+    @api.onchange('duration', 'effort_rate')
     def compute_calendar_effort(self):
         pd_date_range = pd.bdate_range
-        id_member_type = self.env['planning.member.type'].search([('name', '=', 'Shadow Time')])
-        self.validate_remaining_effort_rate(id_member_type)
         if self.check_upgrade_booking == False:
             if self.start_date and self.end_date and self.start_date < self.end_date:
                 day_count = (self.end_date - self.start_date).days
@@ -439,27 +437,6 @@ class PlanningCalendarResource(models.Model):
                     self.effort_rate = self.calendar_effort * 20 / self.duration * 100
                 else:
                     self.effort_rate = 0
-                    
-    def validate_remaining_effort_rate(self, id_member_type):
-        if self.member_type.name != id_member_type.name:
-            member_calendars = self.search([('employee_id', '=', self.employee_id.id), 
-                                                                            ('id', '!=', self.id or self.id.origin),
-                                                                            ('member_type', '!=', id_member_type.id)])
-            total_effort_booked = 0
-            for member_calendar in member_calendars:
-                # if member_calendar.member_type.name != 'Shadow Time':
-                if self.start_date <= member_calendar.start_date and self.end_date >= member_calendar.end_date\
-                    or self.start_date <= member_calendar.start_date and self.end_date < member_calendar.end_date and self.end_date > member_calendar.start_date\
-                    or self.start_date > member_calendar.start_date and self.end_date >= member_calendar.end_date and self.start_date < member_calendar.end_date\
-                    or self.start_date > member_calendar.start_date and self.end_date < member_calendar.end_date\
-                    or self.start_date == member_calendar.end_date or self.end_date == member_calendar.start_date:
-                        
-                    total_effort_booked += member_calendar.effort_rate
-                        
-            remaining_effort = 100 - total_effort_booked
-            if self.effort_rate > remaining_effort:
-                raise UserError(_('The member %(member)s remaining effort rate is %(remaining)s, you cannot book effort greater than %(remaining)s with member type other than Shadow',\
-                                    member=self.employee_id.name, remaining=remaining_effort))
             
                 
     
