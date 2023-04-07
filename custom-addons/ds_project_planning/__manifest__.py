@@ -41,7 +41,7 @@
         "views/project_gantt_views.xml",
         "views/task_gantt_views.xml",
         "data/member_type_data.xml",
-        "data/con_gen_update_week_month.xml",
+        # "data/con_gen_update_week_month.xml",
         "views/project_update_status.xml",
     ],
 }

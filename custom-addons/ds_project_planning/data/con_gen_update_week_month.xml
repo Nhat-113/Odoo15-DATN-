@@ -1,6 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    
     <data>
+        <!-- <record id="ir_cron_gen_data_booking" model="ir.cron">
+            <field name="name">Planning: Generate Data Month Week Day</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="model_id" ref="model_planning_calendar_resource"/>
+            <field name="state">code</field>
+            <field name="code">model.action_cronjob_generate_booking()</field>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="priority">1999</field>
+            <field name="nextcall" eval="(DateTime.now() + relativedelta(minutes=2)).strftime('%Y-%m-%d %H:%M:%S')" />
+        </record> -->
+
+        <!-- <record id="ir_cron_update_data_booking" model="ir.cron">
+            <field name="name">Planning: Update data booking</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">False</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="model_id" ref="model_planning_calendar_resource"/>
+            <field name="state">code</field>
+            <field name="code">model.action_cronjob_update_value_batch()</field>
+            <field name="priority">2000</field>
+        </record> -->
+    </data>
+
+    <!-- <data>
         <record id="ir_cron_gen_update_week_month" model="ir.cron">
             <field name="name">Planning: Gen update week month</field>
             <field name="numbercall">-1</field>
@@ -82,5 +112,5 @@
             <field name="state">code</field>
             <field name="code">model.action_delete_booking()</field>
         </record>
-    </data>
+    </data> -->
 </odoo>
