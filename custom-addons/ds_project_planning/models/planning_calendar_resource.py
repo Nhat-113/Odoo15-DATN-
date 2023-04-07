@@ -198,6 +198,8 @@ class PlanningCalendarResource(models.Model):
     @api.onchange('duration', 'effort_rate')
     def compute_calendar_effort(self):
         pd_date_range = pd.bdate_range
+        id_member_type = self.env['planning.member.type'].search([('name', '=', 'Shadow Time')])
+        self._common_check_effort_rate(id_member_type)
         if self.check_upgrade_booking == False:
             if self.start_date and self.end_date and self.start_date < self.end_date:
                 day_count = (self.end_date - self.start_date).days
