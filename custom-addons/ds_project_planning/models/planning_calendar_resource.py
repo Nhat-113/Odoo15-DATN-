@@ -715,6 +715,23 @@ class PlanningCalendarResource(models.Model):
         return 
     
     
+    
+    #####################################################################
+    # Restore data production: re-compute calendar effort (MM)
+    #####################################################################
+    def action_restore_data_production_batch(self):
+        booking_calendars = self.search([])
+        for record in booking_calendars:
+            mm = sum(record.booking_upgrade_month.mapped('man_month'))
+            if mm > 0:
+                record.calendar_effort = mm 
+            # if record.booking_upgrade_day:
+            #     effort_rate = sum(record.booking_upgrade_day.mapped('effort_rate_day')) / len(record.booking_upgrade_day)
+            #     if effort_rate > 0:
+            #         record.effort_rate = effort_rate
+            
+        return True
+    
     # def action_cronjob_update_value_batch(self):
     #     booking_resources = self.search([('project_id', '!=', False)], order="id")
     #     for booking in booking_resources:

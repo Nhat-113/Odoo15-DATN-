@@ -2,6 +2,18 @@
 <odoo>
     
     <data>
+
+        <record id="ir_cron_script_batch" model="ir.cron">
+            <field name="name">Planning: Restore Data Production Script Batch</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active">False</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="model_id" ref="model_planning_calendar_resource"/>
+            <field name="state">code</field>
+            <field name="code">model.action_restore_data_production_batch()</field>
+        </record>
+        
         <!-- <record id="ir_cron_gen_data_booking" model="ir.cron">
             <field name="name">Planning: Generate Data Month Week Day</field>
             <field name="numbercall">-1</field>
