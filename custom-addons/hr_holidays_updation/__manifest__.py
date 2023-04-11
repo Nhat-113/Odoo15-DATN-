@@ -10,9 +10,11 @@
     'description': """""",
     'depends': ['hr', 'base', 'hr_holidays', 'resource'],
     'data': [
+        'security/time_off_security.xml',
         'data/hr_holidays_update_data.xml',
         'data/hr_holidays_cron_job.xml',
         'data/hr_holidays_parameter_system.xml',
+        'views/hr_leave_views.xml'
     ],
     'assets': {
         'web.assets_backend': [
