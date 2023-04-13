@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class HrLeave(models.Model):
@@ -16,3 +16,13 @@ class HrLeave(models.Model):
         followers = employee.user_id.partner_id.ids + self.inform_to.user_id.partner_id.ids
         if employee.user_id:
             self.message_subscribe(partner_ids=followers)
+            
+            
+    @api.constrains('inform_to')
+    def constrains_inform_to(self):
+        new_follower = []
+        for emp in self.inform_to.user_id.partner_id.ids:
+            if emp not in self.message_follower_ids.partner_id.ids:
+                new_follower.append(emp)
+        if len(new_follower) > 0:
+            self.message_subscribe(partner_ids=new_follower)
