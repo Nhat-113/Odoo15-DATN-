@@ -13,8 +13,8 @@ class HrLeave(models.Model):
     def _compute_convert_date_time(self):
         local_tz = tz.gettz('Asia/Ho_Chi_Minh')
         for record in self:
-            start = record.date_start.replace(tzinfo=tz.UTC)
-            end = record.date_end.replace(tzinfo=tz.UTC)
+            start = record.date_from.replace(tzinfo=tz.UTC)
+            end = record.date_to.replace(tzinfo=tz.UTC)
             record.date_start = start.astimezone(local_tz)
             record.date_end = end.astimezone(local_tz)
     
