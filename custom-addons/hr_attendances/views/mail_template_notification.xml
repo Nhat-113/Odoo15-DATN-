@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="custom_template_mail_notification_attendance" inherit_id="mail.mail_notification_light">
+        <xpath expr="//tbody/tr/td/table/tr/td/span[2]" position="replace">
+            <span></span>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_attendance_missing_xlsx" model="ir.actions.report">
+            <field name="name">Report Xlsx</field>    
+            <field name="model">hr.attendance.missing</field>    
+            <field name="report_type">xlsx</field>
+            <field name="report_name">hr_attendances.report_xlsx</field>
+            <field name="report_file">hr_attendances.report_xlsx</field>
+            <field name="print_report_name">'Report Attendance Missing Xlsx</field>
+        </record>
+    </data>
+</odoo>

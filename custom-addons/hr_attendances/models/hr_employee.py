@@ -1,4 +1,5 @@
 from odoo import models, api,_
+from dateutil import tz
 
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
@@ -41,13 +42,29 @@ class HrEmployee(models.Model):
         """
         self.ensure_one()
         action_date = date_time
+        local_tz = tz.gettz('Asia/Ho_Chi_Minh')
+        date_convert = action_date.replace(tzinfo=tz.UTC).astimezone(local_tz).date()
 
         if is_checkin == 'True':
             vals = {
                 'employee_id': self.id,
                 'check_in': action_date,
             }
-            return self.env['hr.attendance'].create(vals) 
+            domain = [('employee_id', '=', self.id), ('start', '=', date_convert)]
+            model_attendance = self.env['hr.attendance']
+            model_pesudo = self.env['hr.attendance.pesudo']
+            is_exists = model_attendance.search(domain)
+            if is_exists:
+                pesudo = model_pesudo.search(domain)
+                if pesudo:
+                    pesudo.write({'check_out': action_date})
+                    return pesudo
+                else:
+                    return model_pesudo.create({'employee_id': self.id, 'check_in': is_exists.check_in, 'check_out': action_date})
+            else:
+                model_attendance.create(vals)
+                vals['check_out'] = action_date
+                return model_pesudo.create(vals)
         else:
             try:
                 last_record_id = max(self.env['hr.attendance'].search([('employee_id', '=', self.id)]).ids)

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Email template -->
+        <record id="email_template_attendance_missing" model="mail.template">
+            <field name="name">Attendance Missing And Validate Time Off Request</field>
+            <field name="email_from">{{ctx.get('email_from')}}</field>
+            <field name="subject">[HR] Thông báo V/v: Xác nhận chấm công Tháng {{ctx.get('period')}}</field>
+            <field name="email_to">{{ctx.get('email_to')}}</field>
+            <field name="model_id" ref="hr_attendances.model_hr_attendance_missing"/>
+            <field name="auto_delete" eval="True"/>
+            <!-- <field name="report_template" ref="hr_attendances.action_report_attendance_missing_xlsx"/> -->
+            <!-- <field name="report_name">Report Attendances</field>   -->
+            <field name="lang">{{(object.employee_id.user_id.lang or user.lang)}}</field>
+            <field name="body_html" type='html'>
+                <div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 14px; color: rgb(34, 34, 34); background-color: #FFF; ">
+
+                    <p><b>Dear Anh/Chị,</b></p>
+                    
+                    <t t-if="ctx.get('is_timeoff') == True">
+                        <br/>
+                        <p>
+                            <b t-if="ctx.get('is_missing_attendance') == True">THÔNG BÁO 1:</b> Phòng nhân sự gửi danh sách những Anh/Chị nghỉ phép trong tháng <t t-out="ctx.get('period')"/> nhưng chưa được Approve (xem tệp đính kèm). 
+                            <b style='font-size: 16px; color: red;'>Anh/Chị vui lòng kiểm tra lại ngày nghỉ phép của mình và báo PM để Approve đến ngày mai (<t t-out='datetime.datetime.now().date() + relativedelta(days=1)'/>)</b>. 
+                            Hết ngày mai bộ phận nhân sự sẽ Refuse những request không được Approve.
+                        </p>
+                    </t>
+                    <br/>
+                    <t t-if="ctx.get('is_missing_attendance') == True">
+                        <p>
+                            <b t-if="ctx.get('is_timeoff') == True">THÔNG BÁO 2:</b>
+                            Theo kết quả Check in/out được kết xuất từ <u>https://taskmanagement.d-soft.tech/Attendances</u> tool,
+                            những Anh/Chị có tên trong danh sách (xem tệp đính kèm) hiện thiếu dữ liệu chấm công trong tháng
+                            <t t-out="ctx.get('period')"/>. Vì vậy, Anh/Chị kiểm tra lại nếu không đúng so với ngày đi làm thực tế vui lòng 
+                            gửi mail giải trình/xác nhận đến trước <b style='font-size: 16px; color: red;'> 10h00 ngày mai (<t t-out='datetime.datetime.now().date() + relativedelta(days=1)'/>)</b>. 
+                            Anh/Chị lưu ý sau thời gian này bộ phận nhân sự không nhận thêm phản hồi nào nữa.
+                        </p>
+                        <br/>
+                        <p>
+                            <b style='font-size: 16px; background-color: yellow;'>
+                                Anh/chị lưu ý bắt đầu từ ngày 01/04/2023 các trường hợp quên chấm công ngoài giải trình lý do qua mail (hr@d-soft.com.vn) sẽ phạt 20.000đ/ lần.
+                            </b>
+                        </p>
+                        <br/>
+                        <p>
+                            <i style='background-color: yellow;'>
+                                Note: Mail giải trình phải đồng thời Cc cho Trưởng bộ phận quản lý trực tiếp (PM/LD).
+                            </i>
+                        </p>
+                    </t>
+                   
+                    <p>
+                        Mọi thắc mắc và mail giải trình xin gửi về mail: <b>hr@d-soft.com.vn</b>
+                    </p>
+                    <br/>
+                    <p>Phòng Nhân sự trân trọng thông báo.</p>
+                </div>
+            </field>
+        </record>
+
+        <record id="email_template_attendance_missing_mail_to_hr" model="mail.template">
+            <field name="name">Attendance Missing - Send Daily To HR</field>
+            <field name="email_from"></field>
+            <field name="subject">[Administrator] Attendance Missing</field>
+            <field name="email_to"></field>
+            <field name="model_id" ref="hr_attendances.model_hr_attendance_missing"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">{{(object.employee_id.user_id.lang or user.lang)}}</field>
+            <field name="body_html" type='html'>
+                <div style="font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 14px; color: rgb(34, 34, 34); background-color: #FFF; ">
+                    <p><b>Dear HR D-Soft JSC,</b></p>
+                    <p>This is a notification from the system administrator of the taskmanagement tool.
+                        The system has recorded some days of attendance missing for employees in the company.
+                        Please access the system under category: <b> <i>Attendances/Reporting/Attendance Missing</i></b> to view the detail.</p>
+                    <br/>
+                    <p><b>Regards</b></p>
+                    <br/>
+                    <br/>
+                        <i><u>https://taskmanagement.d-soft.tech/</u></i>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -86,7 +86,7 @@ class HrAttendance(http.Controller):
                 }
             else:
                 vals = []
-                public_holiday = request.env['resource.calendar.leaves'].search([('calendar_id','=',False),('holiday_id','=',False)])
+                public_holiday = request.env['resource.calendar.leaves'].search([('resource_id','=',False),('holiday_id','=',False)])
                 for record in public_holiday:
                     holiday = {
                                 'item': record.name,
