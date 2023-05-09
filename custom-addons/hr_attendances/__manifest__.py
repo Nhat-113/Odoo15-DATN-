@@ -17,7 +17,8 @@
         'data/hr_attendance_missing_cron.xml',
         'data/hr_attendance_cron.xml',
         'views/hr_attendance_missing_view.xml',
-        'views/mail_template_notification.xml'
+        'views/mail_template_notification.xml',
+        'views/attendance_calendar_view.xml',
     ],
     'assets': {
         'web.assets_backend': [

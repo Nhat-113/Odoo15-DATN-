@@ -2,6 +2,7 @@ from odoo import models, fields, api
 from dateutil import tz
 from datetime import date
 import pandas as pd
+import pytz
 
 class HrAttendance(models.Model):
     _inherit = 'hr.attendance'
@@ -10,18 +11,33 @@ class HrAttendance(models.Model):
     check_in = fields.Datetime(string="Check In", required=False)
     start = fields.Date(string="Start", store=True, compute='_compute_convert_datetime_start')
     end = fields.Date(string="End", store=True, compute='_compute_convert_datetime_end')
+    status = fields.Selection([('early', 'Early'),
+                             ('timely', 'Timely'),
+                             ('late', 'Late')] ,
+                            string="Status", 
+                            store=True,
+                            compute='_compute_convert_datetime_start')
 
         
     
     @api.depends('check_in')
     def _compute_convert_datetime_start(self):
         local_tz = tz.gettz('Asia/Ho_Chi_Minh')
+        utc_tz = pytz.timezone('Asia/Ho_Chi_Minh')
         for record in self:
             if bool(record.check_in):
                 start = record.check_in.replace(tzinfo=tz.UTC)
                 record.start = start.astimezone(local_tz)
             else:
                 record.start = False
+            if record.check_in:
+                checkin_tz = pytz.utc.localize(record.check_in).astimezone(utc_tz)
+                if checkin_tz.hour == 8 and checkin_tz.minute < 30 or checkin_tz.hour < 8:
+                    record.status = 'early'
+                elif checkin_tz.hour == 8 and checkin_tz.minute == 30:
+                    record.status = 'timely'
+                else:
+                    record.status = 'late'
             
     @api.depends('check_out')
     def _compute_convert_datetime_end(self):
