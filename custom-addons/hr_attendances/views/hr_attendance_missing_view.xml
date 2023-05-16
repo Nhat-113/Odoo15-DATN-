@@ -76,7 +76,8 @@
                 <field name="department_id" optional="hide"/>
                 <field name="employee_id" widget="many2one_avatar_employee" 
                                             options="{'no_quick_create': True, 'no_create': True, 'no_create_edit':True, 'no_open': True}" 
-                                            attrs="{'readonly' : [('timeoff', '!=', False)]}"/>
+                                            attrs="{'readonly' : [('timeoff', '!=', False)]}"
+                                            required="1"/>
                 <field name="date" width="90px"/>
                 <field name="public_holiday" widget="badge" decoration-info="is_holiday == False" 
                                                             decoration-success="is_holiday == True"/>
