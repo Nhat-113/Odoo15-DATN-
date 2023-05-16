@@ -122,9 +122,11 @@ class HrAttendanceMissing(models.Model):
                                                     ('date_end', '>=',today),
                                                     ('state', '!=', 'refuse')])
             employee_missing_attendances = [emp for emp in contracts.employee_id.ids if emp not in attendances.employee_id.ids]
-            attendances_missing_exists = self.search([('employee_id', 'in', employee_missing_attendances),
-                                                    ('date', '=', today)])
+            # attendances_missing_exists = self.search([('employee_id', 'in', employee_missing_attendances),
+            #                                         ('date', '=', today)])
+            attendances_missing_exists = self.search([('date', '=', today)])
             employee_missing_attendance_finals = [emp for emp in employee_missing_attendances if emp not in attendances_missing_exists.employee_id.ids]
+            timeoff_ids = []
             for emp in employee_missing_attendance_finals:
                 timeoffid = timeoffs.filtered(lambda t: t.employee_id.id == emp)
                 self.create({
@@ -132,6 +134,20 @@ class HrAttendanceMissing(models.Model):
                     'date': today,
                     'timeoff': timeoffid.id
                 })
+                if timeoffid:
+                    timeoff_ids.append(timeoffid.id)
+                
+            #check if user have timeoff request while user have checkin/out
+            timeoff_missings = [tf for tf in timeoffs if tf.id not in timeoff_ids\
+                                                        and tf.employee_id.id in contracts.employee_id.ids\
+                                                            and tf.employee_id.id not in attendances_missing_exists.employee_id.ids]
+            if timeoff_missings != []:
+                for tf in timeoff_missings:
+                    self.create({
+                        'employee_id': tf.employee_id.id,
+                        'date': today,
+                        'timeoff': tf.id
+                    })
             
         
     def is_working_day(self, date):
