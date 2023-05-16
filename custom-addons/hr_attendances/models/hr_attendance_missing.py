@@ -15,7 +15,7 @@ class HrAttendanceMissing(models.Model):
     
     
     
-    employee_id = fields.Many2one('hr.employee', string="Employee")
+    employee_id = fields.Many2one('hr.employee', string="Employee", required=True)
     company_id = fields.Many2one('res.company', related='employee_id.company_id', store=True, string="Company")
     department_id = fields.Many2one('hr.department', related='employee_id.department_id', store=True, string="Department")
     date = fields.Date(string="Date")
