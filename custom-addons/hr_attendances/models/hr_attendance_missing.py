@@ -14,34 +14,93 @@ class HrAttendanceMissing(models.Model):
     _rec_name = 'employee_id'
     
     
+    # def _default_state(self):
+    #     if self.timeoff.state == 'validate':
+    #         return 'confirmed'
+    #     elif self.timeoff.state == 'refuse':
+    #         return 'refuse'
+    #     return 'awaiting_confirmation'
+            
     
     employee_id = fields.Many2one('hr.employee', string="Employee", required=True)
     company_id = fields.Many2one('res.company', related='employee_id.company_id', store=True, string="Company")
     department_id = fields.Many2one('hr.department', related='employee_id.department_id', store=True, string="Department")
-    date = fields.Date(string="Date")
-    timeoff = fields.Many2one('hr.leave', string="Time Off", domain="[('employee_id', '=', employee_id)]")
-    status_timeoff = fields.Selection(related='timeoff.state', store=True, string='Status')
+    date = fields.Date(string="Date", required=True)
+    timeoff = fields.Many2one('hr.leave', string="Time Off", domain="[('employee_id', '=', employee_id),\
+                                                                    ('date_start', '<=', date), \
+                                                                    ('date_end', '>=', date)]")
+    status_timeoff = fields.Selection(related='timeoff.state', store=True, string='Status Time Off')
     description = fields.Text(string="Note")
     is_holiday = fields.Boolean(string="Is Holiday", default=False)
     public_holiday = fields.Many2one('resource.calendar.leaves', string="Public Holiday")
     
+    state = fields.Selection([('refuse', 'Refuse'),
+                              ('awaiting_confirmation', 'Awaiting Confirmation'), 
+                              ('confirmed', 'Confirmed')],default='awaiting_confirmation', string="Status") #, compute='compute_state', default=_default_state
+    
 
+
+    @api.onchange('public_holiday', 'status_timeoff')
+    def compute_state(self):
+        for record in self:
+            if record.timeoff.state == 'validate':
+                record.state = 'confirmed'
+            # elif record.timeoff.state == 'refuse':
+            #     record.state = 'refuse'
+            else:
+                record.state = 'awaiting_confirmation'
+        
     
     def action_approve_timeoff(self):
         self.timeoff.action_validate()
+        self.state = 'confirmed'
+        self.timeoff_validate_attendace_missing(self.timeoff.id, action='approved')
         
     def action_multiple_approve_timeoff(self):
         for record in self.filtered(lambda x: x.timeoff):
             if record.timeoff.state not in ['refuse', 'validate', 'validate1']:
                 record.timeoff.action_validate()
+                record.state = 'confirmed'
+                
+                self.timeoff_validate_attendace_missing(record.timeoff.id, action='approved')
             
     def action_refuse_timeoff(self):
         self.timeoff.action_refuse()
+        if self.is_holiday == False:
+            self.state = 'refuse'
+        self.timeoff_validate_attendace_missing(self.timeoff.id, action='refuse')
+            
         
     def action_multiple_refuse_timeoff(self):
         for record in self.filtered(lambda x: x.timeoff):
             if record.timeoff.state not in ['refuse', 'validate', 'validate1']:
                 record.timeoff.action_refuse()
+                if record.is_holiday == False:
+                    record.state = 'refuse'
+                    
+                self.timeoff_validate_attendace_missing(record.timeoff.id, action='refuse')
+                    
+    def timeoff_validate_attendace_missing(self, timeoff_id, action):
+        # check data missing exist with the same time off in self
+        att_missings = self.search([('timeoff', '=', timeoff_id), ('id', 'not in', self.ids)])
+        if att_missings:
+            if action == 'refuse':
+                for record in att_missings:
+                    if record.is_holiday == False:
+                        record.state = 'refuse'
+            else:
+                att_missings.state = 'confirmed'
+                
+    def action_confirm(self):
+        for record in self:
+            if record.state != 'confirmed':
+                record.state = 'confirmed'
+
+                
+    def action_refuse(self):
+        for record in self:
+            if record.state != 'refuse' and record.timeoff.state != 'validate':
+                record.state = 'refuse'
             
     def action_enable_holiday(self):
         dates = [record.date for record in self]
@@ -66,6 +125,7 @@ class HrAttendanceMissing(models.Model):
             for am in attendance_misings:
                 am.is_holiday = True
                 am.public_holiday = record
+                am.state = 'confirmed'
                 
         return {
             'type': 'ir.actions.client',
@@ -80,8 +140,15 @@ class HrAttendanceMissing(models.Model):
         
         
     def action_disable_holiday(self):
-        self.is_holiday = False
-        self.public_holiday = False
+        # self.is_holiday = False
+        # self.public_holiday = False
+        for record in self:
+            
+            if record.is_holiday:
+                record.state = 'awaiting_confirmation'
+                record.public_holiday = False
+                record.is_holiday = False
+        
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -191,8 +258,10 @@ class HrAttendanceMissing(models.Model):
         if start.month != end.month:
             period += ' - ' + str(end.month) + '/' + str(end.year)
             
-        unapproved = self.filtered(lambda x: x.status_timeoff not in ['refuse', 'validate', 'validate1', False] and bool(x.public_holiday) == False)
-        attendance_missing = self.filtered(lambda d: bool(d.timeoff) == False and bool(d.public_holiday) == False)
+        unapproved = self.filtered(lambda x: x.status_timeoff not in ['refuse', 'validate', 'validate1', False]\
+                                            and bool(x.public_holiday) == False\
+                                            and x.state == 'awaiting_confirmation')
+        attendance_missing = self.filtered(lambda d: bool(d.timeoff) == False and bool(d.public_holiday) == False and d.state == 'awaiting_confirmation')
         if not unapproved and not attendance_missing:
             raise UserError('No missing attendance data or unapproved time off!')
             

@@ -57,6 +57,12 @@
                     ('public_holiday', '=', False)]"/>
                 <filter string="Public Holiday" name="attendance_missing_is_public_holiday_filter" domain="[
                     ('public_holiday', '!=', False)]"/>
+                <filter string="Status: Awaiting Confirmation" name="awaiting_confirmation_filter" domain="[
+                    ('state', '=', 'awaiting_confirmation')]"/>
+                <filter string="Status: Confirmed" name="confirmed_filter" domain="[
+                    ('state', '=', 'confirmed')]"/>
+                <filter string="Status: Refuse" name="refuse_filter" domain="[
+                    ('state', '=', 'refuse')]"/>
             </search>
         </field>
     </record>
@@ -71,14 +77,18 @@
                     <button name="action_disable_holiday" type="object" string="Disable Holiday"/>
                     <!-- <button name="action_validate_timeoff" type="object" string="Validate Time Off"/> -->
                     <button name="send_mail_attendance_missing" type="object" string="Send Mail"/>
+                    <button name="action_confirm" type="object" string="Confirm"/>
+                    <button name="action_refuse" type="object" string="Refuse"/>
                 </header>
                 <field name="company_id" groups="base.group_multi_company" optional="hide"/>
                 <field name="department_id" optional="hide"/>
                 <field name="employee_id" widget="many2one_avatar_employee" 
                                             options="{'no_quick_create': True, 'no_create': True, 'no_create_edit':True, 'no_open': True}" 
                                             attrs="{'readonly' : [('timeoff', '!=', False)]}"
-                                            required="1"/>
+                                            force_save="1"/>
                 <field name="date" width="90px"/>
+                <field name="state" width="90px" widget="badge" decoration-info="state == 'awaiting_confirmation'"
+                                                                decoration-success="state == 'confirmed'"/>
                 <field name="public_holiday" widget="badge" decoration-info="is_holiday == False" 
                                                             decoration-success="is_holiday == True"/>
                 <field name="timeoff" options="{'no_quick_create': True, 'no_create': True, 'no_create_edit':True, 'no_open': True}" />
@@ -88,7 +98,7 @@
 
                 <field name="description" width="300px"/>
                 <field name="is_holiday" invisible="1"/>
-                <button name="action_open_timeoff" type="object" class="btn btn-primary" string="Time Off"
+                <button name="action_open_timeoff" type="object" class="btn btn-primary" string="View Time Off"
                         attrs="{'invisible':[('timeoff','=',False)]}"/>
                 <button name="action_approve_timeoff" type="object" class="btn btn-primary" string="Approve"
                         attrs="{'invisible': [('status_timeoff', 'in', ['validate', 'validate1', 'refuse', False])]}"/>

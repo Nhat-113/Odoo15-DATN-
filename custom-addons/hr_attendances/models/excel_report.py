@@ -53,7 +53,7 @@ class ExcelReport(models.AbstractModel):
         sheet.set_column(index_col + 1, index_col + 7, 25)
         sheet.set_column(index_col, index_col, 4)
         if unapproved:
-            tbl_title_unapproved = 'DANH SÁCH NHÂN VIÊN NGHỈ PHÉP CHƯA ĐƯỢC APPROVE'
+            tbl_title_unapproved = 'LIST OF EMPLOYEES WHOSE TIME OFF REQUESTS HAVE NOT BEEN APPROVED'
             #syntax merge_range(firstRow, firstCol, lastRow, lastCol, data, format)
             sheet.merge_range(1, 1, last_row, last_col, tbl_title_unapproved, format['merge_header'])
         
@@ -89,7 +89,7 @@ class ExcelReport(models.AbstractModel):
                 index += 1
             
         if attendance_missing:
-            tbl_title_attendance_missing = 'DANH SÁCH NHÂN VIÊN THIẾU DỮ LIỆU CHẤM CÔNG'
+            tbl_title_attendance_missing = 'LIST OF EMPLOYEES WITH MISSING ATTENDANCE DATA'
             first_col = last_col + 2 if unapproved else 4
             sheet.set_column(first_col, first_col, 4)
             sheet.set_column(index_col + 7, index_col + 10, 25)
