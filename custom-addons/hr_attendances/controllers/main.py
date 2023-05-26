@@ -11,14 +11,15 @@ import datetime
 class HrAttendance(http.Controller):
     @http.route('/api/facelog_attendances',auth='api_key', type='json')
     def facelog_attendances(self, **kw):
-        if kw['is_checkin']=="" or kw['date_time']=="" or kw['nick_name']=="":
+        if kw['is_checkin']=="" or kw['date_time']=="" or kw['email']=="":
             return {
                 "status": 400, 
                 "message": "Missing parameter"
                 }
         else:
             # Fixme: get config domain email with comapy
-            email = kw['nick_name'] + '@d-soft.com.vn'
+            # email = kw['nick_name'] + '@d-soft.com.vn'
+            email = kw['email']
             employees = request.env['hr.employee'].search([('work_email','=',email)])
             if len(employees):
                 # convert string to datetime
@@ -56,7 +57,8 @@ class HrAttendance(http.Controller):
     @http.route('/api/attendances/getuser', auth='api_key', type='json')
     def facelog_getuser(self, **kw):
         try:
-            email = kw['nick_name'] + '@d-soft.com.vn'
+            # email = kw['nick_name'] + '@d-soft.com.vn'
+            email = kw['email']
             employee = request.env['hr.employee'].search([('work_email','=',email)])
             if not employee:
                 return {"status": 400, "message": "User does not exits"}
@@ -71,8 +73,8 @@ class HrAttendance(http.Controller):
                 }
             return response
         except:
-            if not kw["nick_name"] and not kw:
-                return {"status": 404, "message": "Missing nick_name parameter"}
+            if not kw["email"] and not kw:
+                return {"status": 404, "message": "Missing email parameter"}
             else:
                 return {"status": 400, "massage": "Missing parameter"}
 
