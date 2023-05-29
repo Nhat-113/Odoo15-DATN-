@@ -86,7 +86,7 @@
                     </div>
                 </div>
 
-                <div class="hr_attendance_login o_hr_attendance_sign_in_out_icon">
+                <!-- <div class="hr_attendance_login o_hr_attendance_sign_in_out_icon">
                     <div class="oh-card">
                         <div class="oh-card-body">
                             <div class="stat-widget-one">
@@ -113,7 +113,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="col-md-10 col-sm-12 employee-right"> 
                 <div class="employee_dashboard_detail tabcontent" style="" id="employee_dashboard_detail"  >
@@ -384,7 +384,7 @@
                     </div>
                 </div>
 
-                <div class="hr_attendance_login o_hr_attendance_sign_in_out_icon">
+                <!-- <div class="hr_attendance_login o_hr_attendance_sign_in_out_icon">
                     <div class="oh-card">
                         <div class="oh-card-body">
                             <div class="stat-widget-one">
@@ -411,7 +411,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="col-md-10 col-sm-12 employee-right"> 
                 <div class= "event_annoucement tabcontent_2" >
