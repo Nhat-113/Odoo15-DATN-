@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="ir_cron_hr_attendance_update_data" model="ir.cron">
+            <field name="name">HR Attendance - Facelog Update</field>
+            <field name="active">True</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="(datetime.now()).strftime('%Y-%m-%d 16:00:00')" />
+            <field name="doall" eval="False"/>
+            <field name="model_id" ref="model_hr_attendance"/>
+            <field name="code">model.action_cron_update_attendance_checkout()</field>
+            <field name="state">code</field>
+        </record>
+    </data>
+</odoo>

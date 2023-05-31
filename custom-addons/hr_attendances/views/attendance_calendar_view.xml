@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_calendar_hr_attendance" model="ir.ui.view">
+        <field name="name">hr.attendance.custom.calendar</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <calendar string="Attendance" mode="month" color="status" quick_add="false" date_start="check_in" create="false" hide_time="True">
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="status" filters="1"/>
+                <field name="employee_id" filters="1"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="hr_attendance.hr_attendance_action_employee" model="ir.actions.act_window">
+        <field name="view_mode">tree,form,calendar</field>
+    </record>
+    
+    <record id="hr_attendance.hr_attendance_action_overview" model="ir.actions.act_window">
+        <field name="view_mode">tree,calendar</field>
+    </record>
+
+    <record id="hr_attendance.hr_attendance_action" model="ir.actions.act_window">
+        <field name="view_mode">tree,kanban,form,calendar</field>
+    </record>
+
+</odoo>
