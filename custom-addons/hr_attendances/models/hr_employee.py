@@ -1,5 +1,6 @@
 from odoo import models, api,_
 from dateutil import tz
+from odoo.exceptions import UserError
 
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
@@ -98,3 +99,18 @@ class HrEmployee(models.Model):
                 employee.last_attendance_id = self.env['hr.attendance'].search([
                     ('employee_id', '=', employee.id),
                 ], limit=1)
+                
+
+
+    # #################################
+    # Override function to block URL Check In / Out manual for user
+    # #################################
+    def attendance_manual(self, next_action, entered_pin=None):
+        if self.env.user.has_group('hr_attendance.group_hr_attendance_user') == False:
+            raise UserError (_('You cannot access the Check In / Out manual! Please use the Facelog device to Check In / Out and do not access this URL'))
+        self.ensure_one()
+        can_check_without_pin = not self.env.user.has_group('hr_attendance.group_hr_attendance_use_pin') or (
+                    self.user_id == self.env.user and entered_pin is None)
+        if can_check_without_pin or entered_pin is not None and entered_pin == self.sudo().pin:
+            return self._attendance_action(next_action)
+        return {'warning': _('Wrong PIN')}
