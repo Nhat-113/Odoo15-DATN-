@@ -9,7 +9,7 @@ import datetime
 
 
 class HrAttendance(http.Controller):
-    @http.route('/api/facelog_attendances',auth='api_key', type='json')
+    @http.route('/api/facelog/attendance_odoo',auth='api_key', type='json')
     def facelog_attendances(self, **kw):
         if kw['is_checkin']=="" or kw['date_time']=="" or kw['email']=="":
             return {
