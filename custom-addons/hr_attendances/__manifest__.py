@@ -7,7 +7,7 @@
     'category': 'Services/Hr_attendances',
     "version": "15.0.1.0.0",
     "license": "AGPL-3",
-    'depends': ['hr', 'hr_holidays', 'resource', 'report_xlsx', 'mail'],
+    'depends': ['hr', 'hr_holidays', 'resource', 'report_xlsx', 'mail', 'hr_attendance'],
     "application": True,
     'data': [
         'security/hr_attendance_security.xml',
@@ -16,6 +16,7 @@
         'data/attendance_mising_mail_template.xml',
         'data/hr_attendance_missing_cron.xml',
         'data/hr_attendance_cron.xml',
+        'views/hr_attendance_menu.xml',
         'views/hr_attendance_missing_view.xml',
         'views/mail_template_notification.xml',
         'views/attendance_calendar_view.xml',

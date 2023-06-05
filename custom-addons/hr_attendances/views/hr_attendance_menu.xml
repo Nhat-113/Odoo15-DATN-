@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_attendance.menu_hr_attendance_my_attendances" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6,0,[ref('hr_attendance.group_hr_attendance_user')])]"/>
+    </record>
+</odoo>
