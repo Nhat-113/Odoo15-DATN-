@@ -67,7 +67,29 @@ class HrAttendance(models.Model):
             for record in attendances:
                 temp = pesudo_attendances.filtered(lambda p: p.employee_id.id == record.employee_id.id)
                 if temp:
-                    record.check_out = temp.check_out
+                    time_max = max([att.check_out for att in temp])
+                    record.check_out = time_max
+
+
+    def action_cron_batch_verify_data(self):
+        ################################
+        # verify all records missing checkout
+        ################################
+        attendance_update_failed = self.env['hr.attendance'].sudo().search([('check_out', '=', False)])
+        if attendance_update_failed:
+            dates = [att.start for att in attendance_update_failed]
+            date_min = min(dates)
+            date_max = max(dates)
+            attendance_pseudo = self.env['hr.attendance.pesudo'].sudo().search([('employee_id', 'in', attendance_update_failed.employee_id.ids),
+                                                                                ('start', '>=', date_min),
+                                                                                ('start', '<=', date_max)])
+            for record in attendance_update_failed:
+                att_pseudo = attendance_pseudo.filtered(lambda x: x.employee_id.id == record.employee_id.id and x.start == record.start)
+                if att_pseudo:
+                    max_time = max([att.check_out for att in att_pseudo])
+                    record.check_out = max_time
+                else:
+                    record.check_out = record.check_in
 
 
     def is_working_day(self, date):

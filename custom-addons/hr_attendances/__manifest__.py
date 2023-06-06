@@ -20,6 +20,7 @@
         'views/hr_attendance_missing_view.xml',
         'views/mail_template_notification.xml',
         'views/attendance_calendar_view.xml',
+        'views/hr_attendance_pesudo_view.xml',
     ],
     'assets': {
         'web.assets_backend': [

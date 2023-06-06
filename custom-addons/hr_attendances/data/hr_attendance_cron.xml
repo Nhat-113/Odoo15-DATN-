@@ -7,10 +7,23 @@
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
-            <field name="nextcall" eval="(datetime.now()).strftime('%Y-%m-%d 16:00:00')" />
+            <field name="nextcall" eval="(datetime.now()).strftime('%Y-%m-%d 15:00:00')" />
             <field name="doall" eval="False"/>
             <field name="model_id" ref="model_hr_attendance"/>
             <field name="code">model.action_cron_update_attendance_checkout()</field>
+            <field name="state">code</field>
+        </record>
+
+        <record id="ir_cron_batch_hr_attendance_verify_data" model="ir.cron">
+            <field name="name">HR Attendance Run Batch - Verify Data</field>
+            <field name="active">False</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="(datetime.now()).strftime('%Y-%m-%d 15:00:00')" />
+            <field name="doall" eval="False"/>
+            <field name="model_id" ref="model_hr_attendance"/>
+            <field name="code">model.action_cron_batch_verify_data()</field>
             <field name="state">code</field>
         </record>
     </data>
