@@ -68,7 +68,8 @@ class HrAttendance(models.Model):
                 temp = pesudo_attendances.filtered(lambda p: p.employee_id.id == record.employee_id.id)
                 if temp:
                     time_max = max([att.check_out for att in temp])
-                    record.check_out = time_max
+                    if record.check_in <= time_max:
+                        record.check_out = time_max
 
 
     def action_cron_batch_verify_data(self):
@@ -87,7 +88,8 @@ class HrAttendance(models.Model):
                 att_pseudo = attendance_pseudo.filtered(lambda x: x.employee_id.id == record.employee_id.id and x.start == record.start)
                 if att_pseudo:
                     max_time = max([att.check_out for att in att_pseudo])
-                    record.check_out = max_time
+                    if record.check_in <= max_time:
+                        record.check_out = max_time
                 else:
                     record.check_out = record.check_in
 
@@ -124,12 +126,15 @@ class HrAttendancePesudo(models.Model):
     def _compute_convert_datetime(self):
         local_tz = tz.gettz('Asia/Ho_Chi_Minh')
         for record in self:
-            start = record.check_in.replace(tzinfo=tz.UTC)
-            end = record.check_out.replace(tzinfo=tz.UTC)
-            record.start = start.astimezone(local_tz)
-            record.end = end.astimezone(local_tz)
             if record.check_out and record.check_in:
+                start = record.check_in.replace(tzinfo=tz.UTC)
+                end = record.check_out.replace(tzinfo=tz.UTC)
+                record.start = start.astimezone(local_tz)
+                record.end = end.astimezone(local_tz)
+
                 delta = record.check_out - record.check_in
                 record.worked_hours = delta.total_seconds() / 3600.0
             else:
                 record.worked_hours = False
+                record.start = False
+                record.end = False
