@@ -196,6 +196,17 @@
                                     <div>
                                         <table style="width:100%">
                                             <tr>
+                                                <th style="width:24%"><span class="font-weight-bold">Vị trí công việc:</span></th>
+                                                <td>
+                                                    <span class="font-weight-bold">:  </span>
+                                                    <span class="font-weight-bold">
+                                                        <t t-if='e.employee_id.job_title'>
+                                                            <span t-field="e.employee_id.job_title"/>
+                                                        </t>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
                                                 <th style="width:24%"><span class="font-weight-bold">Tổng thu nhập (Gross)</span></th>
                                                 <td>
                                                     <span class="font-weight-bold">:  </span>
