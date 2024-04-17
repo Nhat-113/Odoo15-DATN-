@@ -113,17 +113,6 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>Mã số thuế</th>
-                                            <td>
-                                                <span>:  </span>
-                                                <span>
-                                                    <t t-if='e.company_id.vat'>
-                                                        <span t-field="e.company_id.vat"/>
-                                                    </t>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
                                             <th>Số điện thoại</th>
                                             <td>
                                                 <span>:  </span>
