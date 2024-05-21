@@ -21,14 +21,12 @@ class BoxManagementMobile(http.Controller):
 
     @http.route('/api/me', auth='bearer_token', type='http', methods=["GET"])
     def get_current_user(self, **kw):
-        try:     
+        try:
             current_user = request.env["res.users"].browse(request.uid)
-            employee_id = current_user.employee_id if current_user.employee_id else None
-            company = getattr(employee_id, 'company_id', None)
-            department = getattr(employee_id, 'department_id', None)
-            job = getattr(employee_id, 'job_id', None)
-            manager = getattr(employee_id, 'parent_id', None)
-            coach = getattr(employee_id, 'coach_id', None)
+            company = current_user.company_id
+            department = current_user.department_id
+            manager = current_user.employee_parent_id
+            coach = current_user.coach_id
             attendance_role = {
                 "role_name": "",
                 "description": ""
@@ -37,35 +35,34 @@ class BoxManagementMobile(http.Controller):
                 check_permission = request.env.user.has_group(f"hr_attendance.{permit.get('role_name')}")
                 if check_permission:
                     attendance_role = permit
+            
             return jsonResponse(
-                {
-                    "data": {
-                        "id": current_user["id"],
-                        "fullname": current_user["display_name"],
-                        "email": current_user["email"] if current_user["email"] else "",
-                        "phone": current_user["phone"] if current_user["phone"] else "",
-                        "avatar": image_url_getter('res.user', request.uid),
-                        "role": attendance_role,
-                        "company": {
-                            "id": employee_id.company_id.id,
-                            "name": employee_id.company_id.name 
-                        } if company else None,
-                        "department": {
-                            "id": employee_id.department_id.id,
-                            "name": employee_id.department_id.name
-                        } if department else None,
-                        "job": {
-                            "id": employee_id.job_id.id,
-                            "name": employee_id.job_id.name
-                        } if job else None,
-                        "manager": {
-                            "id": employee_id.parent_id.id,
-                            "name": employee_id.parent_id.name
-                        } if manager else None,
-                        "coach": {
-                            "id": employee_id.coach_id.id,
-                            "name": employee_id.coach_id.name
-                        } if coach else None,
+                { 
+                "data": {
+                    "id": current_user.id,
+                    "fullname": current_user.display_name,
+                    "email": current_user.email if current_user.email else "",
+                    "mobile_phone": current_user.mobile_phone if current_user.mobile_phone else "",
+                    "work_phone": current_user.work_phone if current_user.work_phone else "",
+                    "avatar": image_url_getter('res.users', request.uid),
+                    "role": attendance_role,
+                    "company": { 
+                        "id": company.id,
+                        "name": company.name
+                    } if company else None,
+                    "department": {
+                        "id": department.id,
+                        "name": department.name
+                    } if department else None,
+                    "job": current_user.job_title,
+                    "manager": {
+                        "id": manager.id,
+                        "name": manager.name
+                    } if manager else None,
+                    "coach": {
+                        "id": coach.id,
+                        "name": coach.name
+                    } if coach else None,
                     }
                 }, 200)
         except Exception as e:
