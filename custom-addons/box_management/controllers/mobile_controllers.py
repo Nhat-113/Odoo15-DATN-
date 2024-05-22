@@ -27,6 +27,7 @@ class BoxManagementMobile(http.Controller):
             department = current_user.department_id
             manager = current_user.employee_parent_id
             coach = current_user.coach_id
+            timeoff = current_user.leave_manager_id
             attendance_role = {
                 "role_name": "",
                 "description": ""
@@ -63,7 +64,11 @@ class BoxManagementMobile(http.Controller):
                         "id": coach.id,
                         "name": coach.name
                     } if coach else None,
-                    }
+                    "timeoff": {
+                        "id": timeoff.id,
+                        "name": timeoff.name
+                    } if timeoff else None
+                }
                 }, 200)
         except Exception as e:
             return jsonResponse({"message": f"Error unexpected: {e}"}, 400)
@@ -81,7 +86,8 @@ class BoxManagementMobile(http.Controller):
                 "data": {
                     "id": employee.id,
                     "fullname": employee.name,
-                    "phone": employee.work_phone if employee.work_phone else "",
+                    "work_phone": employee.work_phone if employee.work_phone else "",
+                    "mobile_phone": employee.mobile_phone if employee.mobile_phone else "",
                     "email": employee.work_email if employee.work_email else "",
                     "avatar": image_url_getter('hr.employee', employee.id),
                     "company": {
@@ -92,10 +98,7 @@ class BoxManagementMobile(http.Controller):
                         "id": employee.department_id.id,
                         "name": employee.department_id.name
                     } if employee.department_id else None,
-                    "job": {
-                        "id": employee.job_id.id,
-                        "name": employee.job_id.name
-                    } if employee.job_id else None,
+                    "job": employee.job_title,
                     "manager": {
                         "id": employee.parent_id.id,
                         "name": employee.parent_id.name
@@ -104,6 +107,10 @@ class BoxManagementMobile(http.Controller):
                         "id": employee.coach_id.id,
                         "name": employee.coach_id.name
                     } if employee.coach_id else None,
+                    "timeoff": {
+                        "id": employee.leave_manager_id.id,
+                        "name": employee.leave_manager_id.name
+                    }
                     # "address": employee.address_id.id
                 } if employee else None
             }
