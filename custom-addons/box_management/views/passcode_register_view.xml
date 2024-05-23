@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- form view for passcode.register -->
+  <record id="passcode_register_view_form" model="ir.ui.view">
+    <field name="name">passcode.register.view.form</field>
+    <field name="model">passcode.register</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <field name="name" />
+            <field name="valid_from" />
+            <field name="expired_date" />
+          </group>
+          <div class="pr-4">
+            <h3 class="font-weight-bold">Enter your 4-digit code below</h3>
+            <div class="mt-2 pr-3">
+              <label for="passcode" class="px-0">Verification Code</label>
+              <div class="d-flex align-items-center">
+                <field
+                  required="True"
+                  name="passcode"
+                  autocomplete="off"
+                  class="px-0 mr-2"
+                  placeholder="e.g. 1234"
+                />
+              </div>
+            </div>
+          </div>
+          <notebook>
+            <page string="Devices" name="description">
+              <field name="device_ids">
+                <tree create="0" export_xlsx="false" edit="0" editable="top">
+                  <field name="device_id" readonly="1" />
+                  <field name="device_name" readonly="1" />
+                  <field name="device_type" readonly="1" />
+                </tree>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <!-- tree view for passcode.register  -->
+  <record id="passcode_register_view_tree" model="ir.ui.view">
+    <field name="name">passcode.register.view.tree</field>
+    <field name="model">passcode.register</field>
+    <field name="arch" type="xml">
+      <tree expand="1">
+        <field name="id" />
+        <field name="name" />
+        <field name="passcode" />
+        <field name="device_ids" widget="many2many_tags" />
+        <field name="valid_from" />
+        <field name="expired_date" />
+        <field name="write_date" string="Last Update" />
+      </tree>
+    </field>
+  </record>
+
+  <!-- action for passcode.register form model -->
+  <record id="action_passcode_management" model="ir.actions.act_window">
+    <field name="name">Change passcode</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">passcode.register</field>
+    <field name="view_mode">tree,form</field>
+    <!-- <field name="target">new</field> -->
+  </record>
+
+  <!-- <menuitem
+    id="passcode_management"
+    name="Passcode"
+    action="action_passcode_management"
+    parent="menu_configuration_master"
+    sequence="1"
+  /> -->
+</odoo>

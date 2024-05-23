@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template id="export_excel_btn" xml:space="preserve">
+  <t t-extend="ListView.buttons" t-name="export_excel_dialog_btn.button">
+    <t t-jquery="button.o_list_button_add" t-operation="after">
+      <button class="btn btn-secondary open_wizard_action" 
+              style="margin-left: 10px;" 
+              type="button">
+              Export
+      </button>
+    </t>
+  </t>
+</template>

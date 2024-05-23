@@ -1,0 +1,22 @@
+<odoo>
+    <data>
+        <!-- Auth API group access rights -->
+        <record id="auth_api_token_access" model="ir.module.category">
+            <field name="name">Auth API token</field>
+        </record>
+
+        <!-- Option Role: User -->
+        <record id="user_access_auth_api_token" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="auth_token_key.auth_api_token_access"/>
+        </record>
+
+        <!-- Option Role: Administrator -->
+        <record id="administrator_access_auth_api_token" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="auth_token_key.auth_api_token_access"/>
+            <field name="implied_ids" eval="[(4, ref('user_access_auth_api_token'))]"/>
+        </record>
+
+    </data>
+</odoo>

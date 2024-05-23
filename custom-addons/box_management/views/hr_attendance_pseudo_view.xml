@@ -1,0 +1,15 @@
+<odoo>
+    <data>
+        <record id="hr_attendance_pseudo_update_inherit" model="ir.ui.view">
+            <field name="name">hr.attendance.pesudo.treeview.inherit</field>
+            <field name="model">hr.attendance.pesudo</field>
+            <field name="inherit_id" ref="hr_attendances.hr_attendance_pseudo_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='worked_hours']" position="after">
+                    <field name="location_date" force_save="1" invisible="1"/>
+                    <field name="is_multiple" force_save="1" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

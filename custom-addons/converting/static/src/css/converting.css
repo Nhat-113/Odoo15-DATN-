@@ -1,0 +1,115 @@
+/* Converting Section Styles */
+.converting {
+  display: flex;
+}
+
+.converting > button {
+  padding: 5px 20px !important;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.converting .btn-primary {
+  background: rgba(25, 135, 84, 1) !important;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0)) !important;
+  border: green;
+}
+
+.converting .btn-primary:hover {
+  background: green;
+  border: green;
+  opacity: 0.9;
+}
+
+.converting .o_clear_file_button {
+  background: #ff0000;
+  color: #ffffff;
+  border: #ff0000;
+}
+
+.converting .fa-pencil {
+  margin: 0 8px;
+}
+
+/* Converting Container Styles */
+.converting-container {
+  position: relative;
+}
+
+.converting-container .converting > input {
+  background: #fff !important;
+  cursor: pointer;
+}
+
+.converting-container > a {
+  max-width: 700px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.converting-container > a:hover {
+  overflow: auto;
+  white-space: inherit;
+  text-overflow: clip;
+  word-break: break-all;
+  position: absolute;
+  z-index: 10;
+  padding: 10px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  border-radius: 5px;
+  background: #000;
+  opacity: 0.8;
+  color: white !important;
+}
+
+/* Miscellaneous Styles */
+.converting-line {
+  height: 1px;
+  width: 100%;
+  background: #ddd;
+}
+
+.converting-icon-container {
+  display: flex;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.converting-icon-container i {
+  display: inline-block;
+  animation: moveUpDown 1.5s infinite;
+}
+
+.invoice-upload-container,
+.ct-upload-container,
+.ck-upload-container {
+  display: none;
+  font-size: 14px;
+}
+
+.converting-container:hover .invoice-upload-container,
+.converting-container:hover .ct-upload-container,
+.converting-container:hover .ck-upload-container {
+  display: block;
+  position: absolute;
+  background: #000;
+  opacity: 0.8;
+  color: white;
+  top: 40px;
+  z-index: 10;
+  max-width: 800px;
+  border-radius: 5px;
+  overflow-wrap: break-word;
+}
+
+@keyframes moveUpDown {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}

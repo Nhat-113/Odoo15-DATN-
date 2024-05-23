@@ -19,11 +19,11 @@
             <tree editable="bottom" export_xlsx="1" limit="150">
                 <field name="employee_id" widget="many2one_avatar_employee"
                                             options="{'no_quick_create': True, 'no_create': True, 'no_create_edit':True, 'no_open': True}"/>
-                <field name="start" />
-                <field name="end"/>
                 <field name="check_in"/>
                 <field name="check_out"/>
-                <field name="worked_hours"/>
+                <field name="worked_hours" widget="float_time"/>
+                <field name="start" invisible="1"/>
+                <field name="end" invisible="1"/>
             </tree>
         </field>
     </record>

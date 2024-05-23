@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <menuitem id="menu_box_root" name="Facelog Management" sequence="0" />
+
+  <menuitem
+    id="menu_device_managment"
+    name="Facelog Control"
+    action="action_box_management"
+    parent="menu_box_root"
+    sequence="0"
+  />
+
+  <menuitem
+    id="passcode_management"
+    name="Passcode"
+    action="action_passcode_management"
+    parent="menu_box_root"
+    sequence="1"
+  />
+</odoo>

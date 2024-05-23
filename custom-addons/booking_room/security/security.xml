@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="0">
+
+        <record id="module_category_booking_room" model="ir.module.category">
+            <field name="name">Meeting Room</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="group_booking_room_employee" model="res.groups">
+            <field name="name">Employee</field>
+            <field name="category_id" ref="module_category_booking_room" />
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]" />
+        </record>
+
+        <record id="group_booking_room_hr" model="res.groups">
+            <field name="name">HR</field>
+            <field name="category_id" ref="module_category_booking_room" />
+            <field name="implied_ids" eval="[(4, ref('group_booking_room_employee'))]" />
+        </record>
+        
+    </data>
+
+</odoo>

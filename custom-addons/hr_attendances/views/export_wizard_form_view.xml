@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_export_wizard_form" model="ir.ui.view">
+        <field name="name">export.wizard.form</field>
+        <field name="model">export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Export Excel Attendance" width="100px">
+                 <sheet>
+                    <group name="group_top">
+                        <group name="group_left">
+                            <field name="start_date"/>
+                        </group>
+                        <group name="group_right">
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Export" class="btn btn-primary" type="object" name='export_excel'/> 
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="export_wizard_action" model="ir.actions.act_window">
+        <field name="name">Export Excel Wizard Action</field>
+        <field name="res_model">export.wizard</field>
+        <field name="view_mode">form</field>
+    </record>
+</odoo>

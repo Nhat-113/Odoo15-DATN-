@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_accounting_converting,accounting.converting,model_accounting_converting,converting.group_accountant_converting,1,1,1,1

@@ -8,7 +8,7 @@ class HrAttendance(models.Model):
     _inherit = 'hr.attendance'
     _order = "id desc"
 
-    check_in = fields.Datetime(string="Check In", required=False)
+    check_in = fields.Datetime(string="Check In", default=fields.Datetime.now, required=False)
     start = fields.Date(string="Start", store=True, compute='_compute_convert_datetime_start')
     end = fields.Date(string="End", store=True, compute='_compute_convert_datetime_end')
     status = fields.Selection([('early', 'Early'),
@@ -17,8 +17,19 @@ class HrAttendance(models.Model):
                             string="Status", 
                             store=True,
                             compute='_compute_convert_datetime_start')
+    location_date = fields.Date("Location Date", store=True, compute="_compute_location_date")
 
-        
+
+    @api.depends('check_in', 'check_out')
+    def _compute_location_date(self):
+        user_tz = pytz.timezone(self.env.user.tz)
+        for record in self:
+            if record.check_in:
+                record.location_date = record.check_in.astimezone(user_tz).date()
+            elif not record.check_in and record.check_out:
+                record.location_date = record.check_out.astimezone(user_tz).date()
+            else:
+                record.location_date = None
     
     @api.depends('check_in')
     def _compute_convert_datetime_start(self):
@@ -61,7 +72,7 @@ class HrAttendance(models.Model):
     
     
     def action_cron_update_attendance_checkout(self):
-        if self.is_working_day(date.today()):
+        # if self.is_working_day(date.today()):
             pesudo_attendances = self.env['hr.attendance.pesudo'].search([('start', '=', date.today())])
             attendances = self.search([('start', '=', date.today()), ('check_out', '=', False)])
             for record in attendances:

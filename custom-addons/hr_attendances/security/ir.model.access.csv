@@ -1,3 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_hr_attendance_mising_user,hr.attendance.missing.user,model_hr_attendance_missing,hr_attendance.group_hr_attendance_user,1,1,1,1
+hr_attendance_facelog.access_export_wizard,access_export_wizard,model_export_wizard,hr_attendance.group_hr_attendance_user,1,1,1,1
 access_hr_attendance_pesudo,hr.attendance.pesudo,model_hr_attendance_pesudo,hr_attendance.group_hr_attendance,1,1,1,1

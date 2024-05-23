@@ -1,0 +1,119 @@
+<odoo>
+    <record id="converting_view_form" model="ir.ui.view">
+        <field name="name">converting.view.form</field>
+        <field name="model">accounting.converting</field>
+        <field name="arch" type="xml">
+            <form class="form-container">
+                <sheet>
+                    <div class="">
+                        <div class="d-flex">
+                            <label for="name" string="Title" />
+                            <span class="text-danger" style="font-size:16px">*</span>
+                        </div>
+                        <div class="converting-container">
+                            <h1 class="text-break converting">
+                                <field name="name" placeholder="e.g. Title of Invoice"></field>
+                            </h1>
+                        </div>
+                    </div>
+                    <div class="converting-line"></div>
+                    <group>
+                        <div class="d-flex o_td_label">
+                            <label for="invoice_attachment" string="Invoice"
+                                style="margin-right:5px;" />
+                            <span class="text-danger" style="font-size:16px">*</span>
+                        </div>
+                        <div>
+                            <div class="converting-container">
+                                <field name="invoice_attachment" filename="invoice_attachment_name"
+                                    class="converting"
+                                    attrs="{'readonly':[('is_creating', '=', False)]}"
+                                    options="{'accepted_file_extensions': '.xlsx,.xls'}"
+                                />
+                                <div class="invoice-upload-container"></div>
+                                <div class="ct-upload-container"></div>
+                                <div class="ck-upload-container"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex o_td_label">
+                            <label for="ct_transaction_attachment" string="VietinBank" />
+                        </div>
+                        <div class="converting-container">
+                            <field name="ct_transaction_attachment"
+                                filename="ct_transaction_attachment_name"
+                                class="converting"
+                                attrs="{'readonly':[('is_creating', '=', False)]}"
+                                options="{'accepted_file_extensions': '.xlsx,.xls'}" />
+                            <div class="invoice-upload-container"></div>
+                            <div class="ct-upload-container"></div>
+                            <div class="ck-upload-container"></div>
+                        </div>
+                        <div class="d-flex o_td_label">
+                            <label for="ct_transaction_attachment" string="VpBank" />
+                        </div>
+                        <div class="converting-container">
+                            <field name="ck_transaction_attachment"
+                                filename="ck_transaction_attachment_name"
+                                class="converting"
+                                attrs="{'readonly':[('is_creating', '=', False)]}"
+                                options="{'accepted_file_extensions': '.xlsx,.xls'}" />
+                            <div class="invoice-upload-container"></div>
+                            <div class="ct-upload-container"></div>
+                            <div class="ck-upload-container"></div>
+                        </div>
+                        <field name="create_uid" invisible="1" />
+                        <field name="invoice_attachment_name" invisible="1" />
+                        <field name="ct_transaction_attachment_name" invisible="1" />
+                        <field name="ck_transaction_attachment_name" invisible="1" />
+                        <field name="invoice_bank_attachment_name" invisible="1" />
+                        <field name="misa_attachment_name" invisible="1" />
+                        <field name="is_creating" invisible="1" />
+                    </group>
+                    <div class="converting-icon-container" title="icon"
+                        attrs="{'invisible':[('is_creating', '=', True)]}">
+                        <i class="fa fa-chevron-down" />
+                    </div>
+                    <group attrs="{'invisible':[('is_creating', '=', True)]}">
+                        <field name="invoice_bank_attachment" readonly="1"
+                            filename="invoice_bank_attachment_name" />
+                        <field name="misa_attachment" readonly="1"
+                            filename="misa_attachment_name" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="model_name_view_tree" model="ir.ui.view">
+        <field name="name">accounting.view.tree</field>
+        <field name="model">accounting.converting</field>
+        <field name="arch" type="xml">
+            <tree string="">
+                <field name="name" />
+                <field name="invoice_attachment_name" />
+                <field name="ct_transaction_attachment_name" />
+                <field name="ck_transaction_attachment_name" />
+                <field name="invoice_bank_attachment" widget="binary"
+                    filename="invoice_bank_attachment_name" />
+                <field name="misa_attachment" widget="binary" filename="misa_attachment_name" />
+                <field name="invoice_bank_attachment_name" invisible="1" />
+                <field name="misa_attachment_name" invisible="1" />
+            </tree>
+        </field>
+    </record>
+
+    <data>
+        <record id="action_converting" model="ir.actions.act_window">
+            <field name="name">Invoice Converting</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">accounting.converting</field>
+            <field name="view_mode">tree,form</field>
+            <field name="limit">20</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Import your invoice
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

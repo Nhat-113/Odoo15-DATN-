@@ -1,9 +1,34 @@
-from odoo import models, api,_
+from odoo import models, api, fields,_
 from dateutil import tz
-from odoo.exceptions import UserError
+import zmq
+import time
+import psutil
+from odoo.tools import config
+from datetime import datetime
+from odoo.exceptions import UserError, ValidationError
+
 
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
+
+    fingerprint_template = fields.Char(string='Fingerprint', required=False)
+    attendance_ids = fields.One2many(
+        'hr.attendance', 'employee_id', groups="hr_attendance.group_hr_attendance_user",
+        help='list of attendances for the employee', store=False)
+    last_attendance_id = fields.Many2one(
+        'hr.attendance', compute='_compute_last_attendance_id', store=False,
+        groups="hr_attendance.group_hr_attendance_kiosk,hr_attendance.group_hr_attendance")
+    last_check_in = fields.Datetime(
+        related='last_attendance_id.check_in', store=False,
+        groups="hr_attendance.group_hr_attendance_user")
+    last_check_out = fields.Datetime(
+        related='last_attendance_id.check_out', store=False,
+        groups="hr_attendance.group_hr_attendance_user")
+    attendance_state = fields.Selection(
+        string="Attendance Status", compute='_compute_attendance_state',
+        selection=[('checked_out', "Checked out"), ('checked_in', "Checked in")],
+        groups="hr_attendance.group_hr_attendance_kiosk,hr_attendance.group_hr_attendance")
+
 
     def attendance_manual_api(self, employee, date_time, next_action, is_checkin, entered_pin=None):
         employee.ensure_one()
@@ -114,3 +139,21 @@ class HrEmployee(models.Model):
         if can_check_without_pin or entered_pin is not None and entered_pin == self.sudo().pin:
             return self._attendance_action(next_action)
         return {'warning': _('Wrong PIN')}
+    
+    # #################################
+    # This all functions update from newest source
+    # #################################
+
+    @api.constrains('work_email')
+    def _check_work_email(self):
+        for employee in self:
+            if employee.work_email == False:
+               raise UserError('Work email cannot be left blank')
+            else:
+                if self.env['hr.employee'].sudo().search_count([('work_email', '=', employee.work_email)]) > 1:
+                    raise ValidationError(_("Work email is already in use."))
+
+class EmployeePublic(models.Model):
+    _inherit = 'hr.employee.public'
+
+    fingerprint_template = fields.Char(string='Fingerprint', required=False, related="employee_id.fingerprint_template", groups="hr_attendance.group_hr_attendance_kiosk,hr_attendance.group_hr_attendance")
