@@ -38,13 +38,11 @@ class ExportWizard(models.TransientModel):
             raise ValidationError("The start date must be less than the end date!")
         if (self.end_date - self.start_date).days <= 7:
             raise ValidationError("The export time is too short!")
-        attendances = self.action_get_data()
         cnt_days = (self.end_date - self.start_date).days + 1
         datas = {
             'end_month': cnt_days,
             'start_date': self.start_date,
             'end_date': self.end_date,
-            'data': attendances
         }
         kwargs = {
             'report_type': 'xlsx',
@@ -55,7 +53,7 @@ class ExportWizard(models.TransientModel):
             'report_file': 'hr_attendances.HrAttendance.export_excel_report',
         }
         kwargs = json.dumps(kwargs)
-            
+
         return {
             'type': 'ir.actions.act_url',
             'url': f'/api/attendance/xlsx_reports?kw={kwargs}',
@@ -449,7 +447,7 @@ class ExportWizard(models.TransientModel):
         working_days = pd.date_range(start=start_date, end=end_date, freq='B')    # 'B' stands for business day
         return len(working_days)
 
-    def attendance_query(self, company_ids, table_mode):
+    def attendance_query(self, company_ids, table_mode, start_date, end_date):
         query = f"""
                 WITH attendances AS (
                     SELECT
@@ -459,7 +457,7 @@ class ExportWizard(models.TransientModel):
                         check_out AT TIME ZONE 'UTC' AT TIME ZONE '{self.env.user.tz}' AS check_out,
                         worked_hours
                     FROM {table_mode}
-                    WHERE location_date BETWEEN '{self.start_date}' AND '{self.end_date}'
+                    WHERE location_date BETWEEN '{start_date}' AND '{end_date}'
                     ORDER BY check_in DESC
                 ),
                 departure_dates AS (
@@ -485,8 +483,8 @@ class ExportWizard(models.TransientModel):
                 WHERE e.active = True
                     AND e.company_id IN {tuple(company_ids + [0])}
                     OR (e.active = False 
-                        AND (d.departure_date BETWEEN '{self.start_date}' AND '{self.end_date}'
-                            OR (d.departure_date >= '{self.start_date}' and d.departure_date >= '{self.end_date}')
+                        AND (d.departure_date BETWEEN '{start_date}' AND '{end_date}'
+                            OR (d.departure_date >= '{start_date}' and d.departure_date >= '{end_date}')
                         )
                     )
                 ORDER BY e.id desc, a.check_in desc;
@@ -511,13 +509,13 @@ class ExportWizard(models.TransientModel):
         return single_mode, multi_mode
             
 
-    def action_get_data(self):
+    def action_get_data(self, start_date, end_date):
         single_mode, multi_mode = self.compute_attendance_view_mode()
         attendances = []
         if single_mode:
-            single_mode = self.attendance_query(single_mode, "hr_attendance")
+            single_mode = self.attendance_query(single_mode, "hr_attendance", start_date, end_date)
         if multi_mode:
-            multi_mode = self.attendance_query(multi_mode, "hr_attendance_pesudo")
+            multi_mode = self.attendance_query(multi_mode, "hr_attendance_pesudo", start_date, end_date)
         
         attendances.extend(single_mode)
         attendances.extend(multi_mode)

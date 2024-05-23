@@ -162,9 +162,12 @@ class HrAttendance(http.Controller):
         options = data['options']
         output_format = data['output_format']
         report_name = data['report_name']
-        uid = request.session.uid
-        report_obj = request.env[model].with_user(uid)
         options = json.loads(options)
+        start_date = datetime.strptime(options["start_date"], '%Y-%m-%d')
+        end_date = datetime.strptime(options["end_date"], '%Y-%m-%d')
+        file_model = request.env[model]
+        file_data = file_model.action_get_data(start_date, end_date)
+        options["data"] = file_data
         try:
             if output_format == "xlsx":
                 response = request.make_response(
@@ -181,7 +184,7 @@ class HrAttendance(http.Controller):
                     ],
                     cookies=None,
                 )
-                report_obj.generate_xlsx_report(options, response)
+                file_model.generate_xlsx_report(options, response)
 
             return response
 
