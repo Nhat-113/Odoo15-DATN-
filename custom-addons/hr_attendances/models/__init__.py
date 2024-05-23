@@ -5,3 +5,4 @@ from . import hr_employee
 # from . import resource_calendar_leaves
 # from . import hr_attendance_missing
 from . import export_wizard
+from . import res_user
