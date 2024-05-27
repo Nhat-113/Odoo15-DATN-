@@ -48,8 +48,7 @@ class BoxManagementMobile(http.Controller):
             }
 
             for key, field in fields_map.items():
-                value = getattr(user, field)
-                data[key] = value if value else ""
+                data[key] = getattr(user, field, "")
 
             obj_fields_map = [
                 ("company", "company_id"),
@@ -77,36 +76,34 @@ class BoxManagementMobile(http.Controller):
             employee = request.env['hr.employee'].search([('id', '=', employee_id)])
 
             if not employee:
-                return jsonResponse({"data": None}, 200)
-            else:
-                data = { "avatar": image_url_getter('hr.employee', employee.id) }
+                return jsonResponse({"message": "Employee Not Found"}, 404)
+            
+            data = { "avatar": image_url_getter('hr.employee', employee.id) }
+            fields_map = {
+                "id": "id",
+                "fullname": "name",
+                "email": "work_email",
+                "work_phone": "work_phone",
+                "mobile_phone": "mobile_phone",
+                "job": "job_title"
+            }
 
-                fields_map = {
-                    "id": "id",
-                    "fullname": "name",
-                    "email": "work_email",
-                    "work_phone": "work_phone",
-                    "mobile_phone": "mobile_phone",
-                    "job": "job_title"
-                }
+            for key, field in fields_map.items():
+                data[key] = getattr(employee, field, "")
 
-                for key, field in fields_map.items():
-                    value = getattr(employee, field)
-                    data[key] = value if value else ""
+            obj_fields_map = [
+                ("company", "company_id"),
+                ("department", "department_id"),
+                ("manager", "parent_id"),
+                ("coach", "coach_id"),
+                ("timeoff", "leave_manager_id")
+            ]
 
-                obj_fields_map = [
-                    ("company", "company_id"),
-                    ("department", "department_id"),
-                    ("manager", "parent_id"),
-                    ("coach", "coach_id"),
-                    ("timeoff", "leave_manager_id")
-                ]
+            for key, field in obj_fields_map:
+                value = getattr(employee, field)
+                data[key] = {"id": value.id, "name": value.name} if value else None
 
-                for key, field in obj_fields_map:
-                    value = getattr(employee, field)
-                    data[key] = {"id": value.id, "name": value.name} if value else None
-
-                return jsonResponse({"data": data}, 200)
+            return jsonResponse({"data": data}, 200)
         except Exception as e:
             return jsonResponse({"message": f"Bad request: {e}"}, 400)
 
