@@ -22,54 +22,48 @@ class BoxManagementMobile(http.Controller):
     @http.route('/api/me', auth='bearer_token', type='http', methods=["GET"])
     def get_current_user(self, **kw):
         try:
-            current_user = request.env["res.users"].browse(request.uid)
-            company = current_user.company_id
-            department = current_user.department_id
-            manager = current_user.employee_parent_id
-            coach = current_user.coach_id
-            timeoff = current_user.leave_manager_id
+            user = request.env.user
+            
             attendance_role = {
                 "role_name": "",
                 "description": ""
             }
             for permit in role_attendance:
-                check_permission = request.env.user.has_group(f"hr_attendance.{permit.get('role_name')}")
+                check_permission = user.has_group(f"hr_attendance.{permit.get('role_name')}")
                 if check_permission:
                     attendance_role = permit
+
+            data = {
+                "avatar": image_url_getter('res.users', request.uid),
+                "role": attendance_role
+            }
             
-            return jsonResponse(
-                { 
-                "data": {
-                    "id": current_user.id,
-                    "fullname": current_user.display_name,
-                    "email": current_user.email if current_user.email else "",
-                    "mobile_phone": current_user.mobile_phone if current_user.mobile_phone else "",
-                    "work_phone": current_user.work_phone if current_user.work_phone else "",
-                    "avatar": image_url_getter('res.users', request.uid),
-                    "role": attendance_role,
-                    "company": { 
-                        "id": company.id,
-                        "name": company.name
-                    } if company else None,
-                    "department": {
-                        "id": department.id,
-                        "name": department.name
-                    } if department else None,
-                    "job": current_user.job_title,
-                    "manager": {
-                        "id": manager.id,
-                        "name": manager.name
-                    } if manager else None,
-                    "coach": {
-                        "id": coach.id,
-                        "name": coach.name
-                    } if coach else None,
-                    "timeoff": {
-                        "id": timeoff.id,
-                        "name": timeoff.name
-                    } if timeoff else None
-                }
-                }, 200)
+            fields_map = {
+                "id": "id",
+                "fullname": "display_name",
+                "email": "email",
+                "work_phone": "work_phone",
+                "mobile_phone": "mobile_phone",
+                "job": "job_title"
+            }
+
+            for key, field in fields_map.items():
+                value = getattr(user, field)
+                data[key] = value if value else ""
+
+            obj_fields_map = [
+                ("company", "company_id"),
+                ("department", "department_id"),
+                ("manager", "employee_parent_id"),
+                ("coach", "coach_id"),
+                ("timeoff", "leave_manager_id")
+            ]
+
+            for key, field in obj_fields_map:
+                value = getattr(user, field)
+                data[key] = {"id": value.id, "name": value.name} if value else None
+
+            return jsonResponse({"data": data}, 200)
         except Exception as e:
             return jsonResponse({"message": f"Error unexpected: {e}"}, 400)
 
@@ -81,40 +75,38 @@ class BoxManagementMobile(http.Controller):
                 return jsonResponse({"message": "Access Denied"}, 403)
             
             employee = request.env['hr.employee'].search([('id', '=', employee_id)])
-            
-            msg = {
-                "data": {
-                    "id": employee.id,
-                    "fullname": employee.name,
-                    "work_phone": employee.work_phone if employee.work_phone else "",
-                    "mobile_phone": employee.mobile_phone if employee.mobile_phone else "",
-                    "email": employee.work_email if employee.work_email else "",
-                    "avatar": image_url_getter('hr.employee', employee.id),
-                    "company": {
-                        "id": employee.company_id.id,
-                        "name": employee.company_id.name 
-                    } if employee.company_id else None,
-                    "department": {
-                        "id": employee.department_id.id,
-                        "name": employee.department_id.name
-                    } if employee.department_id else None,
-                    "job": employee.job_title,
-                    "manager": {
-                        "id": employee.parent_id.id,
-                        "name": employee.parent_id.name
-                    } if employee.parent_id else None,
-                    "coach": {
-                        "id": employee.coach_id.id,
-                        "name": employee.coach_id.name
-                    } if employee.coach_id else None,
-                    "timeoff": {
-                        "id": employee.leave_manager_id.id,
-                        "name": employee.leave_manager_id.name
-                    }
-                    # "address": employee.address_id.id
-                } if employee else None
-            }
-            return jsonResponse(msg, 200)
+
+            if not employee:
+                return jsonResponse({"data": None}, 200)
+            else:
+                data = { "avatar": image_url_getter('hr.employee', employee.id) }
+
+                fields_map = {
+                    "id": "id",
+                    "fullname": "name",
+                    "email": "work_email",
+                    "work_phone": "work_phone",
+                    "mobile_phone": "mobile_phone",
+                    "job": "job_title"
+                }
+
+                for key, field in fields_map.items():
+                    value = getattr(employee, field)
+                    data[key] = value if value else ""
+
+                obj_fields_map = [
+                    ("company", "company_id"),
+                    ("department", "department_id"),
+                    ("manager", "parent_id"),
+                    ("coach", "coach_id"),
+                    ("timeoff", "leave_manager_id")
+                ]
+
+                for key, field in obj_fields_map:
+                    value = getattr(employee, field)
+                    data[key] = {"id": value.id, "name": value.name} if value else None
+
+                return jsonResponse({"data": data}, 200)
         except Exception as e:
             return jsonResponse({"message": f"Bad request: {e}"}, 400)
 
