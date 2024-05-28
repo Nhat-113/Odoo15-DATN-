@@ -48,7 +48,8 @@ class BoxManagementMobile(http.Controller):
             }
 
             for key, field in fields_map.items():
-                data[key] = getattr(user, field, "")
+                value = getattr(user, field)
+                data[key] = value if value else ""
 
             obj_fields_map = [
                 ("company", "company_id"),
@@ -89,7 +90,8 @@ class BoxManagementMobile(http.Controller):
             }
 
             for key, field in fields_map.items():
-                data[key] = getattr(employee, field, "")
+                value = getattr(employee, field)
+                data[key] = value if value else ""
 
             obj_fields_map = [
                 ("company", "company_id"),
