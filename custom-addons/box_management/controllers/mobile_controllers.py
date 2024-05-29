@@ -127,7 +127,7 @@ class BoxManagementMobile(http.Controller):
     @http.route("/api/attendance/employee", type="http", auth="bearer_token", methods=["GET"])
     def get_attendance_data(self, **kwargs):
         params = validate_pagination(kwargs.get('page', 1), kwargs.get('per_page', 10))
-        if params is False:
+        if not params:
             return jsonResponse({
                 "status": 40001,
                 "message": "Invalid",
@@ -229,7 +229,7 @@ class BoxManagementMobile(http.Controller):
     @http.route("/api/attendance/employee/<int:employee_id>", type="http", auth="bearer_token", methods=["GET"])
     def get_employee_attendances(self, employee_id, **kwargs):
         params = validate_pagination(kwargs.get('page', 1), kwargs.get('per_page', 10))
-        if params is False:
+        if not params:
             return jsonResponse({
                 "status": 40001,
                 "message": "Invalid",
@@ -282,7 +282,7 @@ class BoxManagementMobile(http.Controller):
     @http.route("/api/company", type='http', auth="bearer_token", methods=["GET"])
     def company_list(self, **kw):
         params = validate_pagination(kw.get('page', 1), kw.get('per_page', 10))
-        if params is False:
+        if not params:
             return jsonResponse({
                 "status": 40001,
                 "message": "Invalid",
@@ -319,7 +319,7 @@ class BoxManagementMobile(http.Controller):
     @http.route("/api/employee", type='http', auth="bearer_token", methods=["GET"])
     def employee_list(self, **kw):
         params = validate_pagination(kw.get('page', 1), kw.get('per_page', 10))
-        if params is False:
+        if not params:
             return jsonResponse({
                 "status": 40001,
                 "message": "Invalid",
