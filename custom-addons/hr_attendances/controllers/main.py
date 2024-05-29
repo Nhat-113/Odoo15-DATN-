@@ -183,7 +183,7 @@ class HrAttendance(http.Controller):
                     ],
                     cookies=None,
                 )
-                file_model.generate_xlsx_report(options, response)
+                file_model.generate_xlsx_report(options, response, options['allowed_companies'])
 
             return response
 
