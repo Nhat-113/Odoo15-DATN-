@@ -5,6 +5,7 @@ from pytz import timezone
 
 
 MAX_FILE_SIZE = 10 * 1000 * 1000
+ALLOWED_ATTACHMENT = ["txt","doc","docx","xlsx","csv","ppt","pptx","pdf","png","jpg","jpeg"]
 
 def generate_time_selection():
     time_selection = []
@@ -48,8 +49,8 @@ class MeetingSchedule(models.Model):
             ("weekly", "Weekly Meeting"),
         ],
     )
-    start_date = fields.Datetime(string="Start Date Time", required=True)
-    end_date = fields.Datetime(string="End Date Time", required=True)
+    start_date = fields.Datetime(string="Start Date Time", tracking=True, required=True)
+    end_date = fields.Datetime(string="End Date Time", tracking=True, required=True)
     s_date = fields.Date(string="Start Date", required=True)
     e_date = fields.Date(string="End Date", required=True)
 
@@ -72,7 +73,7 @@ class MeetingSchedule(models.Model):
         compute="_compute_duration",
         store=True,
     )
-    room_id = fields.Many2one("meeting.room", string="Room", required=True)
+    room_id = fields.Many2one("meeting.room", string="Room", tracking=True, required=True)
     company_id = fields.Many2one(
         "res.company",
         string="Company name",
@@ -107,7 +108,7 @@ class MeetingSchedule(models.Model):
     attachment_ids = fields.One2many('ir.attachment','res_id', string="Attachments") 
     file_attachment_ids = fields.Many2many('ir.attachment', string="Attach File", inverse='_inverse_file_attachment_ids')
     
-    partner_ids = fields.Many2many(comodel_name="hr.employee", string="Attendees")
+    partner_ids = fields.Many2many(comodel_name="hr.employee", string="Attendees", tracking=True)
     for_attachment = fields.Boolean(default=True, compute="_check_for_attachment")
     customize = fields.Boolean(string="Customize", default=False)
 
@@ -125,7 +126,6 @@ class MeetingSchedule(models.Model):
 
     def _inverse_file_attachment_ids(self):
         self.attachment_ids = self.file_attachment_ids
-        return
     
     def _compute_access_link(self):
         for record in self:
@@ -162,6 +162,8 @@ class MeetingSchedule(models.Model):
                 record.day = date_obj.strftime("%-d")
                 record.month = date_obj.strftime("%b %Y")
                 record.time = date_obj.strftime("%H:%M")
+                record.weekday = date_obj.strftime("%A")
+                record.s_date = date_obj.date()
 
     @api.depends("start_date", "end_date")
     def _compute_duration(self):
@@ -171,29 +173,28 @@ class MeetingSchedule(models.Model):
                 start_time = record.start_date.astimezone(self.get_local_tz()).time()
                 end_time = record.end_date.astimezone(self.get_local_tz()).time()
 
-                start_seconds = (start_time.hour * 3600 + start_time.minute * 60 + start_time.second)
-                end_seconds = (end_time.hour * 3600 + end_time.minute * 60 + end_time.second)
-
-                duration_seconds = end_seconds - start_seconds
-                duration_hours = duration_seconds / 3600
-                record.duration = duration_hours
+                if self.start_date >= self.end_date:
+                    self.duration = 0
+                else:
+                    start_seconds = start_time.hour * 3600 + start_time.minute * 60 + start_time.second
+                    end_seconds = end_time.hour * 3600 + end_time.minute * 60 + end_time.second
+                        
+                    duration_seconds = end_seconds - start_seconds
+                    duration_hours = duration_seconds / 3600
+                    self.duration = duration_hours
 
     # Constraints
     @api.constrains("file_attachment_ids")
     def _validate_attachment(self):
-        allowed_extensions = ["txt","doc","docx","xlsx","csv","ppt","pptx","pdf","png","jpg","jpeg"]
-
-        for record in self:
-            if len(record.file_attachment_ids) > 1:
-                raise ValidationError("You can only attach one file.")
-            
-            if record.file_attachment_ids:
-                if "." not in record.file_attachment_ids.name \
-                or record.file_attachment_ids.name.rsplit(".", 1)[1].lower() not in allowed_extensions:
+        if self.file_attachment_ids:
+            for file in self.file_attachment_ids:
+                file_type = file.name.rsplit(".", 1)[1].lower()
+                if "." not in file.name \
+                or file_type not in ALLOWED_ATTACHMENT:
                     raise ValidationError("Invalid attachment file type")
                 
-                if record.file_attachment_ids.file_size > MAX_FILE_SIZE:
-                    size_in_mb =record.file_attachment_ids.file_size /1000 /1000
+                if file.file_size > MAX_FILE_SIZE:
+                    size_in_mb = file.file_size /1000 /1000
                     raise ValidationError(
                         f"Attachment file size is {round(size_in_mb,2)} MB "
                         f"which exceeds the maximum file size allowed of {MAX_FILE_SIZE / 1000 / 1000} MB"
@@ -233,19 +234,28 @@ class MeetingSchedule(models.Model):
     @api.onchange("start_date", "end_date")
     def _onchange_start_end_date(self):
         if self.start_date and self.end_date:
+            local_tz = self.get_local_tz()
             self.access_link = self._notify_get_action_link('view')
-            start_date = self.start_date.astimezone(self.get_local_tz()) 
-            end_date = self.end_date.astimezone(self.get_local_tz()) 
+            start_date = self.start_date.astimezone(local_tz) 
+            end_date = self.end_date.astimezone(local_tz) 
             
-            start_seconds = start_date.hour * 3600 + start_date.minute * 60 + start_date.second
-            end_seconds = end_date.hour * 3600 + end_date.minute * 60 + end_date.second
-                
-            duration_seconds = end_seconds - start_seconds
-            duration_hours = duration_seconds / 3600
-            self.duration = duration_hours
+            if self.start_date >= self.end_date:
+                self.duration = 0
+            else:
+                start_seconds = start_date.hour * 3600 + start_date.minute * 60 + start_date.second
+                end_seconds = end_date.hour * 3600 + end_date.minute * 60 + end_date.second
+                    
+                duration_seconds = end_seconds - start_seconds
+                duration_hours = duration_seconds / 3600
+                self.duration = duration_hours
 
-            self.start_minutes = str(start_date.hour).zfill(2) + ":" + str(start_date.minute).zfill(2)
-            self.end_minutes = str(end_date.hour).zfill(2) + ":" + str(end_date.minute).zfill(2)          
+            c_hour = datetime.now().astimezone(local_tz).hour
+            if c_hour >= 22:
+                self.start_minutes = '23:00'      
+                self.end_minutes = '23:30'
+            else:  
+                self.start_minutes = str(start_date.hour).zfill(2) + ":" + str(start_date.minute).zfill(2)
+                self.end_minutes = str(end_date.hour).zfill(2) + ":" + str(end_date.minute).zfill(2)        
         
             if self.duration != 0 and end_date.date() != start_date.date() and self.meeting_type != "daily" :
                 self.meeting_type = "daily"
@@ -281,6 +291,12 @@ class MeetingSchedule(models.Model):
             combined_datetime = datetime.combine(self.e_date, time_obj)
             self.end_date = combined_datetime - timedelta(hours=local_offset)
 
+    @api.onchange("s_date")
+    def _onchange_s_date(self):
+        if self.s_date and self.end_date and self.is_edit:
+            self.e_date = self.s_date
+            self.end_date = datetime.combine(self.s_date, self.end_date.time())
+
     @api.onchange("meeting_type")
     def onchange_meeting_type(self):
         if self.meeting_type != "daily" and self.s_date != self.e_date:
@@ -309,20 +325,20 @@ class MeetingSchedule(models.Model):
 
         hours = self.get_local_tz(offset=True)
 
-        local_start_datetime = (start_datetime + timedelta(hours=hours)).date()
-        local_end_datetime = (end_datetime + timedelta(hours=hours)).date()
+        local_start_date = (start_datetime + timedelta(hours=hours)).date()
+        local_end_date = (end_datetime + timedelta(hours=hours)).date()
 
         new_end_date = ""
         
-        if local_start_datetime == start_datetime.date():
+        if local_start_date == start_datetime.date():
             new_end_date = end_date
-        elif local_start_datetime > start_datetime.date():
-            if local_end_datetime > end_datetime.date():
+        elif local_start_date > start_datetime.date():
+            if local_end_date > end_datetime.date():
                 new_end_date = end_date
-            elif local_end_datetime == end_datetime.date():
+            elif local_end_date == end_datetime.date():
                 new_end_date = end_date + timedelta(days=1)
 
-        self.write({"end_date": new_end_date, "meeting_type": "normal"})
+        self.write({"end_date": new_end_date, "e_date": new_end_date.date(), "meeting_type": "normal"})
 
         weekday_attributes = [
             self.monday,
@@ -341,16 +357,21 @@ class MeetingSchedule(models.Model):
         ]
 
         booking_to_create = []
-
+        
         for booking in booking_dates:
             if weekday_mapping.get(booking.weekday(), False):
+                date = booking.date()
+                s_hour = (booking + timedelta(hours=hours)).hour
+                e_hour = (booking + timedelta(hours=(hours + self.duration))).hour
+                if s_hour < hours and e_hour >= hours:
+                    date += timedelta(days=1)
                 booking_to_create.append({
                     "name": self.name,
                     "meeting_subject": self.meeting_subject,
                     "description": self.description,
                     "meeting_type": "normal",
                     "start_date": booking,
-                    "end_date": datetime.combine(booking.date(), end_datetime.time()),
+                    "end_date": datetime.combine(date, end_datetime.time()),
                     "duration": self.duration,
                     "file_attachment_ids": self.file_attachment_ids,
                     "room_id": self.room_id.id,
@@ -359,8 +380,8 @@ class MeetingSchedule(models.Model):
                     "is_edit": True,
                     "is_first_tag": False,
                     "partner_ids": self.partner_ids,
-                    's_date': booking.date(),
-                    'e_date': booking.date(),
+                    's_date': date,
+                    'e_date': date,
                 })
 
         self.create(booking_to_create)
@@ -468,8 +489,9 @@ class MeetingSchedule(models.Model):
     def write(self, vals):
         for record in self:
             start_date = vals.get("start_date")
-
             if not record.check_is_hr():
+                if self.env.uid != record.user_id.id:
+                    raise ValidationError("Cannot modify someone else's meeting")
                 if self._check_is_past_date(record.start_date):
                     raise ValidationError("Cannot edit ongoing or finished meetings")
                 if self._check_is_past_date(start_date):
@@ -478,8 +500,11 @@ class MeetingSchedule(models.Model):
 
     def unlink(self):
         for record in self:
-            if not record.check_is_hr() and record._check_is_past_date(start_date=record.start_date):
-                raise ValidationError("Cannot delete ongoing or finished meetings.")
+            if not record.check_is_hr(): 
+                if self.env.uid != record.user_id.id:
+                    raise ValidationError("Cannot delete someone else's meeting")
+                if record._check_is_past_date(start_date=record.start_date):
+                    raise ValidationError("Cannot delete ongoing or finished meetings.")
         return super(MeetingSchedule, self).unlink()
 
     @api.model

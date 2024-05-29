@@ -4,3 +4,30 @@
   border-radius: 10px !important;
   margin-right: 8px !important;
 }
+.booking-room-title{
+  position: relative;
+  cursor: pointer;
+}
+
+.booking-room-title::after {
+  content: attr(data-full-title);
+  position: absolute;
+  white-space: nowrap;
+  background-color: #333;
+  color: #fff;
+  padding: 5px;
+  border-radius: 3px;
+  top: 100%;
+  left: 0;
+  transform: translateY(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+  z-index: 10;
+}
+
+.booking-room-title:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
