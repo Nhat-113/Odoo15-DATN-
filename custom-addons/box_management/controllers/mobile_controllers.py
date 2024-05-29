@@ -21,7 +21,7 @@ class BoxManagementMobile(http.Controller):
 
     @http.route('/api/me', auth='bearer_token', type='http', methods=["GET"])
     def get_current_user(self, **kw):
-        try:
+        try:            
             user = request.env.user
             
             attendance_role = {
@@ -65,19 +65,30 @@ class BoxManagementMobile(http.Controller):
 
             return jsonResponse({"data": data}, 200)
         except Exception as e:
-            return jsonResponse({"message": f"Error unexpected: {e}"}, 400)
+            return jsonResponse({
+                "status": 40002,
+                "message": "Bad request",
+                "keyerror": e
+                }, 400)
 
     @http.route("/api/employee/<int:employee_id>", type="http", auth="bearer_token", methods=["GET"])
     def get_employee_info(self, employee_id, **kwargs):
         try:
             request_user_id = request.uid
             if not check_authorize('hr.employee', request_user_id):
-                return jsonResponse({"message": "Access Denied"}, 403)
-            
+                return jsonResponse({
+                    "status": 40301,
+                    "message": "Forbidden",
+                    "keyerror": "Access Denied"
+                }, 403)
             employee = request.env['hr.employee'].search([('id', '=', employee_id)])
 
             if not employee:
-                return jsonResponse({"message": "Employee Not Found"}, 404)
+                return jsonResponse({
+                    "status": 40401,
+                    "message": "Not found",
+                    "keyerror": "Employee Not Found"
+                }, 404)
             
             data = { "avatar": image_url_getter('hr.employee', employee.id) }
             fields_map = {
@@ -107,21 +118,37 @@ class BoxManagementMobile(http.Controller):
 
             return jsonResponse({"data": data}, 200)
         except Exception as e:
-            return jsonResponse({"message": f"Bad request: {e}"}, 400)
+            return jsonResponse({
+                "status": 40002,
+                "message": "Bad request",
+                "keyerror": e
+            }, 400)
 
     @http.route("/api/attendance/employee", type="http", auth="bearer_token", methods=["GET"])
     def get_attendance_data(self, **kwargs):
         params = validate_pagination(kwargs.get('page', 1), kwargs.get('per_page', 10))
-        if params is False:
-            return jsonResponse({"message": "Page or Per_page must be an integer number"}, 400)
+        if not params:
+            return jsonResponse({
+                "status": 40001,
+                "message": "Invalid",
+                "keyerror": "Page or Per_page must be an integer number"
+            }, 400)
         try:
             request_user_id = request.uid
             if not check_authorize('hr.attendance', request_user_id):
-                return jsonResponse({"message": "Access Denied"}, 403)
+                return jsonResponse({
+                    "status": 40301,
+                    "message": "Forbidden",
+                    "keyerror": "Access Denied"
+                }, 403)
             
             missing_fields = check_field_missing_api(kwargs, ['date'])
             if 'date' in missing_fields:
-                return jsonResponse({"message": message_error_missing(missing_fields)}, 400)
+                return jsonResponse({
+                    "status": 40001,
+                    "message": "Invalid",
+                    "keyerror": message_error_missing(missing_fields)
+                }, 400)
             
             
             date_str = kwargs.get('date')
@@ -193,13 +220,21 @@ class BoxManagementMobile(http.Controller):
                 }, 200)  
         
         except Exception as e:
-            return jsonResponse({"message": f"Bad request: {e}"}, 400)
+            return jsonResponse({
+                "status": 40002,
+                "message": "Bad request",
+                "keyerror": e
+            }, 400)
 
     @http.route("/api/attendance/employee/<int:employee_id>", type="http", auth="bearer_token", methods=["GET"])
     def get_employee_attendances(self, employee_id, **kwargs):
         params = validate_pagination(kwargs.get('page', 1), kwargs.get('per_page', 10))
-        if params is False:
-            return jsonResponse({"message": "Page or Per_page must be an integer number"}, 400)
+        if not params:
+            return jsonResponse({
+                "status": 40001,
+                "message": "Invalid",
+                "keyerror": "Page or Per_page must be an integer number"
+            }, 400)
         try:
             current_tz = request.env.user.tz
             request_user_id = request.uid
@@ -208,7 +243,11 @@ class BoxManagementMobile(http.Controller):
             
             missing_fields = check_field_missing_api(kwargs, ['date'])
             if 'date' in missing_fields:
-                return jsonResponse({"message": message_error_missing(missing_fields)}, 400)
+                return jsonResponse({
+                    "status": 40001,
+                    "message": "Invalid",
+                    "keyerror": message_error_missing(missing_fields)
+                }, 400)
             
             date_str = kwargs.get('date')
             date = datetime.strptime(date_str, "%Y-%m-%d")
@@ -234,13 +273,21 @@ class BoxManagementMobile(http.Controller):
             }
             return jsonResponse(msg, 200)
         except Exception as e:
-            return jsonResponse({"message": f"Bad request: {e}"}, 400)
+            return jsonResponse({
+                "status": 40002,
+                "message": "Bad request",
+                "keyerror": e
+            }, 400)
 
     @http.route("/api/company", type='http', auth="bearer_token", methods=["GET"])
     def company_list(self, **kw):
         params = validate_pagination(kw.get('page', 1), kw.get('per_page', 10))
-        if params is False:
-            return jsonResponse({"message": "Page or Per_page must be an integer number"}, 400)
+        if not params:
+            return jsonResponse({
+                "status": 40001,
+                "message": "Invalid",
+                "keyerror": "Page or Per_page must be an integer number"
+            }, 400)
         try:
             offset = params["offset"]
             limit = params["limit"]
@@ -263,13 +310,21 @@ class BoxManagementMobile(http.Controller):
             }
             return jsonResponse(response_data, 200)
         except Exception as e:
-            return jsonResponse({"message": f"Error unexpected: {e}"}, 400)
+            return jsonResponse({
+                "status": 40002,
+                "message": "Bad request",
+                "keyerror": e
+            }, 400)
 
     @http.route("/api/employee", type='http', auth="bearer_token", methods=["GET"])
     def employee_list(self, **kw):
         params = validate_pagination(kw.get('page', 1), kw.get('per_page', 10))
-        if params is False:
-            return jsonResponse({"message": "Page or Per_page must be an integer number"}, 400)
+        if not params:
+            return jsonResponse({
+                "status": 40001,
+                "message": "Invalid",
+                "keyerror": "Page or Per_page must be an integer number"
+            }, 400)
         try:
             offset = params["offset"]
             limit = params["limit"]
@@ -298,4 +353,8 @@ class BoxManagementMobile(http.Controller):
             }
             return jsonResponse(response_data, 200)
         except Exception as e:
-            return jsonResponse({"message": f"Error unexpected: {e}"}, 400)
+            return jsonResponse({
+                "status": 40002,
+                "message": "Bad request",
+                "keyerror": e
+            }, 400)
