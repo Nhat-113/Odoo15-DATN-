@@ -161,12 +161,11 @@ class HrAttendance(http.Controller):
         model = data['model']
         options = data['options']
         output_format = data['output_format']
-        report_name = data['report_name']
         options = json.loads(options)
-        start_date = datetime.strptime(options["start_date"], '%Y-%m-%d')
-        end_date = datetime.strptime(options["end_date"], '%Y-%m-%d')
         file_model = request.env[model]
-        file_data = file_model.action_get_data(start_date, end_date)
+        file_data = file_model.action_get_data(options["start_date"], 
+                                               options["end_date"], 
+                                               options['allowed_companies'])
         options["data"] = file_data
         try:
             if output_format == "xlsx":
@@ -179,7 +178,7 @@ class HrAttendance(http.Controller):
                         ),
                         (
                             "Content-Disposition",
-                            f"attachment; filename={report_name}.xlsx",
+                            f"attachment; filename=Attendance_report_{options['start_date']}_{options['end_date']}.xlsx",
                         ),
                     ],
                     cookies=None,

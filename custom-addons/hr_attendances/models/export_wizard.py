@@ -39,25 +39,24 @@ class ExportWizard(models.TransientModel):
         if (self.end_date - self.start_date).days <= 7:
             raise ValidationError("The export time is too short!")
         cnt_days = (self.end_date - self.start_date).days + 1
+        allowed_companies = self.env.context.get('allowed_company_ids', [])
         datas = {
             'end_month': cnt_days,
             'start_date': self.start_date,
             'end_date': self.end_date,
+            'allowed_companies': allowed_companies
         }
         kwargs = {
-            'report_type': 'xlsx',
             'model': self._name,
             'output_format': 'xlsx',
             'options': json.dumps(datas, default=date_utils.json_default),
-            'report_name': f'Attendance_report_{self.start_date}_{self.end_date}',
-            'report_file': 'hr_attendances.HrAttendance.export_excel_report',
         }
         kwargs = json.dumps(kwargs)
 
         return {
             'type': 'ir.actions.act_url',
             'url': f'/api/attendance/xlsx_reports?kw={kwargs}',
-            'target': 'self'
+            'target': 'new'
         }
     
     
@@ -495,8 +494,8 @@ class ExportWizard(models.TransientModel):
         return attendances
 
 
-    def compute_attendance_view_mode(self):
-        companies = self.env.companies
+    def compute_attendance_view_mode(self, allowed_companies):
+        companies = self.env['res.company'].search([('id', 'in', allowed_companies)])
         single_mode = []
         multi_mode = []
         
@@ -509,8 +508,8 @@ class ExportWizard(models.TransientModel):
         return single_mode, multi_mode
             
 
-    def action_get_data(self, start_date, end_date):
-        single_mode, multi_mode = self.compute_attendance_view_mode()
+    def action_get_data(self, start_date, end_date, allowed_companies):
+        single_mode, multi_mode = self.compute_attendance_view_mode(allowed_companies)
         attendances = []
         if single_mode:
             single_mode = self.attendance_query(single_mode, "hr_attendance", start_date, end_date)
