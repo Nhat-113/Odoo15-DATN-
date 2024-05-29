@@ -177,7 +177,7 @@ class ExportWizard(models.TransientModel):
         return result
             
     
-    def generate_xlsx_report(self, data, response):
+    def generate_xlsx_report(self, data, response, allowed_companies):
         
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
@@ -225,7 +225,9 @@ class ExportWizard(models.TransientModel):
             **format
         }
 
-        B1 = f"Bang Cham Cong {self.env.company.name} {data['start_date']} - {data['end_date']}"
+        companies = self.env['res.company'].search([('id', 'in', allowed_companies)])
+        companies = ", ".join([item.name for item in companies])
+        B1 = f"Bang Cham Cong {companies} {data['start_date']} - {data['end_date']}"
         self.merge_range(sheet, 0, 0, 1, 6, B1, self.format(workbook, format))
         
         A6 = "ST\nT"
@@ -486,7 +488,7 @@ class ExportWizard(models.TransientModel):
                             OR (d.departure_date >= '{start_date}' and d.departure_date >= '{end_date}')
                         )
                     )
-                ORDER BY e.id desc, a.check_in desc;
+                ORDER BY e.name, a.check_in desc;
         """
         
         self._cr.execute(query)
