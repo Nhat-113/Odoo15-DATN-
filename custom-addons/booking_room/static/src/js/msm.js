@@ -5,17 +5,19 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
   var dialogs = require("web.view_dialogs");
   var rpc = require("web.rpc");
   var QWeb = core.qweb;
-
-  const config = require("web.config");
   var CalendarController = require("web.CalendarController");
   var CalendarRenderer = require("web.CalendarRenderer");
   var CalendarModel = require("web.CalendarModel");
   var CalendarView = require("web.CalendarView");
   var viewRegistry = require("web.view_registry");
   var session = require("web.session");
+  const { createYearCalendarView } = require('booking_room.fullcalendar');
+  var _t = core._t;
+
   function dateToServer(date) {
     return date.clone().utc().locale("en").format("YYYY-MM-DD HH:mm:ss");
   }
+
   function default_start_minutes() {
     let current_time = new Date();
     let current_hour = current_time.getUTCHours();
@@ -23,6 +25,7 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
 
     return { current_hour, current_minute };
   }
+
   function default_end_minutes() {
     let current_time = new Date();
     let current_hour = current_time.getUTCHours();
@@ -31,7 +34,7 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
 
     return { current_hour, current_minute };
   }
-  var _t = core._t;
+
   var BookingCalendarController = CalendarController.extend({
     /**
      * @override
@@ -237,7 +240,209 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       dialog.o;
     },
   });
-  var BookingPopoverRenderer = CalendarRenderer.extend({});
+
+  var BookingPopoverRenderer = CalendarRenderer.extend({
+    _getFullCalendarOptions: function (fcOptions) {
+      var self = this;
+      const options = Object.assign(
+        {},
+        this.state.fc_options,
+        {
+          plugins: ["moment", "interaction", "dayGrid", "timeGrid"],
+          eventDrop: function (eventDropInfo) {
+            var event = self._convertEventToFC3Event(eventDropInfo.event);
+            self.trigger_up("dropRecord", event);
+          },
+          eventResize: function (eventResizeInfo) {
+            self._unselectEvent();
+            var event = self._convertEventToFC3Event(eventResizeInfo.event);
+            self.trigger_up("updateRecord", event);
+          },
+          eventClick: function (eventClickInfo) {
+            eventClickInfo.jsEvent.preventDefault();
+            eventClickInfo.jsEvent.stopPropagation();
+            var eventData = eventClickInfo.event;
+            self._unselectEvent();
+            $(self.calendarElement)
+              .find(self._computeEventSelector(eventClickInfo))
+              .addClass("o_cw_custom_highlight");
+            self._renderEventPopover(eventData, $(eventClickInfo.el));
+          },
+          selectAllow: function (event) {
+            if (event.end.getDate() === event.start.getDate() || event.allDay) {
+              return true;
+            }
+          },
+          yearDateClick: function (info) {
+            self._unselectEvent();
+            info.view.unselect();
+            if (!info.events.length) {
+              if (info.selectable) {
+                const data = {
+                  start: info.date,
+                  allDay: true,
+                };
+                if (self.state.context.default_name) {
+                  data.title = self.state.context.default_name;
+                }
+                self.trigger_up(
+                  "openCreate",
+                  self._convertEventToFC3Event(data)
+                );
+              }
+            } else {
+              self._renderYearEventPopover(
+                info.date,
+                info.events,
+                $(info.dayEl)
+              );
+            }
+          },
+          select: function (selectionInfo) {
+            var data = {
+              start: selectionInfo.start,
+              end: selectionInfo.end,
+              allDay: selectionInfo.allDay,
+            };
+            self._preOpenCreate(data);
+          },
+          eventRender: function (info) {
+            var event = info.event;
+            var element = $(info.el);
+            var view = info.view;
+            self._addEventAttributes(element, event);
+            if (view.type === "dayGridYear") {
+              const color = this.getColor(event.extendedProps.color_index);
+              if (typeof color === "string") {
+                element.css({
+                  backgroundColor: color,
+                });
+              } else if (typeof color === "number") {
+                element.addClass(`o_calendar_color_${color}`);
+              } else {
+                element.addClass("o_calendar_color_1");
+              }
+            } else {
+              var $render = $(self._eventRender(event));
+              element.find(".fc-content").html($render.html());
+              element.addClass($render.attr("class"));
+
+              // Add background if doesn't exist
+              if (!element.find(".fc-bg").length) {
+                element
+                  .find(".fc-content")
+                  .after($("<div/>", { class: "fc-bg" }));
+              }
+
+              if (view.type === "dayGridMonth" && event.extendedProps.record) {
+                var start = event.extendedProps.r_start || event.start;
+                var end = event.extendedProps.r_end || event.end;
+                $(this.el)
+                  .find(
+                    _.str.sprintf(
+                      '.fc-day[data-date="%s"]',
+                      moment(start).format("YYYY-MM-DD")
+                    )
+                  )
+                  .addClass("fc-has-event");
+                // Detect if the event occurs in just one day
+                // note: add & remove 1 min to avoid issues with 00:00
+                var isSameDayEvent = moment(start)
+                  .clone()
+                  .add(1, "minute")
+                  .isSame(moment(end).clone().subtract(1, "minute"), "day");
+                if (!event.extendedProps.record.allday && isSameDayEvent) {
+                  // For month view: do not show background for non allday, single day events
+                  element.addClass("o_cw_nobg");
+                  if (event.extendedProps.showTime && !self.hideTime) {
+                    const displayTime = moment(start)
+                      .clone()
+                      .format(self._getDbTimeFormat());
+                    element.find(".fc-content .fc-time").text(displayTime);
+                  }
+                }
+              }
+
+              // On double click, edit the event
+              element.on("dblclick", function () {
+                self.trigger_up("edit_event", { id: event.id });
+              });
+            }
+          },
+          datesRender: function (info) {
+            const viewToMode = Object.fromEntries(
+              Object.entries(self.scalesInfo).map(([k, v]) => [v, k])
+            );
+            self.trigger_up("viewUpdated", {
+              mode: viewToMode[info.view.type],
+              title: info.view.title,
+            });
+          },
+          // Add/Remove a class on hover to style multiple days events.
+          // The css ":hover" selector can't be used because these events
+          // are rendered using multiple elements.
+          eventMouseEnter: function (mouseEnterInfo) {
+            $(self.calendarElement)
+              .find(self._computeEventSelector(mouseEnterInfo))
+              .addClass("o_cw_custom_hover");
+          },
+          eventMouseLeave: function (mouseLeaveInfo) {
+            if (!mouseLeaveInfo.event.id) {
+              return;
+            }
+            $(self.calendarElement)
+              .find(self._computeEventSelector(mouseLeaveInfo))
+              .removeClass("o_cw_custom_hover");
+          },
+          eventDragStart: function (mouseDragInfo) {
+            mouseDragInfo.el.classList.add(mouseDragInfo.view.type);
+            $(self.calendarElement)
+              .find(`[data-event-id=${mouseDragInfo.event.id}]`)
+              .addClass("o_cw_custom_hover");
+            self._unselectEvent();
+          },
+          eventResizeStart: function (mouseResizeInfo) {
+            $(self.calendarElement)
+              .find(`[data-event-id=${mouseResizeInfo.event.id}]`)
+              .addClass("o_cw_custom_hover");
+            self._unselectEvent();
+          },
+          eventLimitClick: function () {
+            self._unselectEvent();
+            return "popover";
+          },
+          windowResize: function () {
+            self._onWindowResize();
+          },
+          views: {
+            timeGridDay: {
+              columnHeaderFormat: "LL",
+            },
+            timeGridWeek: {
+              columnHeaderFormat: "ddd D",
+            },
+            dayGridMonth: {
+              columnHeaderFormat: "dddd",
+            },
+            dayGridYear: {
+              weekNumbers: false,
+            },
+          },
+          height: "parent",
+          unselectAuto: false,
+          // prevent too small events
+          timeGridEventMinHeight: 15,
+          dir: _t.database.parameters.direction,
+          events: (info, successCB) => {
+            successCB(self.state.data);
+          },
+        },
+        fcOptions
+      );
+      options.plugins.push(createYearCalendarView(FullCalendar, options));
+      return options;
+    },
+  });
 
   var BookingCalendarRenderer = BookingPopoverRenderer.extend({
     /**
@@ -283,6 +488,18 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
               .popover("show");
           });
         });
+    },
+    _getPopoverParams: function (eventData) {
+      const params = this._super.apply(this, arguments);
+      var title_room = eventData._def.extendedProps.record.room_id[1];
+      var truncated_title_room = title_room;
+
+      if (title_room.length > 30) {
+        truncated_title_room = title_room.substring(0, 30) + "…";
+      }
+
+      params.title = `<span class="booking-room-title" data-full-title="${title_room}">${truncated_title_room}</span>`;
+      return params;
     },
   });
 
