@@ -22,17 +22,29 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
   function default_start_minutes() {
     let current_time = new Date();
     let current_hour = current_time.getUTCHours();
-    let current_minute = Math.ceil(current_time.getMinutes() / 15 + 1) * 15;
-
-    return { current_hour, current_minute };
+    let current_minute = 0;
+    if (current_hour == 16 && (Math.ceil(current_time.getMinutes() / 15 + 1) * 15) > 0){
+      current_hour = 17;
+        return  { current_hour, current_minute };
+    }
+    else{
+     current_minute = Math.ceil(current_time.getMinutes() / 15 + 1) * 15;
+     return { current_hour, current_minute };
+    }
+    
   }
 
   function default_end_minutes() {
     let current_time = new Date();
     let current_hour = current_time.getUTCHours();
-    let current_minute =
-      Math.ceil(current_time.getMinutes() / 15 + 1) * 15 + 30;
-
+    let current_minute = 0;
+    if (current_hour == 16 && Math.ceil(current_time.getMinutes() / 15 + 1) * 15 > 0){
+      current_hour = 17;
+      return  { current_hour, current_minute };
+  }
+    else{
+    current_minute = Math.ceil(current_time.getMinutes() / 15 + 1) * 15;
+    }
     return { current_hour, current_minute };
   }
 
@@ -59,22 +71,27 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
         let current_time = new Date();
 
         let startTime = default_start_minutes();
+        let endTime = default_end_minutes();
+
         var newStartDate = moment(data[this.mapping.date_start])
           .hour(startTime.current_hour)
           .minute(startTime.current_minute);
-        if (current_time.getDay > 7) {
-          newStartDate = newStartDate.subtract(1, "day");
+         
+        if (startTime.current_hour==17 && endTime.current_hour==17)
+         {
+          newStartDate = newStartDate.add(1, 'day');
         }
         var formattedStartDate = newStartDate.format("YYYY-MM-DD HH:mm:ss");
         context["default_" + this.mapping.date_start] =
           formattedStartDate || null;
 
-        let endTime = default_end_minutes();
+        
         var newEndDate = moment(data[this.mapping.date_stop])
           .hour(endTime.current_hour)
           .minute(endTime.current_minute);
-        if (current_time.getDay > 7) {
-          newEndDate = newEndDate.subtract(1, "day");
+          if (startTime.current_hour==17 && endTime.current_hour==17){
+            newEndDate = newEndDate.add(1, 'day');
+            newEndDate = newEndDate.add(30, 'minutes');
         }
         var formattedDateStop = newEndDate.format("YYYY-MM-DD HH:mm:ss");
         context["default_" + this.mapping.date_stop] = formattedDateStop;

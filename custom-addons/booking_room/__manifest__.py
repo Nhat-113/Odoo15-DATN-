@@ -33,6 +33,7 @@
         "views/schedule_view.xml",
         "views/menu.xml",
         "data/mail_template.xml",
+        "data/edit_event_mail.xml"
       
     ],
     "sequence": -100,

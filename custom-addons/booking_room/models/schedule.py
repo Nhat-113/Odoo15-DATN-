@@ -112,6 +112,10 @@ class MeetingSchedule(models.Model):
     for_attachment = fields.Boolean(default=True, compute="_check_for_attachment")
     customize = fields.Boolean(string="Customize", default=False)
 
+    edit_room = fields.Char()
+    edit_time_start = fields.Char()
+    edit_time_end = fields.Char()
+
     def _compute_default_start_minutes(self):
         time_start_date =  self.start_date.astimezone(self.get_local_tz()) 
         start_hour = time_start_date.hour
@@ -490,8 +494,39 @@ class MeetingSchedule(models.Model):
         if not allowed and self.meeting_type == "daily" and self.is_first_tag == True:
             raise ValidationError(f"Start date cannot be scheduled on {weekday_name}.")
 
-    def send_meeting_email(self):
-        template_id = self.env.ref('booking_room.template_sendmail')
+    def send_meeting_email(self, template, vals):
+        room = self.env['meeting.room'].search([('id', '=', vals.get('room_id'))], limit=1)
+        change_room = room.name if room else None
+
+        local_tz = self.env.user.tz or 'UTC'  # Get the local timezone from the user settings, default to 'UTC'
+
+        format_string = "%Y-%m-%d %H:%M:%S"
+        start_date = vals.get('start_date')
+        end_date = vals.get('end_date')
+
+        attendens = vals.get('partner_ids')
+
+        start_date = datetime.strptime(start_date, format_string) if start_date else None
+        end_date = datetime.strptime(end_date, format_string) if end_date else None
+
+        if start_date:
+            change_datestart = start_date.astimezone(timezone(local_tz))
+        else:
+            change_datestart = self.start_date.astimezone(timezone(local_tz))
+
+        if end_date:
+            change_dateend = end_date.astimezone(timezone(local_tz))
+        else:
+            change_dateend = self.end_date.astimezone(timezone(local_tz))
+
+        if change_room:
+            change_room = "Room " + str(change_room)
+            self.edit_room += change_room + ", "
+
+        self.edit_time_end = "Date Start: " + change_datestart.strftime(format_string)
+        self.edit_time_start = "Date End: " + change_dateend.strftime(format_string)
+
+        template_id = self.env.ref(template)
         for record in self:
             template_id.send_mail(record.id, force_send=True)
 
@@ -522,12 +557,15 @@ class MeetingSchedule(models.Model):
         if vals["is_first_tag"] == True \
         and "partner_ids" in vals \
         and len(vals["partner_ids"][0][2]) > 0:
-            meeting_schedule.send_meeting_email()
+            meeting_schedule.send_meeting_email('booking_room.template_sendmail')
         return meeting_schedule
 
     def write(self, vals):
         for record in self:
             start_date = vals.get("start_date")
+            end_date = vals.get("end_date")
+            name_event =  vals.get("room_id")
+            vals = vals
             if not record.check_is_hr():
                 if self.env.uid != record.user_id.id:
                     raise ValidationError("Cannot modify someone else's meeting")
@@ -535,6 +573,8 @@ class MeetingSchedule(models.Model):
                     raise ValidationError("Cannot edit ongoing or finished meetings")
                 if self._check_is_past_date(start_date):
                     raise ValidationError("Start date cannot be in the past")
+            if start_date!= None or end_date!= None or name_event!=None:
+                self.send_meeting_email('booking_room.template_edit_event_sendmail',vals)
         return super(MeetingSchedule, self).write(vals)
 
     def unlink(self):

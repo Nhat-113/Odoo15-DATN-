@@ -87,12 +87,11 @@
         <field name="model">meeting.schedule</field>
         <field name="arch" type="xml">
             <tree string="Schedules">
-                <field name="meeting_subject" />
-                <field name="name" />
+                <field name="meeting_subject"/>
+                <field name="user_id" widget="many2one_avatar_user" />  
                 <field name="start_date" />
                 <field name="end_date" />
-                <field name="duration" />
-                <field name="user_id" widget="many2one_avatar_user" />
+                <field name="description" />
                 <field name="company_id" optional="show" />
             </tree>
         </field>
@@ -175,6 +174,9 @@
                             <field name="time" invisible="1" />
                             <field name="is_edit" invisible="1" />
                             <field name="is_first_tag" invisible="1" />
+                            <field name="edit_room" invisible="1" />
+                            <field name="edit_time_end" invisible="1" />
+                            <field name="edit_time_start" invisible="1" />                            
                         </group>
                     </group>
                     <!-- attachment -->
