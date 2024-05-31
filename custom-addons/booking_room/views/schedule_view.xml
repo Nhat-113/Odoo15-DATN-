@@ -101,7 +101,7 @@
         <field name="name">meeting.schedule.form</field>
         <field name="model">meeting.schedule</field>
         <field name="arch" type="xml">
-            <form string="New Meeting">
+            <form string="New Meeting" js_class="custom_form_view">
                 <xpath expr="//header" position="after">
                     <div class="alert alert-warning" role="alert"
                         style="height: 40px; margin-bottom:0px;"
@@ -176,7 +176,9 @@
                             <field name="is_first_tag" invisible="1" />
                             <field name="edit_room" invisible="1" />
                             <field name="edit_time_end" invisible="1" />
-                            <field name="edit_time_start" invisible="1" />                            
+                            <field name="edit_time_start" invisible="1" /> 
+                            <field name="reason_delete" invisible="1"/>      
+                            <field name="edit_emp" invisible="1"/>                        
                         </group>
                     </group>
                     <!-- attachment -->

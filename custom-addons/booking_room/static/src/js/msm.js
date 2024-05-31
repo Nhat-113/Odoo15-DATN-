@@ -245,6 +245,7 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       var self = this;
 
       var id = ev.data.event.record.id;
+      var type_v = "calendar_view"
 
       var dialog = new Dialog(this, {
         title: _t("Delete Confirmation"),
@@ -259,12 +260,15 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
               var selectedValue = $(
                 'input[name="recurrence-update"]:checked'
               ).val();
-
+              
+              var reason_delete = $(
+                'textarea[name="reason_delete_event"]'
+              ).val(); 
               rpc
                 .query({
                   model: "meeting.schedule",
                   method: "delete_meeting",
-                  args: [selectedValue, id],
+                  args: [selectedValue, reason_delete, id, type_v],
                 })
                 .then(function (result) {
                   self.reload();

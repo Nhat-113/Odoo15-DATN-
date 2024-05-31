@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+    <div t-name="booking_room.RecurrentEventUpdateForm">
+        <div class="form-check o_radio_item">
+            <input name="recurrence-update" type="radio" class="form-check-input o_radio_input" checked="true" value="self_only" id="self_only"/>
+            <label class="form-check-label o_form_label" for="self_only">This event</label>
+        </div>
+        <div class="form-check o_radio_item" style="font-size:900">
+            <p> Reason </p>
+            <textarea id="w3review" name="reason_delete_event" rows="4" cols="50" maxlength="250"></textarea>
+        </div>
+    </div>
+</template>
