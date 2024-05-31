@@ -9,9 +9,10 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
   var CalendarRenderer = require("web.CalendarRenderer");
   var CalendarModel = require("web.CalendarModel");
   var CalendarView = require("web.CalendarView");
+  var BookingCalendarPopover = require("booking.CalendarPopover");
   var viewRegistry = require("web.view_registry");
   var session = require("web.session");
-  const { createYearCalendarView } = require('booking_room.fullcalendar');
+  const { createYearCalendarView } = require("booking_room.fullcalendar");
   var _t = core._t;
 
   function dateToServer(date) {
@@ -175,24 +176,50 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
         return;
       }
 
-      var options = {
-        res_model: self.modelName,
-        res_id: id || null,
-        context: event.context || self.context,
-        title: event.data.title
-          ? _.str.sprintf(_t("Open: %s"), event.data.title)
-          : "Booking Detail",
-        on_saved: function () {
-          if (event.data.on_save) {
-            event.data.on_save();
+      const buttons = [];
+      rpc
+        .query({
+          model: "meeting.schedule",
+          method: "get_booking_detail",
+          args: [id],
+        })
+        .then((result) => {
+          const date = new Date();
+          const start_date = new Date(result.start_date);
+          if (
+            result.is_hr === false &&
+            (result.user_id !== session.uid || start_date < date)
+          ) {
+            buttons.push({
+              text: _t("Cancel"),
+              class: "btn-secondary o_form_button_cancel",
+              close: true,
+            });
           }
-          self.reload();
-        },
-      };
-      if (this.formViewId) {
-        options.view_id = parseInt(this.formViewId);
-      }
-      new dialogs.FormViewDialog(this, options).open();
+
+          var options = {
+            res_model: self.modelName,
+            res_id: id || null,
+            context: event.context || self.context,
+            title: event.data.title
+              ? _.str.sprintf(_t("Open: %s"), event.data.title)
+              : "Booking Detail",
+            on_saved: function () {
+              if (event.data.on_save) {
+                event.data.on_save();
+              }
+              self.reload();
+            },
+            buttons: buttons.length > 0 ? buttons : undefined,
+          };
+          if (self.formViewId) {
+            options.view_id = parseInt(self.formViewId);
+          }
+          new dialogs.FormViewDialog(self, options).open();
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     },
     _setEventTitle: function () {
       return _t("Booking Form");
@@ -242,6 +269,11 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
   });
 
   var BookingPopoverRenderer = CalendarRenderer.extend({
+    config: {
+      CalendarPopover: BookingCalendarPopover,
+      eventTemplate: "calendar-box",
+    },
+
     _getFullCalendarOptions: function (fcOptions) {
       var self = this;
       const options = Object.assign(
@@ -459,19 +491,25 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       rpc
         .query({
           model: "meeting.schedule",
-          method: "check_is_hr",
+          method: "get_current_user",
           args: [],
         })
         .then(function (result) {
           const record = eventData._def.extendedProps.record;
           const date = new Date();
-          if (
-            result === false &&
-            (record.user_id[0] !== session.uid || record.start_date._d < date)
-          ) {
+          const partner_id = record.partner_ids.find(
+            (id) => id === result.employee_id
+          );
+          if (result.is_hr === false && record.user_id[0] !== session.uid) {
             calendarPopover._canDelete = false;
             calendarPopover.isEventEditable = function () {
               return false;
+            };
+          }
+
+          if (partner_id && record.user_id[0] !== session.uid) {
+            calendarPopover.isEventViewable = function () {
+              return true;
             };
           }
         })
