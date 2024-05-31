@@ -137,15 +137,36 @@ class MeetingSchedule(models.Model):
         for rec in self:
             rec.check_access_team_id = bool(rec.check_is_hr() or rec.user_id.id == self.env.uid)
 
+    def get_attendees(self):
+        if self.id:
+            query = """
+                SELECT hr_employee_id
+                FROM hr_employee_meeting_schedule_rel
+                WHERE meeting_schedule_id = %s
+            """
+            self.env.cr.execute(query, [self.id])
+            result = self.env.cr.fetchall()
+            partner_ids = [row[0] for row in result]
+            return partner_ids
+        return []
+
+    def check_is_attendee(self):
+        partner_ids = self.get_attendees()
+        employee_id = self.env.user.employee_id.id
+        return employee_id in partner_ids
+
+
     @api.depends("partner_ids")
     def _check_for_attachment(self):
-        current_user_id = self.env.user.id
+        res_user_id = self.env.user.id
+        is_attendee = self.check_is_attendee()
+
         for rec in self:
             is_hr = rec.check_is_hr()
             rec.for_attachment = bool(
                 is_hr or
-                current_user_id == rec.create_uid.id or
-                self.env.user.employee_ids.id in rec.partner_ids.ids
+                res_user_id == rec.create_uid.id or
+                is_attendee
             )
 
     @api.depends("room_id", "user_id")
