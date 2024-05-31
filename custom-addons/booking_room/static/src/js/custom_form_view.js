@@ -26,41 +26,27 @@ odoo.define('booking_room.meeting_view_form', function (require) {
                       classes: "btn btn-primary",
                       close: true,
                       click: function () {
-                        //   var selectedValue = $('input[name="recurrence-update"]:checked').val();
-                        //   var reason_delete = $('textarea[name="reason_delete_event"]').val();
-                        //   rpc.query({
-                        //       model: "meeting.schedule",
-                        //       method: "delete_meeting",
-                        //       args: [selectedValue, reason_delete, id, type_v],
-                        //   }).then(function (result) {
-                        //     console.log(result.view_id)
-                        //       if (result.status === 'success') {
-                        //           self.do_action({
-                        //               type: 'ir.actions.act_window',
-                        //               res_model: 'meeting.schedule',
-                        //               res_id: result.view_id,
-                        //               views: [[false, 'list']],
-                        //               target: 'current'
-                        //           });
-                        //       } else {
-                        //           Dialog.alert(self, result.message);
-                        //       }
-                        //   }).catch(function (error) {
-                        //       Dialog.alert(self, error.message.data.message);
-                        //   });
-                        this.do_action({
-                            type: 'ir.actions.act_window',
-                            res_model: 'meeting.schedule',
-                            view_mode: 'list',
-                            view_type: 'list',
-                            views: [[false, 'list']],
-                            target: 'target',
-                            context: { },
-                            res_id: false,
-                            title: false,
-                            clearBreadcrumbs: true,
-                            flags: {'form': {'action_buttons': true, 'options': {'clear_breadcrumbs':true } } }
-                        });
+                          var selectedValue = $('input[name="recurrence-update"]:checked').val();
+                          var reason_delete = $('textarea[name="reason_delete_event"]').val();
+                          rpc.query({
+                              model: "meeting.schedule",
+                              method: "delete_meeting",
+                              args: [selectedValue, reason_delete, id, type_v],
+                          }).then(function (result) {
+                              if (result.status === 'success') {
+                                  self.do_action({
+                                      type: 'ir.actions.act_window',
+                                      res_model: 'meeting.schedule',
+                                      res_id: result.view_id,
+                                      views: [[false, 'list']],
+                                      target: 'current'
+                                  });
+                              } else {
+                                  Dialog.alert(self, result.message);
+                              }
+                          }).catch(function (error) {
+                              Dialog.alert(self, error.message.data.message);
+                          });
                       }
                   },
                   {

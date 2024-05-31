@@ -623,7 +623,7 @@ class MeetingSchedule(models.Model):
             if selected_value == "self_only":
                 find_meeting.reason_delete = reason_delete
                 find_meeting.send_meeting_email('booking_room.template_send_mail_delete')
-                # find_meeting.unlink()
+                find_meeting.unlink()
                 view_id = find_meeting.env.ref('booking_room.schedule_view_tree').id
                 return {'status': 'success','view_id':view_id}
                 # if type =="form_view":
