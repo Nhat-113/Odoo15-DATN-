@@ -450,6 +450,21 @@ class MeetingSchedule(models.Model):
     def check_is_hr(self):
         return self.env.user.has_group("booking_room.group_booking_room_hr")
 
+    @api.model
+    def get_current_user(self):
+        return {"employee_id": self.env.user.employee_id.id, "is_hr": self.check_is_hr()}
+
+    @api.model
+    def get_booking_detail(self, id):
+        booking = self.search([('id', '=', id)])
+        if booking:
+            result = {
+                "user_id": booking.user_id.id,
+                "start_date": booking.start_date + timedelta(hours=self.get_local_tz(offset=True)),
+                "is_hr": self.check_is_hr(),
+            }
+        return result
+
     def _check_is_past_date(self, start_date):
         if start_date is None:
             return False

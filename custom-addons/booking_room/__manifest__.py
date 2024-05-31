@@ -15,11 +15,15 @@
         "web.assets_backend": [
             "booking_room/static/src/css/booking_room.css",
             "booking_room/static/src/js/year_calendar_view.js",
+            "booking_room/static/src/js/booking_popover.js",
+            "booking_room/static/src/js/list.js",
             "booking_room/static/src/js/msm.js",
-            "booking_room/static/src/xml/delete_event.xml"
+            "booking_room/static/src/xml/delete_event.xml",
+            "booking_room/static/src/xml/calendar_popover.xml",
         ],
         'web.assets_qweb': [
-            'booking_room/static/src/xml/delete_event.xml'
+            'booking_room/static/src/xml/delete_event.xml',
+            "booking_room/static/src/xml/calendar_popover.xml",
         ],
     },
     "data": [

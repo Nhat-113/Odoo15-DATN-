@@ -20,6 +20,7 @@
                 <field name="end_date" />
                 <field name="user_id" filters="1" avatar_field="avatar_128" />
                 <field name="room_id" filters="1" />
+                <field name="partner_ids" invisible="1" />
             </calendar>
         </field>
     </record>

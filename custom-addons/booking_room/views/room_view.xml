@@ -5,7 +5,7 @@
         <field name="name">meeting.tree</field>
         <field name="model">meeting.room</field>
         <field name="arch" type="xml">
-            <tree string="Rooms">
+            <tree string="Rooms" js_class="list_view">
                 <field name="name" />
                 <field name="description" />
                 <field name="create_date" string="Created"/>
