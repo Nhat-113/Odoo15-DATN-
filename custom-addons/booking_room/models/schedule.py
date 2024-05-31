@@ -151,12 +151,10 @@ class MeetingSchedule(models.Model):
         return []
 
     def check_is_attendee(self):
-        res_user_id = self.env.user.id
         partner_ids = self.get_attendees()
-        employee = self.env['hr.employee'].sudo().search([('user_id', '=', res_user_id)], limit=1)
-        if employee:
-            return employee.id in partner_ids
-        return False
+        employee_id = self.env.user.employee_id.id
+        return employee_id in partner_ids
+
 
     @api.depends("partner_ids")
     def _check_for_attachment(self):
