@@ -4,7 +4,7 @@ from datetime import timedelta, datetime
 from pytz import timezone
 
 
-MAX_FILE_SIZE = 10 * 1000 * 1000
+MAX_FILE_SIZE = 50 * 1000 * 1000
 ALLOWED_ATTACHMENT = ["txt","doc","docx","xlsx","csv","ppt","pptx","pdf","png","jpg","jpeg"]
 
 def generate_time_selection():
@@ -212,12 +212,15 @@ class MeetingSchedule(models.Model):
                 file_type = file.name.rsplit(".", 1)[1].lower()
                 if "." not in file.name \
                 or file_type not in ALLOWED_ATTACHMENT:
-                    raise ValidationError("Invalid attachment file type")
+                    raise ValidationError(
+                        f"Invalid attachment file type. " 
+                        f"File {file.name}'s file type is '.{file_type}' which is not allowed"
+                    )
                 
                 if file.file_size > MAX_FILE_SIZE:
                     size_in_mb = file.file_size /1000 /1000
                     raise ValidationError(
-                        f"Attachment file size is {round(size_in_mb,2)} MB "
+                        f"The size of file: {file.name} is {round(size_in_mb,2)} MB "
                         f"which exceeds the maximum file size allowed of {MAX_FILE_SIZE / 1000 / 1000} MB"
                     )
 
