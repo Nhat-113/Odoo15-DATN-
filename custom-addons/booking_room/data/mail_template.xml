@@ -33,7 +33,7 @@
                                     <h3>Meeting Details:</h3>     
                                     <p style="padding-left: 24px;">Date: <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> <t t-esc="object.end_daily"/></p>
                                     <p style="padding-left: 24px;">Time: <t t-esc="object.start_minutes"/> - <t t-esc="object.end_minutes"/></p>
-                                    <p style="padding-left: 24px;">Location: Meeting Room <t t-esc="object.room_id.name"/> </p>
+                                    <p style="padding-left: 24px;">Location: <t t-esc="object.room_id.name"/> </p>
                                     <p style="padding-left: 24px;">Description <t t-esc="object.description"/></p>
                                 </p>
                                 <p>Thank you!</p>

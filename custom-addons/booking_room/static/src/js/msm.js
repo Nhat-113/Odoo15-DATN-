@@ -547,8 +547,8 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       var title_room = eventData._def.extendedProps.record.room_id[1];
       var truncated_title_room = title_room;
 
-      if (title_room.length > 30) {
-        truncated_title_room = title_room.substring(0, 30) + "…";
+      if (title_room.length > 25) {
+        truncated_title_room = title_room.substring(0, 25) + "…";
       }
 
       params.title = `<span class="booking-room-title" data-full-title="${title_room}">${truncated_title_room}</span>`;
