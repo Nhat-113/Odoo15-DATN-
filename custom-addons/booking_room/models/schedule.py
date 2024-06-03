@@ -194,6 +194,7 @@ class MeetingSchedule(models.Model):
                 record.time = date_obj.strftime("%H:%M")
                 record.weekday = date_obj.strftime("%A")
                 record.s_date = date_obj.date()
+                record.e_date = date_obj.date()
 
     @api.depends("start_date", "end_date")
     def _compute_duration(self):
@@ -371,7 +372,9 @@ class MeetingSchedule(models.Model):
             elif local_end_date == end_datetime.date():
                 new_end_date = end_date + timedelta(days=1)
 
-        self.write({"end_date": new_end_date, "e_date": new_end_date.date(), "meeting_type": "normal","count":1})
+        local_new_end_date = (new_end_date + timedelta(hours=hours)).date()
+
+        self.write({"end_date": new_end_date, "e_date": local_new_end_date, "meeting_type": "normal","count":1})
 
         weekday_attributes = [
             self.monday,
