@@ -21,6 +21,7 @@
             "booking_room/static/src/js/custom_form_view.js",
             "booking_room/static/src/xml/calendar_popover.xml",
             "booking_room/static/src/js/custom_form_view.js",
+            "booking_room/static/src/js/disable_archive.js",
         ],
         'web.assets_qweb': [
             'booking_room/static/src/xml/delete_event.xml',
