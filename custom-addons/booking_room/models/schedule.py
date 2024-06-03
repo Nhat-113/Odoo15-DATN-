@@ -531,7 +531,7 @@ class MeetingSchedule(models.Model):
 
         if change_room:
             change_room = str(change_room)
-            self.edit_room = change_room + ", "
+            self.edit_room = change_room
         else :
             self.edit_room = self.room_id.name
 

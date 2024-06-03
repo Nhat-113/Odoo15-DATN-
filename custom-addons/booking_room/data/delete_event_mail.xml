@@ -31,8 +31,8 @@
                                     <p>Dear,</p>
                                     <p style="margin-top: 8px;">I hope this email finds you well.</p>
                                     </p>                            
-                                    <p>We regret to inform you that the meeting titled "<t t-esc="object.meeting_subject"/>" scheduled for <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> has been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
-                                    <p>Reason : <t t-esc="object.reason_delete"/> </p>
+                                    <p>We regret to inform you that the meeting titled "<t t-esc="object.meeting_subject"/>" scheduled on <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> has been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
+                                    <p>Reason: <t t-esc="object.reason_delete"/> </p>
                                 <p>Thank you!</p>
                                 <p style="padding-top: 24px; padding-bottom: 16px;">
                                 </p>
