@@ -2,8 +2,7 @@ odoo.define("booking_room.room_view_tree", function (require) {
   "use strict";
   var ListRenderer = require("web.ListRenderer");
   var viewRegistry = require("web.view_registry");
-  var ListView = require('web.ListView');
-
+  var ListView = require("web.ListView");
 
   var CustomListRenderer = ListRenderer.extend({
     _renderBody: function () {
@@ -13,14 +12,23 @@ odoo.define("booking_room.room_view_tree", function (require) {
         $rows.push(self._renderEmptyRow());
       }
 
-      // Add row numbers
+      // Add row numbers only to non-empty rows
       var rowNumber = 1;
       $rows.forEach(function ($row) {
-        var $cells = $row.children();
-        $('<td class="o_data_cell">')
-          .text(rowNumber)
-          .insertAfter($cells.first());
-        rowNumber++;
+        // Check if the row has any non-empty cells
+        var hasData = $row
+          .children()
+          .toArray()
+          .some(function (cell) {
+            return $(cell).text().trim() !== "";
+          });
+        if (hasData) {
+          var $cells = $row.children();
+          $('<td class="o_data_cell">')
+            .text(rowNumber)
+            .insertAfter($cells.first());
+          rowNumber++;
+        }
       });
 
       return $("<tbody>").append($rows);
@@ -37,6 +45,21 @@ odoo.define("booking_room.room_view_tree", function (require) {
         $tr.find("th").first()
       ); // Add header for row numbers in the second column
       return $("<thead>").append($tr);
+    },
+
+    _renderFooter: function () {
+      var aggregates = {};
+      _.each(this.columns, function (column) {
+        if ("aggregate" in column) {
+          aggregates[column.attrs.name] = column.aggregate;
+        }
+      });
+      var $cells = this._renderAggregateCells(aggregates);
+      if (this.hasSelectors) {
+        $cells.unshift($("<td>"));
+      }
+      $cells.push($("<td>"));
+      return $("<tfoot>").append($("<tr>").append($cells));
     },
   });
 
