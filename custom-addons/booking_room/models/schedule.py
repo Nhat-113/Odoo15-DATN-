@@ -530,8 +530,10 @@ class MeetingSchedule(models.Model):
             change_dateend = self.end_date.astimezone(timezone(local_tz))
 
         if change_room:
-            change_room = "Room " + str(change_room)
+            change_room = str(change_room)
             self.edit_room = change_room + ", "
+        else :
+            self.edit_room = self.room_id.name
 
         self.edit_time = change_datestart.strftime("%H:%M") +" to " +change_dateend.strftime("%H:%M") 
         self.edit_date_start = change_datestart.strftime("%d-%m-%Y")

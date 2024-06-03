@@ -34,7 +34,7 @@
                                 </p>
                                                 
                                 <p>Updated Meeting Details:</p>
-                                <p style="padding-left: 24px;"> Location: Meeting <t t-esc="object.edit_room"/></p>
+                                <p style="padding-left: 24px;"> Location: <t t-esc="object.edit_room"/></p>
                                 <p style="padding-left: 24px;"> Date: <t t-esc="object.edit_date_start"/></p>
                                 <p style="padding-left: 24px;"> Time: <t t-esc="object.edit_time"/></p>
       

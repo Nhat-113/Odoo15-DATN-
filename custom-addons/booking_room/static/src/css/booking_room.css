@@ -31,3 +31,12 @@
   visibility: visible;
   transform: translateY(0);
 }
+#booking-room-custom_des {
+  white-space: nowrap; 
+  overflow: hidden;    
+  text-overflow: ellipsis;
+  max-width: 200px; 
+  vertical-align: top;
+}
+
+
