@@ -175,10 +175,12 @@
                             <field name="is_edit" invisible="1" />
                             <field name="is_first_tag" invisible="1" />
                             <field name="edit_room" invisible="1" />
-                            <field name="edit_time_end" invisible="1" />
-                            <field name="edit_time_start" invisible="1" /> 
+                            <field name="edit_date_start" invisible="1" />
+                            <field name="edit_time" invisible="1" /> 
                             <field name="reason_delete" invisible="1"/>      
-                            <field name="edit_emp" invisible="1"/>                        
+                            <field name="edit_emp" invisible="1"/>  
+                            <field name="count" invisible="1"/>   
+                            <field name="end_daily" invisible="1"/>                        
                         </group>
                     </group>
                     <!-- attachment -->

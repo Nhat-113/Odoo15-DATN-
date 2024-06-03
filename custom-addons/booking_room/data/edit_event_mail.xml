@@ -34,9 +34,10 @@
                                 </p>
                                                 
                                 <p>Updated Meeting Details:</p>
-                                <p><t t-esc="object.edit_room"/></p>
-                                <p><t t-esc="object.edit_time_end"/></p>
-                                <p><t t-esc="object.edit_time_start"/></p>
+                                <p style="padding-left: 24px;"> Location: Meeting <t t-esc="object.edit_room"/></p>
+                                <p style="padding-left: 24px;"> Date: <t t-esc="object.edit_date_start"/></p>
+                                <p style="padding-left: 24px;"> Time: <t t-esc="object.edit_time"/></p>
+      
                                 <p>Thank you!</p>
                                 <p style="padding-top: 24px; padding-bottom: 16px;">
                                     <a t-att-href="object.access_link" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">

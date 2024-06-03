@@ -29,7 +29,7 @@
                             <td style="min-width:590px">
                                 <p style="margin:0px">
                                     <p>Dear,</p>
-                                    <p style="margin-top: 8px;">You are invited to a meeting. Please attend at <t t-esc="object.s_date"/>, room <t t-esc="object.room_id.name"/>.</p>
+                                    <p style="margin-top: 8px;">You are invited to a meeting. Please attend at <t t-esc="object.s_date.strftime('%d/%m/%Y')"/>, room <t t-esc="object.room_id.name"/>.</p>
     </p>
                                 <p>Thank you!</p>
                                 <p style="padding-top: 24px; padding-bottom: 16px;">

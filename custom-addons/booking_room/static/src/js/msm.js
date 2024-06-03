@@ -22,29 +22,16 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
   function default_start_minutes() {
     let current_time = new Date();
     let current_hour = current_time.getUTCHours();
-    let current_minute = 0;
-    if (current_hour == 16 && (Math.ceil(current_time.getMinutes() / 15 + 1) * 15) > 0){
-      current_hour = 17;
-        return  { current_hour, current_minute };
-    }
-    else{
-     current_minute = Math.ceil(current_time.getMinutes() / 15 + 1) * 15;
-     return { current_hour, current_minute };
-    }
-    
-  }
+    let current_minute = Math.ceil(current_time.getMinutes() / 15 + 1) * 15;
 
+    return { current_hour, current_minute };
+  }
   function default_end_minutes() {
     let current_time = new Date();
     let current_hour = current_time.getUTCHours();
-    let current_minute = 0;
-    if (current_hour == 16 && Math.ceil(current_time.getMinutes() / 15 + 1) * 15 > 0){
-      current_hour = 17;
-      return  { current_hour, current_minute };
-  }
-    else{
-    current_minute = Math.ceil(current_time.getMinutes() / 15 + 1) * 15;
-    }
+    let current_minute =
+      Math.ceil(current_time.getMinutes() / 15 + 1) * 15 + 30;
+
     return { current_hour, current_minute };
   }
 
@@ -71,27 +58,22 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
         let current_time = new Date();
 
         let startTime = default_start_minutes();
-        let endTime = default_end_minutes();
-
         var newStartDate = moment(data[this.mapping.date_start])
           .hour(startTime.current_hour)
           .minute(startTime.current_minute);
-         
-        if (startTime.current_hour==17 && endTime.current_hour==17)
-         {
-          newStartDate = newStartDate.add(1, 'day');
+        if (current_time.getDay > 7) {
+          newStartDate = newStartDate.subtract(1, "day");
         }
         var formattedStartDate = newStartDate.format("YYYY-MM-DD HH:mm:ss");
         context["default_" + this.mapping.date_start] =
           formattedStartDate || null;
 
-        
+        let endTime = default_end_minutes();
         var newEndDate = moment(data[this.mapping.date_stop])
           .hour(endTime.current_hour)
           .minute(endTime.current_minute);
-          if (startTime.current_hour==17 && endTime.current_hour==17){
-            newEndDate = newEndDate.add(1, 'day');
-            newEndDate = newEndDate.add(30, 'minutes');
+        if (current_time.getDay > 7) {
+          newEndDate = newEndDate.subtract(1, "day");
         }
         var formattedDateStop = newEndDate.format("YYYY-MM-DD HH:mm:ss");
         context["default_" + this.mapping.date_stop] = formattedDateStop;
@@ -245,7 +227,7 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       var self = this;
 
       var id = ev.data.event.record.id;
-      var type_v = "calendar_view"
+      var type_view = "calendar_view"
 
       var dialog = new Dialog(this, {
         title: _t("Delete Confirmation"),
@@ -257,18 +239,16 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
             classes: "btn btn-primary",
             close: true,
             click: function () {
-              var selectedValue = $(
-                'input[name="recurrence-update"]:checked'
-              ).val();
-              
-              var reason_delete = $(
-                'textarea[name="reason_delete_event"]'
-              ).val(); 
+              var selectedValue = $('input[name="recurrence-update"]:checked').val();
+              var reason_delete = $('input[name="reason"]:checked').val();
+              if (reason_delete=="others"){
+                reason_delete = $('textarea[name="reason_delete_event"]').val();
+              }
               rpc
                 .query({
                   model: "meeting.schedule",
                   method: "delete_meeting",
-                  args: [selectedValue, reason_delete, id, type_v],
+                  args: [selectedValue, reason_delete, id, type_view],
                 })
                 .then(function (result) {
                   self.reload();
@@ -286,6 +266,20 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       });
       dialog.open();
       dialog.o;
+      dialog.open(); // Open the dialog
+
+      // Add the event listener to toggle the textarea display
+      dialog.opened().then(function() {
+          var othersRadio = dialog.$('input[name="reason"][value="others"]');
+          var reasonTextarea = dialog.$('#reason_textarea');
+          dialog.$('input[name="reason"]').on('change', function () {
+              if (othersRadio.is(':checked')) {
+                  reasonTextarea.show();
+              } else {
+                  reasonTextarea.hide();
+              }
+          });
+      });
     },
   });
 
