@@ -515,14 +515,14 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
           const partner_id = record.partner_ids.find(
             (id) => id === result.employee_id
           );
-          if (result.is_hr === false && record.user_id[0] !== session.uid) {
+          if (!result.is_hr && record.user_id[0] !== session.uid) {
             calendarPopover._canDelete = false;
             calendarPopover.isEventEditable = function () {
               return false;
             };
           }
 
-          if (partner_id && record.user_id[0] !== session.uid) {
+          if (partner_id && record.user_id[0] !== session.uid && !result.is_hr) {
             calendarPopover.isEventViewable = function () {
               return true;
             };
