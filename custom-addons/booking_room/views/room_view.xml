@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <tree string="Rooms" js_class="list_view">
                 <field name="name" />
-                <field name="description" />
+                <field name="description" class="booking-room-custom_des"/>
                 <field name="create_date" string="Created"/>
                 <field name="write_date" string="Last Updated"/>
             </tree>
