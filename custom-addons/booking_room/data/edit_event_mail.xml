@@ -1,11 +1,11 @@
 <odoo>
     <data>
-        <record id="template_sendmail" model="mail.template">
+        <record id="template_sendmail_edit_event" model="mail.template">
             <field name="name">Send mail</field>
             <field name="model_id" ref="model_meeting_schedule"/>
             <field name="subject">Meeting Schedule</field>
             <field name="email_from">{{object.create_uid.email_formatted or ''}}</field>
-            <field name="email_to">{{ ','.join(partner.work_email for partner in object.partner_ids if partner.work_email) }}</field>
+            <field name="email_to">{{ ','.join(partner.work_email for partner in object.edit_emp if partner.work_email) }}</field>
             <field name="body_html"><![CDATA[
                 <div id=":n1" class="ii gt" jslog="20277; u014N:xr6bB; 1:WyIjdGhyZWFkLWY6MTc5ODQ1MDQyMzE5NTQwOTM3NSJd; 4:WyIjbXNnLWY6MTc5ODQ1MDQyMzE5NTQwOTM3NSJd"><div id=":n2" class="a3s aiL "><table border="0" cellpadding="0" cellspacing="0" style="padding-top:16px;background-color:#f1f1f1;font-family:Verdana,Arial,sans-serif;color:#454748;width:100%;border-collapse:separate"><tbody><tr><td align="center">
                     <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding:24px;background-color:white;color:#454748;border-collapse:separate">
@@ -20,7 +20,7 @@
                                     </td><td valign="middle" align="right">
                                     </td></tr>
                                     <tr><td colspan="2" style="text-align:center">
-                                      <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0;margin:4px 0px 32px 0px"></hr>
+                                          <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0;margin:4px 0px 32px 0px"></hr>
                                     </td></tr>
                                 </tbody></table>
                             </td>
@@ -29,13 +29,15 @@
                             <td style="min-width:590px">
                                 <p style="margin:0px">
                                     <p>Dear,</p>
-                                    <p>We cordially invite you to attend our team meeting.</p>      
-                                    <h3>Meeting Details:</h3>     
-                                    <p style="padding-left: 24px;">Date: <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> <t t-esc="object.end_daily"/></p>
-                                    <p style="padding-left: 24px;">Time: <t t-esc="object.start_minutes"/> - <t t-esc="object.end_minutes"/></p>
-                                    <p style="padding-left: 24px;">Location: Meeting Room <t t-esc="object.room_id.name"/> </p>
-                                    <p style="padding-left: 24px;">Description <t t-esc="object.description"/></p>
+                                    <p>I hope this message finds you well.</p>
+                                    <p style="margin-top: 8px;">You are invited to a meeting. Please note that the meeting titled <t t-esc="object.meeting_subject"/> has had some changes.</p>
                                 </p>
+                                                
+                                <p>Updated Meeting Details:</p>
+                                <p style="padding-left: 24px;"> Location: Meeting <t t-esc="object.edit_room"/></p>
+                                <p style="padding-left: 24px;"> Date: <t t-esc="object.edit_date_start"/></p>
+                                <p style="padding-left: 24px;"> Time: <t t-esc="object.edit_time"/></p>
+      
                                 <p>Thank you!</p>
                                 <p style="padding-top: 24px; padding-bottom: 16px;">
                                     <a t-att-href="object.access_link" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">

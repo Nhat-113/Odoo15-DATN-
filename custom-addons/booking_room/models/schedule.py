@@ -100,6 +100,7 @@ class MeetingSchedule(models.Model):
     friday = fields.Boolean(string="Friday", default=True, readonly=False)
     saturday = fields.Boolean(string="Saturday", default=False, readonly=False)
     sunday = fields.Boolean(string="Sunday", default=False, readonly=False)
+    
 
     is_edit = fields.Boolean(default=False)
     is_first_tag = fields.Boolean(default=True)
@@ -111,6 +112,14 @@ class MeetingSchedule(models.Model):
     partner_ids = fields.Many2many(comodel_name="hr.employee", string="Attendees", tracking=True)
     for_attachment = fields.Boolean(default=True, compute="_check_for_attachment")
     customize = fields.Boolean(string="Customize", default=False)
+
+    edit_room = fields.Char()
+    edit_time = fields.Char()
+    edit_date_start = fields.Char()
+    reason_delete = fields.Char()
+    count = fields.Integer(default = 0)
+    edit_emp = fields.Many2many(comodel_name="hr.employee", string="Attendees", tracking=True,relation="meeting_schedule_edit_emp_rel" )
+    end_daily = fields.Char()
 
     def _compute_default_start_minutes(self):
         time_start_date =  self.start_date.astimezone(self.get_local_tz()) 
@@ -362,7 +371,7 @@ class MeetingSchedule(models.Model):
             elif local_end_date == end_datetime.date():
                 new_end_date = end_date + timedelta(days=1)
 
-        self.write({"end_date": new_end_date, "e_date": new_end_date.date(), "meeting_type": "normal"})
+        self.write({"end_date": new_end_date, "e_date": new_end_date.date(), "meeting_type": "normal","count":1})
 
         weekday_attributes = [
             self.monday,
@@ -379,7 +388,7 @@ class MeetingSchedule(models.Model):
             start_datetime + timedelta(days=day)
             for day in range(1, (end_datetime - start_datetime).days + 1)
         ]
-
+        self.end_daily = "to " + str((self.end_date + timedelta(days=len(booking_dates))).strftime('%d/%m/%Y'))
         booking_to_create = []
         
         for booking in booking_dates:
@@ -490,10 +499,68 @@ class MeetingSchedule(models.Model):
         if not allowed and self.meeting_type == "daily" and self.is_first_tag == True:
             raise ValidationError(f"Start date cannot be scheduled on {weekday_name}.")
 
-    def send_meeting_email(self):
-        template_id = self.env.ref('booking_room.template_sendmail')
+    def send_meeting_email(self, template):
+        template_id = self.env.ref(template)
         for record in self:
             template_id.send_mail(record.id, force_send=True)
+
+    def send_meeting_email_edit(self, template, vals):
+        room = self.env['meeting.room'].search([('id', '=', vals.get('room_id'))], limit=1)
+        change_room = room.name if room else None
+
+        local_tz = self.env.user.tz or 'UTC'  # Get the local timezone from the user settings, default to 'UTC'
+
+        format_string = "%Y-%m-%d %H:%M:%S"
+        start_date = vals.get('start_date')
+        end_date = vals.get('end_date')
+
+        attendens = vals.get('partner_ids')
+
+        start_date = datetime.strptime(str(start_date), format_string) if start_date else None
+        end_date = datetime.strptime(str(end_date), format_string) if end_date else None
+
+        if start_date:
+            change_datestart = start_date.astimezone(timezone(local_tz))
+        else:
+            change_datestart = self.start_date.astimezone(timezone(local_tz))
+
+        if end_date:
+            change_dateend = end_date.astimezone(timezone(local_tz))
+        else:
+            change_dateend = self.end_date.astimezone(timezone(local_tz))
+
+        if change_room:
+            change_room = "Room " + str(change_room)
+            self.edit_room = change_room + ", "
+
+        self.edit_time = change_datestart.strftime("%H:%M") +" to " +change_dateend.strftime("%H:%M") 
+        self.edit_date_start = change_datestart.strftime("%d-%m-%Y")
+        if attendens:  
+            curent_emp =[]
+            for edit_emp in self.partner_ids:
+                curent_emp.append(edit_emp.id)
+            curent_emp = set(curent_emp)
+            edit_emp = set(vals.get('partner_ids')[0][2])
+            missing_in_curent_emp = curent_emp - edit_emp
+
+            additional_in_curent_emp = edit_emp - curent_emp
+
+            if len(missing_in_curent_emp) >0:
+                self.edit_emp = self.env['hr.employee'].search([("id", "in", list(missing_in_curent_emp))])
+                template_id = self.env.ref('booking_room.template_sendmail_delete_attendens')
+                for record in self:
+                    template_id.send_mail(record.id, force_send=True)
+
+            if len(additional_in_curent_emp)>0:
+                self.edit_emp = self.env['hr.employee'].search([("id", "in", list(additional_in_curent_emp))])
+                template_id = self.env.ref('booking_room.template_sendmail_add_attendens')
+                for record in self:
+                    template_id.send_mail(record.id, force_send=True)
+        if start_date!=None or end_date!=None or change_room!=None:     
+            self.edit_emp=self.partner_ids
+            template_id = self.env.ref(template)
+            for record in self:
+                template_id.send_mail(record.id, force_send=True)
 
     def get_local_tz(self, offset=False):
         user_tz = self.env.user.tz or "UTC"
@@ -522,19 +589,25 @@ class MeetingSchedule(models.Model):
         if vals["is_first_tag"] == True \
         and "partner_ids" in vals \
         and len(vals["partner_ids"][0][2]) > 0:
-            meeting_schedule.send_meeting_email()
+            meeting_schedule.send_meeting_email('booking_room.template_sendmail')
         return meeting_schedule
 
     def write(self, vals):
-        for record in self:
-            start_date = vals.get("start_date")
-            if not record.check_is_hr():
-                if self.env.uid != record.user_id.id:
-                    raise ValidationError("Cannot modify someone else's meeting")
-                if self._check_is_past_date(record.start_date):
-                    raise ValidationError("Cannot edit ongoing or finished meetings")
-                if self._check_is_past_date(start_date):
-                    raise ValidationError("Start date cannot be in the past")
+        if vals.get("count") !=1:
+            for record in self:
+                start_date = vals.get("start_date")
+                end_date = vals.get("end_date")
+                name_event =  vals.get("room_id")
+                edit_attendees = vals.get('partner_ids')
+                if not record.check_is_hr():
+                    if self.env.uid != record.user_id.id:
+                        raise ValidationError("Cannot modify someone else's meeting")
+                    if self._check_is_past_date(record.start_date):
+                        raise ValidationError("Cannot edit ongoing or finished meetings")
+                    if self._check_is_past_date(start_date):
+                        raise ValidationError("Start date cannot be in the past")
+                if start_date!= None or end_date!= None or name_event!=None or edit_attendees!=None:
+                    self.send_meeting_email_edit('booking_room.template_sendmail_edit_event',vals)
         return super(MeetingSchedule, self).write(vals)
 
     def unlink(self):
@@ -547,24 +620,36 @@ class MeetingSchedule(models.Model):
         return super(MeetingSchedule, self).unlink()
 
     @api.model
-    def delete_meeting(self, selected_value, id):
+    def delete_meeting(self, selected_value,reason_delete, id, type_view):
         find_meeting = self.search([("id", "=", id)])
+        s=find_meeting.partner_ids
         if self.check_is_hr() == True:
             if selected_value == "self_only":
-                find_meeting.unlink()
+                find_meeting.reason_delete = reason_delete
+                find_meeting.send_meeting_email('booking_room.template_send_mail_delete')
+                if type_view!="form_view":
+                    return super(MeetingSchedule, find_meeting).unlink()
             elif selected_value == "future_events":
                 record_to_detele = self.search([("start_date", ">=", find_meeting.start_date)])
+                for sendmail in record_to_detele:
+                    sendmail.reason_delete = reason_delete
+                    sendmail.send_meeting_email('booking_room.template_send_mail_delete')
                 find_meeting.unlink()
-                record_to_detele.unlink()
+                return super(MeetingSchedule, record_to_detele).unlink()
             else:
                 record_to_detele = self.search([])
-                record_to_detele.unlink()
+                for sendmail in record_to_detele:
+                    sendmail.reason_delete = reason_delete
+                    sendmail.send_meeting_email('booking_room.template_send_mail_delete')
+                return super(MeetingSchedule, record_to_detele).unlink()
         else:
             if find_meeting.user_id.id == self.env.uid:
                 if selected_value == "self_only":
                     if self._check_is_past_date(find_meeting.start_date):
                         raise Exception("Cannot delete ongoing or finished meetings.")
-                    return super(MeetingSchedule, find_meeting).unlink()
+                    if type_view!="form_view":
+                        find_meeting.send_meeting_email('booking_room.template_send_mail_delete')
+                        return super(MeetingSchedule, find_meeting).unlink()
                 elif selected_value == "future_events":
                     record_to_detele = self.search(
                         [
@@ -572,6 +657,8 @@ class MeetingSchedule(models.Model):
                             ("create_uid", "=", self.env.uid),
                         ]
                     )
+                    for sendmail in record_to_detele:
+                        sendmail.send_meeting_email('booking_room.template_send_mail_delete')
                     return super(MeetingSchedule, record_to_detele).unlink()
                 else:
                     record_to_detele = self.search(
@@ -580,6 +667,6 @@ class MeetingSchedule(models.Model):
                             ("create_uid", "=", self.env.uid),
                         ]
                     )
+                    for sendmail in record_to_detele:
+                        sendmail.send_meeting_email('booking_room.template_send_mail_delete')
                     return super(MeetingSchedule, record_to_detele).unlink()
-
-            raise Exception("You cannot delete someone else's meeting.")

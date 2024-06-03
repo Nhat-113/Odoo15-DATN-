@@ -1,23 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template>
-    <div t-name="booking_room.RecurrentEventUpdate">
-        <h4>Options:</h4>
-        <div class="form-check o_radio_item">
-            <input name="recurrence-update" type="radio" class="form-check-input o_radio_input" checked="true" value="self_only" id="self_only"/>
-            <label class="form-check-label o_form_label" for="self_only" style="margin-top:2px">This event</label>
-        </div>
+    <div t-name="booking_room.RecurrentEventUpdateForm">
+       
+        <input name="recurrence-update" type="radio" class="form-check-input o_radio_input" style="display:none" checked="true" value="self_only" id="self_only"/>
 
-        <div class="form-check o_radio_item">
-            <input name="recurrence-update" type="radio" class="form-check-input o_radio_input" value="future_events" id="future_events"/>
-            <label class="form-check-label o_form_label" for="future_events" style="margin-top:2px">This and following events</label>
-        </div>
-
-        <div class="form-check o_radio_item">
-            <input name="recurrence-update" type="radio" class="form-check-input o_radio_input" value="all_events" id="all_events"/>
-            <label class="form-check-label o_form_label" for="all_events" style="margin-top:2px">All events</label>
-        </div>
-
-        <h4 style="margin-top:5%">Reason:</h4>
         <div class="form-check o_radio_item">
             <input name="reason" type="radio" class="form-check-input o_radio_input" value="Schedule change" checked="true" id="reason1"/>
             <label class="form-check-label o_form_label" for="reason1" style="margin-top:2px">Schedule change</label>
@@ -29,14 +15,15 @@
         <div class="form-check o_radio_item">
             <input name="reason" type="radio" class="form-check-input o_radio_input" value="Meeting no longer necessary" id="reason3"/>
             <label class="form-check-label o_form_label" for="reason3" style="margin-top:2px">Meeting no longer necessary</label>
-        </div>        
-        <div class="form-check o_radio_item">
-            <input name="reason" type="radio" class="form-check-input o_radio_input" value="others" id="others"/>
-            <label class="form-check-label o_form_label" for="others" style="margin-top:2px">Others</label>
-        </div>
-        <div class="form-check o_radio_item" style="display: none;" id="reason_textarea">
-            <textarea id="w3review" name="reason_delete_event" rows="4" cols="50" maxlength="250"></textarea>
         </div>
 
+        <div class="form-check o_radio_item">
+            <input name="reason" type="radio" class="form-check-input o_radio_input" value="others" id="others"/>
+            <label class="form-check-label o_form_label" for="others">Others</label>
+        </div>
+        <div class="form-check o_radio_item" style="display: none;" id="reason_textarea">
+            <p>Reason</p>
+            <textarea id="w3review" name="reason_delete_event" rows="4" cols="50" maxlength="250"></textarea>
+        </div>
     </div>
 </template>

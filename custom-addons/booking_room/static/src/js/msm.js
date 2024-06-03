@@ -26,7 +26,6 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
 
     return { current_hour, current_minute };
   }
-
   function default_end_minutes() {
     let current_time = new Date();
     let current_hour = current_time.getUTCHours();
@@ -228,6 +227,7 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       var self = this;
 
       var id = ev.data.event.record.id;
+      var type_view = "calendar_view"
 
       var dialog = new Dialog(this, {
         title: _t("Delete Confirmation"),
@@ -239,15 +239,16 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
             classes: "btn btn-primary",
             close: true,
             click: function () {
-              var selectedValue = $(
-                'input[name="recurrence-update"]:checked'
-              ).val();
-
+              var selectedValue = $('input[name="recurrence-update"]:checked').val();
+              var reason_delete = $('input[name="reason"]:checked').val();
+              if (reason_delete=="others"){
+                reason_delete = $('textarea[name="reason_delete_event"]').val();
+              }
               rpc
                 .query({
                   model: "meeting.schedule",
                   method: "delete_meeting",
-                  args: [selectedValue, id],
+                  args: [selectedValue, reason_delete, id, type_view],
                 })
                 .then(function (result) {
                   self.reload();
@@ -265,6 +266,20 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       });
       dialog.open();
       dialog.o;
+      dialog.open(); // Open the dialog
+
+      // Add the event listener to toggle the textarea display
+      dialog.opened().then(function() {
+          var othersRadio = dialog.$('input[name="reason"][value="others"]');
+          var reasonTextarea = dialog.$('#reason_textarea');
+          dialog.$('input[name="reason"]').on('change', function () {
+              if (othersRadio.is(':checked')) {
+                  reasonTextarea.show();
+              } else {
+                  reasonTextarea.hide();
+              }
+          });
+      });
     },
   });
 
