@@ -93,7 +93,7 @@
                 <field name="end_date" />
                 <field name="description" />
                 <field name="company_id" optional="show" />
-            </tree>
+                </tree>
         </field>
     </record>
 
@@ -107,6 +107,11 @@
                         style="height: 40px; margin-bottom:0px;"
                         attrs="{'invisible':['|',('duration', '&gt;', 0.25),('duration', '=', 0.25)]}">
                         A meeting must be at least 15 minutes.
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                        style="height: 40px; margin-bottom:0px;"
+                        attrs="{'invisible': [('template_not_found', '=', False)]}">
+                        Template mail not found (don't send mail)
                     </div>
                 </xpath>
                 <sheet>
@@ -180,7 +185,9 @@
                             <field name="reason_delete" invisible="1"/>      
                             <field name="edit_emp" invisible="1"/>  
                             <field name="count" invisible="1"/>   
-                            <field name="end_daily" invisible="1"/>                        
+                            <field name="end_daily" invisible="1"/>
+                            <field name="delete_type" invisible="1"/> 
+                            <field name="template_not_found" invisible="1"/> 
                         </group>
                     </group>
                     <!-- attachment -->

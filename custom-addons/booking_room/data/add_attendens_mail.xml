@@ -3,7 +3,7 @@
         <record id="template_sendmail_add_attendens" model="mail.template">
             <field name="name">Send mail</field>
             <field name="model_id" ref="model_meeting_schedule"/>
-            <field name="subject">Meeting Schedule</field>
+            <field name="subject">Meeting Notice: {{object.meeting_subject}}</field>
             <field name="email_from">{{object.create_uid.email_formatted or ''}}</field>
             <field name="email_to">{{ ','.join(partner.work_email for partner in object.edit_emp if partner.work_email) }}</field>
             <field name="body_html"><![CDATA[
@@ -28,7 +28,12 @@
                         <tr>
                             <td style="min-width:590px">
                                 <p style="margin:0px">
-                                    <p>Dear,</p>
+                                    <t t-if="len(object.edit_emp) == 1">
+                                        <p>Dear <t t-esc="object.edit_emp[0].name" />,</p>
+                                    </t>
+                                    <t t-else="">
+                                        <p>Dear all,</p>
+                                    </t>
                                     <p style="margin-top: 8px;">You are invited to a meeting. Please attend on <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> in room <t t-esc="object.room_id.name"/>.</p>
     </p>
                                 <p>Thank you!</p>

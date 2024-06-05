@@ -58,23 +58,30 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
         let current_time = new Date();
 
         let startTime = default_start_minutes();
-        var newStartDate = moment(data[this.mapping.date_start])
+        let endTime = default_end_minutes();
+
+        if (startTime.current_hour >= 15 && startTime.current_minute >= 45 ){
+          var newStartDate = moment(data[this.mapping.date_start])
+          .hour(17)
+          .minute(0)
+          .add(1, 'day'); 
+          var newEndDate = moment(data[this.mapping.date_stop])
+          .hour(17)
+          .minute(30)
+          .add(1, 'day'); 
+        }
+        else {
+          var newStartDate = moment(data[this.mapping.date_start])
           .hour(startTime.current_hour)
           .minute(startTime.current_minute);
-        if (current_time.getDay > 7) {
-          newStartDate = newStartDate.subtract(1, "day");
+
+          var newEndDate = moment(data[this.mapping.date_stop])
+          .hour(endTime.current_hour)
+          .minute(endTime.current_minute);
         }
         var formattedStartDate = newStartDate.format("YYYY-MM-DD HH:mm:ss");
         context["default_" + this.mapping.date_start] =
           formattedStartDate || null;
-
-        let endTime = default_end_minutes();
-        var newEndDate = moment(data[this.mapping.date_stop])
-          .hour(endTime.current_hour)
-          .minute(endTime.current_minute);
-        if (current_time.getDay > 7) {
-          newEndDate = newEndDate.subtract(1, "day");
-        }
         var formattedDateStop = newEndDate.format("YYYY-MM-DD HH:mm:ss");
         context["default_" + this.mapping.date_stop] = formattedDateStop;
       } else {
@@ -225,10 +232,10 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
     },
     _onDeleteRecord: function (ev) {
       var self = this;
-
+    
       var id = ev.data.event.record.id;
-      var type_view = "calendar_view"
-
+      var type_view = "calendar_view";
+    
       var dialog = new Dialog(this, {
         title: _t("Delete Confirmation"),
         size: "medium",
@@ -237,13 +244,18 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
           {
             text: _t("OK"),
             classes: "btn btn-primary",
-            close: true,
+            close: false,
             click: function () {
               var selectedValue = $('input[name="recurrence-update"]:checked').val();
               var reason_delete = $('input[name="reason"]:checked').val();
-              if (reason_delete=="others"){
+              if (reason_delete == "others") {
                 reason_delete = $('textarea[name="reason_delete_event"]').val();
+                if (!reason_delete.trim()) {
+                  dialog.$('#warning_message').show();
+                  return;
+                }
               }
+              dialog.$('#warning_message').hide();
               rpc
                 .query({
                   model: "meeting.schedule",
@@ -251,10 +263,11 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
                   args: [selectedValue, reason_delete, id, type_view],
                 })
                 .then(function (result) {
+                  dialog.close();
                   self.reload();
                 })
                 .catch(function (error) {
-                  Dialog.alert(this, error.message.data.message);
+                  Dialog.alert(self, error.message.data.message);
                 });
             },
           },
@@ -272,11 +285,13 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       dialog.opened().then(function() {
           var othersRadio = dialog.$('input[name="reason"][value="others"]');
           var reasonTextarea = dialog.$('#reason_textarea');
+          var reasonInput = dialog.$('#w3review');
           dialog.$('input[name="reason"]').on('change', function () {
               if (othersRadio.is(':checked')) {
                   reasonTextarea.show();
               } else {
                   reasonTextarea.hide();
+                  dialog.$('#warning_message').hide();
               }
           });
       });

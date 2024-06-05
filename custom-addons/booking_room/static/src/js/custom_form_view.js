@@ -31,24 +31,25 @@ odoo.define('booking_room.meeting_view_form', function (require) {
           {
             text: _t("OK"),
             classes: "btn btn-primary",
-            close: true,
+            close: false,
             click: function () {
               var selectedValue = $('input[name="recurrence-update"]:checked').val();
               var reason_delete = $('input[name="reason"]:checked').val();
-              if (reason_delete=="others"){
+              if (reason_delete == "others"){
                 reason_delete = $('textarea[name="reason_delete_event"]').val();
+                if (!reason_delete.trim()) {
+                  dialog.$('#warning_message').show();
+                  return;
+                }
               }
+              dialog.$('#warning_message').hide();
               rpc.query({
                 model: "meeting.schedule",
                 method: "delete_meeting",
                 args: [selectedValue, reason_delete, id, type_view],
-              }).then(function (result) {
-                console.log(result.message)
-                  try {
-                      Dialog.alert("sss")
-                  } catch (e){
-                      doIt()
-                  }
+              }).then(function () {
+                  dialog.close();
+                  doIt();
               }).catch(function (error) {
                 console.error('RPC call failed:', error);
               });
@@ -72,6 +73,7 @@ odoo.define('booking_room.meeting_view_form', function (require) {
                   reasonTextarea.show();
               } else {
                   reasonTextarea.hide();
+                  dialog.$('#warning_message').hide(); 
               }
           });
       });
