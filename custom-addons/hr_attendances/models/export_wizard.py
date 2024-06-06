@@ -18,6 +18,8 @@ LIST_MONTHS = [('1', 'January'), ('2', 'February'), ('3', 'March'), ('4', 'April
 DATE_FORMAT = "%Y-%m-%d"
 OFF = "OFF"
 PN = "PN"
+WFH = "WFH"
+T_OFF = "T-OFF"
 CONFIRM = "CONFIRM"
 HOUR_SMALL = 4
 
@@ -25,7 +27,6 @@ HOUR_SMALL = 4
 class ExportWizard(models.TransientModel):
     _name = 'export.wizard'
     _description = 'Export Excel Wizard'
-    
     
     start_date = fields.Date(string="Start Date", required=True)
     end_date = fields.Date(string="End Date", required=True)
@@ -36,8 +37,6 @@ class ExportWizard(models.TransientModel):
     def export_excel(self):
         if self.start_date > self.end_date:
             raise ValidationError("The start date must be less than the end date!")
-        if (self.end_date - self.start_date).days <= 7:
-            raise ValidationError("The export time is too short!")
         cnt_days = (self.end_date - self.start_date).days + 1
         allowed_companies = self.env.context.get('allowed_company_ids', [])
         datas = {
@@ -177,7 +176,7 @@ class ExportWizard(models.TransientModel):
         return result
             
     
-    def generate_xlsx_report(self, data, response, allowed_companies):
+    def generate_xlsx_report(self, data, response, allowed_companies, time_off_data):
         
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
@@ -199,6 +198,16 @@ class ExportWizard(models.TransientModel):
         }
         off_format = {
             'bg_color': '#BFBFBF',
+            **format,
+            **border_default
+        }
+        wfh_format = {
+             'bg_color': '#ADD8E6',
+            **format,
+            **border_default
+        }
+        pn_format = {
+            'bg_color': '548235',
             **format,
             **border_default
         }
@@ -251,17 +260,38 @@ class ExportWizard(models.TransientModel):
         start_index_col = 4
         end_index_col = data['end_month'] + start_index_col - 1
         working_day = self.working_days(data['start_date'], data['end_date'])
-        self.merge_range(sheet, 1, 1, start_index_col + 10, end_index_col - 10, f"Công tiêu chuẩn: {working_day}", self.format(workbook, format))
-        
-        date_from = f"Từ ngày {data['start_date']}"
-        self.merge_range(sheet, 2, 2, start_index_col + 6, start_index_col + 12, date_from, self.format(workbook, format))
-        date_to = f"Đến ngày {data['end_date']}"
-        self.merge_range(sheet, 2, 2, end_index_col - 12, end_index_col - 6, date_to, self.format(workbook, format))
-        
+        width_space = data['end_month'] // 7
         E4 = "Chấm công ngày"
-        self.merge_range(sheet, 3, 3, start_index_col, end_index_col, E4, self.format(workbook, header_footer))
-        
+
+        if data['end_month'] == 1:
+            self.set_column(sheet, 4, 4, 25)
+            sheet.write(1, end_index_col, f"Công tiêu chuẩn: {working_day}", self.format(workbook, header_footer))
+            sheet.write(3, end_index_col, E4, self.format(workbook, header_footer))
+            sheet.write(2, start_index_col, f"Từ {data['start_date']} đến {data['end_date']}", self.format(workbook, format))
+
         self.set_column(sheet, start_index_col, end_index_col, 6)
+        self.merge_range(sheet, 1, 1, start_index_col, end_index_col, f"Công tiêu chuẩn: {working_day}", self.format(workbook, format))
+        self.merge_range(sheet, 3, 3, start_index_col, end_index_col, E4, self.format(workbook, header_footer))
+        date_from = f"Từ ngày {data['start_date']}"
+        date_to = f"Đến ngày {data['end_date']}"
+
+        if data['end_month'] == 2:
+            self.merge_range(sheet, 2, 2, start_index_col - 1, start_index_col, date_from, self.format(workbook, format))
+            self.merge_range(sheet, 2, 2, end_index_col, end_index_col + 1, date_to, self.format(workbook, format))
+
+        elif 2 < data['end_month'] < 6:
+            self.merge_range(sheet, 2, 2, start_index_col - 1, start_index_col + 1, date_from, self.format(workbook, format))
+            self.merge_range(sheet, 2, 2, start_index_col + 2, start_index_col + 4, date_to, self.format(workbook, format))
+
+        elif 5 < data['end_month'] < 8:
+            self.merge_range(sheet, 2, 2, start_index_col, start_index_col + 2, date_from, self.format(workbook, format))
+            self.merge_range(sheet, 2, 2, end_index_col - 2, end_index_col, date_to, self.format(workbook, format))
+            
+        else:
+            self.merge_range(sheet, 2, 2, start_index_col, start_index_col + 3 * width_space, date_from, self.format(workbook, format))
+            self.merge_range(sheet, 2, 2, end_index_col - 3 * width_space, end_index_col, date_to, self.format(workbook, format))
+
+        
         start_date_obj = datetime.strptime(data['start_date'], DATE_FORMAT)
         day_indexs = {}
         for i in range(data['end_month']):
@@ -283,17 +313,14 @@ class ExportWizard(models.TransientModel):
         sheet.write(5, end_index_col + 2, "Tổng Công\nLàm Việc", self.format(workbook, header_footer))
         sheet.write(5, end_index_col + 3, "Phép năm", self.format(workbook, header_footer))
         
-        self.main_action_export_data(data, day_indexs, sheet, workbook, off_format, cell_default, header_footer, border_default, format)
-        
+        self.main_action_export_data(data, day_indexs, sheet, workbook, off_format, cell_default, header_footer, border_default, format, time_off_data, wfh_format, pn_format)
         
         workbook.close()
         output.seek(0)
         response.stream.write(output.read())
         output.close()
         
-        
-    
-    def main_action_export_data(self, data, day_indexs, sheet, workbook, off_format, cell_default, header_footer, border_default, format):
+    def main_action_export_data(self, data, day_indexs, sheet, workbook, off_format, cell_default, header_footer, border_default, format, time_off_data, wfh_format, pn_format):
         wd_format = {
             'bg_color': 'e2f0d9',
             'bold': False
@@ -322,6 +349,7 @@ class ExportWizard(models.TransientModel):
                 'right': 2
         }
         attendances = data['data']
+        approved_time_off_map, approved_wfh_map = time_off_data
         row = 6
         boxRowFirst = row
         boxColFirst = 4
@@ -356,7 +384,18 @@ class ExportWizard(models.TransientModel):
                 sheet.write(row_active, 3, '', self.format(workbook, cell_default, **{**border_default, **fmLRBorder, 'align': 'left'}))
                 index += 1
                 row += 1
-                
+            for key, values in approved_wfh_map.items():
+                if key == employee_id:
+                    for value in values:
+                        if value in day_indexs:
+                            day_off = day_indexs.get(value)
+                            sheet.write(row_active, 3 + day_off, WFH, self.format(workbook, wfh_format))
+            for key, values in approved_time_off_map.items():
+                if key == employee_id:
+                    for value in values:
+                        if value in day_indexs:
+                            day_off1 = day_indexs.get(value)
+                            sheet.write(row_active, 3 + day_off1, PN, self.format(workbook, pn_format))
             for key, vals in record.items():
                 if key == 'name':
                     sheet.write(row_active, 1, vals, self.format(workbook, cell_default, **wd_format, **fmLeft))
@@ -373,15 +412,14 @@ class ExportWizard(models.TransientModel):
                             'num_format': '0.00', 
                             **wd_format
                         }
-                        if hours < HOUR_SMALL:
-                            fm_hour = {
-                                **fm_hour,
-                                **bg_small_hour 
-                            }
-                            
-                        sheet.write_number(row_active, 3 + day_indexs.get(vals), hours, self.format(workbook, cell_default, **fm_hour))
-                        sum_columns[str(day_indexs.get(vals))] += hours
-                else:
+                        day_index = day_indexs.get(vals)  
+                        if day_index is not None:
+                            if hours < HOUR_SMALL:
+                                fm_hour = {**fm_hour, **bg_small_hour}
+
+                            sheet.write_number(row_active, 3 + day_index, hours, self.format(workbook, cell_default, **fm_hour))
+                            if str(day_index) in sum_columns:
+                                sum_columns[str(day_index)] += hours
                     continue
                 
             workingday = round(sum_rows[employee_id]/8, 2)
@@ -420,13 +458,16 @@ class ExportWizard(models.TransientModel):
         sheet.set_row(boxRowLast + 1, 25)
         sheet.set_row(boxRowLast + 3, 25)
         sheet.set_row(boxRowLast + 4, 25)
+        sheet.set_row(boxRowLast + 5, 25)
+        sheet.set_row(boxRowLast + 6, 25)
         sheet.write(boxRowLast + 3, 1, OFF, self.format(workbook, format, **{'bg_color': '#BFBFBF'}))
         sheet.write(boxRowLast + 3, 2, 'Nghỉ ca', self.format(workbook, format, **{'bold': True}))
         sheet.write(boxRowLast + 4, 1, PN, self.format(workbook, format, **{'bg_color': '548235'}))
         sheet.write(boxRowLast + 4, 2, 'Phép năm', self.format(workbook, format, **{'bold': True}))
         sheet.write(boxRowLast + 5, 1, CONFIRM, self.format(workbook, format, **{'bg_color': 'ffd966'}))
         sheet.write(boxRowLast + 5, 2, f'Thiếu giờ làm (<{HOUR_SMALL}h)', self.format(workbook, format, **{'bold': True}))
-        
+        sheet.write(boxRowLast + 6, 1, WFH, self.format(workbook, format, **{'bg_color': '#ADD8E6'}))
+        sheet.write(boxRowLast + 6, 2, 'Work from home', self.format(workbook, format, **{'bold': True}))
         
         
     def handle_user_off_all_month(self, sheet, row_active, col, workbook, cell_default):
@@ -522,4 +563,52 @@ class ExportWizard(models.TransientModel):
         attendances.extend(multi_mode)
         
         return self.handle_data_export(attendances)
+
+    def approved_time_off_query(self, company_ids, start_date, end_date):
+
+        companies = self.env['res.company'].browse(company_ids)
+
+        if hasattr(companies, 'time_off_type_id'):
+            time_off_type_ids = self.get_time_off_type_ids_for_companies(company_ids)
+
+        else:
+            time_off_type_ids = [0]
+
+        try:
+            hr_leave_model = self.env['hr.leave']
+        except KeyError:
+            return {}, {}
+            
+        approved_leaves = self.env['hr.leave'].search([
+            ('state', '=', 'validate'),
+            ('request_date_from', '>=', start_date),
+            ('request_date_to', '<=', end_date),
+            ('employee_id.company_id', 'in', company_ids),
+        ])
+
+        approved_time_off_map = {}
+        approved_wfh_map = {}
         
+        for leave in approved_leaves:
+            emp_id = str(leave.employee_id.id)
+            leave_days = pd.date_range(leave.request_date_from, leave.request_date_to, freq='D')
+            
+            for leave_day in leave_days:
+                day_str = leave_day.strftime('%-d/%-m')
+                
+                if leave.holiday_status_id.id in time_off_type_ids:
+                    if emp_id not in approved_wfh_map:
+                        approved_wfh_map[emp_id] = [day_str]
+                    elif day_str not in approved_wfh_map[emp_id]:  
+                        approved_wfh_map[emp_id].append(day_str)
+                else:
+                    if emp_id not in approved_time_off_map:
+                        approved_time_off_map[emp_id] = [day_str]
+                    elif day_str not in approved_time_off_map[emp_id]:  
+                        approved_time_off_map[emp_id].append(day_str)
+
+        return approved_time_off_map, approved_wfh_map
+
+
+
+
