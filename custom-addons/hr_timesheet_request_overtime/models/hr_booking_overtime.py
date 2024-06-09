@@ -273,7 +273,7 @@ class AccountAnalyticLine(models.Model):
         date = vals_list.get('date')
         employee = vals_list.get('employee_id')
         project_id = vals_list.get('project_id')
-        values = {'payment_month': str(datetime.strptime(date, '%Y-%m-%d').month)}
+        values = {'payment_month': str(datetime.strptime(str(date), '%Y-%m-%d').month)}
         
         if type_timesheet == 'yes':
             # TODO check lai truong hop search ra nhieu hon 1 booking, CASE nay booking phai la duy nhat
