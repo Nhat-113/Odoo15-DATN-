@@ -1,0 +1,7 @@
+.tenant-link-max-width-field {
+    white-space: nowrap !important; 
+    overflow: hidden !important;    
+    text-overflow: ellipsis !important;
+    max-width: 200px !important; 
+    vertical-align: top !important;
+}
