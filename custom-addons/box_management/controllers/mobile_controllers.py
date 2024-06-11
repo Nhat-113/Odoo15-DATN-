@@ -50,14 +50,18 @@ class BoxManagementMobile(http.Controller):
             for key, field in fields_map.items():
                 value = getattr(user, field)
                 data[key] = value if value else ""
-
+        
             obj_fields_map = [
                 ("company", "company_id"),
                 ("department", "department_id"),
                 ("manager", "employee_parent_id"),
-                ("coach", "coach_id"),
-                ("timeoff", "leave_manager_id")
+                ("coach", "coach_id")
             ]
+            
+            check_leave_manager_id = hasattr(user, 'leave_manager_id')
+
+            if check_leave_manager_id:
+                obj_fields_map.append(("timeoff", "leave_manager_id"))
 
             for key, field in obj_fields_map:
                 value = getattr(user, field)
@@ -111,7 +115,6 @@ class BoxManagementMobile(http.Controller):
                 ("coach", "coach_id"),
                 ("timeoff", "leave_manager_id")
             ]
-
             for key, field in obj_fields_map:
                 value = getattr(employee, field)
                 data[key] = {"id": value.id, "name": value.name} if value else None
