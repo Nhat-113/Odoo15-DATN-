@@ -7,6 +7,7 @@ from odoo.http import request
 
 import json
 import logging
+from itertools import chain
 
 
 ###############################

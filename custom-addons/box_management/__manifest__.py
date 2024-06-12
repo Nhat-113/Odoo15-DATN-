@@ -16,6 +16,7 @@
         "security/ir.model.access.csv",
         "views/passcode_register_view.xml",
         "views/box_management_view.xml",
+        "views/setting_device_view.xml",
         "views/menu.xml",
         "views/hr_attendance_view.xml",
         "views/hr_attendance_pseudo_view.xml",

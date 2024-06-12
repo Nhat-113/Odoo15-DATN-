@@ -7,3 +7,4 @@ from . import res_config_settings
 from . import attendance_device_details
 from . import hr_attendance
 from . import hr_attendance_pseudo
+from . import setting_device
