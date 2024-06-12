@@ -4,4 +4,3 @@ access.box.management.admin,access_box_management_admin,box_management.model_box
 access.attendance.device.details,access.attendance_device_details,box_management.model_attendance_device_details,base.group_user,1,1,1,1
 access.passcode.register.hr,access_passcode_register_hr,box_management.model_passcode_register,group_facelog_device_hr,1,1,1,1
 access.passcode.register.admin,access_passcode_register_admin,box_management.model_passcode_register,group_facelog_device_admin,1,1,1,1
-access.box.management.employee,access_box_management_employee,box_management.model_box_management,group_facelog_device_employee,1,0,0,0

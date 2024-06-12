@@ -4,17 +4,11 @@
             <field name="name">Facelog Device</field>
             <field name="sequence">1</field>
         </record>
-        
-        <record id="group_facelog_device_employee" model="res.groups">
-            <field name="name">Employee</field>
-            <field name="category_id" ref="box_management.module_category_facelog_device"/>
-            <field name="implied_ids" eval="[(4, ref('base.group_user'))]" />
-        </record>
             
         <record id="group_facelog_device_hr" model="res.groups">
             <field name="name">HR</field>
             <field name="category_id" ref="box_management.module_category_facelog_device"/>
-            <field name="implied_ids" eval="[(4, ref('group_facelog_device_employee'))]" />
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]" />
         </record>
         
         <record id="group_facelog_device_admin" model="res.groups">
