@@ -5,3 +5,6 @@
     max-width: 200px !important; 
     vertical-align: top !important;
 }
+.tenant-white-space {
+    white-space: pre-wrap; 
+  }
