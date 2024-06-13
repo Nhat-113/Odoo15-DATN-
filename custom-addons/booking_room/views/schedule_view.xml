@@ -108,11 +108,6 @@
                         attrs="{'invisible':['|',('duration', '&gt;', 0.25),('duration', '=', 0.25)]}">
                         A meeting must be at least 15 minutes.
                     </div>
-                    <div class="alert alert-warning" role="alert"
-                        style="height: 40px; margin-bottom:0px;"
-                        attrs="{'invisible': [('template_not_found', '=', False)]}">
-                        Template mail not found (don't send mail)
-                    </div>
                 </xpath>
                 <sheet>
                     <group>
@@ -187,7 +182,6 @@
                             <field name="count" invisible="1"/>   
                             <field name="end_daily" invisible="1"/>
                             <field name="delete_type" invisible="1"/> 
-                            <field name="template_not_found" invisible="1"/> 
                         </group>
                     </group>
                     <!-- attachment -->
