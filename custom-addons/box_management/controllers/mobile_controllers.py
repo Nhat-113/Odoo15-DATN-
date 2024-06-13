@@ -80,12 +80,9 @@ class BoxManagementMobile(http.Controller):
         try:
             request_user_id = request.uid
             if not check_authorize('hr.employee', request_user_id):
-                return jsonResponse({
-                    "status": 40301,
-                    "message": "Forbidden",
-                    "keyerror": "Access Denied"
-                }, 403)
-            employee = request.env['hr.employee'].search([('id', '=', employee_id)])
+                employee = request.env['hr.employee.public'].search([('id', '=', employee_id)])
+            else:
+                employee = request.env['hr.employee'].search([('id', '=', employee_id)])
 
             if not employee:
                 return jsonResponse({
