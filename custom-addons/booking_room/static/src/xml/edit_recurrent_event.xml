@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+    <div t-name="booking_room.edit_recurrent_event">
+        <div class="form-check o_radio_item">
+            <input name="edit-option" type="radio" class="form-check-input o_radio_input"
+                checked="true" value="this" id="edit_self_only" />
+            <label class="form-check-label o_form_label" for="edit_self_only" style="margin-top:2px">This booking</label>
+        </div>
+        <div class="form-check o_radio_item">
+            <input name="edit-option" type="radio" class="form-check-input o_radio_input"
+                value="future" id="edit_future_events" />
+            <label class="form-check-label o_form_label" for="edit_future_events" style="margin-top:2px">This
+                and following related bookings</label>
+        </div>
+        <div class="form-check o_radio_item">
+            <input name="edit-option" type="radio" class="form-check-input o_radio_input"
+                value="all" id="edit_all_events" />
+            <label class="form-check-label o_form_label" for="edit_all_events" style="margin-top:2px">All related bookings</label>
+        </div>
+    </div>
+</template>

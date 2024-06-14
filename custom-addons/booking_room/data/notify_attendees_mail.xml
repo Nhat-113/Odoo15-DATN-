@@ -1,11 +1,11 @@
 <odoo>
     <data>
-        <record id="template_sendmail_delete_attendens" model="mail.template">
-            <field name="name">Booking room - Mail Edit Attendens</field>
+        <record id="template_notify_attendees" model="mail.template">
+            <field name="name">Booking room - Notify attendees mail</field>
             <field name="model_id" ref="model_meeting_schedule"/>
-            <field name="subject">Meeting Notice: {{object.meeting_subject}}</field>
+            <field name="subject">Meeting Schedule</field>
             <field name="email_from">{{object.create_uid.email_formatted or ''}}</field>
-            <field name="email_to">{{ ','.join(partner.work_email for partner in object.edit_emp if partner.work_email) }}</field>
+            <field name="email_to">{{ ','.join(partner.work_email for partner in object.partner_ids if partner.work_email) }}</field>
             <field name="body_html"><![CDATA[
                 <div id=":n1" class="ii gt" jslog="20277; u014N:xr6bB; 1:WyIjdGhyZWFkLWY6MTc5ODQ1MDQyMzE5NTQwOTM3NSJd; 4:WyIjbXNnLWY6MTc5ODQ1MDQyMzE5NTQwOTM3NSJd"><div id=":n2" class="a3s aiL "><table border="0" cellpadding="0" cellspacing="0" style="padding-top:16px;background-color:#f1f1f1;font-family:Verdana,Arial,sans-serif;color:#454748;width:100%;border-collapse:separate"><tbody><tr><td align="center">
                     <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding:24px;background-color:white;color:#454748;border-collapse:separate">
@@ -28,27 +28,24 @@
                         <tr>
                             <td style="min-width:590px">
                                 <p style="margin:0px">
-                                    <t t-if="len(object.edit_emp) == 1">
-                                        <p>Dear <t t-esc="object.edit_emp[0].name" />,</p>
+                                    <t t-if="len(object.partner_ids) == 1">
+                                        <p>Dear <t t-esc="object.partner_ids[0].name" />,</p>
                                     </t>
                                     <t t-else="">
                                         <p>Dear all,</p>
                                     </t>
-                                    <p style="margin-top: 8px;">I hope this email finds you well.</p>
-                                    </p> 
-                                    <t t-if="object.delete_type != 'none' and object.delete_type != None">
-                                        <p>I regret to inform you that all meetings titled "<t t-esc="object.meeting_subject"/>" scheduled after <t t-esc="object.s_date"/> have been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
-                                    <t t-else="">
-                                        <t t-if="object.meeting_type != 'normal'">
-                                            <p>I regret to inform you that the <t t-esc="object.meeting_type"/> meeting scheduled from <t t-esc="object.edit_date_start"/> to <t t-esc="object.edit_date_end"/> has been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
-                                        </t>
-                                        <t t-else="">
-                                            <p>I regret to inform you that the "<t t-esc="object.meeting_subject"/>" scheduled on <t t-esc="object.s_date"/> has been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
-                                        </t>                            
+                                    <t t-if="object.meeting_type != 'normal'">
+                                        <p>Your <t t-esc="object.meeting_type"/> meeting will start in 10 minutes, please attend on time.</p>
                                     </t>
-                                </p>
+                                    <t t-else="">
+                                        <p>Your meeting will start in 10 minutes, please attend on time.</p>
+                                    </t>
+                                    <p>Room: <t t-esc="object.room_id.name"/>
                                 <p>Thank you!</p>
                                 <p style="padding-top: 24px; padding-bottom: 16px;">
+                                    <a t-att-href="object.access_link" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">
+                                        View <t t-esc="model_description or 'Applications'"/>
+                                    </a>
                                 </p>
                                 <br/>
                             </td>

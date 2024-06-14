@@ -6,6 +6,8 @@ from pytz import timezone
 
 MAX_FILE_SIZE = 50 * 1000 * 1000
 ALLOWED_ATTACHMENT = ["txt","doc","docx","xlsx","csv","ppt","pptx","pdf","png","jpg","jpeg"]
+TIME_STRING_FORMAT = "%Y-%m-%d %H:%M:%S"
+DATE_FORMAT = "%d/%m/%Y"
 
 def generate_time_selection():
     time_selection = []
@@ -90,8 +92,9 @@ class MeetingSchedule(models.Model):
     month = fields.Char("Month and Year", compute="_compute_kanban_date_start", store=True,)
     time = fields.Char("Time", compute="_compute_kanban_date_start", store=True,)
 
-    repeat_weekly = fields.Integer(string="Repeat Weekly", default=1)
+    repeat_weekly = fields.Integer(string="Repeat Weekly", default=0)
     weekday = fields.Char(string="Day of week")
+    parent_id = fields.Integer()
 
     monday = fields.Boolean(string="Monday", default=True, readonly=False)
     tuesday = fields.Boolean(string="Tuesday", default=True, readonly=False)
@@ -103,7 +106,6 @@ class MeetingSchedule(models.Model):
     
 
     is_edit = fields.Boolean(default=False)
-    is_first_tag = fields.Boolean(default=True)
     check_access_team_id = fields.Boolean("Check Access", compute="_check_user_id")
     access_link = fields.Char(compute='_compute_access_link')
     attachment_ids = fields.One2many('ir.attachment','res_id', string="Attachments") 
@@ -116,11 +118,13 @@ class MeetingSchedule(models.Model):
     edit_room = fields.Char()
     edit_time = fields.Char()
     edit_date_start = fields.Char()
+    edit_date_end = fields.Char()
     reason_delete = fields.Char()
     count = fields.Integer(default = 0)
     edit_emp = fields.Many2many(comodel_name="hr.employee", string="Attendees", tracking=True,relation="meeting_schedule_edit_emp_rel" )
     end_daily = fields.Char()
     delete_type = fields.Char(default="")
+    email_sent = fields.Boolean(string='Email Sent', default=False)
 
     def _compute_default_start_minutes(self):
         time_start_date =  self.start_date.astimezone(self.get_local_tz()) 
@@ -189,12 +193,13 @@ class MeetingSchedule(models.Model):
         for record in self:
             if record.start_date:
                 date_obj = record.start_date.astimezone(self.get_local_tz())
-                record.day = date_obj.strftime("%-d")
+                record.day = date_obj.strftime("%d")
                 record.month = date_obj.strftime("%b %Y")
                 record.time = date_obj.strftime("%H:%M")
                 record.weekday = date_obj.strftime("%A")
                 record.s_date = date_obj.date()
-                record.e_date = date_obj.date()
+                if record.is_edit:
+                    record.e_date = date_obj.date()
 
     @api.depends("start_date", "end_date")
     def _compute_duration(self):
@@ -369,7 +374,7 @@ class MeetingSchedule(models.Model):
 
         local_new_end_date = (new_end_date + timedelta(hours=hours)).date()
 
-        self.write({"end_date": new_end_date, "e_date": local_new_end_date, "meeting_type": "normal","count":1})
+        self.write({"end_date": new_end_date, "e_date": local_new_end_date, "count": 1})
 
         weekday_attributes = [
             self.monday,
@@ -400,7 +405,7 @@ class MeetingSchedule(models.Model):
                     "name": self.name,
                     "meeting_subject": self.meeting_subject,
                     "description": self.description,
-                    "meeting_type": "normal",
+                    "meeting_type": self.meeting_type,
                     "start_date": booking,
                     "end_date": datetime.combine(date, end_datetime.time()),
                     "duration": self.duration,
@@ -409,8 +414,8 @@ class MeetingSchedule(models.Model):
                     "company_id": self.company_id.id,
                     "user_id": self.user_id.id,
                     "is_edit": True,
-                    "is_first_tag": False,
                     "partner_ids": self.partner_ids,
+                    'parent_id': self.id,
                     's_date': date,
                     'e_date': date,
                 })
@@ -419,37 +424,34 @@ class MeetingSchedule(models.Model):
 
     def create_weekly(self):
         booking_to_create = []
-        for rec in self:
-            start_date = rec.start_date
+        start_date = self.start_date
 
-            self.write({"meeting_type": "normal"})
-
-            for i in range(rec.repeat_weekly + 1):
-                new_bookings = []
-                current_date = start_date + timedelta(weeks=i)
-                if current_date != start_date:
-                    new_bookings.append(
-                        {
-                            "name": rec.room_id.name,
-                            "meeting_subject": rec.meeting_subject,
-                            "description": rec.description,
-                            "start_date": current_date,
-                            "end_date": current_date + timedelta(hours=rec.duration),
-                            "meeting_type": "normal",
-                            "room_id": rec.room_id.id,
-                            "company_id": rec.company_id.id,
-                            "duration": self.duration,
-                            "file_attachment_ids": rec.file_attachment_ids,
-                            "user_id": rec.user_id.id,
-                            "repeat_weekly": 0,
-                            "is_edit": True,
-                            "is_first_tag": False,
-                            "partner_ids": self.partner_ids,
-                            's_date': current_date.date(),
-                            'e_date': (current_date + timedelta(hours=rec.duration)).date()
-                        }
-                    )
-                booking_to_create.extend(new_bookings)
+        for i in range(self.repeat_weekly + 1):
+            new_bookings = []
+            current_date = start_date + timedelta(weeks=i)
+            if current_date != start_date:
+                new_bookings.append(
+                    {
+                        "name": self.room_id.name,
+                        "meeting_subject": self.meeting_subject,
+                        "description": self.description,
+                        "start_date": current_date,
+                        "end_date": current_date + timedelta(hours=self.duration),
+                        "meeting_type": self.meeting_type,
+                        "room_id": self.room_id.id,
+                        "company_id": self.company_id.id,
+                        "duration": self.duration,
+                        "file_attachment_ids": self.file_attachment_ids,
+                        "user_id": self.user_id.id,
+                        "repeat_weekly": self.repeat_weekly,
+                        "is_edit": True,
+                        "partner_ids": self.partner_ids,
+                        'parent_id': self.id,
+                        's_date': current_date.date(),
+                        'e_date': current_date.date()
+                    }
+                )
+            booking_to_create.extend(new_bookings)
 
         self.create(booking_to_create)
 
@@ -468,7 +470,9 @@ class MeetingSchedule(models.Model):
             result = {
                 "user_id": booking.user_id.id,
                 "start_date": booking.start_date + timedelta(hours=self.get_local_tz(offset=True)),
+                "end_date": booking.end_date + timedelta(hours=self.get_local_tz(offset=True)),
                 "is_hr": self.check_is_hr(),
+                "room_id": booking.room_id.id,
             }
         return result
 
@@ -494,7 +498,7 @@ class MeetingSchedule(models.Model):
             6: ("Sunday", self.sunday),
         }
         weekday_name, allowed = weekday_mapping.get(start_datetime.weekday())
-        if not allowed and self.meeting_type == "daily" and self.is_first_tag == True:
+        if not allowed and self.meeting_type == "daily" and not self.parent_id:
             raise ValidationError(f"Start date cannot be scheduled on {weekday_name}.")
 
     def send_meeting_email(self, template):
@@ -503,73 +507,77 @@ class MeetingSchedule(models.Model):
             for record in self:
                 template_id.send_mail(record.id, force_send=True)
 
-    def send_meeting_email_edit(self, template, vals):
-        template_id_edit = self.env.ref( template,raise_if_not_found=False)
-        template_id_add_attendens = self.env.ref('booking_room.template_sendmail_add_attendens',raise_if_not_found=False)
-        template_id_delete_attendens = self.env.ref('booking_room.template_sendmail_delete_attendens',raise_if_not_found=False)
-        
-        room = self.env['meeting.room'].search([('id', '=', vals.get('room_id'))], limit=1)
-        change_room = room.name if room else None
+    def send_meeting_email_edit(self, vals, edit_type = 'single'):
+        if len(self.partner_ids.ids) == 0 and 'partner_ids' not in vals:
+            return
+        template_id_edit = self.env.ref('booking_room.template_sendmail_edit_event', raise_if_not_found=False)
+        template_id_add_attendens = self.env.ref('booking_room.template_sendmail_add_attendens', raise_if_not_found=False)
+        template_id_delete_attendens = self.env.ref('booking_room.template_sendmail_delete_attendens', raise_if_not_found=False)
 
-        local_tz = self.env.user.tz or 'UTC'  # Get the local timezone from the user settings, default to 'UTC'
+        current_rec = self.search([('id', "=", vals['id'])]) if edit_type != 'single' else None
+        source_rec = current_rec if current_rec else self
+        local_tz = self.get_local_tz()
 
-        format_string = "%Y-%m-%d %H:%M:%S"
+        room_name = self.env['meeting.room'].search([('id', '=', vals['room_id'])]).name if 'room_id' in vals else source_rec.room_id.name
         start_date = vals.get('start_date')
+        smallest_start_date = vals.get('smallest_start_date')
+        largest_start_date = vals.get('largest_start_date')
         end_date = vals.get('end_date')
-
-        attendens = vals.get('partner_ids')
-        curen_edit_emp = None
-
-        start_date = datetime.strptime(str(start_date), format_string) if start_date else None
-        end_date = datetime.strptime(str(end_date), format_string) if end_date else None
+        partner_ids = vals.get('partner_ids')
 
         if start_date:
-            change_datestart = start_date.astimezone(timezone(local_tz))
+            local_start_date = datetime.strptime(str(start_date), TIME_STRING_FORMAT).astimezone(local_tz)
         else:
-            change_datestart = self.start_date.astimezone(timezone(local_tz))
+            local_start_date = source_rec.start_date.astimezone(local_tz)
 
         if end_date:
-            change_dateend = end_date.astimezone(timezone(local_tz))
+            local_end_date = datetime.strptime(str(end_date), TIME_STRING_FORMAT).astimezone(local_tz)
         else:
-            change_dateend = self.end_date.astimezone(timezone(local_tz))
+            local_end_date = source_rec.end_date.astimezone(local_tz)
 
-        if change_room:
-            change_room = str(change_room)
-            self.edit_room = change_room
-        else :
-            self.edit_room = self.room_id.name
+        if smallest_start_date and largest_start_date:
+            local_smallest_start_date = smallest_start_date.astimezone(local_tz)
+            local_largest_start_date = largest_start_date.astimezone(local_tz)
 
-        self.edit_time = change_datestart.strftime("%H:%M") +" to " +change_dateend.strftime("%H:%M") 
-        self.edit_date_start = change_datestart.strftime("%d-%m-%Y")
-        if attendens and template_id_delete_attendens and template_id_add_attendens:
-            curent_emp =[]
-            curen_edit_emp = vals.get('partner_ids')
-            for edit_emp in self.partner_ids:
+        source_rec.edit_room = room_name
+        source_rec.s_date = local_start_date.date()
+        source_rec.e_date = local_end_date.date()
+        source_rec.edit_time = local_start_date.strftime("%H:%M") +" to " + local_end_date.strftime("%H:%M")
+        source_rec.delete_type = 'none'
+        if not current_rec:
+            source_rec.edit_date_start = local_start_date.strftime(DATE_FORMAT)
+            source_rec.edit_date_end = local_end_date.strftime(DATE_FORMAT)
+        else:
+            source_rec.edit_date_start = local_smallest_start_date.strftime(DATE_FORMAT)
+            source_rec.edit_date_end = local_largest_start_date.strftime(DATE_FORMAT)
+
+        removed_emps = {}
+        # Run if there are changes in partners
+        if partner_ids or partner_ids == []:
+            curent_emp = []
+            for edit_emp in source_rec.partner_ids:
                 curent_emp.append(edit_emp.id)
             curent_emp = set(curent_emp)
-            edit_emp = set(vals.get('partner_ids')[0][2])
-            missing_in_curent_emp = curent_emp - edit_emp
+            edit_emp = set(partner_ids[0][2]) if not current_rec else set(partner_ids)
 
-            additional_in_curent_emp = edit_emp - curent_emp
+            removed_emps = curent_emp - edit_emp
+            added_emps = edit_emp - curent_emp
 
-            if len(missing_in_curent_emp) >0:
-                self.edit_emp = self.env['hr.employee'].search([("id", "in", list(missing_in_curent_emp))])
-                for record in self:
-                    template_id_delete_attendens.send_mail(record.id, force_send=True)
+            if len(removed_emps) > 0:
+                source_rec.edit_emp = self.env['hr.employee'].search([("id", "in", list(removed_emps))])
+                template_id_delete_attendens.send_mail(source_rec.id, force_send=True)
 
-            if len(additional_in_curent_emp)>0:
-                self.edit_emp = self.env['hr.employee'].search([("id", "in", list(additional_in_curent_emp))])
-                for record in self:
-                    template_id_add_attendens.send_mail(record.id, force_send=True)
+            if len(added_emps) > 0:
+                source_rec.edit_emp = self.env['hr.employee'].search([("id", "in", list(added_emps))])
+                template_id_add_attendens.send_mail(source_rec.id, force_send=True)
 
-        if start_date != None or end_date != None or change_room != None:   
-            if curen_edit_emp != None:
-                    self.edit_emp = curen_edit_emp
-            else:
-                self.edit_emp=self.partner_ids
-            if template_id_edit: 
-                for record in self:
-                    template_id_edit.send_mail(record.id, force_send=True)
+        # Removed employees won't receive an email of changes
+        source_rec.edit_emp = source_rec.partner_ids.filtered(lambda p: p.id not in removed_emps) if removed_emps else source_rec.partner_ids
+
+        # Send email of changes only when these fields below change
+        if start_date or end_date:
+            if start_date != source_rec.start_date or end_date != source_rec.end_date or 'room_id' in vals:
+                template_id_edit.send_mail(source_rec.id, force_send=True)
 
     def get_local_tz(self, offset=False):
         user_tz = self.env.user.tz or "UTC"
@@ -591,11 +599,11 @@ class MeetingSchedule(models.Model):
 
         meeting_type = vals.get("meeting_type")
 
-        if meeting_type == "daily":
+        if meeting_type == "daily" and not vals["parent_id"]:
             meeting_schedule.create_daily()
-        elif meeting_type == "weekly":
+        elif meeting_type == "weekly" and not vals["parent_id"]:
             meeting_schedule.create_weekly()
-        if vals["is_first_tag"] == True \
+        if not vals["parent_id"] \
         and "partner_ids" in vals \
         and len(vals["partner_ids"][0][2]) > 0:
             meeting_schedule.send_meeting_email('booking_room.template_sendmail')
@@ -606,17 +614,26 @@ class MeetingSchedule(models.Model):
             for record in self:
                 start_date = vals.get("start_date")
                 end_date = vals.get("end_date")
-                name_event =  vals.get("room_id")
-                edit_attendees = vals.get('partner_ids')
-                if not record.check_is_hr():
+                room_id =  vals.get("room_id")
+                partner_ids = vals.get('partner_ids')
+
+                if start_date and end_date:
+                    local_tz = self.get_local_tz()
+                    local_start_date = start_date if isinstance(start_date, datetime) else datetime.strptime(start_date, TIME_STRING_FORMAT).astimezone(local_tz)
+                    local_end_date = end_date if isinstance(end_date, datetime) else datetime.strptime(end_date, TIME_STRING_FORMAT).astimezone(local_tz)
+                    if local_start_date.date() != local_end_date.date():
+                        raise ValidationError("A meeting must end on the same day")
+
+                if not record.check_is_hr() and 'email_sent' not in vals:
                     if self.env.uid != record.user_id.id:
                         raise ValidationError("Cannot modify someone else's meeting")
                     if self._check_is_past_date(record.start_date):
                         raise ValidationError("Cannot edit ongoing or finished meetings")
                     if self._check_is_past_date(start_date):
                         raise ValidationError("Start date cannot be in the past")
-                if start_date!= None or end_date!= None or name_event!=None or edit_attendees!=None:
-                    self.send_meeting_email_edit('booking_room.template_sendmail_edit_event',vals)
+                if record.meeting_type == 'normal':
+                    if start_date or end_date or room_id or partner_ids:
+                        self.send_meeting_email_edit(vals)
         return super(MeetingSchedule, self).write(vals)
 
     def unlink(self):
@@ -706,3 +723,123 @@ class MeetingSchedule(models.Model):
                 template_id = self.env.ref('booking_room.template_sendmail_delete_attendens', raise_if_not_found=False)
                 if template_id:
                     template_id.send_mail(record.id, force_send=True)
+
+    @api.model
+    def write_many(self, data, start_date_str, selected_value, action_type = "form"):
+        id = data["id"]
+        duration = data["duration"]
+        parent_id = data["parent_id"]
+
+        if action_type == "form":
+            old_start_date = datetime.strptime(start_date_str, TIME_STRING_FORMAT)
+            start_date = datetime.strptime(data["start_date"], TIME_STRING_FORMAT)
+            room_id = data["room_id"]["data"]["id"]
+            file_attachment_ids = data["file_attachment_ids"]["res_ids"]
+            partner_ids = data["partner_ids"]["res_ids"]
+        else:
+            old_start_date = datetime.strptime(data["start_date"], TIME_STRING_FORMAT)
+            start_date = datetime.strptime(start_date_str, TIME_STRING_FORMAT)
+            room_id = data["room_id"][0]
+            file_attachment_ids = data["file_attachment_ids"]
+            partner_ids = data["partner_ids"]
+
+        rec = self.search([('id', '=', id)])
+
+        filter = []
+        
+        if selected_value == 'this':
+            filter = [('id', "=", id)]
+        if selected_value == 'future':
+            if parent_id == 0: 
+                filter = [
+                    '|', 
+                    ('id', "=", id), 
+                    ('parent_id', "=", id),
+                    ('start_date','>=', old_start_date),
+                ]
+            else:
+                filter = [
+                    '|', 
+                    ('id', "=", parent_id), 
+                    ('parent_id', "=", parent_id),
+                    ('start_date','>=', old_start_date),
+                ]
+        elif selected_value == 'all':
+            if parent_id == 0: filter = ['|', ('id', "=", id), ('parent_id', "=", id)]
+            else:
+                filter = [
+                    '|',
+                    ('id', "=", parent_id),
+                    ('parent_id', "=", parent_id),
+                ]
+
+        if not self.check_is_hr(): filter.append(('start_date','>=', fields.Datetime.now()))
+
+        child_records = self.search(filter, order="start_date ASC" if start_date < old_start_date else "start_date DESC")
+        gap = start_date - old_start_date
+        recs_to_edit = []
+
+        for rec in child_records:
+            new_start_date = datetime.combine((rec.start_date + gap).date(), start_date.time())
+            new_end_date = new_start_date + timedelta(hours=duration)
+            new_date = new_start_date.astimezone(self.get_local_tz()).date()
+
+            if action_type == 'form':
+                vals = {
+                    "room_id": room_id,
+                    "start_date": new_start_date,
+                    "end_date": new_end_date,
+                    "meeting_subject": data["meeting_subject"],
+                    "description": data["description"],
+                    "duration": data["duration"],
+                    "repeat_weekly": data["repeat_weekly"],
+                    "s_date": new_date,
+                    "e_date": new_date,
+                    "file_attachment_ids": file_attachment_ids if len(file_attachment_ids) > 0 else None,
+                    "partner_ids": partner_ids if len(partner_ids) > 0 else None,
+                }
+            else:
+                vals = {
+                    "start_date": new_start_date,
+                    "end_date": new_end_date,
+                    "duration": data["duration"],
+                    "s_date": new_date,
+                    "e_date": new_date,
+                }
+            recs_to_edit.append(vals)
+
+        smallest_start_date = min(d["start_date"] for d in recs_to_edit)
+        largest_start_date = max(d["start_date"] for d in recs_to_edit)
+            
+        mail_data = {
+            "id": data["id"],
+            "smallest_start_date": smallest_start_date,
+            "largest_start_date": largest_start_date,
+            "start_date": start_date,
+            "end_date": start_date + timedelta(hours=duration),
+            "partner_ids": partner_ids if len(partner_ids) > 0 else [],
+        }
+        if room_id != rec.room_id.id: mail_data["room_id"] = room_id
+        self.send_meeting_email_edit(mail_data, edit_type='multi')
+        for i, rec in enumerate(child_records): rec.write(recs_to_edit[i])
+
+    @api.model
+    def notify_booking(self):
+        NOTIFY_MAIL_MINUTES = 10
+
+        current_time = fields.Datetime.now()
+        local_tz = self.get_local_tz()
+        local_current_time = current_time.astimezone(local_tz)
+        records_to_send = self.search([
+            ('start_date', '<=', current_time + timedelta(minutes=NOTIFY_MAIL_MINUTES)),
+            ('email_sent', '=', False),
+            ('s_date', '=', local_current_time.date()),
+        ])
+        for record in records_to_send:
+            # if user create booking when current time is less than 10 minutes from the start of that booking, it wont send notify mail
+            if (record.create_date + timedelta(minutes=NOTIFY_MAIL_MINUTES) > record.start_date and self.parent_id == 0):
+                record.email_sent = True
+            else:
+                template_id = self.env.ref('booking_room.template_notify_attendees')
+                template_id.send_mail(record.id, force_send=True)
+                record.email_sent = True

@@ -33,12 +33,17 @@
                                     </t>
                                     <t t-else="">
                                         <p>Dear all,</p>
+                                    </t>                                    
+                                    <t t-if="object.meeting_type != 'normal'">
+                                        <p>We cordially invite you to attend our <t t-esc="object.meeting_type"/> meeting.</p>      
                                     </t>
-                                    <p>We cordially invite you to attend our team meeting.</p>      
-                                    <h3>Meeting Details:</h3>
-                                    <p style="padding-left: 24px;"> Meeting Subject: <t t-esc="object.meeting_subject"/></p>     
+                                    <t t-else="">
+                                        <p>We cordially invite you to attend our meeting.</p>      
+                                    </t>
+                                    <h3>Meeting Details:</h3>     
                                     <p style="padding-left: 24px;">Date: <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> <t t-esc="object.end_daily"/></p>
                                     <p style="padding-left: 24px;">Time: <t t-esc="object.start_minutes"/> - <t t-esc="object.end_minutes"/></p>
+                                    <p style="padding-left: 24px;">Timezone: <t t-esc="object.user_id.tz"/></p>
                                     <p style="padding-left: 24px;">Location: <t t-esc="object.room_id.name"/> </p>
                                     <t t-if="object.description">
                                         <p style="padding-left: 24px;">Description: <t t-esc="object.description"/></p>
