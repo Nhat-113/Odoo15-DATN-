@@ -120,6 +120,7 @@ class MeetingSchedule(models.Model):
     count = fields.Integer(default = 0)
     edit_emp = fields.Many2many(comodel_name="hr.employee", string="Attendees", tracking=True,relation="meeting_schedule_edit_emp_rel" )
     end_daily = fields.Char()
+    delete_type = fields.Char(default="")
 
     def _compute_default_start_minutes(self):
         time_start_date =  self.start_date.astimezone(self.get_local_tz()) 
@@ -140,7 +141,7 @@ class MeetingSchedule(models.Model):
         for record in self:
             record.access_link = record._notify_get_action_link('view')
 
-    #Depends
+    # Depends
     @api.depends("user_id")
     def _check_user_id(self):
         for rec in self:
@@ -164,7 +165,6 @@ class MeetingSchedule(models.Model):
         employee_id = self.env.user.employee_id.id
         return employee_id in partner_ids
 
-
     @api.depends("partner_ids")
     def _check_for_attachment(self):
         res_user_id = self.env.user.id
@@ -177,7 +177,7 @@ class MeetingSchedule(models.Model):
                 res_user_id == rec.create_uid.id or
                 is_attendee
             )
-
+            
     @api.depends("room_id", "user_id")
     def _compute_meeting_name(self):
         for record in self:
@@ -283,13 +283,8 @@ class MeetingSchedule(models.Model):
                 duration_hours = duration_seconds / 3600
                 self.duration = duration_hours
 
-            c_hour = datetime.now().astimezone(local_tz).hour
-            if c_hour >= 22:
-                self.start_minutes = '23:00'      
-                self.end_minutes = '23:30'
-            else:  
-                self.start_minutes = str(start_date.hour).zfill(2) + ":" + str(start_date.minute).zfill(2)
-                self.end_minutes = str(end_date.hour).zfill(2) + ":" + str(end_date.minute).zfill(2)        
+            self.start_minutes = str(start_date.hour).zfill(2) + ":" + str(start_date.minute).zfill(2)
+            self.end_minutes = str(end_date.hour).zfill(2) + ":" + str(end_date.minute).zfill(2)        
         
             if self.duration != 0 and end_date.date() != start_date.date() and self.meeting_type != "daily" :
                 self.meeting_type = "daily"
@@ -503,11 +498,16 @@ class MeetingSchedule(models.Model):
             raise ValidationError(f"Start date cannot be scheduled on {weekday_name}.")
 
     def send_meeting_email(self, template):
-        template_id = self.env.ref(template)
-        for record in self:
-            template_id.send_mail(record.id, force_send=True)
+        template_id = self.env.ref(template, raise_if_not_found=False)
+        if template_id:
+            for record in self:
+                template_id.send_mail(record.id, force_send=True)
 
     def send_meeting_email_edit(self, template, vals):
+        template_id_edit = self.env.ref( template,raise_if_not_found=False)
+        template_id_add_attendens = self.env.ref('booking_room.template_sendmail_add_attendens',raise_if_not_found=False)
+        template_id_delete_attendens = self.env.ref('booking_room.template_sendmail_delete_attendens',raise_if_not_found=False)
+        
         room = self.env['meeting.room'].search([('id', '=', vals.get('room_id'))], limit=1)
         change_room = room.name if room else None
 
@@ -518,6 +518,7 @@ class MeetingSchedule(models.Model):
         end_date = vals.get('end_date')
 
         attendens = vals.get('partner_ids')
+        curen_edit_emp = None
 
         start_date = datetime.strptime(str(start_date), format_string) if start_date else None
         end_date = datetime.strptime(str(end_date), format_string) if end_date else None
@@ -540,8 +541,9 @@ class MeetingSchedule(models.Model):
 
         self.edit_time = change_datestart.strftime("%H:%M") +" to " +change_dateend.strftime("%H:%M") 
         self.edit_date_start = change_datestart.strftime("%d-%m-%Y")
-        if attendens:  
+        if attendens and template_id_delete_attendens and template_id_add_attendens:
             curent_emp =[]
+            curen_edit_emp = vals.get('partner_ids')
             for edit_emp in self.partner_ids:
                 curent_emp.append(edit_emp.id)
             curent_emp = set(curent_emp)
@@ -552,20 +554,22 @@ class MeetingSchedule(models.Model):
 
             if len(missing_in_curent_emp) >0:
                 self.edit_emp = self.env['hr.employee'].search([("id", "in", list(missing_in_curent_emp))])
-                template_id = self.env.ref('booking_room.template_sendmail_delete_attendens')
                 for record in self:
-                    template_id.send_mail(record.id, force_send=True)
+                    template_id_delete_attendens.send_mail(record.id, force_send=True)
 
             if len(additional_in_curent_emp)>0:
                 self.edit_emp = self.env['hr.employee'].search([("id", "in", list(additional_in_curent_emp))])
-                template_id = self.env.ref('booking_room.template_sendmail_add_attendens')
                 for record in self:
-                    template_id.send_mail(record.id, force_send=True)
-        if start_date!=None or end_date!=None or change_room!=None:     
-            self.edit_emp=self.partner_ids
-            template_id = self.env.ref(template)
-            for record in self:
-                template_id.send_mail(record.id, force_send=True)
+                    template_id_add_attendens.send_mail(record.id, force_send=True)
+
+        if start_date != None or end_date != None or change_room != None:   
+            if curen_edit_emp != None:
+                    self.edit_emp = curen_edit_emp
+            else:
+                self.edit_emp=self.partner_ids
+            if template_id_edit: 
+                for record in self:
+                    template_id_edit.send_mail(record.id, force_send=True)
 
     def get_local_tz(self, offset=False):
         user_tz = self.env.user.tz or "UTC"
@@ -635,17 +639,15 @@ class MeetingSchedule(models.Model):
                 if type_view!="form_view":
                     return super(MeetingSchedule, find_meeting).unlink()
             elif selected_value == "future_events":
-                record_to_detele = self.search([("start_date", ">=", find_meeting.start_date)])
-                for sendmail in record_to_detele:
-                    sendmail.reason_delete = reason_delete
-                    sendmail.send_meeting_email('booking_room.template_send_mail_delete')
+                delete_type = "future_events"
+                record_to_detele = self.search([("start_date", ">=", find_meeting.start_date)], order="id")
+                record_to_detele.send_mail_delete_attends(reason_delete, record_to_detele, delete_type)
                 find_meeting.unlink()
                 return super(MeetingSchedule, record_to_detele).unlink()
             else:
-                record_to_detele = self.search([])
-                for sendmail in record_to_detele:
-                    sendmail.reason_delete = reason_delete
-                    sendmail.send_meeting_email('booking_room.template_send_mail_delete')
+                delete_type = "future_events"
+                record_to_detele = self.search([], order="id")
+                record_to_detele.send_mail_delete_attends(reason_delete, record_to_detele, delete_type)
                 return super(MeetingSchedule, record_to_detele).unlink()
         else:
             if find_meeting.user_id.id == self.env.uid:
@@ -653,6 +655,7 @@ class MeetingSchedule(models.Model):
                     if self._check_is_past_date(find_meeting.start_date):
                         raise Exception("Cannot delete ongoing or finished meetings.")
                     if type_view!="form_view":
+                        find_meeting.delete_type = 'normal'
                         find_meeting.send_meeting_email('booking_room.template_send_mail_delete')
                         return super(MeetingSchedule, find_meeting).unlink()
                 elif selected_value == "future_events":
@@ -660,18 +663,46 @@ class MeetingSchedule(models.Model):
                         [
                             ("start_date", ">=", find_meeting.start_date),
                             ("create_uid", "=", self.env.uid),
-                        ]
+                        ],
+                        order="id"
                     )
-                    for sendmail in record_to_detele:
-                        sendmail.send_meeting_email('booking_room.template_send_mail_delete')
+                    delete_type = "future_events"
+                    record_to_detele.send_mail_delete_attends(reason_delete,record_to_detele,delete_type)
                     return super(MeetingSchedule, record_to_detele).unlink()
                 else:
                     record_to_detele = self.search(
                         [
                             ("start_date", ">=", fields.Datetime.now()),
                             ("create_uid", "=", self.env.uid),
-                        ]
+                        ],
+                        order="id"
                     )
-                    for sendmail in record_to_detele:
-                        sendmail.send_meeting_email('booking_room.template_send_mail_delete')
+                    delete_type = "future_events"
+                    record_to_detele.send_mail_delete_attends(reason_delete,record_to_detele,delete_type)
                     return super(MeetingSchedule, record_to_detele).unlink()
+                    
+    def send_mail_delete_attends(self, reason_delete, records_to_delete, delete_type):
+        name_meeting = ""
+        name_room = ""
+        attends = set()
+        for record in records_to_delete:
+            if name_meeting != record.meeting_subject or name_room != record.room_id.name:
+                record.reason_delete = reason_delete
+                record.delete_type = delete_type
+                template_id = self.env.ref('booking_room.template_send_mail_delete', raise_if_not_found=False)
+                if template_id:
+                    template_id.send_mail(record.id, force_send=True)
+                name_meeting = record.meeting_subject
+                name_room = record.room_id.name
+                attends.update(record.partner_ids.ids)
+
+            new_attendees = set(record.partner_ids.ids) - attends
+
+            if new_attendees:
+                attends.update(new_attendees)
+                record.reason_delete = reason_delete
+                record.delete_type = delete_type
+                record.edit_emp = record.partner_ids.filtered(lambda emp: emp.id in new_attendees)
+                template_id = self.env.ref('booking_room.template_sendmail_delete_attendens', raise_if_not_found=False)
+                if template_id:
+                    template_id.send_mail(record.id, force_send=True)

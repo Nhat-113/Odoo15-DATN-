@@ -93,7 +93,7 @@
                 <field name="end_date" />
                 <field name="description" />
                 <field name="company_id" optional="show" />
-            </tree>
+                </tree>
         </field>
     </record>
 
@@ -180,7 +180,8 @@
                             <field name="reason_delete" invisible="1"/>      
                             <field name="edit_emp" invisible="1"/>  
                             <field name="count" invisible="1"/>   
-                            <field name="end_daily" invisible="1"/>                        
+                            <field name="end_daily" invisible="1"/>
+                            <field name="delete_type" invisible="1"/> 
                         </group>
                     </group>
                     <!-- attachment -->

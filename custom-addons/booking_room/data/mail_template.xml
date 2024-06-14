@@ -1,9 +1,9 @@
 <odoo>
     <data>
         <record id="template_sendmail" model="mail.template">
-            <field name="name">Send mail</field>
+            <field name="name">Booking room - Send Mail</field>
             <field name="model_id" ref="model_meeting_schedule"/>
-            <field name="subject">Meeting Schedule</field>
+            <field name="subject">Meeting Notice: {{object.meeting_subject}}</field>
             <field name="email_from">{{object.create_uid.email_formatted or ''}}</field>
             <field name="email_to">{{ ','.join(partner.work_email for partner in object.partner_ids if partner.work_email) }}</field>
             <field name="body_html"><![CDATA[
@@ -28,13 +28,21 @@
                         <tr>
                             <td style="min-width:590px">
                                 <p style="margin:0px">
-                                    <p>Dear,</p>
+                                    <t t-if="len(object.partner_ids) == 1">
+                                        <p>Dear <t t-esc="object.partner_ids[0].name" />,</p>
+                                    </t>
+                                    <t t-else="">
+                                        <p>Dear all,</p>
+                                    </t>
                                     <p>We cordially invite you to attend our team meeting.</p>      
-                                    <h3>Meeting Details:</h3>     
+                                    <h3>Meeting Details:</h3>
+                                    <p style="padding-left: 24px;"> Meeting Subject: <t t-esc="object.meeting_subject"/></p>     
                                     <p style="padding-left: 24px;">Date: <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> <t t-esc="object.end_daily"/></p>
                                     <p style="padding-left: 24px;">Time: <t t-esc="object.start_minutes"/> - <t t-esc="object.end_minutes"/></p>
                                     <p style="padding-left: 24px;">Location: <t t-esc="object.room_id.name"/> </p>
-                                    <p style="padding-left: 24px;">Description: <t t-esc="object.description"/></p>
+                                    <t t-if="object.description">
+                                        <p style="padding-left: 24px;">Description: <t t-esc="object.description"/></p>
+                                    </t>
                                 </p>
                                 <p>Thank you!</p>
                                 <p style="padding-top: 24px; padding-bottom: 16px;">

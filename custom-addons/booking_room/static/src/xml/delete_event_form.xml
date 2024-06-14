@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template>
     <div t-name="booking_room.RecurrentEventUpdateForm">
-       
         <input name="recurrence-update" type="radio" class="form-check-input o_radio_input" style="display:none" checked="true" value="self_only" id="self_only"/>
 
         <div class="form-check o_radio_item">
@@ -24,6 +23,7 @@
         <div class="form-check o_radio_item" style="display: none;" id="reason_textarea">
             <p>Reason</p>
             <textarea id="w3review" name="reason_delete_event" rows="4" cols="50" maxlength="250"></textarea>
+            <p id="warning_message" style="color: red; display: none;">Please provide a reason for selecting 'Others'.</p>
         </div>
     </div>
 </template>

@@ -26,6 +26,7 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
 
     return { current_hour, current_minute };
   }
+
   function default_end_minutes() {
     let current_time = new Date();
     let current_hour = current_time.getUTCHours();
@@ -35,6 +36,20 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
     return { current_hour, current_minute };
   }
 
+  // Function to check if mail templates exist
+  function checkMailTemplateExists(template_ids) {
+    return rpc.query({
+      model: 'ir.model.data',
+      method: 'search_read',
+      args: [
+        [['module', '=', 'booking_room'], ['name', 'in', template_ids]],
+        ['name']
+      ]
+    }).then(function (result) {
+      return result.map(record => record.name);
+    });
+  }
+
   var BookingCalendarController = CalendarController.extend({
     /**
      * @override
@@ -42,114 +57,166 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
     _onOpenCreate: function (event) {
       var self = this;
       const mode = this.mode;
-      if (["year", "month"].includes(this.model.get().scale)) {
-        event.data.allDay = true;
-      }
-      var data = this.model.calendarEventToRecord(event.data);
-      var context = _.extend(
-        {},
-        this.context,
-        event.options && event.options.context
-      );
-      if (data.name) {
-        context.default_name = data.name;
-      }
-      if (mode === "month" || mode === "year") {
-        let current_time = new Date();
 
-        let startTime = default_start_minutes();
-        var newStartDate = moment(data[this.mapping.date_start])
-          .hour(startTime.current_hour)
-          .minute(startTime.current_minute);
-        if (current_time.getDay > 7) {
-          newStartDate = newStartDate.subtract(1, "day");
-        }
-        var formattedStartDate = newStartDate.format("YYYY-MM-DD HH:mm:ss");
-        context["default_" + this.mapping.date_start] =
-          formattedStartDate || null;
+      const template_ids = [
+        'template_sendmail',
+        'template_sendmail_add_attendens',
+        'template_sendmail_delete_attendens',
+        'template_send_mail_delete',
+        'template_sendmail_edit_event'
+      ];
 
-        let endTime = default_end_minutes();
-        var newEndDate = moment(data[this.mapping.date_stop])
-          .hour(endTime.current_hour)
-          .minute(endTime.current_minute);
-        if (current_time.getDay > 7) {
-          newEndDate = newEndDate.subtract(1, "day");
+      // Check if the mail templates exist
+      checkMailTemplateExists(template_ids).then(function (existingTemplates) {
+        let check_mail_template = [];
+        if (!existingTemplates.includes("template_sendmail")) {
+          check_mail_template.push("template_sendmail")
         }
-        var formattedDateStop = newEndDate.format("YYYY-MM-DD HH:mm:ss");
-        context["default_" + this.mapping.date_stop] = formattedDateStop;
-      } else {
-        context["default_" + this.mapping.date_start] =
-          data[this.mapping.date_start] || null;
-        if (this.mapping.date_stop) {
-          context["default_" + this.mapping.date_stop] =
-            data[this.mapping.date_stop] || null;
+
+        if (!existingTemplates.includes("template_sendmail_add_attendens")) {
+          check_mail_template.push("template_sendmail_add_attendens")
         }
-      }
-      if (this.mapping.date_delay) {
-        context["default_" + this.mapping.date_delay] =
-          data[this.mapping.date_delay] || null;
-      }
-      if (this.mapping.all_day) {
-        context["default_" + this.mapping.all_day] =
-          data[this.mapping.all_day] || null;
-      }
-      for (var k in context) {
-        if (context[k] && context[k]._isAMomentObject) {
-          context[k] = dateToServer(context[k]);
+
+        if (!existingTemplates.includes("template_sendmail_delete_attendens")) {
+          check_mail_template.push("template_sendmail_delete_attendens")
         }
-      }
-      var options = _.extend({}, this.options, event.options, {
-        context: context,
-        title: this._setEventTitle(),
-      });
-      if (this.quick != null) {
-        this.quick.destroy();
-        this.quick = null;
-      }
-      if (
-        !options.disableQuickCreate &&
-        !event.data.disableQuickCreate &&
-        this.quickAddPop
-      ) {
-        this.quick = new QuickCreate(this, true, options, data, event.data);
-        this.quick.open();
-        this.quick.opened(function () {
-          self.quick.focus();
-        });
-        return;
-      }
-      if (this.eventOpenPopup) {
-        if (this.previousOpen) {
-          this.previousOpen.close();
+
+        if (!existingTemplates.includes("template_send_mail_delete")) {
+          check_mail_template.push("template_send_mail_delete")
         }
-        this.previousOpen = new dialogs.FormViewDialog(self, {
-          res_model: this.modelName,
-          context: context,
-          title: options.title,
-          view_id: this.formViewId || false,
-          disable_multiple_selection: true,
-          on_saved: function () {
-            if (event.data.on_save) {
-              event.data.on_save();
-            }
-            self.reload();
-          },
-        });
-        this.previousOpen.on("closed", this, () => {
-          if (event.data.on_close) {
-            event.data.on_close();
+
+        if (!existingTemplates.includes("template_sendmail_edit_event")) {
+          check_mail_template.push("template_sendmail_edit_event")
+        }
+
+        // Continue with the original functionality after checking the templates
+        if (["year", "month"].includes(self.model.get().scale)) {
+          event.data.allDay = true;
+        }
+        var data = self.model.calendarEventToRecord(event.data);
+        var context = _.extend(
+          {},
+          self.context,
+          event.options && event.options.context
+        );
+        if (data.name) {
+          context.default_name = data.name;
+        }
+        if (mode === "month" || mode === "year") {
+          let current_time = new Date();
+
+          let startTime = default_start_minutes();
+          let endTime = default_end_minutes();
+
+          if (startTime.current_hour >= 15 && startTime.current_minute >= 45) {
+            var newStartDate = moment(data[self.mapping.date_start])
+              .hour(17)
+              .minute(0)
+              .add(1, 'day'); 
+            var newEndDate = moment(data[self.mapping.date_stop])
+              .hour(17)
+              .minute(30)
+              .add(1, 'day'); 
+          } else {
+            var newStartDate = moment(data[self.mapping.date_start])
+              .hour(startTime.current_hour)
+              .minute(startTime.current_minute);
+
+            var newEndDate = moment(data[self.mapping.date_stop])
+              .hour(endTime.current_hour)
+              .minute(endTime.current_minute);
           }
-        });
-        this.previousOpen.open();
-      } else {
-        this.do_action({
-          type: "ir.actions.act_window",
-          res_model: this.modelName,
-          views: [[this.formViewId || false, "form"]],
-          target: "current",
+          var formattedStartDate = newStartDate.format("YYYY-MM-DD HH:mm:ss");
+          context["default_" + self.mapping.date_start] =
+            formattedStartDate || null;
+          var formattedDateStop = newEndDate.format("YYYY-MM-DD HH:mm:ss");
+          context["default_" + self.mapping.date_stop] = formattedDateStop;
+        } else {
+          context["default_" + self.mapping.date_start] =
+            data[self.mapping.date_start] || null;
+          if (self.mapping.date_stop) {
+            context["default_" + self.mapping.date_stop] =
+              data[self.mapping.date_stop] || null;
+          }
+        }
+        if (self.mapping.date_delay) {
+          context["default_" + self.mapping.date_delay] =
+            data[self.mapping.date_delay] || null;
+        }
+        if (self.mapping.all_day) {
+          context["default_" + self.mapping.all_day] =
+            data[self.mapping.all_day] || null;
+        }
+        for (var k in context) {
+          if (context[k] && context[k]._isAMomentObject) {
+            context[k] = dateToServer(context[k]);
+          }
+        }
+        var options = _.extend({}, self.options, event.options, {
           context: context,
+          title: self._setEventTitle(),
         });
-      }
+        if (self.quick != null) {
+          self.quick.destroy();
+          self.quick = null;
+        }
+        if (
+          !options.disableQuickCreate &&
+          !event.data.disableQuickCreate &&
+          self.quickAddPop
+        ) {
+          self.quick = new QuickCreate(self, true, options, data, event.data);
+          self.quick.open();
+          self.quick.opened(function () {
+            self.quick.focus();
+          });
+          return;
+        }
+        if (self.eventOpenPopup) {
+          if (self.previousOpen) {
+            self.previousOpen.close();
+          }
+          self.previousOpen = new dialogs.FormViewDialog(self, {
+            res_model: self.modelName,
+            context: context,
+            title: options.title,
+            view_id: self.formViewId || false,
+            disable_multiple_selection: true,
+            on_saved: function () {
+              if (check_mail_template.length !== 0) {
+                self.do_action({
+                  type: 'ir.actions.client',
+                  tag: 'display_notification',
+                  params: {
+                    title: "Waring",
+                    message: "The following templates don't exist:\n" + check_mail_template.join("\n"),
+                    type: "danger",
+                    sticky: false,
+                  },
+                });
+              }
+              if (event.data.on_save) {
+                event.data.on_save();
+              }
+              self.reload();
+            },
+          });
+          self.previousOpen.on("closed", self, () => {
+            if (event.data.on_close) {
+              event.data.on_close();
+            }
+          });
+          self.previousOpen.open();
+        } else {
+          self.do_action({
+            type: "ir.actions.act_window",
+            res_model: self.modelName,
+            views: [[self.formViewId || false, "form"]],
+            target: "current",
+            context: context,
+          });
+        }
+      });
     },
     _onOpenEvent: function (event) {
       var self = this;
@@ -225,10 +292,10 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
     },
     _onDeleteRecord: function (ev) {
       var self = this;
-
+    
       var id = ev.data.event.record.id;
-      var type_view = "calendar_view"
-
+      var type_view = "calendar_view";
+    
       var dialog = new Dialog(this, {
         title: _t("Delete Confirmation"),
         size: "medium",
@@ -237,13 +304,18 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
           {
             text: _t("OK"),
             classes: "btn btn-primary",
-            close: true,
+            close: false,
             click: function () {
               var selectedValue = $('input[name="recurrence-update"]:checked').val();
               var reason_delete = $('input[name="reason"]:checked').val();
-              if (reason_delete=="others"){
+              if (reason_delete == "others") {
                 reason_delete = $('textarea[name="reason_delete_event"]').val();
+                if (!reason_delete.trim()) {
+                  dialog.$('#warning_message').show();
+                  return;
+                }
               }
+              dialog.$('#warning_message').hide();
               rpc
                 .query({
                   model: "meeting.schedule",
@@ -251,10 +323,11 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
                   args: [selectedValue, reason_delete, id, type_view],
                 })
                 .then(function (result) {
+                  dialog.close();
                   self.reload();
                 })
                 .catch(function (error) {
-                  Dialog.alert(this, error.message.data.message);
+                  Dialog.alert(self, error.message.data.message);
                 });
             },
           },
@@ -272,11 +345,13 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       dialog.opened().then(function() {
           var othersRadio = dialog.$('input[name="reason"][value="others"]');
           var reasonTextarea = dialog.$('#reason_textarea');
+          var reasonInput = dialog.$('#w3review');
           dialog.$('input[name="reason"]').on('change', function () {
               if (othersRadio.is(':checked')) {
                   reasonTextarea.show();
               } else {
                   reasonTextarea.hide();
+                  dialog.$('#warning_message').hide();
               }
           });
       });
