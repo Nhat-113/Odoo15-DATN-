@@ -83,15 +83,19 @@ def validate_pagination(offset, limit):
     except:
         return False
 
-def image_url_getter(model, id, field = 'image_1920'):
-    try:
-        is_exist_image = request.env[model].browse(id)[field]
-        image_url = ""
-        if (is_exist_image):
-            image_url = f"{request.httprequest.host_url}web/image?model={model}&id={str(id)}&field={field}"
-        return image_url
-    except:
-        return ""
+def image_url_getter(model, record_id, field='image_1920'):
+    record = request.env[model].browse(record_id)
+    check_field_img = hasattr(record, 'image_1920')
+    image_url = ""
+
+    if check_field_img:
+        is_exist_image = record[field]
+        if is_exist_image:
+            Params = request.env['ir.config_parameter'].sudo()
+            base_url = Params.get_param('web.base.url')
+            image_url = f"{base_url}/web/image?model={model}&id={record_id}&field={field}"
+    return image_url
+        
 def valid_timezone(timez, timest):
     try:
         input_timezone = timezone(timez)
