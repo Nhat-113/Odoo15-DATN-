@@ -78,6 +78,7 @@ class BoxManagementMobile(http.Controller):
     @http.route("/api/employee/<int:employee_id>", type="http", auth="bearer_token", methods=["GET"])
     def get_employee_info(self, employee_id, **kwargs):
         try:
+            user = request.env.user
             request_user_id = request.uid
             if not check_authorize('hr.employee', request_user_id):
                 employee = request.env['hr.employee.public'].search([('id', '=', employee_id)])
@@ -110,8 +111,13 @@ class BoxManagementMobile(http.Controller):
                 ("department", "department_id"),
                 ("manager", "parent_id"),
                 ("coach", "coach_id"),
-                ("timeoff", "leave_manager_id")
             ]
+
+            check_leave_manager_id = hasattr(user, 'leave_manager_id')
+
+            if check_leave_manager_id:
+                obj_fields_map.append(("timeoff", "leave_manager_id"))
+
             for key, field in obj_fields_map:
                 value = getattr(employee, field)
                 data[key] = {"id": value.id, "name": value.name} if value else None
