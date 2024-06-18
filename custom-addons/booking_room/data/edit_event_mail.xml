@@ -35,14 +35,28 @@
                                         <p>Dear all,</p>
                                     </t>
                                     <p>I hope this message finds you well.</p>
-                                    <p style="margin-top: 8px;">You are invited to a meeting. Please note that the meeting titled <t t-esc="object.meeting_subject"/> has had some changes.</p>
+                                    <t t-if="object.meeting_type != 'normal'">
+                                        <p style="margin-top: 8px;">The <t t-esc="object.meeting_type"/> meeting which you were invited has had some changes.</p>
+                                    </t>
+                                    <t t-else="">
+                                        <p style="margin-top: 8px;">You are invited to a meeting. Please note that the meeting titled "<t t-esc="object.meeting_subject"/>" has had some changes.</p>
+                                    </t>
                                 </p>
-                                                
+                                
                                 <p>Updated Meeting Details:</p>
-                                <p style="padding-left: 24px;"> Meeting Subject: <t t-esc="object.meeting_subject"/></p>
-                                <p style="padding-left: 24px;"> Location: <t t-esc="object.edit_room"/></p>
-                                <p style="padding-left: 24px;"> Date: <t t-esc="object.edit_date_start"/></p>
-                                <p style="padding-left: 24px;"> Time: <t t-esc="object.edit_time"/></p>
+                                <t t-if="object.meeting_type != 'normal'">
+                                    <p style="padding-left: 24px;"> Meeting Subject: <t t-esc="object.meeting_subject"/></p>
+                                    <p style="padding-left: 24px;">Location: <t t-esc="object.edit_room"/></p>
+                                    <p style="padding-left: 24px;">From: <t t-esc="object.edit_date_start"/> to <t t-esc="object.edit_date_end"/></p>
+                                    <p style="padding-left: 24px;">Time: <t t-esc="object.edit_time"/></p>
+                                </t>
+                                <t t-else="">
+                                    <p style="padding-left: 24px;"> Meeting Subject: <t t-esc="object.meeting_subject"/></p>
+                                    <p style="padding-left: 24px;">Location: <t t-esc="object.edit_room"/></p>
+                                    <p style="padding-left: 24px;">Date: <t t-esc="object.edit_date_start"/></p>
+                                    <p style="padding-left: 24px;">Time: <t t-esc="object.edit_time"/></p>
+                                </t>
+                                <p style="padding-left: 24px;">Timezone: <t t-esc="object.user_id.tz"/></p>
       
                                 <p>Thank you!</p>
                                 <p style="padding-top: 24px; padding-bottom: 16px;">

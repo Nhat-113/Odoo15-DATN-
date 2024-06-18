@@ -34,8 +34,14 @@
                                     <t t-else="">
                                         <p>Dear all,</p>
                                     </t>
-                                    <p style="margin-top: 8px;">You are invited to a meeting. Please attend on <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> in room <t t-esc="object.room_id.name"/>.</p>
-    </p>
+                                </p> 
+                                <t t-if="object.meeting_type != 'normal'">
+                                    <p style="margin-top: 8px;">You are invited to a <t t-esc="object.meeting_type"/> meeting from <t t-esc="object.edit_date_start"/> to <t t-esc="object.edit_date_end"/> in room <t t-esc="object.room_id.name"/>.</p>
+                                </t>
+                                <t t-else="">
+                                    <p style="margin-top: 8px;">You are invited to a meeting. Please attend on <t t-esc="object.edit_date_start"/> <t t-esc="object.start_minutes"/> in room <t t-esc="object.room_id.name"/>.</p>
+                                    <p>Timezone: <t t-esc="object.user_id.tz"/></p>
+                                </t>
                                 <p>Thank you!</p>
                                 <p style="padding-top: 24px; padding-bottom: 16px;">
                                     <a t-att-href="object.access_link" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">

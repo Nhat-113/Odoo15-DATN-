@@ -10,6 +10,7 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
   var CalendarModel = require("web.CalendarModel");
   var CalendarView = require("web.CalendarView");
   var BookingCalendarPopover = require("booking.CalendarPopover");
+  var CustomViewDialogs = require("booking_room.CustomViewDialogs");
   var viewRegistry = require("web.view_registry");
   var session = require("web.session");
   const { createYearCalendarView } = require("booking_room.fullcalendar");
@@ -49,6 +50,16 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       return result.map(record => record.name);
     });
   }
+  const formatDate = (dateStr) => {
+    let date = new Date(dateStr.toLocaleString("en-US", { timeZone: "UTC" }));
+    let year = date.getFullYear();
+    let month = String(date.getMonth() + 1).padStart(2, "0");
+    let day = String(date.getDate()).padStart(2, "0");
+    let hours = String(date.getHours()).padStart(2, "0");
+    let minutes = String(date.getMinutes()).padStart(2, "0");
+    let seconds = String(date.getSeconds()).padStart(2, "0");
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
 
   var BookingCalendarController = CalendarController.extend({
     /**
@@ -222,6 +233,7 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       var self = this;
       var id = event.data._id;
       id = id && parseInt(id).toString() === id ? parseInt(id) : id;
+
       if (!this.eventOpenPopup) {
         this._rpc({
           model: self.modelName,
@@ -242,7 +254,6 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
         return;
       }
 
-      const buttons = [];
       rpc
         .query({
           model: "meeting.schedule",
@@ -252,16 +263,10 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
         .then((result) => {
           const date = new Date();
           const start_date = new Date(result.start_date);
-          if (
+          const isReadOnly =
             result.is_hr === false &&
-            (result.user_id !== session.uid || start_date < date)
-          ) {
-            buttons.push({
-              text: _t("Cancel"),
-              class: "btn-secondary o_form_button_cancel",
-              close: true,
-            });
-          }
+            (result.user_id !== session.uid || start_date < date);
+          // re-check -------------------------------------
 
           var options = {
             res_model: self.modelName,
@@ -276,16 +281,93 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
               }
               self.reload();
             },
-            buttons: buttons.length > 0 ? buttons : undefined,
+            close_text: "Cancel",
+            readonly: isReadOnly ? true : false,
+            event: result,
           };
           if (self.formViewId) {
             options.view_id = parseInt(self.formViewId);
           }
-          new dialogs.FormViewDialog(self, options).open();
+          new CustomViewDialogs.CustomFormViewDialog(self, options).open();
         })
         .catch(function (error) {
           console.log(error);
         });
+    },
+
+    _onDropRecord: function (event) {
+      const self = this;
+      function openDialog() {
+        return new Promise(function (resolve, reject) {
+          var dialog = new Dialog(self, {
+            title: _t("Edit recurring meeting"),
+            size: "medium",
+            $content: $(QWeb.render("booking_room.edit_recurrent_event", {})),
+            onForceClose: function () {
+              self.reload();
+            },
+            buttons: [
+              {
+                text: _t("Confirm"),
+                classes: "btn btn-primary",
+                close: true,
+                click: function () {
+                  var selected_value = $(
+                    'input[name="edit-option"]:checked'
+                  ).val();
+                  rpc
+                    .query({
+                      model: "meeting.schedule",
+                      method: "write_many",
+                      args: [
+                        event.data.record,
+                        formatDate(event.data.start._i),
+                        selected_value,
+                        "drag",
+                      ],
+                    })
+                    .then(function () {
+                      resolve(true);
+                    })
+                    .catch(function (error) {
+                      Dialog.alert(this, error.message.data.message);
+                      reject(error);
+                    });
+                },
+              },
+              {
+                text: _t("Cancel"),
+                close: true,
+                click: function () {
+                  resolve(false);
+                },
+              },
+            ],
+          });
+          dialog.open();
+        });
+      }
+
+      if (event.data.record.meeting_type !== "normal") {
+        return openDialog()
+          .then(function (confirmed) {
+            if (confirmed) {
+              self.reload();
+            } else {
+              self.reload();
+            }
+          })
+          .catch(function (error) {
+            self.reload();
+            return Promise.reject(error);
+          });
+      } else {
+        this._updateRecord(
+          _.extend({}, event.data, {
+            drop: true,
+          })
+        );
+      }
     },
     _setEventTitle: function () {
       return _t("Booking Form");
