@@ -1,6 +1,7 @@
 from odoo import http
-from datetime import datetime
+from datetime import datetime, timedelta
 from odoo.http import request
+from dateutil.relativedelta import relativedelta
 # from odoo.tools import  config
 from helper.helper import message_error_missing, check_field_missing_api, jsonResponse, convert_current_tz, check_authorize, handle_pagination, validate_pagination, image_url_getter
 
@@ -364,3 +365,55 @@ class BoxManagementMobile(http.Controller):
                 "message": "Bad request",
                 "keyerror": e
             }, 400)
+
+    @http.route("/api/attendance/statistic", type="http", auth="bearer_token", methods=["GET"])
+    def get_attendance_statistics(self, **kwargs):
+        def validate_month(month_str):
+            try:
+                return datetime.strptime(month_str, "%Y-%m")
+            except ValueError:
+                return None
+
+        month_str = kwargs.get('month')
+        month_date = validate_month(month_str)
+        
+        if not month_date:
+            return jsonResponse({
+                "status": 40001,
+                "message": "Invalid",
+                "keyerror": "Month must be in format YYYY-MM"
+            }, 400)
+
+        start_date = month_date.replace(day=1)
+        end_date = (start_date + relativedelta(months=1)) - timedelta(days=1)
+
+        attendance_records = request.env['hr.attendance'].search_read(
+            domain=[('location_date', '>=', start_date), ('location_date', '<=', end_date)],
+            fields=['employee_id', 'location_date', 'check_in', 'check_out'],
+            order='location_date asc'
+        )
+
+        date_statistics = {}
+        for record in attendance_records:
+            date_str = record['location_date'].strftime("%Y-%m-%d")
+
+            if date_str not in date_statistics:
+                date_statistics[date_str] = {"total_check_in": 0, "total_check_out": 0}
+
+            if record['check_in']:
+                date_statistics[date_str]["total_check_in"] += 1
+            if record['check_out']:
+                date_statistics[date_str]["total_check_out"] += 1
+
+        statistics = [
+            {
+                "date": date_str,
+                "total_check_in": data["total_check_in"],
+                "total_check_out": data["total_check_out"]
+            }
+            for date_str, data in date_statistics.items()
+        ]
+        return jsonResponse({
+            "status": 200,
+            "data": statistics
+        }, 200)
