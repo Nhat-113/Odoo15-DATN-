@@ -38,6 +38,7 @@
                                     </p> 
                                     <t t-if="object.delete_type != 'none' and object.delete_type != None">
                                         <p>I regret to inform you that all meetings titled "<t t-esc="object.meeting_subject"/>" scheduled after <t t-esc="object.s_date"/> have been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
+                                    </t>                            
                                     <t t-else="">
                                         <t t-if="object.meeting_type != 'normal'">
                                             <p>I regret to inform you that the <t t-esc="object.meeting_type"/> meeting scheduled from <t t-esc="object.edit_date_start"/> to <t t-esc="object.edit_date_end"/> has been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
