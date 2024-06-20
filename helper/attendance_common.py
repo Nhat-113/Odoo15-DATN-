@@ -103,27 +103,34 @@ def handle_facelog_process_box_io(datas, attendance, pseudo_attendance, is_multi
         "position": datas['position']
     }
     if attendance and attendance.check_in:
-        data_updates = {
-            "check_out": datas['timeutc']
-        }
-        validate_end_time(attendance.check_in, datas['timeutc'])
-        attendance.write(data_updates)
-        if pseudo_attendance:
-            pseudo_attendance.write(data_updates)
-            create_attendance_device_details(data_details, pseudo_attendance)
-        message += "Check out"
+        if not attendance.check_out:
+            data_updates = {
+                "check_out": datas['timeutc']
+            }
+            validate_end_time(attendance.check_in, datas['timeutc'])
+            attendance.write(data_updates)
+            if pseudo_attendance:
+                pseudo_attendance.write(data_updates)
+                create_attendance_device_details(data_details, pseudo_attendance)
+            message += "Check out"
+        else:
+            create_attendance_device_details(data_details, create_attendance(datas, is_multiple_mode))
+            message += "Check in"
     else:
-        data_news = {
-            "employee_id": datas['employee_id'].id,
-            "check_in": datas['timeutc'],
-            "is_multiple": is_multiple_mode
-        }
-        request.env['hr.attendance'].create(data_news)
-        pseudo = request.env['hr.attendance.pesudo'].create(data_news)
-        create_attendance_device_details(data_details, pseudo)
+        create_attendance_device_details(data_details, create_attendance(datas, is_multiple_mode))
         message += "Check in"
     return message
     
+def create_attendance(datas, is_multiple_mode):
+    data_news = {
+        "employee_id": datas['employee_id'].id,
+        "check_in": datas['timeutc'],
+        "is_multiple": is_multiple_mode
+    }
+    request.env['hr.attendance'].create(data_news)
+    pseudo = request.env['hr.attendance.pesudo'].create(data_news)
+    return pseudo
+
 def handle_attendance_view_mode(datas):
     """
         Handle the logic of the api check in/out to resolve view mode single or multiple.
