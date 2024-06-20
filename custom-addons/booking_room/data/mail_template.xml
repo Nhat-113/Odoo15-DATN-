@@ -1,6 +1,6 @@
 <odoo>
     <data>
-        <record id="template_sendmail" model="mail.template">
+        <record id="template_send_mail" model="mail.template">
             <field name="name">Booking room - Send Mail</field>
             <field name="model_id" ref="model_meeting_schedule"/>
             <field name="subject">Meeting Notice: {{object.meeting_subject}}</field>
@@ -41,7 +41,7 @@
                                         <p>We cordially invite you to attend our meeting.</p>      
                                     </t>
                                     <h3>Meeting Details:</h3>     
-                                    <p style="padding-left: 24px;">Date: <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> <t t-esc="object.end_daily"/></p>
+                                    <p style="padding-left: 24px;">Date: <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> to <t t-esc="object.edit_date_end"/></p>
                                     <p style="padding-left: 24px;">Time: <t t-esc="object.start_minutes"/> - <t t-esc="object.end_minutes"/></p>
                                     <p style="padding-left: 24px;">Timezone: <t t-esc="object.user_id.tz"/></p>
                                     <p style="padding-left: 24px;">Location: <t t-esc="object.room_id.name"/> </p>

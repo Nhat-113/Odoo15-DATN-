@@ -1,9 +1,9 @@
 <odoo>
     <data>
-        <record id="template_sendmail_add_attendens" model="mail.template">
+        <record id="template_send_mail_add_attendens" model="mail.template">
             <field name="name">Booking room - Mail Add Attendens</field>
             <field name="model_id" ref="model_meeting_schedule"/>
-            <field name="subject">Meeting Notice: {{object.meeting_subject}}</field>
+            <field name="subject">Invited To A Meeting:  {{object.meeting_subject}}</field>
             <field name="email_from">{{object.create_uid.email_formatted or ''}}</field>
             <field name="email_to">{{ ','.join(partner.work_email for partner in object.edit_emp if partner.work_email) }}</field>
             <field name="body_html"><![CDATA[

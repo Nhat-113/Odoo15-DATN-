@@ -1,9 +1,9 @@
 <odoo>
     <data>
-        <record id="template_sendmail_delete_attendens" model="mail.template">
+        <record id="template_send_mail_edit_attendens" model="mail.template">
             <field name="name">Booking room - Mail Edit Attendens</field>
             <field name="model_id" ref="model_meeting_schedule"/>
-            <field name="subject">Meeting Notice: {{object.meeting_subject}}</field>
+            <field name="subject">Deleted A Meeting: {{object.meeting_subject}}</field>
             <field name="email_from">{{object.create_uid.email_formatted or ''}}</field>
             <field name="email_to">{{ ','.join(partner.work_email for partner in object.edit_emp if partner.work_email) }}</field>
             <field name="body_html"><![CDATA[
@@ -36,16 +36,19 @@
                                     </t>
                                     <p style="margin-top: 8px;">I hope this email finds you well.</p>
                                     </p> 
-                                    <t t-if="object.delete_type != 'none' and object.delete_type != None">
-                                        <p>I regret to inform you that all meetings titled "<t t-esc="object.meeting_subject"/>" scheduled after <t t-esc="object.s_date"/> have been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
-                                    </t>                            
-                                    <t t-else="">
-                                        <t t-if="object.meeting_type != 'normal'">
-                                            <p>I regret to inform you that the <t t-esc="object.meeting_type"/> meeting scheduled from <t t-esc="object.edit_date_start"/> to <t t-esc="object.edit_date_end"/> has been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
+                                    t t-if="object.delete_type == 'none'">
+                                        <p>I regret to inform you that the Meeting scheduled on <t t-esc="object.s_date.strftime('%d/%m/%Y')"/>  has been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
+                                    </t>
+                                    <t t-else="">                           
+                                        <t t-if="object.meeting_type == 'normal'">
+                                            <p>I regret to inform you that the "<t t-esc="object.meeting_subject"/>" scheduled on <t t-esc="object.s_date.strftime('%d/%m/%Y')"/>  has been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
+                                        </t>
+                                        <t t-elif="object.meeting_type == 'daily'">
+                                            <p>We regret to inform you that <t t-esc="object.meeting_type"/> meetings titled "<t t-esc="object.meeting_subject"/>" scheduled from <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> to <t t-esc="object.edit_date_end"/> have been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
                                         </t>
                                         <t t-else="">
-                                            <p>I regret to inform you that the "<t t-esc="object.meeting_subject"/>" scheduled on <t t-esc="object.s_date"/> has been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
-                                        </t>                            
+                                        <p>We regret to inform you that the meetings on <t t-esc="object.weekday"/> from <t t-esc="object.s_date.strftime('%d/%m/%Y')"/> to <t t-esc="object.edit_date_end"/> have been canceled. We apologize for any inconvenience this may cause and hope this does not disrupt your plans too much.</p>
+                                        </t>
                                     </t>
                                 </p>
                                 <p>Thank you!</p>

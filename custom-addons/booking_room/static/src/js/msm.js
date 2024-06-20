@@ -40,16 +40,13 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
   // Function to check if mail templates exist
   function checkMailTemplateExists(template_ids) {
     return rpc.query({
-      model: 'ir.model.data',
-      method: 'search_read',
-      args: [
-        [['module', '=', 'booking_room'], ['name', 'in', template_ids]],
-        ['name']
-      ]
+        model: 'meeting.schedule',
+        method: 'check_mail_template_exists',
+        args: [template_ids]
     }).then(function (result) {
-      return result.map(record => record.name);
+        return result;
     });
-  }
+}
   const formatDate = (dateStr) => {
     let date = new Date(dateStr.toLocaleString("en-US", { timeZone: "UTC" }));
     let year = date.getFullYear();
@@ -70,35 +67,22 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
       const mode = this.mode;
 
       const template_ids = [
-        'template_sendmail',
-        'template_sendmail_add_attendens',
-        'template_sendmail_delete_attendens',
+        'template_send_mail',
+        'template_send_mail_add_attendens',
+        'template_send_mail_edit_attendens',
         'template_send_mail_delete',
-        'template_sendmail_edit_event'
+        'template_send_mail_edit_event'
       ];
 
       // Check if the mail templates exist
       checkMailTemplateExists(template_ids).then(function (existingTemplates) {
-        let check_mail_template = [];
-        if (!existingTemplates.includes("template_sendmail")) {
-          check_mail_template.push("template_sendmail")
-        }
+        let missingTemplates = [];
 
-        if (!existingTemplates.includes("template_sendmail_add_attendens")) {
-          check_mail_template.push("template_sendmail_add_attendens")
-        }
-
-        if (!existingTemplates.includes("template_sendmail_delete_attendens")) {
-          check_mail_template.push("template_sendmail_delete_attendens")
-        }
-
-        if (!existingTemplates.includes("template_send_mail_delete")) {
-          check_mail_template.push("template_send_mail_delete")
-        }
-
-        if (!existingTemplates.includes("template_sendmail_edit_event")) {
-          check_mail_template.push("template_sendmail_edit_event")
-        }
+        template_ids.forEach(function(template_id) {
+            if (!existingTemplates.includes(template_id)) {
+                missingTemplates.push(template_id);
+            }
+        });
 
         // Continue with the original functionality after checking the templates
         if (["year", "month"].includes(self.model.get().scale)) {
@@ -114,20 +98,26 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
           context.default_name = data.name;
         }
         if (mode === "month" || mode === "year") {
-          let current_time = new Date();
 
           let startTime = default_start_minutes();
           let endTime = default_end_minutes();
-
-          if (startTime.current_hour >= 15 && startTime.current_minute >= 45) {
-            var newStartDate = moment(data[self.mapping.date_start])
+          
+          if (startTime.current_hour == 16 && startTime.current_minute == 30)
+            {
+              var newStartDate = moment(data[self.mapping.date_start])
               .hour(17)
               .minute(0)
-              .add(1, 'day'); 
             var newEndDate = moment(data[self.mapping.date_stop])
               .hour(17)
               .minute(30)
-              .add(1, 'day'); 
+            }
+          else if (startTime.current_hour >= 15 && startTime.current_minute > 30) {
+              var newStartDate = moment(data[self.mapping.date_start])
+                .hour(17)
+                .minute(0)
+              var newEndDate = moment(data[self.mapping.date_stop])
+                .hour(17)
+                .minute(30)
           } else {
             var newStartDate = moment(data[self.mapping.date_start])
               .hour(startTime.current_hour)
@@ -194,13 +184,13 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
             view_id: self.formViewId || false,
             disable_multiple_selection: true,
             on_saved: function () {
-              if (check_mail_template.length !== 0) {
+              if (missingTemplates.length !== 0) {
                 self.do_action({
                   type: 'ir.actions.client',
                   tag: 'display_notification',
                   params: {
-                    title: "Waring",
-                    message: "The following templates don't exist:\n" + check_mail_template.join("\n"),
+                    title: "Warning",
+                    message: "There is a problem with the email template, so emails cannot be sent to attendees. Please contact the administrator to fix it",
                     type: "danger",
                     sticky: false,
                   },

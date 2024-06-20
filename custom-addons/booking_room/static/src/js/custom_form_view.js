@@ -13,14 +13,11 @@ odoo.define('booking_room.meeting_view_form', function (require) {
   // Function to check if mail templates exist
   function checkMailTemplateExists(template_ids) {
     return rpc.query({
-      model: 'ir.model.data',
-      method: 'search_read',
-      args: [
-        [['module', '=', 'booking_room'], ['name', 'in', template_ids]],
-        ['name']
-      ]
+        model: 'meeting.schedule',
+        method: 'check_mail_template_exists',
+        args: [template_ids]
     }).then(function (result) {
-      return result.map(record => record.name);
+        return result;
     });
   }
   // Custom Form Controller
@@ -29,42 +26,29 @@ odoo.define('booking_room.meeting_view_form', function (require) {
     saveRecord: function (recordID, options) {
       var self = this;
       const template_ids = [
-        'template_sendmail',
-        'template_sendmail_add_attendens',
-        'template_sendmail_delete_attendens',
+        'template_send_mail',
+        'template_send_mail_add_attendens',
+        'template_send_mail_edit_attendens',
         'template_send_mail_delete',
-        'template_sendmail_edit_event'
+        'template_send_mail_edit_event'
       ];
 
       // Check if the mail templates exist
     checkMailTemplateExists(template_ids).then(function (existingTemplates) {
-      let check_mail_template = [];
-      if (!existingTemplates.includes("template_sendmail")) {
-        check_mail_template.push("template_sendmail")
-      }
+      let missingTemplates = [];
 
-      if (!existingTemplates.includes("template_sendmail_add_attendens")) {
-        check_mail_template.push("template_sendmail_add_attendens")
-      }
-
-      if (!existingTemplates.includes("template_sendmail_delete_attendens")) {
-        check_mail_template.push("template_sendmail_delete_attendens")
-      }
-
-      if (!existingTemplates.includes("template_send_mail_delete")) {
-        check_mail_template.push("template_send_mail_delete")
-      }
-
-      if (!existingTemplates.includes("template_sendmail_edit_event")) {
-        check_mail_template.push("template_sendmail_edit_event")
-      }
-      if (check_mail_template.length !== 0) {
+      template_ids.forEach(function(template_id) {
+          if (!existingTemplates.includes(template_id)) {
+              missingTemplates.push(template_id);
+          }
+      });
+      if (missingTemplates.length !== 0) {
         self.do_action({
           type: 'ir.actions.client',
           tag: 'display_notification',
           params: {
-            title: "Waring",
-            message: "The following templates don't exist:\n" + check_mail_template.join("\n"),
+            title: "Warning",
+            message: "There is a problem with the email template, so emails cannot be sent to attendees. Please contact the administrator to fix it",
             type: "danger",
             sticky: false,
           },
