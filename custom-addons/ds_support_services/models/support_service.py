@@ -78,7 +78,29 @@ class SupportServices(models.Model):
     domain_department_id = fields.Char(string="Department domain", readonly=True, store=False, compute='_compute_domain_project_department')
     domain_project_id = fields.Char(string="Project domain", readonly=True, store=False, compute='_compute_domain_project_department')
     check_readonly_field_project = fields.Boolean(default=False, compute='compute_domain_readonly_project')
-    
+
+
+    @api.onchange('project_id', 'category', 'get_month_tb')
+    def get_member_line(self):
+        if self.project_id and self.category.type_category == "team_building":
+            member_line = []
+            member_ids = []
+            month_request = int(self.get_month_tb)
+            mem = self.project_id.planning_calendar_resources
+
+            for rec in mem:
+                if month_request == rec.start_date.month \
+                    or month_request == rec.end_date.month \
+                    or (month_request > rec.start_date.month \
+                        and month_request < rec.end_date.month):
+                    member_ids.append(rec.employee_id.id)
+
+            member_line = [(5, 0, 0)]
+            for item in member_ids:
+                member_line.append((0, 0, {
+                    'employee_id': item
+                }))
+            self.update({"member_team_building": member_line})
 
     @api.depends('category')
     def compute_check_role_it(self):
@@ -135,11 +157,11 @@ class SupportServices(models.Model):
             else:
                 request.check_invisible_project_id = True
     
-    @api.onchange('project_id', 'category')
-    def set_member_team_building(self):
-        for request in self:
-            if request.category.type_category == 'team_building':
-                request.member_team_building = False
+    # @api.onchange('project_id', 'category')
+    # def set_member_team_building(self):
+    #     for request in self:
+    #         if request.category.type_category == 'team_building':
+    #             request.member_team_building = False
 
     @api.depends('name', 'approval','category')
     def compute_check_role_officer(self):
