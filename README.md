@@ -42,3 +42,85 @@ To learn the software, we recommend the <a href="https://www.odoo.com/slides">Od
   - Specification written in this branch's latest commit should work at production environment
   - Do not commit to `master` directly
     - If you want to add/change documents in this branch, send pull request to this branch
+
+
+## Installation
+
+### Ubuntu
+
+※ Require: Python3.8 installed
+
+※ Install packages:
+
+```
+  sudo apt install python3.8-venv
+  sudo apt update
+  sudo apt install gcc
+  sudo apt install build-essential
+  sudo apt-get install python3.8-dev
+
+  python3.8 -m venv .<your-venv>
+  source ./<your-venv>/bin/activate
+
+  pip3 install -r requirements.txt
+```
+
+※ Debugger: VSCode -> Run -> Add Configuration -> Python Debugger -> Python File
+
+1. Create your odoo config file: `odoo.conf`
+
+```
+[options]
+addons_path = ./addons, ./custom-addons, ./odoo/addons
+
+# db_host = postgres
+# db_password = odoo
+db_port = 5432
+admin_passwd = 1
+# csv_internal_sep = ,
+# proxy_mode = True
+# db_name = odoo2
+# db_maxconn = 64
+# db_sslmode = prefer
+# db_template = template0
+dbfilter = odoo15
+# socket_port = 5555z
+# demo = {}
+# email_from = False
+# from_filter = False
+# http_interface =
+# http_port = 8069
+# limit_memory_hard = 13690208256
+# limit_memory_soft = 11408506880
+# limit_request = 8192
+# limit_time_cpu = 600
+# limit_time_real = 1200
+# longpolling_port = 8072
+# http_enable = True
+# max_cron_threads = 1
+workers = 0
+```
+
+2. Edit launch.json
+
+```markdown
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Odoo",
+      "type": "python",
+      "request": "launch",
+      "stopOnEntry": false,
+      "console": "integratedTerminal",
+      "python": "${workspaceFolder}/<your-venv>/bin/python3", // link to your .venv folder
+      "program": "${workspaceFolder}/odoo-bin",
+      "args": [
+        "--config=${workspaceFolder}/odoo.conf",
+        // "--database=tutor1,tutor2",
+        // "--update=nama_folder1,nama_folder2"
+      ]
+    }
+  ]
+}
+```
