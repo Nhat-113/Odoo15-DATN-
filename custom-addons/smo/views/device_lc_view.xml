@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="smo_device_lc_view_tree" model="ir.ui.view">
+        <field name="name">smo.device.lc.tree</field>
+        <field name="model">smo.device.lc</field>
+        <field name="arch" type="xml">
+            <tree string="LC Devices" create="false" edit="false" delete="false" export_xlsx="false"
+                    js_class="smo_custom_list_view" expand="1">
+                <field name="device_name" />
+                <field name="param_name"/>
+                <field name="current_state" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_show_devices_lc" model="ir.actions.act_window">
+        <field name="name">Light Bulbs</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">smo.device.lc</field>
+        <field name="view_mode">tree</field>
+        <field name="context">{'group_by': 'device_name'}</field>
+        <field name="view_id" ref="smo_device_lc_view_tree"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Not found any LC device. Please sync data from ThingsBoard!
+            </p>
+        </field>
+    </record>
+
+</odoo>

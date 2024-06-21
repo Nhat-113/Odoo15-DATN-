@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_smo_user_buser,smo.user,model_smo_user,smo.group_smo_admin,1,1,1,1
+access_smo_token_buser,smo.user,model_smo_token,smo.group_smo_admin,1,1,1,1
+access_smo_tenant_buser,smo.user,model_smo_tenant,smo.group_smo_admin,1,1,1,1
+access_smo_asset_buser,smo.user,model_smo_asset,smo.group_smo_admin,1,1,1,1
+access_smo_device_buser,smo.user,model_smo_device,smo.group_smo_admin,1,1,1,1
+access_smo_device_iaq_buser,smo.user,model_smo_device_iaq,smo.group_smo_admin,1,1,1,1
+access_smo_device_lc_buser,smo.user,model_smo_device_lc,smo.group_smo_admin,1,1,1,1
+access_smo_device_lc_schedule_buser,smo.user,model_smo_device_lc_schedule,smo.group_smo_admin,1,1,1,1
+

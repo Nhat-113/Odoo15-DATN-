@@ -1,0 +1,16 @@
+<odoo>
+    <record id="ir_cron_fetch_devices_detail" model="ir.cron">
+        <field name="name">Fetch Device Details</field>
+        <field name="model_id" ref="model_smo_device"/>
+        <field name="state">code</field>
+        <field name="code">
+          env['smo.device'].sync_all()
+        </field>
+        <field name="active" eval="True"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=0)).strftime('%Y-%m-%d 17:00:00')" />
+    </record>
+</odoo>
