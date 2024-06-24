@@ -6,10 +6,16 @@ import pytz
 
 
 def create_attendance_device_details(datas, pseudo):
-    datas["pseudo_attendance_id"] = pseudo.id
-    pseudo.update({
-        "attendance_device_details": [(0,0, datas)]
+    if "location_id" in datas:
+        datas["pseudo_attendance_id_app"] = pseudo.id
+        pseudo.update({
+        "attendance_device_details_app": [(0,0, datas)]
     })
+    else:
+        datas["pseudo_attendance_id"] = pseudo.id
+        pseudo.update({
+            "attendance_device_details": [(0,0, datas)]
+        })
 
 
 def validate_end_time(start, end):
@@ -92,16 +98,21 @@ def attendance_single_record_mode(datas, attendance, pseudo_attendance, is_multi
         else:
             pseudo = request.env['hr.attendance.pesudo'].create(data_updates)
             create_attendance_device_details(data_details, pseudo)
-        
+
         message += "Check out"
     return message
 
 def handle_facelog_process_box_io(datas, attendance, pseudo_attendance, is_multiple_mode):
     message = ""
-    data_details = {
-        "device_id": datas['device_id'],
-        "position": datas['position']
-    }
+    if 'location_id' in datas:
+        data_details = {
+            "location_id": datas['location_id'],
+        }
+    else:
+        data_details = {
+            "device_id": datas['device_id'],
+            "position": datas['position']
+        }
     if attendance and attendance.check_in:
         if not attendance.check_out:
             data_updates = {
@@ -120,7 +131,7 @@ def handle_facelog_process_box_io(datas, attendance, pseudo_attendance, is_multi
         create_attendance_device_details(data_details, create_attendance(datas, is_multiple_mode))
         message += "Check in"
     return message
-    
+
 def create_attendance(datas, is_multiple_mode):
     data_news = {
         "employee_id": datas['employee_id'].id,
@@ -130,7 +141,7 @@ def create_attendance(datas, is_multiple_mode):
     request.env['hr.attendance'].create(data_news)
     pseudo = request.env['hr.attendance.pesudo'].create(data_news)
     return pseudo
-
+    
 def handle_attendance_view_mode(datas):
     """
         Handle the logic of the api check in/out to resolve view mode single or multiple.
@@ -138,6 +149,16 @@ def handle_attendance_view_mode(datas):
             "employee_id": employee,
             "device_type": device_type,
             "device_id": device_id,
+            "timezone": timezone,
+            "timestamp": timestamp,
+            "timeutc": formatted_time
+        }
+
+        Handle the logic of the api check in/out for mobile.
+        datas = {
+            "employee_id": employee,
+            "device_type": device_type,
+            "location_id": location_id,
             "timezone": timezone,
             "timestamp": timestamp,
             "timeutc": formatted_time
@@ -167,5 +188,3 @@ def handle_attendance_view_mode(datas):
         else:
             # HR_attendance single record view mode
             return attendance_single_record_mode(datas, attendance, pseudo_attendance, is_multiple_mode)
-
-        

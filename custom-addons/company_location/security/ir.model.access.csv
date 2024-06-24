@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access.company.location.hr,access_company_location_hr,company_location.model_company_location,group_company_location_hr,1,1,0,0
+access.company.location.admin,access_company_location_admin,company_location.model_company_location,group_company_location_admin,1,1,1,1
+access.location.wifi.hr,access_location_wifi_hr,company_location.model_location_wifi,group_company_location_hr,1,1,0,0
+access.location.wifi.admin,access_location_wifi_admin,company_location.model_location_wifi,group_company_location_admin,1,1,1,1

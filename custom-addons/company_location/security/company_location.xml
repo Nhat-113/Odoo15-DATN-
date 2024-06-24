@@ -1,0 +1,20 @@
+<odoo>
+    <data>
+        <record model="ir.module.category" id="module_category_company_location">
+            <field name="name">Companies Location</field>
+            <field name="sequence">2</field>
+        </record>
+            
+        <record id="group_company_location_hr" model="res.groups">
+            <field name="name">HR</field>
+            <field name="category_id" ref="company_location.module_category_company_location"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]" />
+        </record>
+        
+        <record id="group_company_location_admin" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="company_location.module_category_company_location"/>
+            <field name="implied_ids" eval="[(4, ref('group_company_location_hr'))]" />
+        </record>
+    </data>
+</odoo>

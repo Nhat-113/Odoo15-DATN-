@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <menuitem id="menu_company_location_root" name="Companies Location" sequence="0" />
+
+  <menuitem
+    id="menu_company_location"
+    name="Companies Location"
+    action="action_company_location"
+    parent="menu_company_location_root"
+    sequence="0"
+  />
+
+  <menuitem id="comany_location_config_settings_menu_action"
+  name="Configuration" 
+  parent="menu_company_location_root"
+  sequence="2" 
+  action="action_company_location_configuration"
+  groups="base.group_system"/>
+
+</odoo>

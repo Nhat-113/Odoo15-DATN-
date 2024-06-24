@@ -40,7 +40,20 @@ def alternative_json_response(self, result=None, error=None):
         status=error and error.pop("http_status", 200) or status_code,
         headers=[("Content-Type", mime), ("Content-Length", len(body))],
     )
-
+def alternative_json_response_for_mobile(self, result=None, error=None):
+    if error is not None:
+        response = error
+    if result is not None:
+        response = result
+    response_data = json.loads(response.data)
+    mime = "application/json"
+    body = json.dumps(response_data, default=date_utils.json_default)
+    return Response(
+        body,
+        status=error and error.pop("http_status", 200) or result.status_code,
+        headers=[("Content-Type", mime), ("Content-Length", str(len(body)))],
+    )
+    
 def convert_current_tz(tizone, datime):
     input_timezone = timezone(tizone)
     input_timestamp = datetime.strptime(
@@ -130,3 +143,15 @@ def check_and_handle_missing_fields(kwargs, required_fields, message="Invalid", 
             "keyerror": message_error_missing(missing_fields)
         }, 400)
     return None
+
+def valid_timezone_for_mobile(timez, timest):
+    try:
+        input_timezone = timezone(timez)
+        input_timestamp = input_timezone.localize(
+            datetime.strptime(timest, "%Y-%m-%d %H:%M:%S")
+            
+        ).astimezone(timezone("UTC"))
+        formatted_time = datetime.strptime(input_timestamp.strftime("%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
+        return formatted_time
+    except:
+        return {"status": 40001, "message": 'Invalid timestamp or timezone value'}

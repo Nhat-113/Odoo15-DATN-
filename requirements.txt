@@ -50,3 +50,5 @@ xlwt==1.3.*
 zeep==3.4.0
 forex-python==1.8
 pandas
+geocoder==1.38.1
+geopy==2.4.1
