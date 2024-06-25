@@ -168,11 +168,12 @@
                                 ></field>
                             </div>
                             <field name="weekday"
-                                attrs="{'invisible':[('meeting_type', '=', 'daily')]}" readonly="1"></field>
+                                attrs="{'invisible':[('meeting_type', '=', 'daily'),('is_edit', '=', False)]}" readonly="1"></field>
                             <field name="repeat_weekly"
                                 attrs="{'invisible': [('meeting_type', '!=', 'weekly')], 'readonly': [('is_edit', '=', True)]}"></field>
                         </group>
                         <group>
+                            <field name="user_tz" attrs="{'invisible': [('is_edit', '=', False)]}"/>
                             <field name="duration" invisible="1"></field>
                             <field name="customize"
                                 widget="boolean_toggle"
