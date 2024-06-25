@@ -108,3 +108,25 @@ def valid_timezone(timez, timest):
         return formatted_time
     except:
         return {"status": 400, "message": 'Invalid timestamp or timezone value'}
+
+def is_valid_month(month_str, format="%Y-%m"):
+    try:
+        return datetime.strptime(month_str, format)
+    except ValueError:
+        return False
+
+def is_valid_integer(value):
+    try:
+        return int(value)
+    except (ValueError, TypeError): 
+        return None
+
+def check_and_handle_missing_fields(kwargs, required_fields, message="Invalid", status=40001):
+    missing_fields = check_field_missing_api(kwargs, required_fields)
+    if missing_fields:
+        return jsonResponse({
+            "status": status,
+            "message": message,
+            "keyerror": message_error_missing(missing_fields)
+        }, 400)
+    return None
