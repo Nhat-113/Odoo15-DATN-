@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 from odoo.http import request
 from dateutil.relativedelta import relativedelta
 # from odoo.tools import  config
-from helper.helper import message_error_missing, check_field_missing_api, jsonResponse, convert_current_tz, check_authorize, handle_pagination, validate_pagination, image_url_getter
+import pytz
+from helper.helper import message_error_missing, check_field_missing_api, jsonResponse, convert_current_tz, check_authorize, handle_pagination, validate_pagination, image_url_getter, is_valid_month, is_valid_integer, check_and_handle_missing_fields
 
 TIME_FORMAT = "%Y-%m-%d, %H:%M:%S"
 role_attendance = [
@@ -417,3 +418,114 @@ class BoxManagementMobile(http.Controller):
             "status": 200,
             "data": statistics
         }, 200)
+
+    @http.route('/api/attendance/history', auth='bearer_token', type='http', methods=['GET'])
+    def get_attendance_history(self, **kwargs):
+        response = check_and_handle_missing_fields(kwargs, ['employee_id', 'date'])
+        if response is not None:
+            return response
+
+        employee_id = kwargs.get('employee_id')
+        employee_id_int = is_valid_integer(employee_id)
+        if not employee_id_int:
+            return jsonResponse({
+                "status": 40001,
+                "message": "Invalid",
+                "keyerror": "Employee ID must be an int"
+            }, 400)
+        else: 
+            employee_id = int(employee_id)
+        
+        month_str = kwargs.get('date')
+        month_date = is_valid_month(month_str)
+        if not month_date:
+            return jsonResponse({
+                "status": 40001,
+                "message": "Invalid",
+                "keyerror": "Month must be in format YYYY-MM"
+            }, 400)
+        
+        role_check_result = self.check_role()
+        if not role_check_result:
+            return jsonResponse({
+                    "status": 40301,
+                    "message": "Forbidden",
+                    "keyerror": "Access Denied"
+                }, 403)
+
+        employee = request.env['hr.employee'].search([('id', '=', employee_id)])
+        if not employee:
+            return jsonResponse({
+                "status": 40401, 
+                "message": "Not Found",
+                "keyerror": "Employee not found"
+            }, 404)
+
+        start_date = month_date.replace(day=1)
+        end_date = (start_date + relativedelta(months=1)) - timedelta(days=1)
+        all_dates = [(start_date + timedelta(days=x)).strftime("%Y-%m-%d") for x in range((end_date - start_date).days + 1)]
+
+        attendance_records = request.env['hr.attendance'].search_read(
+            domain=[
+                ('employee_id', '=', employee_id),
+                ('location_date', '>=', start_date),
+                ('location_date', '<=', end_date)
+            ],
+            fields=['location_date', 'check_in', 'check_out'],
+            order='location_date asc, check_in asc'
+        )
+
+        attendance_by_date = {}
+        vietnam_timezone = pytz.timezone('Asia/Ho_Chi_Minh')
+        for record in attendance_records:
+            date_str = record['location_date'].strftime("%Y-%m-%d")
+            day_records = attendance_by_date.setdefault(date_str, {})
+
+            check_in = day_records.get('check_in')
+            if not check_in or (record['check_in'] and record['check_in'] < check_in):
+                day_records['check_in'] = record['check_in']
+
+            check_out = day_records.get('check_out')
+            if not check_out or (record['check_out'] and record['check_out'] > check_out):
+                day_records['check_out'] = record['check_out']
+
+        attendances = []
+
+        for date in all_dates:
+            record = attendance_by_date.get(date, {})
+            check_in = record.get('check_in')
+            check_out = record.get('check_out')
+
+            check_in_str = check_in.replace(tzinfo=pytz.utc).astimezone(vietnam_timezone).strftime("%H:%M:%S") if check_in else ""
+            check_out_str = check_out.replace(tzinfo=pytz.utc).astimezone(vietnam_timezone).strftime("%H:%M:%S") if check_out else ""
+            
+            duration = str(check_out - check_in) if check_in and check_out else "0:00:00"
+            attendances.append({
+                "date": date,
+                "check_in": check_in_str,
+                "check_out": check_out_str,
+                "duration": duration
+            })
+
+        return jsonResponse({
+            "status": 200,
+            "attendances": attendances,
+        }, 200)
+
+    def check_role(self):
+        current_user = request.env.user
+        attendance_role = {
+            "role_name": "",
+            "description": ""
+        }
+        for permit in role_attendance:
+                check_permission = current_user.has_group(f"hr_attendance.{permit.get('role_name')}")
+                if check_permission:
+                    attendance_role = permit
+
+        if attendance_role['role_name'] == 'group_hr_attendance':
+            employee_id = request.params.get('employee_id')
+            if employee_id and int(employee_id) != current_user.employee_id.id:
+                return False 
+
+        return True
