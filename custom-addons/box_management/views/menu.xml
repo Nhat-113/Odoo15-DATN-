@@ -17,4 +17,12 @@
     parent="menu_box_root"
     sequence="1"
   />
+
+  <menuitem
+    id="setting_device_management"
+    name="Time Setting"
+    action="action_setting_device_management"
+    parent="menu_box_root"
+    sequence="2"
+  />
 </odoo>
