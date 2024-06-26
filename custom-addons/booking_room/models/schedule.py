@@ -88,9 +88,9 @@ class MeetingSchedule(models.Model):
         required=True,
         default=lambda self: self.env.user,
     )
-    day = fields.Char("Day", compute="_compute_kanban_date_start", store=True,)
-    month = fields.Char("Month and Year", compute="_compute_kanban_date_start", store=True,)
-    time = fields.Char("Time", compute="_compute_kanban_date_start", store=True,)
+    day = fields.Char("Day", compute="_compute_date_start", store=True,)
+    month = fields.Char("Month and Year", compute="_compute_date_start", store=True,)
+    time = fields.Char("Time", compute="_compute_date_start", store=True,)
 
     repeat_weekly = fields.Integer(string="Repeat Weekly", default=0)
     weekday = fields.Char(string="Day of week")
@@ -125,6 +125,7 @@ class MeetingSchedule(models.Model):
     end_daily = fields.Char()
     delete_type = fields.Char(default="")
     email_sent = fields.Boolean(string='Email Sent', default=False)
+    user_tz = fields.Char(string="Timezone", default="", compute="_compute_user_tz", store=False)
 
     def _compute_default_start_minutes(self):
         time_start_date =  self.start_date.astimezone(self.get_local_tz()) 
@@ -144,6 +145,10 @@ class MeetingSchedule(models.Model):
     def _compute_access_link(self):
         for record in self:
             record.access_link = record._notify_get_action_link('view')
+
+    def _compute_user_tz(self):
+        local_tz = self.get_local_tz()
+        for rec in self: rec.user_tz = local_tz
 
     # Depends
     @api.depends("user_id")
@@ -189,7 +194,7 @@ class MeetingSchedule(models.Model):
                 record.name = f"{record.room_id.name} - {record.user_id.name}"
 
     @api.depends("start_date")
-    def _compute_kanban_date_start(self):
+    def _compute_date_start(self):
         for record in self:
             if record.start_date:
                 date_obj = record.start_date.astimezone(self.get_local_tz())
@@ -461,7 +466,12 @@ class MeetingSchedule(models.Model):
 
     @api.model
     def get_current_user(self):
-        return {"employee_id": self.env.user.employee_id.id, "is_hr": self.check_is_hr()}
+        return {
+            "employee_id": self.env.user.employee_id.id, 
+            "is_hr": self.check_is_hr(),
+            "user_tz": self.get_local_tz(),
+            "tz_offset": self.get_local_tz(offset=True),
+        }
 
     @api.model
     def get_booking_detail(self, id):
@@ -476,6 +486,10 @@ class MeetingSchedule(models.Model):
             }
         return result
 
+    @api.model
+    def set_user_tz(self, local_tz):
+        self.env.user.tz = local_tz
+
     def _check_is_past_date(self, start_date):
         if start_date is None:
             return False
@@ -484,8 +498,7 @@ class MeetingSchedule(models.Model):
         return start_date < fields.Datetime.now()
 
     def _validate_start_date(self):
-        user_tz = self.env.user.tz or "UTC"
-        local_tz = timezone(user_tz)
+        local_tz = self.get_local_tz()
         start_datetime = self.start_date.astimezone(local_tz)
 
         weekday_mapping = {

@@ -22,6 +22,7 @@
             "booking_room/static/src/js/custom_form_view.js",
             "booking_room/static/src/js/custom_form_view.js",
             "booking_room/static/src/js/disable_archive.js",
+            "booking_room/static/src/js/init_action.js",
         ],
         'web.assets_qweb': [
             'booking_room/static/src/xml/delete_event.xml',
