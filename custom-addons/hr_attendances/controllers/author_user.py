@@ -27,9 +27,12 @@ class AuthorUser(http.Controller):
                             "key": key,
                             "user_id": uid
                         })
+                employee_id = request.env.user.employee_id
+                is_employee = bool(employee_id)
                 return {
                     "status": 200,
-                    "token": key
+                    "token": key,
+                    "is_employee": is_employee,
                 }
         except Exception as e:
             return { "status": 401, "message": f"login failed: {e}"}
