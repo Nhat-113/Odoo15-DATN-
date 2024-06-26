@@ -481,13 +481,13 @@ class ExportWizard(models.TransientModel):
                     ON a.employee_id = e.id
                 LEFT JOIN departure_dates d
 	                ON d.employee_id = e.id
-                WHERE e.active = True
-                    AND e.company_id IN {tuple(company_ids + [0])}
+                WHERE (e.active = True
                     OR (e.active = False 
                         AND (d.departure_date BETWEEN '{start_date}' AND '{end_date}'
                             OR (d.departure_date >= '{start_date}' and d.departure_date >= '{end_date}')
                         )
-                    )
+                    ))
+                    AND e.company_id IN {tuple(company_ids + [0])}
                 ORDER BY e.name, a.check_in desc;
         """
         
