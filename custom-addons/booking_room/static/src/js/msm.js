@@ -15,6 +15,7 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
   var session = require("web.session");
   const { createYearCalendarView } = require("booking_room.fullcalendar");
   var _t = core._t;
+  var framework = require("web.framework");
 
   function dateToServer(date) {
     return date.clone().utc().locale("en").format("YYYY-MM-DD HH:mm:ss");
@@ -177,7 +178,8 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
           if (self.previousOpen) {
             self.previousOpen.close();
           }
-          self.previousOpen = new dialogs.FormViewDialog(self, {
+
+          self.previousOpen = new CustomViewDialogs.CustomFormViewDialog(self, {
             res_model: self.modelName,
             context: context,
             title: options.title,
@@ -274,6 +276,7 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
             close_text: "Cancel",
             readonly: isReadOnly ? true : false,
             event: result,
+            action: "edit",
           };
           if (self.formViewId) {
             options.view_id = parseInt(self.formViewId);
@@ -378,6 +381,7 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
             classes: "btn btn-primary",
             close: false,
             click: function () {
+              framework.blockUI();
               var selectedValue = $('input[name="recurrence-update"]:checked').val();
               var reason_delete = $('input[name="reason"]:checked').val();
               if (reason_delete == "others") {
@@ -400,6 +404,9 @@ odoo.define("booking_room.schedule_view_calendar", function (require) {
                 })
                 .catch(function (error) {
                   Dialog.alert(self, error.message.data.message);
+                })
+                .finally(function(){
+                  framework.unblockUI();
                 });
             },
           },
