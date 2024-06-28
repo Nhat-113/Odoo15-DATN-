@@ -208,10 +208,10 @@
                                         </p>
                                         <p>-	Thời gian thực tập là: 05 ngày/tuần (từ thứ 2 đến thứ 6).</p>
                                         <div class="ml-4">
-                                            <p>+	Sáng từ: 8h00 đến 12h00.</p>
-                                            <p>+	Chiều từ: 13h30 đến 17h30.</p>
+                                            <p>+	Sáng từ: <span t-esc="e.format_time()['hour_from_morning']"/> đến <span t-esc="e.format_time()['hour_to_morning']"/>.</p>
+                                            <p>+	Chiều từ: <span t-esc="e.format_time()['hour_from_afternoon']"/> đến <span t-esc="e.format_time()['hour_to_afternoon']"/>.</p>
                                         </div>
-                                        <p>-	Thời gian nghỉ trưa từ: 12h00 đến 13h30.</p>
+                                        <p>-	Thời gian nghỉ trưa từ: <span t-esc="e.format_time()['hour_to_morning']"/> đến <span t-esc="e.format_time()['hour_from_afternoon']"/>.</p>
                                         <p>-    Công cụ làm việc (máy tính): do thực tập sinh tự túc</p>
                                     </div>
                                     <br/>
