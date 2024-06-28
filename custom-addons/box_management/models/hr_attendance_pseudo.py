@@ -6,6 +6,7 @@ class HrAttendancePseudo(models.Model):
     
     
     attendance_device_details = fields.One2many('attendance.device.details', 'pseudo_attendance_id', string="Attendance Device Details")
+    attendance_device_details_app = fields.One2many('attendance.device.details.app', 'pseudo_attendance_id_app', string="Attendance Device Details App")
     is_multiple = fields.Boolean(string="Multiple")
     location_date = fields.Date("Location Date", store=True, compute="_compute_location_date")
     

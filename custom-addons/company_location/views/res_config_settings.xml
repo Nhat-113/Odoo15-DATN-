@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="res_conig_settings_inherit_view" model="ir.ui.view">
+            <field name="name">res.config.settings.location</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+            <field name="arch" type ="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="Company Location" string="Company Location" data-key="company_location" >
+                        <div id="companies" position="after">
+                            <div id = "custom_settings_div_id">
+                                <h2>Acceptance Distance</h2>
+                                <div class="row mt16 o_settings_container" name="acceptance_distance_setting_container">
+                                    <div class="col-xs-12 col-md-6 o_setting_box" id="acceptance_distance_setting">
+                                        <div class="o_setting_right_pane d-flex">
+                                            <div class="w-50">
+                                                <field name="acceptance_distance" class="w-auto pl-1 font-weight-bold" modifiers="{&quot;readonly&quot;: true}"/>                              
+                                            </div>
+                                            <div class="mt-1 ml-2">Meter</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+    <record id="action_company_location_configuration" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'company_location'}</field>
+    </record>
+    </data>
+</odoo>
