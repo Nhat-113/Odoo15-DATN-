@@ -1,0 +1,46 @@
+<odoo>
+    <menuitem
+        id="smo_menu_root"
+        name="Smart Office"
+        sequence="0"
+        groups="base.group_user" />
+
+    <menuitem
+        id="menu_device_master"
+        name="Devices"
+        parent="smo_menu_root"
+        sequence="1"
+    />
+
+     <menuitem
+        id="menu_lc_schedule_master"
+        name="Schedule"
+        action="action_show_lc_schedule"
+        parent="smo_menu_root"
+        sequence="2"
+    />
+
+    <menuitem
+        id="menu_device_main"
+        name="Overview"
+        action="smo.action_show_devices"
+        parent="menu_device_master"
+        sequence="1"
+    />
+
+    <menuitem
+        id="menu_device_iaq_master"
+        name="IAQ Sensors"
+        action="smo.action_show_devices_iaq"
+        parent="menu_device_master"
+        sequence="2"
+    />
+
+    <menuitem
+        id="menu_device_lc_master"
+        name="Lights"
+        action="smo.action_show_devices_lc"
+        parent="menu_device_master"
+        sequence="3"
+    />
+</odoo>

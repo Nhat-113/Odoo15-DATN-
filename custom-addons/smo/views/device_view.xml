@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="sync_data_action" model="ir.actions.server">
+        <field name="name">Sync Data</field>
+        <field name="model_id" ref="model_smo_device"/>
+        <field name="binding_model_id" ref="model_smo_device"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = env['smo.device'].fetch_devices_detail()
+        </field>
+    </record>
+
+    <record id="smo_device_view_tree" model="ir.ui.view">
+        <field name="name">smo.device.tree</field>
+        <field name="model">smo.device</field>
+        <field name="arch" type="xml">
+            <tree string="Devices" create="false" edit="false" delete="false" export_xlsx="false"
+                    js_class="smo_custom_list_view" expand="1">
+                <field name="asset_name"/>
+                <field name="device_name" />
+                <field name="device_type" />
+                <field name="last_sync_time" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="smo_device_view_form" model="ir.ui.view">
+        <field name="name">smo.device.form</field>
+        <field name="model">smo.device</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false" export_xlsx="false"> 
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="device_name"/>
+                            <field name="device_type"/>
+                            <field name="last_sync_time"/>
+                        </group>
+                        <group>
+                            <field name="asset_name"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Air Quality" attrs="{'invisible': [('device_type', '!=', 'IAQ')]}">
+                            <field name="smo_device_iaq_ids">
+                                <tree create="false" delete="false">
+                                    <field name="param_name"/>
+                                    <field name="current_value"/>
+                                    <field name="unit"/>
+                                    <field name="last_updated"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Light Bulbs" attrs="{'invisible': [('device_type', '!=', 'LC')]}">
+                            <field name="smo_device_lc_ids">
+                                <tree create="false" delete="false">
+                                    <field name="param_name"/>
+                                    <field name="current_state" widget="boolean_toggle"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_show_devices" model="ir.actions.act_window">
+        <field name="name">Devices Overview</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">smo.device</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'group_by': 'asset_name'}</field>
+        <field name="view_id" ref="smo_device_view_tree"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Not found any device. Please sync data from ThingsBoard!
+            </p>
+        </field>
+    </record>
+
+</odoo>
