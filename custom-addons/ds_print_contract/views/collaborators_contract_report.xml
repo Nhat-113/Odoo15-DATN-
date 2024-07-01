@@ -42,7 +42,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <p> 
-                                        - Căn cứ vào BLDS được Quốc hội nước Cộng hòa xã hội chủ nghĩa Việt Nam khóa XI, kỳ họp thứ 7 thông qua ngày 14 tháng 6 năm 2005;
+                                        – Căn cứ vào Bộ luật dân sự số 91/2015/QH13 được Quốc hội nước Cộng hòa xã hội chủ nghĩa Việt Nam khóa XIII, kỳ họp thứ 10 thông qua ngày 24 tháng 11 năm 2015;
                                     </p>
                                     <p>- Căn cứ vào khả năng nhu cầu của hai bên.</p>
                                     <p>
@@ -137,8 +137,8 @@
                                         </p>
                                         <p>
                                             <div class="row">
-                                                <div class="col-3">
-                                                    - Số CMND: <t t-if='e.employee_id.identification_id'>
+                                                <div class="col-5">
+                                                    - Số CMND/CCCD: <t t-if='e.employee_id.identification_id'>
                                                         <span style="padding-right: 20px;" t-field="e.employee_id.identification_id"/>
                                                         </t>
                                                         <t t-if="not e.employee_id.identification_id">................</t>
@@ -150,7 +150,7 @@
                                                     </t>
                                                     <t t-if="not e.employee_id.id_start_date">..............</t>
                                                 </div>
-                                                <div class="col-6">
+                                                <div class="col-4">
                                                     Nơi cấp:
                                                     <t t-if='e.employee_id.identification_place'>
                                                         <span t-field="e.employee_id.identification_place"/>
@@ -210,6 +210,8 @@
                                             <p>1. Quyền của Bên B</p>
                                             <p>- Yêu cầu Bên A thanh toán đầy đủ và đúng hạn các chế độ thù lao và các quyền, lợi ích vật chất khác theo Hợp đồng này.</p>
                                             <p>- Được tham gia các cuộc họp, hội thảo liên quan đến công việc và nghiệp vụ khi có sự đồng ý của bên A</p>
+                                            <p>2. Nghĩa vụ của bên B</p>
+                                            <p>- Đảm bảo hoàn thành công việc theo sự phân công, điều hành của cấp quản lý và Ban Giám đốc.</p>
                                         </div>
                                         <div>
                                             <p><b>Điều 7: Hiệu lực và thời hạn hợp đồng</b></p> 
