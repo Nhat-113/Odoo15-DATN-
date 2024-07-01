@@ -75,7 +75,7 @@ def attendance_single_record_mode(datas, attendance, pseudo_attendance, is_multi
             "check_in": datas['timeutc'],
             "is_multiple": is_multiple_mode
         }
-        if not attendance:
+        if not attendance or attendance.check_in and attendance.check_out:
             request.env['hr.attendance'].create(data_news)
         pseudo = request.env['hr.attendance.pesudo'].create(data_news)
         create_attendance_device_details(data_details, pseudo)
@@ -172,7 +172,8 @@ def handle_attendance_view_mode(datas):
         datetz = datetz.astimezone(pytz.timezone(request.env.user.tz))
     
     attendance = request.env['hr.attendance'].search([('employee_id', '=', datas['employee_id'].id),
-                                                      ('location_date', '=', datetz.date())],
+                                                      ('location_date', '=', datetz.date()),
+                                                      ('check_in', '!=', None)],
                                                      order="check_in desc, check_out desc", limit=1)
     pseudo_attendance = request.env['hr.attendance.pesudo'].search([('employee_id', '=', datas['employee_id'].id), 
                                                                     ('location_date', '=', datetz.date())],
