@@ -70,19 +70,6 @@ class HrAttendance(models.Model):
         # TODO create check validity func here
         return True
     
-    
-    def action_cron_update_attendance_checkout(self):
-        # if self.is_working_day(date.today()):
-            pesudo_attendances = self.env['hr.attendance.pesudo'].search([('start', '=', date.today())])
-            attendances = self.search([('start', '=', date.today()), ('check_out', '=', False)])
-            for record in attendances:
-                temp = pesudo_attendances.filtered(lambda p: p.employee_id.id == record.employee_id.id)
-                if temp:
-                    time_max = max([att.check_out for att in temp])
-                    if record.check_in <= time_max:
-                        record.check_out = time_max
-
-
     def action_cron_batch_verify_data(self):
         ################################
         # verify all records missing checkout
