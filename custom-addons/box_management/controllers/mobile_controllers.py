@@ -25,6 +25,7 @@ class BoxManagementMobile(http.Controller):
     def get_current_user(self, **kw):
         try:            
             user = request.env.user
+            employee = request.env.user.employee_id
             
             attendance_role = {
                 "role_name": "",
@@ -37,7 +38,8 @@ class BoxManagementMobile(http.Controller):
 
             data = {
                 "avatar": image_url_getter('res.users', request.uid),
-                "role": attendance_role
+                "role": attendance_role,
+                "employee_id": employee.id if employee else ''
             }
             
             fields_map = {
