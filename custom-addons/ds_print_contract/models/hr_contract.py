@@ -38,6 +38,27 @@ class HrContract(models.Model):
     duration_months = fields.Integer(string="Duration",
                                      default=2)
 
+    def format_time(self):
+        morning_shift = next((att for att in self.resource_calendar_id.attendance_ids if att.day_period == "morning"), False)
+        afternoon_shift = next((att for att in self.resource_calendar_id.attendance_ids if att.day_period == "afternoon"), False)
+        data = {
+                "hour_from_morning": "8h00",
+                "hour_to_morning": "12h00",
+                "hour_from_afternoon": "13h30",
+                "hour_to_afternoon": "17h30",
+        }
+        if morning_shift and afternoon_shift:
+            data['hour_from_morning'] = morning_shift.hour_from
+            data['hour_to_morning'] = morning_shift.hour_to
+            data['hour_from_afternoon'] = afternoon_shift.hour_from
+            data['hour_to_afternoon'] = afternoon_shift.hour_to
+
+            for key, value in data.items():
+                hours = int(value)
+                minutes = int((value - hours) * 60)
+                data[key] = f"{hours:2}h{minutes:02}"
+        return data
+
     def send_email_contract(self):
         """
         This function opens a window to compose an email, with the edi payslip template message loaded by default
