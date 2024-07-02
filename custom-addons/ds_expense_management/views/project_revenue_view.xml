@@ -99,6 +99,7 @@
                             <field name="revenue_sgd" widget="monetary" attrs="{'invisible': [('get_currency_name', '!=', 'VND')]}"/> -->
                             <field name="revenue_vnd" widget="monetary" attrs="{'invisible': [('get_currency_name', '=', 'VND')]}"/>
                             <field name="total_commission" widget="monetary"/>
+                            <field name="total_discount" widget="monetary"/>
                             <field name="total_revenue_remaining" widget="monetary"/>
                             <!-- <field name="currency_usd" invisible="1"/>
                             <field name="currency_jpy" invisible="1"/>
@@ -162,6 +163,8 @@
 
                                         <field name="commission_percents" />
                                         <field name="result_commission" sum="Total Commission" widget="monetary"/>
+                                        <field name="discount_percents" />
+                                        <field name="result_discount" sum="Total Discount" widget="monetary"/>
                                         <field name="result_revenue" sum="Total Revenue Remaining" widget="monetary"/>
                                         <field name="description" />
                                         <field name="company_id" invisible="1"/>
