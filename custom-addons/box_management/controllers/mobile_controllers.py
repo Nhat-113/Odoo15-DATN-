@@ -96,7 +96,7 @@ class BoxManagementMobile(http.Controller):
                     "keyerror": "Employee Not Found"
                 }, 404)
             
-            data = { "avatar": image_url_getter('hr.employee', employee.id) }
+            data = { "avatar": self.get_avatar_employee(employee_id) }
             fields_map = {
                 "id": "id",
                 "fullname": "name",
@@ -209,7 +209,7 @@ class BoxManagementMobile(http.Controller):
                         "employee_id": employee["id"],
                         "employee_name": employee["name"],
                         "job_title": employee["job_title"] if employee["job_title"] else "",
-                        "avatar": image_url_getter('hr.employee', employee["id"]),
+                        "avatar": self.get_avatar_employee(employee["id"]),
                     } 
                     first_check_in = convert_current_tz(current_tz, attd[0]['check_in']).strftime(TIME_FORMAT)
                     last_check_out = convert_current_tz(current_tz, attd[0]['check_out']).strftime(TIME_FORMAT) if attd[0]['check_out'] else ""
@@ -355,7 +355,7 @@ class BoxManagementMobile(http.Controller):
                         "email": employee.work_email if employee.work_email else "",
                         "phone": employee.mobile_phone if employee.mobile_phone else "",
                         "job_title": employee.job_title if employee.job_title else "", 
-                        "avatar": image_url_getter('hr.employee', employee.id)
+                        "avatar": self.get_avatar_employee(employee.id)
                     }
                     for employee in employees
                 ] if len(employees) else [],
@@ -531,3 +531,25 @@ class BoxManagementMobile(http.Controller):
                 return False 
 
         return True
+    
+    def get_avatar_employee(self, id):
+        model = 'hr.employee'
+        base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        avatar = f"{base_url}/api/get_image?model={model}&id={id}"
+        
+        return avatar
+    
+    @http.route('/api/get_image', type='http', auth="bearer_token", website=True, sitemap=False)
+    def mobile_get_image(self, **kwargs):
+        
+        model = kwargs.get('model')
+        id = kwargs.get('id')
+        
+        status, headers, image_base64 = request.env['ir.http'].sudo().binary_content(
+            model=model,
+            id=id,
+            field='image_1920',
+            default_mimetype='image/png')
+        result = request.env['ir.http']._content_image_get_response(status, headers, image_base64)
+        
+        return result
