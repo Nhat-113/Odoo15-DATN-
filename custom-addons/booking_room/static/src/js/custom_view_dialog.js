@@ -6,6 +6,7 @@ odoo.define("booking_room.CustomViewDialogs", function (require) {
   var Dialog = require("web.Dialog");
   var _t = core._t;
   var QWeb = core.qweb;
+  var framework = require("web.framework");
 
   const CustomFormViewDialog = dialogs.FormViewDialog.extend({
     init: function (parent, options) {
@@ -55,7 +56,9 @@ odoo.define("booking_room.CustomViewDialogs", function (require) {
               (multi_select ? _t("Save & Close") : _t("Save")),
             classes: "btn-primary",
             click: function () {
-              self._save(options.event).then(self.close.bind(self));
+              self
+                ._save(options.event, options?.action || "")
+                .then(self.close.bind(self));
             },
           });
 
@@ -107,11 +110,30 @@ odoo.define("booking_room.CustomViewDialogs", function (require) {
      *
      * @override
      */
-    _save: function (event) {
+    _save: function (event, action) {
       var self = this;
       var data = this.form_view.renderer.state.data;
+
+      if (action !== "edit") {
+        framework.blockUI();
+        return this.form_view
+          .saveRecord(this.form_view.handle, {
+            stayInEdit: true,
+            reload: false,
+            savePoint: this.shouldSaveLocally,
+            viewType: "form",
+          })
+          .then(function (changedFields) {
+            // record might have been changed by the save (e.g. if this was a new record, it has an
+            // id now), so don't re-use the copy obtained before the save
+            var record = self.form_view.model.get(self.form_view.handle);
+            return self.on_saved(record, !!changedFields.length);
+          })
+          .finally(function () {
+            framework.unblockUI();
+          });
+      }
       const old_start_date = new Date(event.start_date);
-      const old_end_date = new Date(event.end_date);
 
       const formatDate = (dateStr) => {
         let date = new Date(
@@ -139,6 +161,7 @@ odoo.define("booking_room.CustomViewDialogs", function (require) {
                 classes: "btn btn-primary",
                 close: true,
                 click: function () {
+                  framework.blockUI();
                   var selected_value = $(
                     'input[name="edit-option"]:checked'
                   ).val();
@@ -146,14 +169,10 @@ odoo.define("booking_room.CustomViewDialogs", function (require) {
                     .query({
                       model: "meeting.schedule",
                       method: "write_many",
-                      args: [
-                        data,
-                        formatDate(old_start_date),
-                        selected_value,
-                      ],
+                      args: [data, formatDate(old_start_date), selected_value],
                     })
                     .then(function () {
-                      resolve(true); 
+                      resolve(true);
                     })
                     .catch(function (error) {
                       Dialog.alert(this, error.message.data.message);
@@ -185,8 +204,12 @@ odoo.define("booking_room.CustomViewDialogs", function (require) {
           })
           .catch(function (error) {
             return Promise.reject(error);
+          })
+          .finally(function () {
+            framework.unblockUI();
           });
       } else {
+        framework.blockUI();
         return this.form_view
           .saveRecord(this.form_view.handle, {
             stayInEdit: true,
@@ -199,6 +222,9 @@ odoo.define("booking_room.CustomViewDialogs", function (require) {
             // id now), so don't re-use the copy obtained before the save
             var record = self.form_view.model.get(self.form_view.handle);
             return self.on_saved(record, !!changedFields.length);
+          })
+          .finally(function () {
+            framework.unblockUI();
           });
       }
     },

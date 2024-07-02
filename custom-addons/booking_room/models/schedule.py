@@ -361,6 +361,7 @@ class MeetingSchedule(models.Model):
         end_datetime = self.end_date
         end_date = datetime.combine(start_datetime.date(), end_datetime.time())
 
+        local_tz = self.get_local_tz()
         hours = self.get_local_tz(offset=True)
 
         local_start_date = (start_datetime + timedelta(hours=hours)).date()
@@ -400,7 +401,7 @@ class MeetingSchedule(models.Model):
         booking_to_create = []
         
         for booking in booking_dates:
-            if weekday_mapping.get(booking.weekday(), False):
+            if weekday_mapping.get(booking.astimezone(local_tz).weekday(), False):
                 date = booking.date()
                 s_hour = (booking + timedelta(hours=hours)).hour
                 e_hour = (booking + timedelta(hours=(hours + self.duration))).hour
