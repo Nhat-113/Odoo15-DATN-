@@ -30,6 +30,7 @@
              "data/offical_labor_contract_gross_mail_template.xml",
              "views/probationary_contract_gross_report.xml",
              "data/probationary_contract_gross_mail_template.xml",
+             "views/mirai_contract_gross_report.xml",
              ],
     "installable": True,
     'auto_install': False,

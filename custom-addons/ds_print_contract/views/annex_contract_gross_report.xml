@@ -90,7 +90,7 @@
                                             <t t-if='e.company_id.street'>
                                                 <span t-field="e.company_id.street"/>
                                             </t>
-                                            <t t-if="not e.company_id.street">Số 10 Hải Phòng - P.Thạch Thang - Q.Hải Châu - TP.Đà Nẵng</t>
+                                            <t t-if="not e.company_id.street">Lô A1-2 Đường Chương Dương - P.Khuê Mỹ - Q.Ngũ Hành Sơn - TP.Đà Nẵng</t>
                                         </span>
                                     </td>
                                 </tr>
@@ -167,13 +167,13 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th colspan="2">CMND số :
+                                    <th colspan="2">CCCD số :
                                         <span>
                                             <t t-if='e.employee_id.identification_id'>
                                                 <span t-field="e.employee_id.identification_id"/>
                                             </t>
                                             <t t-if="not e.employee_id.identification_id">....................................</t>
-                                        </span> cấp ngày:
+                                        </span> Cấp ngày:
                                         <span>
                                             <t t-if='e.employee_id.id_start_date'>
                                                 <span t-esc="e.employee_id.id_start_date.strftime('%d/%m/%Y')"/>
@@ -196,7 +196,7 @@
                                     <div>
                                         <table style="width:100%">
                                             <tr>
-                                                <th style="width:24%"><span class="font-weight-bold">Vị trí công việc:</span></th>
+                                                <th style="width:24%"><span>Vị trí công việc:</span></th>
                                                 <td>
                                                     <span class="font-weight-bold">:  </span>
                                                     <span class="font-weight-bold">
@@ -207,7 +207,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th style="width:24%"><span class="font-weight-bold">Tổng thu nhập (Gross)</span></th>
+                                                <th style="width:24%"><span>Tổng thu nhập (Gross)</span></th>
                                                 <td>
                                                     <span class="font-weight-bold">:  </span>
                                                     <span class="font-weight-bold">

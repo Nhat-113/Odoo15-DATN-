@@ -42,6 +42,19 @@
         <field name="paperformat_id" ref="ds_print_contract.contract_paperformat_qweb" />
     </record>
 
+    <!-- Hợp đồng chính thức gross cho mirai-->
+    <record id="action_mirai_report_contract_gross" model="ir.actions.report">
+        <field name="name">Mirai Employee Official Labor Contract (Gross)</field>
+        <field name="model">hr.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ds_print_contract.mirai_contract_gross_qweb_report</field>
+        <field name="report_file">ds_print_contract.mirai_contract_gross_qweb_report</field>
+        <field name="print_report_name">'Official Labor Contract (Gross)- %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_hr_contract"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="ds_print_contract.contract_paperformat_qweb" />
+    </record>
+
     <!-- Hợp đồng thử việc -->
     <record id="action_report_probationary_contract" model="ir.actions.report">
         <field name="name">Employee Probationary Contract</field>

@@ -91,7 +91,7 @@
                                                     <t t-if='e.company_id.street'>
                                                         <span t-field="e.company_id.street"/>
                                                     </t>
-                                                    <t t-if="not e.company_id.street">Số 10 Hải Phòng - P.Thạch Thang - Q.Hải Châu - TP.Đà Nẵng</t>
+                                                    <t t-if="not e.company_id.street">Lô A1-2 Đường Chương Dương - P.Khuê Mỹ - Q.Ngũ Hành Sơn - TP.Đà Nẵng</t>
                                                 </span>
                                             </td>
                                         </tr>
@@ -168,13 +168,13 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th colspan="2">CMND số :
+                                            <th colspan="2">CCCD số :
                                                 <span>
                                                     <t t-if='e.employee_id.identification_id'>
                                                         <span t-field="e.employee_id.identification_id"/>
                                                     </t>
                                                     <t t-if="not e.employee_id.identification_id">....................................</t>
-                                                </span> cấp ngày:
+                                                </span> Cấp ngày:
                                                 <span>
                                                     <t t-if='e.employee_id.id_start_date'>
                                                         <span t-esc="e.employee_id.id_start_date.strftime('%d/%m/%Y')"/>

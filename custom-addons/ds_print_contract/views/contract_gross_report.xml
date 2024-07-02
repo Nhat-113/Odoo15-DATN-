@@ -98,7 +98,7 @@
                                                     <t t-if='e.company_id.street'>
                                                         <span t-field="e.company_id.street"/>
                                                     </t>
-                                                    <t t-if="not e.company_id.street">Số 10 Hải Phòng - P.Thạch Thang - Q.Hải Châu - TP.Đà Nẵng</t>
+                                                    <t t-if="not e.company_id.street">Lô A1-2 Đường Chương Dương - P.Khuê Mỹ - Q.Ngũ Hành Sơn - TP.Đà Nẵng</t>
                                                 </span>
                                             </td>
                                         </tr>
@@ -172,7 +172,9 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th colspan="2">Số CMND/Hộ chiếu :
+                                            <th>Số CCCD/Hộ chiếu</th>
+                                            <td>
+                                                <span>:  </span>
                                                 <span>
                                                     <t t-if='e.employee_id.identification_id'>
                                                         <span t-field="e.employee_id.identification_id"/>
@@ -185,7 +187,7 @@
                                                     <t t-if="not e.employee_id.identification_id">
                                                         <t t-if="not e.employee_id.passport_id">....................................</t>
                                                     </t>
-                                                </span>&#160;&#160;&#160;&#160;cấp ngày :
+                                                </span>&#160;&#160;&#160;&#160;Cấp ngày :
                                                 <span>
                                                     <t t-if='e.employee_id.id_start_date'>
                                                         <span t-esc="e.employee_id.id_start_date.strftime('%d/%m/%Y')"/>
@@ -198,7 +200,7 @@
                                                     </t>
                                                     <t t-if="not e.employee_id.identification_place">......................................................</t>
                                                 </span>
-                                            </th>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <th>Địa chỉ thường trú</th>
@@ -274,7 +276,7 @@
                                         </t>
                                     </div>
                                     <br/>
-                                    <p class="font-weight-bold">Điều II. Chế độ làm việc</p>
+                                    <p class="font-weight-bold page-break-before">Điều II. Chế độ làm việc</p>
                                     <div class="ml-4">
                                         <p>1.   Thời giờ làm việc: Theo quy định chung của công ty.</p>
                                         <p>2.   Trong một số trường hợp đặc biệt, do tính chất công việc, nhu cầu kinh doanh hay nhu cầu của tổ chức/bộ phận. Công ty có thể áp dụng thời gian linh hoạt. Trường hợp Người lao động được áp dụng thời gian làm việc linh hoạt. Người lao động có thể không tuân thủ lịch làm việc cố định bình thường mà làm theo ca kíp nhưng vẫn phải đảm bảo đủ số giờ làm việc theo quy định của Công ty.</p>
