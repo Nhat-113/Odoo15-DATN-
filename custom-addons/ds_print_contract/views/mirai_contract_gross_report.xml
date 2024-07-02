@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <template id="contract_qweb_report" name="contract_qweb_report">
+    <template id="mirai_contract_gross_qweb_report" name="contract_gross_qweb_report">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="e">
                 <t t-call="web.external_layout">
@@ -78,7 +78,7 @@
                                 <div class="col-12">
                                     <table style="width:100%">
                                         <tr>
-                                            <th><span>Chúng tôi, một bên là</span></th>
+                                            <th><span class="font-weight-bold">Chúng tôi, một bên là</span></th>
                                             <td>
                                                 <span>:  </span>
                                                 <b>
@@ -291,7 +291,7 @@
                                         <p class="font-weight-bold">Mức lương cơ bản: <span t-esc="'{:,}'.format(int(e.wage))"/> vnd/tháng.</p>
                                         <p>Mức lương này là căn cứ đóng Bảo hiểm bắt buộc theo quy định Pháp luật lao động là cơ sở để giải quyết các chế độ Bảo hiểm xã hội theo quy định của Luật Bảo hiểm xã hội.</p>
                                         <p>Các khoản phúc lợi khác: <span t-esc="'{:,}'.format(int(e.non_taxable_allowance + e.taxable_allowance))"/> vnd/tháng.</p>
-                                        <p class="font-weight-bold">Tổng thu nhập thực nhận: <span t-esc="'{:,}'.format(int(e.wage + e.non_taxable_allowance + e.taxable_allowance))"/> vnd/tháng.</p>
+                                        <p class="font-weight-bold">Tổng thu nhập (Gross): <span t-esc="'{:,}'.format(int(e.wage + e.non_taxable_allowance + e.taxable_allowance))"/> vnd/tháng.</p>
                                         <p class="font-weight-bold">Hình thức trả lương</p>
                                         <p>Theo tháng bằng chuyển khoản, trả một lần vào ngày 02 hàng tháng. Nếu trùng vào ngày nghỉ thì được trả vào ngày làm việc đầu tiên tiếp theo. Người lao động đồng ý mở tài khoản cá nhân tại ngân hàng do Công ty chỉ định để trả tiền lương ngay sau khi ký Hợp đồng lao động với Công ty.</p>
                                         <p class="font-weight-bold">2.   Chế độ phúc lợi:
@@ -314,7 +314,7 @@
                                             <p class="font-weight-bold">1.   <span class="font-weight-normal">Hoàn thành những công việc được giao, chấp hành sự phân công công việc của Công ty.</span></p>
                                             <p class="font-weight-bold">2.   <span class="font-weight-normal">Thực hiện nội quy, quy định của công ty.</span></p>
                                             <p class="font-weight-bold">3.   <span class="font-weight-normal">Trường hợp người lao động có hành vi gây thiệt hại đến sản xuất, kinh doanh, làm hư hỏng hoặc mất tài sản trang thiết bị làm việc hoặc có hành vi khác gây thiệt hại về tài sản, uy tín, hình ảnh công ty thì ngoài việc bị xử lý kỷ luật, người lao động còn có trách nhiệm bổi thưởng thiệt hại.</span></p>
-                                            <p class="font-weight-bold">4.   <span class="font-weight-normal">Trường hợp người lao động đơn phương chấm dứt hợp đồng phải báo trước ít nhất 45 ngày đối với hợp đồng không xác định thời hạn và ít nhất trước 30 ngày đối với hợp đồng xác định thời hạn từ 12 tháng đến 36 tháng theo quy định của luật Lao động và trước khi nghỉ phải bàn giao lại thiết bị máy móc đang sử dụng theo biên bản bàn giao và có nghĩa vụ thanh toán phí Bảo hiểm còn lại (nếu có)</span></p>
+                                            <p class="font-weight-bold">4.   <span class="font-weight-normal">Trường hợp người lao động đơn phương chấm dứt hợp đồng phải báo trước ít nhất 45 ngày đối với hợp đồng không xác định thời hạn và ít nhất trước 30 ngày đối với hợp đồng xác định thời hạn từ 12 tháng đến 36 tháng theo quy định của luật Lao động và trước khi nghỉ phải bàn giao công việc và trang thiết bị máy móc đang sử dụng theo biên bản bàn giao và có nghĩa vụ thanh toán phí Bảo hiểm còn lại (nếu có).</span></p>
                                         </div>
                                     </div>
                                     <br/>
@@ -328,14 +328,14 @@
                                         <p class="font-weight-bold">B- Quyền hạn: </p>
                                         <div>
                                             <p>1.   Quản lý người lao động hoàn thành công việc theo hợp đồng (bố trí và phân công công việc theo đúng chức danh và chuyên môn).</p>
-                                            <p>2.   Có quyền thay đổi, tạm hoãn, chấm dứt hợp đồng lao động và áp dụng các biện pháp kỷ luật theo quy định của pháp luật hiện hành, Thoả ước Lao động Tập thể và Nội quy Lao động của Công ty.</p>
+                                            <p>2.   Có quyền thay đổi, tạm hoãn, chấm dứt hợp đồng lao động và áp dụng các biện pháp kỷ luật theo quy định của pháp luật hiện hành và Nội quy Lao động của Công ty.</p>
                                             <p>3.   Có quyền đòi bồi thường khiếu nại tới các cơ quan liên đới để bảo vệ quyền lợi của mình nếu Người lao động vi phạm Pháp luật nhà nước hay các điều khoản của hợp đồng này.</p>
                                         </div>
                                     </div>
                                     <br/>
                                     <p class="font-weight-bold">Điều V. Điều khoản thi hành</p>
                                     <div>
-                                        <p>1.   Những vấn đề về lao động không được ghi trong hợp đồng này thì áp dụng quy định tại Nội quy Lao động, Thoả ước lao động tập thể và quy định của pháp luật lao động để giải quyết.</p>
+                                        <p>1.   Những vấn đề về lao động không được ghi trong hợp đồng này thì áp dụng quy định tại Nội quy Lao động và quy định của pháp luật lao động để giải quyết.</p>
                                         <p>2.   Khi hai bên ký kết phụ lục hợp đồng thì nội dung của phụ lục cũng có giá trị như các nội dung của bản hợp đồng này.</p>
                                         <p>3.   Hợp đồng lao động này làm thành hai (02) bản có giá trị như nhau, mỗi bên giữ một bản, và có hiệu lực từ ngày ký.</p>
                                         <p>4.   Người lao động đọc kỹ, hiểu rõ và cam kết thực hiện các điều khoản và quy định ghi tại hợp đồng lao động.</p>

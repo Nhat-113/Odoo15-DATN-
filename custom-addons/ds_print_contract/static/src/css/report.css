@@ -37,3 +37,7 @@ th {
   margin-top: 10px;
   margin-bottom: 20px;
 }
+
+.page-break-before {
+  page-break-before: always;
+}

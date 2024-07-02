@@ -75,7 +75,7 @@
                                                         <t t-if='e.company_id.street'>
                                                             <span t-field="e.company_id.street"/>
                                                         </t>
-                                                        <t t-if="not e.company_id.street">Số 10 Hải Phòng - P.Thạch Thang - Q.Hải Châu - TP.Đà Nẵng</t>
+                                                        <t t-if="not e.company_id.street">Lô A1-2 Đường Chương Dương - P.Khuê Mỹ - Q.Ngũ Hành Sơn - TP.Đà Nẵng</t>
                                                     </span>
                                         </p>
                                         <p>
@@ -138,7 +138,7 @@
                                         <p>
                                             <div class="row">
                                                 <div class="col-5">
-                                                    - Số CMND/CCCD: <t t-if='e.employee_id.identification_id'>
+                                                    - Số CCCD: <t t-if='e.employee_id.identification_id'>
                                                         <span style="padding-right: 20px;" t-field="e.employee_id.identification_id"/>
                                                         </t>
                                                         <t t-if="not e.employee_id.identification_id">................</t>

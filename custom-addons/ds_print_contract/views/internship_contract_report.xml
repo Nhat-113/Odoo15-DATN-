@@ -169,7 +169,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th colspan="2">CMND số :
+                                            <th colspan="2">CCCD số :
                                                 <span>
                                                     <t t-if='e.employee_id.identification_id'>
                                                         <span style="padding-right: 20px;" t-field="e.employee_id.identification_id"/>
