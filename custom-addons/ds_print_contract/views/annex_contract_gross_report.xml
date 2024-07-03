@@ -209,8 +209,8 @@
                                             <tr>
                                                 <th style="width:24%"><span>Tổng thu nhập (Gross)</span></th>
                                                 <td>
-                                                    <span class="font-weight-bold">:  </span>
-                                                    <span class="font-weight-bold">
+                                                    <span>:  </span>
+                                                    <span>
                                                         <t t-if="e.wage">
                                                             <span t-esc="'{:,}'.format(int(e.wage + e.other_allowance))"/>
                                                         </t>
