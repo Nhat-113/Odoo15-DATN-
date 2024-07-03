@@ -75,7 +75,7 @@ def attendance_single_record_mode(datas, attendance, pseudo_attendance, is_multi
             "check_in": datas['timeutc'],
             "is_multiple": is_multiple_mode
         }
-        if not attendance or attendance.check_in and attendance.check_out:
+        if not attendance:
             request.env['hr.attendance'].create(data_news)
         pseudo = request.env['hr.attendance.pesudo'].create(data_news)
         create_attendance_device_details(data_details, pseudo)
