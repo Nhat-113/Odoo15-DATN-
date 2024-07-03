@@ -35,6 +35,7 @@ class HrContract(models.Model):
     other_allowance = fields.Monetary(compute='_other_allowance_total', string="Other Allowance", readonly=True, help="Other allowances = Non-Taxable Allowances + Taxable Allowances")
     non_taxable_allowance = fields.Monetary(string="Non-Taxable Allowance", help="Non-Taxable Allowances")
     taxable_allowance = fields.Monetary(string="Taxable Allowance", help="Taxable Allowances")
+    gasoline_subsidy = fields.Monetary(string="Gasoline Subsidy", help="Gasoline subsidy")
     percent_prob_contract = fields.Float('Probationary Contract', store=True, default=85)
 
     @api.depends('non_taxable_allowance', 'taxable_allowance')

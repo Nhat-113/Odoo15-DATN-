@@ -113,6 +113,12 @@
                         <field name="other_allowance" nolabel="1"/>
                         <span>/ month</span>
                     </div>
+                    <label for="gasoline_subsidy"/>
+                    <div class="o_row">
+
+                        <field name="gasoline_subsidy" nolabel="1"/>
+                        <span>/ month</span>
+                    </div>
                 </group>
                 <group string="Other" name="group_right">
                     <label for="percent_prob_contract" attrs="{'invisible': [('contract_document_type', '!=', 'probationary')]}"/>
