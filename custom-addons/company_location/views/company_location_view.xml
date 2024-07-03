@@ -43,9 +43,7 @@
             <page string="Employee Access" name="description">
               <field name="employee_ids">
                 <tree create="0" edit="0" editable="top">
-                  <field name="name" readonly="1"/>
-                  <field name="image_1920" widget="image" options="{'size': [30, 30]}"/>
-                  <field name="job_title" readonly="1" />
+                  <field name="avatar_name" string="Name" readonly="1"/>
                   <field name="work_email" readonly="1"/>
                   <field name ="work_phone" readonly="1"/>
                 </tree>
