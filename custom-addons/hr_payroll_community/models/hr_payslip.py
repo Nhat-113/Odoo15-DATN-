@@ -445,24 +445,27 @@ class HrPayslip(models.Model):
             else:
                 bhxh_percent = 0
                 bhxh_percent_sdld = 0
-
-            bhxh = {
+            
+            res.append({
+                'name': 'Khoản bổ sung/Tạm ứng (VND)',
+                'code': 'KBS',
+                'contract_id': contract.id,
+                'amount': contract.gasoline_subsidy,
+            })
+            if bhxh_percent > 0:
+                res.append({
                     'name': 'BHXH (%) (Trích vào lương NLĐ)',
                     'code': 'PBH',
                     'contract_id': contract.id,
                     'amount': bhxh_percent
-                }
-            bhxh_sdld = {
+                })
+            if bhxh_percent_sdld > 0:
+                res.append({
                     'name': 'BHXH (%) (Trích vào chi phí DN)',
                     'code': 'BHC',
                     'contract_id': contract.id,
                     'amount': bhxh_percent_sdld
-                }
-
-            if bhxh_percent > 0:  
-                res.append(bhxh)
-            if bhxh_percent_sdld > 0:
-                res.append(bhxh_sdld)
+                })
         return res
 
 

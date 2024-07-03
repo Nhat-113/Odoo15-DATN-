@@ -435,11 +435,11 @@
         </record>
 
         <!-- input lương tạm ứng -->
-        <record id="hr_rule_input_kbs" model="hr.rule.input">
+        <!-- <record id="hr_rule_input_kbs" model="hr.rule.input">
             <field name="name">Khoản bổ sung/Tạm ứng (VND)</field>
             <field name="code">KBS</field>
             <field name="input_id" ref="hr_payroll_community.hr_rule_kbs"/>            
-        </record>
+        </record> -->
         <!-- kết thúc -->
 
         <record id="hr_rule_pcd" model="hr.salary.rule">
