@@ -166,6 +166,9 @@ class HrAttendance(http.Controller):
         file_data = file_model.action_get_data(options["start_date"], 
                                                options["end_date"], 
                                                options['allowed_companies'])
+        
+        time_off_data = file_model.approved_time_off_query(options['allowed_companies'], options["start_date"], options["end_date"])
+
         options["data"] = file_data
         try:
             if output_format == "xlsx":
@@ -183,7 +186,7 @@ class HrAttendance(http.Controller):
                     ],
                     cookies=None,
                 )
-                file_model.generate_xlsx_report(options, response, options['allowed_companies'])
+                file_model.generate_xlsx_report(options, response, options['allowed_companies'], time_off_data)
 
             return response
 
