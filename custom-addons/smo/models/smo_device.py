@@ -9,6 +9,7 @@ import json
 class SmoDevice(models.Model):
   _name = "smo.device"
   _description = "SmartOffice Devices"
+  _rec_name = "device_name"
 
   smo_asset_id = fields.Many2one('smo.asset', string="SmartOffice Asset ID", required=True, ondelete='cascade')
   asset_id = fields.Char(string='Asset ID')
@@ -19,7 +20,6 @@ class SmoDevice(models.Model):
   smo_device_iaq_ids = fields.One2many('smo.device.iaq', 'smo_device_id', string='IAQ Device Records')
   smo_device_lc_ids = fields.One2many('smo.device.lc', 'smo_device_id', string='LC Device Records')
   last_sync_time =fields.Datetime(string='Last Sync Time', required=True)
-  _rec_name = "device_name"
 
   @api.model
   def fetch_devices(self, smo_uid):
@@ -36,7 +36,7 @@ class SmoDevice(models.Model):
       params = {'fromId': asset_id, 'fromType': 'ASSET'}
     
       try:
-        response = make_request('/api/relations/info', method='GET',
+        response = make_request(self, '/api/relations/info', method='GET',
                   params=params,
                   access_token=tokens.access_token)
         response.raise_for_status()
@@ -49,13 +49,17 @@ class SmoDevice(models.Model):
       except Exception as err:
         raise UserError(f'An error occurred: {str(err)}')
 
+      try:
+        data = response.json()
+      except Exception as err:
+        raise UserError('Failed to parse response data of devices')
+
       asset_record = self.env['smo.asset'].search([('asset_id', '=', asset_id)], limit=1)
       if not asset_record:
         raise UserError('Asset record not found')
         
       existing_devices = {device.device_id: device for device in self.search([('smo_asset_id', '=', asset_record.id)])}
 
-      data = response.json()
       for device in data:
         device_id = device['to']['id']
         device_name = device['toName']
@@ -121,9 +125,9 @@ class SmoDevice(models.Model):
         continue
       
       if device['type'] == 'IAQ':
-        self.fetch_iaq_devices(device, smo_device_record, tokens_record, smo_uid)
+        self.fetch_iaq_devices(smo_device_record, tokens_record, smo_uid)
       elif device['type'] == 'LC':
-        self.fetch_lc_devices(device, smo_device_record, tokens_record, smo_uid)
+        self.fetch_lc_devices(smo_device_record, tokens_record, smo_uid, device['Asset'])
       else:
         # Other device types are not supported
         pass
@@ -132,20 +136,20 @@ class SmoDevice(models.Model):
 
     if reload == True:
       return {
-      'type': 'ir.actions.client',
-      'tag': 'reload',
+        'type': 'ir.actions.client',
+        'tag': 'reload',
       }
 
   @api.model
-  def fetch_iaq_devices(self, device, smo_device_record, tokens_record, smo_uid):
-    device_id = device['device_id']
+  def fetch_iaq_devices(self, smo_device_record, tokens_record, smo_uid):
     smo_device_id = smo_device_record.id
+    device_id = smo_device_record.device_id
 
     params = {'useStrictDataTypes': False}
     endpoint = f'/api/plugins/telemetry/DEVICE/{device_id}/values/timeseries'
 
     try:
-      response = make_request(endpoint, method='GET',
+      response = make_request(self, endpoint, method='GET',
                 params=params,
                 access_token=tokens_record.access_token)
       response.raise_for_status()
@@ -158,10 +162,14 @@ class SmoDevice(models.Model):
     except Exception as err:
       raise UserError(f'An error occurred: {str(err)}')
 
+    try:
+      data = response.json()
+    except Exception as err:
+      raise UserError('Failed to parse response data of IAQ Sensor devices')
+
     iaq_model = self.env['smo.device.iaq']
     existing_iaq_records = {rec.param_name: rec for rec in iaq_model.search([('smo_device_id', '=', smo_device_id)])}
 
-    data = response.json()
     for parameter in data:
       current_value = data[parameter][0]['value']
       last_updated = datetime.fromtimestamp(data[parameter][0]['ts'] / 1000)
@@ -181,18 +189,24 @@ class SmoDevice(models.Model):
           'last_updated': last_updated
         })
 
+    smo_device_record.write({
+      'last_sync_time': fields.Datetime.now()
+    })
+
     for param_name in set(existing_iaq_records) - set(data):
       existing_iaq_records[param_name].unlink()
 
+    self.env.cr.commit()
+
   @api.model
-  def fetch_lc_devices(self, device, smo_device_record, tokens_record, smo_uid):
-    device_id = device['device_id']
+  def fetch_lc_devices(self, smo_device_record, tokens_record, smo_uid, control_asset_list):
     smo_device_id = smo_device_record.id
+    device_id = smo_device_record.device_id
 
     endpoint = f'/api/plugins/telemetry/DEVICE/{device_id}/values/attributes/CLIENT_SCOPE'
         
     try:
-      response = make_request(endpoint, method='GET', access_token=tokens_record.access_token)
+      response = make_request(self, endpoint, method='GET', access_token=tokens_record.access_token)
       response.raise_for_status()
     except requests.HTTPError as http_err:
       if response.status_code == 401:
@@ -203,12 +217,16 @@ class SmoDevice(models.Model):
     except Exception as err:
       raise UserError(f'An error occurred: {str(err)}')
 
+    try:
+      data = response.json()
+    except Exception as err:
+      raise UserError('Failed to parse response data of Light Control devices')
+
     lc_model = self.env['smo.device.lc']
     existing_lc_records = {(rec.param_name, rec.asset_control_id): rec for rec in lc_model.search([('smo_device_id', '=', smo_device_id)])}
 
-    list_controlled_asset = self.filter_controlled_assets(smo_uid, device['Asset'])
+    list_controlled_asset = self.filter_controlled_assets(smo_uid, control_asset_list)
     
-    data = response.json()
     new_keys = set()
     for item in data:
       for asset_id in list_controlled_asset:
@@ -231,10 +249,16 @@ class SmoDevice(models.Model):
               'current_state': current_state
             })
 
+    smo_device_record.write({
+      'last_sync_time': fields.Datetime.now()
+    })
+
     old_keys = set(existing_lc_records)
     keys_to_remove = old_keys - new_keys
     for key in keys_to_remove:
         existing_lc_records[key].unlink()
+      
+    self.env.cr.commit()
 
   @api.model
   def filter_controlled_assets(self, smo_uid, dict_assets_LC):
@@ -261,3 +285,39 @@ class SmoDevice(models.Model):
       'type': 'ir.actions.client',
       'tag': 'reload',
     }
+
+  @api.model
+  def sync_single_device(self, smo_uid=None):
+    if not smo_uid:
+      smo_user_record = self.env['smo.user'].search([], limit=1)
+      smo_uid = smo_user_record.id if smo_user_record else self.env['smo.user'].login()
+
+    tokens_record = self.env['smo.token'].get_tokens_of_id(smo_uid)
+    if not tokens_record:
+      raise UserError('Token record not found.')
+
+    for record in self:
+      if record.device_type == 'IAQ':
+        self.fetch_iaq_devices(record, tokens_record, smo_uid)
+      elif record.device_type == 'LC':
+        devices = self.fetch_devices(smo_uid)
+        if not devices:
+          raise UserError('An error occurred while fetching devices.')
+
+        control_asset_list = {}
+        for device in devices:
+          if device['id'] == record.id:
+            control_asset_list = device.get('Asset', {})
+            break
+        
+        self.fetch_lc_devices(record, tokens_record, smo_uid, control_asset_list)
+      else:
+        # Other device types are not supported
+        pass
+
+    return {
+      'type': 'ir.actions.client',
+      'tag': 'reload',
+    }
+        
+

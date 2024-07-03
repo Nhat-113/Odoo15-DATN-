@@ -22,7 +22,7 @@ class SmoTenant(models.Model):
     params = {'pageSize': 1, 'page': 0}
 
     try:
-      response = make_request('/api/users', method='GET',
+      response = make_request(self, '/api/users', method='GET',
                   params=params,
                   access_token=tokens_record.access_token)
       response.raise_for_status()
@@ -35,7 +35,12 @@ class SmoTenant(models.Model):
     except Exception as err:
         raise UserError(f'An error occurred: {str(err)}')
       
-    res_data = response.json()['data'][0]
+    try:
+      res_data = response.json()
+    except Exception as err:
+      raise UserError('Failed to parse response data of tenants')
+
+    res_data = res_data['data'][0]
     res_customer_id = res_data['customerId']['id']
 
     existed_record = self.search([('smo_user_id', '=', smo_uid)])

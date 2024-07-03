@@ -5,15 +5,19 @@
         <field name="model">smo.device.lc.schedule</field>
         <field name="arch" type="xml">
             <tree string="Lights Control Schedule" export_xlsx="false"
-                    js_class="smo_custom_list_view">
+                    js_class="smo_custom_list_view" expand="1">
                 <field name="schedule_name" />
-                <field name="target_type" />
-                <field name="smo_device_lc_ids" widget="many2many_tags"/>                
-                <field name="state" />
+                <field name="smo_device_lc_ids" widget="many2many_tags"/>
+                <field name="repeat_daily" />        
                 <field name="schedule_mode" />
-                <field name="start_time" />
+                <field name="start_time" 
+                    attrs="{'invisible': [('repeat_daily', '==', True)]}"/>
                 <field name="end_time" 
-                    attrs="{'invisible': [('schedule_mode', '==', 'once')]}"/>
+                    attrs="{'invisible': ['|', ('schedule_mode', '==', 'once'), ('repeat_daily', '==', True)]}"/>
+                <field name="start_time_daily" 
+                    attrs="{'invisible': [('repeat_daily', '==', False)]}"/>
+                <field name="end_time_daily" 
+                    attrs="{'invisible': [('repeat_daily', '==', False)]}"/>
             </tree>
         </field>
     </record>
@@ -37,17 +41,47 @@
                                 attrs="{'invisible': [('state', '!=', True)]}"/>
                               <label for="start_time" string="Turn Off Time"
                                 attrs="{'invisible': [('state', '!=', False)]}"/>
-                            </div>                          
-                            <field nolabel="1" name="start_time"/>                     
+                            </div>
+                            <div>
+                                <field nolabel="1" name="start_time"
+                                    attrs="{'invisible': [('repeat_daily', '=', True)]}"/> 
+                                <field nolabel="1" name="start_time_daily" widget="selection"
+                                    attrs="{'invisible': [('repeat_daily', '=', False)]}"/>
+                            </div>
                         </group>
                         <group attrs="{'invisible': [('schedule_mode', '!=', 'frame')]}" style="display: flex;">
                             <div class="o_td_label">
-                              <label for="end_time" string="Turn Off Time"
-                                attrs="{'invisible': [('state', '!=', True)]}"/>
-                              <label for="end_time" string="Turn On Time"
-                                attrs="{'invisible': [('state', '!=', False)]}"/>
+                                <label for="end_time" string="Turn Off Time"
+                                    attrs="{'invisible': [('state', '!=', True)]}"/>
+                                <label for="end_time" string="Turn On Time"
+                                    attrs="{'invisible': [('state', '!=', False)]}"/>  
                             </div>
-                            <field nolabel="1" name="end_time"/>
+                            <div>
+                                <field nolabel="1" name="end_time"
+                                    attrs="{'invisible': [('repeat_daily', '=', True)]}"/>
+                                <field nolabel="1" name="end_time_daily" widget="selection"
+                                    attrs="{'invisible': [('repeat_daily', '=', False)]}"/>
+                            </div>
+                        </group>
+                    </group>
+                    <group>
+                        <group style="width: 30%">
+                            <field name="repeat_daily" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="custom_day" widget="boolean_toggle"
+                                attrs="{'invisible': [('repeat_daily', '!=', True)]}" />
+                        </group>
+                        <group attrs="{'invisible': ['|', ('custom_day', '!=', True), ('repeat_daily', '!=', True)]}">
+                            <field name="monday" />
+                            <field name="tuesday" />
+                            <field name="wednesday" />
+                            <field name="thursday" />
+                        </group>
+                        <group attrs="{'invisible': ['|', ('custom_day', '!=', True), ('repeat_daily', '!=', True)]}">
+                            <field name="friday" />
+                            <field name="saturday" />
+                            <field name="sunday" />
                         </group>
                     </group>
                     <group>
@@ -63,7 +97,7 @@
                         </group>
                     </group>
                     <group>
-                        <field name="smo_device_lc_ids" widget="many2many_tags" options="{'no_create': True}" domain="[]" 
+                        <field name="smo_device_lc_ids" widget="many2many_tags" options="{'no_create': True}" 
                             attrs="{'readonly': [('target_type', 'in', ['asset', 'device'])]}"
                             style="width: 500px;"/>
                     </group>
@@ -78,6 +112,7 @@
         <field name="res_model">smo.device.lc.schedule</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[]</field>
+        <field name="context">{'group_by': 'repeat_daily'}</field>
         <field name="view_id" ref="smo_lc_schedule_view_tree"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

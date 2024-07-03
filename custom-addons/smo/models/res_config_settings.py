@@ -11,6 +11,16 @@ class ResConfigSettings(models.TransientModel):
     thingsboard_shared_account_password = fields.Char(string="Password",
       config_parameter='smo.shared_account_password')
 
+    @api.onchange('thingsboard_api_url')
+    def reformat_thingsboard_api_url(self):
+        for record in self:
+          record.thingsboard_api_url = record.thingsboard_api_url.strip().strip('/')
+
+    @api.onchange('thingsboard_shared_account_username')
+    def reformat_shared_account_username(self):
+        for record in self:
+          record.thingsboard_shared_account_username = record.thingsboard_shared_account_username.strip()
+
     @api.model
     def get_values(self):
         res = super(ResConfigSettings, self).get_values()
