@@ -53,7 +53,11 @@ class CompanyLocation(http.Controller):
 
             get_location_company = request.env["company.location"].search([("id", "=", location_id)])
             if not get_location_company:
-                return jsonResponse({"status": 40001, "message": f"The specified location (ID: {location_id}) doesn't exist."}, 400)
+                return jsonResponse({"status": 40002, "message": f"The specified location (ID: {location_id}) doesn't exist."}, 400)
+            
+            employee_id = get_employee.id
+            if not get_location_company.employee_ids.filtered(lambda x: x.id == employee_id).id:
+                return jsonResponse({"status": 40101, "message": f"This employee is not authorized to access to company '{get_location_company.company_id.name}' location."}, 401)
 
             formatted_time = valid_timezone_for_mobile(kw.get("timezone"), kw.get("timestamp"))
 
