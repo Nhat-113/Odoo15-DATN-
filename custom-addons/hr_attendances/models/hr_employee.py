@@ -28,7 +28,13 @@ class HrEmployee(models.Model):
         string="Attendance Status", compute='_compute_attendance_state',
         selection=[('checked_out', "Checked out"), ('checked_in', "Checked in")],
         groups="hr_attendance.group_hr_attendance_kiosk,hr_attendance.group_hr_attendance")
+    sync_write_date = fields.Datetime(string="Sync Field Date", compute='check_sync', store=True,)
 
+    @api.depends('name', 'work_email', 'image_1920', 'fingerprint_template')
+    def check_sync(self):
+        currente_date = fields.Datetime.now()
+        for rec in self:
+            rec.sync_write_date = currente_date
 
     def attendance_manual_api(self, employee, date_time, next_action, is_checkin, entered_pin=None):
         employee.ensure_one()
