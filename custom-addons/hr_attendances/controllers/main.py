@@ -352,7 +352,7 @@ class HrEmployees(http.Controller):
                     FROM hr_employee AS m1
                     LEFT JOIN box_employee_rel AS m2 ON m1.id = m2.employee_id
                     WHERE m2.device_id = %(device_id)s
-                    AND (m1.write_date > %(time_sync)s OR m2.write_date > %(time_sync)s)
+                    AND (m1.sync_write_date > %(time_sync)s OR m2.write_date > %(time_sync)s)
                 """, {"time_sync": last_synced_timestamp, "device_id": device.id})
 
             total_records = request.env.cr.fetchone()[0]
@@ -366,7 +366,7 @@ class HrEmployees(http.Controller):
                             FROM hr_employee AS m1
                             LEFT JOIN box_employee_rel AS m2 ON m1.id = m2.employee_id
                             WHERE m2.device_id = %(device_id)s
-                            AND (m1.write_date > %(time_sync)s OR m2.write_date > %(time_sync)s)
+                            AND (m1.sync_write_date > %(time_sync)s OR m2.write_date > %(time_sync)s)
                             ORDER BY m1.id
                             OFFSET %(offset)s
                             LIMIT %(limit)s
@@ -425,7 +425,7 @@ class HrEmployees(http.Controller):
                     FROM hr_employee AS m1
                     LEFT JOIN box_employee_rel AS m2 ON m1.id = m2.employee_id
                     WHERE m2.device_id = %(device_id)s
-                    AND (m1.write_date > %(time_sync)s OR m2.write_date > %(time_sync)s)
+                    AND (m1.sync_write_date > %(time_sync)s OR m2.write_date > %(time_sync)s)
                 """, {"time_sync": last_synced_timestamp, "device_id": device.id})
 
                 total_emp_update = request.env.cr.fetchone()[0]

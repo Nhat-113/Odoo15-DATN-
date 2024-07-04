@@ -23,6 +23,7 @@
         'views/attendance_calendar_view.xml',
         'views/hr_attendance_pesudo_view.xml',
         'views/hr_attendance_view.xml',
+        'views/hr_employee_view.xml',
     ],
     'assets': {
         'web.assets_backend': [
