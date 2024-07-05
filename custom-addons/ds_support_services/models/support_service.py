@@ -65,7 +65,7 @@ class SupportServices(models.Model):
     cost_type = fields.Many2one('cost.support.service', tracking=True, string="Cost Type")
     flag_cost = fields.Char(string="Status Flag", readonly=True, store=True, compute='_compute_flag_cost_type')
     department_id = fields.Many2one('hr.department', string="Department", tracking=True)
-    amount_it_other = fields.Monetary(string='Amount', tracking=True, currency_field='currency_vnd')
+    amount_it_other = fields.Monetary(string='Request payment', tracking=True, currency_field='currency_vnd')
     check_invisible_project_id = fields.Boolean(default=False, compute='compute_check_invisible_project_id')
     get_month_tb = fields.Selection(selection=LIST_MONTHS, default=_get_month_defaults, string="Month", required=True, tracking=True)
     get_year_tb = fields.Selection(selection=_get_years, default=_get_year_defaults, string='Year', required=True, tracking=True)
@@ -79,6 +79,8 @@ class SupportServices(models.Model):
     domain_project_id = fields.Char(string="Project domain", readonly=True, store=False, compute='_compute_domain_project_department')
     check_readonly_field_project = fields.Boolean(default=False, compute='compute_domain_readonly_project')
 
+    actual_payment = fields.Monetary(string='Actual payment', tracking=True, currency_field='currency_vnd')
+    cost_type_project = fields.Boolean(default=False)
 
     @api.onchange('project_id', 'category', 'get_month_tb')
     def get_member_line(self):
@@ -152,6 +154,7 @@ class SupportServices(models.Model):
             if request.category.type_category == 'team_building' or \
                 request.category.type_category in ['it_helpdesk', 'other'] and request.cost_type.type_cost == 'cost_project':
                 request.check_invisible_project_id = False
+                request.cost_type_project = True
             else:
                 request.check_invisible_project_id = True
     
@@ -423,7 +426,7 @@ class SupportServices(models.Model):
     @api.constrains('amount', 'requester_id', 'category')
     def check_amount_advance_salary(self):
         for request in self:
-            if request.category.type_category == 'salary_advance' and request.requester_id.employee_id.id or request.requester_id.employee_ids.id: 
+            if request.category.type_category == 'salary_advance' and (request.requester_id.employee_id.id or request.requester_id.employee_ids.id): 
                 contract = self.env['hr.contract'].sudo().search([
                     ('employee_id', '=', request.requester_id.employee_id.id or request.requester_id.employee_ids.id),
                     ('date_start', '<=', request.date_request),
@@ -528,8 +531,9 @@ class SupportServices(models.Model):
                             'project_expense_management_id': project_expense_management_id.id,
                             'name': request.name,
                             'expense_date': request.date_request,
-                            'total_expenses': request.amount_it_other,
-                            'expense_vnd': request.amount_it_other
+                            'total_expenses': request.actual_payment,
+                            'expense_vnd': request.actual_payment,
+                            'description': request.description
                         })
                     else:
                         self.env['project.expense.value'].create({
@@ -537,7 +541,8 @@ class SupportServices(models.Model):
                             'name': request.name,
                             'expense_date': request.date_request,
                             'total_expenses': 0,
-                            'expense_vnd': request.amount_it_other
+                            'expense_vnd': request.actual_payment,
+                            'description': request.description
                         })
             elif request.category.type_category == 'team_building':
                 project_expense = self.env['project.expense.management'].search([
