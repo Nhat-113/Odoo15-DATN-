@@ -4,7 +4,7 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="e">
                 <t t-call="web.external_layout">
-                    <div class="page">
+                    <div class="page" style="font-family:'Times New Roman', sans-serif; font-size: 16px;">
                         <link rel='stylesheet' href='/ds_print_contract/static/src/css/report.css'/>
                         <div class="container contract-report">
                             <div class="row">
@@ -196,9 +196,9 @@
                                     <div class="ml-4">
                                         <table style="width:100%">
                                             <tr>
-                                                <th style="width:24%"><span class="font-weight-bold">Vị trí công việc:</span></th>
+                                                <th style="width:24%"><span>Vị trí công việc:</span></th>
                                                 <td>
-                                                    <span class="font-weight-bold">:  </span>
+                                                    <span>:  </span>
                                                     <span class="font-weight-bold">
                                                         <t t-if='e.employee_id.job_title'>
                                                             <span t-field="e.employee_id.job_title"/>
