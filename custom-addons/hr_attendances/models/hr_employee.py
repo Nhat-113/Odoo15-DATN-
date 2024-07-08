@@ -30,11 +30,14 @@ class HrEmployee(models.Model):
         groups="hr_attendance.group_hr_attendance_kiosk,hr_attendance.group_hr_attendance")
     sync_write_date = fields.Datetime(string="Sync Field Date", compute='check_sync', store=True,)
 
-    @api.depends('name', 'work_email', 'image_1920', 'fingerprint_template')
+    @api.depends('name', 'work_email', 'image_1920', 'fingerprint_template', 'active')
     def check_sync(self):
-        currente_date = fields.Datetime.now()
+        current_date = fields.Datetime.now()
         for rec in self:
-            rec.sync_write_date = currente_date
+            rec.sync_write_date = current_date
+
+    def unlink(self):
+        self.active = False
 
     def attendance_manual_api(self, employee, date_time, next_action, is_checkin, entered_pin=None):
         employee.ensure_one()
