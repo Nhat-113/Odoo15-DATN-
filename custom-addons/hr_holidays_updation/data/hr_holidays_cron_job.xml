@@ -26,7 +26,7 @@
             <field name="code">model.gen_cron_job_time_off()</field>
             <field name="interval_number">12</field>
             <field name="interval_type">months</field>
-            <field name="nextcall" eval="(datetime(year = 2023, month = 12, day = 15, hour = 0, minute = 0, second = 0)).strftime('%Y-%m-%d 11:00:00')"/>
+            <field name="nextcall" eval="(datetime(year = DateTime.now().year, month = 12, day = 15, hour = 0, minute = 0, second = 0)).strftime('%Y-%m-%d 11:00:00')"/>
         </record>
     </data>
 </odoo>
