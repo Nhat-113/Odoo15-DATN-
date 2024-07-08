@@ -7,4 +7,6 @@ access_smo_device_buser,smo.user,model_smo_device,smo.group_smo_admin,1,1,1,1
 access_smo_device_iaq_buser,smo.user,model_smo_device_iaq,smo.group_smo_admin,1,1,1,1
 access_smo_device_lc_buser,smo.user,model_smo_device_lc,smo.group_smo_admin,1,1,1,1
 access_smo_device_lc_schedule_buser,smo.user,model_smo_device_lc_schedule,smo.group_smo_admin,1,1,1,1
+access_ir_cron,smo.user,model_ir_cron,smo.group_smo_admin,1,1,1,1
+access_ir_action_server,smo.user,base.model_ir_actions_server,smo.group_smo_admin,1,1,1,1
 
