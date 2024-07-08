@@ -17,7 +17,7 @@ class CompanyLocation(http.Controller):
             
             result = {
                 "status": 200,
-                "datas": [
+                "data": [
                     {
                         "id": location.id,
                         "name_company": location.company_id.name,
