@@ -348,6 +348,8 @@ class ExportWizard(models.TransientModel):
                 'left': 2,
                 'right': 2
         }
+        cell_format = self.format(workbook, cell_default, **wd_format, **fmLeft)
+        cell_format.set_text_wrap()
         attendances = data['data']
         approved_time_off_map, approved_wfh_map = time_off_data
         row = 6
@@ -398,7 +400,7 @@ class ExportWizard(models.TransientModel):
                             sheet.write(row_active, 3 + day_off1, PN, self.format(workbook, pn_format))
             for key, vals in record.items():
                 if key == 'name':
-                    sheet.write(row_active, 1, vals, self.format(workbook, cell_default, **wd_format, **fmLeft))
+                    sheet.write(row_active, 1, vals, cell_format)
                 elif key == 'job_title':
                     sheet.write(row_active, 2, vals, self.format(workbook, cell_default, **fmLeft))
                 elif key == 'day_working':
