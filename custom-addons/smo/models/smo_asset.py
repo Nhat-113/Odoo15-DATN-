@@ -30,7 +30,7 @@ class SmoAsset(models.Model):
       'fromType': 'CUSTOMER'
     }
     try:
-      response = make_request('/api/relations/info', method='GET',
+      response = make_request(self, '/api/relations/info', method='GET',
                   params=params,
                   access_token=tokens_record.access_token)
       response.raise_for_status()
@@ -43,13 +43,17 @@ class SmoAsset(models.Model):
     except Exception as err:
         raise UserError(f'An error occurred: {str(err)}')
 
+    try:
+      data = response.json()
+    except Exception as err:
+      raise UserError('Failed to parse response data of assets')
+
     existing_assets = {asset.asset_id: asset for asset in self.search([('smo_tenant_id', '=', customer_id)])}
 
     tenant_record = self.env['smo.tenant'].search([('customer_id', '=', customer_id)], limit=1)
     if not tenant_record:
       raise UserError('Tenant record not found')
 
-    data = response.json()
     fetched_asset_ids = []
     for asset in data:
       customer_id = asset['from']['id']

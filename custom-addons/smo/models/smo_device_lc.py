@@ -42,7 +42,7 @@ class SmoDeviceLc(models.Model):
       raise UserError('Token record not found.')
 
     try:
-      response = make_request(endpoint, method='POST',
+      response = make_request(self, endpoint, method='POST',
                     payload=payload,
                     access_token=tokens.access_token)
       response.raise_for_status()

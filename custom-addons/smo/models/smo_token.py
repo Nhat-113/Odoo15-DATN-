@@ -59,6 +59,7 @@ class SmoToken(models.Model):
       values['smo_user_id'] = smo_uid
       self.create(values)
     self.env.cr.commit()
+    return token_record
   
   @api.model
   def refresh_access_token(self, smo_uid):
@@ -70,7 +71,7 @@ class SmoToken(models.Model):
       "refreshToken": user_token_record.refresh_token
     }
     try: 
-      response = make_request('/api/auth/token', method='POST', payload=payload)
+      response = make_request(self, '/api/auth/token', method='POST', payload=payload)
       response.raise_for_status()
       
       res_data = response.json()
@@ -79,9 +80,10 @@ class SmoToken(models.Model):
           'refresh_token': res_data['refreshToken'],
       })
       self.env.cr.commit()
+      return user_token_record
     except requests.HTTPError as http_err:
       if response.status_code == 401:
-        self.get_new_tokens(smo_uid)
+        return self.get_new_tokens(smo_uid)
       else:
         raise UserError(f'Failed to refresh access token: {response.text}')
     except Exception as err:

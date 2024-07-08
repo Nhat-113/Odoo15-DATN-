@@ -5,5 +5,6 @@ from . import smo_asset
 from . import smo_device
 from . import smo_device_iaq
 from . import smo_device_lc
+from . import ir_cron
 from . import smo_device_lc_schedule
 from . import res_config_settings

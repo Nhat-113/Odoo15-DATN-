@@ -10,7 +10,7 @@ odoo.define('smo.CustomListView', function (require) {
     const CustomListController = ListController.extend({
         renderButtons: function ($node) {
             this._super.apply(this, arguments)
-            if (this.$buttons) {
+            if (this.$buttons && this.modelName != 'smo.device.lc.schedule') {
                 const $syncButton = $('<button type="button" class="btn btn-primary">')
                     .text('Sync').click(this.onClickSyncButton.bind(this))
                 this.$buttons.append($syncButton)
