@@ -11,6 +11,7 @@
     'website': "",
     'depends': ['hr', 'base', 'project', 'web_domain_field', 'ds_project_planning', 'sale_timesheet'],
     'data': [
+        'security/hr_timesheet_security.xml',
         'views/project_view.xml',
         'views/report_timesheet_templates_update.xml',
         'security/ir.model.access.csv',
