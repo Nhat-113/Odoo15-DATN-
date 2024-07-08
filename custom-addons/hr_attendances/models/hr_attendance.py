@@ -98,13 +98,24 @@ class HrAttendance(models.Model):
     
     #Override
     def unlink(self):
-        dates = [d.start for d in self if d.start]
-        date_min = min(dates)
-        date_max = max(dates)
-        pesudos = self.env['hr.attendance.pesudo'].search([('employee_id', 'in', self.employee_id.ids), 
-                                                 ('start', '>=', date_min),
-                                                 ('start', '<=', date_max)])
+        date_min = ""
+        date_max = ""
+        date_start = [d.start for d in self if d.start]
+        date_end = [d.end for d in self if d.end]
+        if date_start:
+            date_min = min(date_start)
+            date_max = max(date_start)
+        
+        elif date_end:
+            date_min = min(date_end)
+            date_max = max(date_end)
+        
+        pesudos = self.env['hr.attendance.pesudo'].search([
+            ('employee_id', 'in', self.employee_id.ids),
+            ('location_date', '>=', date_min),
+            ('location_date', '<=', date_max)])
         pesudos.unlink()
+        
         return super(HrAttendance, self).unlink()
 
 class HrAttendancePesudo(models.Model):
