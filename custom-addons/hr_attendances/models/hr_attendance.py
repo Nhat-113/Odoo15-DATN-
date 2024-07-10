@@ -118,6 +118,21 @@ class HrAttendance(models.Model):
         
         return super(HrAttendance, self).unlink()
 
+    @api.onchange('check_in', 'check_out')
+    def _change_pesudo_data(self):
+        changed_record = self.env['hr.attendance.pesudo'].search([
+            ('employee_id', '=', self.employee_id.id), 
+            '|',
+            ('check_in', '=', self.check_in),
+            ('check_out', '=', self.check_out)
+        ])
+
+        changed_record.update({
+            "check_in": self.check_in,
+            "check_out": self.check_out
+        })
+
+
 class HrAttendancePesudo(models.Model):
     _name = 'hr.attendance.pesudo'
     _order = "id desc"
