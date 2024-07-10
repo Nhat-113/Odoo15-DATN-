@@ -44,6 +44,7 @@
               <field name="employee_ids">
                 <tree create="0" edit="0" editable="top">
                   <field name="avatar_name" string="Name" readonly="1"/>
+                  <field name="company_id" string="Company" readonly="1"/>
                   <field name="work_email" readonly="1"/>
                   <field name ="work_phone" readonly="1"/>
                 </tree>
