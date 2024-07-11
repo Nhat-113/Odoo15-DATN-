@@ -1,5 +1,5 @@
 from odoo import models, fields
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, time
 import calendar
 import pandas as pd
 from odoo.tools import date_utils
@@ -23,6 +23,12 @@ T_OFF = "T-OFF"
 CONFIRM = "CONFIRM"
 HOUR_SMALL = 4
 
+def extract_hour_minute(time_string):
+    try:
+        hour, minute = time_string.split(":")
+        return int(hour), int(minute)
+    except ValueError:
+        raise ValueError("Invalid time format. Expected 'HH:MM'.")
 
 class ExportWizard(models.TransientModel):
     _name = 'export.wizard'
@@ -91,13 +97,20 @@ class ExportWizard(models.TransientModel):
                     if day_number not in datas[str(att[0])]:
                         datas[str(att[0])][day_number]= day_vals
                 continue
-            
+            companies = self.env['hr.employee'].search([('id', '=', att[0])]).company_id
+            hour_start, minute_start = extract_hour_minute(companies.hour_work_start)
             endpoint = att[4]
             worked_hours = att[5]
-            condition = (att[4] - att[4].replace(hour=0, minute=0, second=0)).total_seconds() / 3600.0
+            if companies.attendance_view_type == True and companies.enable_split_shift == True:
+                condition = (att[4] - att[4].replace(hour=hour_start, minute=minute_start, second=0)).total_seconds() / 3600.0
+            else :
+                condition = (att[4] - att[4].replace(hour=0, minute=0, second=0)).total_seconds() / 3600.0
             # in case: period of attendance record between two dates -> separate it into two records for two dates.
             if att[3].day < att[4].day and condition > 0:
-                endpoint = att[4].replace(hour=0, minute=0, second=0)
+                if companies.attendance_view_type == True and companies.enable_split_shift == True:
+                    endpoint = att[4].replace(hour=hour_start, minute=minute_start, second=0)
+                else:
+                    endpoint = att[4].replace(hour=0, minute=0, second=0)
                 delta = att[4] - endpoint
                 worked_hours_remaining = delta.total_seconds() / 3600.0
                 worked_hours -= worked_hours_remaining
@@ -134,6 +147,11 @@ class ExportWizard(models.TransientModel):
                 "worked_hours": worked_hours
             }
             day_number = str(att[3].day) + "/" + str(att[3].month)
+
+            specific_time_start = time(hour_start, minute_start)
+            if companies.attendance_view_type == True and companies.enable_split_shift == True:
+                if att[3].time() < specific_time_start:
+                    day_number = str((att[3] -  timedelta(days=1)).day) + "/" + str(att[3].month)
             if str(att[0]) not in datas:
                 datas[str(att[0])] = {
                     day_number: day_vals
@@ -550,8 +568,7 @@ class ExportWizard(models.TransientModel):
             else:
                 single_mode.append(item.id)
         
-        return single_mode, multi_mode
-            
+        return single_mode, multi_mode            
 
     def action_get_data(self, start_date, end_date, allowed_companies):
         single_mode, multi_mode = self.compute_attendance_view_mode(allowed_companies)
@@ -563,7 +580,6 @@ class ExportWizard(models.TransientModel):
         
         attendances.extend(single_mode)
         attendances.extend(multi_mode)
-        
         return self.handle_data_export(attendances)
 
     def approved_time_off_query(self, company_ids, start_date, end_date):
