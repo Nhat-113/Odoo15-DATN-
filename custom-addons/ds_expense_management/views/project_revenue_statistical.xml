@@ -48,6 +48,8 @@
                 <field name="revenue_vnd" sum="Total Revenue" widget="monetary"/>
                 <field name="commission_percents" />
                 <field name="result_commission" sum="Total Commission" widget="monetary"/>
+                <field name="discount_percents" />
+                <field name="result_discount" sum="Total Discount" widget="monetary"/>
                 <field name="result_revenue" sum="Total Revenue Remaining" widget="monetary"/>
                 <field name="description" />
                 <field name="sort_date" invisible="1"/>

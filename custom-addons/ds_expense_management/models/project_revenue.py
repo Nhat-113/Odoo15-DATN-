@@ -48,6 +48,7 @@ class ProjectRevenue(models.Model):
     revenue_vnd = fields.Monetary(string="Total Revenue", currency_field='currency_vnd', store=True, readonly=True)
     
     total_commission = fields.Monetary(string="Total Commission", compute='_compute_total_revenue', store=True, currency_field='currency_vnd')
+    total_discount = fields.Monetary(string="Total Discount", compute='_compute_total_revenue', store=True, currency_field='currency_vnd')
     total_revenue_remaining = fields.Monetary(string="Total Revenue Remaining", compute='_compute_total_revenue', store=True, currency_field='currency_vnd')
     
     get_currency_name = fields.Char(string='Currency Name', readonly=True, related='currency_id.name',store=True)
@@ -144,10 +145,12 @@ class ProjectRevenue(models.Model):
             total_revenue_vnd = 0
             total_comission = 0
             total_revenue_remaining = 0
+            total_discount = 0
             for item in record.project_revenue_value_ids:
                 total_revenue_curr += item.revenue_project
                 total_revenue_vnd += item.revenue_vnd
                 total_comission += item.result_commission
+                total_discount += item.result_discount
                 total_revenue_remaining += item.result_revenue
             
             if not record.id and record.estimation_id and record.estimation_id.stage.type == 'completed' and self.check_restore_data == False:
@@ -164,6 +167,7 @@ class ProjectRevenue(models.Model):
                 record.revenue_project = total_revenue_curr
                 record.revenue_vnd = total_revenue_vnd
                 record.total_commission = total_comission
+                record.total_discount = total_discount
                 record.total_revenue_remaining = total_revenue_remaining
             
             
@@ -264,6 +268,9 @@ class ProjectRevenueValue(models.Model):
     
     commission_percents = fields.Float(string='Commission Rate (%)')
     result_commission = fields.Monetary(string="Commission", compute='_compute_commission_percentage', store=True, currency_field='currency_vnd')
+
+    discount_percents = fields.Float(string='Discount Rate (%)')
+    result_discount = fields.Monetary(string="Discount", compute='_compute_commission_percentage', store=True, currency_field='currency_vnd')
     result_revenue = fields.Monetary(string="Revenue Remaining", compute='_compute_commission_percentage', store=True, currency_field='currency_vnd')
     
     project_id = fields.Many2one('project.project', string="Project", related="project_revenue_management_id.project_id", store=True)
@@ -339,12 +346,12 @@ class ProjectRevenueValue(models.Model):
                 self.sort_date = datetime.strptime(('01' + '/' + self.get_month + '/' + self.get_year), '%d/%m/%Y')
 
 
-    @api.depends('commission_percents', 'revenue_vnd')
+    @api.depends('discount_percents', 'commission_percents', 'revenue_vnd')
     def _compute_commission_percentage(self):
         for record in self:
             record.result_commission = record.revenue_vnd * record.commission_percents / 100
-            record.result_revenue = record.revenue_vnd - record.result_commission
-            
+            record.result_discount = record.revenue_vnd * record.discount_percents / 100
+            record.result_revenue = record.revenue_vnd - (record.result_commission + record.result_discount)
             
     @api.constrains('commission_percents', 'exchange_rate')
     def _validate_value_input(self):
