@@ -371,12 +371,21 @@ class BoxManagementMobile(http.Controller):
 
     @http.route("/api/attendance/statistic", type="http", auth="bearer_token", methods=["GET"])
     def get_attendance_statistics(self, **kwargs):
+        missing_fields = check_field_missing_api(kwargs, ['month', 'company_ids'])
+        if len(missing_fields) > 0:
+            return jsonResponse({
+                "status": 40001,
+                "message": "Invalid",
+                "keyerror": message_error_missing(missing_fields)
+            }, 400)
+
         def validate_month(month_str):
             try:
                 return datetime.strptime(month_str, "%Y-%m")
             except ValueError:
                 return None
 
+        company_ids = kwargs.get('company_ids')
         month_str = kwargs.get('month')
         month_date = validate_month(month_str)
         
@@ -390,15 +399,33 @@ class BoxManagementMobile(http.Controller):
         start_date = month_date.replace(day=1)
         end_date = (start_date + relativedelta(months=1)) - timedelta(days=1)
 
-        attendance_records = request.env['hr.attendance'].search_read(
-            domain=[('location_date', '>=', start_date), ('location_date', '<=', end_date)],
-            fields=['employee_id', 'location_date', 'check_in', 'check_out'],
-            order='location_date asc'
+        search_domain = [
+            ('location_date', '>=', start_date), 
+            ('location_date', '<=', end_date)
+        ]
+        
+        if company_ids or company_ids == "":
+            company_ids_list = company_ids.split(',')
+            company_ids_int = all(is_valid_integer(company_id) for company_id in company_ids_list)
+            if not company_ids_int or company_ids == "":
+                return jsonResponse({
+                    "status": 40001,
+                    "message": "Invalid",
+                    "keyerror": "Company ID must be an int"
+                }, 400)
+            search_domain.append(('employee_id.company_id.id', 'in', company_ids_list))
+
+        attendance_records = request.env['hr.attendance'].read_group(
+            groupby=['location_date:day', 'employee_id'],
+            fields=['check_in:min', 'check_out:max'],
+            domain=search_domain,
+            lazy=False
         )
 
         date_statistics = {}
         for record in attendance_records:
-            date_str = record['location_date'].strftime("%Y-%m-%d")
+            date_obj = datetime.strptime(record['location_date:day'], '%d %b %Y')
+            date_str = date_obj.strftime("%Y-%m-%d")
 
             if date_str not in date_statistics:
                 date_statistics[date_str] = {"total_check_in": 0, "total_check_out": 0}
