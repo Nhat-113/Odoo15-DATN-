@@ -39,7 +39,7 @@ class ProjectExpense(models.Model):
     # expense_usd = fields.Monetary(string="Total Expense", currency_field='currency_usd', store=True, compute="_convert_currency_revenue")
     # expense_jpy = fields.Monetary(string="Total Expense", currency_field='currency_jpy', store=True, readonly=True)
     # expense_sgd = fields.Monetary(string="Total Expense", currency_field='currency_sgd', store=True, readonly=True)
-    expense_vnd = fields.Monetary(string="Total Expense", currency_field='currency_vnd', store=True, readonly=True)
+    expense_vnd = fields.Monetary(string="Total Expense (VND)", currency_field='currency_vnd', store=True, readonly=True)
     
     get_currency_name = fields.Char(string='Currency Name', readonly=True, related='currency_id.name', store=True)
     get_domain_projects = fields.Char(string='Domain Project', readonly=True, store=False, compute='_get_domain_project')
@@ -47,7 +47,22 @@ class ProjectExpense(models.Model):
     project_expense_value_ids = fields.One2many('project.expense.value', 'project_expense_management_id', string="Project Expense Value")
     
     
-    
+    @api.onchange('project_id')
+    def _get_project_expense_value(self):
+        if not self.project_id:
+            return
+
+        expenses = self.env['project.expense.value'].sudo().search([('project_id', '=', self.project_id.id)])
+
+        values = [(0, 0, {
+            "name": rec.name,
+            "expense_date": rec.expense_date,
+            "total_expenses": rec.total_expenses,
+            "description": rec.description
+        }) for rec in expenses]
+
+        self.update({"project_expense_value_ids": values})
+
     # Remove option in filters, group by from dropdown Search action in formview
     @api.model
     def fields_get(self, allfields=None, attributes=None):
@@ -184,7 +199,6 @@ class ProjectExpenseValue(models.Model):
     
     user_pm = fields.Many2one('res.users', string="Div manager", related='project_expense_management_id.user_pm', store=True)
     user_subceo = fields.Char(string='Sub CEO email', related='project_expense_management_id.user_subceo', store=True)
-    
     
     @api.model
     def fields_get(self, allfields=None, attributes=None):
