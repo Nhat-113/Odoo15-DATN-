@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <menuitem id="company_management_menu" name="Overall Management" groups="group_company_management_div"/>
+    <menuitem 
+        id="company_management_menu" 
+        name="Overall Management" 
+        groups="group_company_management_div,group_company_management_group_leader"
+    />
 
     <!-- <menuitem
         id="human_resource_management"
@@ -14,7 +18,9 @@
         id="cost_management"
         name="Cost Management"
         sequence="2"
-        parent="ds_company_management.company_management_menu"/>
+        parent="ds_company_management.company_management_menu"
+        groups="group_company_management_div"
+    />
 
 
     <menuitem
@@ -48,7 +54,9 @@
         id="configuration"
         name="Configuration"
         sequence="4"
-        parent="ds_company_management.company_management_menu"/>
+        parent="ds_company_management.company_management_menu"
+        groups="group_company_management_div"    
+    />
 
     <menuitem
         id="exchange_rate"
