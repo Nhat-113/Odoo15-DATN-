@@ -20,7 +20,7 @@
 
   <menuitem
     id="setting_device_management"
-    name="Time Setting"
+    name="Schedule Setting"
     action="action_setting_device_management"
     parent="menu_box_root"
     sequence="2"

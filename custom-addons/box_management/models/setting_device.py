@@ -65,8 +65,15 @@ class SettingDevice(models.Model):
     sat = fields.Boolean(string="Sat", readonly=False, default=False)
     sun = fields.Boolean(string="Sun", readonly=False, default=False)
     number_of = fields.Integer(string="NO", default=1)
+    list_days = fields.Text(string="Opening Day", readonly=True, compute='_get_field_day')
 
-            
+    
+    def _get_field_day(self):
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        for rec in self:
+            days_array = [x for x,y in zip(days, get_day_of_week_value(rec)) if y]
+            rec.list_days = ", ".join(f"{day}" for day in days_array)
+
     def get_local_tz(self, offset=False):
         user_tz = self.env.user.tz or "UTC"
         if offset:
@@ -102,8 +109,10 @@ class SettingDevice(models.Model):
             if get_settings:
                 for id in device_ids:    
                     get_setting = get_settings.filtered(lambda x: id in x.device_ids.ids)
-                    create_update_setting(device_id=id, settings=get_setting, start_time=start_time, 
-                        end_time=end_time, week_day=week_day)
+                    if get_setting:
+                        device_id = self.env['box.management'].search([('id', '=', id)]).device_id
+                        create_update_setting(device_id=device_id, settings=get_setting, start_time=start_time, 
+                            end_time=end_time, week_day=week_day)
         self._update_sequence_up()
         return super(SettingDevice, self).create(vals)
 
@@ -127,8 +136,10 @@ class SettingDevice(models.Model):
             if get_settings:
                 for id in ids:
                     get_setting = get_settings.filtered(lambda x: id in x.device_ids.ids)
-                    create_update_setting(device_id=id, settings=get_setting, start_time=start_time,
-                        end_time=end_time, week_day=week_day)
+                    if get_setting:
+                        device_id = self.env['box.management'].search([('id', '=', id)]).device_id
+                        create_update_setting(device_id=device_id, settings=get_setting, start_time=start_time,
+                            end_time=end_time, week_day=week_day)
         return edit
 
     @api.constrains("end_time", "start_time")
