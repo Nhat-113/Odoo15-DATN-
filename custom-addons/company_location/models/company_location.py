@@ -13,11 +13,20 @@ class CompanyLocation(models.Model):
     lng = fields.Float("Longitude", required=True, digits=(10, 7), default=lambda self: self._default_lng_lat().get('lng'))
     lat = fields.Float("Latitude", required=True, digits=(9, 7), default=lambda self: self._default_lng_lat().get('lat'))
     company_id = fields.Many2one("res.company", required=True)
-    employee_ids = fields.Many2many("hr.employee", "location_employee_rel", "location_id", "employee_id", "Employee Access")
+    employee_ids = fields.Many2many("hr.employee", "location_employee_rel", "location_id", "employee_id", "Employee Access", domain="[('company_id', '=', company_id)]")
     wifi_ids = fields.One2many("location.wifi", "parent_id", string="SSID")
     gmap = fields.Char("Location")
     acceptance_distance = fields.Float("Acceptance Distance(meters)", required=True)
     wifi_access = fields.Boolean('Wifi Access', default = False)
+    
+    @api.constrains('company_id')
+    def _check_valid_employee(self):
+        if not self.company_id:
+            raise ValidationError("Company is required.")
+
+        for employee in self.employee_ids:
+            if employee.company_id.id != self.company_id.id:
+                raise ValidationError("There are employees that are not part of the selected company.")
 
     @api.model
     def _default_lng_lat(self):
