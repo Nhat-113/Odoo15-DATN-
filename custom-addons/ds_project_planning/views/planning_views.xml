@@ -420,9 +420,10 @@
                     </group>
                     <label for="member_ids" style="min-width: 150px"/>
                     <field name="member_ids" widget="many2many_avatar_user" readonly="1" force_save="1"/>
+                    <field name="user_readonly" invisible="1"/>
                     <notebook>
                         <page string="Booking Resources">
-                            <field name="planning_calendar_resources" colspan="4" nolabel="1">
+                            <field name="planning_calendar_resources" colspan="4" nolabel="1" attrs="{'readonly': [('user_readonly', '=', True)]}">
                                 <tree string="Assign Members" decoration-warning="inactive == True">
                                     <field name="employee_id" widget="many2one_avatar" options="{'no_create': True}"/>
                                     <field name="start_date" />

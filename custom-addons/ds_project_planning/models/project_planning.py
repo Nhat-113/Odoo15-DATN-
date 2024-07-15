@@ -34,6 +34,14 @@ class Project(models.Model):
     project_phases = fields.One2many(
         'project.planning.phase', 'project_id', string='Phases In Project')
     actual_effort = fields.Float('Actual Effort (MM)', compute='_compute_actual_effort')
+    user_readonly = fields.Boolean(compute='_check_user_readonly')
+
+
+    def _check_user_readonly(self):
+        current_user = self.env.user
+        is_project_manager = self.env.user._has_group('project.group_project_manager')
+        for project in self:
+            project.user_readonly = project.user_id != current_user and is_project_manager
 
     def _compute_actual_effort(self):
         for project in self:
