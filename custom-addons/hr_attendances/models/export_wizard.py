@@ -149,7 +149,7 @@ class ExportWizard(models.TransientModel):
             }
             day_number = str(att[3].day) + "/" + str(att[3].month)
 
-            specific_time_start = time(hour_start, minute_start)
+            specific_time_start = time(hour_start, minute_start, 0)
             if companies.attendance_view_type == True and companies.enable_split_shift == True:
                 if att[3].time() < specific_time_start:
                     day_number = str((att[3] -  timedelta(days=1)).day) + "/" + str(att[3].month)

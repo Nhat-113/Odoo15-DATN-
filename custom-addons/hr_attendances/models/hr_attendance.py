@@ -43,7 +43,7 @@ class HrAttendance(models.Model):
         user_tz = pytz.timezone(self.env.user.tz)
         company_id = self.employee_id.company_id
         hour_start, minute_start = extract_hour_minute(company_id.hour_work_start)
-        specific_time_start = time(hour_start, minute_start)
+        specific_time_start = time(hour_start, minute_start, 0)
         for record in self:
             if record.check_in:
                 user_check_in = pytz.utc.localize(record.check_in).astimezone(user_tz)
