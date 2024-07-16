@@ -1,9 +1,15 @@
 from odoo.http import request, Response
-from datetime import datetime
+from datetime import datetime, timedelta
 from odoo.exceptions import ValidationError
 import pytz
 
 
+def extract_hour_minute(time_string):
+    try:
+        hour, minute = time_string.split(":")
+        return int(hour), int(minute)
+    except ValueError:
+        raise ValueError("Invalid time format. Expected 'HH:MM'.")
 
 def create_attendance_device_details(datas, pseudo):
     if "location_id" in datas:
@@ -170,14 +176,32 @@ def handle_attendance_view_mode(datas):
         datetz = datetz.replace(tzinfo=pytz.timezone(datas['timezone']))
         # Convert to the timezone of the current user
         datetz = datetz.astimezone(pytz.timezone(request.env.user.tz))
-    
-    attendance = request.env['hr.attendance'].search([('employee_id', '=', datas['employee_id'].id),
+    companies = datas['employee_id'].company_id
+    if companies.attendance_view_type == True and companies.enable_split_shift == True:
+        hour_start, hour_end = extract_hour_minute(datas['employee_id'].company_id.hour_work_start)
+        if datetz.hour > hour_start and datetz.minute > hour_end:
+            start_date = datetz.date()
+        else:
+            start_date = (datetz - timedelta(days=1)).date()
+        
+        attendance = request.env['hr.attendance'].search([
+            ('employee_id', '=', datas['employee_id'].id),
+            ('location_date_multi', '=', start_date),
+            ('check_in', '!=', None)
+        ], order="check_in desc, check_out desc", limit=1)
+
+        pseudo_attendance = request.env['hr.attendance.pesudo'].search([('employee_id', '=', datas['employee_id'].id), 
+                                                                        ('location_date_multi', '=', start_date)],
+                                                                        order="check_in desc, check_out desc", limit=1)
+    else:
+        attendance = request.env['hr.attendance'].search([('employee_id', '=', datas['employee_id'].id),
                                                       ('location_date', '=', datetz.date()),
                                                       ('check_in', '!=', None)],
                                                      order="check_in desc, check_out desc", limit=1)
-    pseudo_attendance = request.env['hr.attendance.pesudo'].search([('employee_id', '=', datas['employee_id'].id), 
-                                                                    ('location_date', '=', datetz.date())],
-                                                                   order="check_in desc, check_out desc", limit=1)
+        pseudo_attendance = request.env['hr.attendance.pesudo'].search([('employee_id', '=', datas['employee_id'].id), 
+                                                                        ('location_date', '=', datetz.date())],
+                                                                    order="check_in desc, check_out desc", limit=1)
+                                    
     is_multiple_mode = datas['employee_id'].company_id.attendance_view_type
     if datas['device_type'] == 'box_io':
         return handle_facelog_process_box_io(datas, attendance, pseudo_attendance, is_multiple_mode)

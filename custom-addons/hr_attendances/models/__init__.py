@@ -6,3 +6,5 @@ from . import hr_employee
 # from . import hr_attendance_missing
 from . import export_wizard
 from . import res_user
+from . import res_company
+from . import res_config_setting
