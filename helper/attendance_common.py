@@ -1,5 +1,5 @@
 from odoo.http import request, Response
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from odoo.exceptions import ValidationError
 import pytz
 
@@ -171,15 +171,17 @@ def handle_attendance_view_mode(datas):
         }
     """
     datetz = datetime.strptime(datas['timestamp'], "%Y-%m-%d %H:%M:%S")
+    original_tz = pytz.timezone(datas['timezone']).localize(datetz).tzinfo
+    # Switch back to the original timezone
+    datetz = datetz.replace(tzinfo=original_tz)
     if datas['timezone'] != request.env.user.tz:
-        # Switch back to the original timezone
-        datetz = datetz.replace(tzinfo=pytz.timezone(datas['timezone']))
         # Convert to the timezone of the current user
         datetz = datetz.astimezone(pytz.timezone(request.env.user.tz))
     companies = datas['employee_id'].company_id
     if companies.attendance_view_type == True and companies.enable_split_shift == True:
-        hour_start, hour_end = extract_hour_minute(datas['employee_id'].company_id.hour_work_start)
-        if datetz.hour > hour_start and datetz.minute > hour_end:
+        hour_start, minute_start = extract_hour_minute(datas['employee_id'].company_id.hour_work_start)
+        specific_time_start = time(hour_start, minute_start, 0)
+        if datetz.time() > specific_time_start:
             start_date = datetz.date()
         else:
             start_date = (datetz - timedelta(days=1)).date()
