@@ -19,7 +19,8 @@ DATE_FORMAT = "%Y-%m-%d"
 OFF = "OFF"
 PN = "PN"
 WFH = "WFH"
-T_OFF = "T-OFF"
+WFH_2 = "WFH/2"
+PN_2 = "PN/2"
 CONFIRM = "CONFIRM"
 HOUR_SMALL = 4
 
@@ -368,6 +369,7 @@ class ExportWizard(models.TransientModel):
         }
         cell_format = self.format(workbook, cell_default, **wd_format, **fmLeft)
         cell_format.set_text_wrap()
+        cell_format.set_align('top')
         attendances = data['data']
         approved_time_off_map, approved_wfh_map = time_off_data
         row = 6
@@ -378,6 +380,7 @@ class ExportWizard(models.TransientModel):
         
         # write all cells to default values OFF
         for r in range(boxRowFirst, boxRowLast + 1):
+            sheet.set_row(r, 16)
             for c in range(boxColFirst, boxColLast + 1):
                 sheet.write_string(r, c, OFF, self.format(workbook, off_format))
         
@@ -404,18 +407,11 @@ class ExportWizard(models.TransientModel):
                 sheet.write(row_active, 3, '', self.format(workbook, cell_default, **{**border_default, **fmLRBorder, 'align': 'left'}))
                 index += 1
                 row += 1
-            for key, values in approved_wfh_map.items():
-                if key == employee_id:
-                    for value in values:
-                        if value in day_indexs:
-                            day_off = day_indexs.get(value)
-                            sheet.write(row_active, 3 + day_off, WFH, self.format(workbook, wfh_format))
-            for key, values in approved_time_off_map.items():
-                if key == employee_id:
-                    for value in values:
-                        if value in day_indexs:
-                            day_off1 = day_indexs.get(value)
-                            sheet.write(row_active, 3 + day_off1, PN, self.format(workbook, pn_format))
+            
+            self.write_approved_days(sheet, row_active, employee_id, day_indexs, approved_wfh_map, workbook, wfh_format, wfh_format, WFH, WFH_2)
+
+            self.write_approved_days(sheet, row_active, employee_id, day_indexs, approved_time_off_map, workbook, pn_format, pn_format, PN, PN_2)
+
             for key, vals in record.items():
                 if key == 'name':
                     sheet.write(row_active, 1, vals, cell_format)
@@ -474,12 +470,9 @@ class ExportWizard(models.TransientModel):
         end_cell = xl_rowcol_to_cell(boxRowLast, boxColLast + 3)
         formula = f"=SUM({start_cell}:{end_cell})"
         sheet.write_formula(boxRowLast + 1, boxColLast + 3, formula, self.format(workbook, header_footer, **{**fm_bottom, **bd}))
-        
-        sheet.set_row(boxRowLast + 1, 25)
-        sheet.set_row(boxRowLast + 3, 25)
-        sheet.set_row(boxRowLast + 4, 25)
-        sheet.set_row(boxRowLast + 5, 25)
-        sheet.set_row(boxRowLast + 6, 25)
+
+        for offset in [1, 3, 4, 5, 6, 7, 8]:
+            sheet.set_row(boxRowLast + offset, 25)
         sheet.write(boxRowLast + 3, 1, OFF, self.format(workbook, format, **{'bg_color': '#BFBFBF'}))
         sheet.write(boxRowLast + 3, 2, 'Nghỉ ca', self.format(workbook, format, **{'bold': True}))
         sheet.write(boxRowLast + 4, 1, PN, self.format(workbook, format, **{'bg_color': '548235'}))
@@ -488,8 +481,23 @@ class ExportWizard(models.TransientModel):
         sheet.write(boxRowLast + 5, 2, f'Thiếu giờ làm (<{HOUR_SMALL}h)', self.format(workbook, format, **{'bold': True}))
         sheet.write(boxRowLast + 6, 1, WFH, self.format(workbook, format, **{'bg_color': '#ADD8E6'}))
         sheet.write(boxRowLast + 6, 2, 'Work from home', self.format(workbook, format, **{'bold': True}))
+        sheet.write(boxRowLast + 7, 1, PN_2, self.format(workbook, format, **{'bg_color': '548235'}))
+        sheet.write(boxRowLast + 7, 2, 'Nghỉ nữa ngày', self.format(workbook, format, **{'bold': True}))
+        sheet.write(boxRowLast + 8, 1, WFH_2, self.format(workbook, format, **{'bg_color': '#ADD8E6'}))
+        sheet.write(boxRowLast + 8, 2, 'Work from home half-day', self.format(workbook, format, **{'bold': True}))
         
-        
+    def write_approved_days(self, sheet, row_active, employee_id, day_indexs, approved_map, workbook, full_day_format, half_day_format, full_day_label, half_day_label):
+        for key, values in approved_map.items():
+            if key == employee_id:
+                for value in values:
+                    is_half_day = value.endswith('_half')
+                    day_value = value[:-5] if is_half_day else value 
+                    if day_value in day_indexs:
+                        day_off = day_indexs.get(day_value)
+                        if is_half_day:
+                            sheet.write(row_active, 3 + day_off, half_day_label, self.format(workbook, half_day_format))
+                        else:
+                            sheet.write(row_active, 3 + day_off, full_day_label, self.format(workbook, full_day_format))    
     def handle_user_off_all_month(self, sheet, row_active, col, workbook, cell_default):
         for col in range(col[0], col[1] + 1):
             sheet.write_string(row_active, col, '', self.format(workbook, cell_default))
@@ -610,23 +618,25 @@ class ExportWizard(models.TransientModel):
         for leave in approved_leaves:
             emp_id = str(leave.employee_id.id)
             leave_days = pd.date_range(leave.request_date_from, leave.request_date_to, freq='D')
-            
             for leave_day in leave_days:
                 day_str = leave_day.strftime('%-d/%-m')
                 
                 if leave.holiday_status_id.id in time_off_type_ids:
-                    if emp_id not in approved_wfh_map:
-                        approved_wfh_map[emp_id] = [day_str]
-                    elif day_str not in approved_wfh_map[emp_id]:  
-                        approved_wfh_map[emp_id].append(day_str)
+                    if leave.request_unit_half:
+                        approved_wfh_map.setdefault(emp_id, []).append(day_str + '_half')
+                    else:
+                        if emp_id not in approved_wfh_map:
+                            approved_wfh_map[emp_id] = [day_str]
+                        elif day_str not in approved_wfh_map[emp_id]:  
+                            approved_wfh_map[emp_id].append(day_str)
+                        
                 else:
-                    if emp_id not in approved_time_off_map:
-                        approved_time_off_map[emp_id] = [day_str]
-                    elif day_str not in approved_time_off_map[emp_id]:  
-                        approved_time_off_map[emp_id].append(day_str)
-
+                    if leave.request_unit_half:
+                        approved_time_off_map.setdefault(emp_id, []).append(day_str + '_half')
+                    else:    
+                        if emp_id not in approved_time_off_map:
+                            approved_time_off_map[emp_id] = [day_str]
+                        elif day_str not in approved_time_off_map[emp_id]:  
+                            approved_time_off_map[emp_id].append(day_str)
+                        
         return approved_time_off_map, approved_wfh_map
-
-
-
-
