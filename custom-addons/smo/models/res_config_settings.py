@@ -14,12 +14,14 @@ class ResConfigSettings(models.TransientModel):
     @api.onchange('thingsboard_api_url')
     def reformat_thingsboard_api_url(self):
         for record in self:
-          record.thingsboard_api_url = record.thingsboard_api_url.strip().strip('/')
+          if record.thingsboard_api_url:
+            record.thingsboard_api_url = record.thingsboard_api_url.strip().strip('/')
 
     @api.onchange('thingsboard_shared_account_username')
     def reformat_shared_account_username(self):
         for record in self:
-          record.thingsboard_shared_account_username = record.thingsboard_shared_account_username.strip()
+          if record.thingsboard_shared_account_username:
+            record.thingsboard_shared_account_username = record.thingsboard_shared_account_username.strip()
 
     @api.model
     def get_values(self):
