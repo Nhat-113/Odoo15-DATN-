@@ -32,6 +32,11 @@
              "data/probationary_contract_gross_mail_template.xml",
              "views/mirai_contract_gross_report.xml",
              ],
+    'assets': {
+        'web.report_assets_common': [
+            'ds_print_contract/static/src/css/report.css',
+        ],
+    },
     "installable": True,
     'auto_install': False,
     'application': False,
