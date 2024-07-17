@@ -98,17 +98,19 @@ class ExportWizard(models.TransientModel):
                     if day_number not in datas[str(att[0])]:
                         datas[str(att[0])][day_number]= day_vals
                 continue
-            companies = self.env['hr.employee'].search([('id', '=', att[0])]).company_id
-            hour_start, minute_start = extract_hour_minute(companies.hour_work_start)
+            hour_work_start = att[7]
+            attendance_view_type = att[8]
+            enable_split_shift = att[9]
+            hour_start, minute_start = extract_hour_minute(hour_work_start)
             endpoint = att[4]
             worked_hours = att[5]
-            if companies.attendance_view_type == True and companies.enable_split_shift == True:
+            if attendance_view_type == True and enable_split_shift == True:
                 condition = (att[4] - att[4].replace(hour=hour_start, minute=minute_start, second=0)).total_seconds() / 3600.0
             else :
                 condition = (att[4] - att[4].replace(hour=0, minute=0, second=0)).total_seconds() / 3600.0
             # in case: period of attendance record between two dates -> separate it into two records for two dates.
             if att[3].day < att[4].day and condition > 0:
-                if companies.attendance_view_type == True and companies.enable_split_shift == True:
+                if attendance_view_type == True and enable_split_shift == True:
                     endpoint = att[4].replace(hour=hour_start, minute=minute_start, second=0)
                 else:
                     endpoint = att[4].replace(hour=0, minute=0, second=0)
@@ -150,7 +152,7 @@ class ExportWizard(models.TransientModel):
             day_number = str(att[3].day) + "/" + str(att[3].month)
 
             specific_time_start = time(hour_start, minute_start, 0)
-            if companies.attendance_view_type == True and companies.enable_split_shift == True:
+            if attendance_view_type == True and enable_split_shift == True:
                 if att[3].time() < specific_time_start:
                     day_number = str((att[3] -  timedelta(days=1)).day) + "/" + str(att[3].month)
             if str(att[0]) not in datas:
@@ -544,12 +546,17 @@ class ExportWizard(models.TransientModel):
                     a.check_in,
                     a.check_out,
                     a.worked_hours,
-                    e.job_title
+                    e.job_title,
+                    c.hour_work_start,
+                    c.attendance_view_type,
+                    c.enable_split_shift
                 FROM hr_employee e
                 LEFT JOIN attendances a
                     ON a.employee_id = e.id
                 LEFT JOIN departure_dates d
-	                ON d.employee_id = e.id
+                    ON d.employee_id = e.id
+                LEFT JOIN res_company c
+                    ON c.id = e.company_id
                 WHERE (e.active = True
                     OR (e.active = False 
                         AND (d.departure_date BETWEEN '{start_date}' AND '{end_date}'
