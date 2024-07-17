@@ -5,7 +5,7 @@
     'sequence': 85,
     'summary': 'Allocate PTOs and follow leaves requests',
     'website': 'https://www.odoo.com/app/time-off',
-    'author': 'phuongtn',
+    'author': 'phuongtn, nhatck',
     'company': 'Dsoft',
     'description': """""",
     'depends': ['hr', 'base', 'hr_holidays', 'resource'],
@@ -23,7 +23,6 @@
         'web.assets_qweb': [
         ],
     },
-
     'images': [],
     'license': "AGPL-3",
     'installable': True,

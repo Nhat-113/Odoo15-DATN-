@@ -7,13 +7,8 @@ from dateutil.relativedelta import relativedelta
 class HrLeave(models.Model):
     _inherit = 'hr.leave'
     
-    
     inform_to = fields.Many2many('hr.employee', 'hr_leave_employee_inform_rel', 'hr_leave_id', 'employee_id', store=True, string="Inform to")
-    new_inform_to = fields.Many2many('hr.employee', 'hr_leave_employee_inform_rel', 'hr_leave_id', 'employee_id', string="New inform to")
-
-    ####################################################
-    # Overrides methods
-    ####################################################    
+    new_inform_to = fields.Many2many('hr.employee', 'hr_leave_employee_inform_rel', 'hr_leave_id', 'employee_id', string="New inform to")  
     def add_follower(self, employee_id):
         employee = self.env['hr.employee'].browse(employee_id)
         followers = employee.user_id.partner_id.ids + self.inform_to.user_id.partner_id.ids
@@ -75,6 +70,50 @@ class HrLeave(models.Model):
                 holiday.add_follower(employee_id)
         return result
     
+    extra_approvers = fields.Many2many('hr.employee', 'hr_leave_employee_extra_approvers_rel', 'hr_leave_id', 'employee_id',
+                            string="Extra Approvers", compute="_compute_extra_approvers", store=True, readonly=True)
+    
+    @api.depends('date_from', 'date_to')
+    def _compute_extra_approvers(self):
+        now = fields.Datetime.now()
+        running_projects = self.env['project.project'].search([
+            ('date_start', '<=', now),
+            ('date', '>=', now)
+        ])
+        pm_ids = [project.user_id.employee_id.id for project in running_projects]
+        for leave in self:
+            leave.extra_approvers = [(6, 0, pm_ids)]
+    
+    @api.onchange('extra_approvers')
+    def _onchange_extra_approvers(self):
+        for leave in self:
+            leave.inform_to = [(6, 0, leave.extra_approvers.ids)]
+    
+    def _is_an_extra_approvers(self):
+        return self.env.user.employee_id in self.extra_approvers
+    
+    @api.depends_context('uid')
+    def _compute_description(self):
+        super(HrLeave, self)._compute_description()
+        for leave in self:
+            if leave._is_an_extra_approvers():
+                leave.name = leave.sudo().private_name
+                
+    def _inverse_description(self):
+        super(HrLeave, self)._inverse_description()
+        for leave in self:
+            if leave._is_an_extra_approvers():
+                leave.name = leave.sudo().private_name
+                
+    @api.ondelete(at_uninstall=False)
+    def _check_unlink_rights(self):
+        crr_user = self.env.user
+        is_timeoff_officer = crr_user.has_group('hr_holidays.group_hr_holidays_user')
+        is_timeoff_manager = crr_user.has_group('hr_holidays.group_hr_holidays_manager')
+        for leave in self:
+            if  leave.state in ['draft', 'confirm'] and not (is_timeoff_manager or is_timeoff_officer or (leave.employee_id == crr_user.employee_id)):
+                raise UserError('Only the employee who requested the Timeoff or a Timeoff Officer/Administrator can delete a timeoff request.')
+            
     @api.model_create_multi
     def create(self, vals_list):
         records = super(HrLeave, self).create(vals_list)
