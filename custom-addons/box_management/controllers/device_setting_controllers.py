@@ -22,7 +22,10 @@ class SettingDevice(http.Controller):
             if isinstance(last_synced_timestamp, datetime) is False: 
                 return last_synced_timestamp
 
-            settings = request.env['setting.device'].search(['&', ("device_ids", "=", device_id), ('write_date', '>', last_synced_timestamp)])
+            settings = request.env['setting.device'].search([
+                ("device_ids", "=", device_id),
+                ('write_date', '>', last_synced_timestamp)
+            ])
             days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
             
             response_data = {

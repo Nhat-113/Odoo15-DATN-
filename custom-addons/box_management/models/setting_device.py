@@ -65,17 +65,21 @@ class SettingDevice(models.Model):
     sat = fields.Boolean(string="Sat", readonly=False, default=False)
     sun = fields.Boolean(string="Sun", readonly=False, default=False)
     number_of = fields.Integer(string="NO", default=1)
+    list_days = fields.Text(string="Opening Day", readonly=True, compute='_get_field_day')
 
-            
+    
+    def _get_field_day(self):
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        for rec in self:
+            days_array = [x for x,y in zip(days, get_day_of_week_value(rec)) if y]
+            rec.list_days = ", ".join(f"{day}" for day in days_array)
+
     def get_local_tz(self, offset=False):
         user_tz = self.env.user.tz or "UTC"
         if offset:
             tz_offset = timezone(user_tz).utcoffset(datetime.now()).total_seconds() // 3600
             return tz_offset
         return timezone(user_tz)
-
-    def check_time_correct(self, start, end):
-        return start < end
 
     @api.depends('start_time', 'end_time')
     def _get_time_duration(self):
@@ -87,48 +91,58 @@ class SettingDevice(models.Model):
         device_ids = vals['device_ids'][0][2]
         week_day = get_day_of_week_value(vals)
         start_time = convert_string_to_time(vals['start_time'])
-        end_time = convert_string_to_time(vals['end_time']) 
+        end_time = convert_string_to_time(vals['end_time'])
         
-        if not self.check_time_correct(start=start_time, end=end_time):
-            raise exceptions.ValidationError(
-                ("Start Time cannot be greater than End Time.")
-            )
+        if start_time >= end_time:
+            raise exceptions.ValidationError("Start Time cannot be greater than End Time.")
 
-        if not week_day.__contains__(True):
+        if not any(week_day):
             raise exceptions.ValidationError(_("Please select at least one day of the week"))
 
         if device_ids:
             get_settings = self.env['setting.device'].search([("device_ids", 'in', device_ids)])
-            if get_settings:
-                for id in device_ids:    
-                    get_setting = get_settings.filtered(lambda x: id in x.device_ids.ids)
-                    create_update_setting(device_id=id, settings=get_setting, start_time=start_time, 
-                        end_time=end_time, week_day=week_day)
+            devices = self.env['box.management'].browse(device_ids)
+
+            for device in devices:
+                get_setting = get_settings.filtered(lambda x: device.id in x.device_ids.ids)
+                create_update_setting(
+                    device_id=device.device_id,
+                    settings=get_setting,
+                    start_time=start_time,
+                    end_time=end_time,
+                    week_day=week_day
+                )
+
         self._update_sequence_up()
         return super(SettingDevice, self).create(vals)
 
     def write(self, vals):
         edit = super(SettingDevice, self).write(vals)
-        ids = self.device_ids.ids
+        device_ids = self.device_ids.ids
         week_day = get_day_of_week_value(self)
         start_time = convert_string_to_time(self.start_time)
         end_time = convert_string_to_time(self.end_time) 
 
-        if not self.check_time_correct(start=start_time, end=end_time):
-            raise exceptions.ValidationError(
-                ("Start Time cannot be greater than End Time.")
-            )
+        if start_time >= end_time:
+            raise exceptions.ValidationError("Start Time cannot be greater than End Time.")
 
-        if not week_day.__contains__(True):
+        if not any(week_day):
             raise exceptions.ValidationError(_("Please select at least one day of the week"))
 
-        if ids:
-            get_settings = self.env['setting.device'].search(['&', ("device_ids", 'in', ids), ('id', '!=', self.id)])
-            if get_settings:
-                for id in ids:
-                    get_setting = get_settings.filtered(lambda x: id in x.device_ids.ids)
-                    create_update_setting(device_id=id, settings=get_setting, start_time=start_time,
-                        end_time=end_time, week_day=week_day)
+        if device_ids:
+            get_settings = self.env['setting.device'].search([("device_ids", 'in', device_ids), ('id', '!=', self.id)])
+            devices = self.env['box.management'].browse(device_ids)
+
+            for device in devices:
+                get_setting = get_settings.filtered(lambda x: device.id in x.device_ids.ids)
+                create_update_setting(
+                    device_id=device.device_id,
+                    settings=get_setting,
+                    start_time=start_time,
+                    end_time=end_time,
+                    week_day=week_day
+                )
+
         return edit
 
     @api.constrains("end_time", "start_time")
