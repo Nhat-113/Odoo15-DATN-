@@ -165,6 +165,7 @@ class BoxManagementMobile(http.Controller):
             date = datetime.strptime(date_str, "%Y-%m-%d")
             name = kwargs.get('name')
             company_name = kwargs.get('company_name')
+            company_ids = kwargs.get('company_ids')
             type = kwargs.get('type', 'all')
             offset = params["offset"]
             limit = params["limit"]
@@ -176,6 +177,17 @@ class BoxManagementMobile(http.Controller):
                 search_domain.append(('employee_id.name', 'ilike', name))
             if company_name:
                 search_domain.append(('employee_id.company_id.name', 'ilike', company_name))
+
+            if company_ids:
+                company_ids_list = company_ids.split(',')
+                company_ids_int = all(is_valid_integer(company_id) for company_id in company_ids_list)
+                if not company_ids_int:
+                    return jsonResponse({
+                        "status": 40001,
+                        "message": "Invalid",
+                        "keyerror": "Company ID must be an int"
+                    }, 400)
+                search_domain.append(('employee_id.company_id.id', 'in', company_ids_list))
 
             total_search_records = request.env['hr.attendance'].read_group(
                 groupby=['employee_id'],  # Specify 'employee_id' for grouping
@@ -371,7 +383,7 @@ class BoxManagementMobile(http.Controller):
 
     @http.route("/api/attendance/statistic", type="http", auth="bearer_token", methods=["GET"])
     def get_attendance_statistics(self, **kwargs):
-        missing_fields = check_field_missing_api(kwargs, ['month', 'company_ids'])
+        missing_fields = check_field_missing_api(kwargs, ['month'])
         if len(missing_fields) > 0:
             return jsonResponse({
                 "status": 40001,
@@ -404,10 +416,10 @@ class BoxManagementMobile(http.Controller):
             ('location_date', '<=', end_date)
         ]
         
-        if company_ids or company_ids == "":
+        if company_ids:
             company_ids_list = company_ids.split(',')
             company_ids_int = all(is_valid_integer(company_id) for company_id in company_ids_list)
-            if not company_ids_int or company_ids == "":
+            if not company_ids_int:
                 return jsonResponse({
                     "status": 40001,
                     "message": "Invalid",
