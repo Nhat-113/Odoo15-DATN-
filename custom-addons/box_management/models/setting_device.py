@@ -106,11 +106,12 @@ class SettingDevice(models.Model):
 
         if device_ids:
             get_settings = self.env['setting.device'].search([("device_ids", 'in', device_ids)])
+            devices_ids = self.env['box.management'].search([('id', 'in', device_ids)])
             if get_settings:
                 for id in device_ids:    
                     get_setting = get_settings.filtered(lambda x: id in x.device_ids.ids)
                     if get_setting:
-                        device_id = self.env['box.management'].search([('id', '=', id)]).device_id
+                        device_id = devices_ids.filtered(lambda x: id == x.id).device_id
                         create_update_setting(device_id=device_id, settings=get_setting, start_time=start_time, 
                             end_time=end_time, week_day=week_day)
         self._update_sequence_up()
@@ -133,11 +134,12 @@ class SettingDevice(models.Model):
 
         if ids:
             get_settings = self.env['setting.device'].search(['&', ("device_ids", 'in', ids), ('id', '!=', self.id)])
+            device_ids = self.env['box.management'].search([('id', 'in', ids)])
             if get_settings:
                 for id in ids:
                     get_setting = get_settings.filtered(lambda x: id in x.device_ids.ids)
                     if get_setting:
-                        device_id = self.env['box.management'].search([('id', '=', id)]).device_id
+                        device_id = device_ids.filtered(lambda x: id == x.id).device_id
                         create_update_setting(device_id=device_id, settings=get_setting, start_time=start_time,
                             end_time=end_time, week_day=week_day)
         return edit
