@@ -198,7 +198,7 @@
                                                     <t t-if='e.employee_id.identification_place'>
                                                         <span t-field="e.employee_id.identification_place"/>
                                                     </t>
-                                                    <t t-if="not e.employee_id.identification_place">......................................................</t>
+                                                    <t t-if="not e.employee_id.identification_place">....................................</t>
                                                 </span>
                                             </td>
                                         </tr>
@@ -318,7 +318,7 @@
                                         </div>
                                     </div>
                                     <br/>
-                                    <p class="font-weight-bold" style="page-break-before: always;">Điều IV. Nghĩa vụ và quyền hạn của người sử dụng lao động</p>
+                                    <p class="font-weight-bold">Điều IV. Nghĩa vụ và quyền hạn của người sử dụng lao động</p>
                                     <div>
                                         <p class="font-weight-bold">A- Nghĩa vụ: </p>
                                         <div>
