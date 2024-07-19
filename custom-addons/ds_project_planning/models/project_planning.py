@@ -39,9 +39,10 @@ class Project(models.Model):
 
     def _check_user_readonly(self):
         current_user = self.env.user
-        is_project_manager = self.env.user._has_group('project.group_project_manager')
+        is_project_manager = self.env.user._has_group('ds_project_planning.group_project_pm')
+        is_admin = self.env.user._has_group('project.group_project_manager')
         for project in self:
-            project.user_readonly = project.user_id != current_user and is_project_manager
+            project.user_readonly = project.user_id != current_user and is_project_manager and not is_admin
 
     def _compute_actual_effort(self):
         for project in self:
