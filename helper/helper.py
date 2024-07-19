@@ -55,11 +55,14 @@ def alternative_json_response_for_mobile(self, result=None, error=None):
     )
     
 def convert_current_tz(tizone, datime):
-    input_timezone = timezone(tizone)
-    input_timestamp = datetime.strptime(
-                    str(datime), "%Y-%m-%d %H:%M:%S"
-                ).astimezone(input_timezone)
-    return input_timestamp
+    try:
+        input_timezone = timezone(tizone)
+        input_timestamp = datetime.strptime(
+                        str(datime), "%Y-%m-%d %H:%M:%S"
+                    ).astimezone(input_timezone)
+        return input_timestamp
+    except ValueError:
+        return None
 
 def logger (): 
     _logfile = "odoo.log" if "logpath" not in config.options else config.options["logpath"]

@@ -5,7 +5,7 @@
     <field name="name">company.location.view.tree</field>
     <field name="model">company.location</field>
     <field name="arch" type="xml">
-      <tree expand="1" export_xlsx="false" js_class="list_view">
+      <tree expand="1" export_xlsx="false">
         <field name="company_id" />
         <field name="lng" />
         <field name="lat" />
