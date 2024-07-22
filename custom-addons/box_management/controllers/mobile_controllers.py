@@ -204,6 +204,27 @@ class BoxManagementMobile(http.Controller):
                 offset=records_to_skip,
                 limit=limit
             )
+
+            is_multiple_mode = request.env.user.employee_id.company_id.attendance_view_type
+            durations = {}
+            if is_multiple_mode:
+                all_attds = request.env['hr.attendance'].search(
+                    args=search_domain,
+                    offset=records_to_skip,
+                    limit=limit
+                )
+                for attd in all_attds:
+                    emp_id = attd.employee_id.id
+                    if attd.check_in and attd.check_out:
+                        duration_seconds = attd.check_out - attd.check_in
+                        if emp_id in durations:
+                            durations[emp_id] += duration_seconds
+                        else:
+                            durations[emp_id] = duration_seconds
+                    else: 
+                        if emp_id not in durations:
+                            durations[emp_id] = timedelta(0)
+
             employee_ids = [emp.get("employee_id")[0] for emp in attds]
 
             employees = request.env["hr.employee"].sudo().search([
@@ -223,7 +244,7 @@ class BoxManagementMobile(http.Controller):
                         "job_title": employee["job_title"] if employee["job_title"] else "",
                         "avatar": self.get_avatar_model('hr.employee', employee["id"]),
                     } 
-                    first_check_in = convert_current_tz(current_tz, attd[0]['check_in']).strftime(TIME_FORMAT)
+                    first_check_in = convert_current_tz(current_tz, attd[0]['check_in']).strftime(TIME_FORMAT) if attd[0]['check_in'] else ""
                     last_check_out = convert_current_tz(current_tz, attd[0]['check_out']).strftime(TIME_FORMAT) if attd[0]['check_out'] else ""
                     if type == 'checkin':
                         entry["check_in"] = first_check_in
@@ -232,9 +253,13 @@ class BoxManagementMobile(http.Controller):
                     else: 
                         entry["check_in"] = first_check_in
                         entry["check_out"] = last_check_out
-                    # duration_seconds = (attd['last_check_out'] - attd['first_check_in']).total_seconds() if attd['last_check_out'] else 0
-                    # duration = str(timedelta(seconds=duration_seconds))
-                    # entry["duration"] = duration
+
+                    entry["duration"] = timedelta(0)
+                    if is_multiple_mode:
+                        entry["duration"] = durations[entry["employee_id"]]
+                    else:
+                        if first_check_in and last_check_out and attd[0]['check_out'] >= attd[0]['check_in']:
+                            entry["duration"] = attd[0]['check_out'] - attd[0]['check_in']
                     attendances.append(entry)
             return jsonResponse({
                 "attendances": attendances,
@@ -506,12 +531,14 @@ class BoxManagementMobile(http.Controller):
         end_date = (start_date + relativedelta(months=1)) - timedelta(days=1)
         all_dates = [(start_date + timedelta(days=x)).strftime("%Y-%m-%d") for x in range((end_date - start_date).days + 1)]
 
+        domain = [
+            ('employee_id', '=', employee_id),
+            ('location_date', '>=', start_date),
+            ('location_date', '<=', end_date)
+        ]
+
         attendance_records = request.env['hr.attendance'].search_read(
-            domain=[
-                ('employee_id', '=', employee_id),
-                ('location_date', '>=', start_date),
-                ('location_date', '<=', end_date)
-            ],
+            domain=domain,
             fields=['location_date', 'check_in', 'check_out'],
             order='location_date asc, check_in asc'
         )
@@ -530,6 +557,22 @@ class BoxManagementMobile(http.Controller):
             if not check_out or (record['check_out'] and record['check_out'] > check_out):
                 day_records['check_out'] = record['check_out']
 
+        is_multiple_mode = request.env.user.employee_id.company_id.attendance_view_type
+        durations = {}
+        if is_multiple_mode:
+            all_attds = request.env['hr.attendance'].search(domain)
+            for attd in all_attds:
+                date = attd.location_date.strftime("%Y-%m-%d")
+                if attd.check_in and attd.check_out:
+                    duration_seconds = attd.check_out - attd.check_in
+                    if date in durations:
+                        durations[date] += duration_seconds
+                    else:
+                        durations[date] = duration_seconds
+                else: 
+                    if date not in durations:
+                        durations[date] = timedelta(0)
+
         attendances = []
 
         for date in all_dates:
@@ -540,7 +583,13 @@ class BoxManagementMobile(http.Controller):
             check_in_str = check_in.replace(tzinfo=pytz.utc).astimezone(vietnam_timezone).strftime("%H:%M:%S") if check_in else ""
             check_out_str = check_out.replace(tzinfo=pytz.utc).astimezone(vietnam_timezone).strftime("%H:%M:%S") if check_out else ""
             
-            duration = str(check_out - check_in) if check_in and check_out else "0:00:00"
+            duration = timedelta(0)
+            if is_multiple_mode:
+                duration = durations[date] if date in durations else timedelta(0)
+            else:
+                if check_in_str and check_out_str and check_out >= check_in:
+                    duration = check_out - check_in
+
             attendances.append({
                 "date": date,
                 "check_in": check_in_str,
