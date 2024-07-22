@@ -21,7 +21,7 @@ class HrAttendancePseudo(models.Model):
     
     @api.depends('check_in', 'check_out')
     def _compute_location_date(self):
-        user_tz = pytz.timezone(self.env.user.tz)
+        user_tz = pytz.timezone(self.env.user.tz or 'Asia/Ho_Chi_Minh')
         for record in self:
             if record.check_in:
                 record.location_date = record.check_in.astimezone(user_tz).date()
@@ -31,9 +31,9 @@ class HrAttendancePseudo(models.Model):
                 record.location_date = None
     @api.depends('check_in', 'check_out')
     def _compute_location_date_multi(self):
-        user_tz = pytz.timezone(self.env.user.tz)
-        company_id = self.employee_id.company_id
-        hour_start, minute_start = extract_hour_minute(company_id.hour_work_start)
+        user_tz = pytz.timezone(self.env.user.tz or 'Asia/Ho_Chi_Minh')
+        company = self.employee_id.company_id
+        hour_start, minute_start = extract_hour_minute(company.hour_work_start or company[0].hour_work_start)
         specific_time_start = time(hour_start, minute_start)
         for record in self:
             if record.check_in:

@@ -29,7 +29,7 @@ class HrAttendance(models.Model):
 
     @api.depends('check_in', 'check_out')
     def _compute_location_date(self):
-        user_tz = pytz.timezone(self.env.user.tz)
+        user_tz = pytz.timezone(self.env.user.tz or 'Asia/Ho_Chi_Minh')
         for record in self:
             if record.check_in:
                 record.location_date = record.check_in.astimezone(user_tz).date()
@@ -40,9 +40,9 @@ class HrAttendance(models.Model):
 
     @api.depends('check_in', 'check_out')
     def _compute_location_date_multi(self):
-        user_tz = pytz.timezone(self.env.user.tz)
-        company_id = self.employee_id.company_id
-        hour_start, minute_start = extract_hour_minute(company_id.hour_work_start)
+        user_tz = pytz.timezone(self.env.user.tz or 'Asia/Ho_Chi_Minh')
+        company = self.employee_id.company_id
+        hour_start, minute_start = extract_hour_minute(company.hour_work_start or company[0].hour_work_start)
         specific_time_start = time(hour_start, minute_start, 0)
         for record in self:
             if record.check_in:
@@ -64,8 +64,8 @@ class HrAttendance(models.Model):
     
     @api.depends('check_in')
     def _compute_convert_datetime_start(self):
-        local_tz = tz.gettz('Asia/Ho_Chi_Minh')
-        utc_tz = pytz.timezone('Asia/Ho_Chi_Minh')
+        local_tz = tz.gettz(self.env.user.tz or 'Asia/Ho_Chi_Minh')
+        utc_tz = pytz.timezone(self.env.user.tz or 'Asia/Ho_Chi_Minh')
         for record in self:
             if bool(record.check_in):
                 start = record.check_in.replace(tzinfo=tz.UTC)
@@ -83,7 +83,7 @@ class HrAttendance(models.Model):
             
     @api.depends('check_out')
     def _compute_convert_datetime_end(self):
-        local_tz = tz.gettz('Asia/Ho_Chi_Minh')
+        local_tz = tz.gettz(self.env.user.tz or 'Asia/Ho_Chi_Minh')
         for record in self:
             if bool(record.check_out):
                 end = record.check_out.replace(tzinfo=tz.UTC)
@@ -179,7 +179,7 @@ class HrAttendancePesudo(models.Model):
     
     @api.depends('check_in', 'check_out')
     def _compute_convert_datetime(self):
-        local_tz = tz.gettz('Asia/Ho_Chi_Minh')
+        local_tz = tz.gettz(self.env.user.tz or 'Asia/Ho_Chi_Minh')
         for record in self:
             if record.check_out and record.check_in:
                 start = record.check_in.replace(tzinfo=tz.UTC)
