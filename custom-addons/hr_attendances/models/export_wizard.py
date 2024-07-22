@@ -534,10 +534,10 @@ class ExportWizard(models.TransientModel):
                 ),
                 departure_dates AS (
                     SELECT 
-                        employee_id,
+                        id AS employee_id,
                         MAX(departure_date) AS departure_date
-                    FROM hr_departure_wizard
-                    GROUP BY employee_id
+                    FROM hr_employee
+                    GROUP BY id
                 )
                 SELECT
                     e.id AS employee_id,
@@ -560,7 +560,7 @@ class ExportWizard(models.TransientModel):
                 WHERE (e.active = True
                     OR (e.active = False 
                         AND (d.departure_date BETWEEN '{start_date}' AND '{end_date}'
-                            OR (d.departure_date >= '{start_date}' and d.departure_date >= '{end_date}')
+                            OR (d.departure_date >= '{start_date}' AND d.departure_date >= '{end_date}')
                         )
                     ))
                     AND e.company_id IN {tuple(company_ids + [0])}
