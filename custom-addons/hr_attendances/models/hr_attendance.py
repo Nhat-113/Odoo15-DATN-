@@ -100,28 +100,6 @@ class HrAttendance(models.Model):
         """
         # TODO create check validity func here
         return True
-    
-    def action_cron_batch_verify_data(self):
-        ################################
-        # verify all records missing checkout
-        ################################
-        attendance_update_failed = self.env['hr.attendance'].sudo().search([('check_out', '=', False)])
-        if attendance_update_failed:
-            dates = [att.start for att in attendance_update_failed]
-            date_min = min(dates)
-            date_max = max(dates)
-            attendance_pseudo = self.env['hr.attendance.pesudo'].sudo().search([('employee_id', 'in', attendance_update_failed.employee_id.ids),
-                                                                                ('start', '>=', date_min),
-                                                                                ('start', '<=', date_max)])
-            for record in attendance_update_failed:
-                att_pseudo = attendance_pseudo.filtered(lambda x: x.employee_id.id == record.employee_id.id and x.start == record.start)
-                if att_pseudo:
-                    max_time = max([att.check_out for att in att_pseudo])
-                    if record.check_in <= max_time:
-                        record.check_out = max_time
-                else:
-                    record.check_out = record.check_in
-
 
     def is_working_day(self, date):
         return bool(len(pd.bdate_range(date, date)))
