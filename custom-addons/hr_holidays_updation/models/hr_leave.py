@@ -39,6 +39,11 @@ class HrLeave(models.Model):
             crr_past_date_limit = fields.Date.today() - relativedelta(days=past_limit_in_day)
             if any(hol.date_from.date() < crr_past_date_limit and hol.employee_id.leave_manager_id != user for hol in self):
                 raise UserError(_(f'You must have manager rights to modify/validate a time off that already begun over {past_limit_in_day} days ago.'))
+            
+            leaves = self._get_leaves_on_public_holiday()
+            if leaves:
+                employee_names = ', '.join(leaves.mapped('employee_id.name'))
+                raise UserError(_('These employees: %s are not supposed to work during that period.') % employee_names)
         
         employee_id = values.get('employee_id', False)
         context = self.env.context
@@ -57,8 +62,12 @@ class HrLeave(models.Model):
                 values['request_date_from'] = values['date_from']
             if 'date_to' in values:
                 values['request_date_to'] = values['date_to']
-
-        result = super(HrLeave, self).write(values)
+                
+        # Model hr.leave inherit mail.thread
+        # which mean: in hr.leave write method, super(HolidayRequest, self).write(values) call mail.thread's write method
+        # So, in this case, where we completely override the whole write method
+        # we need to call mail.thread's write method to keep the original behaviour
+        result = super(type(self.env['mail.thread']), self).write(values)
         if employee_id and not context.get('leave_fast_create'):
             for holiday in self:
                 holiday.add_follower(employee_id)
