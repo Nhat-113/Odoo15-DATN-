@@ -16,7 +16,6 @@
         # 'views/hr_attendance_report_xlsx.xml',
         # 'data/attendance_mising_mail_template.xml',
         # 'data/hr_attendance_missing_cron.xml',
-        'data/hr_attendance_cron.xml',
         'views/hr_attendance_menu.xml',
         # 'views/hr_attendance_missing_view.xml',
         'views/mail_template_notification.xml',
