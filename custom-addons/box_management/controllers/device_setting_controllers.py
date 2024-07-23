@@ -22,7 +22,7 @@ class SettingDevice(http.Controller):
             if isinstance(last_synced_timestamp, datetime) is False: 
                 return last_synced_timestamp
 
-            settings = request.env['setting.device'].search([
+            settings = request.env['setting.device'].with_context(active_test=False).search([
                 ("device_ids", "=", device_id),
                 ('write_date', '>', last_synced_timestamp)
             ])
@@ -36,6 +36,7 @@ class SettingDevice(http.Controller):
                         "start_time": item.start_time + ":00",
                         "end_time":item.end_time + ":00",
                         "days": [x for x,y in zip(days, get_day_of_week_value(item)) if y],
+                        "active": True if item.active and item.status == "active" else False
                     }
                     for item in settings
                 ]

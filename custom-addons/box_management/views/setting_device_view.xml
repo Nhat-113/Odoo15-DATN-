@@ -9,24 +9,23 @@
         <sheet>
           <group>
             <group>
-              <field name="name" width="50%"/>
+              <field name="name"/>
+              <label for="start_time" class="o_form_label o_readonly_modifier" string="Opening Time" />
+              <div class="d-flex o-row">
+                  <field name="start_time" widget="selection"
+                  options="{'related_end_date': 'end_time',}" />
+                  <i class="fa fa-long-arrow-right mx-2 my-1" />
+                  <field name="end_time" widget="selection"
+                  options="{'related_end_date': 'start_time',}" />
+              </div>
+              <field name="status" style="width: 50%"/>
             </group>
-          </group>
-          <group>
-            <label for="start_time" class="o_form_label o_readonly_modifier" string="Opening Time" />
-            <div class="d-flex o-row" width="40%">
-                <field name="start_time" widget="selection"
-                options="{'related_end_date': 'end_time',}" />
-                <i class="fa fa-long-arrow-right mx-2 my-1" />
-                <field name="end_time" widget="selection"
-                options="{'related_end_date': 'start_time',}" />
-            </div>
+            <group>
+              <div>
+                <widget name="week_days" style="margin: 0 auto;"/>
+              </div>
+            </group>
           </group>               
-          <group>
-            <div style="width: 60%; margin: 0 auto;">
-              <widget name="week_days"/>
-            </div>
-          </group>
           <notebook>
             <page string="Devices" name="description">
               <field name="device_ids">
@@ -60,12 +59,13 @@
     <field name="model">setting.device</field>
     <field name="arch" type="xml">
       <tree expand="1">
-        <field name="number_of"/>
-        <field name="name" />
-        <field name="device_ids" widget="many2many_tags" />
+        <field name="name"/>
+        <field name="device_ids" widget="many2many_tags"/>
         <field name="time_duration"/>
         <field name="list_days"/>
+        <field name="status"/>
         <field name="write_date" string="Last Update" />
+        <field name="active" invisible="1"/>
       </tree>
     </field>
   </record>

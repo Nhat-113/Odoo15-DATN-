@@ -55,7 +55,7 @@ class SettingDevice(models.Model):
     )
     time_duration = fields.Char(string="Opening Time", compute='_get_time_duration',)
     
-    active = fields.Boolean(required=True, default=True)
+    active = fields.Boolean(required=True, default=True, string="Active")
 
     mon = fields.Boolean(string="Mon", readonly=False, default=True)
     tue = fields.Boolean(string="Tue", readonly=False, default=True)
@@ -64,8 +64,16 @@ class SettingDevice(models.Model):
     fri = fields.Boolean(string="Fri", readonly=False, default=True)
     sat = fields.Boolean(string="Sat", readonly=False, default=False)
     sun = fields.Boolean(string="Sun", readonly=False, default=False)
-    number_of = fields.Integer(string="NO", default=1)
+    # number_of = fields.Integer(string="NO", default=1)
     list_days = fields.Text(string="Opening Day", readonly=True, compute='_get_field_day')
+    status = fields.Selection(
+        string="Status",
+        default="active",
+        selection=[
+            ("active", "Active"),
+            ("inactive", "Inactive"),
+    ])
+
 
     
     def _get_field_day(self):
@@ -110,10 +118,12 @@ class SettingDevice(models.Model):
                     settings=get_setting,
                     start_time=start_time,
                     end_time=end_time,
-                    week_day=week_day
+                    week_day=week_day,
+                    active=self.active,
+                    status=self.status
                 )
 
-        self._update_sequence_up()
+        # self._update_sequence_up()
         return super(SettingDevice, self).create(vals)
 
     def write(self, vals):
@@ -140,7 +150,9 @@ class SettingDevice(models.Model):
                     settings=get_setting,
                     start_time=start_time,
                     end_time=end_time,
-                    week_day=week_day
+                    week_day=week_day,
+                    status=self.status,
+                    active=self.active
                 )
 
         return edit
@@ -156,16 +168,21 @@ class SettingDevice(models.Model):
                 )
 
     def unlink(self):
-        update_settings = super(SettingDevice, self).write({"active": False})
-        self._update_sequence_down()
-        return update_settings
+        return super(SettingDevice, self).write({"active": False})
 
-    def _update_sequence_down(self):
-        records = self.search([], order='number_of')
-        for index, record in enumerate(records):
-            record.number_of = index + 1 
+    def action_archive(self):   
+        return super(SettingDevice, self).write({"active": False})
 
-    def _update_sequence_up(self):
-        records = self.search([], order='number_of')
-        for record in records:
-            record.number_of += 1
+    def action_unarchive(self):
+        return super(SettingDevice, self).write({"active": True})
+
+
+    # def _update_sequence_down(self):
+    #     records = self.search([], order='number_of')
+    #     for index, record in enumerate(records):
+    #         record.number_of = index + 1 
+
+    # def _update_sequence_up(self):
+    #     records = self.search([], order='number_of')
+    #     for record in records:
+    #         record.number_of += 1
