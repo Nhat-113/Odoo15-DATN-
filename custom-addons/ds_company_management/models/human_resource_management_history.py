@@ -135,7 +135,7 @@ class HumanResourceManagementHistory(models.Model):
     # function get data human resource
     @api.model
     def get_list_human_resource_history(self):
-        user_id_login = self.env.user.id
+        current_user = self.env.user
         get_role_user_login = self.get_role_user_login() 
         selected_companies =  self.env['human.resource.management'].get_current_company_value()
 		
@@ -143,7 +143,7 @@ class HumanResourceManagementHistory(models.Model):
         cr = self._cr
 	
         sql_domain_for_company = ''
-        sql_domain_for_role = ''
+        sql_for_department = ''
         
         sql_domain_for_department_emp = ''
         sql_domain_for_department_proj = ''
@@ -158,21 +158,19 @@ class HumanResourceManagementHistory(models.Model):
                                             + ' OR human_resource_management_history.PROJECT_DEPARTMENT_ID IS NULL )' 
 
         if  get_role_user_login  == 'Ceo':
-            sql_domain_for_role = ''
             sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ')'
 
         elif get_role_user_login  == 'Sub-Ceo':
-            sql_domain_for_company =   'where ( company_manager_user_id = ' + str(user_id_login) \
+            sql_domain_for_company =   'where ( company_manager_user_id = ' + str(current_user.id) \
                                         + ' and company_id in ' + str(tuple(selected_companies)) + ')'
-            sql_domain_for_role = ''
 
         elif get_role_user_login  == 'Div-Manager':
-            sql_domain_for_company = 'where (company_id in ' + str(tuple(selected_companies))
-            sql_domain_for_role = ''
+            sql_domain_for_company = 'where (company_id = ' + str(current_user.company_id.id)
+            sql_for_department = get_sql_by_department(self)
 
         elif get_role_user_login  == 'Leader':
-            sql_domain_for_company = 'where (company_id in ' + str(tuple(selected_companies))
-            sql_domain_for_role = ''
+            sql_domain_for_company = 'where (company_id = ' + str(current_user.company_id.id)
+            sql_for_department = get_sql_by_department(self)
 
         sql = ("""select  	employee_name,
                             company_name,
@@ -207,8 +205,7 @@ class HumanResourceManagementHistory(models.Model):
                             end_date_contract 
                             from human_resource_management_history """)
         sql += sql_domain_for_company
-        sql += get_sql_by_department(self)
-        sql += sql_domain_for_role
+        sql += sql_for_department
         sql += sql_domain_for_department_emp
         sql += sql_domain_for_department_proj
 
@@ -222,13 +219,13 @@ class HumanResourceManagementHistory(models.Model):
 
     @api.model
     def get_human_resource_free_history(self):
-        user_id_login = self.env.user.id
+        current_user = self.env.user
         get_role_user_login = self.get_role_user_login() 
         selected_companies =  self.env['human.resource.management'].get_current_company_value()
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
         cr = self._cr
         sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ')'
-
+        sql_for_department = ''
         sql_domain_for_role = ''
         if len(id_all_mirai_department) == 0: 
             sql_domain_for_department_emp = ''
@@ -245,20 +242,17 @@ class HumanResourceManagementHistory(models.Model):
         sql_domain_for_group_by = 'GROUP BY employee_id, employee_name ,company_name, department_name, company_id, \
                                      year_history, start_date_contract, end_date_contract order by employee_name asc'
 
-        if get_role_user_login  == 'Ceo':
-            sql_domain_for_role = ''
-
         if get_role_user_login  == 'Sub-Ceo':
             sql_domain_for_company  = 'where ( company_id in ' + str(tuple(selected_companies))
-            sql_domain_for_role = ' and company_manager_user_id = ' + str(user_id_login)
+            sql_domain_for_role = ' and company_manager_user_id = ' + str(current_user.id) + ')'
 
         elif get_role_user_login  == 'Div-Manager':
-            sql_domain_for_company  = 'where ( company_id in ' + str(tuple(selected_companies))
-            sql_domain_for_role = ''
+            sql_domain_for_company  = 'where ( company_id = ' + str(current_user.company_id.id)
+            sql_for_department = get_sql_by_department(self)
 
         elif get_role_user_login  == 'Leader':
-            sql_domain_for_company  = 'where ( company_id in ' + str(tuple(selected_companies))
-            sql_domain_for_role = ''
+            sql_domain_for_company  = 'where ( company_id = ' + str(current_user.company_id.id)
+            sql_for_department = get_sql_by_department(self)
 
         sql = ("""SELECT  employee_id, employee_name, company_name, department_name,
 				SUM (month1 ) as month1,
@@ -280,7 +274,7 @@ class HumanResourceManagementHistory(models.Model):
 				FROM human_resource_management_history 
 					""")
         sql += sql_domain_for_company
-        sql += get_sql_by_department(self)
+        sql += sql_for_department
         sql += sql_domain_for_role
         sql += sql_domain_for_department_emp
         sql += sql_domain_for_department_proj

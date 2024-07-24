@@ -409,7 +409,7 @@ class HumanResourceManagement(models.Model):
         cr = self._cr
     
         sql_domain_for_company = ''
-        sql_domain_for_role = ''
+        sql_for_department = ''
 
         if len(id_all_mirai_department) == 0: 
             sql_domain_for_department_emp = ''
@@ -422,28 +422,25 @@ class HumanResourceManagement(models.Model):
                                             + ' OR PROJECT_DEPARTMENT_ID IS NULL )' 
 
         if current_user.has_group('ds_company_management.group_company_management_ceo') == True:
-            sql_domain_for_role = ''
             sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ')'
-
 
         elif current_user.has_group('ds_company_management.group_company_management_sub_ceo') == True and \
                 current_user.has_group('ds_company_management.group_company_management_ceo') == False:
-            sql_domain_for_company =   'where ( company_manager_user_id = ' + str(current_user.id) \
+            sql_domain_for_company = 'where ( company_manager_user_id = ' + str(current_user.id) \
                                         + ' and company_id in ' + str(tuple(selected_companies)) + ')'
-            sql_domain_for_role = ''
 
         elif current_user.has_group('ds_company_management.group_company_management_div') == True or \
                 current_user.has_group('ds_company_management.group_company_management_group_leader') == True and \
                 current_user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
             sql_domain_for_company = 'where ( company_id = ' + str(current_user.company_id.id)
-            sql_domain_for_role = ''
+            sql_for_department = get_sql_by_department(self)
+
 
         sql = ("""select """ + COLUMNS + """ from human_resource_management """)
         sql += sql_domain_for_company
-        sql += sql_domain_for_role
         sql += sql_domain_for_department_emp
         sql += sql_domain_for_department_proj
-        sql += get_sql_by_department(self)
+        sql += sql_for_department
 
         cr.execute(sql)
         list_human_resource = cr.fetchall()
@@ -504,11 +501,12 @@ class HumanResourceManagement(models.Model):
 
     @api.model
     def get_human_resource_free(self):
-        user_id_login = self.env.user.id
+        current_user = self.env.user
         selected_companies = self.get_current_company_value()
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
         cr = self._cr
         sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ')'
+        sql_for_department = ''
 
         sql_domain_for_role = ''
         if len(id_all_mirai_department) == 0: 
@@ -521,18 +519,18 @@ class HumanResourceManagement(models.Model):
 
         sql_domain_for_group_by = 'GROUP BY employee_id, employee_name ,company_name, department_name, company_id, start_date_contract, end_date_contract order by employee_name asc'
 
-        if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
-            sql_domain_for_role = ''
-
-        if self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
+        if current_user.has_group('ds_company_management.group_company_management_sub_ceo') == True \
+            and current_user.has_group('ds_company_management.group_company_management_ceo') == False:
             # sql_domain_for_company = sql_domain_for_company[:-1]
             sql_domain_for_company  = ''
-            sql_domain_for_role = 'where ( company_manager_user_id = ' + str(user_id_login) + ')'
+            sql_domain_for_role = 'where ( company_manager_user_id = ' + str(current_user.id) + ')'
 
-        elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
-                self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
+        elif current_user.has_group('ds_company_management.group_company_management_div') == True or \
+                current_user.has_group('ds_company_management.group_company_management_group_leader') == True and \
+                current_user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
+            sql_domain_for_role = ' where (department_manager_user_id = ' + str(current_user.id)
             sql_domain_for_company = ''
-            sql_domain_for_role = ' where (department_manager_user_id = ' + str(user_id_login) +  ')'
+            sql_for_department = get_sql_by_department(self)
 
 
         sql = ("""SELECT  employee_id, employee_name, company_name, department_name,
@@ -555,6 +553,7 @@ class HumanResourceManagement(models.Model):
                     """)
         sql += sql_domain_for_company
         sql += sql_domain_for_role
+        sql += sql_for_department
         sql += sql_domain_for_department_emp
         sql += sql_domain_for_department_proj
         sql += sql_domain_for_group_by
