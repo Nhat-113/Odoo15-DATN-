@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from odoo.http import request
+import requests
 from helper.smo_helper import make_request
 from odoo.exceptions import ValidationError, UserError
 import json
@@ -28,8 +29,10 @@ class SmoUser(models.Model):
     try:
       response = make_request(self, '/api/auth/login', method='POST', payload=payload)
       response.raise_for_status()
-    except:
+    except requests.HTTPError as http_err:
       raise ValidationError(f'Failed to authenticate: {json.loads(response.text)["message"]}')
+    except Exception as err:
+      raise UserError(f'An error occurred: {str(err)}')
     
     try:
       tokens = response.json()
