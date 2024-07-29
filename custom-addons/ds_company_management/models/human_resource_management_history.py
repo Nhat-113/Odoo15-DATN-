@@ -1,6 +1,6 @@
 import datetime
 from odoo import fields, models, api
-from helper.company_management_common import get_sql_by_department
+from helper.company_management_common import get_sql_by_department, is_ceo, is_sub_ceo, is_div_manager, is_group_leader
 
 
 class HumanResourceManagementHistory(models.Model):
@@ -117,26 +117,11 @@ class HumanResourceManagementHistory(models.Model):
                 FROM human_resource_management;
              """
         self.env.cr.execute(sql)
-    
-    #check role user login
-    def get_role_user_login(self):
-        if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
-            return 'Ceo'
-        elif self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and \
-				self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
-            return 'Sub-Ceo'
-        elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
-                self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
-            return 'Div-Manager'
-        elif self.env.user.has_group('ds_company_management.group_company_management_group_leader') == True and \
-            self.env.user.has_group('ds_company_management.group_company_management_div') == False:
-            return 'Leader'
 
     # function get data human resource
     @api.model
     def get_list_human_resource_history(self):
         current_user = self.env.user
-        get_role_user_login = self.get_role_user_login() 
         selected_companies =  self.env['human.resource.management'].get_current_company_value()
 		
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()		
@@ -157,18 +142,18 @@ class HumanResourceManagementHistory(models.Model):
                                             + str(tuple(id_all_mirai_department)) \
                                             + ' OR human_resource_management_history.PROJECT_DEPARTMENT_ID IS NULL )' 
 
-        if  get_role_user_login  == 'Ceo':
+        if is_ceo(current_user):
             sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ')'
 
-        elif get_role_user_login  == 'Sub-Ceo':
+        elif is_sub_ceo(current_user):
             sql_domain_for_company =   'where ( company_manager_user_id = ' + str(current_user.id) \
                                         + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
-        elif get_role_user_login  == 'Div-Manager':
+        elif is_div_manager(current_user):
             sql_domain_for_company = 'where (company_id = ' + str(current_user.company_id.id)
             sql_for_department = get_sql_by_department(self)
 
-        elif get_role_user_login  == 'Leader':
+        elif is_group_leader(current_user):
             sql_domain_for_company = 'where (company_id = ' + str(current_user.company_id.id)
             sql_for_department = get_sql_by_department(self)
 
@@ -220,11 +205,10 @@ class HumanResourceManagementHistory(models.Model):
     @api.model
     def get_human_resource_free_history(self):
         current_user = self.env.user
-        get_role_user_login = self.get_role_user_login() 
         selected_companies =  self.env['human.resource.management'].get_current_company_value()
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()
         cr = self._cr
-        sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies)) + ')'
+        sql_domain_for_company = ''
         sql_for_department = ''
         sql_domain_for_role = ''
         if len(id_all_mirai_department) == 0: 
@@ -242,15 +226,15 @@ class HumanResourceManagementHistory(models.Model):
         sql_domain_for_group_by = 'GROUP BY employee_id, employee_name ,company_name, department_name, company_id, \
                                      year_history, start_date_contract, end_date_contract order by employee_name asc'
 
-        if get_role_user_login  == 'Sub-Ceo':
+        if is_sub_ceo(current_user) and not is_ceo(current_user):
             sql_domain_for_company  = 'where ( company_id in ' + str(tuple(selected_companies))
             sql_domain_for_role = ' and company_manager_user_id = ' + str(current_user.id) + ')'
 
-        elif get_role_user_login  == 'Div-Manager':
+        elif is_div_manager(current_user) and not is_sub_ceo(current_user):
             sql_domain_for_company  = 'where ( company_id = ' + str(current_user.company_id.id)
             sql_for_department = get_sql_by_department(self)
 
-        elif get_role_user_login  == 'Leader':
+        elif is_group_leader(current_user) and not is_div_manager(current_user):
             sql_domain_for_company  = 'where ( company_id = ' + str(current_user.company_id.id)
             sql_for_department = get_sql_by_department(self)
 
@@ -291,9 +275,8 @@ class HumanResourceManagementHistory(models.Model):
     #get data history support 
     @api.model
     def get_list_human_resource_history_support(self):
-        user_id_login = self.env.user.id
+        current_user = self.env.user
         selected_companies =  self.env['human.resource.management'].get_current_company_value()
-        get_role_user_login = self.get_role_user_login() 
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()		
         # div_manager_department_id =  self.env.user.employee_ids.department_id.id
         cr = self._cr
@@ -308,14 +291,14 @@ class HumanResourceManagementHistory(models.Model):
             sql_domain_for_department_emp = ' AND (human_resource_management_history.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.department_id IS NULL )'
             sql_domain_for_department_proj = ' AND (human_resource_management_history.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.PROJECT_DEPARTMENT_ID IS NULL )' 
         
-        if  get_role_user_login  == 'Ceo':
+        if is_ceo(current_user):
             sql_domain_for_company = 'where company_id != company_project_id and  ( company_id in ' + str(tuple(selected_companies)) + ')'
 
-        elif get_role_user_login  == 'Sub-Ceo':
-            sql_domain_for_company =   'where ( company_manager_user_id != ' + str(user_id_login) + ' and user_id_sub_ceo_project = ' + str(user_id_login) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
+        elif is_sub_ceo(current_user):
+            sql_domain_for_company =   'where ( company_manager_user_id != ' + str(current_user.id) + ' and user_id_sub_ceo_project = ' + str(current_user.id) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
-        elif get_role_user_login  == 'Div-Manager':
-            sql_domain_for_role = ' where ( (department_manager_user_id != ' + str(user_id_login) + 'or  department_manager_user_id is null  )' + ' and department_manager_project_id = ' + str(user_id_login) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
+        elif is_div_manager(current_user):
+            sql_domain_for_role = ' where ( (department_manager_user_id != ' + str(current_user.id) + 'or  department_manager_user_id is null  )' + ' and department_manager_project_id = ' + str(current_user.id) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
         sql = ("""select  	employee_name,
                             company_name,
