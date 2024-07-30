@@ -448,7 +448,7 @@ class HumanResourceManagement(models.Model):
     
     @api.model
     def get_list_human_resource_support(self):
-        user_id_login = self.env.user.id
+        current_user = self.env.user
         selected_companies = self.get_current_company_value()
         id_all_mirai_department = self.env['cost.management.upgrade.action'].handle_remove_department()		
         # div_manager_department_id =  self.env.user.employee_ids.department_id.id
@@ -464,24 +464,24 @@ class HumanResourceManagement(models.Model):
             sql_domain_for_department_proj = ''
         else :
             id_all_mirai_department.append(0)
-            sql_domain_for_department_emp = ' AND (department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR department_id IS NULL )'
-            sql_domain_for_department_proj = ' AND (PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR PROJECT_DEPARTMENT_ID IS NULL )' 
+            sql_domain_for_department_emp = ' AND (department_id  NOT IN ' + str(tuple(id_all_mirai_department)) \
+                                            + ' OR department_id IS NULL )'
+            sql_domain_for_department_proj = ' AND (PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) \
+                                            + ' OR PROJECT_DEPARTMENT_ID IS NULL )' 
 
-        if self.env.user.has_group('ds_company_management.group_company_management_ceo') == True:
-            sql_domain_for_role = ''
-
+        if is_ceo(current_user):
             sql_domain_for_company = 'where company_id != company_project_id and  ( company_id in ' + str(tuple(selected_companies)) + ')'
 
+        elif is_sub_ceo(current_user):
+            sql_domain_for_company = ' where ( company_manager_user_id != ' + str(current_user.id) \
+                                    + ' and user_id_sub_ceo_project = ' + str(current_user.id)\
+                                    + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
-        elif self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == True and \
-                self.env.user.has_group('ds_company_management.group_company_management_ceo') == False:
-            sql_domain_for_company =   'where ( company_manager_user_id != ' + str(user_id_login) + ' and user_id_sub_ceo_project = ' + str(user_id_login) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
-            sql_domain_for_role = ''
-
-        elif self.env.user.has_group('ds_company_management.group_company_management_div') == True and \
-                self.env.user.has_group('ds_company_management.group_company_management_sub_ceo') == False:
-            sql_domain_for_company = ''
-            sql_domain_for_role = ' where ( (department_manager_user_id != ' + str(user_id_login) + 'or  department_manager_user_id is null  )' + ' and department_manager_project_id = ' + str(user_id_login) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
+        elif is_div_manager(current_user) or is_group_leader(current_user):
+            sql_domain_for_role = ' where ( (department_manager_user_id != ' + str(current_user.id) \
+                                + ' or department_manager_user_id is null  )' \
+                                + ' and department_manager_project_id = ' + str(current_user.id) \
+                                + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
         sql = ("""select """ + COLUMNS + """ from human_resource_management """)
         sql += sql_domain_for_company
