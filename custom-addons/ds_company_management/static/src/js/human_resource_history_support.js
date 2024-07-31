@@ -20,6 +20,7 @@ odoo.define('human_resource_template_history_support.Dashboard', function (requi
     var rpc = require('web.rpc');
     var _t = core._t;
     const number_rows_not_count = 4;
+    const common = require('ds_company_management.company_management_common')
 
     var HumanResourceHistorySupportTemplate = AbstractAction.extend({
         template: 'Human_resource_history_support',
@@ -56,6 +57,7 @@ odoo.define('human_resource_template_history_support.Dashboard', function (requi
                         return
                     selection.addEventListener('change', () => self.callBackDataFunction())
                     selectionHistory.addEventListener('change', () => self.callBackDataFunction())
+                    common.get_most_recent_year(selectionHistory)
 
                     //sort table
                     const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
