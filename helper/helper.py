@@ -158,3 +158,10 @@ def valid_timezone_for_mobile(timez, timest):
         return formatted_time
     except:
         return {"status": 40001, "message": 'Invalid timestamp or timezone value'}
+
+def mobile_error_response(status, message, keyerror_message):
+    return jsonResponse({
+        "status": status,
+        "message": message,
+        "keyerror": keyerror_message
+    }, 400)
