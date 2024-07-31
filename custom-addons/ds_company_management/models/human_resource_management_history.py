@@ -288,17 +288,25 @@ class HumanResourceManagementHistory(models.Model):
         sql_domain_for_department_proj = ''
         if len(id_all_mirai_department) != 0: 
             id_all_mirai_department.append(0)
-            sql_domain_for_department_emp = ' AND (human_resource_management_history.department_id  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.department_id IS NULL )'
-            sql_domain_for_department_proj = ' AND (human_resource_management_history.PROJECT_DEPARTMENT_ID  NOT IN ' + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.PROJECT_DEPARTMENT_ID IS NULL )' 
+            sql_domain_for_department_emp = ' AND (human_resource_management_history.department_id  NOT IN ' \
+                + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.department_id IS NULL )'
+            sql_domain_for_department_proj = ' AND (human_resource_management_history.PROJECT_DEPARTMENT_ID  NOT IN ' \
+                + str(tuple(id_all_mirai_department)) + ' OR human_resource_management_history.PROJECT_DEPARTMENT_ID IS NULL )' 
         
         if is_ceo(current_user):
-            sql_domain_for_company = 'where company_id != company_project_id and  ( company_id in ' + str(tuple(selected_companies)) + ')'
+            sql_domain_for_company = ' where company_id != company_project_id and \
+                                    ( company_id in ' + str(tuple(selected_companies)) + ')'
 
         elif is_sub_ceo(current_user):
-            sql_domain_for_company =   'where ( company_manager_user_id != ' + str(current_user.id) + ' and user_id_sub_ceo_project = ' + str(current_user.id) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
+            sql_domain_for_company = ' where ( company_manager_user_id != ' + str(current_user.id) \
+                                    + ' and user_id_sub_ceo_project = ' + str(current_user.id) \
+                                    + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
-        elif is_div_manager(current_user):
-            sql_domain_for_role = ' where ( (department_manager_user_id != ' + str(current_user.id) + 'or  department_manager_user_id is null  )' + ' and department_manager_project_id = ' + str(current_user.id) + ' and company_id in ' + str(tuple(selected_companies)) + ')'
+        elif is_div_manager(current_user) or is_group_leader(current_user):
+            sql_domain_for_role = ' where ( (department_manager_user_id != ' + str(current_user.id) \
+                                + ' or department_manager_user_id is null  )' \
+                                + ' and department_manager_project_id = ' + str(current_user.id) \
+                                + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
         sql = ("""select  	employee_name,
                             company_name,

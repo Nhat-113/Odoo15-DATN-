@@ -11,16 +11,18 @@ def get_children_departments(self, department_id):
 
 def get_sql_by_department(self):
     current_user = self.env.user
-    sql_domain_parent_department = ''
-    departments = get_children_departments(self, current_user.department_id.id)
-    departments.append(current_user.department_id.id)
-        
-    if len(departments) > 1:
-        sql_domain_parent_department =' ' + 'and department_id in ' + str(tuple(departments)) + ') '
-    elif len(departments) == 1:
-        sql_domain_parent_department = ' ' + 'and department_id = ' + str(departments[0]) + ') '
-    else:
-        sql_domain_parent_department = ') '
+    empl_id = current_user.employee_id.id
+    sql_domain_parent_department = ' and department_id = null) '
+    if empl_id:
+        is_department_manager = empl_id == current_user.department_id.manager_id.id
+        if is_department_manager:
+            departments = get_children_departments(self, current_user.department_id.id)
+            departments.append(current_user.department_id.id)
+                
+            if len(departments) > 1:
+                sql_domain_parent_department = ' and department_id in ' + str(tuple(departments)) + ') '
+            elif len(departments) == 1:
+                sql_domain_parent_department = ' and department_id = ' + str(departments[0]) + ') '
     return sql_domain_parent_department
 
 def is_ceo(current_user):
