@@ -14,7 +14,8 @@
         'data/hr_holidays_update_data.xml',
         'data/hr_holidays_cron_job.xml',
         'data/hr_holidays_parameter_system.xml',
-        'views/hr_leave_views.xml'
+        'views/hr_leave_views.xml',
+        'data/inform_to_mail.xml',
     ],
     'assets': {
         'web.assets_backend': [
