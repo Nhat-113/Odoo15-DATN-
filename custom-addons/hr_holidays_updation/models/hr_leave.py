@@ -9,7 +9,7 @@ class HrLeave(models.Model):
     
     
     inform_to = fields.Many2many('hr.employee', 'hr_leave_employee_inform_rel', 'hr_leave_id', 'employee_id', store=True, string="Inform to")
-
+    new_inform_to = fields.Many2many('hr.employee', 'hr_leave_employee_inform_rel', 'hr_leave_id', 'employee_id', string="New inform to")
 
     ####################################################
     # Overrides methods
@@ -31,6 +31,8 @@ class HrLeave(models.Model):
             self.message_subscribe(partner_ids=new_follower)
 
     def write(self, values):
+        if 'inform_to' in values:
+            self.write_send_mail(values)
         user = self.env.user
         is_officer = user.has_group('hr_holidays.group_hr_holidays_user') or self.env.is_superuser()
 
@@ -72,4 +74,30 @@ class HrLeave(models.Model):
             for holiday in self:
                 holiday.add_follower(employee_id)
         return result
-        
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(HrLeave, self).create(vals_list)
+        new_follower = []
+        for emp in records.inform_to:
+            if emp not in records.message_follower_ids.partner_id.ids:
+                new_follower.append(emp.work_email)
+
+        if len(new_follower) > 0: 
+            records.new_inform_to = records.inform_to # Update Many2many field with new inform to
+            records.send_mail_to_inform()
+        return records
+    
+    def send_mail_to_inform(self):
+        template_id = 'hr_holidays_updation.template_send_mail_inform_to'
+        template = self.env.ref(template_id, raise_if_not_found=False)
+        template.send_mail(self.id, force_send=True)
+
+    def write_send_mail(self, vals_list):
+        new_follower = []
+        for emp in vals_list['inform_to'][0][2]:
+            if emp not in self.message_follower_ids.partner_id.ids and emp not in self.inform_to.ids:
+                new_follower.append(emp)
+        if len(new_follower) > 0:
+            self.new_inform_to = [(6, 0, new_follower)] # Update Many2many field with new inform to
+            self.send_mail_to_inform()    
