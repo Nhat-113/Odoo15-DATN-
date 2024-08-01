@@ -55,6 +55,7 @@
             '/ds_company_management/static/src/js/lib/chart.js',
             '/ds_company_management/static/src/js/dynamic_dashboard.js',
             '/ds_company_management/static/src/js/cost_management_update_data.js',
+            '/ds_company_management/static/src/js/company_management_common.js'
         ],
         'web.assets_qweb': [
             'ds_company_management/static/src/xml/human_resource_view.xml',
