@@ -33,6 +33,7 @@
             "data/mail_template.xml",
             "views/hr_timesheet_menu_view.xml",
             "views/hr_timesheet_request_overtime_view.xml",
-            "views/hr_timesheet_reporting_overtime.xml"
+            "views/hr_timesheet_reporting_overtime.xml",
+            "views/res_config_settings.xml",
             ],
 }
