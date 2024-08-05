@@ -21,6 +21,8 @@ PN = "PN"
 WFH = "WFH"
 WFH_2 = "WFH/2"
 PN_2 = "PN/2"
+UP = "UP"
+UP_2 = "UP/2"
 CONFIRM = "CONFIRM"
 HOUR_SMALL = 4
 
@@ -232,6 +234,11 @@ class ExportWizard(models.TransientModel):
             **format,
             **border_default
         }
+        unpaid_format ={
+            'bg_color': 'red',
+            **format,
+            **border_default
+        }
         cell_default = {
             **format,
             **border_default,
@@ -334,14 +341,14 @@ class ExportWizard(models.TransientModel):
         sheet.write(5, end_index_col + 2, "Tổng Công\nLàm Việc", self.format(workbook, header_footer))
         sheet.write(5, end_index_col + 3, "Phép năm", self.format(workbook, header_footer))
         
-        self.main_action_export_data(data, day_indexs, sheet, workbook, off_format, cell_default, header_footer, border_default, format, time_off_data, wfh_format, pn_format)
+        self.main_action_export_data(data, day_indexs, sheet, workbook, off_format, cell_default, header_footer, border_default, format, time_off_data, wfh_format, pn_format, unpaid_format)
         
         workbook.close()
         output.seek(0)
         response.stream.write(output.read())
         output.close()
         
-    def main_action_export_data(self, data, day_indexs, sheet, workbook, off_format, cell_default, header_footer, border_default, format, time_off_data, wfh_format, pn_format):
+    def main_action_export_data(self, data, day_indexs, sheet, workbook, off_format, cell_default, header_footer, border_default, format, time_off_data, wfh_format, pn_format, unpaid_format):
         wd_format = {
             'bg_color': 'e2f0d9',
             'bold': False
@@ -373,7 +380,7 @@ class ExportWizard(models.TransientModel):
         cell_format.set_text_wrap()
         cell_format.set_align('top')
         attendances = data['data']
-        approved_time_off_map, approved_wfh_map = time_off_data
+        approved_time_off_map, approved_wfh_map, approved_unpaid_map = time_off_data
         row = 6
         boxRowFirst = row
         boxColFirst = 4
@@ -411,6 +418,8 @@ class ExportWizard(models.TransientModel):
                 row += 1
             
             self.write_approved_days(sheet, row_active, employee_id, day_indexs, approved_wfh_map, workbook, wfh_format, wfh_format, WFH, WFH_2)
+
+            self.write_approved_days(sheet, row_active, employee_id, day_indexs, approved_unpaid_map, workbook, unpaid_format, unpaid_format, UP, UP_2)
 
             self.write_approved_days(sheet, row_active, employee_id, day_indexs, approved_time_off_map, workbook, pn_format, pn_format, PN, PN_2)
 
@@ -477,16 +486,16 @@ class ExportWizard(models.TransientModel):
             sheet.set_row(boxRowLast + offset, 25)
         sheet.write(boxRowLast + 3, 1, OFF, self.format(workbook, format, **{'bg_color': '#BFBFBF'}))
         sheet.write(boxRowLast + 3, 2, 'Nghỉ ca', self.format(workbook, format, **{'bold': True}))
-        sheet.write(boxRowLast + 4, 1, PN, self.format(workbook, format, **{'bg_color': '548235'}))
-        sheet.write(boxRowLast + 4, 2, 'Phép năm', self.format(workbook, format, **{'bold': True}))
-        sheet.write(boxRowLast + 5, 1, CONFIRM, self.format(workbook, format, **{'bg_color': 'ffd966'}))
-        sheet.write(boxRowLast + 5, 2, f'Thiếu giờ làm (<{HOUR_SMALL}h)', self.format(workbook, format, **{'bold': True}))
-        sheet.write(boxRowLast + 6, 1, WFH, self.format(workbook, format, **{'bg_color': '#ADD8E6'}))
-        sheet.write(boxRowLast + 6, 2, 'Work from home', self.format(workbook, format, **{'bold': True}))
-        sheet.write(boxRowLast + 7, 1, PN_2, self.format(workbook, format, **{'bg_color': '548235'}))
-        sheet.write(boxRowLast + 7, 2, 'Nghỉ nữa ngày', self.format(workbook, format, **{'bold': True}))
-        sheet.write(boxRowLast + 8, 1, WFH_2, self.format(workbook, format, **{'bg_color': '#ADD8E6'}))
-        sheet.write(boxRowLast + 8, 2, 'Work from home half-day', self.format(workbook, format, **{'bold': True}))
+        sheet.write(boxRowLast + 4, 1, CONFIRM, self.format(workbook, format, **{'bg_color': 'ffd966'}))
+        sheet.write(boxRowLast + 4, 2, f'Thiếu giờ làm (<{HOUR_SMALL}h)', self.format(workbook, format, **{'bold': True}))
+        if any(time_off_data):
+            sheet.write(boxRowLast + 5, 1, PN, self.format(workbook, format, **{'bg_color': '548235'}))
+            sheet.write(boxRowLast + 5, 2, 'Phép năm', self.format(workbook, format, **{'bold': True}))
+            sheet.write(boxRowLast + 6, 1, WFH, self.format(workbook, format, **{'bg_color': '#ADD8E6'}))
+            sheet.write(boxRowLast + 6, 2, 'Làm việc tại nhà', self.format(workbook, format, **{'bold': True}))
+            sheet.write(boxRowLast + 7, 1, UP, self.format(workbook, format, **{'bg_color': 'red'}))
+            sheet.write(boxRowLast + 7, 2, 'Nghỉ phép không lương', self.format(workbook, format, **{'bold': True}))
+            
         
     def write_approved_days(self, sheet, row_active, employee_id, day_indexs, approved_map, workbook, full_day_format, half_day_format, full_day_label, half_day_label):
         for key, values in approved_map.items():
@@ -607,10 +616,17 @@ class ExportWizard(models.TransientModel):
         else:
             time_off_type_ids = [0]
 
+        time_off_type_unpaid_ids = [0]
+        for company in companies:
+            if hasattr(company, 'time_off_type_unpaid_id') and company.time_off_type_unpaid_id:
+                time_off_type_unpaid_ids.extend(company.time_off_type_unpaid_id.ids)
+
+        time_off_type_unpaid_ids = list(set(time_off_type_unpaid_ids))
+
         try:
             hr_leave_model = self.env['hr.leave']
         except KeyError:
-            return {}, {}
+            return {}, {}, {}
             
         approved_leaves = self.env['hr.leave'].search([
             ('state', '=', 'validate'),
@@ -621,6 +637,7 @@ class ExportWizard(models.TransientModel):
 
         approved_time_off_map = {}
         approved_wfh_map = {}
+        approved_unpaid_map = {}
         
         for leave in approved_leaves:
             emp_id = str(leave.employee_id.id)
@@ -636,7 +653,16 @@ class ExportWizard(models.TransientModel):
                             approved_wfh_map[emp_id] = [day_str]
                         elif day_str not in approved_wfh_map[emp_id]:  
                             approved_wfh_map[emp_id].append(day_str)
-                        
+
+                elif leave.holiday_status_id.id in time_off_type_unpaid_ids:
+                    if leave.request_unit_half:
+                        approved_unpaid_map.setdefault(emp_id, []).append(day_str + '_half')
+                    else:
+                        if emp_id not in approved_unpaid_map:
+                            approved_unpaid_map[emp_id] = [day_str]
+                        elif day_str not in approved_unpaid_map[emp_id]:  
+                            approved_unpaid_map[emp_id].append(day_str)
+
                 else:
                     if leave.request_unit_half:
                         approved_time_off_map.setdefault(emp_id, []).append(day_str + '_half')
@@ -646,4 +672,4 @@ class ExportWizard(models.TransientModel):
                         elif day_str not in approved_time_off_map[emp_id]:  
                             approved_time_off_map[emp_id].append(day_str)
                         
-        return approved_time_off_map, approved_wfh_map
+        return approved_time_off_map, approved_wfh_map, approved_unpaid_map
