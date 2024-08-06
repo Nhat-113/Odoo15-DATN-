@@ -33,7 +33,7 @@ class SmoTenant(models.Model):
       else:
         raise UserError(f'Failed to fetch tenant: {response.text}')
     except Exception as err:
-        raise UserError(f'An error occurred: {str(err)}')
+        raise UserError(f'Something went wrong! Please check your API URL and try again!')
       
     try:
       res_data = response.json()

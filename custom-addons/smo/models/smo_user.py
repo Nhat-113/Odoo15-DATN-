@@ -32,7 +32,7 @@ class SmoUser(models.Model):
     except requests.HTTPError as http_err:
       raise ValidationError(f'Failed to authenticate: {json.loads(response.text)["message"]}')
     except Exception as err:
-      raise UserError(f'An error occurred: {str(err)}')
+      raise UserError(f'Something went wrong! Please check your API URL or API account and try again!')
     
     try:
       tokens = response.json()

@@ -8,6 +8,7 @@
                     js_class="smo_custom_list_view" expand="1">
                 <field name="schedule_name" />
                 <field name="smo_device_lc_ids" widget="many2many_tags"/>
+                <field name="state_display"/>
                 <field name="repeat_daily" />        
                 <field name="schedule_mode" />
                 <field name="start_time" 

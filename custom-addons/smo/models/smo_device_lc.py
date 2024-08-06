@@ -7,6 +7,7 @@ import requests
 class SmoDeviceLc(models.Model):
   _name = "smo.device.lc"
   _description = "SmartOffice LC Devices"
+  _order = 'param_name asc'
 
   smo_device_id = fields.Many2one('smo.device', string="SmartOffice Device ID", required=True, ondelete='cascade')
   asset_control_id = fields.Char(string="Asset Control ID", required=True)
@@ -26,7 +27,7 @@ class SmoDeviceLc(models.Model):
           try:
             self.change_light_state(record.device_id, record.param_name, new_state)
           except Exception as err:
-            raise UserError(f'Failed to change light state: {str(err)}')
+            raise UserError(f'Failed to change light state!')
     return super(SmoDeviceLc, self).write(vals)
 
   def change_light_state(self, device_id, key, state, smo_uid=None, update_local=False):
@@ -59,4 +60,4 @@ class SmoDeviceLc(models.Model):
       else:
         raise UserError(f"Failed to call API to change light state: {response.text}")
     except Exception as err:
-      raise UserError(f"An error occurred: {str(err)}")
+      raise UserError(f'Something went wrong! Please check your API URL and try again!')

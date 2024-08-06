@@ -28,12 +28,13 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'smo/static/src/js/custom_list_view.js',
             'smo/static/src/js/devices_list_view_renderer.js',
+            'smo/static/src/js/custom_list_view.js',
         ],
         'web.assets_qweb': [
         ],
     },
+    'uninstall_hook': 'uninstall_hook',
     'license': "LGPL-3",
     'installable': True,
     'application': True,

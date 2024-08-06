@@ -47,7 +47,7 @@ class SmoDevice(models.Model):
         else:
           raise UserError(f'Failed to fetch devices: {response.text}')
       except Exception as err:
-        raise UserError(f'An error occurred: {str(err)}')
+        raise UserError(f'Something went wrong! Please check your API URL and try again!')
 
       try:
         data = response.json()
@@ -160,7 +160,7 @@ class SmoDevice(models.Model):
       else:
         raise UserError(f'Failed to fetch IAQ device data: {response.text}')
     except Exception as err:
-      raise UserError(f'An error occurred: {str(err)}')
+      raise UserError(f'Something went wrong! Please check your API URL and try again!')
 
     try:
       data = response.json()
@@ -215,8 +215,8 @@ class SmoDevice(models.Model):
       else:
         raise UserError(f'Failed to fetch LC device data: {response.text}')
     except Exception as err:
-      raise UserError(f'An error occurred: {str(err)}')
-
+      raise UserError(f'Something went wrong! Please check your API URL and try again!')
+    
     try:
       data = response.json()
     except Exception as err:
