@@ -110,6 +110,11 @@ class HrAttendance(http.Controller):
     def facelog_attendances_v2(self, **kw):
         request._json_response = alternative_json_response.__get__(request, JsonRequest)
         try:
+            current_user = request.env.user
+            is_creator = current_user.has_group('hr_attendance.group_hr_attendance_user')
+            if not is_creator:
+                return {"status": 400, "message": "This user's API key is not allowed to create an 'Attendance' record"}
+
             kw = request.jsonrequest
             if not kw.get('email'):
                 return {"status": 400, "message": "Missing required parameter email"}
