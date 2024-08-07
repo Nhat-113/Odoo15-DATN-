@@ -14,7 +14,7 @@ class Tenant(models.Model):
     sequence = fields.Integer(string= 'No.')
     allow_to_open = fields.Boolean(string= 'Allow To Open', default= False, tracking= True)
     door_ids = fields.One2many('door.information', 'tenant_id', string="Doors")
-    face_detection_link = fields.Char(string= 'Face Detection Link', default = None)
+    face_detection_link = fields.Char(string= 'Face Detection Link')
 
     @api.model
     def create(self, vals):
