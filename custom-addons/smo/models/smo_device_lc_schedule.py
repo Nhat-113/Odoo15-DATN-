@@ -4,10 +4,12 @@ import datetime
 from pytz import timezone, UTC
 from helper.smo_helper import generate_time_selection
 
-START_TIME_MISSING_ANNOUNCE = 'Invalid Input: Start time must be provided'
-END_TIME_MISSING_ANNOUNCE = 'Invalid Input: End time must be provided in Time Frame mode'
-START_TIME_AFTER_END_TIME_ANNOUNCE = 'Invalid Input: End time must be after Start Time'
-END_TIME_IN_PAST_ANNOUNCE = 'Invalid Input: End time must be in the future'
+START_TIME_MISSING_ANNOUNCE = 'Invalid Input: Start Time must be provided'
+START_TIME_IN_PAST_ANNOUNCE = 'Invalid Input: Start Time must not be in the past'
+END_TIME_MISSING_ANNOUNCE = 'Invalid Input: End Time must be provided in Time Frame mode'
+START_TIME_AFTER_END_TIME_ANNOUNCE = 'Invalid Input: End Time must be after Start Time'
+END_TIME_IN_PAST_ANNOUNCE = 'Invalid Input: End Time must be in the future'
+NO_DAY_IN_WEEK_ANNOUNCE = 'Invalid Input: You must choose at least one day in week'
 
 class SmoDeviceLcSchedule(models.Model):
   _name = "smo.device.lc.schedule"
@@ -42,8 +44,8 @@ class SmoDeviceLcSchedule(models.Model):
   smo_asset_id = fields.Many2one('smo.asset', string='Asset')
   smo_device_id = fields.Many2one('smo.device', string='Device')
   
-  start_time = fields.Datetime(string="Start Time", default=fields.Datetime.now())
-  end_time = fields.Datetime(string="End Time", default=fields.Datetime.now())
+  start_time = fields.Datetime(string="Start Time", default=lambda self: fields.Datetime.now(),)
+  end_time = fields.Datetime(string="End Time")
 
   start_time_daily = fields.Selection(generate_time_selection(), string="Start Time Daily", store=True,)
   end_time_daily = fields.Selection(generate_time_selection(), string="End Time Daily", store=True,)
@@ -52,12 +54,22 @@ class SmoDeviceLcSchedule(models.Model):
 
   cron_start_ids = fields.One2many('ir.cron', 'smo_device_lc_schedule_id_start', string="Cron Starts")
   cron_end_ids = fields.One2many('ir.cron', 'smo_device_lc_schedule_id_end', string="Cron Ends")
+  
+  state_display = fields.Char(string="Turn On/Off", compute='_compute_state_display')
+  
+  @api.depends('state')
+  def _compute_state_display(self):
+      for record in self:
+          record.state_display = "Turn ON" if record.state else "Turn OFF"
 
   def _validate_time_for_repeating_schedule(self):
     for record in self:
       if record.repeat_daily == True:
         if not record.start_time_daily:
           raise ValidationError(START_TIME_MISSING_ANNOUNCE)
+        
+        if record.custom_day and not any([record.monday, record.tuesday, record.wednesday, record.thursday, record.friday, record.saturday, record.sunday]):
+          raise ValidationError(NO_DAY_IN_WEEK_ANNOUNCE)
 
         if record.schedule_mode == 'frame':
           if not record.end_time_daily:
@@ -72,6 +84,9 @@ class SmoDeviceLcSchedule(models.Model):
       if record.repeat_daily == False:
         if not record.start_time:
           raise ValidationError(START_TIME_MISSING_ANNOUNCE)
+        
+        if record.start_time < now and record.schedule_mode != "frame":
+          raise ValidationError(START_TIME_IN_PAST_ANNOUNCE)
       
         if record.schedule_mode == "frame" and record.start_time >= record.end_time:
           raise ValidationError(START_TIME_AFTER_END_TIME_ANNOUNCE)
@@ -115,7 +130,7 @@ class SmoDeviceLcSchedule(models.Model):
     for record in self:
       schedules = self._get_overlapped_devices_schedules(record)
       if not schedules:
-        return
+        continue
 
       for schedule in schedules:
         if schedule.repeat_daily:
@@ -167,10 +182,8 @@ class SmoDeviceLcSchedule(models.Model):
     return f'at {local_start_time}'
 
   def _is_time_overlap(self, start1, end1, start2, end2):
-    if end1 is None:
-      end1 = start1
-    if end2 is None:
-      end2 = start2
+    end1 = end1 or start1
+    end2 = end2 or start2
 
     return (start1 <= start2 <= end1) or (start2 <= start1 <= end2)
 
@@ -240,6 +253,12 @@ class SmoDeviceLcSchedule(models.Model):
     record._set_lc_ids_by_asset_or_device()
     record._create_and_update_cronjob_for_schedule()
     return record
+  
+  @api.onchange('schedule_mode')
+  def _onchange_schedule_mode(self):
+    for record in self:
+      if record.schedule_mode == 'frame' and record.repeat_daily == False:
+        record.end_time = fields.Datetime.now()
 
   def create_cron(self, name, time, schedule_id_start=False, schedule_id_end=False):
     return self.env['ir.cron'].create({
@@ -259,18 +278,20 @@ class SmoDeviceLcSchedule(models.Model):
 
   def _create_and_update_crons_for_onetime_schedules(self):
     for record in self:
+      now = fields.Datetime.now()
       local_start_time = record._convert_to_local_time(record.start_time).strftime('%H:%M:%S on %d/%m/%Y')
-      start_cron_name = f'Turn lights {"on" if record.state == True else "off"} at {local_start_time}'
+      start_cron_name = f'[{record.schedule_name}] Turn lights {"on" if record.state == True else "off"} at {local_start_time}'
       
-      if record.cron_start_ids:
-        record.cron_start_ids.write({'nextcall': record.start_time, 'name': start_cron_name})
-      else:
-        start_cron = record.create_cron(start_cron_name, record.start_time, schedule_id_start=record.id)
-        record.cron_start_ids = [(4, start_cron.id)]
+      if record.start_time > now:
+        if record.cron_start_ids:
+          record.cron_start_ids.write({'nextcall': record.start_time, 'name': start_cron_name})
+        else:
+          start_cron = record.create_cron(start_cron_name, record.start_time, schedule_id_start=record.id)
+          record.cron_start_ids = [(4, start_cron.id)]
 
       if record.schedule_mode == 'frame':
         local_end_time = record._convert_to_local_time(record.end_time).strftime('%H:%M:%S on %d/%m/%Y')
-        end_cron_name = f'Turn lights {"off" if record.state == True else "on"} at {local_end_time}'
+        end_cron_name = f'[{record.schedule_name}] Turn lights {"off" if record.state == True else "on"} at {local_end_time}'
         
         if record.cron_end_ids:
           record.cron_end_ids.write({'nextcall': record.end_time, 'name': end_cron_name})
@@ -302,7 +323,7 @@ class SmoDeviceLcSchedule(models.Model):
       for day, code in days_mapping.items():
         if day in days_to_create_crons:
           start_time = record._get_next_call_datetime(record.start_time_daily, code)
-          start_cron_name = f'Turn {"on" if record.state == True else "off"} lights on {day.capitalize()}'
+          start_cron_name = f'[{record.schedule_name}] Turn {"on" if record.state == True else "off"} lights on {day.capitalize()}'
           
           if day in existing_start_crons:
             existing_start_crons[day].write({'nextcall': start_time, 'name': start_cron_name})
@@ -312,7 +333,7 @@ class SmoDeviceLcSchedule(models.Model):
 
           if record.schedule_mode == 'frame':
             end_time = record._get_next_call_datetime(record.end_time_daily, code)
-            end_cron_name = f'Turn {"off" if record.state == True else "on"} lights on {day.capitalize()}'
+            end_cron_name = f'[{record.schedule_name}] Turn {"off" if record.state == True else "on"} lights on {day.capitalize()}'
             
             if day in existing_end_crons:
               existing_end_crons[day].write({'nextcall': end_time, 'name': end_cron_name})
@@ -336,14 +357,14 @@ class SmoDeviceLcSchedule(models.Model):
   def _get_next_call_datetime(self, time_str, day_of_week_code):
     hour, minute = map(int, time_str.split(':'))
 
-    today_utc = fields.Datetime.context_timestamp(self, fields.Datetime.now())
-    today_day = today_utc.weekday()
+    today_local = fields.Datetime.context_timestamp(self, fields.Datetime.now())
+    today_day_of_week_local = today_local.weekday()
 
-    days_ahead = int(day_of_week_code) - today_day
-    if days_ahead < 0 or (days_ahead == 0 and (hour, minute) <= (today_utc.hour, today_utc.minute)):
+    days_ahead = int(day_of_week_code) - today_day_of_week_local
+    if days_ahead < 0 or (days_ahead == 0 and (hour, minute) <= (today_local.hour, today_local.minute)):
       days_ahead += 7
 
-    next_call_date_local = today_utc + datetime.timedelta(days=days_ahead)
+    next_call_date_local = today_local + datetime.timedelta(days=days_ahead)
     next_call_local = next_call_date_local.replace(hour=hour, minute=minute, second=0, microsecond=0)
 
     next_call_utc = next_call_local.astimezone(UTC).replace(tzinfo=None)
