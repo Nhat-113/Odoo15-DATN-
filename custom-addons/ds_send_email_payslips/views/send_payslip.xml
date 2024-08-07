@@ -54,10 +54,19 @@
             <field name="inherit_id" ref="hr_payroll_community.hr_payslip_run_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//header/button[@name='draft_payslip_run']" position="after">
+                    <field name="all_draft" invisible="1"/>
+                    <field name="all_sent" invisible="1"/>
                     <button name="send_multi_payslips" type="object"
+                        attrs="{'invisible': [('all_sent', '=', True)]}"
                         class="oe_highlight"
                         string="Send Email Payslips"
                         confirm="Are you sure that you want to send the Email Payslips to all Employess in this Payslips Batches? This action can't be undone."
+                    />
+                    <button name="draft_multi_payslips" type="object"
+                        attrs="{'invisible': [('all_draft', '=', True)]}"
+                        class="btn-secondary o_form_button_create"
+                        string="Set All to Draft"
+                        confirm="Are you sure that you want to draft the Payslips of all Employess in this Payslips Batches and change Email Send Status to Not Send Yet?"
                     />
                 </xpath>
             </field>

@@ -51,7 +51,7 @@ class SendPayslips(models.Model):
             }
         else:
             template.send_mail(self.id, force_send=True)
-            self.write({'email_send_status': 'sent'})
+            self.write({'email_send_status': 'sent', 'state': 'done'})
             message_id = self.env['ds_send_email_payslips.message.wizard'].create(
                 {'message': _("Email Payslip is successfully sent")})
 
@@ -80,7 +80,7 @@ class SendPayslips(models.Model):
                 )
 
             # change send mail status
-            payslips.write({'email_send_status': 'sent'})
+            payslips.write({'email_send_status': 'sent', 'state': 'done'})
 
         # Reset global variable
         self.env['ir.config_parameter'].sudo().set_param(
@@ -117,10 +117,28 @@ class SendPayslips(models.Model):
             'target': 'new'
         }
 
+    def action_payslip_draft(self):
+        return super(SendPayslips, self).write({'email_send_status': 'not_sent_yet', 'state': 'draft'})
 
 class HrPayslipRun(models.Model):
     _name = 'hr.payslip.run'
     _inherit = ['hr.payslip.run', 'mail.thread']
+
+    # These 2 fields are used for hiding and displaying Send Email Payslips & Draft button
+    all_draft = fields.Boolean(compute='_compute_all_sent_draft', string='All Draft')
+    all_sent = fields.Boolean(compute='_compute_all_sent_draft', string='All Sent')
+
+    @api.depends('slip_ids')
+    def _compute_all_sent_draft(self):
+        for record in self:
+            if record.slip_ids:
+                all_draft = all(payslip.state == 'draft' for payslip in record.slip_ids)
+                all_sent = all(payslip.email_send_status == 'sent' for payslip in record.slip_ids)
+                record.all_draft = all_draft
+                record.all_sent = all_sent
+
+    def draft_multi_payslips(self):
+        self.slip_ids.write({'email_send_status': 'not_sent_yet', 'state': 'draft'})
 
     def send_multi_payslips(self):
         template = self.env.ref(
@@ -161,7 +179,7 @@ class MailComposer(models.TransientModel):
         """ Check if the payslip has been sent via click button send mail and update the status. """
         if self.model == 'hr.payslip':
             payslip = self.env['hr.payslip'].browse(self.res_id)
-            payslip.write({'email_send_status': 'sent'})
+            payslip.write({'email_send_status': 'sent', 'state': 'done'})
 
         res = super(MailComposer, self).action_send_mail()
         return res
