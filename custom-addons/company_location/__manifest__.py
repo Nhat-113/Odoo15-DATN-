@@ -18,11 +18,6 @@
         "views/res_config_settings.xml",
         "views/menu.xml"
     ],
-    "assets": {
-        "web.assets_backend": [
-            "company_location/static/src/js/company_location_custom_view.js",
-        ],
-    },
     "installable": True,
     "auto_install": False,
     "application": True,
