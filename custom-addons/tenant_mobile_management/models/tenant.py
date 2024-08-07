@@ -12,6 +12,9 @@ class Tenant(models.Model):
     link_domain = fields.Char(string= 'Link Domain', required= True, tracking= True)
     description = fields.Text(string= 'Description', tracking= True)
     sequence = fields.Integer(string= 'No.')
+    allow_to_open = fields.Boolean(string= 'Allow To Open', default= False, tracking= True)
+    door_ids = fields.One2many('door.information', 'tenant_id', string="Doors")
+    face_detection_link = fields.Char(string= 'Face Detection Link', default = None)
 
     @api.model
     def create(self, vals):

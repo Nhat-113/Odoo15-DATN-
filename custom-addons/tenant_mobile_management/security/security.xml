@@ -1,13 +1,22 @@
 <odoo>
     <data>
-
         <record id="group_tenant_mobile_management_admin" model="res.groups">
             <field name="name">Tenant Management</field>
         </record>
 
-        <record id="access_ternant_management_admin" model="ir.model.access">
-            <field name="name">administrator</field>
+        <record id="access_tenant_management_admin" model="ir.model.access">
+            <field name="name">Administrator Access to Tenant Management</field>
             <field name="model_id" ref="model_tenant_management"/>
+            <field name="group_id" ref="group_tenant_mobile_management_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="access_door_information_admin" model="ir.model.access">
+            <field name="name">Administrator Access to Door Information</field>
+            <field name="model_id" ref="model_door_information"/>
             <field name="group_id" ref="group_tenant_mobile_management_admin"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
