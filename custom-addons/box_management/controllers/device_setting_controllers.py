@@ -32,6 +32,7 @@ class SettingDevice(http.Controller):
                 "status": 200,
                 "data": [
                     {
+                        "id": item.id,
                         "name": item.name,
                         "start_time": item.start_time + ":00",
                         "end_time":item.end_time + ":00",
