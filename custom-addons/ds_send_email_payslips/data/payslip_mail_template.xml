@@ -29,4 +29,24 @@
             </field>
         </record>
     </data>
+
+    <data>
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'ds_send_email_payslips'), ('name', '=', 'email_template_hr_payslip')]" />
+            </function>
+            <value eval="{'noupdate': False}"/>
+        </function>
+
+        <record id="email_template_hr_payslip" model="mail.template">
+            <field name="auto_delete">False</field>
+        </record>
+
+        <function name="write" model="ir.model.data">
+            <function name="search" model="ir.model.data">
+                <value eval="[('module', '=', 'ds_send_email_payslips'), ('name', '=', 'email_template_hr_payslip')]" />
+            </function>
+            <value eval="{'noupdate': True}"/>
+        </function>
+    </data>
 </odoo>
