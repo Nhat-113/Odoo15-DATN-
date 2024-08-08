@@ -14,3 +14,9 @@ def uninstall_hook(cr, registry):
     ]
 
     ir_config.search([('key', 'in', keys_to_unlink)]).unlink()
+    
+    device_lc_schedule = env['smo.device.lc.schedule']
+    
+    schedules = device_lc_schedule.search([])
+    if schedules:
+        schedules.unlink()
