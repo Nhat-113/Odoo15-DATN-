@@ -4,7 +4,8 @@ from odoo.http import request
 from dateutil.relativedelta import relativedelta
 # from odoo.tools import  config
 import pytz
-from helper.helper import message_error_missing, check_field_missing_api, jsonResponse, convert_current_tz, check_authorize, handle_pagination, validate_pagination, image_url_getter, is_valid_month, is_valid_integer, check_and_handle_missing_fields
+from helper.helper import message_error_missing, check_field_missing_api, jsonResponse, convert_current_tz, check_authorize, handle_pagination, validate_pagination, image_url_getter, is_valid_month, is_valid_integer, check_and_handle_missing_fields, mobile_error_response
+from helper.hr_employee_common import get_all_department_children
 
 TIME_FORMAT = "%Y-%m-%d, %H:%M:%S"
 role_attendance = [
@@ -642,3 +643,56 @@ class BoxManagementMobile(http.Controller):
         result = request.env['ir.http']._content_image_get_response(status, headers, image_base64)
         
         return result
+
+    @http.route("/api/manager/members", type='http', auth="bearer_token", methods=["GET"])
+    def member_list(self, **kw):
+        params = validate_pagination(kw.get('page', 1), kw.get('per_page', 10))
+        if not params:
+            return mobile_error_response(status=40001, message="Invalid", keyerror_message="Page or Per_page must be an integer number")
+
+        missing_fields = check_field_missing_api(kw, ['employee_id'])
+        if missing_fields:
+            return mobile_error_response(status=40001, message="Invalid", keyerror_message=message_error_missing(missing_fields))
+
+        employee_id = kw.get("employee_id")
+        if not employee_id.isdigit() or int(employee_id) == 0:
+            return mobile_error_response(status=40001, message="Invalid", keyerror_message="The member_id must be a positive integer")
+
+        try:
+            departments = request.env['hr.department'].search([('manager_id.id', '=', employee_id)]).ids
+            if not departments:
+                return mobile_error_response(status=40001, message="Invalid", keyerror_message="The current user is not a manager.")
+
+            departments.extend(get_all_department_children(request=request, parent_id=departments, list_departments=[]))
+            domain = [('department_id.id', 'in', departments), ('id', '!=', employee_id)]
+            
+            if kw.get('name'):
+                domain.append(('name', 'ilike', kw['name']))
+
+            offset, limit = params["offset"], params["limit"]
+            records_to_skip = (offset - 1) * limit
+            total_records = request.env['hr.employee'].search_count(domain)
+            employees = request.env['hr.employee'].search(domain, offset=records_to_skip, limit=limit)
+
+            response_data = {
+                "employees": [
+                    {
+                        "id": employee.id,
+                        "fullname": employee.name,
+                        "email": employee.work_email or "",
+                        "phone": employee.mobile_phone or "",
+                        "job_title": employee.job_title or "",
+                        "avatar": self.get_avatar_model('hr.employee', employee.id)
+                    }
+                    for employee in employees
+                ],
+                "pagination": handle_pagination(offset, limit, total_records)
+            }
+            return jsonResponse(response_data, 200)
+
+        except Exception as e:
+            return jsonResponse({
+                "status": 40002,
+                "message": "Bad request",
+                "keyerror": str(e)
+            }, 400)
