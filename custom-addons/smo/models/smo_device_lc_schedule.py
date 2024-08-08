@@ -3,6 +3,11 @@ from odoo.exceptions import UserError, ValidationError
 import datetime
 from pytz import timezone, UTC
 from helper.smo_helper import generate_time_selection
+import pytz
+from odoo import tools
+import logging
+
+_logger = logging.getLogger(__name__)
 
 START_TIME_MISSING_ANNOUNCE = 'Invalid Input: Start Time must be provided'
 START_TIME_IN_PAST_ANNOUNCE = 'Invalid Input: Start Time must not be in the past'
@@ -49,6 +54,9 @@ class SmoDeviceLcSchedule(models.Model):
 
   start_time_daily = fields.Selection(generate_time_selection(), string="Start Time Daily", store=True,)
   end_time_daily = fields.Selection(generate_time_selection(), string="End Time Daily", store=True,)
+  
+  start_time_daily_utc = fields.Char(string="Start Time Daily UTC", compute='_compute_start_daily_utc', store=True)
+  end_time_daily_utc = fields.Char(string="End Time Daily UTC", compute='_compute_end_daily_utc', store=True)
 
   state = fields.Boolean(string="Turn Lights On/Off", required=True, default=True)
 
@@ -61,7 +69,31 @@ class SmoDeviceLcSchedule(models.Model):
   def _compute_state_display(self):
       for record in self:
           record.state_display = "Turn ON" if record.state else "Turn OFF"
+          
+  def _convert_time_string_local_to_utc(self, time_string):
+    hour, minute = map(int, time_string.split(':'))
+    today_datetime = fields.Datetime.now()
+    today_datetime_local = self._convert_to_local_time(today_datetime)
+    today_datetime_local = today_datetime_local.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    utc_datetime = today_datetime_local.astimezone(UTC).replace(tzinfo=None)
+    utc_time = utc_datetime.time()
+    
+    return utc_time
 
+  @api.depends('start_time_daily')
+  def _compute_start_daily_utc(self):
+    for record in self:
+      if record.start_time_daily:
+        record.start_time_daily_utc = self._convert_time_string_local_to_utc(record.start_time_daily)
+        
+  
+  @api.depends('end_time_daily')
+  def _compute_end_daily_utc(self):
+    for record in self:
+      for record in self:
+        if record.end_time_daily:
+          record.end_time_daily_utc = self._convert_time_string_local_to_utc(record.end_time_daily)
+  
   def _validate_time_for_repeating_schedule(self):
     for record in self:
       if record.repeat_daily == True:
@@ -75,7 +107,7 @@ class SmoDeviceLcSchedule(models.Model):
           if not record.end_time_daily:
             raise ValidationError(END_TIME_MISSING_ANNOUNCE)
             
-          if record.start_time_daily > record.end_time_daily:
+          if record.start_time_daily >= record.end_time_daily:
             raise ValidationError(START_TIME_AFTER_END_TIME_ANNOUNCE)
 
   def _validate_time_for_schedule(self):
@@ -88,11 +120,12 @@ class SmoDeviceLcSchedule(models.Model):
         if record.start_time < now and record.schedule_mode != "frame":
           raise ValidationError(START_TIME_IN_PAST_ANNOUNCE)
       
-        if record.schedule_mode == "frame" and record.start_time >= record.end_time:
-          raise ValidationError(START_TIME_AFTER_END_TIME_ANNOUNCE)
+        if record.schedule_mode == "frame":
+          if record.start_time >= record.end_time:
+            raise ValidationError(START_TIME_AFTER_END_TIME_ANNOUNCE)
         
-        if record.schedule_mode == "frame" and record.id and record.end_time < now:
-          raise ValidationError(END_TIME_IN_PAST_ANNOUNCE)
+          if record.id and record.end_time < now:
+            raise ValidationError(END_TIME_IN_PAST_ANNOUNCE)
 
   @api.constrains('start_time', 'end_time', 'start_time_daily', 'end_time_daily', 'repeat_daily', 'schedule_mode', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'smo_device_lc_ids')
   def _check_schedule_overlap(self):
@@ -122,9 +155,14 @@ class SmoDeviceLcSchedule(models.Model):
           else:
             schedule_start_time = self._convert_to_local_time(schedule.start_time).time()
             schedule_end_time = self._convert_to_local_time(schedule.end_time).time() if schedule.schedule_mode == 'frame' else None
+          
+          if record.state != schedule.state:
+            check_overlap = self._is_time_point_overlap
+          else:
+            check_overlap = self._is_time_overlap
 
-          if self._is_time_overlap(start_time, end_time, schedule_start_time, schedule_end_time):
-            raise ValidationError(record._get_overlapped_validation_err_messages(schedule))
+          if check_overlap(start_time, end_time, schedule_start_time, schedule_end_time):
+              raise ValidationError(record._get_overlapped_validation_err_messages(schedule))
 
   def _check_overlap_for_schedule(self):
     for record in self:
@@ -133,6 +171,11 @@ class SmoDeviceLcSchedule(models.Model):
         continue
 
       for schedule in schedules:
+        if record.state != schedule.state:
+          check_overlap = self._is_time_point_overlap
+        else:
+          check_overlap = self._is_time_overlap
+          
         if schedule.repeat_daily:
           overlapped_days = record._get_overlapped_days(schedule)
           if overlapped_days:
@@ -142,10 +185,10 @@ class SmoDeviceLcSchedule(models.Model):
             schedule_start_time = self._parse_time(schedule.start_time_daily)
             schedule_end_time = self._parse_time(schedule.end_time_daily) if schedule.schedule_mode == 'frame' else None
 
-            if self._is_time_overlap(record_start_time, record_end_time, schedule_start_time, schedule_end_time):
+            if check_overlap(record_start_time, record_end_time, schedule_start_time, schedule_end_time):
               raise ValidationError(record._get_overlapped_validation_err_messages(schedule))
         else:
-          if self._is_time_overlap(record.start_time, record.end_time, schedule.start_time, schedule.end_time):
+          if check_overlap(record.start_time, record.end_time, schedule.start_time, schedule.end_time):
             raise ValidationError(record._get_overlapped_validation_err_messages(schedule))
   
   def _get_overlapped_validation_err_messages(self, conflicting_schedule):
@@ -186,12 +229,16 @@ class SmoDeviceLcSchedule(models.Model):
     end2 = end2 or start2
 
     return (start1 <= start2 <= end1) or (start2 <= start1 <= end2)
+  
+  def _is_time_point_overlap(self, start1, end1, start2, end2):
+    return len({start1, end1, start2, end2}) != 4
 
   def _convert_to_local_time(self, utc_time):
     return fields.Datetime.context_timestamp(self, utc_time)
 
-  def _parse_time(self, time_str):
-    return datetime.datetime.strptime(time_str, '%H:%M').time()
+  def _parse_time(self, time_str, second=False):
+    format = '%H:%M:%S' if second else '%H:%M'
+    return datetime.datetime.strptime(time_str, format).time()
 
   def _get_overlapped_devices_schedules(self, record):
     return self.search([
@@ -256,9 +303,8 @@ class SmoDeviceLcSchedule(models.Model):
   
   @api.onchange('schedule_mode')
   def _onchange_schedule_mode(self):
-    for record in self:
-      if record.schedule_mode == 'frame' and record.repeat_daily == False:
-        record.end_time = fields.Datetime.now()
+    if self.schedule_mode == 'frame' and self.repeat_daily == False:
+      self.end_time = fields.Datetime.now()
 
   def create_cron(self, name, time, schedule_id_start=False, schedule_id_end=False):
     return self.env['ir.cron'].create({
@@ -277,8 +323,8 @@ class SmoDeviceLcSchedule(models.Model):
     })
 
   def _create_and_update_crons_for_onetime_schedules(self):
+    now = fields.Datetime.now()
     for record in self:
-      now = fields.Datetime.now()
       local_start_time = record._convert_to_local_time(record.start_time).strftime('%H:%M:%S on %d/%m/%Y')
       start_cron_name = f'[{record.schedule_name}] Turn lights {"on" if record.state == True else "off"} at {local_start_time}'
       
@@ -411,22 +457,24 @@ class SmoDeviceLcSchedule(models.Model):
       raise UserError('Lighting Schedule record not found.')
 
     mode = schedule_record.schedule_mode
-
+    now = fields.Datetime.now()
+    
     if schedule_record.repeat_daily:
-      now = fields.Datetime.now().time()
-      start = schedule_record._parse_time(schedule_record.start_time_daily)
-      end = schedule_record._parse_time(schedule_record.end_time_daily) if mode == 'frame' else None
+      now = now.time()
+      start = self._parse_time(schedule_record.start_time_daily_utc, second=True)
+      end = self._parse_time(schedule_record.end_time_daily_utc, second=True) if mode == 'frame' else None
     else:
-      now = fields.Datetime.now()
       start = schedule_record.start_time
       end = schedule_record.end_time if mode == 'frame' else None
+      
+    state = schedule_record.state
 
-    state = True
-    if mode == 'frame' and (now >= end if end else False):
-      state = not schedule_record.state
-    elif now >= start:
-      state = schedule_record.state
-    for lc_record in schedule_record.smo_device_lc_ids:
-      self.env['smo.device.lc'].change_light_state(lc_record.device_id, lc_record.param_name, state, update_local=True)    
+    if mode == 'frame' and end and now >= end:
+      state = not state
+    
+    if schedule_record.smo_device_lc_ids:
+      schedule_record.smo_device_lc_ids.write({'current_state': state})
+      
+        
 
 

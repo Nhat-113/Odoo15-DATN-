@@ -3,6 +3,9 @@ from odoo.exceptions import UserError
 from odoo.http import request
 from helper.smo_helper import make_request
 import requests
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class SmoDeviceLc(models.Model):
   _name = "smo.device.lc"
@@ -23,14 +26,13 @@ class SmoDeviceLc(models.Model):
     for record in self:
       if record.id and 'current_state' in vals:
         new_state = vals['current_state']
-        if record.current_state != new_state:
-          try:
-            self.change_light_state(record.device_id, record.param_name, new_state)
-          except Exception as err:
-            raise UserError(f'Failed to change light state!')
+        try:
+          self.change_light_state(record.device_id, record.param_name, new_state)
+        except Exception as err:
+          raise UserError(f'Failed to change light state!')
     return super(SmoDeviceLc, self).write(vals)
 
-  def change_light_state(self, device_id, key, state, smo_uid=None, update_local=False):
+  def change_light_state(self, device_id, key, state, smo_uid=None):
     if not smo_uid:
       smo_user_record = self.env['smo.user'].search([], limit=1)
       smo_uid = smo_user_record.id if smo_user_record else self.env['smo.user'].login()
@@ -47,12 +49,6 @@ class SmoDeviceLc(models.Model):
                     payload=payload,
                     access_token=tokens.access_token)
       response.raise_for_status()
-
-      if update_local == True:
-        record = self.search([('device_id', '=', device_id), ('param_name', '=', key)])
-        if record:
-          record.write({'current_state': state})
-          self.env.cr.commit()
     except requests.HTTPError as http_err:
       if response.status_code == 401:
         self.env['smo.token'].refresh_access_token(smo_uid)
