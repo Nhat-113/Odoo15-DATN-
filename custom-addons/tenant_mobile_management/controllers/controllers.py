@@ -15,9 +15,22 @@ class check_api(http.Controller):
                 }, 400)
 
             tenant = request.env["tenant.management"].sudo().search([('server_name', '=', kw.get("server_name"))])
+            door_information_list = [
+                {
+                    'door_name': door.name,
+                    'door_link': door.link
+                } for door in tenant.door_ids]
 
             if tenant:
-                return jsonResponse({'link_domain': tenant.link_domain}, 200)
+                data = {
+                    'link_domain': tenant.link_domain,
+                    'allow_to_open': tenant.allow_to_open,
+                    'face_detection_link': tenant.face_detection_link,
+                    'door_information_list': []
+                }
+                if tenant.allow_to_open:
+                    data['door_information_list'] = door_information_list
+                return jsonResponse(data, 200)
             else:
                 return jsonResponse({
                     "status": 40001,

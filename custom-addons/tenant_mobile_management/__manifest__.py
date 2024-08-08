@@ -2,7 +2,7 @@
     'name': 'Tenant Mobile Management',
     'description': """Tenant Mobile Management""",
     'version': '1.0',
-    'author': 'Vo Van Nhat',
+    'author': 'D-soft',
     'category': 'Hidden',
     'depends': ['base', 'mail'],
     "assets": {

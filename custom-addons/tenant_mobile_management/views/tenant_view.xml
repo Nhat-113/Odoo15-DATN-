@@ -11,6 +11,8 @@
                     <field name = "server_name" class = "tenant-link-max-width-field"/>
                     <field name = "link_domain" class = "tenant-link-max-width-field"/>
                     <field name = "description" class = "tenant-link-max-width-field"/>
+                    <field name = "allow_to_open" class = "tenant-link-max-width-field"/>
+                    <field name = "face_detection_link" class = "tenant-link-max-width-field"/>
                     <field name = "create_date" string = "Created"/>
                     <field name = "write_date" string = "Last Updated"/>
                 </tree>
@@ -28,6 +30,21 @@
                             <field name = "link_domain"/>
                             <field name = "description"/>
                         </group>
+                        <separator string="For remote time tracking and door access"/>
+                        <group>
+                            <field name = "allow_to_open"/>
+                            <field name = "face_detection_link"/>
+                        </group>
+                        <notebook>
+                            <page string="Door Information">
+                                <field name="door_ids">
+                                    <tree editable="bottom">
+                                        <field name="name" class = "tenant-white-space"/>
+                                        <field name="link" class = "tenant-white-space"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids"/>
