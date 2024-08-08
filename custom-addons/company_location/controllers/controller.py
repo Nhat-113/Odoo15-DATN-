@@ -11,9 +11,9 @@ class CompanyLocation(http.Controller):
        try: 
             get_employee = request.env.user.employee_id
             if not get_employee.id :
-                return jsonResponse({"status": 40301, "message": "Employee is not authorized to access"}, 403)
+                return jsonResponse({"status": 40301, "message": "This user is not an employee"}, 403)
                 
-            get_location_company = request.env["company.location"].search([("employee_ids", "=", get_employee.id)])
+            get_location_company = request.env["company.location"].sudo().search([("employee_ids", "=", get_employee.id)])
             
             result = {
                 "status": 200,
