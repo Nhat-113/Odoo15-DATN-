@@ -86,13 +86,11 @@ class SmoDeviceLcSchedule(models.Model):
       if record.start_time_daily:
         record.start_time_daily_utc = self._convert_time_string_local_to_utc(record.start_time_daily)
         
-  
   @api.depends('end_time_daily')
   def _compute_end_daily_utc(self):
     for record in self:
-      for record in self:
-        if record.end_time_daily:
-          record.end_time_daily_utc = self._convert_time_string_local_to_utc(record.end_time_daily)
+      if record.end_time_daily:
+        record.end_time_daily_utc = self._convert_time_string_local_to_utc(record.end_time_daily)
   
   def _validate_time_for_repeating_schedule(self):
     for record in self:
@@ -231,7 +229,10 @@ class SmoDeviceLcSchedule(models.Model):
     return (start1 <= start2 <= end1) or (start2 <= start1 <= end2)
   
   def _is_time_point_overlap(self, start1, end1, start2, end2):
-    return len({start1, end1, start2, end2}) != 4
+    end1 = end1 or start1
+    end2 = end2 or start2
+
+    return start1 in {start2, end2} or end1 in {start2, end2}
 
   def _convert_to_local_time(self, utc_time):
     return fields.Datetime.context_timestamp(self, utc_time)
