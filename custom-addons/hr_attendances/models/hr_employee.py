@@ -166,3 +166,4 @@ class EmployeePublic(models.Model):
     _inherit = 'hr.employee.public'
 
     fingerprint_template = fields.Char(string='Fingerprint', required=False, related="employee_id.fingerprint_template", groups="hr_attendance.group_hr_attendance_kiosk,hr_attendance.group_hr_attendance")
+    sync_write_date = fields.Datetime(string="Sync Field Date", required=False, related="employee_id.sync_write_date", groups="hr_attendance.group_hr_attendance_kiosk,hr_attendance.group_hr_attendance")
