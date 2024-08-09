@@ -309,9 +309,10 @@ class HrRequestOverTime(models.Model):
         # Send mail for PM
         self._send_message_auto_subscribe_notify_request_overtime({self: item.user_id for item in self}, mail_template, subject_template)
         # Payment for time off
+        company_ids = self.env['res.company'].search([('id', 'in', self.timesheet_overtime_id.employee_id.company_id.ids)])
         for record in self.timesheet_overtime_id:
             if record.status_timesheet_overtime != 'approved':
-                record._compute_pay_type_of_timeoff()
+                record._compute_pay_type_of_timeoff(company_ids)
                 record.status_timesheet_overtime = 'approved'
                 record.check_approval_ot = True
 

@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_inherit_timesheet_overtime" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.hr.timesheet</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="10" />
+            <field name="inherit_id" ref="hr_timesheet.res_config_settings_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//div[@id='timesheet_off_validation_setting']" position="after">
+                    <div class="col-12 col-lg-6 o_setting_box" id="timesheet_overtime_setting">
+                        <div class="o_setting_right_pane">
+                            <label for="timeoff_type_overtime" />
+                            <span 
+                                class="fa fa-lg fa-building-o" 
+                                title="Values set here are company-specific."
+                                groups="base.group_multi_company" 
+                            />
+                            <div class="row">
+                                <div class="text-muted col-md-12">
+                                    Select the type of time off you want to request for overtime
+                                </div>
+                            </div>
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="timeoff_type_overtime" options="{'no_create': True}"
+                                        class="pl-0" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

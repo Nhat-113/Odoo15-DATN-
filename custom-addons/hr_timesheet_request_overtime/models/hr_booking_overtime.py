@@ -201,9 +201,10 @@ class AccountAnalyticLine(models.Model):
         self.check_request_ot = True
 
     def approved_timesheet_overtime(self):
+        company_ids = self.env['res.company'].search([('id', 'in', self.employee_id.company_id.ids)])
         for record in self:
             record.validation_month_year()
-            record._compute_pay_type_of_timeoff()
+            record._compute_pay_type_of_timeoff(company_ids)
             record.check_approval_ot = True
             record.write({  'status_timesheet_overtime': 'approved',
                             })
@@ -215,56 +216,68 @@ class AccountAnalyticLine(models.Model):
                 record.check_request_ot = True
 
     def action_approved_all_timesheet_overtime(self):
+        company_ids = self.env['res.company'].search([('id', 'in', self.employee_id.company_id.ids)])
         for record in self:
             record.validation_month_year()
-            record._compute_pay_type_of_timeoff()
+            record._compute_pay_type_of_timeoff(company_ids)
             record.check_approval_ot = True
             record.status_timesheet_overtime = 'approved'
             record.write({  'status_timesheet_overtime': 'approved',
                             })
             record.check_approval_ot = True
 
-    def _compute_pay_type_of_timeoff(self):
-        for record in self:
-            if record.type_ot == 'yes' and\
-                record.status_timesheet_overtime != 'approved' and\
-                        record.pay_type in ['full_day_off', 'half_cash_half_dayoff']:
-                
-                pay_type = record.pay_type
-                time_of_type = self.env['hr.leave.type'].search([('company_id','=',record.employee_id.company_id.id),('name', 'like', 'Nghỉ bù')])
-                if len(time_of_type)==0:
-                    raise ValidationError(_("Please Create Time Off Types: Nghỉ bù."))
-                number_of_hours_display = 0
-                               
-                type_date = {'other':1, 'normal_day':1.5, 'weekend':2, 'holiday':3}
+    def _compute_pay_type_of_timeoff(self, company_ids):
+        if self.type_ot == 'yes' and\
+            self.status_timesheet_overtime != 'approved' and\
+                    self.pay_type in ['full_day_off', 'half_cash_half_dayoff']:
+            pay_type = self.pay_type
+            company_id = company_ids.filtered(lambda c: c.id == self.employee_id.company_id.id)
+            time_off_type = company_id.timeoff_type_overtime
+            if not time_off_type:
+                time_off_type = self.env['hr.leave.type'].search([('company_id','=',self.employee_id.company_id.id),('name', 'like', 'Nghỉ bù')])
+                if len(time_off_type) == 0:
+                    raise ValidationError(_(f"Please Create Time Off Types: Nghỉ bù Or Select Time Off type for company {self.employee_id.company_id.name}."))
+            if not time_off_type.active:
+                raise ValidationError(_("The selected Timeoff type has been archived or not available."))
+            if time_off_type.requires_allocation != 'yes':
+                raise ValidationError(_("The selected Timeoff type must require allocation."))
+            number_of_hours_display = 0
+                            
+            type_date = {'other':1, 'normal_day':1.5, 'weekend':2, 'holiday':3}
 
-                if pay_type == 'full_day_off':
-                    number_of_hours_display = record.unit_amount * type_date[record.type_day_ot]
-                elif pay_type == 'half_cash_half_dayoff':
-                    number_of_hours_display = record.unit_amount/2 * type_date[record.type_day_ot]
+            if pay_type == 'full_day_off':
+                number_of_hours_display = self.unit_amount * type_date[self.type_day_ot]
+            elif pay_type == 'half_cash_half_dayoff':
+                number_of_hours_display = self.unit_amount/2 * type_date[self.type_day_ot]
 
-                number_of_days = number_of_hours_display/8
-                
-                vals = {
-                    'holiday_type': 'employee',
-                    'name': 'Nghỉ bù Overtime',
-                    # Mac dinh lay nghi bu dau tien
-                    'holiday_status_id': time_of_type[0].id,
-                    'employee_id': record.employee_id.id,
-                    'date_from': datetime.now(), 
-                    'date_to': date(date.today().year, 12, 31),
-                    'number_of_days': number_of_days, 
-                    'number_of_hours_display': number_of_hours_display,
-                    'notes': False,
-                    'state': 'validate',
-                    'duration_display': number_of_hours_display,
-                    'multi_employee': False, 
-                    # TODO fix number_of_hours_display
-                }
-                hr_leave_allocation_id = self.env['hr.leave.allocation'].create(vals)
-                record.hr_leave_allocation_id = hr_leave_allocation_id.id
-            else:
-                continue
+            number_of_days = number_of_hours_display/8
+            
+            vals = {
+                'holiday_type': 'employee',
+                'name': 'Nghỉ bù Overtime',
+                # Mac dinh lay nghi bu dau tien
+                'holiday_status_id': time_off_type[0].id,
+                'employee_id': self.employee_id.id,
+                'date_from': datetime.now(), 
+                'date_to': date(date.today().year, 12, 31),
+                'number_of_days': number_of_days, 
+                'number_of_hours_display': number_of_hours_display,
+                'notes': False,
+                'state': 'validate',
+                'duration_display': number_of_hours_display,
+                'multi_employee': False,
+                # TODO fix number_of_hours_display
+            }
+
+            """
+            The code below is used to validate if number_of_days is smaller than 0
+            reason: action approve all will raise 500 error instead of Validation error
+            """
+            if vals['number_of_days'] <= 0:
+                raise ValidationError('The duration must be greater than 0.')
+
+            hr_leave_allocation_id = self.env['hr.leave.allocation'].create(vals)
+            self.hr_leave_allocation_id = hr_leave_allocation_id.id
 
     # Find request overtime for timesheet when type_timesheet = 'type_ot'
     @api.model
