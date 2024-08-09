@@ -8,6 +8,11 @@ odoo.define('smo.CustomListView', function (require) {
     const CustomDevicesListRenderer = require('smo.CustomDevicesListRenderer')
 
     const CustomListController = ListController.extend({
+        _getActionMenuItems: function (state) {
+            this.isExportEnable = false;
+            return this._super.apply(this, arguments);
+        },
+        
         renderButtons: function ($node) {
             this._super.apply(this, arguments)
             if (this.$buttons && this.modelName != 'smo.device.lc.schedule') {

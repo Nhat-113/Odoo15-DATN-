@@ -259,7 +259,7 @@ class SmoDeviceLcSchedule(models.Model):
       if end_date:
         days.append(days_in_week[end_date.weekday()])
 
-    return set(days)
+    return sorted(set(days), key=lambda x: days_in_week.index(x))
 
   def _get_overlapped_days(self, compared_schedule):
     self.ensure_one()

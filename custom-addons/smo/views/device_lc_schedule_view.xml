@@ -27,7 +27,7 @@
         <field name="name">smo.device.lc.schedule.form</field>
         <field name="model">smo.device.lc.schedule</field>
         <field name="arch" type="xml">
-            <form duplicate="false">
+            <form duplicate="false" export_xlsx="false">
                 <sheet>
                     <label for="schedule_name" style="font-size: 1.5em;"/>
                     <field name="schedule_name" style="font-size: 1.7em;"/>                  
