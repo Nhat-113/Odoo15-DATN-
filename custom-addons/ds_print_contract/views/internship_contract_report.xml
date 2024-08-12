@@ -283,11 +283,17 @@
                             </div>
                             <div class="row contract-signature">
                                 <div class="col-6 text-center">
-                                    <p class="font-weight-bold">BÊN B</p>
+                                    <p class="font-weight-bold">Người lao động</p>
                                     <p class="font-italic">(Ký và ghi rõ họ tên)</p>
                                 </div>
                                 <div class="col-6 text-center">
-                                    <p class="font-weight-bold">BÊN A</p>
+                                    <p class="font-weight-bold">Đại diện 
+                                        <t t-if="e.company_id.display_name">
+                                            <span t-field="e.company_id.display_name"/>
+                                        </t>
+                                        <t t-if="not e.company_id.display_name">Công ty CỔ PHẦN D-SOFT
+                                        </t>
+                                    </p>
                                     <p class="font-italic">(Ký, đóng dấu và ghi rõ họ tên)</p>
                                 </div>
                             </div>
