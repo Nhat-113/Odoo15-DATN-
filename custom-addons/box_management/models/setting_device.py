@@ -119,8 +119,8 @@ class SettingDevice(models.Model):
                     start_time=start_time,
                     end_time=end_time,
                     week_day=week_day,
-                    active=self.active,
-                    status=self.status
+                    active=True,
+                    status=vals['status']
                 )
 
         # self._update_sequence_up()
