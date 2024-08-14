@@ -275,7 +275,13 @@ class SmoDevice(models.Model):
     return {key: dict_assets_LC[key] for key in common_keys}
 
   @api.model
-  def sync_all(self):
+  def cron_auto_sync_all(self):
+    ir_config = self.env['ir.config_parameter'].sudo()
+    http_auto_sync_active = ir_config.get_param('smo.auto_sync_http') or False
+    
+    if not http_auto_sync_active:
+      return
+    
     smo_users_record = self.env['smo.user'].search([])
     for record in smo_users_record:
       smo_uid = record.id
@@ -319,5 +325,19 @@ class SmoDevice(models.Model):
       'type': 'ir.actions.client',
       'tag': 'reload',
     }
+    
+  @api.model
+  def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
+      res = super(SmoDevice, self).fields_view_get(view_id, view_type, toolbar, submenu)
+      if toolbar:
+          sync_manual = self.env['ir.config_parameter'].sudo().get_param('smo.manual_sync') or False
+        
+          if 'action' in res['toolbar'] and not sync_manual:
+              sync_all_action_id = self.env.ref('smo.sync_data_action').id or -1
+              sync_one_action_id = self.env.ref('smo.sync_data_action_specific_device').id or -1
+              res['toolbar']['action'] = [action for action in res['toolbar']['action'] 
+                                              if action['id'] not in [sync_all_action_id, sync_one_action_id]]
+      
+      return res
         
 

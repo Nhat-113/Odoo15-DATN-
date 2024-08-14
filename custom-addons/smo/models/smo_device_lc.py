@@ -23,11 +23,14 @@ class SmoDeviceLc(models.Model):
   _rec_name = "param_name"
 
   def write(self, vals):
+    skip_calling_api = self.env.context.get('skip_calling_api') or False
     for record in self:
       if record.id and 'current_state' in vals:
         new_state = vals['current_state']
         try:
-          self.change_light_state(record.device_id, record.param_name, new_state)
+          if not skip_calling_api:
+            self.change_light_state(record.device_id, record.param_name, new_state)
+          self._send_update_message(record.id, new_state)
         except Exception as err:
           raise UserError(f'Failed to change light state!')
     return super(SmoDeviceLc, self).write(vals)
@@ -57,3 +60,9 @@ class SmoDeviceLc(models.Model):
         raise UserError(f"Failed to call API to change light state: {response.text}")
     except Exception as err:
       raise UserError(f'Something went wrong! Please check your API URL and try again!')
+    
+  def _send_update_message(self, record_id, new_state):
+      self.env['bus.bus']._sendone('smo_channel', 'smo.device.lc/update', {
+        'id': record_id,
+        'current_state': new_state
+      })

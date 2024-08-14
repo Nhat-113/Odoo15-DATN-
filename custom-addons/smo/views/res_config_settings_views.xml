@@ -56,6 +56,65 @@
               </div>
             </div>
 
+            <h2>ThingsBoard Websocket</h2>
+            <div class="row mt16 o_settings_container" name="thingsboard_wss_setting_container">
+              <div class="col-12 col-lg-6 o_setting_box" title="Set Websocket URL of ThingsBoard Server used to sync data.">
+                <div class="o_setting_left_pane" />
+                <div class="o_setting_right_pane">
+                  <span class="o_form_label">Thingsboard Websocket URL</span>
+                  <span class="fa fa-lg fa-key" 
+                    title="Websocket URL set here are used for all people that used this add-on."
+                    aria-label="Websocket URL info set here are used for all people that used this add-on."/>
+                  <div class="text-muted">
+                    This is the Websocket URL that used to sync data from server.
+                  </div>
+                  <div class="content-group">
+                    <div class="row mt16">
+                      <label string="URL:" for="thingsboard_wss_url" class="col-lg-3 o_light_label"/>
+                      <field name="thingsboard_wss_url" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h2>Sync Settings</h2>
+            <div class="row mt16 o_settings_container" name="smo_sync_settings">
+              <div class="col-12 col-lg-6 o_setting_box">
+                <div class="o_setting_left_pane">
+                  <field name="smo_manual_sync"/>
+                </div>
+                <div class="o_setting_right_pane">
+                  <label string="Manual Sync" for="smo_manual_sync"/>
+                  <div class="text-muted" id="msg_smo_manual_sync_setting">
+                    Manual Sync by button
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-lg-6 o_setting_box">
+                <div class="o_setting_left_pane">
+                  <field name="smo_auto_sync_socket"/>
+                </div>
+                <div class="o_setting_right_pane">
+                  <label string="Auto Sync: WebSocket" for="smo_auto_sync_socket"/>
+                  <div class="text-muted" id="msg_smo_auto_sync_socket_setting">
+                    Auto Sync with WebSocket Server
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-lg-6 o_setting_box">
+                <div class="o_setting_left_pane">
+                  <field name="smo_auto_sync_http"/>
+                </div>
+                <div class="o_setting_right_pane">
+                  <label string="Auto Sync: HTTP" for="smo_auto_sync_http"/>
+                  <div class="text-muted" id="msg_smo_auto_sync_http_setting">
+                    Scheduled Auto Sync every 12 AM
+                  </div>
+                </div>
+              </div>
+            </div>
+            
 
             
           </div>
