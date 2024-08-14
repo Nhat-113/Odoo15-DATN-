@@ -391,7 +391,10 @@ class ExportWizard(models.TransientModel):
         for r in range(boxRowFirst, boxRowLast + 1):
             sheet.set_row(r, 16)
             for c in range(boxColFirst, boxColLast + 1):
-                sheet.write_string(r, c, OFF, self.format(workbook, off_format))
+                if c - 3 > day_indexs.get(str(date.today().day) + "/" + str(date.today().month), 0):  # apply format to future days
+                    sheet.write_string(r, c, '', self.format(workbook, cell_default))
+                else:
+                    sheet.write_string(r, c, OFF, self.format(workbook, off_format))
         
         index = 0
         employee_writeds = {}   # {"employee_id": "row_index"}
@@ -432,21 +435,21 @@ class ExportWizard(models.TransientModel):
                     hours = record['worked_hours'] if record['worked_hours'] else 0
                     
                     # off all month
-                    if not vals:
-                        self.handle_user_off_all_month(sheet, row_active, [boxColFirst, boxColLast], workbook, cell_default)
-                    else:
-                        fm_hour = {
-                            'num_format': '0.00', 
-                            **wd_format
-                        }
-                        day_index = day_indexs.get(vals)  
-                        if day_index is not None:
-                            if hours < HOUR_SMALL:
-                                fm_hour = {**fm_hour, **bg_small_hour}
+                    # if not vals:
+                    #     self.handle_user_off_all_month(sheet, row_active, [boxColFirst, boxColLast], workbook, cell_default)
+                    # else:
+                    fm_hour = {
+                        'num_format': '0.00', 
+                        **wd_format
+                    }
+                    day_index = day_indexs.get(vals)  
+                    if day_index is not None:
+                        if hours < HOUR_SMALL:
+                            fm_hour = {**fm_hour, **bg_small_hour}
 
-                            sheet.write_number(row_active, 3 + day_index, hours, self.format(workbook, cell_default, **fm_hour))
-                            if str(day_index) in sum_columns:
-                                sum_columns[str(day_index)] += hours
+                        sheet.write_number(row_active, 3 + day_index, hours, self.format(workbook, cell_default, **fm_hour))
+                        if str(day_index) in sum_columns:
+                            sum_columns[str(day_index)] += hours
                     continue
                 
             workingday = round(sum_rows[employee_id]/8, 2)
@@ -509,9 +512,9 @@ class ExportWizard(models.TransientModel):
                             sheet.write(row_active, 3 + day_off, half_day_label, self.format(workbook, half_day_format))
                         else:
                             sheet.write(row_active, 3 + day_off, full_day_label, self.format(workbook, full_day_format))    
-    def handle_user_off_all_month(self, sheet, row_active, col, workbook, cell_default):
-        for col in range(col[0], col[1] + 1):
-            sheet.write_string(row_active, col, '', self.format(workbook, cell_default))
+    # def handle_user_off_all_month(self, sheet, row_active, col, workbook, cell_default):
+    #     for col in range(col[0], col[1] + 1):
+    #         sheet.write_string(row_active, col, '', self.format(workbook, cell_default))
         
     def merge_range(self, sheet, firstRow, lastRow, firstCol, lastCol, content, format):
         return sheet.merge_range(firstRow, firstCol, lastRow, lastCol, content, format)
