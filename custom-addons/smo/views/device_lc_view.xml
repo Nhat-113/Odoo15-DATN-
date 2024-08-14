@@ -7,7 +7,7 @@
             <tree string="LC Devices" create="false" edit="false" delete="false" export_xlsx="false"
                     js_class="smo_custom_list_view" expand="1">
                 <field name="device_name" />
-                <field name="param_name"/>
+                <field name="name"/>
                 <field name="current_state" widget="boolean_toggle"/>
             </tree>
         </field>
