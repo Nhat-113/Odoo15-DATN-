@@ -7,20 +7,36 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+name_list = {
+  'L1': 'IoT',
+  'L2': 'Mobile-UI/UX',
+  'L3': 'Hammock 1',
+  'L4': 'Hammock 2',
+  'L5': 'Carbonix/Elic 1',
+  'L6': 'Carbonix/Elic 2',
+  'L7': 'Charity',
+  'L8': 'Decor'
+}
+    
 class SmoDeviceLc(models.Model):
   _name = "smo.device.lc"
   _description = "SmartOffice LC Devices"
   _order = 'param_name asc'
 
+  name = fields.Char(string="Bulb", compute="_compute_light_name", store=True)
   smo_device_id = fields.Many2one('smo.device', string="SmartOffice Device ID", required=True, ondelete='cascade')
   asset_control_id = fields.Char(string="Asset Control ID", required=True)
   asset_name = fields.Char(string="Asset Name", related="smo_device_id.asset_name")
   device_id = fields.Char(string="Device ID", required=True)
   device_name = fields.Char(string="Device Name")
   device_type= fields.Char(string="Device Type")
-  param_name = fields.Char(string="Bulb", required=True)
+  param_name = fields.Char(string="Light Code", required=True)
   current_state = fields.Boolean(string="On/Off", required=True)
-  _rec_name = "param_name"
+  
+  @api.depends('param_name')
+  def _compute_light_name(self):
+    for record in self:
+      record.name = name_list[record.param_name] or record.param_name
 
   def write(self, vals):
     skip_calling_api = self.env.context.get('skip_calling_api') or False
