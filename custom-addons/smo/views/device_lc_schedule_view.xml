@@ -92,9 +92,11 @@
                         <group>
                             <field name="smo_asset_id" options="{'no_create': True}"
                                 attrs="{'invisible': [('target_type', '!=', 'asset')]}"/>
-                            <field name="smo_device_id" options="{'no_create': True}"
-                                domain="[('device_type', '=', 'LC')]" 
+                            <field name="devices_selections" options="{'no_create': True}"
                                 attrs="{'invisible': [('target_type', '!=', 'device')]}"/>
+                            <!-- <field name="smo_device_id" options="{'no_create': True}"
+                                domain="[('device_type', '=', 'LC')]" 
+                                attrs="{'invisible': [('target_type', '!=', 'device')]}"/> -->
                         </group>
                     </group>
                     <group>

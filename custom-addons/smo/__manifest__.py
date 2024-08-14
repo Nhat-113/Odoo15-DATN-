@@ -11,7 +11,7 @@
     'author': 'D-Soft Enterprise Team',
     'company': 'D-Soft',
     'maintainer': 'D-Soft Enterprise Team',
-    'depends': ['base'],
+    'depends': ['base', 'web'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
@@ -30,10 +30,14 @@
         'web.assets_backend': [
             'smo/static/src/js/devices_list_view_renderer.js',
             'smo/static/src/js/custom_list_view.js',
+            'smo/static/src/js/devices_form_view_renderer.js',
+            'smo/static/src/js/custom_form_view.js',
+            'smo/static/src/js/websocket_service.js'
         ],
         'web.assets_qweb': [
         ],
     },
+    'post_init_hook': 'post_init_hook',
     'uninstall_hook': 'uninstall_hook',
     'license': "LGPL-3",
     'installable': True,

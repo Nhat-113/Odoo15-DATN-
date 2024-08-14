@@ -5,6 +5,28 @@ odoo.define('smo.CustomDevicesListRenderer', function (require) {
   const rpc = require('web.rpc')
 
   const CustomDevicesListRenderer = ListRenderer.extend({
+    _updateLightBooleanToggle: function (SmoDeviceLcId, newState) {
+      const self = this
+
+      const $recordRow = this.$el.find(`tr[custom-data-id="smo.device.lc_${SmoDeviceLcId}"]`)
+      
+      if ($recordRow.length) {
+        const recordId = $($recordRow).data('id')
+        const record = self._getRecord(recordId)
+        record.data.current_state = newState
+
+        self.defs = []
+        const $newRow = self._renderRow(record)
+        $recordRow.replaceWith($newRow);
+      }
+    },
+
+    _renderRow: function (record) {
+      var $tr = this._super.apply(this, arguments)
+      $tr.attr('custom-data-id', record.model + '_' + record.data.id)
+      return $tr
+    },
+
     _renderGroupRow: function (group, groupLevel) {
       const $row = this._super.apply(this, arguments)
       const { groupedBy } = this.state

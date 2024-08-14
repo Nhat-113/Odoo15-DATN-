@@ -4,7 +4,7 @@
         <field name="model_id" ref="model_smo_device"/>
         <field name="state">code</field>
         <field name="code">
-          env['smo.device'].sync_all()
+            env['smo.device'].cron_auto_sync_all()
         </field>
         <field name="active" eval="True"/>
         <field name="interval_number">1</field>

@@ -39,7 +39,8 @@
         <field name="name">smo.device.form</field>
         <field name="model">smo.device</field>
         <field name="arch" type="xml">
-            <form create="false" edit="false" delete="false" export_xlsx="false"> 
+            <form create="false" edit="false" delete="false" export_xlsx="false"
+                    js_class="smo_custom_form_view"> 
                 <sheet>
                     <group>
                         <group>

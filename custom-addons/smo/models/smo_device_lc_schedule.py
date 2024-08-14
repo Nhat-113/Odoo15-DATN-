@@ -47,8 +47,8 @@ class SmoDeviceLcSchedule(models.Model):
 
   smo_device_lc_ids = fields.Many2many('smo.device.lc', string="Scheduled Bulbs", required=True)
   smo_asset_id = fields.Many2one('smo.asset', string='Asset')
-  smo_device_id = fields.Many2one('smo.device', string='Device')
-  
+  devices_selections = fields.Selection(selection="_get_devices_for_lc_schedule", string="Device")
+
   start_time = fields.Datetime(string="Start Time", default=lambda self: fields.Datetime.now(),)
   end_time = fields.Datetime(string="End Time")
 
@@ -64,6 +64,12 @@ class SmoDeviceLcSchedule(models.Model):
   cron_end_ids = fields.One2many('ir.cron', 'smo_device_lc_schedule_id_end', string="Cron Ends")
   
   state_display = fields.Char(string="Turn On/Off", compute='_compute_state_display')
+  
+  @api.model
+  def _get_devices_for_lc_schedule(self):
+      device_ids = self.env['smo.device'].search([('device_type', '=', 'LC')])
+      devices = [(device.device_id, device.device_name) for device in device_ids]
+      return list(set(devices))
   
   @api.depends('state')
   def _compute_state_display(self):
@@ -267,17 +273,17 @@ class SmoDeviceLcSchedule(models.Model):
     compared_schedule_days = compared_schedule._get_selected_days()
     return set(self_days) & set(compared_schedule_days)
 
-  @api.onchange('target_type', 'smo_asset_id', 'smo_device_id')
+  @api.onchange('target_type', 'smo_asset_id', 'devices_selections')
   def _onchange_target_type(self):
     for record in self:
       record.smo_device_lc_ids = [(5, 0, 0)]
       select_type = self.target_type
       if select_type == 'custom':
         self.smo_asset_id = None
-        self.smo_device_id = None
-      elif select_type == 'asset' and self.smo_asset_id:
-        self.smo_device_id = None
-      elif select_type == 'device' and self.smo_device_id:
+        self.devices_selections = None
+      elif select_type == 'asset':
+        self.devices_selections = None
+      elif select_type == 'device':
         self.smo_asset_id = None
       record._set_lc_ids_by_asset_or_device()
 
@@ -293,6 +299,13 @@ class SmoDeviceLcSchedule(models.Model):
     self.ensure_one()
     if self.smo_asset_id:
       return self.env['smo.device.lc'].search([('asset_control_id', '=', self.smo_asset_id.asset_id)])
+    return self.env['smo.device.lc']
+  
+  @api.model
+  def _get_device_lc_ids(self):
+    self.ensure_one()
+    if self.devices_selections:
+      return self.env['smo.device.lc'].search([('device_id', '=', self.devices_selections)])
     return self.env['smo.device.lc']
   
   @api.model
@@ -428,13 +441,13 @@ class SmoDeviceLcSchedule(models.Model):
   def _set_lc_ids_by_asset_or_device(self):
     if self.target_type == 'asset' and self.smo_asset_id:
       self.smo_device_lc_ids = [(6, 0, self._get_asset_lc_ids().ids)]
-    elif self.target_type == 'device' and self.smo_device_id:
-      self.smo_device_lc_ids = [(6, 0, self.smo_device_id.smo_device_lc_ids.ids)]
+    elif self.target_type == 'device':
+      self.smo_device_lc_ids = [(6, 0, self._get_device_lc_ids().ids)]
 
   def write(self, vals):
     res = super(SmoDeviceLcSchedule, self).write(vals)
     for record in self:
-      if any(field in vals for field in {'target_type', 'smo_asset_id', 'smo_device_id'}):
+      if any(field in vals for field in {'target_type', 'smo_asset_id', 'devices_selections'}):
         self._set_lc_ids_by_asset_or_device()
 
       if 'repeat_daily' in vals:
@@ -472,8 +485,9 @@ class SmoDeviceLcSchedule(models.Model):
 
     if mode == 'frame' and end and now >= end:
       state = not state
-    
+    _logger.info(f'now: {now}, state: {state}, start: {start}, end: {end}')
     if schedule_record.smo_device_lc_ids:
+      _logger.info(f'devices: {schedule_record.smo_device_lc_ids}')
       schedule_record.smo_device_lc_ids.write({'current_state': state})
       
         
