@@ -53,7 +53,6 @@ class SocketController(http.Controller):
     def process_lc_data(self, **kw):
         try:
             message = json.loads(kw['message']) if kw['message'] else None
-            
             if not message:
                 return {'status': 200, 'message': 'Empty message'}
             
@@ -62,7 +61,6 @@ class SocketController(http.Controller):
                 return {'status': 400, 'message': 'Missing subscriptionId'}
             
             lc_devices = request.env['smo.device.lc'].search([('smo_device_id', '=', smo_device_id)])
-            
             if not lc_devices:
                 _logger.warning("No devices found for subscription ID %s", smo_device_id)
                 return {'status': 404, 'message': 'No matching devices found'}
