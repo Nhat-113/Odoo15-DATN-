@@ -96,10 +96,14 @@ class SettingDevice(models.Model):
 
     @api.model
     def create(self, vals):
-        device_ids = vals['device_ids'][0][2]
-        week_day = get_day_of_week_value(vals)
+        if not isinstance(vals['device_ids'][0], (int)):
+            device_ids = vals['device_ids'][0][2]
+        else:
+            device_ids = vals['device_ids']
+
         start_time = convert_string_to_time(vals['start_time'])
         end_time = convert_string_to_time(vals['end_time'])
+        week_day = get_day_of_week_value(vals)
         
         if start_time >= end_time:
             raise exceptions.ValidationError("Start Time cannot be greater than End Time.")
@@ -127,15 +131,40 @@ class SettingDevice(models.Model):
         return super(SettingDevice, self).create(vals)
 
     def write(self, vals):
-        edit = super(SettingDevice, self).write(vals)
-        device_ids = self.device_ids.ids
-        week_day = get_day_of_week_value(self)
+        if "status" in vals and vals['status'] == "active":
+            self.update({"active": True})
+
         start_time = convert_string_to_time(self.start_time)
         end_time = convert_string_to_time(self.end_time) 
+        if "device_ids" in vals:
+            vals_divices = vals["device_ids"][0][2]
+            if len(vals_divices) < len(self.device_ids):
+                devices_removed = list(set(self.device_ids.ids) - set(vals_divices))
+                devices = self.env['box.management'].search([('id', 'in', devices_removed)])
+                data_news = {
+                    "name": self.name,
+                    "start_time": self.start_time,
+                    "end_time": self.end_time,
+                    "device_ids": devices.ids,
+                    "status": "inactive",
+                    "active": False,
+                    "mon": self.mon,
+                    "tue": self.tue,
+                    "wed": self.wed,
+                    "thu": self.thu,
+                    "fri": self.fri,
+                    "sat": self.sat,
+                    "sun": self.sun
+                }
+                self.create(data_news)
+
+        edit = super(SettingDevice, self).write(vals)
+        device_ids = self.device_ids.ids
 
         if start_time >= end_time:
             raise exceptions.ValidationError("Start Time cannot be greater than End Time.")
 
+        week_day = get_day_of_week_value(self)
         if not any(week_day):
             raise exceptions.ValidationError(_("Please select at least one day of the week"))
 
@@ -168,13 +197,13 @@ class SettingDevice(models.Model):
                 )
 
     def unlink(self):
-        return super(SettingDevice, self).write({"active": False})
+        return super(SettingDevice, self).write({"active": False, "status": "inactive"})
 
     def action_archive(self):   
-        return super(SettingDevice, self).write({"active": False})
+        return super(SettingDevice, self).write({"active": False, "status": "inactive"})
 
     def action_unarchive(self):
-        return super(SettingDevice, self).write({"active": True})
+        return super(SettingDevice, self).write({"active": True, "status": "active"})
 
 
     # def _update_sequence_down(self):
