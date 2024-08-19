@@ -69,6 +69,7 @@ class SettingDevice(models.Model):
     status = fields.Selection(
         string="Status",
         default="active",
+        required=True, 
         selection=[
             ("active", "Active"),
             ("inactive", "Inactive"),
@@ -126,47 +127,69 @@ class SettingDevice(models.Model):
                     active=True,
                     status=vals['status']
                 )
+            new_record = super(SettingDevice, self).create(vals)
+        
+            if devices:
+                for device in devices:
+                    self.env['schedule.device.rel'].create({
+                        'schedule_id': new_record.id,
+                        'device_id': device.device_id,
+                        'active': True, 
+                    })
 
-        # self._update_sequence_up()
-        return super(SettingDevice, self).create(vals)
+        return new_record
 
     def write(self, vals):
-        if "status" in vals and vals['status'] == "active":
-            self.update({"active": True})
-
         start_time = convert_string_to_time(self.start_time)
         end_time = convert_string_to_time(self.end_time) 
-        if "device_ids" in vals:
-            vals_divices = vals["device_ids"][0][2]
-            if len(vals_divices) < len(self.device_ids):
-                devices_removed = list(set(self.device_ids.ids) - set(vals_divices))
-                devices = self.env['box.management'].search([('id', 'in', devices_removed)])
-                data_news = {
-                    "name": self.name,
-                    "start_time": self.start_time,
-                    "end_time": self.end_time,
-                    "device_ids": devices.ids,
-                    "status": "inactive",
-                    "active": False,
-                    "mon": self.mon,
-                    "tue": self.tue,
-                    "wed": self.wed,
-                    "thu": self.thu,
-                    "fri": self.fri,
-                    "sat": self.sat,
-                    "sun": self.sun
-                }
-                self.create(data_news)
-
-        edit = super(SettingDevice, self).write(vals)
-        device_ids = self.device_ids.ids
-
         if start_time >= end_time:
             raise exceptions.ValidationError("Start Time cannot be greater than End Time.")
 
         week_day = get_day_of_week_value(self)
         if not any(week_day):
             raise exceptions.ValidationError(_("Please select at least one day of the week"))
+
+        if "device_ids" in vals:
+            vals_divices = vals["device_ids"][0][2]
+            if len(vals_divices) < len(self.device_ids):
+                devices_removed = list(set(self.device_ids.ids) - set(vals_divices))
+                devices = self.env['box.management'].search([('id', 'in', devices_removed)])
+                device_id = []
+                for device in devices:
+                    device_id.append(device.device_id)
+
+                schedule_rel = self.env['schedule.device.rel'].search([('schedule_id', '=', self.id), ('device_id', 'in', device_id)])
+                data_update = {
+                    "active": False,
+                }
+                schedule_rel.update(data_update)
+            else:
+                devices = self.env['box.management'].search([('id', 'in', vals_divices)])
+                schedule_rel = self.env['schedule.device.rel'].search([('schedule_id', '=', self.id)])
+                if schedule_rel:
+                    for item in devices:
+                        data_update = {
+                            'device_id': item.device_id,
+                            'active': True, 
+                        }
+                        schedule_rel.update(data_update)
+                else:
+                    for item in devices:
+                        data_update = {
+                            'schedule_id': self.id,
+                            'device_id': item.device_id,
+                            'active': True, 
+                        }
+                        schedule_rel.create(data_update)
+
+        edit = super(SettingDevice, self).write(vals)
+        device_ids = self.device_ids.ids
+
+        if "status" in vals and vals['status'] == "active":
+            self.update({"active": True})
+        elif "status" in vals and vals['status'] == "inactive":
+            schedule_rel = self.env['schedule.device.rel'].search([('schedule_id', '=', self.id)])
+            schedule_rel.update({"active": False})
 
         if device_ids:
             get_settings = self.env['setting.device'].search([("device_ids", 'in', device_ids), ('id', '!=', self.id)])
@@ -197,9 +220,13 @@ class SettingDevice(models.Model):
                 )
 
     def unlink(self):
+        schedule_rel = self.env['schedule.device.rel'].search([('schedule_id', 'in', self.ids)])
+        schedule_rel.update({"active": False})
         return super(SettingDevice, self).write({"active": False, "status": "inactive"})
 
     def action_archive(self):   
+        schedule_rel = self.env['schedule.device.rel'].search([('schedule_id', 'in', self.ids)])
+        schedule_rel.update({"active": False})
         return super(SettingDevice, self).write({"active": False, "status": "inactive"})
 
     def action_unarchive(self):
