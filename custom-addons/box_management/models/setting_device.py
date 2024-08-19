@@ -181,10 +181,11 @@ class SettingDevice(models.Model):
         edit = super(SettingDevice, self).write(vals)
         device_ids = self.device_ids.ids
 
+        schedule_rel = self.env['schedule.device.rel'].sudo().with_context(active_test=False).search([('schedule_id', '=', self.id)])
         if "status" in vals and vals['status'] == "active":
+            schedule_rel.update({"active": True})
             self.update({"active": True})
         elif "status" in vals and vals['status'] == "inactive":
-            schedule_rel = self.env['schedule.device.rel'].search([('schedule_id', '=', self.id)])
             schedule_rel.update({"active": False})
 
         if device_ids:
