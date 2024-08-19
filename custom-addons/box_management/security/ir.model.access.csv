@@ -8,3 +8,4 @@ access.passcode.register.admin,access_passcode_register_admin,box_management.mod
 access.passcode.register.admin,access_passcode_register_admin,box_management.model_passcode_register,group_facelog_device_admin,1,1,1,1
 access.setting.device.admin,access_setting_device_admin,box_management.model_setting_device,group_facelog_device_admin,1,1,1,1
 access.setting.device.hr,access_setting_device_hr,box_management.model_setting_device,group_facelog_device_hr,1,1,1,1
+access.setting.device.rel.hr,access_setting_device_rel_hr,box_management.model_schedule_device_rel,group_facelog_device_hr,1,1,1,1

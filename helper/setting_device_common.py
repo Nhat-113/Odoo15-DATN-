@@ -19,9 +19,12 @@ def create_update_setting(device_id, settings, start_time, end_time, week_day, s
         end = convert_string_to_time(rec.end_time)
         rec_week_day = get_day_of_week_value(rec)
         
-        if is_overlapped_time([(start, end), (start_time, end_time)]) and status == "active" and active:
-            if any(x and y for x, y in zip(week_day, rec_week_day)):
-                raise exceptions.ValidationError(
-                    _("Device ID %(id)s was set from %(start)s to %(end)s on the same days.", 
-                      id=device_id, start=start, end=end)
-                )
+        if status=="active" and active and rec.status=="active":
+                if is_overlapped_time([(start, end), (start_time, end_time)]):
+                    if any(x and y for x, y in zip(week_day, rec_week_day)):
+                        raise exceptions.ValidationError(
+                            _("Device ID %(id)s was set from %(start)s to %(end)s on the same days.", 
+                            id=device_id, start=start, end=end)
+                    )
+        else:
+            return

@@ -9,3 +9,4 @@ from . import attendance_device_details_app
 from . import hr_attendance
 from . import hr_attendance_pseudo
 from . import setting_device
+from . import schedule_device_rel

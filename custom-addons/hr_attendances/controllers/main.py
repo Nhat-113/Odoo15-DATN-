@@ -437,11 +437,12 @@ class HrEmployees(http.Controller):
 
                 total_passcode_update = request.env['passcode.register'].sudo().with_context(active_test=False).search_count([("device_ids", "=", device_id), ('write_date', '>', last_synced_timestamp)])
                 total_setting_update = request.env['setting.device'].sudo().with_context(active_test=False).search_count([("device_ids", "=", device_id), ('write_date', '>', last_synced_timestamp)])
+                total_setting_rel_update = request.env['schedule.device.rel'].sudo().with_context(active_test=False).search_count([("device_id", "=", device_id), ('write_date', '>', last_synced_timestamp)])
                 response_data = {
                     "status": 200,
                     "employee": "1" if total_emp_update > 0 else "0",
                     "passcode": "1" if total_passcode_update > 0 else "0",
-                    "time_setting": "1" if total_setting_update > 0 else "0" 
+                    "time_setting": "1" if total_setting_update or total_setting_rel_update > 0 else "0" ,
                 }
             return response_data
         except Exception as e:
