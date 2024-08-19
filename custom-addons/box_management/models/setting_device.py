@@ -108,6 +108,7 @@ class SettingDevice(models.Model):
         if not any(week_day):
             raise exceptions.ValidationError(_("Please select at least one day of the week"))
 
+        new_record = super(SettingDevice, self).create(vals)
         if device_ids:
             get_settings = self.env['setting.device'].search([("device_ids", 'in', device_ids)])
             devices = self.env['box.management'].browse(device_ids)
@@ -123,16 +124,12 @@ class SettingDevice(models.Model):
                     active=True,
                     status=vals['status']
                 )
-            new_record = super(SettingDevice, self).create(vals)
-        
-            if devices:
-                for device in devices:
-                    self.env['schedule.device.rel'].create({
+                self.env['schedule.device.rel'].create({
                         'schedule_id': new_record.id,
                         'device_id': device.device_id,
                         'active': True, 
                     })
-
+        
         return new_record
 
     def write(self, vals):
