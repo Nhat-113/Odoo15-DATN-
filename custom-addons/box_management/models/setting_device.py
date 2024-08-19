@@ -97,11 +97,7 @@ class SettingDevice(models.Model):
 
     @api.model
     def create(self, vals):
-        if not isinstance(vals['device_ids'][0], (int)):
-            device_ids = vals['device_ids'][0][2]
-        else:
-            device_ids = vals['device_ids']
-
+        device_ids = vals['device_ids'][0][2]
         start_time = convert_string_to_time(vals['start_time'])
         end_time = convert_string_to_time(vals['end_time'])
         week_day = get_day_of_week_value(vals)
