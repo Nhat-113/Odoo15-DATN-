@@ -387,14 +387,22 @@ class ExportWizard(models.TransientModel):
         boxColLast = boxColFirst + data['end_month'] - 1
         boxRowLast = len({item['employee_id'] for item in attendances}) + row - 1
         
+        # get today in format d/m
+        current_day_str = str(date.today().day) + "/" + str(date.today().month)
+        current_date_index = day_indexs.get(current_day_str, None)
+        current_date = date.today().strftime('%Y-%m-%d')
+        start_date = data.get('start_date')
         # write all cells to default values OFF
         for r in range(boxRowFirst, boxRowLast + 1):
             sheet.set_row(r, 16)
             for c in range(boxColFirst, boxColLast + 1):
-                if c - 3 > day_indexs.get(str(date.today().day) + "/" + str(date.today().month), 0):  # apply format to future days
+                if start_date > current_date: #start_date > current
                     sheet.write_string(r, c, '', self.format(workbook, cell_default))
-                else:
-                    sheet.write_string(r, c, OFF, self.format(workbook, off_format))
+                else: #start_date < current
+                    if current_date_index is None or c - 3 <= current_date_index: # end date <= current
+                        sheet.write_string(r, c, OFF, self.format(workbook, off_format))
+                    else: # end date > current
+                        sheet.write_string(r, c, '', self.format(workbook, cell_default))
         
         index = 0
         employee_writeds = {}   # {"employee_id": "row_index"}
@@ -641,12 +649,29 @@ class ExportWizard(models.TransientModel):
         approved_time_off_map = {}
         approved_wfh_map = {}
         approved_unpaid_map = {}
-        
+
+        # Get working time for company
+        company_calendars = self.env['resource.calendar'].search([('company_id', 'in', company_ids)])
+        calendar_working_days = {calendar.id: calendar.attendance_ids.mapped('dayofweek') for calendar in company_calendars}
+
+        # leave in approved_leaves
         for leave in approved_leaves:
             emp_id = str(leave.employee_id.id)
+            calendar_id = leave.employee_id.resource_calendar_id.id
+
+            if not calendar_id:
+                continue
+
             leave_days = pd.date_range(leave.request_date_from, leave.request_date_to, freq='D')
+            working_days = [int(day) for day in calendar_working_days.get(calendar_id, [])]
+
             for leave_day in leave_days:
                 day_str = leave_day.strftime('%-d/%-m')
+                day_of_week = leave_day.weekday()
+
+                # check day isn't working days
+                if day_of_week not in working_days:
+                    continue
                 
                 if leave.holiday_status_id.id in time_off_type_ids:
                     if leave.request_unit_half:
