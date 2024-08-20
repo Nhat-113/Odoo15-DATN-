@@ -131,8 +131,26 @@ def handle_facelog_process_box_io(datas, attendance, pseudo_attendance, is_multi
                 create_attendance_device_details(data_details, pseudo_attendance)
             message += "Check out"
         else:
-            create_attendance_device_details(data_details, create_attendance(datas, is_multiple_mode))
-            message += "Check in"
+            if is_multiple_mode:
+                create_attendance_device_details(data_details, create_attendance(datas, is_multiple_mode))
+                message += "Check in"
+            else:
+                validate_end_time(attendance.check_in, datas['timeutc'])
+                attendance.write({"check_out": datas['timeutc']})
+                
+                if pseudo_attendance and not pseudo_attendance.check_out:
+                    validate_end_time(pseudo_attendance.check_in, datas['timeutc'])
+                    pseudo_attendance.write({"check_out": datas['timeutc']})
+                    create_attendance_device_details(data_details, pseudo_attendance)
+                else:
+                    data_updates = {
+                        "employee_id": datas['employee_id'].id,
+                        "check_in": datas['timeutc'],
+                        "is_multiple": is_multiple_mode
+                    }
+                    pseudo = request.env['hr.attendance.pesudo'].create(data_updates)
+                    create_attendance_device_details(data_details, pseudo)
+                message += "Check out"
     else:
         create_attendance_device_details(data_details, create_attendance(datas, is_multiple_mode))
         message += "Check in"
