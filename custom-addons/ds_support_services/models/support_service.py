@@ -80,7 +80,6 @@ class SupportServices(models.Model):
     check_readonly_field_project = fields.Boolean(default=False, compute='compute_domain_readonly_project')
 
     actual_payment = fields.Monetary(string='Actual payment', tracking=True, currency_field='currency_vnd')
-    cost_type_project = fields.Boolean(default=False)
 
     @api.onchange('project_id', 'category', 'get_month_tb')
     def get_member_line(self):
@@ -154,7 +153,6 @@ class SupportServices(models.Model):
             if request.category.type_category == 'team_building' or \
                 request.category.type_category in ['it_helpdesk', 'other'] and request.cost_type.type_cost == 'cost_project':
                 request.check_invisible_project_id = False
-                request.cost_type_project = True
             else:
                 request.check_invisible_project_id = True
     
@@ -466,14 +464,14 @@ class SupportServices(models.Model):
                         self.env['expense.general'].create({
                             'expense_management_id': expense_management_id.id,
                             'category_expenses': request.category_expense.id,
-                            'total_expenses': request.amount_it_other,
+                            'total_expenses': request.actual_payment,
                             'description': request.name
                         })
                     else:
                         self.env['expense.activity'].create({
                             'expense_management_id': expense_management_id.id,
                             'category_expenses': request.category_expense.id,
-                            'total_expenses': request.amount_it_other,
+                            'total_expenses': request.actual_payment,
                             'description': request.name
                         })
                 elif request.cost_type.type_cost == 'cost_department':
@@ -498,8 +496,8 @@ class SupportServices(models.Model):
                             'project_expense_management_id': department_expense_management_id.id,
                             'name': request.name,
                             'expense_date': request.date_request,
-                            'total_expenses': request.amount_it_other,
-                            'expense_vnd': request.amount_it_other
+                            'total_expenses': request.actual_payment,
+                            'expense_vnd': request.actual_payment
                         })
                     else:
                         self.env['project.expense.value'].create({
@@ -507,7 +505,7 @@ class SupportServices(models.Model):
                             'name': request.name,
                             'expense_date': request.date_request,
                             'total_expenses': 0,
-                            'expense_vnd': request.amount_it_other
+                            'expense_vnd': request.actual_payment
                         })
                 else:
                     project_expense = self.env['project.expense.management'].search([
