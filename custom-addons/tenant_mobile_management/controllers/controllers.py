@@ -15,21 +15,29 @@ class check_api(http.Controller):
                 }, 400)
 
             tenant = request.env["tenant.management"].sudo().search([('server_name', '=', kw.get("server_name"))])
-            door_information_list = [
+            box_login_infor = {
+                'box_username': tenant.box_username or '',
+                'box_password': tenant.box_password or '',
+                'box_url': tenant.box_url or ''
+            }
+            device_information_list = [
                 {
-                    'door_name': door.name,
-                    'door_link': door.link
-                } for door in tenant.door_ids]
+                    'device_name': device.name,
+                    'device_id': device.device_id,
+                    'device_description': device.description or ''
+                } for device in tenant.device_ids]
 
             if tenant:
                 data = {
                     'link_domain': tenant.link_domain,
                     'allow_to_open': tenant.allow_to_open,
-                    'face_detection_link': tenant.face_detection_link,
-                    'door_information_list': []
+                    'face_detection_link': tenant.face_detection_link or '',
+                    'box_login_infor': {},
+                    'device_information_list': []
                 }
                 if tenant.allow_to_open:
-                    data['door_information_list'] = door_information_list
+                    data['device_information_list'] = device_information_list
+                    data['box_login_infor'] = box_login_infor
                 return jsonResponse(data, 200)
             else:
                 return jsonResponse({

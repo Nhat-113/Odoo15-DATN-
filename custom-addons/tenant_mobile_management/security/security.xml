@@ -14,9 +14,9 @@
             <field name="perm_unlink" eval="True"/>
         </record>
 
-        <record id="access_door_information_admin" model="ir.model.access">
-            <field name="name">Administrator Access to Door Information</field>
-            <field name="model_id" ref="model_door_information"/>
+        <record id="access_device_information_admin" model="ir.model.access">
+            <field name="name">Administrator Access to Device Information</field>
+            <field name="model_id" ref="model_device_information"/>
             <field name="group_id" ref="group_tenant_mobile_management_admin"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>

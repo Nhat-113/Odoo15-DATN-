@@ -13,8 +13,11 @@ class Tenant(models.Model):
     description = fields.Text(string= 'Description', tracking= True)
     sequence = fields.Integer(string= 'No.')
     allow_to_open = fields.Boolean(string= 'Allow To Open', default= False, tracking= True)
-    door_ids = fields.One2many('door.information', 'tenant_id', string="Doors")
-    face_detection_link = fields.Char(string= 'Face Detection Link')
+    device_ids = fields.One2many('device.information', 'tenant_id', string="devices")
+    face_detection_link = fields.Char(string= 'Face Detection Link', tracking= True)
+    box_username = fields.Char(string= 'Box User Name', tracking= True)
+    box_password = fields.Char(string= 'Box Password', tracking= True)
+    box_url = fields.Char(string= 'Box URL', tracking= True)
 
     @api.model
     def create(self, vals):

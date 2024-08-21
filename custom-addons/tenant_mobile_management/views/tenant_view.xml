@@ -30,17 +30,21 @@
                             <field name = "link_domain"/>
                             <field name = "description"/>
                         </group>
-                        <separator string="For remote time tracking and door access"/>
+                        <separator string="For remote time tracking and device access"/>
                         <group>
-                            <field name = "allow_to_open"/>
-                            <field name = "face_detection_link"/>
+                            <field name="allow_to_open"/>
+                            <field name="face_detection_link"/>
+                            <field name="box_username"/>
+                            <field name="box_password"/>
+                            <field name="box_url"/>
                         </group>
                         <notebook>
-                            <page string="Door Information">
-                                <field name="door_ids">
+                            <page string="Device Information">
+                                <field name="device_ids">
                                     <tree editable="bottom">
                                         <field name="name" class = "tenant-white-space"/>
-                                        <field name="link" class = "tenant-white-space"/>
+                                        <field name="device_id" class = "tenant-white-space"/>
+                                        <field name="description" class = "tenant-white-space"/>
                                     </tree>
                                 </field>
                             </page>
