@@ -3,12 +3,16 @@ from odoo.exceptions import UserError
 from odoo.tools.translate import _
 from dateutil.relativedelta import relativedelta
 
+PAST_LIMIT_IN_DAY = 3
 
 class HrLeave(models.Model):
     _inherit = 'hr.leave'
     
     inform_to = fields.Many2many('hr.employee', 'hr_leave_employee_inform_rel', 'hr_leave_id', 'employee_id', store=True, string="Inform to")
-    new_inform_to = fields.Many2many('hr.employee', 'hr_leave_employee_inform_rel', 'hr_leave_id', 'employee_id', string="New inform to")  
+    new_inform_to = fields.Many2many('hr.employee', 'hr_leave_employee_inform_rel', 'hr_leave_id', 'employee_id', string="New inform to")
+    extra_approvers = fields.Many2many('hr.employee', 'hr_leave_employee_extra_approvers_rel', 'hr_leave_id', 'employee_id',
+                            string="Extra Approvers", compute="_compute_extra_approvers", store=True, readonly=True)
+    
     def add_follower(self, employee_id):
         employee = self.env['hr.employee'].browse(employee_id)
         followers = employee.user_id.partner_id.ids + self.inform_to.user_id.partner_id.ids
@@ -32,10 +36,9 @@ class HrLeave(models.Model):
         is_officer = user.has_group('hr_holidays.group_hr_holidays_user') or self.env.is_superuser()
 
         if not is_officer:
-            past_limit_in_day = 3
-            crr_past_date_limit = fields.Date.today() - relativedelta(days=past_limit_in_day)
+            crr_past_date_limit = fields.Date.today() - relativedelta(days=PAST_LIMIT_IN_DAY)
             if any(hol.date_from.date() < crr_past_date_limit and hol.employee_id.leave_manager_id != user for hol in self):
-                raise UserError(_(f'You must have manager rights to modify/validate a time off that already begun over {past_limit_in_day} days ago.'))
+                raise UserError(_(f'You must have manager rights to modify/validate a time off that already begun over {PAST_LIMIT_IN_DAY} days ago.'))
             
             leaves = self._get_leaves_on_public_holiday()
             if leaves:
@@ -69,23 +72,31 @@ class HrLeave(models.Model):
             for holiday in self:
                 holiday.add_follower(employee_id)
         return result
-    
-    extra_approvers = fields.Many2many('hr.employee', 'hr_leave_employee_extra_approvers_rel', 'hr_leave_id', 'employee_id',
-                            string="Extra Approvers", compute="_compute_extra_approvers", store=True, readonly=True)
-    
+
     @api.depends('date_from', 'date_to')
     def _compute_extra_approvers(self):
         now = fields.Datetime.now()
+        user_company = self.env.user.company_id
+        
         running_projects = self.env['project.project'].search([
             ('date_start', '<=', now),
             ('date', '>=', now)
         ])
-        pm_ids = [project.user_id.employee_id.id for project in running_projects]
+        
+        pm_ids = [
+            project.user_id.employee_id.id 
+            for project in running_projects
+            if project.user_id.company_id == user_company
+            and project.user_id != self.env.user.leave_manager_id
+            and project.user_id != self.env.user
+            and project.user_id.employee_id
+        ]
+        
         for leave in self:
             leave.extra_approvers = [(6, 0, pm_ids)]
-    
+
     @api.onchange('extra_approvers')
-    def _onchange_extra_approvers(self):
+    def _inform_to_extra_approvers(self):
         for leave in self:
             leave.inform_to = [(6, 0, leave.extra_approvers.ids)]
     
@@ -98,13 +109,7 @@ class HrLeave(models.Model):
         for leave in self:
             if leave._is_an_extra_approvers():
                 leave.name = leave.sudo().private_name
-                
-    def _inverse_description(self):
-        super(HrLeave, self)._inverse_description()
-        for leave in self:
-            if leave._is_an_extra_approvers():
-                leave.name = leave.sudo().private_name
-                
+
     @api.ondelete(at_uninstall=False)
     def _check_unlink_rights(self):
         crr_user = self.env.user

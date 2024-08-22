@@ -5,9 +5,6 @@ class HrLeaveReportCalendar(models.Model):
     
     employee_id_public = fields.Many2one('hr.employee.public', string='Employee', compute='_compute_employee_id_public')
     
-    def _check_read_hr_employee(self):
-        return self.env.user.has_group('hr.group_hr_user')
-    
     @api.depends('employee_id')
     def _compute_employee_id_public(self):
         employee_ids = self.mapped('employee_id.id')
