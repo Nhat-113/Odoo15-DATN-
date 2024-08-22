@@ -127,19 +127,44 @@ class HrAttendance(models.Model):
         
         return super(HrAttendance, self).unlink()
 
-    @api.constrains('check_in', 'check_out')
-    def _change_pesudo_data(self):
-        changed_record = self.env['hr.attendance.pesudo'].search([
-            ('employee_id', '=', self.employee_id.id), 
-            '|',
-            ('check_in', '=', self.check_in),
-            ('check_out', '=', self.check_out)
-        ])
+    @api.model
+    def create(self, vals):
+        data_new = {
+            "employee_id": vals['employee_id'],
+            "check_in": vals['check_in'],
+            "check_out": vals['check_out'] if 'check_out' in vals else False
+        }
+        if 'from_mobile' not in vals and 'from_box' not in vals:
+            self.env['hr.attendance.pesudo'].create(data_new)
+        vals.pop('from_mobile', None)
+        vals.pop('from_box', None)
+        return super(HrAttendance, self).create(vals)
 
-        changed_record.update({
-            "check_in": self.check_in,
-            "check_out": self.check_out
-        })
+    def _change_pesudo(self, vals, type_changed, multiple_mode):
+        domain = [('employee_id', '=', self.employee_id.id), ('location_date', '=', self.location_date)]
+        pseudo_attendance_model = self.env['hr.attendance.pesudo']
+
+        if multiple_mode:
+            domain.append((type_changed, '=', self[type_changed]))
+            changed_record = pseudo_attendance_model.search(domain)
+            changed_record.update(vals)
+        else:
+            pseudo_attendance = pseudo_attendance_model.search(domain)
+            if pseudo_attendance:
+                pseudo_attendance = pseudo_attendance.sorted(key=lambda x: x.check_in or x.check_out, reverse=True)
+                latest_pseudo = pseudo_attendance[0]
+                earliest_pseudo = pseudo_attendance[-1]
+
+                if type_changed == 'check_in':
+                    earliest_pseudo.update(vals)
+                else:
+                    latest_pseudo.update(vals)     
+
+    def write(self, vals):
+        if 'from_box' not in vals:
+            multiple_mode = self.env.user.company_id.attendance_view_type
+            self._change_pesudo(vals, next(iter(vals)), multiple_mode)
+        return super(HrAttendance, self).write({next(iter(vals)): vals[next(iter(vals))]})
 
 
 class HrAttendancePesudo(models.Model):
@@ -152,8 +177,11 @@ class HrAttendancePesudo(models.Model):
     check_in = fields.Datetime(string="Check In")
     check_out = fields.Datetime(string="Check Out")
     worked_hours = fields.Float(string='Worked Hours', compute='_compute_convert_datetime', store=True, readonly=True)
+    is_admin_system = fields.Boolean(compute='_compute_group_of_user', store=False, required=False)
     
     
+    def _compute_group_of_user(self):
+        self.is_admin_system = self.env.user.has_group('base.group_system')
     
     @api.depends('check_in', 'check_out')
     def _compute_convert_datetime(self):
