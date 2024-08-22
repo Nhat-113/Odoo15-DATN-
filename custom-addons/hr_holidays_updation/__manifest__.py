@@ -16,6 +16,7 @@
         'data/hr_holidays_parameter_system.xml',
         'views/hr_leave_views.xml',
         'data/inform_to_mail.xml',
+        'views/hr_leave_report_calendar.xml'
     ],
     'assets': {
         'web.assets_backend': [

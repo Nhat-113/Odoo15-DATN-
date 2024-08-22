@@ -1,0 +1,16 @@
+<odoo>
+    <record id="hr_leave_report_calendar_view_form_inherit" model="ir.ui.view">
+        <field name="name">hr.leave.report.calendar.view.form.inherit</field>
+        <field name="model">hr.leave.report.calendar</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_report_calendar_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_id']" position="replace">
+                <field name="employee_id" groups="hr.group_hr_user"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='employee_id']" position="after">
+                <field name="employee_id_public" groups="!hr.group_hr_user"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
