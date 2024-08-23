@@ -40,7 +40,7 @@ def attendance_multi_record_mode(datas, attendance, pseudo_attendance, is_multip
             "employee_id": datas['employee_id'].id,
             "check_in": datas['timeutc'],
             "is_multiple": is_multiple_mode,
-            "from_box": True
+            "from_api": True
         }
         request.env['hr.attendance'].create(data_news)
         pseudo = request.env['hr.attendance.pesudo'].create(data_news)
@@ -52,12 +52,12 @@ def attendance_multi_record_mode(datas, attendance, pseudo_attendance, is_multip
             "check_out": datas['timeutc'],
             "check_in": False,
             "is_multiple": is_multiple_mode,
-            "from_box": True
+            "from_api": True
         }
         
         if attendance and not attendance.check_out:
             validate_end_time(attendance.check_in, datas['timeutc'])
-            attendance.write({"check_out": datas['timeutc'], "from_box": True})
+            attendance.write({"check_out": datas['timeutc'], "from_api": True})
         else:
             request.env['hr.attendance'].create(data_updates)
 
@@ -82,11 +82,11 @@ def attendance_single_record_mode(datas, attendance, pseudo_attendance, is_multi
             "employee_id": datas['employee_id'].id,
             "check_in": datas['timeutc'],
             "is_multiple": is_multiple_mode,
-            "from_box": True
+            "from_api": True
         }
         if not attendance:
             request.env['hr.attendance'].create(data_news)
-        data_news.pop("from_box", None)
+        data_news.pop("from_api", None)
         pseudo = request.env['hr.attendance.pesudo'].create(data_news)
         create_attendance_device_details(data_details, pseudo)
         message += "Check in"
@@ -99,7 +99,7 @@ def attendance_single_record_mode(datas, attendance, pseudo_attendance, is_multi
         
         if attendance:
             validate_end_time(attendance.check_in, datas['timeutc'])
-            attendance.write({"check_out": datas['timeutc'], "from_box": True})
+            attendance.write({"check_out": datas['timeutc'], "from_api": True})
         
         if pseudo_attendance and not pseudo_attendance.check_out:
             validate_end_time(pseudo_attendance.check_in, datas['timeutc'])
@@ -160,12 +160,12 @@ def handle_facelog_process_box_io(datas, attendance, pseudo_attendance, is_multi
         message += "Check in"
     return message
 
-def create_attendance(datas, is_multiple_mode, from_mobile):
+def create_attendance(datas, is_multiple_mode):
     data_news = {
         "employee_id": datas['employee_id'].id,
         "check_in": datas['timeutc'],
         "is_multiple": is_multiple_mode,
-        "from_mobile": from_mobile
+        "from_api": True
     }
     request.env['hr.attendance'].create(data_news)
     pseudo = request.env['hr.attendance.pesudo'].create(data_news)
