@@ -46,22 +46,6 @@ class ProjectExpense(models.Model):
     
     project_expense_value_ids = fields.One2many('project.expense.value', 'project_expense_management_id', string="Project Expense Value")
     
-    
-    @api.onchange('project_id')
-    def _get_project_expense_value(self):
-        if not self.project_id:
-            return
-
-        expenses = self.env['project.expense.value'].sudo().search([('project_id', '=', self.project_id.id)])
-
-        values = [(0, 0, {
-            "name": rec.name,
-            "expense_date": rec.expense_date,
-            "total_expenses": rec.total_expenses,
-            "description": rec.description
-        }) for rec in expenses]
-
-        self.update({"project_expense_value_ids": values})
 
     # Remove option in filters, group by from dropdown Search action in formview
     @api.model
