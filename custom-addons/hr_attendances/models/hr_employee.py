@@ -37,7 +37,17 @@ class HrEmployee(models.Model):
             rec.sync_write_date = current_date
 
     def unlink(self):
-        self.active = False
+        for record in self:
+            record.active = False
+            record.departure_date = fields.Date.today()
+            
+        contract_records = self.env['hr.contract'].search([
+            ('employee_id', 'in', self.ids),
+            ('state', '=', 'open')
+        ])
+        for contract in contract_records:
+            contract.write({'date_end': fields.Date.today()})
+
 
     def attendance_manual_api(self, employee, date_time, next_action, is_checkin, entered_pin=None):
         employee.ensure_one()
