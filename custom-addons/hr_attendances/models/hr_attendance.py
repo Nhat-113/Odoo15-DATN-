@@ -134,10 +134,9 @@ class HrAttendance(models.Model):
             "check_in": vals['check_in'],
             "check_out": vals['check_out'] if 'check_out' in vals else False
         }
-        if 'from_mobile' not in vals and 'from_box' not in vals:
+        if 'from_api' not in vals:
             self.env['hr.attendance.pesudo'].create(data_new)
-        vals.pop('from_mobile', None)
-        vals.pop('from_box', None)
+        vals.pop('from_api', None)
         return super(HrAttendance, self).create(vals)
 
     def _change_pesudo(self, vals, type_changed, multiple_mode):
@@ -161,7 +160,7 @@ class HrAttendance(models.Model):
                     latest_pseudo.update(vals)     
 
     def write(self, vals):
-        if 'from_box' not in vals:
+        if 'from_api' not in vals:
             multiple_mode = self.env.user.company_id.attendance_view_type
             self._change_pesudo(vals, next(iter(vals)), multiple_mode)
         return super(HrAttendance, self).write({next(iter(vals)): vals[next(iter(vals))]})
