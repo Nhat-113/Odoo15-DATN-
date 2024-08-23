@@ -125,13 +125,10 @@ def handle_facelog_process_box_io(datas, attendance, pseudo_attendance, is_multi
         }
     if attendance and attendance.check_in:
         if not attendance.check_out:
-            data_updates = {
-                "check_out": datas['timeutc']
-            }
             validate_end_time(attendance.check_in, datas['timeutc'])
-            attendance.write(data_updates)
+            attendance.write({"check_out": datas['timeutc'], "from_api": True})
             if pseudo_attendance:
-                pseudo_attendance.write(data_updates)
+                pseudo_attendance.write({"check_out": datas['timeutc']})
                 create_attendance_device_details(data_details, pseudo_attendance)
             message += "Check out"
         else:
@@ -140,7 +137,7 @@ def handle_facelog_process_box_io(datas, attendance, pseudo_attendance, is_multi
                 message += "Check in"
             else:
                 validate_end_time(attendance.check_in, datas['timeutc'])
-                attendance.write({"check_out": datas['timeutc']})
+                attendance.write({"check_out": datas['timeutc'], "from_api": True})
                 
                 if pseudo_attendance and not pseudo_attendance.check_out:
                     validate_end_time(pseudo_attendance.check_in, datas['timeutc'])
