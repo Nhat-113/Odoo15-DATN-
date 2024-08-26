@@ -48,7 +48,7 @@ class Contract(models.Model):
 
     def write(self, vals):
         vals_olds = ['wage', 'non_taxable_allowance', 'taxable_allowance']
-        salary_old = self.env['hr.contract'].search([('id', '=', self.id)])
+        salary_old = self.env['hr.contract'].search([('id', 'in', self.ids)])
         for vals_old in vals_olds:
             if vals_old in vals:
                 self.env['hr.contract.old'].search([]).create({
