@@ -14,12 +14,12 @@ def extract_hour_minute(time_string):
 def create_attendance_device_details(datas, pseudo):
     if "location_id" in datas:
         datas["pseudo_attendance_id_app"] = pseudo.id
-        pseudo.update({
+        pseudo.sudo().update({
         "attendance_device_details_app": [(0,0, datas)]
     })
     else:
         datas["pseudo_attendance_id"] = pseudo.id
-        pseudo.update({
+        pseudo.sudo().update({
             "attendance_device_details": [(0,0, datas)]
         })
 
@@ -43,7 +43,7 @@ def attendance_multi_record_mode(datas, attendance, pseudo_attendance, is_multip
             "from_api": True
         }
         request.env['hr.attendance'].create(data_news)
-        pseudo = request.env['hr.attendance.pesudo'].create(data_news)
+        pseudo = request.env['hr.attendance.pesudo'].sudo().create(data_news)
         create_attendance_device_details(data_details, pseudo)
         message += "Check in"
     else:
@@ -62,10 +62,10 @@ def attendance_multi_record_mode(datas, attendance, pseudo_attendance, is_multip
             request.env['hr.attendance'].create(data_updates)
 
         if pseudo_attendance and not pseudo_attendance.check_out:
-            pseudo_attendance.write({"check_out": datas['timeutc']})
+            pseudo_attendance.sudo().write({"check_out": datas['timeutc']})
             create_attendance_device_details(data_details, pseudo_attendance)
         else:
-            pseudo = request.env['hr.attendance.pesudo'].create(data_updates)
+            pseudo = request.env['hr.attendance.pesudo'].sudo().create(data_updates)
             create_attendance_device_details(data_details, pseudo)
         
         message += "Check out"
@@ -87,7 +87,7 @@ def attendance_single_record_mode(datas, attendance, pseudo_attendance, is_multi
         if not attendance:
             request.env['hr.attendance'].create(data_news)
         data_news.pop("from_api", None)
-        pseudo = request.env['hr.attendance.pesudo'].create(data_news)
+        pseudo = request.env['hr.attendance.pesudo'].sudo().create(data_news)
         create_attendance_device_details(data_details, pseudo)
         message += "Check in"
     else:
@@ -103,10 +103,10 @@ def attendance_single_record_mode(datas, attendance, pseudo_attendance, is_multi
         
         if pseudo_attendance and not pseudo_attendance.check_out:
             validate_end_time(pseudo_attendance.check_in, datas['timeutc'])
-            pseudo_attendance.write({"check_out": datas['timeutc']})
+            pseudo_attendance.sudo().write({"check_out": datas['timeutc']})
             create_attendance_device_details(data_details, pseudo_attendance)
         else:
-            pseudo = request.env['hr.attendance.pesudo'].create(data_updates)
+            pseudo = request.env['hr.attendance.pesudo'].sudo().create(data_updates)
             create_attendance_device_details(data_details, pseudo)
 
         message += "Check out"
@@ -128,7 +128,7 @@ def handle_facelog_process_box_io(datas, attendance, pseudo_attendance, is_multi
             validate_end_time(attendance.check_in, datas['timeutc'])
             attendance.write({"check_out": datas['timeutc'], "from_api": True})
             if pseudo_attendance:
-                pseudo_attendance.write({"check_out": datas['timeutc']})
+                pseudo_attendance.sudo().write({"check_out": datas['timeutc']})
                 create_attendance_device_details(data_details, pseudo_attendance)
             message += "Check out"
         else:
@@ -141,7 +141,7 @@ def handle_facelog_process_box_io(datas, attendance, pseudo_attendance, is_multi
                 
                 if pseudo_attendance and not pseudo_attendance.check_out:
                     validate_end_time(pseudo_attendance.check_in, datas['timeutc'])
-                    pseudo_attendance.write({"check_out": datas['timeutc']})
+                    pseudo_attendance.sudo().write({"check_out": datas['timeutc']})
                     create_attendance_device_details(data_details, pseudo_attendance)
                 else:
                     data_updates = {
@@ -149,7 +149,7 @@ def handle_facelog_process_box_io(datas, attendance, pseudo_attendance, is_multi
                         "check_in": datas['timeutc'],
                         "is_multiple": is_multiple_mode
                     }
-                    pseudo = request.env['hr.attendance.pesudo'].create(data_updates)
+                    pseudo = request.env['hr.attendance.pesudo'].sudo().create(data_updates)
                     create_attendance_device_details(data_details, pseudo)
                 message += "Check out"
     else:
@@ -165,7 +165,7 @@ def create_attendance(datas, is_multiple_mode):
         "from_api": True
     }
     request.env['hr.attendance'].create(data_news)
-    pseudo = request.env['hr.attendance.pesudo'].create(data_news)
+    pseudo = request.env['hr.attendance.pesudo'].sudo().create(data_news)
     return pseudo
     
 def handle_attendance_view_mode(datas):
@@ -212,7 +212,7 @@ def handle_attendance_view_mode(datas):
             ('check_in', '!=', None)
         ], order="check_in desc, check_out desc", limit=1)
 
-        pseudo_attendance = request.env['hr.attendance.pesudo'].search([('employee_id', '=', datas['employee_id'].id), 
+        pseudo_attendance = request.env['hr.attendance.pesudo'].sudo().search([('employee_id', '=', datas['employee_id'].id), 
                                                                         ('location_date_multi', '=', start_date)],
                                                                         order="check_in desc, check_out desc", limit=1)
     else:
@@ -220,7 +220,7 @@ def handle_attendance_view_mode(datas):
                                                       ('location_date', '=', datetz.date()),
                                                       ('check_in', '!=', None)],
                                                      order="check_in desc, check_out desc", limit=1)
-        pseudo_attendance = request.env['hr.attendance.pesudo'].search([('employee_id', '=', datas['employee_id'].id), 
+        pseudo_attendance = request.env['hr.attendance.pesudo'].sudo().search([('employee_id', '=', datas['employee_id'].id), 
                                                                         ('location_date', '=', datetz.date())]) 
         if pseudo_attendance:
             list_attendances = [
