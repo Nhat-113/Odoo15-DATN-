@@ -136,6 +136,9 @@ class HrPayslipRun(models.Model):
                 all_sent = all(payslip.email_send_status == 'sent' for payslip in record.slip_ids)
                 record.all_draft = all_draft
                 record.all_sent = all_sent
+            else:
+                record.all_draft = True
+                record.all_sent = True
 
     def draft_multi_payslips(self):
         self.slip_ids.write({'email_send_status': 'not_sent_yet', 'state': 'draft'})
