@@ -12,6 +12,9 @@
                 <xpath expr="//field[@name='worked_hours']" position="after">
                     <field name="location_date" force_save="1" invisible="1"/>
                 </xpath>
+                <xpath expr="//field[@name='employee_id']" position="attributes"> 
+                    <attribute name="options">{'no_create':True}</attribute>
+                </xpath> 
             </field>
         </record>
     </data>

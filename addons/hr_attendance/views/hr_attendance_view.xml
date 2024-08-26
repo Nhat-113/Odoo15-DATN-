@@ -8,7 +8,7 @@
         <field name="model">hr.attendance</field>
         <field name="arch" type="xml">
             <tree string="Employee attendances" edit="0" sample="1">
-                <field name="employee_id" options="{'no_create': True}"/>
+                <field name="employee_id"/>
                 <field name="check_in"/>
                 <field name="check_out"/>
                 <field name="worked_hours" string="Work Hours" widget="float_time"/>
