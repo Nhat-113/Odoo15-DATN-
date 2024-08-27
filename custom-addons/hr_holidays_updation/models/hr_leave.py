@@ -72,6 +72,18 @@ class HrLeave(models.Model):
             for holiday in self:
                 holiday.add_follower(employee_id)
         return result
+    
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_correct_states(self):
+        error_message = _('You cannot delete a time off which is in %s state')
+        state_description_values = {elem[0]: elem[1] for elem in self._fields['state']._description_selection(self.env)}
+        
+        if not self.user_has_groups('hr_holidays.group_hr_holidays_user'):
+            if any(hol.state not in ['draft', 'confirm'] for hol in self):
+                raise UserError(error_message % state_description_values.get(self[:1].state))
+        else:
+            for holiday in self.filtered(lambda holiday: holiday.state not in ['draft', 'cancel', 'confirm']):
+                raise UserError(error_message % (state_description_values.get(holiday.state),))
 
     @api.depends('date_from', 'date_to')
     def _compute_extra_approvers(self):
@@ -99,7 +111,7 @@ class HrLeave(models.Model):
     def _inform_to_extra_approvers(self):
         for leave in self:
             leave.inform_to = [(6, 0, leave.extra_approvers.ids)]
-    
+
     def _is_an_extra_approvers(self):
         return self.env.user.employee_id in self.extra_approvers
     
