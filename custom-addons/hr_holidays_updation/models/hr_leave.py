@@ -156,4 +156,10 @@ class HrLeave(models.Model):
                 new_follower.append(emp)
         if len(new_follower) > 0:
             self.new_inform_to = [(6, 0, new_follower)] # Update Many2many field with new inform to
-            self.send_mail_to_inform()    
+            self.send_mail_to_inform()
+            
+    def name_get(self):
+        if self.env.context.get('short_name'):
+            return super(HrLeave, self).with_context({'short_name': 0}).name_get()
+        return super(HrLeave, self).name_get()
+
