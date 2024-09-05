@@ -72,7 +72,20 @@ class ExportWizard(models.TransientModel):
         datas = {}
         pseudo_records = {}
         fail_record = {}
+        calendar_ids = list(set(att[10] for att in attendances))
+        resource_calendars = self.env['resource.calendar'].browse(calendar_ids)
+        resource_calendar_dict = {calendar.id: calendar for calendar in resource_calendars}
+        
         for att in attendances:
+            ###Part handle the removal of lunch break time
+            # get calendar id
+            calendar_id = att[10]
+
+            if calendar_id and att[2] is not None:
+                # call get_lunch_break_time with calendar_id
+                lunch_break_start, lunch_break_end, lunch_break_duration=self.get_lunch_break_time(resource_calendar_dict[calendar_id], att[2])
+
+            ###Part handle write data in datas
             if att[3]is None and att[4] is None:
                 datas[str(att[0])] = {
                     "name": att[1],
@@ -143,7 +156,17 @@ class ExportWizard(models.TransientModel):
                             fail_record[str(att[0])].append(str(att[3].day) + "/" + str(att[3].month))
                         else:
                             fail_record[str(att[0])] = [str(att[3].day) + "/" + str(att[3].month)]
-            
+
+            ###Part handle the removal of lunch break time
+            #Check to retrieve the working hours.
+            if att[3] and att[4] and lunch_break_start and lunch_break_end:
+                att_time_start= att[3].time()   #checkin
+                att_time_end= att[4].time()     #checkout
+                if att_time_start < lunch_break_start and att_time_end > lunch_break_end:
+                    # worked hours = worked hour - lunch
+                    worked_hours -= lunch_break_duration
+
+                    
             day_vals = {
                 "name": att[1],
                 "job_title": att[6],
@@ -569,7 +592,8 @@ class ExportWizard(models.TransientModel):
                     e.job_title,
                     c.hour_work_start,
                     c.attendance_view_type,
-                    c.enable_split_shift
+                    c.enable_split_shift,
+                    e.resource_calendar_id
                 FROM hr_employee e
                 LEFT JOIN attendances a
                     ON a.employee_id = e.id
@@ -701,3 +725,37 @@ class ExportWizard(models.TransientModel):
                             approved_time_off_map[emp_id].append(day_str)
                         
         return approved_time_off_map, approved_wfh_map, approved_unpaid_map
+
+     ###====Part handling the removal of lunch break time===###
+    def get_lunch_break_time(self, resource_calendar, date):
+
+        day_of_week = str(date.weekday())
+
+        # filter all attendance records from Resource Calendar
+        attendances = resource_calendar.attendance_ids.filtered(lambda att: att.dayofweek == day_of_week)
+        
+        lunch_break_start = None
+        lunch_break_end = None
+        lunch_break_duration = 0
+        
+        # loop looking for time lunch break
+        for attendance in attendances:
+            if attendance.day_period == 'morning':
+                lunch_break_start = attendance.hour_to  # morning end time
+            elif attendance.day_period == 'afternoon':
+                lunch_break_end = attendance.hour_from  # afternoon start time
+
+        if lunch_break_start and lunch_break_end:
+            lunch_break_duration = lunch_break_end - lunch_break_start #lunch break time
+            lunch_break_start = self.float_to_time(lunch_break_start)   #att[3] datetime
+            lunch_break_end = self.float_to_time(lunch_break_end)       #att[4] datetime
+        
+        return lunch_break_start, lunch_break_end, lunch_break_duration
+
+    def float_to_time(self,hour_float):
+        if hour_float is None:
+            return None
+        if isinstance(hour_float, (int, float)):
+            hour = int(hour_float)
+            minute = int((hour_float - hour) * 60)
+        return time(hour=hour, minute=minute)
