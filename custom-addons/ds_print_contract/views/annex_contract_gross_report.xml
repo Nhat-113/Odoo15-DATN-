@@ -259,9 +259,7 @@
  năm
                                             <span t-esc="e.date_start.strftime('%Y')"/>
                                         </p>
-                                        <p>Và là bộ phận của hợp đồng số …………/HĐLĐ
-                                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y')"/>
- được lập thành 02 (hai) bản có giá trị như nhau, mỗi bên giữ 01 (một) bản
+                                        <p>Và là bộ phận của hợp đồng số …………/………… được lập thành 02 (hai) bản có giá trị như nhau, mỗi bên giữ 01 (một) bản
                                         </p>
                                         <p>Phụ lục hợp đồng được lập tại:
                                             <span class="font-weight-bold">
