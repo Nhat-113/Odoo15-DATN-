@@ -513,7 +513,8 @@ class BoxManagementMobile(http.Controller):
             }, 400)
         
         role_check_result = self.check_role()
-        if not role_check_result:
+        direct_subordinates_result = self.is_employee_in_department(employee_id)
+        if not role_check_result and not direct_subordinates_result:
             return jsonResponse({
                     "status": 40301,
                     "message": "Forbidden",
@@ -602,6 +603,21 @@ class BoxManagementMobile(http.Controller):
             "status": 200,
             "attendances": attendances,
         }, 200)
+    # handle for department role emp
+    def is_employee_in_department(self, employee_id):
+        current_user_id = request.env.user.employee_id.id
+        if not current_user_id:
+            return False
+
+        current_department = request.env['hr.department'].search([('manager_id', '=', current_user_id)])
+        if not current_department:
+            return False
+
+        all_departments = request.env['hr.department'].search([('id', 'child_of', current_department.ids)])
+
+        all_employees_in_departments = request.env['hr.employee'].search([('department_id', 'in', all_departments.ids)])
+
+        return employee_id in all_employees_in_departments.ids
 
     def check_role(self):
         current_user = request.env.user
