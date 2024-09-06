@@ -1,11 +1,11 @@
 <odoo>
     <data>
-        <record id="template_send_mail_inform_to" model="mail.template">
-            <field name="name">Time Off - Inform Mail</field>
+        <record id="template_send_mail_extra_approvers" model="mail.template">
+            <field name="name">Time Off - Extra Approver Mail</field>
             <field name="model_id" ref="model_hr_leave"/>
-            <field name="subject">{{object.holiday_status_id.name}} : {{object.duration_display}}: Time Off Approval assigned to you</field>
+            <field name="subject">{{object.display_name}}: Time Off Approval assigned to you</field>
             <field name="email_from">{{object.create_uid.email_formatted or ''}}</field>
-            <field name="email_to">{{ ','.join(emp.work_email for emp in object.new_inform_to) }}</field>
+            <field name="email_to">{{ ','.join(emp.work_email for emp in object.extra_approvers) }}</field>
             <field name="body_html"><![CDATA[
                 <div id=":n1" class="ii gt" jslog="20277; u014N:xr6bB; 1:WyIjdGhyZWFkLWY6MTc5ODQ1MDQyMzE5NTQwOTM3NSJd; 4:WyIjbXNnLWY6MTc5ODQ1MDQyMzE5NTQwOTM3NSJd"><div id=":n2" class="a3s aiL "><table border="0" cellpadding="0" cellspacing="0" style="padding:16px;background-color:#f1f1f1;font-family:Verdana,Arial,sans-serif;color:#454748;width:100%;border-collapse:separate"><tbody><tr><td align="center">
                     <table border="0" cellpadding="0" cellspacing="0" width="590" style="padding:24px;background-color:white;color:#454748;border-collapse:separate">
@@ -18,7 +18,7 @@
                                             <td align="center" style="min-width:590px">
                                                 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:white;padding:0;border-collapse:separate">
                                                     <tbody><tr><td valign="middle">
-                                                        <span style="font-size:10px">Your Time Off</span>
+                                                        <span style="font-size:10px">Time Off Approval Notification</span>
                                                         <span style="font-size:20px;font-weight:bold">
                                                         </span>
                                                     </td><td valign="middle" align="right">
@@ -31,15 +31,16 @@
                                         </tr>
                                         <tr>
                                             <td style="min-width:590px">
-                                                <span t-field="object.create_uid.name"/> assigned you an activity <span t-field="object.activity_type_id.name"/>
+                                                New <span t-field="object.holiday_status_id.name"/> request has been created by <span t-field="object.create_uid.name"/>
+                                                <p></p>
+                                                You are assigned as an Extra Approver for this <span t-field="object.activity_type_id.name"/>
                                                 on <span t-field="object.holiday_status_id.name"/>
                                                 <p style="padding: 16px 0px 16px 0px;">
                                                     <a t-att-href="object._notify_get_action_link('view')"
                                                         style="background-color:#875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
-                                                        View <t t-esc="model_description or 'Time Off'"/>
+                                                        View Time Off
                                                     </a>
                                                 </p>
-                                                New <span t-field="object.holiday_status_id.name"/> Request created by <span t-field="object.create_uid.name"/>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -53,7 +54,7 @@
                                 <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0;margin:16px 0px 4px 0px"></hr>
                                 <b><t t-esc="user.company_id.name"/></b><br/>
                                 <div style="color:#999999">
-                                    <t t-esc="object.user_id.phone"/>   
+                                    <t t-esc="object.user_id.phone"/>
                                 </div>
                             </td>
                         </tr>

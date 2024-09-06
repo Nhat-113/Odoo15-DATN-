@@ -1,24 +1,27 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, tools
 from odoo.exceptions import UserError
 from odoo.tools.translate import _
 from dateutil.relativedelta import relativedelta
 
-PAST_LIMIT_IN_DAY = 3
+PAST_LIMIT_IN_DAY = tools.config.get('past_limit_in_day', 0)
+try:
+    PAST_LIMIT_IN_DAY = int(PAST_LIMIT_IN_DAY)
+    PAST_LIMIT_IN_DAY = PAST_LIMIT_IN_DAY if PAST_LIMIT_IN_DAY >= 0 else 0
+except Exception:
+    PAST_LIMIT_IN_DAY = 0
 
 class HrLeave(models.Model):
     _inherit = 'hr.leave'
     
     inform_to = fields.Many2many('hr.employee', 'hr_leave_employee_inform_rel', 'hr_leave_id', 'employee_id', store=True, string="Inform to")
-    new_inform_to = fields.Many2many('hr.employee', 'hr_leave_employee_inform_rel', 'hr_leave_id', 'employee_id', string="New inform to")
     extra_approvers = fields.Many2many('hr.employee', 'hr_leave_employee_extra_approvers_rel', 'hr_leave_id', 'employee_id',
                             string="Extra Approvers", compute="_compute_extra_approvers", store=True, readonly=True)
     
     def add_follower(self, employee_id):
         employee = self.env['hr.employee'].browse(employee_id)
-        followers = employee.user_id.partner_id.ids + self.inform_to.user_id.partner_id.ids
+        followers = employee.user_id.partner_id.ids + self.inform_to.user_id.partner_id.ids + self.extra_approvers.user_id.partner_id.ids
         if employee.user_id:
             self.message_subscribe(partner_ids=followers)
-            
             
     @api.constrains('inform_to')
     def constrains_inform_to(self):
@@ -28,10 +31,17 @@ class HrLeave(models.Model):
                 new_follower.append(emp)
         if len(new_follower) > 0:
             self.message_subscribe(partner_ids=new_follower)
+            
+    @api.constrains('extra_approvers')
+    def constrains_extra_approvers(self):
+        new_follower = []
+        for emp in self.extra_approvers.user_id.partner_id.ids:
+            if emp not in self.message_follower_ids.partner_id.ids:
+                new_follower.append(emp)
+        if len(new_follower) > 0:
+            self.message_subscribe(partner_ids=new_follower)
 
-    def write(self, values):
-        if 'inform_to' in values:
-            self.write_send_mail(values)
+    def write(self, values):          
         user = self.env.user
         is_officer = user.has_group('hr_holidays.group_hr_holidays_user') or self.env.is_superuser()
 
@@ -63,11 +73,24 @@ class HrLeave(models.Model):
             if 'date_to' in values:
                 values['request_date_to'] = values['date_to']
                 
+        current_inform_to = {leave.id: leave.inform_to.ids for leave in self}
+                
         # Model hr.leave inherit mail.thread
         # which mean: in hr.leave write method, super(HolidayRequest, self).write(values) call mail.thread's write method
         # So, in this case, where we completely override the whole write method
         # we need to call mail.thread's write method to keep the original behaviour
         result = super(type(self.env['mail.thread']), self).write(values)
+        
+        if 'inform_to' in values:
+            for leave in self:
+                old_inform_to = set(current_inform_to.get(leave.id, []))
+                new_inform_to = set(leave.inform_to.ids)
+                
+                new_inform_to_employees = new_inform_to - old_inform_to
+                if new_inform_to_employees:
+                    new_inform_to_employees = self.env['hr.employee'].browse(new_inform_to_employees)
+                    leave.send_mail_to_inform_to(new_inform_to_employees)
+        
         if employee_id and not context.get('leave_fast_create'):
             for holiday in self:
                 holiday.add_follower(employee_id)
@@ -107,11 +130,6 @@ class HrLeave(models.Model):
         for leave in self:
             leave.extra_approvers = [(6, 0, pm_ids)]
 
-    @api.onchange('extra_approvers')
-    def _inform_to_extra_approvers(self):
-        for leave in self:
-            leave.inform_to = [(6, 0, leave.extra_approvers.ids)]
-
     def _is_an_extra_approvers(self):
         return self.env.user.employee_id in self.extra_approvers
     
@@ -126,40 +144,32 @@ class HrLeave(models.Model):
     def _check_unlink_rights(self):
         crr_user = self.env.user
         is_timeoff_officer = crr_user.has_group('hr_holidays.group_hr_holidays_user')
-        is_timeoff_manager = crr_user.has_group('hr_holidays.group_hr_holidays_manager')
         for leave in self:
-            if  leave.state in ['draft', 'confirm'] and not (is_timeoff_manager or is_timeoff_officer or (leave.employee_id == crr_user.employee_id)):
-                raise UserError('Only the employee who requested the Timeoff or a Timeoff Officer/Administrator can delete a timeoff request.')
+            if  leave.state in ['draft', 'confirm'] and not (is_timeoff_officer or (leave.employee_id == crr_user.employee_id)):
+                raise UserError('You are not allowed to delete this Time Off Request!')
             
     @api.model_create_multi
     def create(self, vals_list):
         records = super(HrLeave, self).create(vals_list)
-        new_follower = []
-        for emp in records.inform_to:
-            if emp not in records.message_follower_ids.partner_id.ids:
-                new_follower.append(emp.work_email)
-
-        if len(new_follower) > 0: 
-            records.new_inform_to = records.inform_to # Update Many2many field with new inform to
-            records.send_mail_to_inform()
+        records.send_mail_to_extra_approvers()
+        records.send_mail_to_inform_to()
         return records
     
-    def send_mail_to_inform(self):
-        template_id = 'hr_holidays_updation.template_send_mail_inform_to'
+    def send_mail_by_template(self, template_id):
         template = self.env.ref(template_id, raise_if_not_found=False)
         template.send_mail(self.id, force_send=True)
+        
+    def send_mail_to_extra_approvers(self):
+        self.send_mail_by_template('hr_holidays_updation.template_send_mail_extra_approvers')
 
-    def write_send_mail(self, vals_list):
-        new_follower = []
-        for emp in vals_list['inform_to'][0][2]:
-            if emp not in self.message_follower_ids.partner_id.ids and emp not in self.inform_to.ids:
-                new_follower.append(emp)
-        if len(new_follower) > 0:
-            self.new_inform_to = [(6, 0, new_follower)] # Update Many2many field with new inform to
-            self.send_mail_to_inform()
+    def send_mail_to_inform_to(self, new_inform=False):
+        if new_inform:
+            template = self.env.ref('hr_holidays_updation.template_send_mail_inform_to', raise_if_not_found=False)
+            template.send_mail(self.id, force_send=True, email_values={'email_to': ','.join(emp.work_email for emp in new_inform) })
+            return
+        self.send_mail_by_template('hr_holidays_updation.template_send_mail_inform_to')
             
     def name_get(self):
         if self.env.context.get('short_name'):
             return super(HrLeave, self).with_context({'short_name': 0}).name_get()
         return super(HrLeave, self).name_get()
-
