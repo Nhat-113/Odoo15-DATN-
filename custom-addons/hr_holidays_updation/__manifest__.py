@@ -17,7 +17,8 @@
         'views/hr_leave_views.xml',
         'data/hr_holidays_template_extra_approver_mail.xml',
         'data/hr_holidays_template_inform_to_mail.xml',
-        'views/hr_leave_report_calendar.xml'
+        'views/hr_leave_report_calendar.xml',
+        'views/res_config_settings_views.xml'
     ],
     'assets': {
         'web.assets_backend': [

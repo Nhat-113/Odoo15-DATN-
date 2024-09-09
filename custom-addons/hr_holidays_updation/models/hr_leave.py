@@ -3,13 +3,6 @@ from odoo.exceptions import UserError
 from odoo.tools.translate import _
 from dateutil.relativedelta import relativedelta
 
-PAST_LIMIT_IN_DAY = tools.config.get('past_limit_in_day', 0)
-try:
-    PAST_LIMIT_IN_DAY = int(PAST_LIMIT_IN_DAY)
-    PAST_LIMIT_IN_DAY = PAST_LIMIT_IN_DAY if PAST_LIMIT_IN_DAY >= 0 else 0
-except Exception:
-    PAST_LIMIT_IN_DAY = 0
-
 class HrLeave(models.Model):
     _inherit = 'hr.leave'
     
@@ -31,24 +24,19 @@ class HrLeave(models.Model):
                 new_follower.append(emp)
         if len(new_follower) > 0:
             self.message_subscribe(partner_ids=new_follower)
-            
-    @api.constrains('extra_approvers')
-    def constrains_extra_approvers(self):
-        new_follower = []
-        for emp in self.extra_approvers.user_id.partner_id.ids:
-            if emp not in self.message_follower_ids.partner_id.ids:
-                new_follower.append(emp)
-        if len(new_follower) > 0:
-            self.message_subscribe(partner_ids=new_follower)
 
     def write(self, values):          
         user = self.env.user
         is_officer = user.has_group('hr_holidays.group_hr_holidays_user') or self.env.is_superuser()
+        
+        past_limit_in_days_config = self.env['ir.config_parameter'].sudo().get_param('hr_holidays.past_limit_in_days')
+        past_limit_in_days = int(past_limit_in_days_config) if past_limit_in_days_config else 0
 
         if not is_officer:
-            crr_past_date_limit = fields.Date.today() - relativedelta(days=PAST_LIMIT_IN_DAY)
+            crr_past_date_limit = fields.Date.today() - relativedelta(days=past_limit_in_days)
             if any(hol.date_from.date() < crr_past_date_limit and hol.employee_id.leave_manager_id != user for hol in self):
-                raise UserError(_(f'You must have manager rights to modify/validate a time off that already begun over {PAST_LIMIT_IN_DAY} days ago.'))
+                limit_day_message = f'already begun over {past_limit_in_days} days ago' if past_limit_in_days > 0 else 'was in the past'
+                raise UserError(_(f'You must have manager rights to modify/validate a time off that {limit_day_message}.'))
             
             leaves = self._get_leaves_on_public_holiday()
             if leaves:
@@ -83,18 +71,55 @@ class HrLeave(models.Model):
         
         if 'inform_to' in values:
             for leave in self:
-                old_inform_to = set(current_inform_to.get(leave.id, []))
-                new_inform_to = set(leave.inform_to.ids)
-                
-                new_inform_to_employees = new_inform_to - old_inform_to
-                if new_inform_to_employees:
-                    new_inform_to_employees = self.env['hr.employee'].browse(new_inform_to_employees)
-                    leave.send_mail_to_inform_to(new_inform_to_employees)
+                leave._send_mail_to_new_inform_to(current_inform_to)
         
         if employee_id and not context.get('leave_fast_create'):
             for holiday in self:
                 holiday.add_follower(employee_id)
         return result
+    
+    def _send_mail_to_new_inform_to(self, current_inform_to):
+        old_inform_to = set(current_inform_to.get(self.id, []))
+        new_inform_to = set(self.inform_to.ids)
+        
+        new_inform_to_employees = new_inform_to - old_inform_to
+        if new_inform_to_employees:
+            new_inform_to_employees = self.env['hr.employee'].browse(new_inform_to_employees)
+            self.send_mail_to_inform_to(new_inform_to_employees)
+        
+    def _check_approval_update(self, state):
+        """ Check if target state is achievable. """
+        if self.env.is_superuser():
+            return
+
+        current_employee = self.env.user.employee_id
+        is_officer = self.env.user.has_group('hr_holidays.group_hr_holidays_user')
+        is_manager = self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
+
+        for holiday in self:
+            val_type = holiday.validation_type
+
+            if not is_manager and state != 'confirm':
+                if state == 'draft':
+                    if holiday.state == 'refuse':
+                        raise UserError(_('Only a Time Off Manager can reset a refused leave.'))
+                    if holiday.date_from and holiday.date_from.date() <= fields.Date.today():
+                        raise UserError(_('Only a Time Off Manager can reset a started leave.'))
+                    if holiday.employee_id != current_employee:
+                        raise UserError(_('Only a Time Off Manager can reset other people leaves.'))
+                else:
+                    if val_type == 'no_validation' and current_employee == holiday.employee_id:
+                        continue
+                    # use ir.rule based first access check: department, members, ... (see security.xml)
+                    holiday.check_access_rule('write')
+
+                    # This handles states validate1 validate and refuse
+                    if holiday.employee_id == current_employee:
+                        raise UserError(_('Only a Time Off Manager can approve/refuse its own requests.'))
+
+                    if (state == 'validate1' and val_type == 'both') or (state == 'validate' and val_type == 'manager') and holiday.holiday_type == 'employee':
+                        if not is_officer and self.env.user != holiday.employee_id.leave_manager_id and not self._is_an_extra_approvers():
+                            raise UserError(_('You must be either %s\'s manager or Time off Manager to approve this leave') % (holiday.employee_id.name))
     
     @api.ondelete(at_uninstall=False)
     def _unlink_if_correct_states(self):
@@ -107,6 +132,14 @@ class HrLeave(models.Model):
         else:
             for holiday in self.filtered(lambda holiday: holiday.state not in ['draft', 'cancel', 'confirm']):
                 raise UserError(error_message % (state_description_values.get(holiday.state),))
+            
+    @api.ondelete(at_uninstall=False)
+    def _check_unlink_rights(self):
+        crr_user = self.env.user
+        is_timeoff_officer = crr_user.has_group('hr_holidays.group_hr_holidays_user')
+        for leave in self:
+            if  leave.state in ['draft', 'confirm'] and not (is_timeoff_officer or (leave.employee_id == crr_user.employee_id)):
+                raise UserError('You are not allowed to delete this Time Off Request!')
 
     @api.depends('date_from', 'date_to')
     def _compute_extra_approvers(self):
@@ -139,14 +172,6 @@ class HrLeave(models.Model):
         for leave in self:
             if leave._is_an_extra_approvers():
                 leave.name = leave.sudo().private_name
-
-    @api.ondelete(at_uninstall=False)
-    def _check_unlink_rights(self):
-        crr_user = self.env.user
-        is_timeoff_officer = crr_user.has_group('hr_holidays.group_hr_holidays_user')
-        for leave in self:
-            if  leave.state in ['draft', 'confirm'] and not (is_timeoff_officer or (leave.employee_id == crr_user.employee_id)):
-                raise UserError('You are not allowed to delete this Time Off Request!')
             
     @api.model_create_multi
     def create(self, vals_list):
