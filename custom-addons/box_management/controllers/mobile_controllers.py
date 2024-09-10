@@ -539,7 +539,7 @@ class BoxManagementMobile(http.Controller):
             ('location_date', '<=', end_date)
         ]
 
-        attendance_records = request.env['hr.attendance'].search_read(
+        attendance_records = request.env['hr.attendance'].sudo().search_read(
             domain=domain,
             fields=['location_date', 'check_in', 'check_out'],
             order='location_date asc, check_in asc'
