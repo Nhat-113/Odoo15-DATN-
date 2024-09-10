@@ -1,7 +1,7 @@
 from odoo import http
 from odoo.http import request, JsonRequest
 from datetime import datetime
-from helper.helper import alternative_json_response_for_mobile, jsonResponse, valid_timezone_for_mobile, message_error_missing, check_field_missing_api
+from helper.helper import alternative_json_response_for_mobile, jsonResponse, valid_timezone_for_mobile, message_error_missing, check_field_missing_api, get_avatar_model
 from helper.attendance_common import handle_attendance_view_mode
 
 class CompanyLocation(http.Controller):
@@ -21,6 +21,7 @@ class CompanyLocation(http.Controller):
                     {
                         "id": location.id,
                         "name_company": location.company_id.name,
+                        "logo": get_avatar_model('res.company', location.company_id.id),
                         "long": location.lng,
                         "lat": location.lat,
                         "acceptance_distance": location.acceptance_distance,
