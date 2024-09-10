@@ -165,3 +165,10 @@ def mobile_error_response(status, message, keyerror_message):
         "message": message,
         "keyerror": keyerror_message
     }, 400)
+
+
+def get_avatar_model(model, id):
+    base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
+    avatar = f"{base_url}/api/get_image?model={model}&id={id}"
+    
+    return avatar
