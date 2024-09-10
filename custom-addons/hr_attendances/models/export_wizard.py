@@ -663,10 +663,20 @@ class ExportWizard(models.TransientModel):
         except KeyError:
             return {}, {}, {}
             
+
+        # start date = A, end date = B, start leave = C, end leave = D
         approved_leaves = self.env['hr.leave'].search([
             ('state', '=', 'validate'),
-            ('request_date_from', '>=', start_date),
-            ('request_date_to', '<=', end_date),
+            '|', '|', '|',
+            '&',  # A <= C <= B
+                ('request_date_from', '>=', start_date),
+                ('request_date_from', '<=', end_date),
+            '&',  # A <= D <= B
+                ('request_date_to', '<=', end_date),
+                ('request_date_to', '>=', start_date),
+            '&',  # C < A < D
+                ('request_date_from', '<', start_date),
+                ('request_date_to', '>', start_date),
             ('employee_id.company_id', 'in', company_ids),
         ])
 
