@@ -1,0 +1,14 @@
+<odoo>
+    <data noupdate="1">
+        <record id="holiday_status_wfh" model="hr.leave.type">
+            <field name="name">Làm việc tại nhà</field>
+            <field name="requires_allocation">no</field>
+            <field name="leave_validation_type">manager</field>
+            <field name="code">WFH</field>
+            <field name="leave_notif_subtype_id" ref="hr_holidays.mt_leave"/>
+            <field name="request_unit">half_day</field>
+            <field name="icon_id" ref="hr_holidays.icon_7"/>
+            <field name="color">2</field>
+        </record>
+    </data>
+</odoo>

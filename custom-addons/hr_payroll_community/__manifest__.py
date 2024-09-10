@@ -36,7 +36,8 @@
         'views/report_payslipdetails_templates.xml',
         'data/hr_percent_data.xml',
         'views/hr_percent_bhxh_view.xml',
-        'data/hr_payroll_recompute_cronjob.xml'
+        'data/hr_payroll_recompute_cronjob.xml',
+        'data/hr_holidays_update_data.xml'
     ],
     'demo': ['data/hr_payroll_demo.xml'],
     'license': 'AGPL-3',
