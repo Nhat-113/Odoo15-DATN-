@@ -27,3 +27,4 @@ class ResCompany(models.Model):
     _inherit = 'res.company'
     hour_work_start = fields.Selection(generate_time_selection(), string = "Hour Work Start", required=True, store=True, default="00:00")
     enable_split_shift = fields.Boolean(string="Customize", default=False)
+    remove_lunch_break = fields.Boolean(string="Lunch Break", default=False)

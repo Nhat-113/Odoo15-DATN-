@@ -27,6 +27,7 @@ class ResConfigSetting(models.TransientModel):
 
     hour_work_start = fields.Selection(generate_time_selection(), string = "Hour Work Start", required=True, default="00:00")
     enable_split_shift = fields.Boolean(string="Customize", default=False)
+    remove_lunch_break = fields.Boolean(string="Lunch Break", default=False)
     
     @api.model
     def get_values(self):
@@ -34,7 +35,8 @@ class ResConfigSetting(models.TransientModel):
         company = self.env.company
         res.update({
             'hour_work_start': company.hour_work_start,  
-            'enable_split_shift': company.enable_split_shift
+            'enable_split_shift': company.enable_split_shift,
+            'remove_lunch_break': company.remove_lunch_break
         })
         return res
 
@@ -42,7 +44,7 @@ class ResConfigSetting(models.TransientModel):
         super(ResConfigSetting, self).set_values()
         company = self.env.company
 
-        fields_to_check = ['hour_work_start', 'enable_split_shift']
+        fields_to_check = ['hour_work_start', 'enable_split_shift', 'remove_lunch_break']
         
         for field in fields_to_check:
             if self[field] != company[field]:

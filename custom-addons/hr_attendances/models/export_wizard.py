@@ -116,6 +116,7 @@ class ExportWizard(models.TransientModel):
             hour_work_start = att[7]
             attendance_view_type = att[8]
             enable_split_shift = att[9]
+            remove_lunch_break = att[11]
             hour_start, minute_start = extract_hour_minute(hour_work_start)
             endpoint = att[4]
             worked_hours = att[5]
@@ -159,7 +160,7 @@ class ExportWizard(models.TransientModel):
 
             ###Part handle the removal of lunch break time
             #Check to retrieve the working hours.
-            if att[3] and att[4] and lunch_break_start and lunch_break_end:
+            if remove_lunch_break and att[3] and att[4] and lunch_break_start and lunch_break_end:
                 att_time_start= att[3].time()   #checkin
                 att_time_end= att[4].time()     #checkout
                 if att_time_start < lunch_break_start < att_time_end <= lunch_break_end:
@@ -167,6 +168,13 @@ class ExportWizard(models.TransientModel):
                     att_time_end_datetime = datetime.combine(datetime.today(), att_time_end)
                     break_duration_hours = (att_time_end_datetime - lunch_break_start_datetime).total_seconds() / 3600
                     worked_hours -= break_duration_hours
+                elif lunch_break_start <= att_time_start < lunch_break_end < att_time_end:
+                    lunch_break_end_datetime = datetime.combine(datetime.today(), lunch_break_end)
+                    att_time_start_datetime = datetime.combine(datetime.today(), att_time_start)
+                    break_duration_hours = (lunch_break_end_datetime - att_time_start_datetime).total_seconds() / 3600
+                    worked_hours -= break_duration_hours
+                elif lunch_break_start <= att_time_start and att_time_end < lunch_break_end:
+                    worked_hours = 0
                 elif att_time_start < lunch_break_start and att_time_end > lunch_break_end:
                     worked_hours -= lunch_break_duration
 
@@ -597,7 +605,8 @@ class ExportWizard(models.TransientModel):
                     c.hour_work_start,
                     c.attendance_view_type,
                     c.enable_split_shift,
-                    e.resource_calendar_id
+                    e.resource_calendar_id,
+                    c.remove_lunch_break
                 FROM hr_employee e
                 LEFT JOIN attendances a
                     ON a.employee_id = e.id
