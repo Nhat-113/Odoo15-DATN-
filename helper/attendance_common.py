@@ -42,7 +42,7 @@ def attendance_multi_record_mode(datas, attendance, pseudo_attendance, is_multip
             "is_multiple": is_multiple_mode,
             "from_api": True
         }
-        request.env['hr.attendance'].create(data_news)
+        request.env['hr.attendance'].sudo().create(data_news)
         pseudo = request.env['hr.attendance.pesudo'].sudo().create(data_news)
         create_attendance_device_details(data_details, pseudo)
         message += "Check in"
@@ -59,7 +59,7 @@ def attendance_multi_record_mode(datas, attendance, pseudo_attendance, is_multip
             validate_end_time(attendance.check_in, datas['timeutc'])
             attendance.write({"check_out": datas['timeutc'], "from_api": True})
         else:
-            request.env['hr.attendance'].create(data_updates)
+            request.env['hr.attendance'].sudo().create(data_updates)
 
         if pseudo_attendance and not pseudo_attendance.check_out:
             pseudo_attendance.sudo().write({"check_out": datas['timeutc']})
@@ -85,7 +85,7 @@ def attendance_single_record_mode(datas, attendance, pseudo_attendance, is_multi
             "from_api": True
         }
         if not attendance:
-            request.env['hr.attendance'].create(data_news)
+            request.env['hr.attendance'].sudo().create(data_news)
         data_news.pop("from_api", None)
         pseudo = request.env['hr.attendance.pesudo'].sudo().create(data_news)
         create_attendance_device_details(data_details, pseudo)
@@ -164,7 +164,7 @@ def create_attendance(datas, is_multiple_mode):
         "is_multiple": is_multiple_mode,
         "from_api": True
     }
-    request.env['hr.attendance'].create(data_news)
+    request.env['hr.attendance'].sudo().create(data_news)
     pseudo = request.env['hr.attendance.pesudo'].sudo().create(data_news)
     return pseudo
     
@@ -206,7 +206,7 @@ def handle_attendance_view_mode(datas):
         else:
             start_date = (datetz - timedelta(days=1)).date()
         
-        attendance = request.env['hr.attendance'].search([
+        attendance = request.env['hr.attendance'].sudo().search([
             ('employee_id', '=', datas['employee_id'].id),
             ('location_date_multi', '=', start_date),
             ('check_in', '!=', None)
@@ -216,7 +216,7 @@ def handle_attendance_view_mode(datas):
                                                                         ('location_date_multi', '=', start_date)],
                                                                         order="check_in desc, check_out desc", limit=1)
     else:
-        attendance = request.env['hr.attendance'].search([('employee_id', '=', datas['employee_id'].id),
+        attendance = request.env['hr.attendance'].sudo().search([('employee_id', '=', datas['employee_id'].id),
                                                       ('location_date', '=', datetz.date()),
                                                       ('check_in', '!=', None)],
                                                      order="check_in desc, check_out desc", limit=1)
