@@ -162,8 +162,12 @@ class ExportWizard(models.TransientModel):
             if att[3] and att[4] and lunch_break_start and lunch_break_end:
                 att_time_start= att[3].time()   #checkin
                 att_time_end= att[4].time()     #checkout
-                if att_time_start < lunch_break_start and att_time_end > lunch_break_end:
-                    # worked hours = worked hour - lunch
+                if att_time_start < lunch_break_start < att_time_end <= lunch_break_end:
+                    lunch_break_start_datetime = datetime.combine(datetime.today(), lunch_break_start)
+                    att_time_end_datetime = datetime.combine(datetime.today(), att_time_end)
+                    break_duration_hours = (att_time_end_datetime - lunch_break_start_datetime).total_seconds() / 3600
+                    worked_hours -= break_duration_hours
+                elif att_time_start < lunch_break_start and att_time_end > lunch_break_end:
                     worked_hours -= lunch_break_duration
 
                     
