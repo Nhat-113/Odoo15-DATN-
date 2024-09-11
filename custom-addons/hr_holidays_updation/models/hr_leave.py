@@ -60,8 +60,11 @@ class HrLeave(models.Model):
                 values['request_date_from'] = values['date_from']
             if 'date_to' in values:
                 values['request_date_to'] = values['date_to']
-                
-        current_inform_to = {leave.id: leave.inform_to.ids for leave in self}
+        
+        if 'inform_to' in values:
+            # Extract and store current inform_to ids before updating records
+            current_inform_to = {leave.id: leave.inform_to.ids for leave in self}
+            new_inform_to = values['inform_to'][0][2]
                 
         # Model hr.leave inherit mail.thread
         # which mean: in hr.leave write method, super(HolidayRequest, self).write(values) call mail.thread's write method
@@ -69,23 +72,22 @@ class HrLeave(models.Model):
         # we need to call mail.thread's write method to keep the original behaviour
         result = super(type(self.env['mail.thread']), self).write(values)
         
-        if 'inform_to' in values:
-            for leave in self:
-                leave._send_mail_to_new_inform_to(current_inform_to)
-        
         if employee_id and not context.get('leave_fast_create'):
             for holiday in self:
                 holiday.add_follower(employee_id)
+                
+        if 'inform_to' in values and new_inform_to:
+            self._send_mail_to_new_inform_to(current_inform_to, new_inform_to)
+        
         return result
     
-    def _send_mail_to_new_inform_to(self, current_inform_to):
-        old_inform_to = set(current_inform_to.get(self.id, []))
-        new_inform_to = set(self.inform_to.ids)
+    def _send_mail_to_new_inform_to(self, current_inform_to, new_inform_to):
+        new_inform_to_empl = self.env['hr.employee'].browse(new_inform_to)
         
-        new_inform_to_employees = new_inform_to - old_inform_to
-        if new_inform_to_employees:
-            new_inform_to_employees = self.env['hr.employee'].browse(new_inform_to_employees)
-            self.send_mail_to_inform_to(new_inform_to_employees)
+        for leave in self:
+            new_inform_to_send_mail_ids = set(new_inform_to) - set(current_inform_to.get(leave.id, []))
+            new_inform_to_send_mail = new_inform_to_empl.filtered(lambda empl: empl.id in new_inform_to_send_mail_ids)
+            leave.send_mail_to_inform_to(new_inform_to_send_mail, only_send_new=True)
         
     def _check_approval_update(self, state):
         """ Check if target state is achievable. """
@@ -187,11 +189,15 @@ class HrLeave(models.Model):
     def send_mail_to_extra_approvers(self):
         self.send_mail_by_template('hr_holidays_updation.template_send_mail_extra_approvers')
 
-    def send_mail_to_inform_to(self, new_inform=False):
+    def send_mail_to_inform_to(self, new_inform=False, only_send_new=False):
+        if only_send_new and not new_inform:
+            return
+        
         if new_inform:
             template = self.env.ref('hr_holidays_updation.template_send_mail_inform_to', raise_if_not_found=False)
             template.send_mail(self.id, force_send=True, email_values={'email_to': ','.join(emp.work_email for emp in new_inform) })
             return
+        
         self.send_mail_by_template('hr_holidays_updation.template_send_mail_inform_to')
             
     def name_get(self):
