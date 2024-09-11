@@ -5,7 +5,7 @@
     'sequence': 85,
     'summary': 'Allocate PTOs and follow leaves requests',
     'website': 'https://www.odoo.com/app/time-off',
-    'author': 'phuongtn',
+    'author': 'phuongtn, nhatck',
     'company': 'Dsoft',
     'description': """""",
     'depends': ['hr', 'base', 'hr_holidays', 'resource'],
@@ -15,7 +15,10 @@
         'data/hr_holidays_cron_job.xml',
         'data/hr_holidays_parameter_system.xml',
         'views/hr_leave_views.xml',
-        'data/inform_to_mail.xml',
+        'data/hr_holidays_template_extra_approver_mail.xml',
+        'data/hr_holidays_template_inform_to_mail.xml',
+        'views/hr_leave_report_calendar.xml',
+        'views/res_config_settings_views.xml'
     ],
     'assets': {
         'web.assets_backend': [
@@ -23,7 +26,6 @@
         'web.assets_qweb': [
         ],
     },
-
     'images': [],
     'license': "AGPL-3",
     'installable': True,

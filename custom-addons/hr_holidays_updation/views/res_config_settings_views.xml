@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+      <field name="name">res.config.settings.inherit.smo</field>
+      <field name="model">res.config.settings</field>
+      <field name="priority" eval="80"/>
+      <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//div[hasclass('settings')]" position="inside">
+          <div class="app_settings_block" data-string="TimeOff" string="Time Off" data-key="holidays" groups="hr_holidays.group_hr_holidays_manager">
+            <h2>Past Limit</h2>
+            <div class="row mt16 o_settings_container" name="timeoff_setting_container">
+              <div class="col-12 col-lg-6 o_setting_box" title="Set Past Limit in Days.">
+                <div class="o_setting_left_pane" />
+                <div class="o_setting_right_pane">
+                  <span class="o_form_label">Past Limit in Days</span>
+                  <span class="fa fa-history" />
+                  <div class="text-muted">
+                    This is Past Limit in Days.
+                  </div>
+                  <div class="content-group">
+                    <div class="row mt16">
+                      <label string="Limit:" for="past_limit_in_days" class="col-lg-3 o_light_label"/>
+                      <field name="past_limit_in_days" />
+                      <span style="margin-left: 5px;">days</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>            
+
+            
+          </div>
+        </xpath>
+      </field>
+    </record>
+
+    <record id="action_timeoff_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'hr_holidays', 'bin_size': False}</field>
+    </record>
+
+    <!-- <menuitem id="smo.menu_smo_settings" name="Configuration" parent="smo_menu_root"
+        sequence="23" action="action_smo_settings" groups="smo.group_smo_admin"/> -->
+</odoo>

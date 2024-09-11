@@ -317,8 +317,9 @@ class AccountAnalyticLine(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
-        values = self._check_change_value_timesheet(vals)
-        vals.update(values)
+        for record in self:
+            values = record._check_change_value_timesheet(vals)
+            vals.update(values)
         return super(AccountAnalyticLine, self).write(vals)
 
     def _check_change_value_timesheet(self, vals):

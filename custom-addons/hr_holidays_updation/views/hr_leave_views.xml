@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="before">
                 <field name="inform_to" widget="many2many_avatar_employee"/> 
+                <field name="extra_approvers" widget="many2many_avatar_employee"/>
             </xpath>
         </field>
     </record>
@@ -19,6 +20,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='duration_display']" position="before">
                 <field name="inform_to" widget="many2many_avatar_employee"/> 
+                <field name="extra_approvers" widget="many2many_avatar_employee"/> 
             </xpath>
         </field>
     </record>
