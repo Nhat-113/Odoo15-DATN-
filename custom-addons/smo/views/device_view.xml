@@ -25,9 +25,9 @@
         <field name="name">smo.device.tree</field>
         <field name="model">smo.device</field>
         <field name="arch" type="xml">
-            <tree string="Devices" create="false" edit="false" delete="false" export_xlsx="false"
+            <tree string="Devices" create="false" delete="false" export_xlsx="false"
                     js_class="smo_custom_list_view" expand="1">
-                <field name="asset_name"/>
+                <field name="asset_name" />
                 <field name="device_name" />
                 <field name="device_type" />
                 <field name="last_sync_time" />
@@ -39,23 +39,23 @@
         <field name="name">smo.device.form</field>
         <field name="model">smo.device</field>
         <field name="arch" type="xml">
-            <form create="false" edit="false" delete="false" export_xlsx="false"
+            <form create="false" delete="false" export_xlsx="false"
                     js_class="smo_custom_form_view"> 
                 <sheet>
                     <group>
                         <group>
-                            <field name="device_name"/>
-                            <field name="device_type"/>
-                            <field name="last_sync_time"/>
+                            <field name="device_name" readonly="1"/>
+                            <field name="device_type" readonly="1"/>
                         </group>
                         <group>
-                            <field name="asset_name"/>
+                            <field name="asset_name" readonly="1"/>
+                            <field name="last_sync_time" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Air Quality" attrs="{'invisible': [('device_type', '!=', 'IAQ')]}">
-                            <field name="smo_device_iaq_ids">
-                                <tree create="false" delete="false">
+                            <field name="smo_device_iaq_ids" readonly="1">
+                                <tree create="false" delete="false" no_open="1">
                                     <field name="param_name"/>
                                     <field name="current_value"/>
                                     <field name="unit"/>
@@ -65,9 +65,20 @@
                         </page>
                         <page string="Light Bulbs" attrs="{'invisible': [('device_type', '!=', 'LC')]}">
                             <field name="smo_device_lc_ids">
-                                <tree create="false" delete="false">
+                                <tree create="false" editable="top" delete="false">
                                     <field name="name"/>
                                     <field name="current_state" widget="boolean_toggle"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Air Conditioner" attrs="{'invisible': [('device_type', '!=', 'AC')]}">
+                            <field name="smo_device_ac_ids">
+                                <tree create="false" editable="top" delete="false">
+                                    <field name="name" />
+                                    <field name="power_state" widget="boolean_toggle"/>
+                                    <field name="temperature" />
+                                    <field name="mode" />
+                                    <field name="fan_speed" />
                                 </tree>
                             </field>
                         </page>

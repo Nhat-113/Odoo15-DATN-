@@ -4,9 +4,9 @@
         <field name="name">smo.device.lc.tree</field>
         <field name="model">smo.device.lc</field>
         <field name="arch" type="xml">
-            <tree string="LC Devices" create="false" edit="false" delete="false" export_xlsx="false"
+            <tree string="LC Devices" create="false" editable="top" delete="false" export_xlsx="false"
                     js_class="smo_custom_list_view" expand="1">
-                <field name="device_name" />
+                <field name="device_name" readonly="1"/>
                 <field name="name"/>
                 <field name="current_state" widget="boolean_toggle"/>
             </tree>

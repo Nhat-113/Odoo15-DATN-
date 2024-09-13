@@ -3,6 +3,9 @@ from helper.smo_helper import make_request
 from odoo.exceptions import UserError
 import requests
 import json
+import logging
+
+_logger = logging.getLogger('smo.logger')
 
 class SmoAsset(models.Model):
     _name = "smo.asset"
@@ -31,22 +34,28 @@ class SmoAsset(models.Model):
         }
         
         try:
+            _logger.info(f'Call API to fetch assets')
             response = make_request(self, '/api/relations/info', method='GET',
                             params=params,
                             access_token=tokens_record.access_token)
             response.raise_for_status()
         except requests.HTTPError as http_err:
+            _logger.error(f'API Server Response: {response.status_code} - Call API to fetch assets failed: {json.loads(response.text)["message"]}')
             if response.status_code == 401:
                 self.env['smo.token'].refresh_access_token(smo_uid)
                 self.fetch_assets(smo_uid)
             else:
                 raise UserError(f'Failed to fetch assets: {response.text}')
         except Exception as err:
+            _logger.error(f'Odoo Server Error: Call API to fetch assets failed: {err}')
             raise UserError(f'Something went wrong! Please check your API URL and try again!')
 
         try:
+            _logger.info(f'API Server Response: {response.status_code} - Call API to fetch assets successfully')
+            _logger.info(f'Parse response data of assets')
             data = response.json()
         except Exception as err:
+            _logger.error(f'Odoo Server Error: Failed to parse response data of assets: {err}')
             raise UserError('Failed to parse response data of assets')
 
         existing_assets = {asset.asset_id: asset for asset in self.search([('smo_tenant_id', '=', customer_id)])}
@@ -64,8 +73,10 @@ class SmoAsset(models.Model):
             fetched_asset_ids.append(asset_id)
 
             if asset_id in existing_assets:
+                _logger.info(f'Update DB: Update asset [{asset_name}]: [asset_name: {existing_assets[asset_id].asset_name} ➜ {asset_name}]')
                 existing_assets[asset_id].write({'asset_name': asset_name})
             else:
+                _logger.info(f'Update DB: Create new asset record to store asset data [{asset_name}]')
                 self.create({
                     'smo_tenant_id': tenant_record.id,
                     'customer_id': tenant_record.customer_id,
@@ -75,6 +86,7 @@ class SmoAsset(models.Model):
 
         assets_to_delete = [asset for asset_id, asset in existing_assets.items() if asset_id not in fetched_asset_ids]
         for asset in assets_to_delete:
+            _logger.info(f'Update DB: Delete asset record [{asset.asset_name}]')
             asset.unlink()
 
         self.env.cr.commit()

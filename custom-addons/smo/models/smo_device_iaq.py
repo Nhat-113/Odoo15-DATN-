@@ -1,16 +1,23 @@
 from odoo import models, fields, api
+import json
+import logging
+
+_logger = logging.getLogger('smo.logger')
 
 class SmoDeviceIaq(models.Model):
     _name = "smo.device.iaq"
     _description = "SmartOffice IAQ Devices"
-
+    _rec_name = "device_name"
+    
     smo_device_id = fields.Many2one('smo.device', string="SmartOffice Device ID", required=True, ondelete='cascade')
     device_id = fields.Char(string="Device ID", required=True)
     device_name = fields.Char(string="Device Name")
     device_type= fields.Char(string="Device Type")
+    
     param_name = fields.Char(string="Parameter", required=True, readonly=True)
-    unit = fields.Char(string="Unit of Measurement", readonly=True, compute='_compute_unit')
     current_value = fields.Char(string="Current Value", required=True, readonly=True)
+    unit = fields.Char(string="Unit of Measurement", readonly=True, compute='_compute_unit')
+    
     last_updated = fields.Datetime(string="Last Updated", required=True, readonly=True)
 
     @api.depends('param_name')

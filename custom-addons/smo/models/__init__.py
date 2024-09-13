@@ -7,4 +7,5 @@ from . import smo_device_iaq
 from . import smo_device_lc
 from . import ir_cron
 from . import smo_device_lc_schedule
+from . import smo_device_ac
 from . import res_config_settings
