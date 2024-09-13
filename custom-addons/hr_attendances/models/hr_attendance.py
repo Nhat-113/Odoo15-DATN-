@@ -1,6 +1,7 @@
 from odoo import models, fields, api
 from dateutil import tz
 from datetime import date, time, timedelta
+from odoo.exceptions import ValidationError
 import pandas as pd
 import pytz
 
@@ -90,17 +91,32 @@ class HrAttendance(models.Model):
                 record.end = end.astimezone(local_tz)
             else:
                 record.end = False
+                
+    def validate_duplicate(self, employee_id, check_in, check_out):
+        if check_in and check_out and check_in == check_out:
+            raise ValidationError('Check-in and check-out time cannot be the same.')
+        
+        attendances_times = []
+        if check_in:
+            attendances_times.append(check_in)
+        if check_out:
+            attendances_times.append(check_out)
+        
+        attendances_records = self.search([
+            ('employee_id', '=', employee_id),
+            '|',
+                ('check_in', 'in', attendances_times),
+                ('check_out', 'in', attendances_times)
+        ])
+        
+        if attendances_records:
+            raise ValidationError(f'Employee has already checked-in or checked-out at this time.')
+        
 
     @api.constrains('check_in', 'check_out', 'employee_id')
     def _check_validity(self):
-        """ Verifies the validity of the attendance record compared to the others from the same employee.
-            For the same employee we must have :
-                * maximum 1 "open" attendance record (without check_out)
-                * no overlapping time slices with previous employee records
-        """
-        # TODO create check validity func here
-        return True
-
+        pass
+        
     def is_working_day(self, date):
         return bool(len(pd.bdate_range(date, date)))
     
@@ -131,9 +147,12 @@ class HrAttendance(models.Model):
     def create(self, vals):
         data_new = {
             "employee_id": vals['employee_id'],
-            "check_in": vals['check_in'],
-            "check_out": vals['check_out'] if 'check_out' in vals else False
+            "check_in": vals['check_in'] if 'check_in' in vals else None,
+            "check_out": vals['check_out'] if 'check_out' in vals else None
         }
+        
+        self.validate_duplicate(data_new['employee_id'], data_new['check_in'], data_new['check_out'])
+        
         if 'from_api' not in vals:
             self.env['hr.attendance.pesudo'].create(data_new)
         vals.pop('from_api', None)
@@ -163,6 +182,8 @@ class HrAttendance(models.Model):
         if 'from_api' not in vals:
             multiple_mode = self.env.user.company_id.attendance_view_type
             self._change_pesudo(vals, next(iter(vals)), multiple_mode)
+        if 'check_out' in vals and vals['check_out'] == str(self.check_in):
+            raise ValidationError('Employee has already checked-in or checked-out at this time.')
         return super(HrAttendance, self).write({next(iter(vals)): vals[next(iter(vals))]})
 
 
