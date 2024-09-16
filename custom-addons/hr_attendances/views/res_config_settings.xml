@@ -11,17 +11,33 @@
                     <h2>Hour Work Start</h2>
                     <div class="row mt16 o_settings_container" name="attendance_view_type">
                         <div class="col-12 col-lg-6 o_setting_box">
-                        <div>
-                            <div class="o_form_label">
+                            <div>
+                                <div class="o_form_label">
                                 The start time of the workday cycle for multi records.
-                            </div>
-                            <div class="text-muted">
+                                </div>
+                                <div class="text-muted">
                                 Allows you to customize the start time for calculating work hours for a day.
+                                </div>
                             </div>
-                        </div>
-                            <div class="o_setting_left_pane w-50" >
+                            <div class="o_setting_left_pane w-50">
                                 <field name="enable_split_shift" class="mb-20" widget="boolean_toggle"></field>
                                 <field class="form-control" name="hour_work_start" attrs="{'invisible':[('enable_split_shift','=',False)]}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <h2>Working Hours</h2>
+                    <div class="row mt16 o_settings_container" name="attendance_view_type">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div>
+                                <div class="o_form_label">
+                                For working hours calculation.
+                                </div>
+                                <div class="text-muted">
+                                Allows you to exclude lunch break time from working hours when exporting the attendance file.
+                                </div>
+                            </div>
+                            <div class="o_setting_left_pane w-50">
+                                <field name="remove_lunch_break" class="mb-20" widget="boolean_toggle"></field>
                             </div>
                         </div>
                     </div>
@@ -29,13 +45,13 @@
             </field>
         </record>
 
-    <record id="action_company_location_configuration" model="ir.actions.act_window">
-        <field name="name">Settings</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">res.config.settings</field>
-        <field name="view_mode">form</field>
-        <field name="target">inline</field>
-        <field name="context">{'module' : 'company_location'}</field>
-    </record>
+        <record id="action_company_location_configuration" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'company_location'}</field>
+        </record>
     </data>
 </odoo>
