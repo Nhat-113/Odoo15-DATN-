@@ -179,11 +179,18 @@ class HrAttendance(models.Model):
                     latest_pseudo.update(vals)     
 
     def write(self, vals):
+        if 'check_in' or 'check_out' in vals:
+            data_new = {
+                "employee_id": self.employee_id.id,
+                "check_in": vals['check_in'] if 'check_in' in vals else None,
+                "check_out": vals['check_out'] if 'check_out' in vals else None
+            }
+            
+            self.validate_duplicate(data_new['employee_id'], data_new['check_in'], data_new['check_out'])
+            
         if 'from_api' not in vals:
             multiple_mode = self.env.user.company_id.attendance_view_type
             self._change_pesudo(vals, next(iter(vals)), multiple_mode)
-        if 'check_out' in vals and vals['check_out'] == str(self.check_in):
-            raise ValidationError('Employee has already checked-in or checked-out at this time.')
         return super(HrAttendance, self).write({next(iter(vals)): vals[next(iter(vals))]})
 
 
