@@ -116,6 +116,12 @@ class HrAttendance(models.Model):
     @api.constrains('check_in', 'check_out', 'employee_id')
     def _check_validity(self):
         pass
+    
+    @api.constrains('check_in', 'check_out')
+    def _check_empty_in_out(self):
+        for rec in self:
+            if not rec.check_in and not rec.check_out:
+                raise ValidationError('Check-in and check-out cannot be empty during the same attendance')
         
     def is_working_day(self, date):
         return bool(len(pd.bdate_range(date, date)))
