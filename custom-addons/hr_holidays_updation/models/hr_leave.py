@@ -150,7 +150,8 @@ class HrLeave(models.Model):
         
         running_projects = self.env['project.project'].search([
             ('date_start', '<=', now),
-            ('date', '>=', now)
+            ('date', '>=', now),
+            ('member_ids', '=', self.env.user.id)
         ])
         
         pm_ids = [
