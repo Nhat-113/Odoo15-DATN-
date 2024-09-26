@@ -1,11 +1,11 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 
 
 
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
     
-    attendance_view_type = fields.Boolean(string="Attendance view multiple records", default=False, store=True)
+    attendance_view_type = fields.Boolean(string=_("Attendance view multiple records"), default=False, store=True)
     
     
     

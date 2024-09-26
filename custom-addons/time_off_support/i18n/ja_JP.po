@@ -1,0 +1,77 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* time_off_support
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 15.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-24 09:39+0000\n"
+"PO-Revision-Date: 2024-09-24 09:39+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: time_off_support
+#: model:ir.model,name:time_off_support.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: time_off_support
+#: model:ir.model,name:time_off_support.model_hr_departure_wizard
+msgid "Departure Wizard"
+msgstr ""
+
+#. module: time_off_support
+#: model:ir.model,name:time_off_support.model_export_wizard
+msgid "Export Excel Wizard"
+msgstr ""
+
+#. module: time_off_support
+#: model:ir.model.fields,field_description:time_off_support.field_res_company__time_off_type_unpaid_id
+msgid "For Unpaid"
+msgstr ""
+
+#. module: time_off_support
+#: model:ir.model.fields,field_description:time_off_support.field_res_company__time_off_type_id
+msgid "For Work From Home"
+msgstr ""
+
+#. module: time_off_support
+#: model:ir.model,name:time_off_support.model_res_company
+msgid "Res Partner Director"
+msgstr ""
+
+#. module: time_off_support
+#: model_terms:ir.ui.view,arch_db:time_off_support.res_config_settings_view_form
+msgid "Specify the `unpaid leave` type to export attendance file"
+msgstr "無給休暇の種類を指定して勤怠データを出力します。"
+
+#. module: time_off_support
+#: model_terms:ir.ui.view,arch_db:time_off_support.res_config_settings_view_form
+msgid "Specify the `work from home` type to export attendance file"
+msgstr "在宅勤務の種類を指定して勤怠データを出力します。"
+
+#. module: time_off_support
+#: model:ir.model.fields,field_description:time_off_support.field_res_config_settings__time_off_type_id
+#: model_terms:ir.ui.view,arch_db:time_off_support.res_config_settings_view_form
+msgid "Time Off Type"
+msgstr "休暇の種類"
+
+#. module: time_off_support
+#: model:ir.model.fields,field_description:time_off_support.field_res_config_settings__time_off_type_unpaid_id
+msgid "Time Off Type Unpaid"
+msgstr ""
+
+#. module: time_off_support
+#: model_terms:ir.ui.view,arch_db:time_off_support.res_config_settings_view_form
+msgid "Type of remote work"
+msgstr "在宅勤務の種類"
+
+#. module: time_off_support
+#: model_terms:ir.ui.view,arch_db:time_off_support.res_config_settings_view_form
+msgid "Type of unpaid leave"
+msgstr "無給休暇の種類"

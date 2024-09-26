@@ -1,0 +1,1102 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* hr_attendances
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 15.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-24 08:10+0000\n"
+"PO-Revision-Date: 2024-09-24 08:10+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_attendance_missing.py:0
+#, python-format
+msgid " Time Off Request"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__00:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__00:00
+msgid "00:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__00:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__00:15
+msgid "00:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__00:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__00:30
+msgid "00:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__00:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__00:45
+msgid "00:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__01:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__01:00
+msgid "01:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__01:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__01:15
+msgid "01:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__01:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__01:30
+msgid "01:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__01:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__01:45
+msgid "01:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__02:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__02:00
+msgid "02:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__02:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__02:15
+msgid "02:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__02:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__02:30
+msgid "02:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__02:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__02:45
+msgid "02:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__03:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__03:00
+msgid "03:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__03:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__03:15
+msgid "03:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__03:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__03:30
+msgid "03:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__03:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__03:45
+msgid "03:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__04:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__04:00
+msgid "04:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__04:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__04:15
+msgid "04:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__04:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__04:30
+msgid "04:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__04:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__04:45
+msgid "04:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__05:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__05:00
+msgid "05:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__05:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__05:15
+msgid "05:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__05:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__05:30
+msgid "05:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__05:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__05:45
+msgid "05:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__06:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__06:00
+msgid "06:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__06:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__06:15
+msgid "06:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__06:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__06:30
+msgid "06:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__06:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__06:45
+msgid "06:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__07:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__07:00
+msgid "07:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__07:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__07:15
+msgid "07:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__07:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__07:30
+msgid "07:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__07:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__07:45
+msgid "07:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__08:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__08:00
+msgid "08:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__08:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__08:15
+msgid "08:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__08:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__08:30
+msgid "08:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__08:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__08:45
+msgid "08:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__09:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__09:00
+msgid "09:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__09:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__09:15
+msgid "09:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__09:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__09:30
+msgid "09:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__09:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__09:45
+msgid "09:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__10:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__10:00
+msgid "10:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__10:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__10:15
+msgid "10:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__10:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__10:30
+msgid "10:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__10:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__10:45
+msgid "10:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__11:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__11:00
+msgid "11:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__11:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__11:15
+msgid "11:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__11:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__11:30
+msgid "11:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__11:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__11:45
+msgid "11:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__12:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__12:00
+msgid "12:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__12:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__12:15
+msgid "12:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__12:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__12:30
+msgid "12:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__12:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__12:45
+msgid "12:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__13:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__13:00
+msgid "13:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__13:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__13:15
+msgid "13:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__13:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__13:30
+msgid "13:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__13:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__13:45
+msgid "13:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__14:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__14:00
+msgid "14:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__14:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__14:15
+msgid "14:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__14:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__14:30
+msgid "14:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__14:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__14:45
+msgid "14:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__15:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__15:00
+msgid "15:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__15:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__15:15
+msgid "15:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__15:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__15:30
+msgid "15:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__15:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__15:45
+msgid "15:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__16:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__16:00
+msgid "16:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__16:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__16:15
+msgid "16:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__16:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__16:30
+msgid "16:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__16:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__16:45
+msgid "16:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__17:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__17:00
+msgid "17:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__17:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__17:15
+msgid "17:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__17:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__17:30
+msgid "17:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__17:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__17:45
+msgid "17:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__18:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__18:00
+msgid "18:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__18:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__18:15
+msgid "18:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__18:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__18:30
+msgid "18:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__18:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__18:45
+msgid "18:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__19:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__19:00
+msgid "19:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__19:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__19:15
+msgid "19:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__19:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__19:30
+msgid "19:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__19:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__19:45
+msgid "19:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__20:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__20:00
+msgid "20:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__20:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__20:15
+msgid "20:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__20:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__20:30
+msgid "20:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__20:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__20:45
+msgid "20:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__21:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__21:00
+msgid "21:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__21:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__21:15
+msgid "21:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__21:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__21:30
+msgid "21:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__21:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__21:45
+msgid "21:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__22:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__22:00
+msgid "22:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__22:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__22:15
+msgid "22:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__22:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__22:30
+msgid "22:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__22:45
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__22:45
+msgid "22:45"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__23:00
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__23:00
+msgid "23:00"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__23:15
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__23:15
+msgid "23:15"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_company__hour_work_start__23:30
+#: model:ir.model.fields.selection,name:hr_attendances.selection__res_config_settings__hour_work_start__23:30
+msgid "23:30"
+msgstr ""
+
+#. module: hr_attendances
+#: model_terms:ir.ui.view,arch_db:hr_attendances.res_config_settings_view_form_inherit_attendance_distance
+msgid ""
+"Allows you to customize the start time for calculating work hours for a day."
+msgstr "当日の勤務時間を計算するための開業時刻をカスタマイズできるようにします。"
+
+#. module: hr_attendances
+#: model_terms:ir.ui.view,arch_db:hr_attendances.res_config_settings_view_form_inherit_attendance_distance
+msgid ""
+"Allows you to exclude lunch break time from working hours when exporting the"
+" attendance file."
+msgstr "勤怠管理表の勤務時間から休憩時間を削除できるようにします。"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Annual Leave"
+msgstr "年次有給休暇"
+
+#. module: hr_attendances
+#: model:ir.model,name:hr_attendances.model_hr_attendance
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_employee__attendance_ids
+#: model_terms:ir.ui.view,arch_db:hr_attendances.view_calendar_hr_attendance
+msgid "Attendance"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.actions.act_window,name:hr_attendances.hr_attendance_pseudo_report_action
+#: model:ir.ui.menu,name:hr_attendances.menu_hr_attendance_pseudo
+msgid "Attendance Pseudo"
+msgstr "打刻詳細"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Attendance Report"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_employee__attendance_state
+msgid "Attendance Status"
+msgstr ""
+
+#. module: hr_attendances
+#: model_terms:ir.ui.view,arch_db:hr_attendances.view_export_wizard_form
+msgid "Cancel"
+msgstr "取消"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance__check_in
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__check_in
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_employee__last_check_in
+msgid "Check In"
+msgstr "チェックイン"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__check_out
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_employee__last_check_out
+msgid "Check Out"
+msgstr "チェックアウト"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_attendance.py:0
+#, python-format
+msgid "Check-in and check-out cannot be empty during the same attendance"
+msgstr "入室打刻と退室打刻を同時に空白のままにすることはできません。"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_attendance.py:0
+#, python-format
+msgid "Check-in and check-out time cannot be the same."
+msgstr "入室打刻と退室打刻を同じにすることはできません。"
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__hr_employee__attendance_state__checked_in
+msgid "Checked in"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields.selection,name:hr_attendances.selection__hr_employee__attendance_state__checked_out
+msgid "Checked out"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model,name:hr_attendances.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_export_wizard__create_uid
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_export_wizard__create_date
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_res_company__enable_split_shift
+#: model:ir.model.fields,field_description:hr_attendances.field_res_config_settings__enable_split_shift
+msgid "Customize"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Daily Attendance"
+msgstr "打刻日"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_export_wizard__display_name
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_attendance.py:0
+#: model:ir.model.fields.selection,name:hr_attendances.selection__hr_attendance__status__early
+#, python-format
+msgid "Early"
+msgstr "早出"
+
+#. module: hr_attendances
+#: model:ir.model,name:hr_attendances.model_hr_employee
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__employee_id
+msgid "Employee"
+msgstr "従業員"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_attendance.py:0
+#, python-format
+msgid "Employee has already checked-in or checked-out at this time."
+msgstr "従業員は現時点で出勤打刻か退勤打刻しました。"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance__end
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__end
+msgid "End"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#: model:ir.model.fields,field_description:hr_attendances.field_export_wizard__end_date
+#, python-format
+msgid "End Date"
+msgstr "終了日"
+
+#. module: hr_attendances
+#. openerp-web
+#: code:addons/hr_attendances/static/src/xml/export_excel_view.xml:0
+#: model_terms:ir.ui.view,arch_db:hr_attendances.view_export_wizard_form
+#, python-format
+msgid "Export"
+msgstr "データ出力"
+
+#. module: hr_attendances
+#. openerp-web
+#: code:addons/hr_attendances/static/src/js/export_excel_view.js:0
+#, python-format
+msgid "Export Attendances"
+msgstr "勤怠データの出力"
+
+#. module: hr_attendances
+#: model_terms:ir.ui.view,arch_db:hr_attendances.view_export_wizard_form
+msgid "Export Excel Attendance"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model,name:hr_attendances.model_export_wizard
+msgid "Export Excel Wizard"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.actions.act_window,name:hr_attendances.export_wizard_action
+msgid "Export Excel Wizard Action"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_employee__fingerprint_template
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_employee_public__fingerprint_template
+msgid "Fingerprint"
+msgstr "指紋"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "From"
+msgstr "開始日："
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "From date"
+msgstr "開始日："
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Full Name"
+msgstr "氏名"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_res_company__hour_work_start
+#: model:ir.model.fields,field_description:hr_attendances.field_res_config_settings__hour_work_start
+#: model_terms:ir.ui.view,arch_db:hr_attendances.res_config_settings_view_form_inherit_attendance_distance
+msgid "Hour Work Start"
+msgstr "開業時刻"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_export_wizard__id
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__id
+msgid "ID"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#: code:addons/hr_attendances/models/hr_attendance.py:0
+#, python-format
+msgid "Invalid time format. Expected 'HH:MM'."
+msgstr "無効な時刻形式です。例：'HH:MM'"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__is_admin_system
+msgid "Is Admin System"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Job Title"
+msgstr "職名"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_employee__last_attendance_id
+msgid "Last Attendance"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_export_wizard____last_update
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_export_wizard__write_uid
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_export_wizard__write_date
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_attendance.py:0
+#: model:ir.model.fields.selection,name:hr_attendances.selection__hr_attendance__status__late
+#, python-format
+msgid "Late"
+msgstr "遅刻"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance__location_date
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance__location_date_multi
+msgid "Location Date"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_res_company__remove_lunch_break
+#: model:ir.model.fields,field_description:hr_attendances.field_res_config_settings__remove_lunch_break
+msgid "Lunch Break"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Missing Working Hours"
+msgstr "勤務時間の不足"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "NO."
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "OFF"
+msgstr "休む"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Official"
+msgstr "正式"
+
+#. module: hr_attendances
+#: model:ir.model,name:hr_attendances.model_hr_employee_public
+msgid "Public Employee"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_attendance_missing.py:0
+#, python-format
+msgid "Public Holiday (Time Off) enabled successfully"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_attendance_missing.py:0
+#, python-format
+msgid "Public Holiday disabled successfully"
+msgstr ""
+
+#. module: hr_attendances
+#: model_terms:ir.ui.view,arch_db:hr_attendances.res_config_settings_view_form_inherit_attendance_distance
+msgid "Remove lunch break time"
+msgstr "休憩時間の削除"
+
+#. module: hr_attendances
+#: model:ir.model,name:hr_attendances.model_res_company
+msgid "Res Partner Director"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.actions.act_window,name:hr_attendances.action_company_location_configuration
+msgid "Settings"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Shift"
+msgstr "シフト"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Standard Work"
+msgstr "所定労働日数"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Standard Workdays/Hours"
+msgstr "標準労働日数/時間"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance__start
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__start
+msgid "Start"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#: model:ir.model.fields,field_description:hr_attendances.field_export_wizard__start_date
+#, python-format
+msgid "Start Date"
+msgstr "開始日："
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance__status
+msgid "Status"
+msgstr "状態"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_employee__sync_write_date
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_employee_public__sync_write_date
+msgid "Sync Field Date"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "The start date must be less than the end date!"
+msgstr "開始日を終了日よりも前の日付にする必要があります。"
+
+#. module: hr_attendances
+#: model_terms:ir.ui.view,arch_db:hr_attendances.res_config_settings_view_form_inherit_attendance_distance
+msgid "The start time of the workday cycle for multi records."
+msgstr "開業時刻設定"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Time Sheet"
+msgstr "タイムシート"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_attendance.py:0
+#: model:ir.model.fields.selection,name:hr_attendances.selection__hr_attendance__status__timely
+#, python-format
+msgid "Timely"
+msgstr "定刻"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "To date"
+msgstr "終了日："
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Total"
+msgstr "合計"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid ""
+"Total\n"
+"Workdays"
+msgstr ""
+"合計\n"
+"労働日数"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid ""
+"Total\n"
+"Working Hours"
+msgstr ""
+"合計\n"
+"労働時間"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Unpaid Leave"
+msgstr "無給休暇"
+
+#. module: hr_attendances
+#: model:ir.model,name:hr_attendances.model_res_users
+msgid "Users"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_employee.py:0
+#, python-format
+msgid "Work email is already in use."
+msgstr "入力したメールアドレスはすでに存在します。"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "Work from Home"
+msgstr "在宅勤務"
+
+#. module: hr_attendances
+#: model:ir.model.fields,field_description:hr_attendances.field_hr_attendance_pesudo__worked_hours
+msgid "Worked Hours"
+msgstr "勤務時間"
+
+#. module: hr_attendances
+#: model_terms:ir.ui.view,arch_db:hr_attendances.res_config_settings_view_form_inherit_attendance_distance
+msgid "Working Hours"
+msgstr "勤務時刻"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_employee.py:0
+#: code:addons/hr_attendances/models/hr_employee.py:0
+#, python-format
+msgid "Wrong PIN"
+msgstr "入力したPINコードが間違っています。"
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/hr_employee.py:0
+#, python-format
+msgid ""
+"You cannot access the Check In / Out manual! Please use the Facelog device "
+"to Check In / Out and do not access this URL"
+msgstr "このURLをクリックすると打刻できなくなりました。打刻にはFaceLogデバイスを使用してください。"
+
+#. module: hr_attendances
+#: model:ir.model,name:hr_attendances.model_hr_attendance_pesudo
+msgid "hr.attendance.pesudo"
+msgstr ""
+
+#. module: hr_attendances
+#: model:ir.model.fields,help:hr_attendances.field_hr_employee__attendance_ids
+msgid "list of attendances for the employee"
+msgstr ""
+
+#. module: hr_attendances
+#: code:addons/hr_attendances/models/export_wizard.py:0
+#, python-format
+msgid "to"
+msgstr "終了日："
+
+#. module: hr_attendance
+#: model_terms:ir.ui.view,arch_db:hr_attendance.view_attendance_tree
+msgid "Work Hours"
+msgstr "勤務時間"
+
+#. module: hr_attendance
+#: model:ir.ui.menu,name:hr_attendance.menu_hr_attendance_my_attendances
+msgid "Check In / Check Out"
+msgstr "チェックイン / チェックアウト"
+
+
+
+

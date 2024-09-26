@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, time, timedelta
-from odoo import api, fields, models, exceptions
+from odoo import api, fields, models, exceptions, _
 from pytz import timezone, utc
 
 def _get_user_time(self, hour, minute, second):
@@ -17,11 +17,11 @@ class Passcode(models.Model):
     _description = "Passcode"
     _rec_name = "name"
     
-    name = fields.Char(string="Name", required=True)
-    passcode = fields.Char(string="Passcode", required=True, size=4)
+    name = fields.Char(string=_("Name"), required=True)
+    passcode = fields.Char(string=_("Passcode"), required=True, size=4)
     device_ids = fields.Many2many(
         comodel_name="box.management",
-        string="Devices",
+        string=_("Devices"),
         relation="device_passcode_rel",
         column1="passcode_id",
         column2="device_id",
@@ -50,9 +50,9 @@ class Passcode(models.Model):
     def _check_passcode(self):
         for record in self:
             if len(record.passcode) != 4:
-                raise exceptions.ValidationError(("Passcode must be 4 digits."))
+                raise exceptions.ValidationError(_("Passcode must be 4 digits."))
             if not record.passcode.isdigit():
-                raise exceptions.ValidationError(("Passcode must be numeric."))
+                raise exceptions.ValidationError(_("Passcode must be numeric."))
 
     def unlink(self):
         update_passcode_remove = super(Passcode, self).write({"active": False})

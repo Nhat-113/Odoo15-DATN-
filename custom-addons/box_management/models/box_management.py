@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import date, datetime
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 
 
 class BoxManagement(models.Model):
@@ -18,9 +18,9 @@ class BoxManagement(models.Model):
         copy=False,
         tracking=True,
         selection=[
-            ("box_in", "In"),
-            ("box_out", "Out"),
-            ("box_io", "In/Out"),
+            ("box_in", _("In")),
+            ("box_out", _("Out")),
+            ("box_io", _("In/Out")),
         ]
     )
     
@@ -31,7 +31,7 @@ class BoxManagement(models.Model):
       column1="device_id", 
       column2="employee_id")
 
-    note = fields.Text(string="Note")
+    note = fields.Text(string=_("Note"))
 
     def write(self, vals):
         ## Validasi Karakter pada field 'name'
