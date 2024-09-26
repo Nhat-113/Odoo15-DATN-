@@ -680,7 +680,7 @@ class ExportWizard(models.TransientModel):
         # start date = A, end date = B, start leave = C, end leave = D
         approved_leaves = self.env['hr.leave'].search([
             ('state', '=', 'validate'),
-            '|', '|', '|',
+            '|', '|',
             '&',  # A <= C <= B
                 ('request_date_from', '>=', start_date),
                 ('request_date_from', '<=', end_date),
