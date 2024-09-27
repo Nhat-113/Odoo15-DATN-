@@ -150,12 +150,14 @@ class HumanResourceManagementHistory(models.Model):
                                         + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
         elif is_div_manager(current_user):
-            sql_domain_for_company = 'where (company_id = ' + str(current_user.company_id.id)
+            sql_domain_for_company = 'where ('
             sql_for_department = get_sql_by_department(self)
+            sql_for_department = sql_for_department.replace('and', '', 1)
 
         elif is_group_leader(current_user):
-            sql_domain_for_company = 'where (company_id = ' + str(current_user.company_id.id)
+            sql_domain_for_company = 'where ('
             sql_for_department = get_sql_by_department(self)
+            sql_for_department = sql_for_department.replace('and', '', 1)
 
         sql = ("""select  	employee_name,
                             company_name,
@@ -231,12 +233,14 @@ class HumanResourceManagementHistory(models.Model):
             sql_domain_for_role = ' and company_manager_user_id = ' + str(current_user.id) + ')'
 
         elif is_div_manager(current_user) and not is_sub_ceo(current_user):
-            sql_domain_for_company  = 'where ( company_id = ' + str(current_user.company_id.id)
+            sql_domain_for_company = 'where ('
             sql_for_department = get_sql_by_department(self)
+            sql_for_department = sql_for_department.replace('and', '', 1)
 
         elif is_group_leader(current_user) and not is_div_manager(current_user):
-            sql_domain_for_company  = 'where ( company_id = ' + str(current_user.company_id.id)
+            sql_domain_for_company = 'where ('
             sql_for_department = get_sql_by_department(self)
+            sql_for_department = sql_for_department.replace('and', '', 1)
 
         sql = ("""SELECT  employee_id, employee_name, company_name, department_name,
 				SUM (month1 ) as month1,
