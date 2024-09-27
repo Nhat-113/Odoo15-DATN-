@@ -172,3 +172,14 @@ def get_avatar_model(model, id):
     avatar = f"{base_url}/api/get_image?model={model}&id={id}"
     
     return avatar
+
+def get_children_departments(self, department_ids):
+    children_departments = []
+    
+    direct_children = self.env['hr.department'].search([('parent_id', 'in', department_ids)])
+    
+    if direct_children:
+        children_departments = direct_children.ids
+        children_departments.extend(get_children_departments(self, children_departments))
+    
+    return children_departments
