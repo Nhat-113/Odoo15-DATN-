@@ -183,3 +183,9 @@ def get_children_departments(self, department_ids):
         children_departments.extend(get_children_departments(self, children_departments))
     
     return children_departments
+
+def get_children_departments_managers(self, department_ids):
+    children_departments_ids = get_children_departments(self, department_ids)
+    children_departments = self.env['hr.department'].browse(children_departments_ids)
+    children_departments_managers_ids = [department.manager_id.user_id.id for department in children_departments]
+    return children_departments_managers_ids
