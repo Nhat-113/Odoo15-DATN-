@@ -146,21 +146,30 @@ class HrLeave(models.Model):
     @api.depends('date_from', 'date_to')
     def _compute_extra_approvers(self):
         now = fields.Datetime.now()
-        user_company = self.env.user.company_id
+        crr_user = self.env.user
         
-        running_projects = self.env['project.project'].search([
-            ('date_start', '<=', now),
-            ('date', '>=', now),
-            ('member_ids', '=', self.env.user.id)
+        booked_resources = self.env['planning.calendar.resource'].search([
+            ('employee_id', '=', crr_user.employee_id.id),
+            '|', '|',
+                '&',
+                    ('start_date', '<=', self.request_date_from),
+                    ('end_date', '>=', self.request_date_from),
+                '&',
+                    ('start_date', '<=', self.request_date_to),
+                    ('end_date', '>=', self.request_date_to),
+                '&',
+                    ('start_date', '>=', self.request_date_from),
+                    ('end_date', '<=', self.request_date_to),
         ])
         
+        running_projects = booked_resources.project_id
+        
         pm_ids = [
-            project.user_id.employee_id.id 
+            project.user_id.employee_ids.id
             for project in running_projects
-            if project.user_id.company_id == user_company
-            and project.user_id != self.env.user.leave_manager_id
-            and project.user_id != self.env.user
-            and project.user_id.employee_id
+            if project.user_id.employee_ids
+            and project.user_id != crr_user
+            and project.user_id != crr_user.leave_manager_id
         ]
         
         for leave in self:
