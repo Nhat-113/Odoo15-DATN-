@@ -3,6 +3,7 @@ from datetime import date
 import json
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+from helper.helper import get_children_departments
 
 LIST_MONTHS = [('1', 'January'), ('2', 'February'), ('3', 'March'), ('4', 'April'),
             ('5', 'May'), ('6', 'June'), ('7', 'July'), ('8', 'August'), 
@@ -75,7 +76,7 @@ class SupportServices(models.Model):
     company_ids = fields.Many2many('res.company', string='Companies')
     expense_type = fields.Many2one('expense.support.service', tracking=True, string="Expense Type")
     category_expense = fields.Many2one('expense.general.category', tracking=True, string="Expense Category")
-    domain_department_id = fields.Char(string="Department domain", readonly=True, store=False, compute='_compute_domain_project_department')
+    domain_department_id = fields.Char(string="Department domain", readonly=True, store=False, compute='_compute_domain_department_id')
     domain_project_id = fields.Char(string="Project domain", readonly=True, store=False, compute='_compute_domain_project_department')
     check_readonly_field_project = fields.Boolean(default=False, compute='compute_domain_readonly_project')
 
@@ -200,7 +201,34 @@ class SupportServices(models.Model):
     def _compute_domain_project_department(self):
         for record in self:
             record.domain_project_id = json.dumps([('company_id', '=', record.company_id.id)])
-            record.domain_department_id = json.dumps([('company_id', '=', record.company_id.id)])
+            
+    @api.depends('requester_id', 'company_id')
+    def _compute_domain_department_id(self):
+        requester_employee_ids = self.requester_id.employee_ids.ids
+        all_managing_departments = self.env['hr.department'].search([('manager_id', 'in', requester_employee_ids)])
+        
+        for record in self:
+            requester_employee_id = record.requester_id.employee_id
+            domain = json.dumps([('id', '=', -1)])
+            
+            managing_departments = all_managing_departments.filtered(lambda department: department.manager_id == requester_employee_id)
+            
+            if managing_departments:
+                managing_departments_ids = managing_departments.ids
+                departments = get_children_departments(self, managing_departments_ids)
+                departments.extend(managing_departments_ids)
+                domain = json.dumps([('id', 'in', departments), ('company_id', '=', record.company_id.id)])
+                
+            record.domain_department_id = domain
+            
+    @api.onchange('requester_id')
+    def _clear_company(self):
+        self.company_id = False
+        self.department_id = False
+            
+    @api.onchange('company_id')
+    def _clear_department(self):
+        self.department_id = False
 
     @api.onchange('category', 'payment')
     def _compute_domain_status(self):
