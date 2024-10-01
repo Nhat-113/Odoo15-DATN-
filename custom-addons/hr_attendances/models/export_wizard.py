@@ -462,12 +462,6 @@ class ExportWizard(models.TransientModel):
                 sheet.write(row_active, 3, '', self.format(workbook, cell_default, **{**border_default, **fmLRBorder, 'align': 'left'}))
                 index += 1
                 row += 1
-            
-            self.write_approved_days(sheet, row_active, employee_id, day_indexs, approved_wfh_map, workbook, wfh_format, wfh_format, WFH, WFH_2)
-
-            self.write_approved_days(sheet, row_active, employee_id, day_indexs, approved_unpaid_map, workbook, unpaid_format, unpaid_format, UP, UP_2)
-
-            self.write_approved_days(sheet, row_active, employee_id, day_indexs, approved_time_off_map, workbook, pn_format, pn_format, PN, PN_2)
 
             for key, vals in record.items():
                 if key == 'name':
@@ -494,6 +488,12 @@ class ExportWizard(models.TransientModel):
                         if str(day_index) in sum_columns:
                             sum_columns[str(day_index)] += hours
                     continue
+            #wrirte time off on file excel
+            self.write_approved_days(sheet, row_active, employee_id, day_indexs, approved_wfh_map, workbook, wfh_format, wfh_format, WFH, WFH_2)
+            
+            self.write_approved_days(sheet, row_active, employee_id, day_indexs, approved_time_off_map, workbook, pn_format, pn_format, PN, PN_2)
+
+            self.write_approved_days(sheet, row_active, employee_id, day_indexs, approved_unpaid_map, workbook, unpaid_format, unpaid_format, UP, UP_2)
                 
             workingday = round(sum_rows[employee_id]/8, 2)
             start_cell = xl_rowcol_to_cell(row_active, boxColFirst)
@@ -547,8 +547,13 @@ class ExportWizard(models.TransientModel):
         for key, values in approved_map.items():
             if key == employee_id:
                 for value in values:
+                    # Find day of the leave type taken twice in one day
+                    value_counts= pd.Series(values).value_counts()
+                    day_off_update = value_counts[value_counts == 2].index.tolist()
                     is_half_day = value.endswith('_half')
                     day_value = value[:-5] if is_half_day else value 
+                    if value in day_off_update:
+                        is_half_day = False
                     if day_value in day_indexs:
                         day_off = day_indexs.get(day_value)
                         if is_half_day:
