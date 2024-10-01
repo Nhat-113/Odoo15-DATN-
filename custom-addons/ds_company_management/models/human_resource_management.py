@@ -485,7 +485,8 @@ class HumanResourceManagement(models.Model):
             if managing_departments:
                 managing_departments_ids = managing_departments.ids
                 departments_managers_ids = get_children_departments_managers(self, managing_departments_ids)
-                departments_managers_ids.append(current_user.id)
+                
+            departments_managers_ids.append(current_user.id)
                 
             sql_domain_for_role = ' where ( (department_manager_user_id not in ' + str(tuple(departments_managers_ids)) \
                                 + ' or department_manager_user_id is null  )' \
