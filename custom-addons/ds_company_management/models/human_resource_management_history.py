@@ -1,6 +1,7 @@
 import datetime
 from odoo import fields, models, api
 from helper.company_management_common import get_sql_by_department, is_ceo, is_sub_ceo, is_div_manager, is_group_leader
+from helper.helper import get_children_departments_managers
 
 
 class HumanResourceManagementHistory(models.Model):
@@ -150,14 +151,12 @@ class HumanResourceManagementHistory(models.Model):
                                         + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
         elif is_div_manager(current_user):
-            sql_domain_for_company = 'where ('
+            sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies))
             sql_for_department = get_sql_by_department(self)
-            sql_for_department = sql_for_department.replace('and', '', 1)
 
         elif is_group_leader(current_user):
-            sql_domain_for_company = 'where ('
+            sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies))
             sql_for_department = get_sql_by_department(self)
-            sql_for_department = sql_for_department.replace('and', '', 1)
 
         sql = ("""select  	employee_name,
                             company_name,
@@ -233,14 +232,12 @@ class HumanResourceManagementHistory(models.Model):
             sql_domain_for_role = ' and company_manager_user_id = ' + str(current_user.id) + ')'
 
         elif is_div_manager(current_user) and not is_sub_ceo(current_user):
-            sql_domain_for_company = 'where ('
+            sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies))
             sql_for_department = get_sql_by_department(self)
-            sql_for_department = sql_for_department.replace('and', '', 1)
 
         elif is_group_leader(current_user) and not is_div_manager(current_user):
-            sql_domain_for_company = 'where ('
+            sql_domain_for_company = 'where ( company_id in ' + str(tuple(selected_companies))
             sql_for_department = get_sql_by_department(self)
-            sql_for_department = sql_for_department.replace('and', '', 1)
 
         sql = ("""SELECT  employee_id, employee_name, company_name, department_name,
 				SUM (month1 ) as month1,
@@ -307,9 +304,17 @@ class HumanResourceManagementHistory(models.Model):
                                     + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
         elif is_div_manager(current_user) or is_group_leader(current_user):
-            sql_domain_for_role = ' where ( (department_manager_user_id != ' + str(current_user.id) \
+            managing_departments = self.env['hr.department'].search([('manager_id', '=', current_user.employee_id.id)])
+            departments_managers_ids = []
+            if managing_departments:
+                managing_departments_ids = managing_departments.ids
+                departments_managers_ids = get_children_departments_managers(self, managing_departments_ids)
+                
+            departments_managers_ids.append(current_user.id)
+                
+            sql_domain_for_role = ' where ( (department_manager_user_id not in ' + str(tuple(departments_managers_ids)) \
                                 + ' or department_manager_user_id is null  )' \
-                                + ' and department_manager_project_id = ' + str(current_user.id) \
+                                + ' and department_manager_project_id in ' + str(tuple(departments_managers_ids)) \
                                 + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
         sql = ("""select  	employee_name,
