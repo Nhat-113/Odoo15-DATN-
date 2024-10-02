@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, _
 from datetime import date, datetime, timedelta, time
 import calendar
 import pandas as pd
@@ -31,21 +31,21 @@ def extract_hour_minute(time_string):
         hour, minute = time_string.split(":")
         return int(hour), int(minute)
     except ValueError:
-        raise ValueError("Invalid time format. Expected 'HH:MM'.")
+        raise ValueError (_("Invalid time format. Expected 'HH:MM'."))
 
 class ExportWizard(models.TransientModel):
     _name = 'export.wizard'
     _description = 'Export Excel Wizard'
     
-    start_date = fields.Date(string="Start Date", required=True)
-    end_date = fields.Date(string="End Date", required=True)
+    start_date = fields.Date(string=_("Start Date"), required=True)
+    end_date = fields.Date(string=_("End Date"), required=True)
     
     
     
     
     def export_excel(self):
         if self.start_date > self.end_date:
-            raise ValidationError("The start date must be less than the end date!")
+            raise ValidationError(_("The start date must be less than the end date!"))
         cnt_days = (self.end_date - self.start_date).days + 1
         allowed_companies = self.env.context.get('allowed_company_ids', [])
         datas = {
@@ -238,7 +238,7 @@ class ExportWizard(models.TransientModel):
         
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-        sheet = workbook.add_worksheet('Attendance Report')
+        sheet = workbook.add_worksheet(_('Attendance Report'))
 
         format = {
                 'align': 'center',
@@ -299,22 +299,22 @@ class ExportWizard(models.TransientModel):
 
         companies = self.env['res.company'].search([('id', 'in', allowed_companies)])
         companies = ", ".join([item.name for item in companies])
-        B1 = f"Bang Cham Cong {companies} {data['start_date']} - {data['end_date']}"
+        B1 = _('Time Sheet')+f" {companies} {data['start_date']} - {data['end_date']}"
         self.merge_range(sheet, 0, 0, 1, 6, B1, self.format(workbook, format))
         
-        A6 = "ST\nT"
+        A6 = _("NO.")
         self.set_column(sheet, 0, 0, 3)
         self.merge_range(sheet, 3, 5, 0, 0, A6, self.format(workbook, header_footer))
         
-        B6 = "Họ và tên"
+        B6 = _("Full Name")
         self.set_column(sheet, 1, 1, 30)
         self.merge_range(sheet, 3, 5, 1, 1, B6, self.format(workbook, header_footer))
         
-        C6 = "Chức danh"
+        C6 = _("Job Title")
         self.set_column(sheet, 2, 2, 30)
         self.merge_range(sheet, 3, 5, 2, 2, C6, self.format(workbook, header_footer))
         
-        D6 = "Ca làm\nviệc"
+        D6 = _("Shift")
         self.set_column(sheet, 3, 3, 7)
         self.merge_range(sheet, 3, 5, 3, 3, D6, self.format(workbook, header_footer))
         
@@ -324,19 +324,19 @@ class ExportWizard(models.TransientModel):
         end_index_col = data['end_month'] + start_index_col - 1
         working_day = self.working_days(data['start_date'], data['end_date'])
         width_space = data['end_month'] // 7
-        E4 = "Chấm công ngày"
+        E4 = _("Daily Attendance")
 
         if data['end_month'] == 1:
             self.set_column(sheet, 4, 4, 25)
-            sheet.write(1, end_index_col, f"Công tiêu chuẩn: {working_day}", self.format(workbook, header_footer))
+            sheet.write(1, end_index_col, _('Standard Work')+f":{working_day}", self.format(workbook, header_footer))
             sheet.write(3, end_index_col, E4, self.format(workbook, header_footer))
-            sheet.write(2, start_index_col, f"Từ {data['start_date']} đến {data['end_date']}", self.format(workbook, format))
+            sheet.write(2, start_index_col, _('From')+f" {data['start_date']}"+ _('to')+f" {data['end_date']}", self.format(workbook, format))
 
         self.set_column(sheet, start_index_col, end_index_col, 6)
-        self.merge_range(sheet, 1, 1, start_index_col, end_index_col, f"Công tiêu chuẩn: {working_day}", self.format(workbook, format))
+        self.merge_range(sheet, 1, 1, start_index_col, end_index_col, _('Standard Work')+ f" :{working_day}", self.format(workbook, format))
         self.merge_range(sheet, 3, 3, start_index_col, end_index_col, E4, self.format(workbook, header_footer))
-        date_from = f"Từ ngày {data['start_date']}"
-        date_to = f"Đến ngày {data['end_date']}"
+        date_from = _('From date')+ f" {data['start_date']}"
+        date_to = _('To date')+ f" {data['end_date']}"
 
         if data['end_month'] == 2:
             self.merge_range(sheet, 2, 2, start_index_col - 1, start_index_col, date_from, self.format(workbook, format))
@@ -368,13 +368,13 @@ class ExportWizard(models.TransientModel):
         # set height row
         sheet.set_row(5, 40)
         
-        self.set_column(sheet, end_index_col + 1, end_index_col + 3, 10)
-        final_col = "Ngày công/giờ làm (chuẩn)"
+        self.set_column(sheet, end_index_col + 1, end_index_col + 3, 12)
+        final_col = _("Standard Workdays/Hours")
         self.merge_range(sheet, 3, 3, end_index_col + 1, end_index_col + 3, final_col, self.format(workbook, header_footer))
-        self.merge_range(sheet, 4, 4, end_index_col + 1, end_index_col + 3, "Chính thức", self.format(workbook, header_footer))
-        sheet.write(5, end_index_col + 1, "Tổng Giờ\nLàm Việc", self.format(workbook, header_footer))
-        sheet.write(5, end_index_col + 2, "Tổng Công\nLàm Việc", self.format(workbook, header_footer))
-        sheet.write(5, end_index_col + 3, "Phép năm", self.format(workbook, header_footer))
+        self.merge_range(sheet, 4, 4, end_index_col + 1, end_index_col + 3, _("Official"), self.format(workbook, header_footer))
+        sheet.write(5, end_index_col + 1, _("Total\nWorking Hours"), self.format(workbook, header_footer))
+        sheet.write(5, end_index_col + 2, _("Total\nWorkdays"), self.format(workbook, header_footer))
+        sheet.write(5, end_index_col + 3, _("Annual Leave"), self.format(workbook, header_footer))
         
         self.main_action_export_data(data, day_indexs, sheet, workbook, off_format, cell_default, header_footer, border_default, format, time_off_data, wfh_format, pn_format, unpaid_format)
         
@@ -509,7 +509,7 @@ class ExportWizard(models.TransientModel):
         sum_columns[str(data['end_month'] + 2)] += round(total_hours/8, 2)
         
 
-        self.merge_range(sheet, boxRowLast + 1, boxRowLast + 1, 0, 2, 'Tổng cộng', self.format(workbook, header_footer, **{**fm_bottom, 'valign': 'vcenter'}))
+        self.merge_range(sheet, boxRowLast + 1, boxRowLast + 1, 0, 2, _('Total'), self.format(workbook, header_footer, **{**fm_bottom, 'valign': 'vcenter'}))
         sheet.write(boxRowLast + 1, 3, '', self.format(workbook, header_footer, **{**fm_bottom, 'left': 2, 'right': 2}))
         column_avg = data['end_month'] + 4
         for col in range(1, column_avg):
@@ -531,16 +531,16 @@ class ExportWizard(models.TransientModel):
         for offset in [1, 3, 4, 5, 6, 7, 8]:
             sheet.set_row(boxRowLast + offset, 25)
         sheet.write(boxRowLast + 3, 1, OFF, self.format(workbook, format, **{'bg_color': '#BFBFBF'}))
-        sheet.write(boxRowLast + 3, 2, 'Nghỉ ca', self.format(workbook, format, **{'bold': True}))
+        sheet.write(boxRowLast + 3, 2, _('OFF'), self.format(workbook, format, **{'bold': True}))
         sheet.write(boxRowLast + 4, 1, CONFIRM, self.format(workbook, format, **{'bg_color': 'ffd966'}))
-        sheet.write(boxRowLast + 4, 2, f'Thiếu giờ làm (<{HOUR_SMALL}h)', self.format(workbook, format, **{'bold': True}))
+        sheet.write(boxRowLast + 4, 2, _('Missing Working Hours')+ f" (<{HOUR_SMALL}h)", self.format(workbook, format, **{'bold': True}))
         if any(time_off_data):
             sheet.write(boxRowLast + 5, 1, PN, self.format(workbook, format, **{'bg_color': '548235'}))
-            sheet.write(boxRowLast + 5, 2, 'Phép năm', self.format(workbook, format, **{'bold': True}))
+            sheet.write(boxRowLast + 5, 2, _('Annual Leave'), self.format(workbook, format, **{'bold': True}))
             sheet.write(boxRowLast + 6, 1, WFH, self.format(workbook, format, **{'bg_color': '#ADD8E6'}))
-            sheet.write(boxRowLast + 6, 2, 'Làm việc tại nhà', self.format(workbook, format, **{'bold': True}))
+            sheet.write(boxRowLast + 6, 2, _('Work from Home'), self.format(workbook, format, **{'bold': True}))
             sheet.write(boxRowLast + 7, 1, UP, self.format(workbook, format, **{'bg_color': 'red'}))
-            sheet.write(boxRowLast + 7, 2, 'Nghỉ phép không lương', self.format(workbook, format, **{'bold': True}))
+            sheet.write(boxRowLast + 7, 2, _('Unpaid Leave'), self.format(workbook, format, **{'bold': True}))
             
         
     def write_approved_days(self, sheet, row_active, employee_id, day_indexs, approved_map, workbook, full_day_format, half_day_format, full_day_label, half_day_label):

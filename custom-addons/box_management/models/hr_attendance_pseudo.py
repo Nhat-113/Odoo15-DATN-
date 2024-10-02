@@ -7,7 +7,7 @@ def extract_hour_minute(time_string):
         hour, minute = time_string.split(":")
         return int(hour), int(minute)
     except ValueError:
-        raise ValueError("Invalid time format. Expected 'HH:MM'.")
+        raise ValueError(_("Invalid time format. Expected 'HH:MM'."))
         
 class HrAttendancePseudo(models.Model):
     _inherit = "hr.attendance.pesudo"

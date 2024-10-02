@@ -53,32 +53,32 @@ class SettingDevice(models.Model):
         store=True,
         required=True
     )
-    time_duration = fields.Char(string="Opening Time", compute='_get_time_duration',)
+    time_duration = fields.Char(string=_("Opening Time"), compute='_get_time_duration',)
     
     active = fields.Boolean(required=True, default=True, string="Active")
 
-    mon = fields.Boolean(string="Mon", readonly=False, default=True)
-    tue = fields.Boolean(string="Tue", readonly=False, default=True)
-    wed = fields.Boolean(string="Wed", readonly=False, default=True)
-    thu = fields.Boolean(string="Thu", readonly=False, default=True)
-    fri = fields.Boolean(string="Fri", readonly=False, default=True)
-    sat = fields.Boolean(string="Sat", readonly=False, default=False)
-    sun = fields.Boolean(string="Sun", readonly=False, default=False)
+    mon = fields.Boolean(string=_("Mon"), readonly=False, default=True)
+    tue = fields.Boolean(string=_("Tue"), readonly=False, default=True)
+    wed = fields.Boolean(string=_("Wed"), readonly=False, default=True)
+    thu = fields.Boolean(string=_("Thu"), readonly=False, default=True)
+    fri = fields.Boolean(string=_("Fri"), readonly=False, default=True)
+    sat = fields.Boolean(string=_("Sat"), readonly=False, default=False)
+    sun = fields.Boolean(string=_("Sun"), readonly=False, default=False)
     # number_of = fields.Integer(string="NO", default=1)
     list_days = fields.Text(string="Opening Day", readonly=True, compute='_get_field_day')
     status = fields.Selection(
-        string="Status",
+        string=_("Status"),
         default="active",
         required=True, 
         selection=[
-            ("active", "Active"),
-            ("inactive", "Inactive"),
+            ("active", _("Active")),
+            ("inactive", _("Inactive")),
     ])
 
 
     
     def _get_field_day(self):
-        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        days = [_('Monday'), _('Tuesday'), _('Wednesday'), _('Thursday'), _('Friday'), _('Saturday'), _('Sunday')]
         for rec in self:
             days_array = [x for x,y in zip(days, get_day_of_week_value(rec)) if y]
             rec.list_days = ", ".join(f"{day}" for day in days_array)

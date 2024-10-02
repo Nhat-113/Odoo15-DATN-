@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api,_
 from dateutil import tz
 from datetime import date, time, timedelta
 from odoo.exceptions import ValidationError
@@ -10,7 +10,7 @@ def extract_hour_minute(time_string):
         hour, minute = time_string.split(":")
         return int(hour), int(minute)
     except ValueError:
-        raise ValueError("Invalid time format. Expected 'HH:MM'.")
+        raise ValueError(_("Invalid time format. Expected 'HH:MM'."))
         
 class HrAttendance(models.Model):
     _inherit = 'hr.attendance'
@@ -19,9 +19,9 @@ class HrAttendance(models.Model):
     check_in = fields.Datetime(string="Check In", default=fields.Datetime.now, required=False)
     start = fields.Date(string="Start", store=True, compute='_compute_convert_datetime_start')
     end = fields.Date(string="End", store=True, compute='_compute_convert_datetime_end')
-    status = fields.Selection([('early', 'Early'),
-                             ('timely', 'Timely'),
-                             ('late', 'Late')] ,
+    status = fields.Selection([('early', _('Early')),
+                             ('timely', _('Timely')),
+                             ('late', _('Late'))] ,
                             string="Status", 
                             store=True,
                             compute='_compute_convert_datetime_start')
@@ -94,7 +94,7 @@ class HrAttendance(models.Model):
                 
     def validate_duplicate(self, employee_id, check_in, check_out):
         if check_in and check_out and check_in == check_out:
-            raise ValidationError('Check-in and check-out time cannot be the same.')
+            raise ValidationError(_('Check-in and check-out time cannot be the same.'))
         
         attendances_times = []
         if check_in:
@@ -110,7 +110,7 @@ class HrAttendance(models.Model):
         ])
         
         if attendances_records:
-            raise ValidationError(f'Employee has already checked-in or checked-out at this time.')
+            raise ValidationError(_('Employee has already checked-in or checked-out at this time.'))
         
 
     @api.constrains('check_in', 'check_out', 'employee_id')
@@ -121,7 +121,7 @@ class HrAttendance(models.Model):
     def _check_empty_in_out(self):
         for rec in self:
             if not rec.check_in and not rec.check_out:
-                raise ValidationError('Check-in and check-out cannot be empty during the same attendance')
+                raise ValidationError(_('Check-in and check-out cannot be empty during the same attendance'))
         
     def is_working_day(self, date):
         return bool(len(pd.bdate_range(date, date)))

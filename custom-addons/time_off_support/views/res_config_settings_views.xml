@@ -7,15 +7,15 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('settings')]//div[@data-key='hr_attendance']" position="inside">
-                <h2>Support for export file attendances</h2>
+                <h2>Time Off Type</h2>
                     <div class="row mt16 o_settings_container" name="time_off_type_settings">
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div>
                                 <div class="o_form_label">
-                                    Select the 'Work from home' option.
+                                    Type of remote work
                                 </div>
                                 <div class="text-muted">
-                                    Select the 'work from home' option to view the data of employees worked remotely.
+                                    Specify the `work from home` type to export attendance file
                                 </div>
                             </div>
                             <field style=" width: 150px;" name="time_off_type_id"/> 
@@ -25,10 +25,10 @@
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div>
                                 <div class="o_form_label">
-                                    Select the 'unpaid' option.
+                                    Type of unpaid leave
                                 </div>
                                 <div class="text-muted">
-                                    To query the database for employees who are currently on unpaid leave.
+                                    Specify the `unpaid leave` type to export attendance file
                                 </div>
                             </div>
                             <field name="time_off_type_unpaid_id" widget="many2many_tags"/> 

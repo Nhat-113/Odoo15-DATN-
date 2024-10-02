@@ -30,7 +30,7 @@
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div>
                                 <div class="o_form_label">
-                                For working hours calculation.
+                                Remove lunch break time
                                 </div>
                                 <div class="text-muted">
                                 Allows you to exclude lunch break time from working hours when exporting the attendance file.
