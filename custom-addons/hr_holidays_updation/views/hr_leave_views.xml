@@ -39,6 +39,6 @@
     </record>
 
     <record id="hr_holidays.hr_leave_action_my" model="ir.actions.act_window">
-        <field name="domain">['|', ('user_id', '=', uid), ('inform_to.user_id', '=', uid)]</field>
+        <field name="domain">['|', '|', ('user_id', '=', uid), ('inform_to.user_id', '=', uid), ('extra_approvers.user_id', '=', uid)]</field>
     </record>
 </odoo>
