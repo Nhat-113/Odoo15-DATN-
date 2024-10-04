@@ -2,6 +2,10 @@ from . import models
 from . import controllers
 
 from odoo import api, SUPERUSER_ID
+import logging
+from logging.handlers import TimedRotatingFileHandler
+from datetime import time
+import os
 
 def post_init_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
@@ -32,3 +36,24 @@ def uninstall_hook(cr, registry):
     schedules = device_lc_schedule.search([])
     if schedules:
         schedules.unlink()
+        
+def initLogger():
+    _logger = logging.getLogger('smo.logger')
+    log_dir = './logs/smo'
+
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+        
+    log_file = os.path.join(log_dir, 'smo.log')
+    
+    handler = TimedRotatingFileHandler(log_file, when='MIDNIGHT')
+
+    formatter = logging.Formatter(
+        fmt='%(asctime)s - %(levelname)s: %(message)s',
+        datefmt='%d/%m/%Y %H:%M:%S'
+    )
+    handler.setFormatter(formatter)
+
+    _logger.addHandler(handler)
+    
+initLogger()

@@ -3,6 +3,7 @@ odoo.define('smo.CustomDevicesFormRenderer', function (require) {
 
     const FormRenderer = require('web.FormRenderer')
 
+    // Currently, must only use for Device Overview Form
     const CustomDevicesFormRenderer = FormRenderer.extend({
         _updateLightBooleanToggleInNotebook: function (SmoDeviceLcId, newState) {
             const self = this

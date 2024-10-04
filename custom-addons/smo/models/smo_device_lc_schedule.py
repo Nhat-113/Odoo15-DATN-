@@ -64,6 +64,8 @@ class SmoDeviceLcSchedule(models.Model):
     cron_end_ids = fields.One2many('ir.cron', 'smo_device_lc_schedule_id_end', string="Cron Ends")
     
     state_display = fields.Char(string="Turn On/Off", compute='_compute_state_display')
+    start_time_display = fields.Char(string="Start Time", compute='_compute_start_time_display')
+    end_time_display = fields.Char(string="End Time", compute='_compute_end_time_display')
     
     @api.model
     def _get_devices_for_lc_schedule(self):
@@ -74,7 +76,20 @@ class SmoDeviceLcSchedule(models.Model):
     @api.depends('state')
     def _compute_state_display(self):
         for record in self:
-            record.state_display = "Turn ON" if record.state else "Turn OFF"
+            record.state_display = "ON" if record.state else "OFF"
+            if record.schedule_mode == 'frame':
+                record.state_display += ' ➜ OFF' if record.state else ' ➜ ON'
+    
+    @api.depends('start_time', 'start_time_daily', 'repeat_daily')
+    def _compute_start_time_display(self):
+        for record in self:
+            record.start_time_display = record.start_time_daily if record.repeat_daily else record.start_time
+            
+
+    @api.depends('end_time', 'end_time_daily', 'repeat_daily')
+    def _compute_end_time_display(self):
+        for record in self:
+            record.end_time_display = record.end_time_daily if record.repeat_daily else record.end_time
             
     def _convert_time_string_local_to_utc(self, time_string):
         hour, minute = map(int, time_string.split(':'))
@@ -160,14 +175,9 @@ class SmoDeviceLcSchedule(models.Model):
                         schedule_start_time = self._convert_to_local_time(schedule.start_time).time()
                         schedule_end_time = self._convert_to_local_time(schedule.end_time).time() if schedule.schedule_mode == 'frame' else None
                     
-                    if record.state != schedule.state:
-                        check_overlap = self._is_time_point_overlap
-                    else:
-                        check_overlap = self._is_time_overlap
-
-                    if check_overlap(start_time, end_time, schedule_start_time, schedule_end_time):
+                    if self._is_time_point_overlap(start_time, end_time, schedule_start_time, schedule_end_time):
                         raise ValidationError(record._get_overlapped_validation_err_messages(schedule))
-
+                    
     def _check_overlap_for_schedule(self):
         for record in self:
             schedules = self._get_overlapped_devices_schedules(record)
@@ -175,11 +185,7 @@ class SmoDeviceLcSchedule(models.Model):
                 continue
 
             for schedule in schedules:
-                if record.state != schedule.state:
-                    check_overlap = self._is_time_point_overlap
-                else:
-                    check_overlap = self._is_time_overlap
-
+                
                 if schedule.repeat_daily:
                     overlapped_days = record._get_overlapped_days(schedule)
                     if overlapped_days:
@@ -189,12 +195,13 @@ class SmoDeviceLcSchedule(models.Model):
                         schedule_start_time = self._parse_time(schedule.start_time_daily)
                         schedule_end_time = self._parse_time(schedule.end_time_daily) if schedule.schedule_mode == 'frame' else None
 
-                        if check_overlap(record_start_time, record_end_time, schedule_start_time, schedule_end_time):
+                        if self._is_time_point_overlap(record_start_time, record_end_time, schedule_start_time, schedule_end_time):
                             raise ValidationError(record._get_overlapped_validation_err_messages(schedule))
+                        
                 else:
-                    if check_overlap(record.start_time, record.end_time, schedule.start_time, schedule.end_time):
+                    if self._is_time_point_overlap(record.start_time, record.end_time, schedule.start_time, schedule.end_time):
                         raise ValidationError(record._get_overlapped_validation_err_messages(schedule))
-    
+                    
     def _get_overlapped_validation_err_messages(self, conflicting_schedule):
         start_part = f'Your schedule overlaps with the following schedule: {conflicting_schedule.schedule_name}\n'
         devices_part = self._format_devices_part(conflicting_schedule)
@@ -310,9 +317,19 @@ class SmoDeviceLcSchedule(models.Model):
     
     @api.model
     def create(self, vals):
-        record = super(SmoDeviceLcSchedule, self).create(vals)
+        changing_message = ', '.join([f"[{key}: {self[key]} ➜ {vals[key]}]" for key in vals])
+        record = None
+        
+        try:
+            record = super(SmoDeviceLcSchedule, self).create(vals)
+            _logger.info(f"Update DB: Create LC Schedule record of device [{'name'}]: {changing_message} ➜ SUCCESS")
+        except:
+            _logger.info(f"Update DB: Create LC Schedule record of device [{'name'}]: {changing_message} ➜ FAILED")
+            raise
+        
         record._set_lc_ids_by_asset_or_device()
         record._create_and_update_cronjob_for_schedule()
+        
         return record
     
     @api.onchange('schedule_mode')
@@ -445,7 +462,16 @@ class SmoDeviceLcSchedule(models.Model):
             self.smo_device_lc_ids = [(6, 0, self._get_device_lc_ids().ids)]
 
     def write(self, vals):
-        res = super(SmoDeviceLcSchedule, self).write(vals)
+        changing_message = ', '.join([f"[{key}: {self[key]} ➜ {vals[key]}]" for key in vals])
+        res = None
+        
+        try:
+            res = super(SmoDeviceLcSchedule, self).write(vals)
+            _logger.info(f"Update DB: Update LC Schedule record of device [{'name'}]: {changing_message} ➜ SUCCESS")
+        except:
+            _logger.info(f"Update DB: Update LC Schedule record of device [{'name'}]: {changing_message} ➜ FAILED")
+            raise
+        
         for record in self:
             if any(field in vals for field in {'target_type', 'smo_asset_id', 'devices_selections'}):
                 self._set_lc_ids_by_asset_or_device()
@@ -483,8 +509,10 @@ class SmoDeviceLcSchedule(models.Model):
 
         if mode == 'frame' and end and now >= end:
             state = not state
+            
+        _logger.info(f"Execute LC Schedule: {schedule_record.schedule_name} - Turn {'on' if state else 'off'} lights: {', '.join(lc.name for lc in schedule_record.smo_device_lc_ids)}")
+            
         if schedule_record.smo_device_lc_ids:
             schedule_record.smo_device_lc_ids.write({'current_state': state})
-        
 
 

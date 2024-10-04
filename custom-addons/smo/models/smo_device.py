@@ -5,6 +5,9 @@ from odoo.exceptions import UserError
 from datetime import datetime
 import requests
 import json
+import logging
+
+_logger = logging.getLogger('smo.logger')
 
 NON_IAQ_LIST = {
     'current_fw_version',
@@ -25,15 +28,19 @@ class SmoDevice(models.Model):
     _name = "smo.device"
     _description = "SmartOffice Devices"
     _rec_name = "device_name"
-
+    
     smo_asset_id = fields.Many2one('smo.asset', string="SmartOffice Asset ID", required=True, ondelete='cascade')
     asset_id = fields.Char(string='Asset ID')
     asset_name = fields.Char(string='Asset Name')
+    
     device_id = fields.Char(string="Device ID", required=True)
     device_name = fields.Char(string="Device Name", required=True)
     device_type = fields.Char(string="Device Type", required=True)
+    
     smo_device_iaq_ids = fields.One2many('smo.device.iaq', 'smo_device_id', string='IAQ Device Records')
     smo_device_lc_ids = fields.One2many('smo.device.lc', 'smo_device_id', string='LC Device Records')
+    smo_device_ac_ids = fields.One2many('smo.device.ac', 'smo_device_id', string='AC Device Records')
+    
     last_sync_time =fields.Datetime(string='Last Sync Time', required=True)
 
     @api.model
@@ -51,22 +58,28 @@ class SmoDevice(models.Model):
             params = {'fromId': asset_id, 'fromType': 'ASSET'}
 
             try:
+                _logger.info(f'Call API to fetch devices data of asset id: {asset_id}')
                 response = make_request(self, '/api/relations/info', method='GET',
                                 params=params,
                                 access_token=tokens.access_token)
                 response.raise_for_status()
             except requests.HTTPError as http_err:
+                _logger.error(f'API Server Response: {response.status_code} - Call API to fetch devices of asset id: {asset_id} failed: {json.loads(response.text)["message"]}')
                 if response.status_code == 401:
                     self.env['smo.token'].refresh_access_token(smo_uid)
                     self.fetch_devices(smo_uid)
                 else:
                     raise UserError(f'Failed to fetch devices: {response.text}')
             except Exception as err:
+                _logger.error(f'Odoo Server Error: Call API to fetch devices data of asset id: {asset_id}: {err}')
                 raise UserError(f'Something went wrong! Please check your API URL and try again!')
 
             try:
+                _logger.info(f'API Server Response: {response.status_code} - Call API to fetch devices of asset id: {asset_id} successfully')
+                _logger.info(f'Parse response data of devices')
                 data = response.json()
             except Exception as err:
+                _logger.error('Odoo Server Error: Failed to parse response data of devices')
                 raise UserError('Failed to parse response data of devices')
 
             asset_record = self.env['smo.asset'].search([('asset_id', '=', asset_id)], limit=1)
@@ -82,6 +95,7 @@ class SmoDevice(models.Model):
 
                 smo_device_id = -1
                 if device_id in existing_devices:
+                    _logger.info(f'Update DB: Update device [{existing_devices[device_id].device_name}] info')
                     existing_devices[device_id].write({
                         'asset_id': asset_record.asset_id,
                         'asset_name': asset_record.asset_name,
@@ -91,6 +105,7 @@ class SmoDevice(models.Model):
                     })
                     smo_device_id = existing_devices[device_id].id
                 else:
+                    _logger.info(f'Update DB: Create new device record to store data of device [{device_name}]')
                     new_device_record = self.create({
                         'smo_asset_id': asset_record.id,
                         'asset_id': asset_record.asset_id,
@@ -114,6 +129,7 @@ class SmoDevice(models.Model):
         
             devices_to_delete = [device for device_id, device in existing_devices.items() if device_id not in [d['device_id'] for d in fetched_devices]]
             for device in devices_to_delete:
+                _logger.info(f'Update DB: Delete device record [{device.device_name}]')
                 device.unlink()
 
             self.env.cr.commit()
@@ -143,6 +159,8 @@ class SmoDevice(models.Model):
                 self.fetch_iaq_devices(smo_device_record, tokens_record, smo_uid)
             elif device['type'] == 'LC':
                 self.fetch_lc_devices(smo_device_record, tokens_record, smo_uid, device['Asset'])
+            elif device['type'] == 'AC':
+                self.fetch_ac_devices(smo_device_record, tokens_record, smo_uid)
             else:
                 # Other device types are not supported
                 pass
@@ -164,22 +182,28 @@ class SmoDevice(models.Model):
         endpoint = f'/api/plugins/telemetry/DEVICE/{device_id}/values/timeseries'
 
         try:
+            _logger.info(f'Call API to fetch IAQ device data of device [{smo_device_record.device_name}]')
             response = make_request(self, endpoint, method='GET',
                             params=params,
                             access_token=tokens_record.access_token)
             response.raise_for_status()
         except requests.HTTPError as http_err:
+            _logger.error(f'API Server Response: {response.status_code} - Call API to fetch IAQ device data of device [{smo_device_record.device_name}] failed: {json.loads(response.text)["message"]}')
             if response.status_code == 401:
                 self.env['smo.token'].refresh_access_token(smo_uid)
                 self.fetch_devices_detail(smo_uid=smo_uid)
             else:
                 raise UserError(f'Failed to fetch IAQ device data: {response.text}')
         except Exception as err:
+            _logger.error(f'Odoo Server Error: Call API to fetch IAQ device data of device [{smo_device_record.device_name}]: {err}')
             raise UserError(f'Something went wrong! Please check your API URL and try again!')
 
         try:
+            _logger.info(f'API Server Response: {response.status_code} - Call API to fetch IAQ device data of device [{smo_device_record.device_name}] successfully')
+            _logger.info(f'Parse response data of IAQ Sensor devices of device [{smo_device_record.device_name}]')
             data = response.json()
         except Exception as err:
+            _logger.error(f'Odoo Server Error: Failed to parse response data of IAQ devices of device [{smo_device_record.device_name}]: {err}')
             raise UserError('Failed to parse response data of IAQ Sensor devices')
 
         iaq_model = self.env['smo.device.iaq']
@@ -195,11 +219,13 @@ class SmoDevice(models.Model):
             current_value = data[parameter][0]['value']
             last_updated = datetime.fromtimestamp(data[parameter][0]['ts'] / 1000)
             if parameter in existing_iaq_records:
+                _logger.info(f'Update DB: Update IAQ record of {parameter} index of device [{existing_iaq_records[parameter].device_name}]: [value: {existing_iaq_records[parameter].current_value} ➜ {current_value}]')
                 existing_iaq_records[parameter].write({
                     'current_value': current_value,
                     'last_updated': last_updated
                 })
             else:
+                _logger.info(f'Update DB: Create new IAQ record to store data of {parameter} index of device [{smo_device_record.device_name}]')
                 iaq_model.create({
                     'smo_device_id': smo_device_id,
                     'device_id': device_id,
@@ -210,6 +236,7 @@ class SmoDevice(models.Model):
                     'last_updated': last_updated
                 })
 
+        _logger.info(f'Update DB: Update last sync time of device [{smo_device_record.device_name}]')
         smo_device_record.write({
             'last_sync_time': fields.Datetime.now()
         })
@@ -218,6 +245,7 @@ class SmoDevice(models.Model):
         
         for param_name in set(existing_iaq_records):
             if param_name in parameters_to_remove or param_name in non_iaq_records:
+                _logger.info(f'Update DB: Delete IAQ record of {param_name} index of device [{smo_device_record.device_name}]')
                 existing_iaq_records[param_name].unlink()
         
         self.env.cr.commit()
@@ -230,20 +258,26 @@ class SmoDevice(models.Model):
         endpoint = f'/api/plugins/telemetry/DEVICE/{device_id}/values/attributes/CLIENT_SCOPE'
             
         try:
+            _logger.info(f'Call API to fetch LC device data of device [{smo_device_record.device_name}]')
             response = make_request(self, endpoint, method='GET', access_token=tokens_record.access_token)
             response.raise_for_status()
         except requests.HTTPError as http_err:
+            _logger.error(f'API Server Response: {response.status_code} - Call API to fetch LC device data of device [{smo_device_record.device_name}] failed: {json.loads(response.text)["message"]}')
             if response.status_code == 401:
                 self.env['smo.token'].refresh_access_token(smo_uid)
                 self.fetch_devices_detail(smo_uid=smo_uid)
             else:
                 raise UserError(f'Failed to fetch LC device data: {response.text}')
         except Exception as err:
+            _logger.error(f'Odoo Server Error: Call API to fetch LC device data of device [{smo_device_record.device_name}]: {err}')
             raise UserError(f'Something went wrong! Please check your API URL and try again!')
         
         try:
+            _logger.info(f'API Server Response: {response.status_code} - Call API to fetch LC device data of device [{smo_device_record.device_name}] successfully')
+            _logger.info(f'Parse response data of LC devices of device [{smo_device_record.device_name}]')
             data = response.json()
         except Exception as err:
+            _logger.error(f'Odoo Server Error: Failed to parse response data of LC devices of device [{smo_device_record.device_name}]: {err}')
             raise UserError('Failed to parse response data of Light Control devices')
 
         lc_model = self.env['smo.device.lc']
@@ -259,10 +293,12 @@ class SmoDevice(models.Model):
                     key = (item['key'], asset_id)
                     new_keys.add(key)
                     if key in existing_lc_records:
-                        existing_lc_records[key].write({
+                        _logger.info(f'Update DB: Update LC record of {item["key"]}-{existing_lc_records[key].name or existing_lc_records[key].param_name} of device [{smo_device_record.device_name}]: [state: {existing_lc_records[key].current_state} ➜ {current_state}]')
+                        existing_lc_records[key].with_context(skip_calling_api=True).write({
                             'current_state': current_state
                         })
                     else:
+                        _logger.info(f'Update DB: Create new LC record to store data of {item["key"]} of device [{smo_device_record.device_name}]')
                         lc_model.create({
                             'smo_device_id': smo_device_id,
                             'asset_control_id': asset_id,
@@ -273,6 +309,7 @@ class SmoDevice(models.Model):
                             'current_state': current_state
                         })
 
+        _logger.info(f'Update DB: Update last sync time of device [{smo_device_record.device_name}]')
         smo_device_record.write({
             'last_sync_time': fields.Datetime.now()
         })
@@ -280,9 +317,65 @@ class SmoDevice(models.Model):
         old_keys = set(existing_lc_records)
         keys_to_remove = old_keys - new_keys
         for key in keys_to_remove:
+            _logger.info(f'Update DB: Delete LC record of {key[0]}-{existing_lc_records[key].name or existing_lc_records[key].param_name} of device [{smo_device_record.device_name}]')
             existing_lc_records[key].unlink()
 
         self.env.cr.commit()
+        
+    @api.model
+    def fetch_ac_devices(self, smo_device_record, tokens_record, smo_uid):
+        smo_device_id = smo_device_record.id
+        device_id = smo_device_record.device_id
+
+        endpoint = f'/api/plugins/telemetry/DEVICE/{device_id}/values/attributes/CLIENT_SCOPE'
+            
+        try:
+            _logger.info(f'Call API to fetch AC device data of device [{smo_device_record.device_name}]')
+            response = make_request(self, endpoint, method='GET', access_token=tokens_record.access_token)
+            response.raise_for_status()
+        except requests.HTTPError as http_err:
+            _logger.error(f'API Server Response: {response.status_code} - Call API to fetch AC device data of device [{smo_device_record.device_name}] failed: {json.loads(response.text)["message"]}')
+            if response.status_code == 401:
+                self.env['smo.token'].refresh_access_token(smo_uid)
+                self.fetch_devices_detail(smo_uid=smo_uid)
+            else:
+                raise UserError(f'Failed to fetch AC device data: {response.text}')
+        except Exception as err:
+            _logger.error(f'Odoo Server Error: Call API to fetch AC device data of device [{smo_device_record.device_name}]: {err}')
+            raise UserError(f'Something went wrong! Please check your API URL and try again!')
+        
+        try:
+            _logger.info(f'API Server Response: {response.status_code} - Call API to fetch AC device data of device [{smo_device_record.device_name}] successfully')
+            _logger.info(f'Parse response data of AC devices of device [{smo_device_record.device_name}]')
+            data = response.json()
+        except Exception as err:
+            _logger.error(f'Odoo Server Error: Failed to parse response data of AC devices of device [{smo_device_record.device_name}]: {err}')
+            raise UserError('Failed to parse response data of Air Conditioner devices')
+
+        _logger.info(f'Raw AC Data: {data}')
+        ac_model = self.env['smo.device.ac']
+        existing_ac_records = ac_model.search([('smo_device_id', '=', smo_device_id)])
+        
+        if existing_ac_records:
+            existing_ac_records.write({
+                'temperature': 17,
+                'mode': 'AUTO',
+                'fan_speed': 'AUTO',
+                'power_state': True
+            })
+        else:
+            self.env['smo.device.ac'].create({
+                'smo_device_id': smo_device_record.id,
+                'temperature': 17,
+                'mode': 'AUTO',
+                'fan_speed': 'AUTO',
+                'power_state': True
+            })
+            
+        _logger.info(f'Update DB: Update last sync time of device [{smo_device_record.device_name}]')
+        smo_device_record.write({
+            'last_sync_time': fields.Datetime.now()
+        })
 
     @api.model
     def filter_controlled_assets(self, smo_uid, dict_assets_LC):

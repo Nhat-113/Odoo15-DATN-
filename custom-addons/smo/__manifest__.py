@@ -21,6 +21,8 @@
         'views/device_iaq_view.xml',
         'views/device_lc_view.xml',
         'views/device_lc_schedule_view.xml',
+        'views/device_ac_view.xml',
+        'views/dashboard.xml',
         'views/smo_menu.xml',
         'views/res_config_settings_views.xml',
 
@@ -32,7 +34,8 @@
             'smo/static/src/js/custom_list_view.js',
             'smo/static/src/js/devices_form_view_renderer.js',
             'smo/static/src/js/custom_form_view.js',
-            'smo/static/src/js/websocket_service.js'
+            'smo/static/src/js/websocket_service.js',
+            'smo/static/src/js/dashboard.js',
         ],
         'web.assets_qweb': [
         ],
@@ -42,4 +45,5 @@
     'license': "LGPL-3",
     'installable': True,
     'application': True,
+
 }

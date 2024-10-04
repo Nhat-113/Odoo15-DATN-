@@ -45,6 +45,7 @@ package.json
 /man/
 /share/
 /src/
+/logs/smo/
 
 # avoid adding it after generation from tsconfig command
 tsconfig.json

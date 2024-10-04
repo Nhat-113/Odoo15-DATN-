@@ -5,20 +5,28 @@
         sequence="0"
         groups="base.group_user" />
 
+
+    <menuitem id="menu_dashboard" 
+        name="Dashboard" 
+        action="action_show_dashboard" 
+        parent="smo_menu_root" 
+        sequence="1"/>
+
+
     <menuitem
         id="menu_device_master"
         name="Devices"
         parent="smo_menu_root"
-        sequence="1"
+        sequence="2"
     />
 
-     <menuitem
+    <menuitem
         id="menu_lc_schedule_master"
         name="Schedule"
         action="action_show_lc_schedule"
         parent="smo_menu_root"
         sequence="2"
-    />
+        />
 
     <menuitem
         id="menu_device_main"
@@ -26,7 +34,7 @@
         action="smo.action_show_devices"
         parent="menu_device_master"
         sequence="1"
-    />
+        />
 
     <menuitem
         id="menu_device_iaq_master"
@@ -34,7 +42,7 @@
         action="smo.action_show_devices_iaq"
         parent="menu_device_master"
         sequence="2"
-    />
+        />
 
     <menuitem
         id="menu_device_lc_master"
@@ -42,5 +50,13 @@
         action="smo.action_show_devices_lc"
         parent="menu_device_master"
         sequence="3"
-    />
+        />
+
+    <menuitem
+        id="menu_device_ac_master"
+        name="Air Conditioners"
+        action="smo.action_show_devices_ac"
+        parent="menu_device_master"
+        sequence="4"
+        />
 </odoo>

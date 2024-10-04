@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+        <record id="dashboard_template" model="ir.ui.view">
+    <field name="name">Dashboard Widget</field>
+    <field name="type">qweb</field>
+    <field name="arch" type="xml">
+        <t t-name="DashboardTemplate">
+            <div id="wrap">
+                <t t-set="widget_url" t-value="widget_url"/>
+                    <iframe t-att-src="widget_url" style="width: 100%; height: 100vh;" frameborder="0"></iframe>
+                </div>
+            </t>
+        </field>
+    </record>
+
+    <record id="action_show_dashboard" model="ir.actions.client">
+        <field name="name">Dashboard Widget</field>
+        <field name="tag">dashboard_action</field>
+    </record>
+    </data>
+</odoo>

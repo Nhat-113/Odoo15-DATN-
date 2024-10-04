@@ -3,7 +3,7 @@ from odoo.http import request
 import json
 import logging
 
-_logger = logging.getLogger(__name__)
+_logger = logging.getLogger('smo.logger')
 
 class SocketController(http.Controller):
 
@@ -46,7 +46,7 @@ class SocketController(http.Controller):
                 }
             }
         except Exception as e:
-            _logger.error(f"Error fetching init data: {str(e)}")
+            _logger.error(f"Odoo Server Error: Error while fetching init data for Socket connection: {str(e)}")
             return {'status': 500, 'message': str(e)}
         
     @http.route('/smo/socket/device/lc', type='json', auth='user', methods=['POST'])
@@ -56,26 +56,30 @@ class SocketController(http.Controller):
             if not message:
                 return {'status': 200, 'message': 'Empty message'}
             
+            _logger.info(f'Receive Socket message: {message}')
+            
             smo_device_id = message.get('subscriptionId')
             if not smo_device_id:
                 return {'status': 400, 'message': 'Missing subscriptionId'}
             
             lc_devices = request.env['smo.device.lc'].search([('smo_device_id', '=', smo_device_id)])
             if not lc_devices:
-                _logger.warning("No devices found for subscription ID %s", smo_device_id)
                 return {'status': 404, 'message': 'No matching devices found'}
             
             param_names = {lc.param_name for lc in lc_devices}
             filtered_data = {key: json.loads(data[0][1]) for key, data in message['data'].items() if key in param_names}
 
+            _logger.info(f'Parsed data received from WebSocket: {filtered_data}')
+            
             for lc in lc_devices:
                 new_state = filtered_data.get(lc.param_name)
                 if new_state is not None and lc.current_state != new_state:
+                    _logger.info(f"Update DB: (from Socket) Update LC record of {lc.param_name}-{lc.name or lc.param_name} of device [{lc.device_name}]: [state: {lc.current_state} ➜ {new_state}]")
                     lc.with_context(skip_calling_api=True).write({'current_state': new_state})
                 
             return {'status': 200, 'message': 'Data processed successfully'}
         except Exception as e:
-            _logger.error(f"Error processing LC data: {str(e)}")
+            _logger.error(f"Odoo Server Error: Error while processing LC data from Socket in Odoo API: {str(e)}")
             return {'status': 500, 'message': str(e)}
         
     @http.route('/smo/token/refresh', type='json', auth='user')
@@ -91,7 +95,7 @@ class SocketController(http.Controller):
             
             return {'status': 400, 'message': 'Failed to refresh tokens'}
         except Exception as e:
-            _logger.exception("Error refreshing tokens: %s", e)
+            _logger.error(f"Odoo Server Error: Error while refreshing tokens by API: {str(e)}")
             return {'status': 500, 'message': 'An error occurred while refreshing tokens'}
         
     @http.route('/smo/sync/manual', type='json', auth='user')
@@ -107,5 +111,5 @@ class SocketController(http.Controller):
                 }
             }
         except Exception as e:
-            _logger.exception("Error refreshing tokens: %s", e)
-            return {'status': 500, 'message': 'An error occurred while refreshing tokens'}
+            _logger.error(f"Odoo Server Error: Error while getting sync manual setting by API: {str(e)}")
+            return {'status': 500, 'message': 'An error occurred while getting sync manual setting'}
