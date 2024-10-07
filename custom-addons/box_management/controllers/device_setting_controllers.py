@@ -4,6 +4,10 @@ from odoo.http import request, JsonRequest
 from helper.helper import alternative_json_response, message_error_missing, check_field_missing_api, valid_timezone
 from helper.setting_device_common import get_day_of_week_value
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
 
 class SettingDevice(http.Controller):
     @http.route("/api/device/sync_settings", type="json", auth="api_key", methods=["GET"])
@@ -11,15 +15,19 @@ class SettingDevice(http.Controller):
         request._json_response = alternative_json_response.__get__(request, JsonRequest)
         try:
             kw = request.jsonrequest
+            log_data = {**{'GET': '/api/device/sync_settings'}, **kw}
             check_exist = check_field_missing_api(kw, ['last_synced_timestamp', 'timezone', 'device_id'])
 
             if len(check_exist) > 0:
-                return {"status": 400, "message": message_error_missing(check_exist)} 
+                res = {"status": 400, "message": message_error_missing(check_exist)}
+                _logger.info({**log_data, **res})
+                return res
             
             device_id = kw.get("device_id")
 
             last_synced_timestamp = valid_timezone(kw.get("timezone"), kw.get("last_synced_timestamp"))
             if isinstance(last_synced_timestamp, datetime) is False: 
+                _logger.info({**log_data, **last_synced_timestamp})
                 return last_synced_timestamp
 
             request.env.cr.execute("""
@@ -76,7 +84,10 @@ class SettingDevice(http.Controller):
                     for item in latest_records
                 ]
             }
+            _logger.info({**log_data, **response_data})
             return response_data
                 
         except Exception as e:
-            return {"status": 400, "message": f"Error unexpected: {e}"}
+            res = {"status": 400, "message": f"Error unexpected: {e}"}
+            _logger.info({**log_data, **res})
+            return res

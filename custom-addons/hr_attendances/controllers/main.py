@@ -10,13 +10,20 @@ from odoo.addons.web.controllers.main import Session, _serialize_exception
 from pytz import timezone
 
 import json
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class HrAttendance(http.Controller):
     @http.route("/api/facelog/attendance_odoo", auth="api_key", type="json")
     def facelog_attendances(self, **kw):
+        log_data = {**{http.request.httprequest.method: '/api/facelog/attendance_odoo'}, **kw}
+
         if kw["is_checkin"] == "" or kw["date_time"] == "" or kw["email"] == "":
-            return jsonResponse({"message": "Missing parameter"}, 400)
+            res = {"status": 400, "message": "Missing parameter"}
+            _logger.info({**log_data, **res})
+            return jsonResponse({"message": res["message"]}, res["status"])
         else:
             # Fixme: get config domain email with comapy
             # email = kw['nick_name'] + '@d-soft.com.vn'
@@ -29,7 +36,9 @@ class HrAttendance(http.Controller):
                         kw["date_time"], "%m/%d/%Y, %H:%M:%S"
                     )
                 except:
-                    return jsonResponse({"message": "Value input does not match format '%m/%d/%Y, %H:%M:%S"}, 500)
+                    res = {"status": 500, "message": "Value input does not match format '%m/%d/%Y, %H:%M:%S"}
+                    _logger.info({**log_data, **res})
+                    return jsonResponse({"message": res["message"]}, res["status"])
                 # convert local+7 to UTC+0
                 date_time = date_time - timedelta(hours=7)
 
@@ -42,11 +51,15 @@ class HrAttendance(http.Controller):
                             )
                         ]
                         if attendance.check_in and date_time < attendance.check_in and kw["is_checkin"] == "False":
-                            return  jsonResponse({"message": "'Check Out' cannot be earlier than 'Check In'"}, 402)
+                            res = {"status": 402, "message": "'Check Out' cannot be earlier than 'Check In'"}
+                            _logger.info({**log_data, **res})
+                            return jsonResponse({"message": res["message"]}, res["status"])
                         
                     result = request.env["hr.employee"].attendance_manual_api(employees,date_time,"hr_attendance.hr_attendance_action_my_attendances",kw["is_checkin"],)
                 else:
-                    return jsonResponse({"message": "is_checkin param does not match format boolean"}, 404)
+                    res = {"status": 404, "message": "is_checkin param does not match format boolean"}
+                    _logger.info({**log_data, **res})
+                    return jsonResponse({"message": res["message"]}, res["status"])
 
                 response_message = result["action"]["attendance"]
                 response = {
@@ -56,29 +69,40 @@ class HrAttendance(http.Controller):
                     "check_out": response_message["check_out"],
                     "worked_hours": response_message["worked_hours"],
                 }
+                _logger.info({**log_data, **{"status": 200}, **response})
                 return {"status": 200, "message": response}
             else:
-                return {"status": 400, "message": "User does not exist"}
+                res = {"status": 400, "message": "User does not exist"}
+                _logger.info({**log_data, **res})
+                return res
 
     @http.route("/api/attendances/getuser", auth="api_key", type="json")
     def facelog_getuser(self, **kw):
         try:
+            log_data = {**{http.request.httprequest.method: '/api/attendances/getuser'}, **kw}
             # email = kw['nick_name'] + '@d-soft.com.vn'
             email = kw["email"]
             employee = request.env["hr.employee"].search([("work_email", "=", email)])
             if not employee:
-                return {"status": 400, "message": "User does not exits"}
+                res = {"status": 400, "message": "User does not exits"}
+                _logger.info({**log_data, **res})
+                return res
             response = {
                 "status": 200,
                 "message": "Request success",
                 "values": {"full_name": employee.name, "birth_day": employee.birthday},
             }
+            _logger.info({**log_data, **response})
             return response
         except:
             if not kw["email"] and not kw:
-                return {"status": 404, "message": "Missing email parameter"}
+                res = {"status": 404, "message": "Missing email parameter"}
+                _logger.info({**log_data, **res})
+                return res
             else:
-                return {"status": 400, "massage": "Missing parameter"}
+                res = {"status": 400, "massage": "Missing parameter"}
+                _logger.info({**log_data, **res})
+                return res
 
     # @http.route("/api/attendances/get_public_holiday", auth="public", type="json")
     # def facelog_get_public_holiday(self, **kw):
@@ -111,11 +135,17 @@ class HrAttendance(http.Controller):
         request._json_response = alternative_json_response.__get__(request, JsonRequest)
         try:
             kw = request.jsonrequest
+            log_data = {**{'POST': '/api/employee/attendances'}, **kw}
+            
             if not kw.get('email'):
-                return {"status": 400, "message": "Missing required parameter email"}
+                res = {"status": 400, "message": "Missing required parameter email"}
+                _logger.info({**log_data, **res})
+                return res
             
             if not kw.get('device_id'):
-                return {"status": 400, "message":"Missing required parameter device_id"}
+                res = {"status": 400, "message":"Missing required parameter device_id"}
+                _logger.info({**log_data, **res})
+                return res
 
             email = kw.get("email")
             device_id = kw.get("device_id")
@@ -123,21 +153,29 @@ class HrAttendance(http.Controller):
             device = request.env['box.management'].sudo().search([("device_id", "=", device_id)])
 
             if not device:
-                return {"status": 400, "message": f"Device ID {device_id} isn't registered on the server."}
+                res = {"status": 400, "message": f"Device ID {device_id} isn't registered on the server."}
+                _logger.info({**log_data, **res})
+                return res
             
             box_types = request.env['box.management']._fields['device_type'].selection
             box_types = [item[0] for item in box_types]
 
             if  not kw.get('device_type') or kw.get('device_type') not in box_types:
-                return {"status": 400, "message": "Missing or invalid required parameter device_type"}
+                res = {"status": 400, "message": "Missing or invalid required parameter device_type"}
+                _logger.info({**log_data, **res})
+                return res
 
             formatted_time = valid_timezone(kw.get("timezone"), kw.get("timestamp"))
             if isinstance(formatted_time, datetime) is False:
-                return formatted_time
+                res = formatted_time
+                _logger.info({**log_data, **res})
+                return res
         
             employee = request.env["hr.employee"].sudo().search([("work_email", "=", email)])
             if not employee:
-                return {"status": 400, "message": "User does not exits"}
+                res = {"status": 400, "message": "User does not exits"}
+                _logger.info({**log_data, **res})
+                return res
             
             # optional field
             position = kw.get("position") if not kw.get("position") else str(kw.get("position"))
@@ -151,12 +189,19 @@ class HrAttendance(http.Controller):
                 "position": position
             }
             message = handle_attendance_view_mode(datas)
-            return  {"status": 200, "message": message + " successfully"}
+            
+            res = {"status": 200, "message": message + " successfully"}
+            _logger.info({**log_data, **res})
+            return res
         except Exception as e:
-            return  {"status": 400, "message": f"Error unexpected: {e}"}
+            res = {"status": 400, "message": f"Error unexpected: {e}"}
+            _logger.info({**log_data, **res})
+            return res
 
     @http.route("/api/attendance/xlsx_reports", type="http", auth="user", methods=["GET"])
     def export_excel_report(self, **kw):
+        log_data = {**{'GET': '/api/attendance/xlsx_reports'}, **kw}
+
         data = json.loads(kw.get("kw"))
         model = data['model']
         options = data['options']
@@ -187,13 +232,15 @@ class HrAttendance(http.Controller):
                     cookies=None,
                 )
                 file_model.generate_xlsx_report(options, response, options['allowed_companies'], time_off_data)
-
+            
+            _logger.info({**log_data, **{'status': 200}})
             return response
 
         except Exception as e:
             se = _serialize_exception(e)
             error = {"code": 200, "message": "Odoo Server Error", "data": se}
-            
+            _logger.info({**log_data, **error})
+
             return request.make_response(html_escape(json.dumps(error)))
 
     @http.route("/api/health", type="http", auth="api_key", methods=["GET"])
@@ -205,6 +252,7 @@ class HrAttendance(http.Controller):
 class SessionCustom(Session):
     @http.route("/web/session/authenticate/api_attendances_key", type="json", auth="public", sitemap=False)
     def authenticate(self, **uid):
+        log_data = {**{http.request.httprequest.method:'/web/session/authenticate/api_attendances_key'}, **uid}
         try:
             if uid:
                 user = request.env["auth.api.key"].search(
@@ -212,7 +260,12 @@ class SessionCustom(Session):
                 )
                 api_key = user.key
             else:
-                return jsonResponse({"message": "Missing uid parameter"}, 404)
+                res = {
+                    "status": 404,
+                    "message": "Missing uid parameter",
+                }
+                _logger.info({**log_data, **res})
+                return jsonResponse({"message": res['message']}, res["status"])
         except:
             api_key = None
 
@@ -224,9 +277,15 @@ class SessionCustom(Session):
                     "user": user.user_id.display_name,
                 },
             }
+            _logger.info({**log_data, **{"status": 200}, **value})
             return jsonResponse(value, 200)
         else:
-            return jsonResponse({"message": "Nothing api key mapping with uid parameter"}, 400)
+            res = {
+                "status": 400,
+                "message": "Nothing api key mapping with uid parameter",
+            }
+            _logger.info({**log_data, **res})
+            return jsonResponse({"message": res['message']}, res["status"])
 
 
 ##HR Employee api
@@ -237,6 +296,8 @@ class HrEmployees(http.Controller):
         request._json_response = alternative_json_response.__get__(request, JsonRequest)
         try:
             kw = request.jsonrequest
+            log_data = {**{'GET': '/api/employee/list'}, **kw}
+
             offset = kw["page"]
             limit = kw["per_page"]
             records_to_skip = (offset - 1) * limit
@@ -282,56 +343,78 @@ class HrEmployees(http.Controller):
                     "per_page": limit,
                     "total": total_records,
                 }
+            _logger.info({**log_data, **response_data})
             return response_data
         except Exception as e:
-            return {"status": 400, "message": f"Error unexpected: {e}"}
+            res = {"status": 400, "message": f"Error unexpected: {e}"}
+            _logger.info({**log_data, **res})
+            return res
 
     @http.route("/api/employee/update_employee_infor", auth="api_key", type="json", methods=["POST"])
     def update_faceimage(self):
         request._json_response = alternative_json_response.__get__(request, JsonRequest)
         try:
             kw = request.jsonrequest
+            log_data = {**{'POST': '/api/employee/update_employee_infor'}, **kw}
+
             email = kw.get("email")
             image = kw.get("data")
             type = kw.get("type")
           
             if not image:
-                return {"status": 400, "message": "Can not update image is null"}
+                res = {"status": 400, "message": "Can not update image is null"}
+                _logger.info({**log_data, **res})
+                return res
+
 
             employee = request.env["hr.employee"].sudo().search([("work_email", "=", email)])
 
             if not employee:
-                return {"status": 400, "message": "User does not exits"}
+                res = {"status": 400, "message": "User does not exits"}
+                _logger.info({**log_data, **res})
+                return res
 
             formatted_time = valid_timezone(kw.get("timezone"), kw.get("timestamp"))
             if isinstance(formatted_time, datetime) is False:
+                _logger.info({**log_data, **formatted_time})
                 return formatted_time
             
             if type not in ['face','fingerprint']:
                 error_type_text = ' | '.join(['face','fingerprint'])
-                return {"status": 400, "message": f'The type value must include one of the following options: {error_type_text}'}
+                res = {"status": 400, "message": f'The type value must include one of the following options: {error_type_text}'}
+                _logger.info({**log_data, **res})
+                return res
 
             if type == "face":
                 employee.write({ "image_1920": image })
             elif type == "fingerprint":
                 employee.write({ "fingerprint_template": image })
             
-            return {"status": 200, "message": f"{type} updated successfully"}
+            res = {"status": 200, "message": f"{type} updated successfully"}
+            _logger.info({**log_data, **res})
+            return res
         except Exception as e:
-            return {"status": 400, "message": f"Error unexpected: {e}"}
+            res = {"status": 400, "message": f"Error unexpected: {e}"}
+            _logger.info({**log_data, **res})
+            return res
         
     @http.route('/api/device/sync_employee', auth='api_key', type='json', methods=['GET'])
     def get_list_employees_update(self, **kw):
         request._json_response = alternative_json_response.__get__(request, JsonRequest)
         kw = request.jsonrequest
+        log_data = {**{'GET': '/api/device/sync_employee'}, **kw}
         params = validate_pagination(kw.get('page', 1), kw.get('per_page', 10))
         if params is False:
-            return {"status": 400, "message": "Page or Per_page must be an integer number"}
+            res = {"status": 400, "message": "Page or Per_page must be an integer number"}
+            _logger.info({**log_data, **res})
+            return res
         try:
             check_exist = check_field_missing_api(kw, ["last_synced_timestamp", "timezone", "device_id"])
             
             if len(check_exist) > 0:
-                return {"status": 400, "message":  message_error_missing(check_exist)}
+                res = {"status": 400, "message":  message_error_missing(check_exist)}
+                _logger.info({**log_data, **res})
+                return res
 
             offset = params["offset"]
             limit = params["limit"]
@@ -341,11 +424,14 @@ class HrEmployees(http.Controller):
             last_synced_timestamp = valid_timezone(kw.get("timezone"), kw.get("last_synced_timestamp"))
 
             if isinstance(last_synced_timestamp, datetime) is False:
+                _logger.info({**log_data, **last_synced_timestamp})
                 return last_synced_timestamp
 
             device = request.env['box.management'].sudo().search([("device_id", "=", device_id)], limit=1)
             if not device:
-                return {"status": 400, "message": f"Device ID {device_id} isn't registered on the server."}
+                res = {"status": 400, "message": f"Device ID {device_id} isn't registered on the server."}
+                _logger.info({**log_data, **res})
+                return res
             # get_status_access = request.env['box.employee.rel'].sudo().search([("device_id", "=", device_id), ("write_date", ">", last_synced_timestamp), ("employee_id.id", "in", )])
             request.env.cr.execute("""
                     SELECT COUNT(*) AS total_count
@@ -395,30 +481,38 @@ class HrEmployees(http.Controller):
                 "per_page": limit,
                 "total": total_records,
             }
-           
+            _logger.info({**log_data, **response_data})
             return response_data
         except Exception as e:
-            return {"status": 400, "message": f"Error unexpected: {e}"}
+            res = {"status": 400, "message": f"Error unexpected: {e}"}
+            _logger.info({**log_data, **res})
+            return res
 
     @http.route("/api/device/check_sync", auth="api_key", type="json", methods=["GET"])
     def check_sync_emp(self, **kw):
         request._json_response = alternative_json_response.__get__(request, JsonRequest)
         try:
             kw = request.jsonrequest
+            log_data = {**{'GET': '/api/device/check_sync'}, **kw}
             check_exist = check_field_missing_api(kw, ["last_synced_timestamp", "timezone", "device_id"])
             if len(check_exist) > 0: 
-                return {"status": 400, "message": message_error_missing(check_exist)}
+                res = {"status": 400, "message": message_error_missing(check_exist)}
+                _logger.info({**log_data, **res})
+                return res
             else: 
                 device_id = kw.get('device_id')
 
                 last_synced_timestamp = valid_timezone(kw.get('timezone'), kw.get('last_synced_timestamp'))
                 if isinstance(last_synced_timestamp, datetime) is False:
+                    _logger.info({**log_data, **last_synced_timestamp})
                     return last_synced_timestamp
                 
                 device = request.env['box.management'].sudo().search([("device_id", "=", device_id)], limit=1)
 
                 if not device:
-                    return {"status": 400, "message": f"Device ID {device_id} isn't registered on the server."}
+                    res = {"status": 400, "message": f"Device ID {device_id} isn't registered on the server."}
+                    _logger.info({**log_data, **res})
+                    return res
 
                 request.env.cr.execute("""
                     SELECT COUNT(*) AS total_count
@@ -439,6 +533,9 @@ class HrEmployees(http.Controller):
                     "passcode": "1" if total_passcode_update > 0 else "0",
                     "time_setting": "1" if total_setting_update or total_setting_rel_update > 0 else "0" ,
                 }
+            _logger.info({**log_data, **response_data})
             return response_data
         except Exception as e:
-            return {"status": 400, "message": f"Error unexpected: {e}"}
+            res = {"status": 400, "message": f"Error unexpected: {e}"}
+            _logger.info({**log_data, **res})
+            return res
