@@ -39,7 +39,7 @@ def uninstall_hook(cr, registry):
         
 def initLogger():
     _logger = logging.getLogger('smo.logger')
-    log_dir = './logs/smo'
+    log_dir = os.path.expanduser('~/odoo_logs/smo')
 
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
