@@ -83,8 +83,8 @@
                 </div>
                 <div class="content-group">
                   <div class="row mt16">
-                    <label string="URL:" for="dashboard_wiget" class="col-lg-3 o_light_label"/>
-                    <field name="dashboard_wiget" />
+                    <label string="URL:" for="dashboard_widget" class="col-lg-3 o_light_label"/>
+                    <field name="dashboard_widget" />
                   </div>
                 </div>
               </div>

@@ -23,24 +23,32 @@ class SmoDeviceAc(models.Model):
     device_name = fields.Char(string="Device Name", related="smo_device_id.device_name")
     device_type= fields.Char(string="Device Type", related="smo_device_id.device_type")
     
-    power_state = fields.Boolean(string="Power ON/OFF", reqquired=True)
+    power_state = fields.Boolean(string="Power ON/OFF", required=True)
     temperature = fields.Integer(string="Temperature", required=True, help="Temperature in °C: 17°C ➜ 30°C")
     
     mode = fields.Selection([
-        ('AUTO', 'Auto'),
-        ('COOL', 'Cool'),
-        ('DRY', 'Dry'),
-        ('HEAT', 'Heat'),
-        ('FAN', 'Fan')
-    ], string="Mode", required=True, default='AUTO')
+        ('0', 'Auto'),
+        ('1', 'Cool'),
+        ('2', 'Dry'),
+        ('3', 'Heat'),
+        ('4', 'Fan')
+    ], string="Mode", required=True, default='0')
     
     fan_speed = fields.Selection([
-        ('AUTO', 'Auto'),
-        ('LOW', 'Low'),
-        ('MEDIUM', 'Medium'),
-        ('HIGH', 'High'),
-    ], string="Fan Speed", required=True, default='AUTO')
+        ('3', 'Auto'),
+        ('0', 'Low'),
+        ('1', 'Medium'),
+        ('2', 'High'),
+    ], string="Fan Speed", required=True, default='0')
     
+    def _get_keys_to_fields_mapping(self):
+        return {
+            'temp': 'temperature',
+            'mode': 'mode',
+            'fanSpeed': 'fan_speed',
+            'powerState': 'power_state'
+            
+        }   
     
     @api.constrains('temperature')
     def _validate_temperature(self):
@@ -76,11 +84,25 @@ class SmoDeviceAc(models.Model):
             raise
         
         skip_calling_api = self.env.context.get('skip_calling_api') or False
+        keys_to_check = self._get_keys_to_fields_mapping().values()
         
-        if not skip_calling_api:
+        if not skip_calling_api and any(key in vals for key in keys_to_check):
             self.post_AC_status_to_server(vals)
+            
+        self._send_update_message()
         
         return result
+    
+    def _send_update_message(self):
+        bus = self.env['bus.bus']
+        for record in self:
+            bus._sendone('smo_channel', 'smo.device.ac/update', {
+                'id': record.id,
+                'power_state': record.power_state,
+                'temperature': record.temperature,
+                'mode': record.mode,
+                'fan_speed': record.fan_speed
+            })
     
     def post_AC_status_to_server(self, vals):
         crr_username = self.env.user.name
@@ -92,14 +114,12 @@ class SmoDeviceAc(models.Model):
             _logger.error(f"Call API [{crr_username}]: POST data of AC devices to Thingsboards Server ➜ FAILED. Message: Token record not found")
             raise UserError('Token record not found')
             
-        fields = {
-            'temperature': 'temp',
-            'power_state': 'powerState',
-            'mode': 'mode',
-            'fan_speed': 'fanSpeed'
-        }
+        fields = {value: key for key, value in self._get_keys_to_fields_mapping().items()}
         
-        payload = {'ss_' + fields[key]: vals[key] for key in fields.keys() & vals.keys()}
+        payload = {
+            'ss_' + fields[key]: int(vals[key]) if key in ['mode', 'fan_speed'] else vals[key]
+            for key in fields.keys() & vals.keys()
+        }
         
         for device_id in device_ids:
             endpoint = f'/api/plugins/telemetry/{device_id[0]}/SHARED_SCOPE'

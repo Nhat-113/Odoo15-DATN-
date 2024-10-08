@@ -57,8 +57,7 @@
                             <field name="smo_device_iaq_ids" readonly="1">
                                 <tree create="false" delete="false" no_open="1">
                                     <field name="param_name"/>
-                                    <field name="current_value"/>
-                                    <field name="unit"/>
+                                    <field name="param_value_display"/>
                                     <field name="last_updated"/>
                                 </tree>
                             </field>

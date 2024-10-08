@@ -18,6 +18,8 @@ class SmoDeviceIaq(models.Model):
     current_value = fields.Char(string="Current Value", required=True, readonly=True)
     unit = fields.Char(string="Unit of Measurement", readonly=True, compute='_compute_unit')
     
+    param_value_display = fields.Char(string="Current Value", compute="_compute_param_value_display")
+    
     last_updated = fields.Datetime(string="Last Updated", required=True, readonly=True)
 
     @api.depends('param_name')
@@ -41,4 +43,10 @@ class SmoDeviceIaq(models.Model):
 
         for record in self:
             record.unit = factor_to_unit.get(record.param_name.lower(), 'N/A')
+            
+    @api.depends('current_value')
+    def _compute_param_value_display(self):
+        for record in self:
+            unit = record.unit if record.unit and record.unit != 'N/A' else ''
+            record.param_value_display = f"{record.current_value} {unit}"
 

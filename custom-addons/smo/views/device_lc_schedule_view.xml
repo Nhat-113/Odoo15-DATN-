@@ -5,7 +5,12 @@
         <field name="model">smo.device.lc.schedule</field>
         <field name="arch" type="xml">
             <tree string="Lights Control Schedule" export_xlsx="false"
-                    js_class="smo_custom_list_view" expand="1">
+                    js_class="smo_lc_schedule_list_view" expand="1"
+                    decoration-warning="status == 'submitted'"
+                    decoration-success="status == 'approved'"
+                    decoration-danger="status == 'refused'"
+            >
+                <field name="request_user" />
                 <field name="schedule_name" />
                 <field name="smo_device_lc_ids" widget="many2many_tags"/>
                 <field name="state_display"/>
@@ -13,6 +18,15 @@
                 <field name="schedule_mode" />
                 <field name="start_time_display" />
                 <field name="end_time_display" />
+                <field name="status" widget="badge" decoration-info="status == 'draft'" decoration-warning="status == 'submitted'" decoration-success="status == 'approved'" decoration-danger="status == 'refused'"/>
+                <!-- <button string="Approve" name="action_approve" type="object"
+                    icon="fa-check"
+                    states="submitted"
+                    groups="smo.group_smo_admin"/>
+                <button string="Refuse" name="action_refuse" type="object"
+                    icon="fa-times"
+                    states="submitted"
+                    groups="smo.group_smo_admin"/> -->
             </tree>
         </field>
     </record>
@@ -22,11 +36,24 @@
         <field name="model">smo.device.lc.schedule</field>
         <field name="arch" type="xml">
             <form duplicate="false" export_xlsx="false">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,submitted,approved" readonly="1"/>
+                    <button string="Submit" name="action_submit" type="object" class="oe_highlight" attrs="{'invisible': [('status', '!=', 'draft')]}"/>
+                    <button string="Approve" name="action_approve" type="object" class="oe_highlight" attrs="{'invisible': [('status', '!=', 'submitted')]}"/>
+                    <button string="Refuse" name="action_refuse" type="object" attrs="{'invisible': [('status', '!=', 'submitted')]}"/>
+                    <button string="Set to Draft" name="action_draft" type="object" attrs="{'invisible': [('status', 'not in', ['approved', 'refused'])]}"/>
+                </header>
                 <sheet>
+                    <widget name="web_ribbon" title="DRAFT" bg_color="bg-primary" attrs="{'invisible':[('status', '!=', 'draft')]}"/>
+                    <widget name="web_ribbon" title="SUBMITTED" bg_color="bg-warning" attrs="{'invisible':[('status', '!=', 'submitted')]}"/>
+                    <widget name="web_ribbon" title="APPROVED" bg_color="bg-success" attrs="{'invisible':[('status', '!=', 'approved')]}"/>
+                    <widget name="web_ribbon" title="REFUSED" bg_color="bg-danger" attrs="{'invisible':[('status', '!=', 'refused')]}"/>
                     <label for="schedule_name" style="font-size: 1.5em;"/>
                     <field name="schedule_name" style="font-size: 1.7em;"/>                  
                     <group>    
                         <group>
+                            
+                            <field name="request_user" groups="smo.group_smo_admin" />
                             <field name="schedule_mode" />
                             <field name="state" widget="boolean_toggle"/>
                         </group>

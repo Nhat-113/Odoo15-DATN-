@@ -18,8 +18,8 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='smo.auto_sync_socket', default=True)
     smo_auto_sync_http = fields.Boolean(string="Auto Sync: HTTP",
         config_parameter='smo.auto_sync_http', default=True)
-    dashboard_wiget = fields.Char(string="Dashboard Wiget URL",
-        config_parameter='smo.dashboard_wiget')
+    dashboard_widget = fields.Char(string="Dashboard Wiget URL",
+        config_parameter='smo.dashboard_widget')
 
     @api.onchange('thingsboard_api_url')
     def _onchange_thingsboard_api_url(self):
@@ -37,12 +37,12 @@ class ResConfigSettings(models.TransientModel):
             if not self.thingsboard_wss_url.startswith(('ws://', 'wss://')):
                 raise ValidationError("The Thingsboard Websocket URL must be in the format 'ws://example' or 'wss://example'")
 
-    @api.onchange('dashboard_wiget')
-    def _onchange_dashboard_wiget(self):
-        if self.dashboard_wiget:
-            self.dashboard_wiget = self.dashboard_wiget.strip().strip('/')
+    @api.onchange('dashboard_widget')
+    def _onchange_dashboard_widget(self):
+        if self.dashboard_widget:
+            self.dashboard_widget = self.dashboard_widget.strip().strip('/')
             
-            if not self.dashboard_wiget.startswith(('http://dev-dboard.d-soft.tech/', 'https://dev-dboard.d-soft.tech/')):
+            if not self.dashboard_widget.startswith(('http://dev-dboard.d-soft.tech/', 'https://dev-dboard.d-soft.tech/')):
                 raise ValidationError("The Dashboard Wiget URL must be in the format 'http://example' or 'https://example'")
 
     @api.onchange('thingsboard_shared_account_username')
@@ -63,7 +63,7 @@ class ResConfigSettings(models.TransientModel):
             ('smo_manual_sync', 'smo.manual_sync'),
             ('smo_auto_sync_socket', 'smo.auto_sync_socket'),
             ('smo_auto_sync_http', 'smo.auto_sync_http'),
-            ('dashboard_wiget', 'smo.dashboard_wiget'),
+            ('dashboard_widget', 'smo.dashboard_widget'),
         ]
 
         for field, config_param in field_config_param_map:
@@ -82,7 +82,8 @@ class ResConfigSettings(models.TransientModel):
             ('thingsboard_wss_url', 'smo.thingsboard_wss_url'),
             ('smo_manual_sync', 'smo.manual_sync'),
             ('smo_auto_sync_socket', 'smo.auto_sync_socket'),
-            ('smo_auto_sync_http', 'smo.auto_sync_http')
+            ('smo_auto_sync_http', 'smo.auto_sync_http'),
+            ('dashboard_widget', 'smo.dashboard_widget'),
         ]
 
         for field, config_param in field_config_param_map:
