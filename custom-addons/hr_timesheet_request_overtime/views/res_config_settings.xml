@@ -7,24 +7,42 @@
             <field name="priority" eval="10" />
             <field name="inherit_id" ref="hr_timesheet.res_config_settings_view_form" />
             <field name="arch" type="xml">
-                <xpath expr="//div[@id='timesheet_off_validation_setting']" position="after">
-                    <div class="col-12 col-lg-6 o_setting_box" id="timesheet_overtime_setting">
-                        <div class="o_setting_right_pane">
-                            <label for="timeoff_type_overtime" />
-                            <span 
-                                class="fa fa-lg fa-building-o" 
-                                title="Values set here are company-specific."
-                                groups="base.group_multi_company" 
-                            />
-                            <div class="row">
-                                <div class="text-muted col-md-12">
-                                    Select the type of time off you want to request for overtime
+                <xpath expr="//div[hasclass('settings')]//div[@data-key='hr_timesheet']//div[@name='section_leaves']" position="replace">
+                    <h2>Time Off</h2>
+                    <div class="row mt16 o_settings_container" name="timesheet_control">
+                        <div class="col-12 col-lg-6 o_setting_box" id="timesheet_overtime_setting">
+                            <div class="o_setting_right_pane">
+                                <label for="timeoff_type_overtime" />
+                                <span 
+                                    class="fa fa-lg fa-building-o" 
+                                    title="Values set here are company-specific."
+                                    groups="base.group_multi_company" 
+                                />
+                                <div class="row">
+                                    <div class="text-muted col-md-12">
+                                        Select the type of time off you want to request for overtime
+                                    </div>
+                                </div>
+                                <div class="content-group">
+                                    <div class="mt16">
+                                        <field name="timeoff_type_overtime" options="{'no_create': True}" class="pl-0" />
+                                    </div>
                                 </div>
                             </div>
-                            <div class="content-group">
-                                <div class="mt16">
-                                    <field name="timeoff_type_overtime" options="{'no_create': True}"
-                                        class="pl-0" />
+                        </div>
+
+                        <div class="col-12 col-lg-6 o_setting_box" id="timesheet_off_validation_setting" groups="base.group_no_one">
+                            <div class="o_setting_left_pane">
+                                <field name="module_project_timesheet_holidays"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="module_project_timesheet_holidays"/>
+                                <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." groups="base.group_multi_company"/>
+                                <div class="text-muted">
+                                    Generate timesheets upon time off validation
+                                </div>
+                                <div class="content-group">
+                                    <div id="module_project_timesheet_holidays"/>
                                 </div>
                             </div>
                         </div>
