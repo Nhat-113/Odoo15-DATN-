@@ -604,7 +604,7 @@ class PlanningCalendarResource(models.Model):
     
     def excute_query_destroy_variable(self, cr, vals, insert, query):
         cr.execute(query)
-        cr.commit()
+        # cr.commit()
         # Destroy variable
         del vals
         del insert
