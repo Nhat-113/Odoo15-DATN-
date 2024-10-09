@@ -151,11 +151,15 @@ class SupportServices(models.Model):
     @api.depends('category', 'payment', 'status', 'cost_type', 'amount', 'name', 'send_to')
     def compute_check_invisible_project_id(self):
         for request in self:
-            if request.category.type_category == 'team_building' or \
-                request.category.type_category in ['it_helpdesk', 'other'] and request.cost_type.type_cost == 'cost_project':
-                request.check_invisible_project_id = False
-            else:
-                request.check_invisible_project_id = True
+            type_category = request.category.type_category
+            cost_type = request.cost_type.type_cost
+            flag_payment = request.flag_payment
+            result = True
+            
+            if type_category == 'team_building' or (type_category in {'it_helpdesk', 'other'} and flag_payment == 'have_cost' and cost_type == 'cost_project'):
+                result = False
+                
+            request.check_invisible_project_id = result
     
     # @api.onchange('project_id', 'category')
     # def set_member_team_building(self):
