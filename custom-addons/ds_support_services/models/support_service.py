@@ -91,9 +91,10 @@ class SupportServices(models.Model):
             mem = self.project_id.planning_calendar_resources
             
             for rec in mem:
-                if month_request >= rec.start_date.month \
-                    and month_request <= rec.end_date.month:
+                if month_request >= rec.start_date.month and month_request <= rec.end_date.month:
                     member_ids.append(rec.employee_id.id)
+            
+            member_ids = set(member_ids)
 
             member_line = [(5, 0, 0)]
             for item in member_ids:
