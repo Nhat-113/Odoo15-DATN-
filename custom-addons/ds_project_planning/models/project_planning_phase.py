@@ -148,22 +148,17 @@ class PlanningPhase(models.Model):
             # self.write({'project_tasks': [(3, task.id, 0) for task in self.project_tasks.ids]})
             self.write({'project_tasks': [(6, 0, tasks.ids)]})
 
-    def compute_tasks(self):
-        if self.project_id and self.start_date and self.end_date:
+    # def compute_tasks(self):
+    #     if self.project_id and self.start_date and self.end_date:
 
-            # tasks is valid if it ends between the given dates
-            clause_1 = ['&', ('date_start', '>=', self.start_date),
-                        ('date_end', '<=', self.end_date)]
-            # OR if it finish between the given dates
-            clause_2 = ['&', ('date_end', '>=', self.start_date),
-                        ('date_end', '<=', self.end_date)]
-            domain = [('project_id', '=', self.project_id.id),
-                      '|'] + clause_1 + clause_2
-            tasks = self.env['project.task'].search(domain)
-            # self.write({'project_tasks': [(3, task.id, 0) for task in self.project_tasks.ids]})
-            self.write({'project_tasks': [(6, 0, tasks.ids)]})
+    #         domain = ['&', ('project_id', '=', self.project_id.id),
+    #                     ('phase_id', '=', self.id)]
 
-        return {}
+    #         tasks = self.env['project.task'].search(domain)
+    #         # self.write({'project_tasks': [(3, task.id, 0) for task in self.project_tasks.ids]})
+    #         self.write({'project_tasks': [(6, 0, tasks.ids)]})
+
+    #     return {}
 
     def _count_milestone_in_phase(self):
         for phase in self:

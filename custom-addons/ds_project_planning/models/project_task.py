@@ -4,7 +4,7 @@ import pandas as pd
 
 from cmath import phase
 from odoo import models, fields, api, _
-from datetime import timedelta
+from datetime import timedelta, datetime
 import json
 
 from odoo.exceptions import ValidationError
@@ -39,6 +39,7 @@ class ProjectTask(models.Model):
         comodel_name='project.task',
         compute='_compute_recursive_dependency_task_ids'
     )
+    # check_phase_required = fields.Boolean(default = True)
 
     def _check_user_readonly_date(self):
         if self.env.user.has_group('project.group_project_manager') == False and self.env.user.has_group('ds_project_planning.group_project_team_leader') == False\
@@ -47,26 +48,80 @@ class ProjectTask(models.Model):
         else:
             self.user_readonly = False
 
-    def write(self, vals):
-        res = super(ProjectTask, self).write(vals)
-        if 'date_start' in vals or 'date_end' in vals:
-            domain_normal = ['&', '&', ('project_id', '=', self.project_id.id), (
-                'start_date', '<=', self.date_start), ('end_date', '>=', self.date_end)]
-            domain_exception = ['&', '&', ('project_id', '=', self.project_id.id), (
-                'start_date', '<=', self.date_end), ('end_date', '>=', self.date_end)]
-            phase_id = self.env['project.planning.phase'].search(domain_normal)
-            phase_id_exception = self.env['project.planning.phase'].search(
-                domain_exception)
-            task_phase_id = False
+    # @api.model
+    # def create(self, vals):
+    #     # Lấy giá trị từ vals nếu có
+    #     phase_id = vals.get('phase_id')
+    #     date_start = datetime.strptime(vals.get('date_start'), '%Y-%m-%d').date() if vals.get('date_start') is not False else None
+    #     date_end = datetime.strptime(vals.get('date_end'), '%Y-%m-%d').date() if vals.get('date_end') is not False else None
 
-            if phase_id:
-                task_phase_id = phase_id.id
-            elif phase_id_exception:
-                task_phase_id = phase_id_exception.id
+    #     if phase_id:
+    #         phase = self.env['project.planning.phase'].browse(phase_id)
+    #         if not date_start and not date_end:
+    #             return super(ProjectTask, self).create(vals)
+    #         elif date_start > phase.end_date or date_end < phase.start_date:
+    #             raise ValidationError(
+    #                 "Dates must be within the phase period from {start_date} to {end_date}. "
+    #                 "Please choose different dates.".format(
+    #                     start_date=phase.start_date.strftime('%d-%m-%Y'),
+    #                     end_date=phase.end_date.strftime('%d-%m-%Y')
+    #                 )
+    #             )
+        
+    #     # Tiếp tục tạo bản ghi sau khi kiểm tra xong
+    #     return super(ProjectTask, self).create(vals)
 
-            self.write({'phase_id': task_phase_id})
+    # def write(self, vals):
+        # Lấy các giá trị phase_id, date_start, và date_end từ vals nếu có
+        # phase_id = vals.get('phase_id', self.phase_id.id)
+        # date_start_vals = self._get_date_from_vals(vals, 'date_start')
+        # date_end_vals = self._get_date_from_vals(vals, 'date_end')
+        # date_start = date_start_vals if vals.get('date_start') else self.date_start
+        # date_end = date_end_vals if vals.get('date_end')  else self.date_end
 
-        return res
+        # Kiểm tra điều kiện với phase_id và dates
+        # if phase_id:
+        #     phase = self.env['project.planning.phase'].browse(phase_id)
+        #     if not date_start and not date_end:
+                
+        #         return super(ProjectTask, self).write(vals)
+        #     if date_start > phase.end_date or date_end < phase.start_date:
+        #         raise ValidationError(
+        #             "Dates must be within the phase period from {start_date} to {end_date}. "
+        #             "Please choose different dates.".format(
+        #                 start_date=phase.start_date.strftime('%d-%m-%Y'),
+        #                 end_date=phase.end_date.strftime('%d-%m-%Y')
+        #             )
+        #         )
+
+        # if 'date_start' in vals or 'date_end' in vals: #date of task
+        #     phase_ids = self._get_phase_ids(self, self.date_start, self.date_end)
+
+        #     task_phase_id = phase_id
+        #     if len(phase_ids) == 1:
+        #         task_phase_id = phase_ids.id
+        #     elif self.phase_id in phase_ids:
+        #         task_phase_id = self.phase_id.id
+        #     if vals.get('phase_id'):
+        #         task_phase_id = vals.get('phase_id')
+        #     vals['phase_id'] = task_phase_id
+        # return super(ProjectTask, self).write(vals)
+
+    # def _get_phase_ids(self, task, date_start, date_end):
+    #     domain = [
+    #         ('project_id', '=', task.project_id.id),
+    #         '|', '|', 
+    #         '&',
+    #         ('start_date', '>', date_start), 
+    #         ('start_date', '<=', date_end),
+    #         '&',
+    #         ('start_date', '<=', date_end), 
+    #         ('end_date', '>=', date_end),
+    #         '&',
+    #         ('end_date', '>=', date_start), 
+    #         ('end_date', '<=', date_end)
+    #     ]
+    #     return task.env['project.planning.phase'].search(domain)
 
     @api.depends('date_start', 'date_end')
     def _compute_planned_duration(self):
@@ -91,6 +146,12 @@ class ProjectTask(models.Model):
             elif not r.date_start or not r.date_end:
                 r.working_day = 0
 
+    # @api.onchange('date_start', 'date_end')
+    # def _onchange_date_field(self):
+    #     if self.date_start:
+    #         phase_ids = self._get_phase_ids(self, self.date_start, self.date_end)
+    #         if len(phase_ids) != 1:
+    #             self.check_phase_required = False
 
     @api.onchange('planned_duration', 'date_start', 'date_end')
     def _inverse_planned_duration(self):
@@ -154,6 +215,19 @@ class ProjectTask(models.Model):
                     ))
                 else:
                     task.planned_duration == 1
+        # if self.date_end and not self.date_start:
+        #     raise ValidationError("Please select a start date")
+   
+    # def _get_date_from_vals(self, vals, field_name):
+    #     """
+    #     Function to get date value from vals and convert it to date format.
+    #     """
+    #     if vals.get(field_name):
+    #         if isinstance(vals[field_name], str):
+    #             return datetime.strptime(vals[field_name], '%Y-%m-%d').date()
+    #         else:
+    #             return vals[field_name]
+    #     return None
 
     def update_date_end(self, stage_id):
         return {}
