@@ -404,7 +404,7 @@ class BoxManagementMobile(http.Controller):
                 ] if len(companies) else [],
                 "pagination": handle_pagination(offset, limit, total_records)
             }
-            _logger.info({**log_data, **{'status': 200}, **res})
+            _logger.info({**log_data, **{'status': 200}, **response_data})
             return jsonResponse(response_data, 200)
         except Exception as e:
             res = {
