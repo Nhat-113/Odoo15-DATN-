@@ -167,9 +167,8 @@ class HrAttendance(http.Controller):
 
             formatted_time = valid_timezone(kw.get("timezone"), kw.get("timestamp"))
             if isinstance(formatted_time, datetime) is False:
-                res = formatted_time
-                _logger.info({**log_data, **res})
-                return res
+                _logger.info({**log_data, **formatted_time})
+                return formatted_time
         
             employee = request.env["hr.employee"].sudo().search([("work_email", "=", email)])
             if not employee:
