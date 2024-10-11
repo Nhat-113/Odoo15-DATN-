@@ -11,4 +11,22 @@
             <field name="color">2</field>
         </record>
     </data>
+
+    <!--  Open this code if the first install Time OFF addon and payroll  -->
+    <!-- <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'hr_holidays'), ('name', '=', 'holiday_status_comp')]" />
+        </function>
+        <value eval="{'noupdate': False}"/>
+    </function>
+        <record id="hr_holidays.holiday_status_comp" model="hr.leave.type">
+            <field name="code">NNB</field>
+            <field name="request_unit">half_day</field>
+        </record>
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'hr_holidays'), ('name', '=', 'holiday_status_comp')]" />
+        </function>
+        <value eval="{'noupdate': True}"/>
+    </function> -->
 </odoo>
