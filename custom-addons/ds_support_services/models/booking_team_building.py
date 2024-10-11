@@ -51,8 +51,9 @@ class BookingTeamBuilding(models.Model):
                 ('employee_id', '=', record.employee_id.id), 
                 ('month', '=', record.support_service_id.get_month_tb),
                 ('year', '=', record.support_service_id.get_year_tb),
-                ('id', '!=', record.id)
-                ])
+                ('id', '!=', record.id),
+                ('support_service_id.status.type_status', '!=', 'refuse')
+            ])
             if len(booking_team_bds)>0:
                 raise UserError(_('There is another project requesting team building for %(employee)s in %(month)s/%(year)s.',
                 employee=record.employee_id.name, month=record.support_service_id.get_month_tb, year=record.support_service_id.get_year_tb))

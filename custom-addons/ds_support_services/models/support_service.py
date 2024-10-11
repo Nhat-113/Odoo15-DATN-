@@ -431,9 +431,9 @@ class SupportServices(models.Model):
         }
 
     def toggle_active(self):
-        for request in self:
-            request.write(
-                {'status': self.env['status.support.service'].search([('type_status', '=', 'draft')]).id})
+        self.member_team_building.check_validate_team_building()
+        self.write(
+            {'status': self.env['status.support.service'].search([('type_status', '=', 'draft')]).id})
 
     def unlink(self):
         for request in self:
