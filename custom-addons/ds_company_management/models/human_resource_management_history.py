@@ -312,9 +312,11 @@ class HumanResourceManagementHistory(models.Model):
                 
             departments_managers_ids.append(current_user.id)
                 
-            sql_domain_for_role = ' where ( (department_manager_user_id not in ' + str(tuple(departments_managers_ids)) \
+            departments_managers_ids_str = f"({departments_managers_ids[0]})" if len(departments_managers_ids) == 1 else str(tuple(departments_managers_ids))
+            
+            sql_domain_for_role = ' where ( (department_manager_user_id not in ' + departments_managers_ids_str \
                                 + ' or department_manager_user_id is null  )' \
-                                + ' and department_manager_project_id in ' + str(tuple(departments_managers_ids)) \
+                                + ' and department_manager_project_id in ' + departments_managers_ids_str \
                                 + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
         sql = ("""select  	employee_name,
