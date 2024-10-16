@@ -223,6 +223,7 @@ class HumanResourceManagement(models.Model):
                             ON EMP.ID = HC.EMPLOYEE_ID
                         LEFT JOIN BOOKING_RESOURCE_MONTH AS BRM 
                             ON HC.EMPLOYEE_ID = BRM.EMPLOYEE_ID
+                            AND BRM.booking_id IS NOT NULL
                             AND EXTRACT(YEAR FROM brm.start_date_month) = EXTRACT(YEAR FROM CURRENT_DATE)
                         LEFT JOIN PLANNING_CALENDAR_RESOURCE AS PCR 
                             ON BRM.BOOKING_ID = PCR.ID
@@ -488,9 +489,11 @@ class HumanResourceManagement(models.Model):
                 
             departments_managers_ids.append(current_user.id)
                 
-            sql_domain_for_role = ' where ( (department_manager_user_id not in ' + str(tuple(departments_managers_ids)) \
+            departments_managers_ids_str = f"({departments_managers_ids[0]})" if len(departments_managers_ids) == 1 else str(tuple(departments_managers_ids))
+            
+            sql_domain_for_role = ' where ( (department_manager_user_id not in ' + departments_managers_ids_str \
                                 + ' or department_manager_user_id is null  )' \
-                                + ' and department_manager_project_id in ' + str(tuple(departments_managers_ids)) \
+                                + ' and department_manager_project_id in ' + departments_managers_ids_str \
                                 + ' and company_id in ' + str(tuple(selected_companies)) + ')'
 
         sql = ("""select """ + COLUMNS + """ from human_resource_management """)
@@ -583,7 +586,7 @@ class HumanResourceManagement(models.Model):
   
         if len(department_removed) != 0:
             department_domain += ' AND (department_id IS NULL OR department_id NOT IN ' + department_removed \
-                                + ') AND (PROJECT_DEPARTMENT_ID IS NULL OR PROJECT_DEPARTMENT_ID NOT IN ' + department_removed + ')'
+                                + ' AND (PROJECT_DEPARTMENT_ID IS NULL OR PROJECT_DEPARTMENT_ID NOT IN ' + department_removed + ')'
         
         if role_user == 'ceo':
             company_domain += ' AND (company_id in ' + selected_companies + ')'
