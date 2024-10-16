@@ -223,6 +223,7 @@ class HumanResourceManagement(models.Model):
                             ON EMP.ID = HC.EMPLOYEE_ID
                         LEFT JOIN BOOKING_RESOURCE_MONTH AS BRM 
                             ON HC.EMPLOYEE_ID = BRM.EMPLOYEE_ID
+                            AND BRM.booking_id IS NOT NULL
                             AND EXTRACT(YEAR FROM brm.start_date_month) = EXTRACT(YEAR FROM CURRENT_DATE)
                         LEFT JOIN PLANNING_CALENDAR_RESOURCE AS PCR 
                             ON BRM.BOOKING_ID = PCR.ID
