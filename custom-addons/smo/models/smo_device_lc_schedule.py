@@ -7,7 +7,7 @@ import pytz
 from odoo import tools
 import logging
 
-_logger = logging.getLogger(__name__)
+_logger = logging.getLogger('smo.logger')
 
 START_TIME_MISSING_ANNOUNCE = 'Invalid Input: Start Time must be provided'
 START_TIME_IN_PAST_ANNOUNCE = 'Invalid Input: Start Time must not be in the past'
@@ -22,6 +22,8 @@ class SmoDeviceLcSchedule(models.Model):
     _rec_name = "schedule_name"
 
     schedule_name = fields.Char(string="Schedule Name", required=True)
+    
+    request_user = fields.Many2one('res.users', string="Requester", default=lambda self: self.env.user)
 
     target_type = fields.Selection([
         ('custom', 'Custom'),
@@ -58,10 +60,17 @@ class SmoDeviceLcSchedule(models.Model):
     start_time_daily_utc = fields.Char(string="Start Time Daily UTC", compute='_compute_start_daily_utc', store=True)
     end_time_daily_utc = fields.Char(string="End Time Daily UTC", compute='_compute_end_daily_utc', store=True)
 
-    state = fields.Boolean(string="Turn Lights On/Off", required=True, default=True)
+    state = fields.Boolean(string="Turn Lights On/Off", default=True)
 
     cron_start_ids = fields.One2many('ir.cron', 'smo_device_lc_schedule_id_start', string="Cron Starts")
     cron_end_ids = fields.One2many('ir.cron', 'smo_device_lc_schedule_id_end', string="Cron Ends")
+    
+    status = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('approved', 'Approved'),
+        ('refused', 'Refused')
+    ], string='Status', default='draft')
     
     state_display = fields.Char(string="Turn On/Off", compute='_compute_state_display')
     start_time_display = fields.Char(string="Start Time", compute='_compute_start_time_display')
@@ -328,7 +337,6 @@ class SmoDeviceLcSchedule(models.Model):
             raise
         
         record._set_lc_ids_by_asset_or_device()
-        record._create_and_update_cronjob_for_schedule()
         
         return record
     
@@ -467,9 +475,9 @@ class SmoDeviceLcSchedule(models.Model):
         
         try:
             res = super(SmoDeviceLcSchedule, self).write(vals)
-            _logger.info(f"Update DB: Update LC Schedule record of device [{'name'}]: {changing_message} ➜ SUCCESS")
+            _logger.info(f"Update DB: Update LC Schedule record of device [{self.schedule_name}]: {changing_message} ➜ SUCCESS")
         except:
-            _logger.info(f"Update DB: Update LC Schedule record of device [{'name'}]: {changing_message} ➜ FAILED")
+            _logger.info(f"Update DB: Update LC Schedule record of device [{self.schedule_name}]: {changing_message} ➜ FAILED")
             raise
         
         for record in self:
@@ -514,5 +522,20 @@ class SmoDeviceLcSchedule(models.Model):
             
         if schedule_record.smo_device_lc_ids:
             schedule_record.smo_device_lc_ids.write({'current_state': state})
+            
+    def action_submit(self):
+        self.write({'status': 'submitted'})
+        
+    def action_approve(self):
+        self._create_and_update_cronjob_for_schedule()
+        self.write({'status': 'approved'})
+        
+    def action_refuse(self):
+        self._unlink_all_crons()
+        self.write({'status': 'refused'})
+        
+    def action_draft(self):
+        self._unlink_all_crons()
+        self.write({'status': 'draft'})
 
 

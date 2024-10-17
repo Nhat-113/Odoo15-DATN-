@@ -8,8 +8,7 @@
                     js_class="smo_custom_list_view" expand="1">
                 <field name="device_name" />
                 <field name="param_name"/>
-                <field name="current_value" />
-                <field name="unit"/>
+                <field name="param_value_display" />
                 <field name="last_updated" />
             </tree>
         </field>

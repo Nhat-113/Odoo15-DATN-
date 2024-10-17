@@ -352,24 +352,29 @@ class SmoDevice(models.Model):
             _logger.error(f'Odoo Server Error: Failed to parse response data of AC devices of device [{smo_device_record.device_name}]: {err}')
             raise UserError('Failed to parse response data of Air Conditioner devices')
 
-        _logger.info(f'Raw AC Data: {data}')
         ac_model = self.env['smo.device.ac']
+        keys_to_fields_mapping = ac_model._get_keys_to_fields_mapping()
+        
+        filtered_data = {
+            keys_to_fields_mapping[item['key']]: str(item['value']) if item['key'] in ['mode', 'fanSpeed'] else item['value']            
+            for item in data
+            if item['key'] in keys_to_fields_mapping
+        }
+        
+        required_attrs = ['power_state', 'fan_speed','mode', 'temperature']
+        missing_attrs = [attr for attr in required_attrs if attr not in filtered_data]
+        if missing_attrs:
+            _logger.error(f'Data from Server of device {smo_device_record.device_name} is missing required attributes: {missing_attrs}')
+            raise UserError(f'Data from Server of device {smo_device_record.device_name} is missing required attributes: {missing_attrs}')
+                
         existing_ac_records = ac_model.search([('smo_device_id', '=', smo_device_id)])
         
         if existing_ac_records:
-            existing_ac_records.write({
-                'temperature': 17,
-                'mode': 'AUTO',
-                'fan_speed': 'AUTO',
-                'power_state': True
-            })
+            existing_ac_records.with_context(skip_calling_api=True).write(filtered_data)
         else:
             self.env['smo.device.ac'].create({
                 'smo_device_id': smo_device_record.id,
-                'temperature': 17,
-                'mode': 'AUTO',
-                'fan_speed': 'AUTO',
-                'power_state': True
+                **filtered_data
             })
             
         _logger.info(f'Update DB: Update last sync time of device [{smo_device_record.device_name}]')
@@ -457,4 +462,10 @@ class SmoDevice(models.Model):
         
         return res
         
-
+    @api.model
+    def get_dashboard_widget(self):
+        ir_config = self.env['ir.config_parameter'].sudo()
+        cids = self.env.company.id
+        action_id = self.env.ref('smo.action_show_devices').id  
+        result = [cids, ir_config.get_param('smo.dashboard_widget'), action_id]
+        return result

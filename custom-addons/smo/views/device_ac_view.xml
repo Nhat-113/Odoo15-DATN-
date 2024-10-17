@@ -4,8 +4,8 @@
         <field name="name">smo.device.ac.tree</field>
         <field name="model">smo.device.ac</field>
         <field name="arch" type="xml">
-            <tree string="AC Devices" create="false" edit="false" delete="false" export_xlsx="false"
-                    js_class="smo_custom_list_view" expand="1">
+            <tree string="AC Devices" create="false" edit="false" delete="true" export_xlsx="false"
+                    js_class="ac_device_list_view" expand="1">
                 <field name="device_name" />
                 <field name="name"/>
                 <field name="power_state" widget="boolean_toggle"/>

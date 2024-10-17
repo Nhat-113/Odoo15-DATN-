@@ -87,7 +87,7 @@ odoo.define('smo.websocket', function (require) {
         _handleWebSocketMessage: function (message) {
             console.log('Got WebSocket message: ', message)
             rpc.query({
-                route: '/smo/socket/device/lc',
+                route: '/smo/socket/device',
                 params: {
                     message: message
                 }

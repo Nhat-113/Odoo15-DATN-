@@ -22,11 +22,11 @@ class SocketController(http.Controller):
                     }
                 }
                     
-            lc_devices = request.env['smo.device'].search_read(
-                [('device_type', '=', 'LC')],
+            realtime_sync_devices = request.env['smo.device'].search_read(
+                [('device_type', 'in', ['LC', 'AC'])],
                 ['id', 'device_id']
             )
-            device_to_subscribe = [{'id': device['id'], 'device_id': device['device_id']} for device in lc_devices]
+            device_to_subscribe = [{'id': device['id'], 'device_id': device['device_id']} for device in realtime_sync_devices]
         
             smo_user_record = request.env['smo.user'].search([], limit=1)
             smo_uid = smo_user_record.id if smo_user_record else request.env['smo.user'].login()
@@ -49,7 +49,7 @@ class SocketController(http.Controller):
             _logger.error(f"Odoo Server Error: Error while fetching init data for Socket connection: {str(e)}")
             return {'status': 500, 'message': str(e)}
         
-    @http.route('/smo/socket/device/lc', type='json', auth='user', methods=['POST'])
+    @http.route('/smo/socket/device', type='json', auth='user', methods=['POST'])
     def process_lc_data(self, **kw):
         try:
             message = json.loads(kw['message']) if kw['message'] else None
@@ -62,24 +62,44 @@ class SocketController(http.Controller):
             if not smo_device_id:
                 return {'status': 400, 'message': 'Missing subscriptionId'}
             
-            lc_devices = request.env['smo.device.lc'].search([('smo_device_id', '=', smo_device_id)])
-            if not lc_devices:
+            subscribed_device = request.env['smo.device'].browse(smo_device_id)
+            if not subscribed_device:
                 return {'status': 404, 'message': 'No matching devices found'}
             
-            param_names = {lc.param_name for lc in lc_devices}
-            filtered_data = {key: json.loads(data[0][1]) for key, data in message['data'].items() if key in param_names}
+            if subscribed_device.device_type == 'LC':
+                lc_devices = subscribed_device.smo_device_lc_ids
+                param_names = {lc.param_name for lc in lc_devices}
+                filtered_data = {key: json.loads(data[0][1]) for key, data in message['data'].items() if key in param_names}
 
-            _logger.info(f'Parsed data received from WebSocket: {filtered_data}')
-            
-            for lc in lc_devices:
-                new_state = filtered_data.get(lc.param_name)
-                if new_state is not None and lc.current_state != new_state:
-                    _logger.info(f"Update DB: (from Socket) Update LC record of {lc.param_name}-{lc.name or lc.param_name} of device [{lc.device_name}]: [state: {lc.current_state} ➜ {new_state}]")
-                    lc.with_context(skip_calling_api=True).write({'current_state': new_state})
+                _logger.info(f'Parsed LC data received from WebSocket: {filtered_data}')
                 
+                for lc in lc_devices:
+                    new_state = filtered_data.get(lc.param_name)
+                    if new_state is not None and lc.current_state != new_state:
+                        _logger.info(f"Update DB: (from Socket) Update LC record of {lc.param_name}-{lc.name or lc.param_name} of device [{lc.device_name}]: [state: {lc.current_state} ➜ {new_state}]")
+                        lc.with_context(skip_calling_api=True).write({'current_state': new_state})
+            
+            elif subscribed_device.device_type == 'AC':
+                ac_device = subscribed_device.smo_device_ac_ids
+                keys_to_fields = ac_device._get_keys_to_fields_mapping()
+                
+                def process_ac_value(key, value):
+                    if key in ['powerState']:
+                        return value.lower() == 'true'
+                    if key in ['temp']:
+                        return int(value)
+                    return value
+                
+                filtered_data = {keys_to_fields[key]: process_ac_value(key, data[0][1]) for key, data in message['data'].items() if key in keys_to_fields}
+                
+                _logger.info(f'Parsed AC data received from WebSocket: {filtered_data}')
+                
+                ac_device.with_context(skip_calling_api=True).write(filtered_data)
+
+
             return {'status': 200, 'message': 'Data processed successfully'}
         except Exception as e:
-            _logger.error(f"Odoo Server Error: Error while processing LC data from Socket in Odoo API: {str(e)}")
+            _logger.error(f"Odoo Server Error: Error while processing data from Socket in Odoo API: {str(e)}")
             return {'status': 500, 'message': str(e)}
         
     @http.route('/smo/token/refresh', type='json', auth='user')
