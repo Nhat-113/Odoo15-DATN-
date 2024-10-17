@@ -45,7 +45,7 @@
         </field>
     </record>
 
-    <menuitem id="menu_config_planning_phase" name="Planning Phases" parent="planning_config_menu" action="action_config_phase" sequence="2"/>
+    <!-- <menuitem id="menu_config_planning_phase" name="Planning Phases" parent="planning_config_menu" action="action_config_phase" sequence="2"/> -->
 
     <!-- Action to open the configuration phases of project -->
     <record id="action_config_milestone" model="ir.actions.act_window">
@@ -63,7 +63,7 @@
         </field>
     </record>
 
-    <menuitem id="menu_config_planning_milestone" name="Planning Milestone" parent="planning_config_menu" action="action_config_milestone" sequence="3"/>
+    <!-- <menuitem id="menu_config_planning_milestone" name="Planning Milestone" parent="planning_config_menu" action="action_config_milestone" sequence="3"/> -->
 
     <!-- Action to open the configuration phases of project -->
     <record id="action_config_role" model="ir.actions.act_window">
