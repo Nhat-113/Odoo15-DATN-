@@ -549,6 +549,8 @@ class SupportServices(models.Model):
                     if len(project_expense) == 1:
                         project_expense_management_id = project_expense
                     elif len(project_expense) == 0:
+                        if not request.project_id.department_id:
+                            raise ValidationError(f"Project '{request.project_id.name}' does not belong to any departments")
                         project_expense_new = self.env['project.expense.management'].create({
                             'company_id': request.company_id.id,
                             'department_id': request.project_id.department_id.id,
@@ -584,6 +586,8 @@ class SupportServices(models.Model):
                 if len(project_expense) == 1:
                     project_expense_management_id = project_expense
                 elif len(project_expense) == 0:
+                    if not request.project_id.department_id:
+                        raise ValidationError(f"Project '{request.project_id.name}' does not belong to any departments")
                     project_expense_new = self.env['project.expense.management'].create({
                         'company_id': request.company_id.id,
                         'department_id': request.project_id.department_id.id,
