@@ -82,19 +82,34 @@ class SupportServices(models.Model):
 
     actual_payment = fields.Monetary(string='Actual payment', tracking=True, currency_field='currency_vnd')
 
-    @api.onchange('project_id', 'category', 'get_month_tb')
+    @api.onchange('project_id', 'category', 'get_month_tb', 'get_year_tb')
     def get_member_line(self):
         if self.project_id and self.category.type_category == "team_building":
             member_line = []
             member_ids = []
-            month_request = int(self.get_month_tb)
-            mem = self.project_id.planning_calendar_resources
+            date_req_tuple = (int(self.get_year_tb), int(self.get_month_tb))
+            mem = self.project_id.planning_calendar_resources.filtered(lambda c: c.employee_id.active == True)
             
             for rec in mem:
-                if month_request >= rec.start_date.month and month_request <= rec.end_date.month:
-                    member_ids.append(rec.employee_id.id)
-            
-            member_ids = set(member_ids)
+                # Check if the employee was booked in the requested tbd month
+                if (rec.start_date.year, rec.start_date.month) <= date_req_tuple <= (rec.end_date.year, rec.end_date.month):
+                    active_contracts = rec.employee_id.contract_ids.filtered(lambda c: c.state != 'cancel') # filter out cancelled contracts
+                    emp_id = rec.employee_id.id
+
+                    # Check if the employee has contract in the requested tbd month
+                    if active_contracts and emp_id not in member_ids:
+                        for contract in active_contracts:
+                            contract_start = contract.date_start
+                            contract_end = contract.date_end
+
+                            if (contract_start.year, contract_start.month) <= date_req_tuple:
+                                if contract_end: 
+                                    if date_req_tuple <= (contract_end.year, contract_end.month):
+                                        member_ids.append(emp_id)
+                                        break
+                                else:
+                                    member_ids.append(emp_id)
+                                    break
 
             member_line = [(5, 0, 0)]
             for item in member_ids:
@@ -549,6 +564,8 @@ class SupportServices(models.Model):
                     if len(project_expense) == 1:
                         project_expense_management_id = project_expense
                     elif len(project_expense) == 0:
+                        if not request.project_id.department_id:
+                            raise ValidationError(f"Project '{request.project_id.name}' does not belong to any departments")
                         project_expense_new = self.env['project.expense.management'].create({
                             'company_id': request.company_id.id,
                             'department_id': request.project_id.department_id.id,
@@ -584,6 +601,8 @@ class SupportServices(models.Model):
                 if len(project_expense) == 1:
                     project_expense_management_id = project_expense
                 elif len(project_expense) == 0:
+                    if not request.project_id.department_id:
+                        raise ValidationError(f"Project '{request.project_id.name}' does not belong to any departments")
                     project_expense_new = self.env['project.expense.management'].create({
                         'company_id': request.company_id.id,
                         'department_id': request.project_id.department_id.id,
