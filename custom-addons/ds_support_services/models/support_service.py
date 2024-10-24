@@ -93,7 +93,7 @@ class SupportServices(models.Model):
             for rec in mem:
                 # Check if the employee was booked in the requested tbd month
                 if (rec.start_date.year, rec.start_date.month) <= date_req_tuple <= (rec.end_date.year, rec.end_date.month):
-                    active_contracts = rec.employee_id.contract_ids.filtered(lambda c: c.state != 'cancel') # filter out cancelled contracts
+                    active_contracts = rec.employee_id.sudo().contract_ids.filtered(lambda c: c.state != 'cancel') # filter out cancelled contracts
                     emp_id = rec.employee_id.id
 
                     # Check if the employee has contract in the requested tbd month
