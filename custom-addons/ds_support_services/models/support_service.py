@@ -450,6 +450,10 @@ class SupportServices(models.Model):
         self.write(
             {'status': self.env['status.support.service'].search([('type_status', '=', 'draft')]).id})
 
+        mail_template = "ds_support_services.draft_request_service_template"
+        subject_template = "["+self.category.name+"] Draft Request Service"
+        self._send_message_auto_subscribe_notify_request_service(self.requester_id , mail_template, subject_template)
+
     def unlink(self):
         for request in self:
             if request.env.user.has_group('ds_support_services.support_service_admin') == False and request.status.type_status in ['approval', 'done', 'repaid']:
