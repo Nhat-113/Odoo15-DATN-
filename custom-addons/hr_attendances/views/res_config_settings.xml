@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="base.res_config_settings_view_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[hasclass('settings')]//div[@data-key='hr_attendance']" position="inside">
-                    <h2>Hour Work Start</h2>
+                    <!-- <h2>Hour Work Start</h2>
                     <div class="row mt16 o_settings_container" name="attendance_view_type">
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div>
@@ -24,7 +24,7 @@
                                 <field class="form-control" name="hour_work_start" attrs="{'invisible':[('enable_split_shift','=',False)]}"/>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <h2>Working Hours</h2>
                     <div class="row mt16 o_settings_container" name="attendance_view_type">
                         <div class="col-12 col-lg-6 o_setting_box">

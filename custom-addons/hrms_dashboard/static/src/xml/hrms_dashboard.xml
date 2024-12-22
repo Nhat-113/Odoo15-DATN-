@@ -54,7 +54,7 @@
                             </div>
                         </h3>
                     </button>
-                    <button id= "btn-payslip" class="btn_payslip hr_payslip" style="display: none">
+                    <!-- <button id= "btn-payslip" class="btn_payslip hr_payslip" style="display: none">
                         <h4>  
                             <i class="fa fa-money"/>
                         </h4>
@@ -64,7 +64,7 @@
                                 <p class="count_number_admin"> <t t-esc="widget.login_employee['payslip_count_done']"/></p>
                             </div>
                         </h3>
-                    </button>
+                    </button> -->
                     <button id="btn-contract" class="btn_expried hr_contract" style="display: none">
                         <h4><i class="fa fa-fw fa-book" style="margin-left: -1px;"></i></h4>
                         <h3  class="fearure_detail">

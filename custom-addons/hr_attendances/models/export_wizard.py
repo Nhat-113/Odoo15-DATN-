@@ -534,13 +534,13 @@ class ExportWizard(models.TransientModel):
         sheet.write(boxRowLast + 3, 2, _('OFF'), self.format(workbook, format, **{'bold': True}))
         sheet.write(boxRowLast + 4, 1, CONFIRM, self.format(workbook, format, **{'bg_color': 'ffd966'}))
         sheet.write(boxRowLast + 4, 2, _('Missing Working Hours')+ f" (<{HOUR_SMALL}h)", self.format(workbook, format, **{'bold': True}))
-        if any(time_off_data):
-            sheet.write(boxRowLast + 5, 1, PN, self.format(workbook, format, **{'bg_color': '548235'}))
-            sheet.write(boxRowLast + 5, 2, _('Annual Leave'), self.format(workbook, format, **{'bold': True}))
-            sheet.write(boxRowLast + 6, 1, WFH, self.format(workbook, format, **{'bg_color': '#ADD8E6'}))
-            sheet.write(boxRowLast + 6, 2, _('Work from Home'), self.format(workbook, format, **{'bold': True}))
-            sheet.write(boxRowLast + 7, 1, UP, self.format(workbook, format, **{'bg_color': 'red'}))
-            sheet.write(boxRowLast + 7, 2, _('Unpaid Leave'), self.format(workbook, format, **{'bold': True}))
+        # if any(time_off_data):
+        sheet.write(boxRowLast + 5, 1, PN, self.format(workbook, format, **{'bg_color': '548235'}))
+        sheet.write(boxRowLast + 5, 2, _('Annual Leave'), self.format(workbook, format, **{'bold': True}))
+        sheet.write(boxRowLast + 6, 1, WFH, self.format(workbook, format, **{'bg_color': '#ADD8E6'}))
+        sheet.write(boxRowLast + 6, 2, _('Work from Home'), self.format(workbook, format, **{'bold': True}))
+        sheet.write(boxRowLast + 7, 1, UP, self.format(workbook, format, **{'bg_color': 'red'}))
+        sheet.write(boxRowLast + 7, 2, _('Unpaid Leave'), self.format(workbook, format, **{'bold': True}))
             
         
     def write_approved_days(self, sheet, row_active, employee_id, day_indexs, approved_map, workbook, full_day_format, half_day_format, full_day_label, half_day_label):

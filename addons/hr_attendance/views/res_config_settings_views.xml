@@ -22,7 +22,7 @@
                             </div>
                         </div>
                     </div>
-                    <h2>Extra Hours</h2>
+                    <!-- <h2>Extra Hours</h2>
                     <div class="row mt16 o_settings_container" name="overtime_settings">
                         <div class="col-12 col-lg-6 o_setting_box">
                             <div class="o_setting_left_pane" title="Activate the count of employees' extra hours.">
@@ -62,7 +62,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </xpath>
         </field>

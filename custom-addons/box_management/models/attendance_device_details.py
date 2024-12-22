@@ -10,5 +10,6 @@ class AttendanceDeviceDetails(models.Model):
     device_id = fields.Many2one('box.management', string="Device", readonly=True)
     device_type = fields.Selection(related='device_id.device_type', string="Device Type", readonly=True, store=True)
     position = fields.Text(string="Position", readonly=True)
-    
+    employee_id = fields.Many2one('hr.employee', string="Employee")
+
     
